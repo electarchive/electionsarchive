@@ -10,8 +10,155 @@ from ea.changeset import Changeset
 from ea.store import Connection, connect
 
 SOURCE = "ca.quebec_match"
-VERSION = "1"
+VERSION = "2"
 SHORT = {"st": "saint", "ste": "sainte"}
+# Members whose next candidacy has another printed name or a riding that is not a namesake, joined by hand. Each
+# tuple lists ca.quebec candidacy keys of one person, backed by the member's page on assnat.qc.ca. The same name does
+# not make people the same: Éric Girard (Lac-Saint-Jean) and Eric Girard (Groulx) are two members, and two Gilles
+# Baril ran in Rouyn-Noranda-Témiscamingue in 1985.
+SAME = (
+    (  # Cloutier: François Cloutier, Ahuntsic 1970; François Cloutier, L'Acadie 1973
+        "1970-04-29:3:1970-04-29:3:0",
+        "1973-10-29:150:1973-10-29:150:0",
+    ),
+    (  # Brown: Glendon Pettes Brown, Brome 1970; Glendon dit Glen Brown, Brome-Missisquoi 1973
+        "1970-04-29:14:1970-04-29:14:0",
+        "1973-10-29:38:1973-10-29:38:0",
+    ),
+    (  # Harvey: André Harvey, Chauveau 1970; André Harvey, Charlesbourg 1973
+        "1970-04-29:19:1970-04-29:19:0",
+        "1973-10-29:18:1973-10-29:18:0",
+    ),
+    (  # Bossé: Alfre Bossé, Dorion 1970; Alfred Bossé, Dorion 1973
+        "1970-04-29:25:1970-04-29:25:0",
+        "1973-10-29:144:1973-10-29:144:0",
+    ),
+    (  # Burns: Robert Gordon Burns, Maisonneuve 1970; Robert Burns, Maisonneuve 1973
+        "1970-04-29:57:1970-04-29:57:0",
+        "1973-10-29:136:1973-10-29:136:0",
+    ),
+    (  # Berthiaume: Paul Berthiaume, Napierville-Laprairie 1970; Paul Berthiaume, La Prairie 1973
+        "1970-04-29:68:1970-04-29:68:0",
+        "1973-10-29:66:1973-10-29:66:0",
+    ),
+    (  # Picard: Fernand Picard, Olier 1970; Fernand Picard, Viau 1973
+        "1970-04-29:71:1970-04-29:71:0",
+        "1973-10-29:138:1973-10-29:138:0",
+    ),
+    (  # Séguin: Arthur-E. Séguin, Robert-Baldwin 1970; Arthur-E. Séguin, Pointe-Claire 1973
+        "1970-04-29:80:1970-04-29:80:0",
+        "1973-10-29:161:1973-10-29:161:0",
+    ),
+    (  # Ostiguy: Marcel Ostiguy, Rouville 1970; Marcel Ostiguy, Verchères 1973
+        "1970-04-29:82:1970-04-29:82:0",
+        "1973-10-29:57:1973-10-29:57:0",
+    ),
+    (  # Vaillancourt: Georges Vaillancourt, Stanstead 1970; Georges Vaillancourt, Orford 1973
+        "1970-04-29:97:1970-04-29:97:0",
+        "1973-10-29:37:1973-10-29:37:0",
+    ),
+    (  # Saint-Pierre: Guy St-Pierre, Verchères 1970; Guy Saint-Pierre, Chambly 1973
+        "1970-04-29:104:1970-04-29:104:0",
+        "1973-10-29:56:1973-10-29:56:0",
+    ),
+    (  # Drummond: Thomas Kevin Drummond, Westmount 1970; Kevin Drummond, Westmount 1973
+        "1970-04-29:106:1970-04-29:106:0",
+        "1973-10-29:152:1973-10-29:152:0",
+    ),
+    (  # Cournoyer: Jean Cournoyer, Chambly 1971; Jean Cournoyer, Robert-Baldwin 1973
+        "1971-02-08:240:1971-02-08:240:0",
+        "1973-10-29:160:1973-10-29:160:0",
+    ),
+    (  # Fortier: J.-Arthur-Guy Fortier, Gaspé-Sud 1970; Guy Fortier, Gaspé 1973
+        "1970-04-29:32:1970-04-29:32:0",
+        "1973-10-29:2:1973-10-29:2:0",
+    ),
+    (  # Bienvenue: Jean Bienvenue, Matane 1970; Jean Bienvenue, Crémazie 1973
+        "1970-04-29:60:1970-04-29:60:0",
+        "1973-10-29:146:1973-10-29:146:0",
+    ),
+    (  # Latulippe: Paul-A. Latulippe, Frontenac 1970; Paul-André Latulippe, Mégantic-Compton 1973
+        "1970-04-29:30:1970-04-29:30:0",
+        "1973-10-29:25:1973-10-29:25:1",
+    ),
+    (  # Dumont: Bernard Dumont, Mégantic 1970; Bernard Dumont, Frontenac 1973
+        "1970-04-29:62:1970-04-29:62:0",
+        "1973-10-29:24:1973-10-29:24:3",
+    ),
+    (  # Bois: Armand Bois, Saint-Sauveur 1970; Armand Bois, Vanier 1973
+        "1970-04-29:92:1970-04-29:92:0",
+        "1973-10-29:104:1973-10-29:104:2",
+    ),
+    (  # Guay: Florian Guay, Dorchester 1970; Florian Guay, Beauce-Nord 1973
+        "1970-04-29:24:1970-04-29:24:0",
+        "1973-10-29:22:1973-10-29:22:2",
+    ),
+    (  # Samson: Camille Samson, Rouyn-Noranda 1976; Camil Samson, Rouyn-Noranda-Témiscamingue 1981
+        "1976-11-15:85:1976-11-15:85:0",
+        "1981-04-13:840:1981-04-13:840:1",
+    ),
+    (  # Baril PQ: Gilles Baril, Rouyn-Noranda-Témiscamingue 1981; Gilles Baril, Rouyn-Noranda-Témiscamingue 1985; Gilles Baril, Bourget 1989; Gilles Baril, Berthier 1994
+        "1981-04-13:840:1981-04-13:840:0",
+        "1985-12-02:840:1985-12-02:840:1",
+        "1989-09-25:446:1989-09-25:446:1",
+        "1994-09-12:425:1994-09-12:425:0",
+    ),
+    (  # Baril PLQ: Gilles Baril, Rouyn-Noranda-Témiscamingue 1985; Gilles Baril, Rouyn-Noranda-Témiscamingue 1989
+        "1985-12-02:840:1985-12-02:840:0",
+        "1989-09-25:650:1989-09-25:650:1",
+    ),
+    (  # Frulla: Liza Frulla-Hébert, Marguerite-Bourgeoys 1989; Liza Frulla, Marguerite-Bourgeoys 1994
+        "1989-09-25:462:1989-09-25:462:0",
+        "1994-09-12:477:1994-09-12:477:0",
+    ),
+    (  # Holden: Richard B. Holden, Westmount 1989; Richard B. Holden, Verdun 1994
+        "1989-09-25:492:1989-09-25:492:0",
+        "1994-09-12:475:1994-09-12:475:1",
+    ),
+    (  # Blais: Marguerite Blais, Saint-Henri-Sainte-Anne 2014; Marguerite Blais, Prévost 2018
+        "2014-04-07:393:144",
+        "2018-10-01:582:1240",
+    ),
+    (  # Legault: François Legault, Rousseau 2008; François Legault, L'Assomption 2012
+        "2008-12-08:504:2008-12-08:504:0",
+        "2012-09-04:363:2012-09-04:363:0",
+    ),
+    (  # Bonnardel: François Bonnardel, Shefford 2008; François Bonnardel, Granby 2012
+        "2008-12-08:134:2008-12-08:134:0",
+        "2012-09-04:133:2012-09-04:133:0",
+    ),
+    (  # Rebello: François Rebello, La Prairie 2008; François Rebello, Sanguinet 2012
+        "2008-12-08:182:2008-12-08:182:0",
+        "2012-09-04:177:2012-09-04:177:1",
+    ),
+    (  # Roy: Sylvie Roy, Lotbinière 2008; Sylvie Roy, Arthabaska 2012
+        "2008-12-08:314:2008-12-08:314:0",
+        "2012-09-04:323:2012-09-04:323:0",
+    ),
+    (  # Fréchette: Christine Fréchette, Sanguinet 2022; Christine Fréchette, Trois-Rivières 2026
+        "2022-10-03:230:2339",
+        "2026-10-05:691:3609",
+    ),
+    (  # Campeau: Richard Campeau, Bourget 2018; Richard Campeau, Camille-Laurin 2022
+        "2018-10-01:370:1209",
+        "2022-10-03:370:2452",
+    ),
+    (  # Beauchemin: Fred Beauchemin, Marguerite-Bourgeoys 2022; Frédéric Beauchemin, Brome-Missisquoi 2026
+        "2022-10-03:304:2189",
+        "2026-10-05:157:3549",
+    ),
+    (  # Blanchette Vézina: Maïté Blanchette Vézina, Rimouski 2022; Maïté Blanchette Vézina, La Peltrie 2026
+        "2022-10-03:838:2499",
+        "2026-10-05:729:3566",
+    ),
+    (  # Simard: Jean-François Simard, Montmorency 1998; Jean-François Simard, Montmorency 2003; Jean-François Simard, Montmorency 2018; Jean-François Simard, Montmorency 2022; Jean-François Simard, Montmorency 2026
+        "1998-11-30:747:1998-11-30:747:0",
+        "2003-04-14:672:2003-04-14:672:2",
+        "2018-10-01:742:1643",
+        "2022-10-03:742:2534",
+        "2026-10-05:761:3426",
+    ),
+)
 
 
 class Run(NamedTuple):
@@ -121,6 +268,24 @@ def groups(conn: Connection) -> tuple[dict[UUID, list[UUID]], dict[UUID, Run]]:
             matched += 1
         print(f"{rule}: {len(pairs)} pairs, {matched} joined, {clashes} refused for running twice on one day")
 
+    for keys in SAME:
+        found = dict(
+            conn.execute(
+                """select x.value, cy.person_id from candidacy cy
+                   join external_id x on x.entity_id = cy.id and x.scheme = %s
+                   where x.value = any(%s)""",
+                ["ca.quebec.candidacy", list(keys)],
+            ).fetchall()
+        )
+        if len(found) != len(keys):
+            raise ValueError(f"{SOURCE}: {sorted(set(keys) - set(found))} are not candidacies")
+        first, *rest = (root(found[key]) for key in keys)
+        for node in rest:
+            if node != first:
+                days[first] |= days.pop(node, set())
+                parent[node] = first
+    print(f"{len(SAME)} hand joins")
+
     groups: dict[UUID, list[UUID]] = defaultdict(list)
     for node in list(parent):
         groups[root(node)].append(node)
@@ -134,7 +299,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Quebec provincial candidates matched across elections by printed name, ignoring initials: in the same or a namesake riding at the next general election, as a sitting member under the same party at the next general election, in the same or a namesake riding under the same party two general elections later, or with a shortened or extended given name in the same or a namesake riding under the same party, or as an independent in the same riding, at the next general election",
+            summary="Quebec provincial candidates matched across elections by printed name, ignoring initials: in the same or a namesake riding at the next general election, as a sitting member under the same party at the next general election, in the same or a namesake riding under the same party two general elections later, or with a shortened or extended given name in the same or a namesake riding under the same party, or as an independent in the same riding, at the next general election, and members joined by hand on the Assemblée nationale's member pages",
             polity="CA-QC",
             kind="match",
         )
