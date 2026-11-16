@@ -495,6 +495,7 @@ class Day:
         self.inherited: set[str] = set()
         self.reasons: dict[str, str] = {}
         self.cited: set[str] = set()
+        self.elections: set[str] = set()
         for depend in depends:
             built = package.folder(depend) / "build" / "person.parquet"
             if built.exists():
@@ -524,6 +525,9 @@ class Day:
         parent: str | None = None,
     ) -> str:
         id = key("election", tag)
+        if id in self.elections:
+            return id
+        self.elections.add(id)
         on = day or self.day
         self.p.add(
             "election", id=id, polity_id=HUNGARY, parent_id=parent, kind=kind, date_from=on, date_to=on, status="held"
@@ -1594,6 +1598,19 @@ def registry() -> Package:
             p.add("office", id=id, polity_id=HUNGARY, kind="mayor")
             english = "Lord Mayor of Budapest" if code == "01" else f"Mayor of {name}"
             native = "Budapest főpolgármestere" if code == "01" else f"{name} polgármestere"
+        elif kind.startswith("nationality-"):
+            place, nation = code.split("|")
+            p.add("body", id=id, polity_id=HUNGARY, kind="council")
+            level = kind.removeprefix("nationality-")
+            if level == "national":
+                english, native = f"National {nation} self-government", f"Országos {nation.lower()} önkormányzat"
+            elif level == "territorial":
+                english = f"{nation} self-government of {COUNTIES[place]}"
+                native = f"{COUNTIES[place]} területi {nation.lower()} önkormányzat"
+            else:
+                town = found.names.get(place) or found.historic.get(place, ("", place))[1]
+                town = person_text(town) if town.isupper() else town
+                english, native = f"{nation} self-government of {town}", f"{town} {nation.lower()} önkormányzat"
         elif kind == "county-assembly":
             p.add("body", id=id, polity_id=HUNGARY, kind="council")
             english = "Budapest Assembly" if code == "01" else f"{COUNTIES[code]} County Assembly"
@@ -2211,32 +2228,40 @@ SYSTEMS += [
         date(1990, 1, 1),
         None,
         {"formula": "fptp"},
-        ("Mayors, and the Lord Mayor of Budapest, are elected directly in a single round; the candidate with the most "
-        "votes wins."),
+        (
+            "Mayors, and the Lord Mayor of Budapest, are elected directly in a single round; the candidate with the most "
+            "votes wins."
+        ),
     ),
     (
         LOCAL_BLOCK,
         date(1990, 1, 1),
         None,
         {"formula": "block"},
-        ("In settlements of up to 10,000 inhabitants the council is elected on one ballot from individual candidates: "
-        "each voter may vote for as many candidates as there are seats, and the candidates with the most votes win."),
+        (
+            "In settlements of up to 10,000 inhabitants the council is elected on one ballot from individual candidates: "
+            "each voter may vote for as many candidates as there are seats, and the candidates with the most votes win."
+        ),
     ),
     (
         LOCAL_SMD,
         date(1990, 1, 1),
         None,
         {"formula": "fptp"},
-        ("In settlements of more than 10,000 inhabitants and in Budapest's districts, part of the council is elected in "
-        "single-member wards by the most votes; the rest come from compensation lists of the votes that won no seat."),
+        (
+            "In settlements of more than 10,000 inhabitants and in Budapest's districts, part of the council is elected in "
+            "single-member wards by the most votes; the rest come from compensation lists of the votes that won no seat."
+        ),
     ),
     (
         LOCAL_LIST,
         date(1990, 1, 1),
         None,
         {"formula": "dhondt", "threshold": {"level": "list", "scope": "contest", "percent": 5}},
-        ("County assemblies (from the voters of settlements of up to 10,000 inhabitants) and, from 2024, the Budapest "
-        "Assembly are elected from closed lists by D'Hondt among the lists that won 5% of the votes."),
+        (
+            "County assemblies (from the voters of settlements of up to 10,000 inhabitants) and, from 2024, the Budapest "
+            "Assembly are elected from closed lists by D'Hondt among the lists that won 5% of the votes."
+        ),
     ),
 ]
 
@@ -2432,3 +2457,313 @@ def vtr_local(d: Day) -> None:
 
 
 OTHER.append((date(2024, 6, 9), "2024 local elections", vtr_local))
+
+
+SHEETS_2019 = (
+    ("Polgármester jelöltek", "Polgármesterek választása", "mayor"),
+    ("Főpolgármester jelöltek", "Főpolgármester választása", "lord-mayor"),
+    ("Egyéni listás jelöltek", "Egyéni listás választás", "council"),
+    ("TEVK jelöltek", "Egyéni választókerületi", "ward"),
+    ("Megyei közgyűlési listák", "Megyei közgyűlés választása", "county-list"),
+)
+ACCOUNTING_COLUMNS = ("A", "F", "K", "M", "N")
+
+
+def _sheet(book: dict[str, list[list[str]]], prefix: str) -> list[list[str]] | None:
+    found = [rows for name, rows in book.items() if name.startswith(prefix[:28])]
+    return found[0] if found else None
+
+
+def local_workbook(
+    d: Day,
+    local: Local,
+    book: dict[str, list[list[str]]],
+    maz: str,
+    pairs: Iterable[tuple[str, str, str]],
+) -> None:
+    """One county's workbook of polling-station results: a names sheet and a results sheet per contest type."""
+    found = places()
+    for names_prefix, results_prefix, role in pairs:
+        names_sheet, results_sheet = _sheet(book, names_prefix), _sheet(book, results_prefix)
+        if names_sheet is None and role == "county-list":
+            names_sheet = next((rows for rows in book.values() if rows and rows[0][:1] == ["Lista sorszám"]), None)
+        if results_sheet is None:
+            continue
+        labels: dict[tuple[str, str | None, int], tuple[str, str]] = {}
+        if names_sheet:
+            header = names_sheet[0]
+            for row in names_sheet[1:]:
+                cells = dict(zip(header, row, strict=False))
+                position = number(cells.get("Jelölt sorszáma") or cells.get("Lista sorszám"))
+                if position is None:
+                    continue
+                place_name = fold(cells.get("Település", ""))
+                ward = cells.get("TEVK") or None
+                label = cells.get("Jelölt neve") or cells.get("Lista neve") or ""
+                labels[(place_name, ward, position)] = (label, cells.get("Jelölő szervezet") or label)
+        start = next(index for index, row in enumerate(results_sheet) if row and row[0] == "Település")
+        header = results_sheet[start]
+        columns = {name: index for index, name in enumerate(header)}
+        option_columns = [(index, int(name)) for index, name in enumerate(header) if name.isdigit()]
+        for row in results_sheet[start + 1 :]:
+            if not row[0].strip() or number(row[columns["A"]]) is None:
+                continue
+            place_name = row[0].strip()
+            area = found.resolve(maz, None, place_name, trust_code=False)
+            ward = row[columns["TEVK"]] if "TEVK" in columns else None
+            place = {"county-list": maz, "lord-mayor": "01"}.get(role, area)
+            tag = local.contest(role, place, ward, magnitude=None if role in ("council", "county-list") else 1)
+            unit = d.unit(area, row[columns["Sorsz."]])
+            registered, voters, cast_, invalid, valid = (number(row[columns[c]]) for c in ACCOUNTING_COLUMNS)
+            d.accounting(tag, unit, registered, voters, cast_, invalid, valid)
+            for index, position in option_columns:
+                votes = number(row[index]) if index < len(row) else None
+                key_place = "" if role in ("county-list", "lord-mayor") else fold(place_name)
+                entry = labels.get((key_place, ward, position))
+                if entry is None:
+                    if votes:
+                        raise ValueError(f"{d.day} {tag}: column {position} has votes but no name")
+                    continue
+                label, nominator = entry
+                kind = "list" if role.endswith("list") else "candidate"
+                option = d.option(tag, label, kind, nominator=nominator, position=position, ident=str(position))
+                if kind == "candidate" and d.first(tag, str(position)):
+                    d.candidate(tag, option, f"{tag}:{position}", label, nominator=nominator)
+                d.value(tag, unit, option, 1, votes)
+
+
+def local_2019(d: Day) -> None:
+    d.cite(ARCHIVE)
+    local = Local(d, 2019)
+    for path in sorted(bundle("2019_onkormanyzati")):
+        found = re.search(r"szavazóköri_eredmények_(\d\d)_", path)
+        if found:
+            local_workbook(d, local, sheets("2019_onkormanyzati", path.split("/")[-1]), found[1], SHEETS_2019)
+
+
+OTHER.append((date(2019, 10, 13), "2019 local elections", local_2019))
+
+
+NATIONALITY_SYSTEM = key("electoral_system", "nationality", 2014)
+SYSTEMS.append(
+    (
+        NATIONALITY_SYSTEM,
+        date(1994, 1, 1),
+        None,
+        {"formula": "block"},
+        ("Voters on the nationality roll elect the settlement nationality self-government on one ballot from "
+        "individual candidates, voting for as many as there are seats; from 2014 the territorial and national "
+        "nationality self-governments are elected from lists on the same day."),
+    )
+)
+
+
+def nationality_body(level: str, place: str, nation: str) -> str:
+    id = key("body", "nationality", level, place, nation)
+    LOCAL_BODIES[id] = ("body", f"nationality-{level}", f"{place}|{nation}")
+    return id
+
+
+def county_unit(d: Day, maz: str, suffix: str = "") -> str:
+    code = f"{d.day}:{maz}{suffix}"
+    found = d.units.get(code)
+    if found is None:
+        found = d.units[code] = key("unit", code)
+        d.p.add(
+            "reporting_unit",
+            id=found,
+            polity_id=HUNGARY,
+            scheme_code="hu.megye",
+            code=code,
+            area_relation="equals",
+            area_id=county(maz),
+            kind="aggregate",
+        )
+    return found
+
+
+def nationality_contest(local: Local, level: str, place: str, nation: str) -> str:
+    """level: national (lists, nationwide), territorial (lists, one county), settlement (candidates)."""
+    d = local.d
+    tag = f"nemz:{local.year}:{level}:{place}:{changeset.slug(nation)}"
+    if tag in d.sets:
+        return tag
+    if level == "national":
+        title, english, area = (
+            f"Országos {nation.lower()} önkormányzat",
+            f"National {nation} self-government",
+            TERRITORY,
+        )
+    elif level == "territorial":
+        title = f"{COUNTIES[place]} területi {nation.lower()} önkormányzat"
+        english, area = f"{nation} self-government of {COUNTIES[place]}", county(place)
+    else:
+        name = local.place_name(place)
+        title, english = f"{name} települési {nation.lower()} önkormányzat", f"{nation} self-government of {name}"
+        area = settlement(place)
+    d.contest(
+        tag,
+        local.election,
+        "body_seats" if level == "settlement" else "list_allocation",
+        title,
+        f"{local.path}/{changeset.slug(tag.split(':', 2)[2])}",
+        district_area=area,
+        magnitude=None,
+        body=nationality_body(level, place, nation),
+        system=NATIONALITY_SYSTEM if level == "settlement" else LOCAL_LIST,
+        method=method(
+            "Nationality ballots are cast at the nationality polling stations. The territorial and national lists "
+            "are published by county, the finest unit the office publishes for them."
+            if level != "settlement"
+            else "Nationality ballots are cast at the nationality polling stations."
+        ),
+        english=english,
+    )
+    return tag
+
+
+FILES_2014 = {
+    "polgármester_választás.csv": "mayor",
+    "főpolgármester_választás.csv": "lord-mayor",
+    "fïpolgármester_választás.csv": "lord-mayor",
+    "egyéni_listás_választás.csv": "council",
+    "egyéni_választókerületi_választás.csv": "ward",
+    "megyei_közgy√lés_választás.csv": "county-list",
+    "megyei_közgyűlés_választás.csv": "county-list",
+    "országos_nemzetiségi_választás.csv": "nat-national",
+    "területi_nemzetiségi_választás.csv": "nat-territorial",
+    "települési_nemzetiségi_választás.csv": "nat-settlement",
+}
+
+
+def local_2014(d: Day) -> None:
+    d.cite(ARCHIVE)
+    local = Local(d, 2014)
+    found = places()
+    for path in sorted(bundle("2014_onkormanyzati")):
+        role = FILES_2014.get(path.split("/")[-1])
+        if role is None:
+            continue
+        for head, items in _protocols(delimited("2014_onkormanyzati", path), "SZAVAZÓKÖR_AZON"):
+            maz = head["MEGYEKÓD"]
+            nation = head.get("NEMZETISÉG", "")
+            if head["TELEPÜLÉS_SORSZÁM"] == "000":
+                area, unit = None, county_unit(d, maz)
+            else:
+                area = found.resolve(maz, head["TELEPÜLÉS_SORSZÁM"], head["TELEPÜLÉS"], trust_code=True)
+                unit = d.unit(area, head["SZAVAZÓKÖR"])
+            if role.startswith("nat-"):
+                level = role[4:]
+                place = "HU" if level == "national" else maz if level == "territorial" else cast(str, area)
+                tag = nationality_contest(local, level, place, nation)
+            else:
+                ward = head.get("EGYÉNI_VÁL_KER") or None
+                place = {"county-list": maz, "lord-mayor": "01"}.get(role, cast(str, area))
+                tag = local.contest(role, place, ward, magnitude=None if role in ("council", "county-list") else 1)
+            d.accounting(
+                tag,
+                unit,
+                number(head["VÁLASZTÓPOLGÁROK_SZÁMA"]),
+                number(head["MEGJELENTEK_SZÁMA"]),
+                number(head["URNÁBAN_LEVŐ_BÉLYEGZETT"]),
+                number(head["ÉRVÉNYTELEN_SZAVAZÓLAP"]),
+                number(head["ÉRVÉNYES_SZAVAZÓLAP"]),
+            )
+            for item in items:
+                position = number(item["SZAVLAP_SORSZÁM"])
+                if "LISTA" in item:
+                    label = item["LISTA"]
+                    option = d.option(tag, label, "list", nominator=label, position=position, ident=str(position))
+                else:
+                    label, nominator = item["JELÖLT"], item["SZERVEZET"]
+                    option = d.option(
+                        tag, label, "candidate", nominator=nominator, position=position, ident=str(position)
+                    )
+                    if d.first(tag, str(position)):
+                        d.candidate(tag, option, f"{tag}:{position}", label, nominator=nominator)
+                d.value(tag, unit, option, 1, number(item["SZAVAZAT"]))
+
+
+OTHER.append((date(2014, 10, 12), "2014 local and nationality elections", local_2014))
+
+
+NATIONALITY_SETTLEMENT_FILES = {2019: "2019_Nemzetisegi telepulesi eredmenyek", 2024: "2024_nemzetisegi"}
+NATIONS = ("Bolgár", "Görög", "Horvát", "Lengyel", "Német", "Örmény", "Roma", "Román", "Ruszin", "Szerb", "Szlovák")
+NATIONS += ("Szlovén", "Ukrán")
+
+
+def nationality_settlements(d: Day, local: Local) -> None:
+    """Settlement nationality self-governments by settlement, the finest unit the office publishes for them."""
+    name = NATIONALITY_SETTLEMENT_FILES[d.day.year]
+    found = places()
+    for path in sorted(bundle(name)):
+        if not path.endswith(".xls"):
+            continue
+        book = sheets(name, path)
+        rows = next((rows for sheet, rows in book.items() if sheet.startswith(("Települési", "Települési nemz"))), [])
+        if not rows:
+            continue
+        maz = None
+        nation = None
+        header: list[str] = []
+        for row in rows:
+            first = row[0].strip() if row else ""
+            if not any(row[1:]) and first:
+                if first in NATIONS:
+                    nation = first
+                elif maz is None:
+                    try:
+                        maz = county_key(first)
+                    except LookupError:
+                        pass
+                continue
+            if first == "Település":
+                header = row
+                continue
+            if not first or nation is None or not header or number(row[2]) is None:
+                continue
+            columns = {cell: index for index, cell in enumerate(header)}
+            area = found.resolve(cast(str, maz), None, first, trust_code=False)
+            tag = nationality_contest(local, "settlement", area, nation)
+            unit = d.settlement_unit(area)
+            d.accounting(
+                tag,
+                unit,
+                number(row[columns["A"]]),
+                number(row[columns["F"]]),
+                number(row[columns["K"]]),
+                number(row[columns["M"]]),
+                number(row[columns["N"]]),
+            )
+            first_option = columns["N"] + 1
+            candidates = [(index, index - first_option + 1) for index in range(first_option, len(row))]
+            running = max((position for index, position in candidates if number(row[index])), default=0)
+            for index, position in candidates:
+                if position > running:
+                    break
+                option = d.option(tag, f"{position}. jelölt", "candidate", position=position, ident=str(position))
+                d.value(tag, unit, option, 1, number(row[index]))
+    for tag, result_set in d.sets.items():
+        if tag.startswith(f"nemz:{local.year}:settlement:"):
+            d.p.add(
+                "note",
+                id=key("note", result_set, "unnamed"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md="The office publishes these results per settlement and by the candidates' order on the ballot, "
+                "without their names; the options are named by that order.",
+                lang="en",
+            )
+
+
+def nationality_2019(d: Day) -> None:
+    nationality_settlements(d, Local(d, 2019))
+
+
+def nationality_2024(d: Day) -> None:
+    d.cite(ARCHIVE)
+    nationality_settlements(d, Local(d, 2024))
+
+
+OTHER.append((date(2019, 10, 13), "2019 nationality elections", nationality_2019))
+OTHER.append((date(2024, 6, 9), "2024 nationality elections", nationality_2024))
