@@ -1,0 +1,1150 @@
+{
+  "polity": "GE",
+  "name": "Georgia",
+  "sources": {
+    "const": {
+      "title": "Constitution of Georgia (consolidated version, Legislative Herald of Georgia)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/en/document/view/30346?publication=36",
+      "kind": "official_body",
+      "note": "Adopted 24 August 1995; the consolidated English text in the Legislative Herald (Matsne) as revised by the constitutional laws of 13 October 2017 and 23 March 2018."
+    },
+    "ec2025": {
+      "title": "Election Code of Georgia (Organic Law No 1253-IVმს-XIმპ of 17 December 2025)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/en/document/view/6720607",
+      "kind": "official_body",
+      "note": "The code in force since its publication on 29 December 2025, read in the Legislative Herald's English consolidated version (last amended 13 October 2026)."
+    },
+    "ec2011": {
+      "title": "Election Code of Georgia (Organic Law of 27 December 2011, final consolidated version)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/en/document/view/1557168?publication=101",
+      "kind": "official_body",
+      "note": "Invalidated on 17 December 2025 by Organic Law No 1253; its final text keeps the transitional articles for the 2020 parliamentary and 2025 municipal elections."
+    },
+    "lsg": {
+      "title": "Organic Law of Georgia Local Self-Government Code (consolidated version)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/en/document/view/2244429",
+      "kind": "official_body"
+    },
+    "cec": {
+      "title": "Elections: results archive of the Central Election Commission of Georgia",
+      "publisher": "Central Election Commission of Georgia",
+      "url": "https://cesko.ge/",
+      "kind": "official_body",
+      "note": "Not read for this survey: the site answered an automated client with a Cloudflare challenge on 2026-11-16. Cited only for where results are published."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "საქართველო",
+      "name_en": "Georgia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const"
+    },
+    {
+      "key": "autonomous_republic",
+      "name": "ავტონომიური რესპუბლიკები",
+      "name_en": "Autonomous republics (Abkhazia and Ajara)",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "const",
+      "counts": [
+        {
+          "date": "2018-04-02",
+          "value": 2,
+          "source": "const",
+          "locator": "Art. 7(2): \"The powers of the Autonomous Republic of Abkhazia and the Autonomous Republic of Ajara ... shall be determined by the constitutional laws of Georgia\""
+        }
+      ]
+    },
+    {
+      "key": "mkhare",
+      "name": "მხარეები",
+      "name_en": "Regions (mkhare) under state trustees",
+      "parent": "national",
+      "elects": false,
+      "source": "ec2025"
+    },
+    {
+      "key": "municipality",
+      "name": "მუნიციპალიტეტები (თვითმმართველი ქალაქები და თემები)",
+      "name_en": "Municipalities: self-governing cities and self-governing communities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "lsg",
+      "counts": [
+        {
+          "date": "2025-12-17",
+          "value": 64,
+          "source": "ec2025",
+          "locator": "Annex (districts for art. 129(7)): the 30 districts list Tbilisi city municipality (districts 1-8) and 63 other municipalities, including the self-governing cities Rustavi, Kutaisi, Poti, and Batumi"
+        }
+      ]
+    },
+    {
+      "key": "settlement",
+      "name": "დასახლებები",
+      "name_en": "Settlements (villages, small towns, and cities)",
+      "parent": "municipality",
+      "source": "lsg"
+    },
+    {
+      "key": "local_unit_1998",
+      "name": "თვითმმართველი ერთეულები (ქალაქი, დაბა, თემი, სოფელი)",
+      "name_en": "Self-governing units of 1998-2006: cities, towns, communities (temi), and villages",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "lsg",
+      "valid_to": "2006-10-05"
+    },
+    {
+      "key": "georgian_ssr",
+      "name": "საქართველოს საბჭოთა სოციალისტური რესპუბლიკა",
+      "name_en": "Georgian Soviet Socialist Republic",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "source": "const",
+      "valid_from": "1921-02-25",
+      "valid_to": "1991-04-09"
+    },
+    {
+      "key": "raion",
+      "name": "რაიონები",
+      "name_en": "Districts (raioni) of the Georgian SSR and their soviets",
+      "parent": "georgian_ssr",
+      "source": "const",
+      "valid_to": "1991-04-09"
+    },
+    {
+      "key": "drg",
+      "name": "საქართველოს დემოკრატიული რესპუბლიკა",
+      "name_en": "Democratic Republic of Georgia",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "source": "const",
+      "valid_from": "1918-05-26",
+      "valid_to": "1921-02-25"
+    }
+  ],
+  "classes": [
+    {
+      "key": "parliament",
+      "tier": "national",
+      "name": "საქართველოს პარლამენტის არჩევნები",
+      "name_en": "Parliament of Georgia general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1990-10-28",
+      "first_held": "1990-10-28",
+      "earliest_record": "1990-10-28",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "const",
+      "locator": "https://matsne.gov.ge/en/document/view/30346?publication=36 (Art. 37)",
+      "note": "Unicameral. Since 2024, 150 members elected by list PR in one nationwide district with a 5% threshold (Constitution Art. 37(2), (6)); earlier parliaments were mixed: party lists plus single-member majoritarian districts with runoffs (120 + 30 in 2020 under the 2011 Code art. 196). The Supreme Council elected on 28 October 1990, the first multiparty vote, is the first convocation. The 2003 list vote was annulled and rerun on 28 March 2004. Art. 37(1) foresees a bicameral parliament (Council of the Republic and Senate) only after jurisdiction is restored over the whole territory.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE",
+          "valid_from": "1990-10-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://matsne.gov.ge/en/document/view/30346?publication=36 (Art. 37(2)-(3): four-year term; \"Regular parliamentary elections shall be held on the last Saturday of October of the calendar year in which the term of Parliament expires.\")",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_last_saturday",
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Central Election Commission of Georgia",
+          "valid_from": "2018-04-02",
+          "vacancy_rule": "A withdrawn list member is replaced by the next candidate on the party list (Election Code 2025 art. 138)."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-10-28",
+          "note": "Supreme Council of the Republic of Georgia, first round; majoritarian runoffs on 11 November 1990. Not counted from a fetched source."
+        },
+        {
+          "date": "1992-10-11",
+          "note": "Parliament of the Republic of Georgia. Not counted from a fetched source."
+        },
+        {
+          "date": "1995-11-05",
+          "note": "Not counted from a fetched source."
+        },
+        {
+          "date": "1999-10-31",
+          "note": "Not counted from a fetched source."
+        },
+        {
+          "date": "2003-11-02",
+          "note": "List results annulled by the Supreme Court; the majoritarian results stood. Not counted from a fetched source."
+        },
+        {
+          "date": "2004-03-28",
+          "note": "Repeat list vote after the 2003 annulment. Not counted from a fetched source."
+        },
+        {
+          "date": "2008-05-21",
+          "note": "Not counted from a fetched source."
+        },
+        {
+          "date": "2012-10-01",
+          "note": "Not counted from a fetched source."
+        },
+        {
+          "date": "2016-10-08",
+          "note": "Majoritarian runoffs on 30 October 2016. Not counted from a fetched source."
+        },
+        {
+          "date": "2020-10-31",
+          "contests": 31,
+          "seats": 150,
+          "source": "ec2011",
+          "note": "One nationwide list contest for 120 seats and 30 single-member majoritarian districts; runoffs on 21 November 2020.",
+          "quote": "Art. 196(2): \"The parliament elected in the next parliamentary elections of Georgia shall consist of 120 parliament members elected under the proportional system and 30 parliament members elected under the majoritarian system.\" Art. 196(7): \"30 single-seat majoritarian electoral districts shall be established\""
+        },
+        {
+          "date": "2024-10-26",
+          "contests": 1,
+          "seats": 150,
+          "source": "const",
+          "quote": "Art. 37(2): \"Parliament shall be composed of 150 Members of Parliament elected in a single multi-mandate electoral district for a term of 4 years by a proportional system\""
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1990-10-28",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2024-10-26"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 3
+    },
+    {
+      "key": "parliament_by",
+      "tier": "national",
+      "name": "საქართველოს პარლამენტის შუალედური და განმეორებითი არჩევნები",
+      "name_en": "Parliament by-elections and reruns in majoritarian districts",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1990-10-28",
+      "valid_to": "2024-10-26",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "ec2011",
+      "note": "A vacant majoritarian seat was filled by a by-election in its district, and annulled district results were rerun (2011 Code). Since 2024 every seat is a list seat filled from the list (Election Code 2025 art. 138), so no parliamentary by-elections remain; reruns of the nationwide vote (art. 136) fall in the general class.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "through": "2024-12-31",
+          "note": "By-elections were held in single-member districts between general elections; not yet counted from the CEC archive."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1990-10-28",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2024-10-26"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 3
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "საქართველოს პრეზიდენტის არჩევნები (პირდაპირი)",
+      "name_en": "Presidential elections by popular vote",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1991-04-14",
+      "valid_to": "2024-12-14",
+      "first_held": "1991-05-26",
+      "earliest_record": "1991-05-26",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "const",
+      "locator": "https://matsne.gov.ge/en/document/view/30346?publication=36 (Art. 50 as revised in 2017, which ended the popular vote)",
+      "note": "Elected by popular vote, two-round majority, in 1991 (President of the Republic of Georgia) and from 1995 to 2018 under the 1995 Constitution (five-year term). The office of President was suspended from 1992 to 1995, when the Chairman of Parliament was Head of State. The 2017 revision moved the election to an Electoral College from 2024. Dates not quoted from a fetched source; first rounds were 26 May 1991, 5 November 1995, 9 April 2000, 4 January 2004, 5 January 2008, 27 October 2013, and 28 October 2018 (runoff 28 November 2018).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GE",
+          "valid_to": "2024-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://matsne.gov.ge/en/document/view/30346?publication=36 (Art. 50, history notes)",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "administered_by": "Central Election Commission of Georgia",
+          "valid_from": "1995-08-24",
+          "valid_to": "2024-12-14"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-05-26"
+        },
+        {
+          "date": "1995-11-05"
+        },
+        {
+          "date": "2000-04-09"
+        },
+        {
+          "date": "2004-01-04"
+        },
+        {
+          "date": "2008-01-05"
+        },
+        {
+          "date": "2013-10-27"
+        },
+        {
+          "date": "2018-10-28"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1991-05-26",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2018-11-28"
+        }
+      ],
+      "est_votes": 13000000,
+      "effort": 2
+    },
+    {
+      "key": "president_panel",
+      "tier": "national",
+      "name": "საქართველოს პრეზიდენტის არჩევა საარჩევნო კოლეგიის მიერ",
+      "name_en": "President elected by the Electoral College",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "2024-12-14",
+      "first_held": "2024-12-14",
+      "earliest_record": "2024-12-14",
+      "finest_note": "One open-ballot vote of the 300-member college; the result is a single tally.",
+      "source": "const",
+      "locator": "https://matsne.gov.ge/en/document/view/30346?publication=36 (Art. 50(1), (3), (4))",
+      "note": "A 300-member Electoral College (all members of Parliament, of the supreme representative bodies of Abkhazia and Ajara, and party nominees from the Sakrebulos on CEC quotas) elects the President for five years by open ballot in the House of Parliament; two thirds in the first round, then a runoff of the top two (Constitution Art. 50; Election Code 2025 arts. 111-121). First held 14 December 2024 (not quoted from a fetched source).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GE",
+          "valid_from": "2024-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ec2025",
+          "locator": "https://matsne.gov.ge/en/document/view/6720607 (art. 111: five-year term; art. 112(1): \"Regular presidential elections of Georgia shall be held in October of the calendar year when the term of office of the President of Georgia is to expire.\")",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "runoff": "threshold",
+          "runoff_rule": "Two thirds of the college's members in the first round, else a second round between the top two (Constitution Art. 50(4))",
+          "administered_by": "Central Election Commission of Georgia (for the Parliament)",
+          "valid_from": "2024-12-14"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-12-14"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "2024-12-14",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2024-12-14"
+        }
+      ],
+      "est_votes": 300,
+      "effort": 1
+    },
+    {
+      "key": "parliament_chair_1992",
+      "tier": "national",
+      "name": "პარლამენტის თავმჯდომარის — სახელმწიფოს მეთაურის არჩევნები",
+      "name_en": "Chairman of Parliament and Head of State by popular vote",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1992-10-11",
+      "valid_to": "1995-08-24",
+      "first_held": "1992-10-11",
+      "earliest_record": "1992-10-11",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "const",
+      "note": "Held once, with the parliamentary election of 11 October 1992, while the presidency was suspended; the 1995 Constitution restored the President. Date not quoted from a fetched source.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "GE",
+          "valid_to": "1995-08-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-10-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1992-10-11",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "1992-10-11"
+        }
+      ],
+      "est_votes": 2500000,
+      "effort": 3
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "რეფერენდუმები და პლებისციტები",
+      "name_en": "Referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1991-03-31",
+      "first_held": "1991-03-31",
+      "earliest_record": "1991-03-31",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "ec2025",
+      "locator": "https://matsne.gov.ge/en/document/view/6720607 (arts. 177-190)",
+      "note": "The President calls a referendum at the request of Parliament, the Government, or 200,000 voters (Constitution Art. 52; Election Code 2025 art. 178); it may not adopt or repeal a law. A plebiscite, called by the Prime Minister, is advisory (art. 180). Held: independence (31 March 1991), reducing Parliament to 150 members (2 November 2003), and the plebiscites on NATO membership and on the date of the parliamentary election (5 January 2008); only 1991 is quoted from a fetched source.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "GE*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ec2025",
+          "locator": "https://matsne.gov.ge/en/document/view/6720607 (art. 178(1), art. 181)",
+          "called": true,
+          "administered_by": "Central Election Commission of Georgia"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-03-31",
+          "contests": 1,
+          "source": "const",
+          "quote": "Art. 1(1): \"Georgia is an independent, unified and indivisible state as confirmed by the Referendum of 31 March 1991 held in the entire territory of the country\""
+        },
+        {
+          "date": "2003-11-02",
+          "note": "Held with the parliamentary election; not counted from a fetched source."
+        },
+        {
+          "date": "2008-01-05",
+          "note": "Two plebiscite questions held with the presidential election; not counted from a fetched source."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1991-03-31",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2008-01-05"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 2
+    },
+    {
+      "key": "sakrebulo",
+      "tier": "municipality",
+      "name": "მუნიციპალიტეტის საკრებულოს არჩევნები",
+      "name_en": "Municipal council (Sakrebulo) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_from": "2006-10-05",
+      "first_held": "2006-10-05",
+      "earliest_record": "2006-10-05",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "ec2025",
+      "locator": "https://matsne.gov.ge/en/document/view/6720607 (arts. 139-170)",
+      "note": "Every municipality's Sakrebulo is elected for four years on the first Saturday of October, partly by list PR with a 4% threshold in the municipality and partly in single-member local majoritarian districts (Election Code 2025 arts. 139, 141, 144-157); Tbilisi's 50 members are 25 list and 25 majoritarian (art. 163(4)). Regular elections were held in 2006, 2010, 2014, 2017, 2021, and 2025 (dates not quoted from a fetched source except through the cadence). The 1998 and 2002 councils of the smaller self-governing units are in sakrebulo_1998.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_from": "2006-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ec2025",
+          "locator": "https://matsne.gov.ge/en/document/view/6720607 (art. 139(1): \"The regular elections of a municipality representative body – the Sakrebulo, and of the Mayor ... shall be conducted on the first Saturday in October\"; art. 141(1): four-year term)",
+          "period_years": 4,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_first_saturday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Central Election Commission of Georgia and the district election commissions",
+          "valid_from": "2017-07-26",
+          "vacancy_rule": "A withdrawn list member is replaced from the party list; a vacant majoritarian seat goes to a by-election (Election Code 2025 arts. 141, 161)."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2006-10-05"
+        },
+        {
+          "date": "2010-05-30"
+        },
+        {
+          "date": "2014-06-15"
+        },
+        {
+          "date": "2017-10-21"
+        },
+        {
+          "date": "2021-10-02"
+        },
+        {
+          "date": "2025-10-04"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "2006-10-05",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2025-10-04"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 3
+    },
+    {
+      "key": "mayor",
+      "tier": "municipality",
+      "name": "მერის არჩევნები",
+      "name_en": "Mayors of self-governing cities and communities",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_from": "2010-05-30",
+      "first_held": "2010-05-30",
+      "earliest_record": "2010-05-30",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "ec2025",
+      "locator": "https://matsne.gov.ge/en/document/view/6720607 (arts. 171-176)",
+      "note": "Elected by direct suffrage with the Sakrebulo, with a second round between the top two on the fourth Saturday after (Election Code 2025 arts. 171, 175). The Mayor of Tbilisi has been elected directly since 2010; every municipality's executive (mayor of a self-governing city, gamgebeli of a community) since 2014, all called mayor since 2017.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "valid_from": "2010-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ec2025",
+          "locator": "https://matsne.gov.ge/en/document/view/6720607 (arts. 139(1), 141(1), 175(2))",
+          "period_years": 4,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_first_saturday",
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Second round between the top two on the fourth Saturday after the first (art. 175(2))",
+          "administered_by": "Central Election Commission of Georgia and the district election commissions",
+          "valid_from": "2017-07-26",
+          "vacancy_rule": "An extraordinary election for the rest of the Sakrebulo's term (art. 176)."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-05-30"
+        },
+        {
+          "date": "2014-06-15"
+        },
+        {
+          "date": "2017-10-21"
+        },
+        {
+          "date": "2021-10-02"
+        },
+        {
+          "date": "2025-10-04"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "2010-05-30",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2025-11-01"
+        }
+      ],
+      "est_votes": 7000000,
+      "effort": 3
+    },
+    {
+      "key": "local_by",
+      "tier": "municipality",
+      "name": "ადგილობრივი შუალედური და რიგგარეშე არჩევნები",
+      "name_en": "Municipal by-elections and extraordinary elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "2006-10-05",
+      "finest_note": "Electoral precinct: the Code requires the CEC to post each precinct commission's summary protocol (art. 85(4), (8)).",
+      "source": "ec2025",
+      "locator": "https://matsne.gov.ge/en/document/view/6720607 (arts. 141, 162, 176)",
+      "note": "By-elections for vacant majoritarian Sakrebulo seats and extraordinary elections of a Sakrebulo or a Mayor, for the rest of the term.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        },
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "Held between regular local elections; not yet counted from the CEC archive."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "2007-01-01",
+          "evidence": "The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website."
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 4
+    },
+    {
+      "key": "sakrebulo_1998",
+      "tier": "local_unit_1998",
+      "name": "თვითმმართველი ერთეულების საკრებულოების არჩევნები (1998-2002)",
+      "name_en": "Councils of cities, towns, communities, and villages (1998 and 2002)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_from": "1998-11-15",
+      "valid_to": "2006-10-05",
+      "first_held": "1998-11-15",
+      "earliest_record": "1998-11-15",
+      "source": "lsg",
+      "finest_note": "Results by council; finer reporting not confirmed.",
+      "note": "The first post-Soviet local elections (15 November 1998 and 2 June 2002) chose councils in the self-governing cities (Tbilisi included), towns (daba), communities (temi), and villages, about a thousand units; the 2005 Organic Law and the 2006 elections consolidated them into municipalities. Dates and unit counts not quoted from a fetched source.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_from": "1998-01-01",
+          "valid_to": "2006-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-11-15"
+        },
+        {
+          "date": "2002-06-02"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "1998-11-15",
+          "evidence": "Whether the CEC archive holds the 1998 and 2002 council results is not confirmed. The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2002-06-02"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 4
+    },
+    {
+      "key": "ajara_supreme_council",
+      "tier": "autonomous_republic",
+      "name": "აჭარის ავტონომიური რესპუბლიკის უმაღლესი საბჭოს არჩევნები",
+      "name_en": "Supreme Council of the Autonomous Republic of Ajara",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1991-01-01",
+      "source": "ec2011",
+      "locator": "https://matsne.gov.ge/en/document/view/1557168?publication=101 (art. 7(4): \"If general elections and the elections of the Supreme Council of Ajara are held simultaneously, DECs and PECs formed for general elections shall perform the duties of DECs and PECs.\")",
+      "finest_note": "Precinct protocols are expected with the parliamentary ones when both are held on one day; not confirmed.",
+      "note": "Elected under the Constitutional Law on the status of Ajara and the Autonomous Republic's own election law, administered by the Supreme Election Commission of Ajara, which is part of the Electoral Administration of Georgia (Election Code 2025 art. 2(q)); since 2008 held with the parliamentary elections. Its members sit in the presidential Electoral College (Constitution Art. 50(3)). Dates not quoted from a fetched source.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE-AJ"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "through": "2003-12-31",
+          "note": "Elections of 1991, 1996, and 2000 under the Abashidze administration; not yet counted."
+        },
+        {
+          "date": "2004-06-20"
+        },
+        {
+          "date": "2008-11-03"
+        },
+        {
+          "date": "2012-10-01"
+        },
+        {
+          "date": "2016-10-08"
+        },
+        {
+          "date": "2020-10-31"
+        },
+        {
+          "date": "2024-10-26"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Election Commission of Georgia (cesko.ge, results.cec.gov.ge)",
+          "url": "https://results.cec.gov.ge/",
+          "format": "html, pdf (precinct summary protocols)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "role": "administers",
+          "first_date": "2004-06-20",
+          "evidence": "The Supreme Election Commission of Ajara administers; whether the CEC portal carries Ajara results is not confirmed. The Commission's sites (cesko.ge, results.cec.gov.ge) answered an automated client with a Cloudflare challenge page (HTTP 403) on 2026-11-16; the Election Code (2025) art. 85(4) and (8) require it to post every precinct's summary protocol on its website.",
+          "last_date": "2024-10-26"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 4
+    },
+    {
+      "key": "abkhazia_supreme_council",
+      "tier": "autonomous_republic",
+      "name": "აფხაზეთის ავტონომიური რესპუბლიკის უმაღლესი საბჭო",
+      "name_en": "Supreme Council of the Autonomous Republic of Abkhazia",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1991-01-01",
+      "source": "const",
+      "disposition": "blocked",
+      "disposition_reason": "No election has been held since the 1991 Supreme Council election because Georgia does not control the territory; the 1991 results have no official publication found.",
+      "note": "The Supreme Council elected in 1991 continues in Tbilisi; its members sit in the presidential Electoral College (Constitution Art. 50(3)).",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "occupied_de_facto",
+      "tier": "autonomous_republic",
+      "name": "ოკუპირებულ ტერიტორიებზე ჩატარებული არჩევნები",
+      "name_en": "Elections held by the de facto authorities in Abkhazia and the Tskhinvali region",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held outside Georgian law by authorities Georgia does not recognize, in territories outside its control; no Georgian body administers or publishes them.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "referendum"
+          ],
+          "iso_pattern": "GE-SO",
+          "precedence": 1
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "supreme_soviet_ssr",
+      "tier": "georgian_ssr",
+      "name": "საქართველოს სსრ უმაღლესი საბჭოს არჩევნები",
+      "name_en": "Supreme Soviet of the Georgian SSR",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1938-01-01",
+      "valid_to": "1990-10-28",
+      "source": "const",
+      "disposition": "blocked",
+      "disposition_reason": "Single-candidate Soviet elections (1938 to 1985); no official per-district results are published by a Georgian authority.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE",
+          "valid_to": "1990-10-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1938-01-01",
+          "precision": "year",
+          "through": "1985-12-31",
+          "note": "Elections every four, then five years; not counted."
+        }
+      ]
+    },
+    {
+      "key": "local_soviets",
+      "tier": "raion",
+      "name": "ადგილობრივი საბჭოების არჩევნები",
+      "name_en": "Local soviets of the Georgian SSR",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_to": "1991-04-09",
+      "source": "const",
+      "disposition": "blocked",
+      "disposition_reason": "Single-candidate Soviet elections; no official results by council are published by a Georgian authority.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_to": "1991-04-09"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "constituent_assembly_1919",
+      "tier": "drg",
+      "name": "საქართველოს დამფუძნებელი კრების არჩევნები",
+      "name_en": "Constituent Assembly of the Democratic Republic of Georgia",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1919-02-14",
+      "valid_to": "1921-02-25",
+      "first_held": "1919-02-14",
+      "source": "const",
+      "disposition": "blocked",
+      "disposition_reason": "The 14-16 February 1919 list vote for 130 seats survives in the republic's own publications and archives; no official digital results were found.",
+      "note": "The 1995 Constitution's preamble names the Constitution of 1921 that this Assembly adopted.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "GE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1919-02-14",
+          "note": "Polling 14-16 February 1919; not quoted from a fetched source."
+        }
+      ]
+    },
+    {
+      "key": "settlement_assembly",
+      "tier": "settlement",
+      "name": "დასახლების საერთო კრება",
+      "name_en": "General Assembly of a settlement",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "lsg",
+      "locator": "https://matsne.gov.ge/en/document/view/2244429 (arts. 85-2 to 85-5)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A residents' meeting for citizen participation that the City Hall convenes and minutes; it is not an election run by the Electoral Administration and elects no body of government.",
+      "match": [
+        {
+          "name_pattern": "General Assembly of (a|the) settlement"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "indirect_officers",
+      "tier": "national",
+      "name": "წარმომადგენლობითი ორგანოების მიერ არჩევა",
+      "name_en": "Officers chosen by elected bodies (Chairperson of Parliament, Prime Minister, Sakrebulo chairs)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes inside an elected body, recorded in its minutes; the Electoral Administration does not run them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker",
+            "head_of_government"
+          ],
+          "iso_pattern": "GE*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "მოსამართლეები",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No judge is chosen by voters: judges are appointed by the High Council of Justice, and Supreme Court and Constitutional Court judges are elected or appointed by Parliament, the President, and the Supreme Court.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "(Judge|Court)",
+          "iso_pattern": "GE*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "party_nominations",
+      "tier": "national",
+      "name": "პარტიული კანდიდატების შერჩევა",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ec2025",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties compile their lists and nominate candidates under their own rules (Election Code 2025 arts. 129, 150-151); the state runs no primaries.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "GE*"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
