@@ -1093,7 +1093,9 @@ def registry() -> Package:
     for id, rules, text_ in systems:
         p.add("electoral_system", id=id, polity_id=NAMIBIA, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text_, lang="en")
-    for code, name in sorted({**PARTIES, **LOCAL_PARTIES}.items()):
+    # Every association the 1998 and 2004 tables can name is listed outright, so the registry never depends on
+    # which files a run happened to read before writing it.
+    for code, name in sorted({**PARTIES, **ASSOCIATION_NAMES, **LOCAL_PARTIES}.items()):
         id = party_id(code)
         p.add("party", id=id, kind="party", polity_id=NAMIBIA)
         p.name(id, name, "en", "official")
