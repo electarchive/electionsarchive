@@ -1,0 +1,2555 @@
+{
+  "polity": "CL",
+  "name": "Chile",
+  "sources": {
+    "cpr": {
+      "title": "Constitución Política de la República de Chile (texto refundido, coordinado y sistematizado, Decreto 100 de 2005, texto vigente)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=242302",
+      "kind": "official_body"
+    },
+    "loc18700": {
+      "title": "Ley N° 18.700, orgánica constitucional sobre votaciones populares y escrutinios (texto vigente)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=30082",
+      "kind": "official_body"
+    },
+    "loc18695": {
+      "title": "DFL N° 1 de 2006, texto refundido de la Ley N° 18.695, orgánica constitucional de municipalidades (texto vigente)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=251693",
+      "kind": "official_body"
+    },
+    "loc19175": {
+      "title": "DFL N° 1 de 2005, texto refundido de la Ley N° 19.175, orgánica constitucional sobre gobierno y administración regional (texto vigente)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=243771",
+      "kind": "official_body"
+    },
+    "primarias": {
+      "title": "DFL N° 1 de 2017, texto refundido de la Ley N° 20.640, que establece el sistema de elecciones primarias (texto vigente)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=1107657",
+      "kind": "official_body"
+    },
+    "ley19253": {
+      "title": "Ley N° 19.253, establece normas sobre protección, fomento y desarrollo de los indígenas, y crea la Corporación Nacional de Desarrollo Indígena",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=30620",
+      "kind": "official_body"
+    },
+    "ley19418": {
+      "title": "Decreto 58 de 1997, texto refundido de la Ley N° 19.418 sobre juntas de vecinos y demás organizaciones comunitarias",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=70040",
+      "kind": "official_body"
+    },
+    "vitacura_2009": {
+      "title": "Decreto que convoca a plebiscito comunal el domingo 15 de marzo de 2009 (Municipalidad de Vitacura)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile (LeyChile)",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=284245",
+      "kind": "official_body"
+    },
+    "servel_territorios": {
+      "title": "Territorios Electorales de Chile (circunscripción senatorial, distrito, circunscripción provincial, and comuna for each of the 346 communes)",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/wp-content/uploads/2026/08/Territorios-Electorales-de-Chile.xlsx",
+      "kind": "official_body",
+      "note": "Read 2026-11-16: 346 rows, one per comuna, with 16 senatorial circunscripciones (one per region, LOC 18.700 art. 180), 28 distritos, and 66 distinct circunscripciones provinciales."
+    },
+    "servel_resultados": {
+      "title": "Resultados electorales históricos (results by mesa and by circunscripción electoral, 1989 to date)",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+      "kind": "official_body",
+      "license": "No license stated: official results published by Servel; facts reused with attribution"
+    },
+    "servel_historial": {
+      "title": "Resultado Histórico Electoral, 1989-2009 (Ministerio del Interior's results site, now hosted by Servel)",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://historial.servel.cl/SitioHistorico/index1992_muni.htm",
+      "kind": "official_body",
+      "license": "No license stated: official results published by Servel; facts reused with attribution"
+    },
+    "servel_spp_2019": {
+      "title": "Cronograma Plebiscito Comuna de San Pedro de la Paz, 29 de septiembre de 2019",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/wp-content/uploads/2022/12/Cronograma_Plebiscito_comuna_San_Pedro_de_la_Paz.pdf",
+      "kind": "official_body"
+    },
+    "bcn_elecciones": {
+      "title": "Historia Política: Procesos eleccionarios, 1810 to 2022 (election timeline by period)",
+      "publisher": "Biblioteca del Congreso Nacional de Chile",
+      "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html?periodo=1925-1973",
+      "kind": "official_body",
+      "note": "Read 2026-11-16. Each period page lists dated events with a detail page per election; the library states its figures are illustrative and points to Servel and Servel's historical archive for official counts."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República de Chile",
+      "name_en": "Republic of Chile",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "cpr"
+    },
+    {
+      "key": "region",
+      "name": "Regiones",
+      "name_en": "Regions, each with an elected regional governor and regional council",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "cl.region",
+      "source": "loc19175",
+      "counts": [
+        {
+          "date": "2026-08-01",
+          "precision": "month",
+          "value": 16,
+          "source": "servel_territorios",
+          "locator": "https://www.servel.cl/wp-content/uploads/2026/08/Territorios-Electorales-de-Chile.xlsx (16 distinct circunscripciones senatoriales; LOC 18.700 art. 180: \"cada región constituirá una circunscripción senatorial\")"
+        }
+      ]
+    },
+    {
+      "key": "provincia",
+      "name": "Provincias",
+      "name_en": "Provinces, run by an appointed presidential delegate; they elect no one",
+      "parent": "region",
+      "elects": false,
+      "source": "cpr"
+    },
+    {
+      "key": "circ_provincial",
+      "name": "Circunscripciones provinciales",
+      "name_en": "Provincial constituencies drawn only to elect regional councillors (each province at least one)",
+      "parent": "region",
+      "scheme": "cl.circ_provincial",
+      "source": "loc19175",
+      "counts": [
+        {
+          "date": "2026-08-01",
+          "precision": "month",
+          "value": 66,
+          "source": "servel_territorios",
+          "locator": "https://www.servel.cl/wp-content/uploads/2026/08/Territorios-Electorales-de-Chile.xlsx (66 distinct circunscripciones provinciales across the 16 regions)"
+        }
+      ]
+    },
+    {
+      "key": "comuna",
+      "name": "Comunas (municipalidades)",
+      "name_en": "Communes, each governed by a municipality with an elected mayor and council",
+      "parent": "provincia",
+      "polity_kind": "municipality",
+      "scheme": "cl.comuna",
+      "source": "loc18695",
+      "counts": [
+        {
+          "date": "2026-08-01",
+          "precision": "month",
+          "value": 346,
+          "source": "servel_territorios",
+          "locator": "https://www.servel.cl/wp-content/uploads/2026/08/Territorios-Electorales-de-Chile.xlsx (346 rows, one per comuna; Antártica is governed by the municipality of Cabo de Hornos, so 345 municipalities)"
+        }
+      ]
+    },
+    {
+      "key": "unidad_vecinal",
+      "name": "Unidades vecinales (juntas de vecinos)",
+      "name_en": "Neighborhood units, whose neighborhood councils elect their own boards",
+      "parent": "comuna",
+      "source": "ley19418"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Elección de Presidente de la República",
+      "name_en": "President of the Republic",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1981-03-11",
+      "first_held": "1989-12-14",
+      "earliest_record": "1989-12-14",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Direct election by absolute majority of valid votes; otherwise a second round between the two leaders on the fourth Sunday after (CPR art. 26). Four-year term without immediate re-election since 2005 (art. 25); Aylwin served four years (1990-1994) and Frei and Lagos six (Ley 19.295). Chileans abroad vote since 2017 (LOC 18.700 art. 190). Contests count rounds: each second round is its own contest.",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (arts. 25 and 26)",
+      "est_votes": 13300000,
+      "effort": 1,
+      "finest_note": "mesa (voting table) inside each circunscripción electoral; Servel workbooks by mesa from 2013, by circunscripción electoral and sex of table for 1989-2009",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1981-03-11"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Second round between the two leaders on the fourth Sunday after the first (CPR art. 26)",
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "cpr",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (art. 26: \"el tercer domingo de noviembre del año anterior a aquel en que deba cesar en el cargo el que esté en funciones\")",
+          "valid_from": "2013-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 12,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "servel_resultados",
+          "locator": "Election days 11 December 2005 and 13 December 2009 in Servel's results workbooks (four-year term from Ley 20.050 of 26 August 2005)",
+          "valid_from": "2005-08-26",
+          "valid_to": "2013-01-01"
+        },
+        {
+          "period_years": 6,
+          "phase": 1,
+          "month": 12,
+          "term_years": 6,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "servel_resultados",
+          "locator": "Election days 11 December 1993 and 12 December 1999 in Servel's results workbooks (six-year term from Ley 19.295 of 4 March 1994)",
+          "valid_from": "1993-01-01",
+          "valid_to": "2005-08-26"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        },
+        {
+          "platform": "Servel, Resultado Histórico Electoral 1989-2009 (historial.servel.cl)",
+          "url": "https://historial.servel.cl/SitioHistorico/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "last_date": "2009-12-13",
+          "finest": "cl.comuna",
+          "source": "servel_historial",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "evidence": "Static HTML pages by country, region, district, and comuna for each election 1989-2009; answers HTTP 200 to a script"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-12-14",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: 1989 presidential election, one round",
+          "contests": 1
+        },
+        {
+          "date": "1993-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: 1993 presidential election, one round",
+          "contests": 1
+        },
+        {
+          "date": "1999-12-12",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: 1999 first round",
+          "contests": 1
+        },
+        {
+          "date": "2000-01-16",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: second round of 16 January 2000",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2005-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: 2005 first round",
+          "contests": 1
+        },
+        {
+          "date": "2006-01-15",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: second round of 15 January 2006",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-12-13",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: 2009 first round",
+          "contests": 1
+        },
+        {
+          "date": "2010-01-17",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_presidenciales_ce_1989_2017_Chile.xlsx: second round of 17 January 2010",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2013-11-17",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_Presidente_Tricel workbooks: 2013 first round",
+          "contests": 1
+        },
+        {
+          "date": "2013-12-15",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_Presidente_2v_Tricel workbooks: 2013 second round",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2017-11-19",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_PRESIDENCIAL_Tricel_1v.xlsx: 2017 first round",
+          "contests": 1
+        },
+        {
+          "date": "2017-12-17",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_PRESIDENCIAL_Tricel_2v.xlsx: 2017 second round",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2021-11-21",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_Presidenciales_1v_2021-1.xlsx: 2021 first round",
+          "contests": 1
+        },
+        {
+          "date": "2021-12-19",
+          "source": "servel_resultados",
+          "quote": "Resultados_mesa_presidencial_TRICEL_2v_2021-1.xlsx: 2021 second round",
+          "contests": 1,
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2025-11-16",
+          "source": "servel_resultados",
+          "quote": "PRELIMINARES_PRESIDENTE_DE_LA_REPUBLICA.zip: 2025 first round",
+          "contests": 1
+        },
+        {
+          "date": "2025-12-14",
+          "source": "servel_resultados",
+          "quote": "Datos_SegundaVotacion-1.zip: 2025 second round",
+          "contests": 1,
+          "election_kind": "runoff"
+        }
+      ]
+    },
+    {
+      "key": "presidente_1925",
+      "tier": "national",
+      "name": "Elección presidencial directa bajo la Constitución de 1925",
+      "name_en": "President by direct vote, 1925-1973",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1925-09-18",
+      "valid_to": "1973-09-11",
+      "first_held": "1925-10-24",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.region"
+        ]
+      },
+      "note": "The 1925 Constitution made the presidential election direct, for six years without immediate re-election; when no candidate won an absolute majority the Congreso Pleno chose between the two leaders (class presidente_congreso_pleno). Eleven elections, from 24 October 1925 to 4 September 1970, by province and department; women voted from 1952.",
+      "source": "bcn_elecciones",
+      "est_votes": 2900000,
+      "effort": 4,
+      "finest_note": "comuna or department in the Dirección del Registro Electoral's printed returns",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1925-09-18",
+          "valid_to": "1973-09-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "BCN Historia Política, Procesos eleccionarios",
+          "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "last_date": "1973-03-04",
+          "source": "bcn_elecciones",
+          "evidence": "Narrative pages with national totals only; the library calls its figures illustrative. Servel's historical archive (historico.servel.cl) refused this session's connection"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1925-10-24",
+          "through": "1946-09-04",
+          "note": "Elections of 1925, 1927, 1931, 1932, 1938, 1942, and 1946 are not dated in the BCN timeline and are not yet enumerated from an official list."
+        },
+        {
+          "date": "1952-09-04",
+          "source": "bcn_elecciones",
+          "quote": "04-09-1952 Elecciones presidenciales de 1952."
+        },
+        {
+          "date": "1958-09-04",
+          "source": "bcn_elecciones",
+          "quote": "04-09-1958 Elecciones presidenciales de 1958."
+        },
+        {
+          "date": "1964-09-04",
+          "source": "bcn_elecciones",
+          "quote": "04-09-1964 Elecciones presidenciales de 1964."
+        },
+        {
+          "date": "1970-09-04",
+          "source": "bcn_elecciones",
+          "quote": "04-09-1970 Elecciones presidenciales de 1970."
+        }
+      ]
+    },
+    {
+      "key": "presidente_congreso_pleno",
+      "tier": "national",
+      "name": "Elección presidencial por el Congreso Pleno",
+      "name_en": "President chosen by the joint Congress when no candidate won a majority, 1925-1973",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1925-09-18",
+      "valid_to": "1973-09-11",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under the 1925 Constitution the Congreso Pleno chose between the two candidates with the most votes when none had an absolute majority (1946, 1952, 1958, and 1970).",
+      "source": "bcn_elecciones",
+      "est_votes": 200,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1925-09-18",
+          "valid_to": "1973-09-11",
+          "precedence": 1
+        }
+      ],
+      "dates": [
+        {
+          "date": "1925-09-18",
+          "through": "1973-09-11",
+          "note": "Not yet enumerated from the Congress's session records."
+        }
+      ]
+    },
+    {
+      "key": "presidente_electores",
+      "tier": "national",
+      "name": "Elección presidencial indirecta por electores (1826-1920)",
+      "name_en": "President chosen through electors, 1826-1920",
+      "category": "indirect",
+      "goal": "national",
+      "valid_to": "1925-09-18",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under the constitutions of 1828 and 1833 voters chose presidential electors by department, and the electors chose the president; Congress decided when no candidate had an absolute majority of electors. The last such election was in 1920.",
+      "source": "bcn_elecciones",
+      "est_votes": 200000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CL",
+          "valid_to": "1925-09-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1826-01-01",
+          "precision": "year",
+          "through": "1920-12-31",
+          "note": "Not yet enumerated; the BCN timeline does not list presidential elections before 1952."
+        }
+      ]
+    },
+    {
+      "key": "diputados",
+      "tier": "national",
+      "name": "Elección de Diputados",
+      "name_en": "Chamber of Deputies",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1981-03-11",
+      "first_held": "1989-12-14",
+      "earliest_record": "1989-12-14",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.distrito",
+          "cl.distrito_1989"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "The whole chamber is renewed every four years (CPR art. 47). 1989-2013: 120 deputies, two per district in 60 districts, by the binomial system (D'Hondt between lists); since 2017: 155 deputies in 28 districts of 3 to 8 seats by D'Hondt with open lists and gender quotas (LOC 18.700 arts. 178-179 bis). There are no by-elections: a vacancy is filled by the party.",
+      "source": "loc18700",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=30082 (art. 178: \"habrá veintiocho distritos electorales\"; art. 179 bis: 155 escaños)",
+      "est_votes": 13000000,
+      "effort": 1,
+      "finest_note": "mesa, in Servel's workbooks from 2013; circunscripción electoral 1989-2009",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1981-03-11"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc18700",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=30082 (art. 174: \"el tercer domingo de noviembre del año anterior a aquel en que deban renovarse la Cámara de Diputados y el Senado\")",
+          "valid_from": "2013-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 12,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "servel_resultados",
+          "locator": "Election days 14 December 1989, 11 December 1993, 11 December 1997, 16 December 2001, 11 December 2005, and 13 December 2009 in resultados_elecciones_diputados_ce_1989_2017.xlsx",
+          "valid_from": "1989-01-01",
+          "valid_to": "2013-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        },
+        {
+          "platform": "Servel, Resultado Histórico Electoral 1989-2009 (historial.servel.cl)",
+          "url": "https://historial.servel.cl/SitioHistorico/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "last_date": "2009-12-13",
+          "finest": "cl.comuna",
+          "source": "servel_historial",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "evidence": "Static HTML pages by country, region, district, and comuna for each election 1989-2009; answers HTTP 200 to a script"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-12-14",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 1989, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "1993-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 1993, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "1997-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 1997, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "2001-12-16",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 2001, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "2005-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 2005, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "2009-12-13",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 2009, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "2013-11-17",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_diputados_ce_1989_2017.xlsx: 2013, districts 1 to 60, two deputies each",
+          "contests": 60,
+          "seats": 120
+        },
+        {
+          "date": "2017-11-19",
+          "contests": 28,
+          "seats": 155,
+          "source": "loc18700",
+          "quote": "Art. 178: \"habrá veintiocho distritos electorales\"; art. 179 bis: \"los 155 escaños de diputados entre los 28 distritos\""
+        },
+        {
+          "date": "2021-11-21",
+          "contests": 28,
+          "seats": 155,
+          "source": "loc18700",
+          "quote": "Art. 178: \"habrá veintiocho distritos electorales\"; art. 179 bis: \"los 155 escaños de diputados entre los 28 distritos\""
+        },
+        {
+          "date": "2025-11-16",
+          "contests": 28,
+          "seats": 155,
+          "source": "loc18700",
+          "quote": "Art. 178: \"habrá veintiocho distritos electorales\"; art. 179 bis: \"los 155 escaños de diputados entre los 28 distritos\""
+        }
+      ]
+    },
+    {
+      "key": "senado",
+      "tier": "national",
+      "name": "Elección de Senadores",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1981-03-11",
+      "first_held": "1989-12-14",
+      "earliest_record": "1989-12-14",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.circunscripcion",
+          "cl.circunscripcion_1989"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Senators serve eight years and half the circunscripciones are renewed every four years with the Chamber (CPR art. 49). 1989-2013: 38 elected senators in 19 two-member circunscripciones (with designated and ex-officio senators until 2006, who were not elected); since 2017: 50 senators, one circunscripción per region with 2 to 5 seats, by D'Hondt (LOC 18.700 art. 180).",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (art. 49); https://www.bcn.cl/leychile/navegar?idNorma=30082 (art. 180: \"El Senado se compone de 50 miembros\")",
+      "est_votes": 6500000,
+      "effort": 1,
+      "finest_note": "mesa, in Servel's workbooks from 2013; circunscripción electoral 1989-2009",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1981-03-11"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_third_sunday",
+          "classes": 2,
+          "term_years": 8,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc18700",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=30082 (art. 174); https://www.bcn.cl/leychile/navegar?idNorma=242302 (art. 49: \"se renovarán alternadamente cada cuatro años\")",
+          "valid_from": "2013-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 12,
+          "classes": 2,
+          "term_years": 8,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "servel_resultados",
+          "locator": "Election days 1989-2009 in resultados_elecciones_senadores_ce_1989_2017.xlsx (the 1989 senators of odd regions served four years)",
+          "valid_from": "1989-01-01",
+          "valid_to": "2013-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        },
+        {
+          "platform": "Servel, Resultado Histórico Electoral 1989-2009 (historial.servel.cl)",
+          "url": "https://historial.servel.cl/SitioHistorico/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "last_date": "2009-12-13",
+          "finest": "cl.comuna",
+          "source": "servel_historial",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "evidence": "Static HTML pages by country, region, district, and comuna for each election 1989-2009; answers HTTP 200 to a script"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-12-14",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1989, all 19 circunscripciones, two senators each",
+          "contests": 19,
+          "seats": 38
+        },
+        {
+          "date": "1993-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1993 partial renewal"
+        },
+        {
+          "date": "1997-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1997 partial renewal"
+        },
+        {
+          "date": "2001-12-16",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2001 partial renewal"
+        },
+        {
+          "date": "2005-12-11",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2005 partial renewal"
+        },
+        {
+          "date": "2009-12-13",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2009 partial renewal"
+        },
+        {
+          "date": "2013-11-17",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2013 partial renewal"
+        },
+        {
+          "date": "2017-11-19",
+          "source": "servel_resultados",
+          "quote": "Servel's senators workbooks for 2017: partial renewal by region"
+        },
+        {
+          "date": "2021-11-21",
+          "source": "servel_resultados",
+          "quote": "Servel's senators workbooks for 2021: partial renewal by region"
+        },
+        {
+          "date": "2025-11-16",
+          "source": "servel_resultados",
+          "quote": "Servel's senators workbooks for 2025: partial renewal by region"
+        }
+      ]
+    },
+    {
+      "key": "congreso_1811",
+      "tier": "national",
+      "name": "Elecciones de congresos y asambleas, 1811-1924",
+      "name_en": "Congresses, constituent congresses, and conventions, 1811-1924",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1925-09-18",
+      "first_held": "1811-05-06",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "From the first National Congress of 1811 through the constituent congresses of 1823-1828 and the parliamentary republic. Deputies were elected directly by department; senators indirectly through electors until the 1874 reform made them direct by province. Census suffrage until 1874 and literacy requirements throughout.",
+      "source": "bcn_elecciones",
+      "locator": "https://www.bcn.cl/historiapolitica/elecciones/index.html?periodo=1833-1891",
+      "est_votes": 300000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special",
+            "indirect"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "CL",
+          "valid_to": "1925-09-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "BCN Historia Política, Procesos eleccionarios",
+          "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "last_date": "1973-03-04",
+          "source": "bcn_elecciones",
+          "evidence": "Narrative pages with national totals only; the library calls its figures illustrative. Servel's historical archive (historico.servel.cl) refused this session's connection"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1811-05-06",
+          "source": "bcn_elecciones",
+          "quote": "06-05-1811 Primeras elecciones parlamentarias en la historia de Chile."
+        },
+        {
+          "date": "1822-05-24",
+          "source": "bcn_elecciones",
+          "quote": "24-05-1822 Elección de miembros para Convención Preparatoria de 1822."
+        },
+        {
+          "date": "1823-07-07",
+          "source": "bcn_elecciones",
+          "quote": "07-07-1823 Elecciones de diputados para el Congreso Constituyente de 1823."
+        },
+        {
+          "date": "1824-10-05",
+          "source": "bcn_elecciones",
+          "quote": "05-10-1824 Elecciones de diputados para el Congreso General de la Nación de 1824."
+        },
+        {
+          "date": "1826-05-15",
+          "source": "bcn_elecciones",
+          "quote": "15-05-1826 Elecciones de diputados para el Congreso Nacional Constituyente de 1826."
+        },
+        {
+          "date": "1828-01-12",
+          "source": "bcn_elecciones",
+          "quote": "12-01-1828 Elecciones de diputados para el Congreso General Constituyente de 1828."
+        },
+        {
+          "date": "1829-05-03",
+          "source": "bcn_elecciones",
+          "quote": "03-05-1829 Elecciones parlamentarias de 1829."
+        },
+        {
+          "date": "1831-05-26",
+          "source": "bcn_elecciones",
+          "quote": "26-05-1831 Elecciones parlamentarias de 1831."
+        },
+        {
+          "date": "1834-03-30",
+          "source": "bcn_elecciones",
+          "quote": "30-03-1834 Elecciones parlamentarias de 1834."
+        },
+        {
+          "date": "1837-03-26",
+          "source": "bcn_elecciones",
+          "quote": "26-03-1837 Elecciones parlamentarias de 1837."
+        },
+        {
+          "date": "1840-03-29",
+          "source": "bcn_elecciones",
+          "quote": "29-03-1840 Elecciones parlamentarias de 1840."
+        },
+        {
+          "date": "1843-03-26",
+          "source": "bcn_elecciones",
+          "quote": "26-03-1843 Elecciones parlamentarias de 1843."
+        },
+        {
+          "date": "1846-03-29",
+          "source": "bcn_elecciones",
+          "quote": "29-03-1846 Elecciones parlamentarias de 1846."
+        },
+        {
+          "date": "1849-03-25",
+          "source": "bcn_elecciones",
+          "quote": "25-03-1849 Elecciones parlamentarias de 1849."
+        },
+        {
+          "date": "1852-03-28",
+          "source": "bcn_elecciones",
+          "quote": "28-03-1852 Elecciones parlamentarias de 1852."
+        },
+        {
+          "date": "1855-03-25",
+          "source": "bcn_elecciones",
+          "quote": "25-03-1855 Elecciones parlamentarias de 1855."
+        },
+        {
+          "date": "1858-03-28",
+          "source": "bcn_elecciones",
+          "quote": "28-03-1858 Elecciones parlamentarias de 1858."
+        },
+        {
+          "date": "1861-03-27",
+          "source": "bcn_elecciones",
+          "quote": "27-03-1861 Elecciones parlamentarias de 1861."
+        },
+        {
+          "date": "1864-03-27",
+          "source": "bcn_elecciones",
+          "quote": "27-03-1864 Elecciones parlamentarias de 1864."
+        },
+        {
+          "date": "1867-03-31",
+          "source": "bcn_elecciones",
+          "quote": "31-03-1867 Elecciones parlamentarias de 1867."
+        },
+        {
+          "date": "1870-03-27",
+          "source": "bcn_elecciones",
+          "quote": "27-03-1870 Elecciones parlamentarias de 1870."
+        },
+        {
+          "date": "1873-03-30",
+          "source": "bcn_elecciones",
+          "quote": "30-03-1873 Elecciones parlamentarias de 1873."
+        },
+        {
+          "date": "1876-03-26",
+          "source": "bcn_elecciones",
+          "quote": "26-03-1876 Elecciones parlamentarias de 1876."
+        },
+        {
+          "date": "1879-03-30",
+          "source": "bcn_elecciones",
+          "quote": "30-03-1879 Elecciones parlamentarias de 1879."
+        },
+        {
+          "date": "1882-03-26",
+          "source": "bcn_elecciones",
+          "quote": "26-03-1882 Elecciones parlamentarias de 1882."
+        },
+        {
+          "date": "1885-03-29",
+          "source": "bcn_elecciones",
+          "quote": "29-03-1885 Elecciones parlamentarias de 1885."
+        },
+        {
+          "date": "1888-03-25",
+          "source": "bcn_elecciones",
+          "quote": "25-03-1888 Elecciones parlamentarias de 1888."
+        },
+        {
+          "date": "1891-10-18",
+          "source": "bcn_elecciones",
+          "quote": "18-10-1891 Elecciones parlamentarias de 1891."
+        },
+        {
+          "date": "1894-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1894 Elecciones parlamentarias de 1894."
+        },
+        {
+          "date": "1897-03-07",
+          "source": "bcn_elecciones",
+          "quote": "07-03-1897 Elecciones parlamentarias de 1897."
+        },
+        {
+          "date": "1900-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1900 Elecciones parlamentarias de 1900."
+        },
+        {
+          "date": "1903-03-01",
+          "source": "bcn_elecciones",
+          "quote": "01-03-1903 Elecciones parlamentarias de 1903."
+        },
+        {
+          "date": "1906-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1906 Elecciones parlamentarias de 1906."
+        },
+        {
+          "date": "1909-03-07",
+          "source": "bcn_elecciones",
+          "quote": "07-03-1909 Elecciones parlamentarias de 1909."
+        },
+        {
+          "date": "1912-03-03",
+          "source": "bcn_elecciones",
+          "quote": "03-03-1912 Elecciones parlamentarias de 1912."
+        },
+        {
+          "date": "1915-03-07",
+          "source": "bcn_elecciones",
+          "quote": "07-03-1915 Elecciones parlamentarias de 1915."
+        },
+        {
+          "date": "1918-03-03",
+          "source": "bcn_elecciones",
+          "quote": "03-03-1918 Elecciones parlamentarias de 1918."
+        },
+        {
+          "date": "1921-03-06",
+          "source": "bcn_elecciones",
+          "quote": "06-03-1921 Elecciones parlamentarias de 1921."
+        },
+        {
+          "date": "1924-03-02",
+          "source": "bcn_elecciones",
+          "quote": "02-03-1924 Elecciones parlamentarias de 1924."
+        }
+      ]
+    },
+    {
+      "key": "congreso_1925",
+      "tier": "national",
+      "name": "Elecciones parlamentarias bajo la Constitución de 1925",
+      "name_en": "Chamber of Deputies and Senate, 1925-1973",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1925-09-18",
+      "valid_to": "1973-09-11",
+      "first_held": "1925-11-22",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "Deputies by departmental groupings for four years and senators by provincial groupings for eight, half renewed every four years, by D'Hondt between lists. The 1930 Congreso Termal was named without a vote. Congress was dissolved on 21 September 1973.",
+      "source": "bcn_elecciones",
+      "est_votes": 2800000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1925-09-18",
+          "valid_to": "1973-09-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "BCN Historia Política, Procesos eleccionarios",
+          "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "last_date": "1973-03-04",
+          "source": "bcn_elecciones",
+          "evidence": "Narrative pages with national totals only; the library calls its figures illustrative. Servel's historical archive (historico.servel.cl) refused this session's connection"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1925-11-22",
+          "source": "bcn_elecciones",
+          "quote": "22-11-1925 Elecciones parlamentarias de 1925."
+        },
+        {
+          "date": "1932-10-30",
+          "source": "bcn_elecciones",
+          "quote": "30-10-1932 Elecciones parlamentarias de 1932."
+        },
+        {
+          "date": "1937-03-07",
+          "source": "bcn_elecciones",
+          "quote": "07-03-1937 Elecciones parlamentarias de 1937."
+        },
+        {
+          "date": "1941-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1941 Elecciones parlamentarias de 1941."
+        },
+        {
+          "date": "1945-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1945 Elecciones parlamentarias de 1945."
+        },
+        {
+          "date": "1949-03-06",
+          "source": "bcn_elecciones",
+          "quote": "06-03-1949 Elecciones parlamentarias de 1949."
+        },
+        {
+          "date": "1953-03-01",
+          "source": "bcn_elecciones",
+          "quote": "01-03-1953 Elecciones parlamentarias de 1953."
+        },
+        {
+          "date": "1957-03-03",
+          "source": "bcn_elecciones",
+          "quote": "03-03-1957 Elecciones parlamentarias de 1957."
+        },
+        {
+          "date": "1961-03-05",
+          "source": "bcn_elecciones",
+          "quote": "05-03-1961 Elecciones parlamentarias de 1961."
+        },
+        {
+          "date": "1965-03-07",
+          "source": "bcn_elecciones",
+          "quote": "07-03-1965 Elecciones parlamentarias de 1965."
+        },
+        {
+          "date": "1969-03-02",
+          "source": "bcn_elecciones",
+          "quote": "02-03-1969 Elecciones parlamentarias de 1969."
+        },
+        {
+          "date": "1973-03-04",
+          "source": "bcn_elecciones",
+          "quote": "04-03-1973 Elecciones parlamentarias de 1973."
+        }
+      ]
+    },
+    {
+      "key": "convencion_constitucional",
+      "tier": "national",
+      "name": "Elección de Convencionales Constituyentes",
+      "name_en": "Constitutional Convention (2021): district seats",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2019-12-24",
+      "valid_to": "2022-07-05",
+      "first_held": "2021-05-15",
+      "earliest_record": "2021-05-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.distrito"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "155 members elected on 15 and 16 May 2021 in the 28 deputies' districts by D'Hondt with gender parity and lists of independents (Ley 21.200, 21.216); 17 of the 155 seats were reserved for indigenous peoples (class escanos_indigenas). The Convention dissolved after the 4 September 2022 plebiscite.",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (Capítulo XV, arts. 130-143 as enacted by Ley 21.200)",
+      "est_votes": 6100000,
+      "effort": 1,
+      "finest_note": "mesa, in Servel's 2021 workbooks",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "2021-01-01",
+          "valid_to": "2022-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-05-15",
+          "deferred": [
+            "2021-05-16"
+          ],
+          "contests": 28,
+          "seats": 138,
+          "source": "cpr",
+          "quote": "\"Los diecisiete escaños reservados para pueblos indígenas ... serán determinados por el Servicio Electoral, dentro de los ciento cincuenta y cinco escaños a elegir en virtud de los distritos electorales\" (155 less 17 reserved = 138 district seats in 28 districts)"
+        }
+      ]
+    },
+    {
+      "key": "consejo_constitucional",
+      "tier": "national",
+      "name": "Elección de miembros del Consejo Constitucional",
+      "name_en": "Constitutional Council (2023)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2023-01-17",
+      "valid_to": "2023-12-18",
+      "first_held": "2023-05-07",
+      "earliest_record": "2023-05-07",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.circunscripcion"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "50 councillors elected on 7 May 2023 in the 16 senatorial circunscripciones with gender parity (CPR art. 144, Ley 21.533), plus one indigenous seat (class escanos_indigenas). The Comisión Experta beside it was appointed by Congress. The draft was rejected on 17 December 2023.",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (art. 144: \"Convócase a elección de miembros del Consejo Constitucional, la que se realizará el 7 de mayo de 2023\")",
+      "est_votes": 11500000,
+      "effort": 1,
+      "finest_note": "mesa, in Servel's 2023 workbook (20230507CA.zip)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "2023-01-01",
+          "valid_to": "2024-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2023-05-07",
+          "contests": 16,
+          "seats": 50,
+          "source": "cpr",
+          "quote": "Art. 144: \"Convócase a elección de miembros del Consejo Constitucional, la que se realizará el 7 de mayo de 2023\"; 50 councillors in the 16 circunscripciones senatoriales"
+        }
+      ]
+    },
+    {
+      "key": "escanos_indigenas",
+      "tier": "national",
+      "name": "Escaños reservados para pueblos indígenas",
+      "name_en": "Seats reserved for indigenous peoples in the constitutional bodies (2021, 2023)",
+      "category": "non_territorial",
+      "goal": "national",
+      "valid_from": "2020-12-23",
+      "valid_to": "2023-12-18",
+      "first_held": "2021-05-15",
+      "earliest_record": "2021-05-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Voters on the indigenous roll chose between their people's candidates instead of the district list ballot: 17 seats for ten peoples in the Convention (7 Mapuche, 2 Aymara, one each Rapa Nui, Quechua, Lickanantay, Diaguita, Colla, Kawashkar, Yagán, and Chango; Ley 21.298) and, in 2023, a single national indigenous constituency whose seats depended on turnout (one elected).",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (transitory provision on the participation of indigenous peoples, Ley 21.298: \"la Convención Constitucional incluirá diecisiete escaños reservados para pueblos indígenas\")",
+      "est_votes": 300000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's 2021 and 2023 workbooks",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "2021-01-01",
+          "valid_to": "2024-01-01",
+          "precedence": 1
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-05-15",
+          "deferred": [
+            "2021-05-16"
+          ],
+          "contests": 10,
+          "seats": 17,
+          "source": "cpr",
+          "quote": "\"la Convención Constitucional incluirá diecisiete escaños reservados para pueblos indígenas\", one contest for each of the ten peoples recognized in Ley 19.253"
+        },
+        {
+          "date": "2023-05-07",
+          "contests": 1,
+          "seats": 1,
+          "source": "servel_resultados",
+          "quote": "20230507CA.zip: one national indigenous constituency (Escaño de pueblos indígenas), one seat elected"
+        }
+      ]
+    },
+    {
+      "key": "plebiscito_nacional",
+      "tier": "national",
+      "name": "Plebiscitos nacionales",
+      "name_en": "National plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1981-03-11",
+      "first_held": "1988-10-05",
+      "earliest_record": "1988-10-05",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "The 1988 plebiscite on the junta's candidate and the 1989 constitutional reform plebiscite under the 1980 Constitution's transitory articles; a plebiscite on a constitutional reform the President and Congress disagree on (CPR arts. 128-129, never used); and the constitutional processes: entry plebiscite of 25 October 2020 (two questions), exit plebiscites of 4 September 2022 and 17 December 2023.",
+      "source": "cpr",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (arts. 128-130, 142, and the provision setting 17 December 2023)",
+      "est_votes": 13000000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's 2020, 2022, and 2023 workbooks; 1988 and 1989 not on Servel's results page",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "sovereign_state"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1981-03-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-10-05",
+          "source": "bcn_elecciones",
+          "quote": "05-10-1988 Plebiscito de 1988 marca el fin del régimen militar."
+        },
+        {
+          "date": "1989-07-30",
+          "source": "bcn_elecciones",
+          "quote": "30-07-1989 Plebiscito aprueba reformas constitucionales."
+        },
+        {
+          "date": "2020-10-25",
+          "contests": 2,
+          "source": "cpr",
+          "quote": "Art. 130: \"un plebiscito nacional para el día 25 de octubre de 2020. En el plebiscito señalado, la ciudadanía dispondrá de dos cédulas electorales\""
+        },
+        {
+          "date": "2022-09-04",
+          "contests": 1,
+          "source": "bcn_elecciones",
+          "quote": "04-09-2022 Plebiscito rechaza propuesta de Nueva Constitución"
+        },
+        {
+          "date": "2023-12-17",
+          "contests": 1,
+          "source": "cpr",
+          "quote": "\"Este plebiscito se celebrará el 17 de diciembre de 2023\""
+        }
+      ]
+    },
+    {
+      "key": "plebiscito_historico",
+      "tier": "national",
+      "name": "Plebiscitos y consultas anteriores a 1981",
+      "name_en": "Plebiscites and consultations before 1981 (1818, 1925, 1978, 1980)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_to": "1981-03-11",
+      "first_held": "1818-08-10",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "The signed registers that approved the 1818 Constitution, the plebiscite of 30 August 1925 on the 1925 Constitution, the Consulta Nacional of 4 January 1978, and the plebiscite of 11 September 1980 on the 1980 Constitution (the last two without electoral registers).",
+      "source": "bcn_elecciones",
+      "locator": "https://www.bcn.cl/historiapolitica/elecciones/index.html?periodo=1973-1990",
+      "est_votes": 6300000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "CL",
+          "valid_to": "1981-03-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "BCN Historia Política, Procesos eleccionarios",
+          "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "last_date": "1973-03-04",
+          "source": "bcn_elecciones",
+          "evidence": "Narrative pages with national totals only; the library calls its figures illustrative. Servel's historical archive (historico.servel.cl) refused this session's connection"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1818-08-10",
+          "source": "bcn_elecciones",
+          "quote": "10-08-1818 Plebiscito aprueba Constitución Política de 1818."
+        },
+        {
+          "date": "1978-01-04",
+          "source": "bcn_elecciones",
+          "quote": "04-01-1978 Consulta Nacional otorga respaldo a régimen militar."
+        },
+        {
+          "date": "1980-09-11",
+          "source": "bcn_elecciones",
+          "quote": "11-09-1980 Plebiscito aprueba nueva Constitución Política."
+        }
+      ]
+    },
+    {
+      "key": "plebiscito_comunal",
+      "tier": "comuna",
+      "name": "Plebiscitos comunales",
+      "name_en": "Communal plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "fine": [
+          "cl.mesa"
+        ]
+      },
+      "note": "The mayor with the council's agreement, or at the initiative of the commune's voters, puts local investment, planning, or administration questions to a binding plebiscite held on a Sunday 120 days after the decree, run by Servel; binding if more than half the electorate votes (LOC 18.695 arts. 99-104; LOC 18.700 art. 169). Known ones include Vitacura (15 March 2009), Peñalolén (2011), and San Pedro de la Paz (29 September 2019).",
+      "source": "loc18695",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=251693 (arts. 99-104)",
+      "est_votes": 60000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "CL*"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel (no results file for communal plebiscites on its results page)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "source": "servel_resultados",
+          "role": "administers",
+          "evidence": "Servel's media library holds the San Pedro de la Paz 2019 schedule but no results workbook; the results are in the TER's proclamation"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "Not yet enumerated: no official list of communal plebiscites has been found."
+        },
+        {
+          "date": "2009-03-15",
+          "contests": 1,
+          "source": "vitacura_2009",
+          "quote": "CONVOCA A PLEBISCITO COMUNAL EL DOMINGO 15 DE MARZO DE 2009 (Vitacura)"
+        },
+        {
+          "date": "2019-09-29",
+          "source": "servel_spp_2019",
+          "quote": "CRONOGRAMA PLEBISCITO COMUNA DE SAN PEDRO DE LA PAZ 29 DE SEPTIEMBRE DE 2019"
+        }
+      ]
+    },
+    {
+      "key": "gobernador_regional",
+      "tier": "region",
+      "name": "Elección de Gobernadores Regionales",
+      "name_en": "Regional governors",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "2017-01-05",
+      "first_held": "2021-05-15",
+      "earliest_record": "2021-05-15",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Elected by direct vote with the municipal elections every four years; a candidate needs at least 40% of valid votes, otherwise the two leaders meet on the fourth Sunday after (CPR art. 111; LOC 19.175 arts. 83 and 98 bis). Replaced the appointed intendente from 14 July 2021. Second rounds are their own contests and add to the count.",
+      "source": "loc19175",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=243771 (art. 83: \"Las elecciones de gobernadores regionales y de consejeros regionales se efectuarán cada cuatro años, conjuntamente con las elecciones municipales\")",
+      "est_votes": 11500000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's 2021 workbooks (3.GORE_.zip and the second round)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "runoff": "threshold",
+          "runoff_threshold": 0.4,
+          "runoff_rule": "Below 40% of valid votes, a second round between the two leaders on the fourth Sunday after (LOC 19.175)",
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc19175",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=243771 (art. 83) with https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 106: \"el último domingo del mes de octubre\")",
+          "valid_from": "2024-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-05-15",
+          "deferred": [
+            "2021-05-16"
+          ],
+          "contests": 16,
+          "source": "loc19175",
+          "quote": "Art. 83: gobernadores regionales elected with the municipal elections; one per region (16)"
+        },
+        {
+          "date": "2021-06-13",
+          "election_kind": "runoff",
+          "source": "servel_resultados",
+          "quote": "Segunda_Votacion__de__GORE_2021.zip: second round of 13 June 2021"
+        },
+        {
+          "date": "2024-10-26",
+          "deferred": [
+            "2024-10-27"
+          ],
+          "contests": 16,
+          "source": "loc19175",
+          "quote": "Art. 83: gobernadores regionales elected with the municipal elections; one per region (16)"
+        },
+        {
+          "date": "2024-11-24",
+          "election_kind": "runoff",
+          "note": "Second round in the regions where no candidate reached 40%; count not yet taken from Servel."
+        }
+      ]
+    },
+    {
+      "key": "consejo_regional",
+      "tier": "circ_provincial",
+      "name": "Elección de Consejeros Regionales",
+      "name_en": "Regional councils, elected by provincial constituency",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "2013-01-01",
+      "first_held": "2013-11-17",
+      "earliest_record": "2013-11-17",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "cl.circ_provincial"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Councils of 14 to 34 members by regional population, elected by direct vote for four years in provincial constituencies (each province at least one) by D'Hondt (CPR art. 113; LOC 19.175 arts. 29 and 29 bis). First direct election with the 2013 parliamentary election, again in 2017; since 2021 with the municipal elections. Before 2013 the councillors were chosen indirectly (class consejo_regional_indirecto).",
+      "source": "loc19175",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=243771 (art. 29: \"Dentro de cada región los consejeros se elegirán por circunscripciones provinciales\")",
+      "est_votes": 11000000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's workbooks by region (Cores_Ter) for 2013 and 2017 and CORE-1.zip for 2021",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "cl.circ_provincial"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc19175",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=243771 (art. 83) with https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 106)",
+          "valid_from": "2024-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "servel_resultados",
+          "locator": "resultados_elecciones_core_ce_2013_2017.xlsx: councillors elected with the parliamentary elections of 17 November 2013 and 19 November 2017",
+          "valid_from": "2013-01-01",
+          "valid_to": "2020-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-11-17",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_core_ce_2013_2017.xlsx: 2013"
+        },
+        {
+          "date": "2017-11-19",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_core_ce_2013_2017.xlsx: 2017"
+        },
+        {
+          "date": "2021-05-15",
+          "deferred": [
+            "2021-05-16"
+          ],
+          "source": "servel_resultados",
+          "quote": "CORE-1.zip: 2021"
+        },
+        {
+          "date": "2024-10-26",
+          "deferred": [
+            "2024-10-27"
+          ],
+          "contests": 66,
+          "source": "servel_territorios",
+          "quote": "Territorios Electorales de Chile: 66 circunscripciones provinciales"
+        }
+      ]
+    },
+    {
+      "key": "consejo_regional_indirecto",
+      "tier": "region",
+      "name": "Elección indirecta de consejeros regionales por los concejales",
+      "name_en": "Regional councillors chosen by municipal councillors, 1992-2009",
+      "category": "indirect",
+      "goal": "subnational",
+      "valid_from": "1992-11-11",
+      "valid_to": "2013-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under the original Ley 19.175 the municipal councillors of each province, meeting as an electoral college, chose the regional councillors after each municipal election.",
+      "source": "loc19175",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Electoral colleges of a few dozen municipal councillors per province; their acts are administrative records, not public elections, and Servel publishes no results for them."
+    },
+    {
+      "key": "alcalde",
+      "tier": "comuna",
+      "name": "Elección de Alcaldes",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "first_held": "2004-10-31",
+      "earliest_record": "2004-10-31",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "cl.comuna"
+        ],
+        "fine": [
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Mayors elected by plurality on a separate ballot from the council since 2004, for four years, with at most two consecutive re-elections since 2021 (CPR art. 118; LOC 18.695 art. 57). Before 2004 the mayor came out of the council vote (class alcalde_indirecto). Antártica votes with Cabo de Hornos, so 345 contests.",
+      "source": "loc18695",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 57: \"El alcalde será elegido por sufragio universal, en votación conjunta y cédula separada de la de concejales\")",
+      "est_votes": 11800000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's workbooks from 2012; circunscripción electoral 2004-2016",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc18695",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 106: \"Las elecciones municipales se efectuarán cada cuatro años, el último domingo del mes de octubre\"; 2016 on 23 October by transitory art. 6; 2021 moved to 15-16 May)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        },
+        {
+          "platform": "Servel, Resultado Histórico Electoral 1989-2009 (historial.servel.cl)",
+          "url": "https://historial.servel.cl/SitioHistorico/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "last_date": "2009-12-13",
+          "finest": "cl.comuna",
+          "source": "servel_historial",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "evidence": "Static HTML pages by country, region, district, and comuna for each election 1989-2009; answers HTTP 200 to a script"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-10-26",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2012-10-28",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2016-10-23",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2021-05-15",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345,
+          "deferred": [
+            "2021-05-16"
+          ]
+        },
+        {
+          "date": "2024-10-26",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345,
+          "deferred": [
+            "2024-10-27"
+          ]
+        },
+        {
+          "date": "2004-10-31",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_alcaldes_ce_2004_2016.xlsx: 2004"
+        }
+      ]
+    },
+    {
+      "key": "concejo_municipal",
+      "tier": "comuna",
+      "name": "Elección de Concejales",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1991-11-12",
+      "first_held": "1992-06-28",
+      "earliest_record": "1992-06-28",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "cl.comuna"
+        ],
+        "fine": [
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Councils of 6, 8, or 10 councillors by the commune's electorate, elected at large by D'Hondt with open lists for four years (CPR art. 119; LOC 18.695 art. 72). First held 28 June 1992 after the 1991 reform; with the mayor on a separate ballot since 2004.",
+      "source": "loc18695",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 72)",
+      "est_votes": 11800000,
+      "effort": 2,
+      "finest_note": "mesa, in Servel's workbooks from 2012; circunscripción electoral 1992-2016",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "cl.comuna"
+          ],
+          "iso_pattern": "CL",
+          "valid_from": "1991-11-12"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "loc18695",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=251693 (art. 106)",
+          "valid_from": "1991-11-12"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        },
+        {
+          "platform": "Servel, Resultado Histórico Electoral 1989-2009 (historial.servel.cl)",
+          "url": "https://historial.servel.cl/SitioHistorico/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-12-14",
+          "last_date": "2009-12-13",
+          "finest": "cl.comuna",
+          "source": "servel_historial",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "evidence": "Static HTML pages by country, region, district, and comuna for each election 1989-2009; answers HTTP 200 to a script"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-06-28",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_concejales_ce_1992_al_2000.xlsx: 1992 (the workbook dates it 28 October)"
+        },
+        {
+          "date": "1996-10-27",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_concejales_ce_1992_al_2000.xlsx: 1996"
+        },
+        {
+          "date": "2000-10-29",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_concejales_ce_1992_al_2000.xlsx: 2000"
+        },
+        {
+          "date": "2004-10-31",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_concejales_ce_2004_2016-1.xlsx: 2004"
+        },
+        {
+          "date": "2008-10-26",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2012-10-28",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2016-10-23",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345
+        },
+        {
+          "date": "2021-05-15",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345,
+          "deferred": [
+            "2021-05-16"
+          ]
+        },
+        {
+          "date": "2024-10-26",
+          "source": "servel_territorios",
+          "quote": "Servel's Territorios Electorales register lists 346 comunas; Antártica has no municipality of its own and votes with Cabo de Hornos (an agrupación de comunas, LOC 18.695 art. 1), so 345 municipalities elect",
+          "contests": 345,
+          "deferred": [
+            "2024-10-27"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "alcalde_indirecto",
+      "tier": "comuna",
+      "name": "Alcaldes elegidos por el concejo o por la votación de concejales (1992-2000)",
+      "name_en": "Mayors chosen by the council or from the councillor vote, 1992-2000",
+      "category": "indirect",
+      "goal": "local",
+      "valid_from": "1991-11-12",
+      "valid_to": "2004-10-31",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "From 1992 to 2000 mayors had no ballot of their own: the council chose one of its members, or the most-voted councillor became mayor when the thresholds the law set were met.",
+      "source": "loc18695",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No separate ballot: the mayor was chosen by the council or followed from the councillor vote, which the class concejo_municipal holds."
+    },
+    {
+      "key": "regidores",
+      "tier": "comuna",
+      "name": "Elecciones municipales de regidores (hasta 1973)",
+      "name_en": "Municipal councils (regidores), to 1973",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1973-09-11",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "Municipalities elected regidores from the nineteenth century (the Ley de Comuna Autónoma of 24 December 1891 gave them control of elections); women voted in municipal elections from Ley 5.357 of 1934. The last were held in April 1971; the junta dissolved the councils in 1973 and appointed mayors until 1992.",
+      "source": "bcn_elecciones",
+      "locator": "https://www.bcn.cl/historiapolitica/elecciones/index.html?periodo=1925-1973",
+      "est_votes": 2500000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "cl.comuna"
+          ],
+          "iso_pattern": "CL",
+          "valid_to": "1973-09-11"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1891-12-24",
+          "through": "1971-12-31",
+          "note": "Not yet enumerated; the BCN timeline lists the laws but not the municipal election days."
+        }
+      ]
+    },
+    {
+      "key": "primaria_presidencial",
+      "tier": "national",
+      "name": "Elecciones primarias presidenciales",
+      "name_en": "State-run presidential primaries",
+      "category": "nominating",
+      "goal": "national",
+      "valid_from": "2012-12-06",
+      "first_held": "2013-06-30",
+      "earliest_record": "2013-06-30",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Servel runs a joint national primary for President and parliamentarians on the twentieth Sunday before the presidential election, open to parties and pacts that opt in; the result binds the parties (Ley 20.640 art. 3). One contest per pact. 2021 was held on 18 July under a pandemic transitory rule.",
+      "source": "primarias",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3: \"deberá realizarse el vigésimo domingo anterior a la fecha de la elección de Presidente de la República\")",
+      "est_votes": 1500000,
+      "effort": 1,
+      "finest_note": "mesa, in Servel's primaries workbooks",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 7,
+          "day_rule": "twentieth_sunday_before_presidential",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Servicio Electoral de Chile (Servel); results qualified by the Tribunal Calificador de Elecciones (TRICEL) or the regional electoral courts (TER)",
+          "source": "primarias",
+          "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3)",
+          "valid_from": "2012-12-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2013-06-30",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-06-30",
+          "source": "servel_resultados",
+          "quote": "Resultados_Mesa_Presidente_Tricel1 workbooks: primaries of Nueva Mayoría and Alianza",
+          "contests": 2
+        },
+        {
+          "date": "2017-07-02",
+          "source": "servel_resultados",
+          "quote": "Resultados_Presidente_Primarias2017_Tricel_nacional.xlsx: primaries of Chile Vamos and Frente Amplio",
+          "contests": 2
+        },
+        {
+          "date": "2021-07-18",
+          "source": "servel_resultados",
+          "quote": "2021_Primarias_Presidenciales.zip: primaries of Chile Vamos and Apruebo Dignidad",
+          "contests": 2
+        },
+        {
+          "date": "2025-06-29",
+          "source": "servel_resultados",
+          "quote": "Resultados_Preliminares_Primarias_Presidencial_CL_20250701.xlsx: primary of Unidad por Chile",
+          "contests": 1
+        }
+      ]
+    },
+    {
+      "key": "primaria_parlamentaria",
+      "tier": "national",
+      "name": "Elecciones primarias parlamentarias",
+      "name_en": "State-run primaries for deputies and senators",
+      "category": "nominating",
+      "goal": "national",
+      "valid_from": "2012-12-06",
+      "first_held": "2013-06-30",
+      "earliest_record": "2013-06-30",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.distrito",
+          "cl.distrito_1989"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Held with the presidential primary in the districts and circunscripciones where a pact opts in (Ley 20.640 art. 3). Deputies' primaries in 2013 and 2017; in 2013 Servel publishes them only by circunscripción electoral.",
+      "source": "primarias",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3)",
+      "est_votes": 400000,
+      "effort": 2,
+      "finest_note": "mesa for 2017; circunscripción electoral for 2013",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2013-06-30",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-06-30",
+          "source": "servel_resultados",
+          "quote": "resultados_elecciones_primarias_diputados_ce_2013_2017.xlsx: 2013"
+        },
+        {
+          "date": "2017-07-02",
+          "source": "servel_resultados",
+          "quote": "Resultados_Diputados_Primarias2017_Tricel.xlsx: 2017"
+        }
+      ]
+    },
+    {
+      "key": "primaria_gobernador",
+      "tier": "region",
+      "name": "Elecciones primarias de gobernadores regionales",
+      "name_en": "State-run primaries for regional governor",
+      "category": "nominating",
+      "goal": "subnational",
+      "valid_from": "2017-01-05",
+      "first_held": "2020-11-29",
+      "earliest_record": "2020-11-29",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.region"
+        ],
+        "fine": [
+          "cl.comuna",
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "Held with the mayoral primaries on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2020 on 29 November ahead of the postponed 2021 elections, 2024 on 9 June.",
+      "source": "primarias",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3: \"La elección primaria para la nominación de candidatos a los cargos de alcalde y de gobernador regional deberá realizarse el vigésimo domingo anterior a la fecha de las elecciones municipales\")",
+      "est_votes": 300000,
+      "effort": 2,
+      "finest_note": "mesa, in Primarias_2020_Alcalde-GORE.zip",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2013-06-30",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-11-29",
+          "source": "servel_resultados",
+          "quote": "Primarias_2020_Alcalde-GORE.zip: GORE"
+        },
+        {
+          "date": "2024-06-09",
+          "source": "primarias",
+          "quote": "Art. 3: the twentieth Sunday before the municipal elections of 27 October 2024"
+        }
+      ]
+    },
+    {
+      "key": "primaria_alcalde",
+      "tier": "comuna",
+      "name": "Elecciones primarias de alcaldes",
+      "name_en": "State-run primaries for mayor",
+      "category": "nominating",
+      "goal": "local",
+      "valid_from": "2012-12-06",
+      "first_held": "2016-06-19",
+      "earliest_record": "2016-06-19",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cl.comuna"
+        ],
+        "fine": [
+          "cl.circ_electoral",
+          "cl.mesa"
+        ]
+      },
+      "note": "In the communes where a pact opts in, on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2016 on 19 June, 2020 on 29 November, 2024 on 9 June.",
+      "source": "primarias",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3)",
+      "est_votes": 300000,
+      "effort": 2,
+      "finest_note": "mesa, in Resultados_Pimarias_Alcalde_2016.xlsx and Primarias_2020_Alcalde-GORE.zip",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "CL"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Servel, Resultados electorales históricos (xlsx and zip by mesa and by circunscripción electoral)",
+          "url": "https://www.servel.cl/biblioteca-de-documentos/resultados-electorales-historicos/",
+          "format": "xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2016-06-19",
+          "finest": "cl.mesa",
+          "source": "servel_resultados",
+          "license": "No license stated: official results published by Servel; facts reused with attribution",
+          "role": "administers",
+          "evidence": "Workbooks under www.servel.cl/wp-content/uploads/ answer HTTP 200 to a script; by mesa from 2012, by circunscripción electoral and sex of table for 1989-2017"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2016-06-19",
+          "source": "servel_resultados",
+          "quote": "Resultados_Pimarias_Alcalde_2016.xlsx: 2016"
+        },
+        {
+          "date": "2020-11-29",
+          "source": "servel_resultados",
+          "quote": "Primarias_2020_Alcalde-GORE.zip: Alcaldes"
+        },
+        {
+          "date": "2024-06-09",
+          "source": "primarias",
+          "quote": "Art. 3: the twentieth Sunday before the municipal elections of 27 October 2024"
+        }
+      ]
+    },
+    {
+      "key": "internas_partidos",
+      "tier": "national",
+      "name": "Elecciones internas de los partidos políticos",
+      "name_en": "Party leadership and internal elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Parties elect their organs and may nominate by internal procedures under their statutes (Ley 18.603); only the Ley 20.640 primaries are run by Servel.",
+      "source": "primarias",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties themselves under their statutes, not by Servel; no official public results."
+    },
+    {
+      "key": "juntas_vecinos",
+      "tier": "unidad_vecinal",
+      "name": "Elecciones de directivas de juntas de vecinos",
+      "name_en": "Neighborhood council boards",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each junta de vecinos elects its board among its members, under the supervision of a ministro de fe; disputes go to the regional electoral court (Ley 19.418).",
+      "source": "ley19418",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Membership organizations' internal elections under Ley 19.418, run by the organizations and not by Servel; electorates are their members, not the electoral roll."
+    },
+    {
+      "key": "conadi_consejeros",
+      "tier": "national",
+      "name": "Elección de consejeros nacionales indígenas de CONADI",
+      "name_en": "Indigenous members of the CONADI National Council",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Eight indigenous representatives (four Mapuche, one Aymara, one Atacameño, one Rapa Nui, and one urban) sit on CONADI's council for four years; CONADI holds a vote among registered indigenous people to propose them.",
+      "source": "ley19253",
+      "locator": "https://www.bcn.cl/leychile/navegar?idNorma=30620 (art. 41 d: \"Estos serán designados, a propuesta de las Comunidades y Asociaciones Indígenas, por el Presidente de la República\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "By law the President designates the eight on the communities' proposal; the vote CONADI organizes is a consultation it runs itself, not an election administered by Servel."
+    }
+  ]
+}
