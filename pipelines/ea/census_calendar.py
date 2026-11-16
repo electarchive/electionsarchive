@@ -81,6 +81,7 @@ DAY_RULES = {
     "nov_first_sunday": nth_weekday(11, 6, 1),
     "oct_second_last_sunday": lambda year: last_weekday(10, 6)(year) - timedelta(days=7),
     "mar_first_sunday": nth_weekday(3, 6, 1),
+    "mar_first_wednesday": nth_weekday(3, 2, 1),
     "may_first_sunday": nth_weekday(5, 6, 1),
     "apr_last_sunday_unless_easter": apr_last_sunday_unless_easter,
     "oct_first_sunday": nth_weekday(10, 6, 1),
