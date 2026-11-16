@@ -118,8 +118,12 @@ DROP = """with hit(id) as (
         cross join lateral (select contest_id from contest_top where inferred @> array[n.id] offset 0) t
   union select t.contest_id from unnest(%(merged)s::uuid[]) n(id)
         cross join lateral (select contest_id from contest_top where refs @> array[n.id] offset 0) t
+),
+gone as (
+  delete from contest_top where contest_id = any(array(select id from hit)) returning contest_id
 )
-delete from contest_top where contest_id = any(array(select id from hit))"""
+insert into cover_stale (contest_id, changeset_id)
+select contest_id, %(id)s::uuid from gone where contest_id <> all(%(up)s::uuid[])"""
 
 
 def uncover(
@@ -142,6 +146,9 @@ def uncover(
         return
     row = conn.execute(sql.SQL(STALE).format(facts=facts or sql.SQL("select null::uuid")), params).fetchone()
     if tops:
-        found = conn.execute(TOPS, {**params, "up": row[0] if row else []}).fetchone()
+        up = row[0] if row else []
+        found = conn.execute(TOPS, {**params, "up": up}).fetchone()
         if found is not None:
-            conn.execute(DROP, dict(zip(("contests", "named", "merged"), found, strict=True)))
+            conn.execute(
+                DROP, {"id": changeset_id, "up": up, **dict(zip(("contests", "named", "merged"), found, strict=True))}
+            )

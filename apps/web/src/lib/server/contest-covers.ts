@@ -223,6 +223,18 @@ async function refillTops() {
     where s.contest_id = t.contest_id and t.built_at < s.at
     returning t.contest_id as id
   `);
+  const remapped = await db.execute<{ id: string }>(sql`
+    delete from contest_top t
+    using (
+      select entity_id as id, recorded_from as at from entity_merge
+      where recorded_from > (select min(built_at) from contest_top)
+      union all
+      select into_id, upper(recorded) from entity_merge_history
+      where upper(recorded) > (select min(built_at) from contest_top)
+    ) m
+    where t.refs @> array[m.id] and t.built_at < m.at
+    returning t.contest_id as id
+  `);
   const listed = await db.execute<{ id: string }>(sql`
     select c.id from contest c
     where c.allocation_parent_id is null and not exists (select from contest_top t where t.contest_id = c.id)
@@ -260,7 +272,7 @@ async function refillTops() {
   }
   await db.execute(sql`analyze contest_top`);
   const { checked, stale } = await auditTops();
-  return `${built} race tops built, ${counted} unit counts filled, ${orphans.rows.length} orphans removed, ${outlived.rows.length} built before a later stale mark removed, ${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} race tops built, ${counted} unit counts filled, ${orphans.rows.length} orphans removed, ${outlived.rows.length} built before a later stale mark removed, ${remapped.rows.length} built before a later merge of an entity they show removed,${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
 }
 
 async function refillCovers() {
