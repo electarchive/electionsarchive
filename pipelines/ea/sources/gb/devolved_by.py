@@ -15,7 +15,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_by"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, INVALID = 1, 2, 5
 PAGE = "https://en.wikipedia.org/w/index.php?title={}&action=raw"
@@ -178,6 +178,12 @@ JOINS = {
     "shirley-anne-somerville": ("gb.scottish_parliament.person", "shirley-anne-somerville", "scottish-national-party"),
     "rosie-kane": ("gb.scottish_parliament.person", "rosie-kane", "scottish-socialist-party"),
     "ross-thomson": ("gb.scottish_parliament.person", "ross-thomson", "conservative"),
+    # Wikidata items for candidates the by-election pages link to the article of the member
+    # they later became; Gareth Hughes (2025, Greens) is left out because no item is shown to be him.
+    "steffan-lewis": ("wikidata", "Q24405255", "plaid-cymru"),
+    "owen-smith": ("wikidata", "Q390690", "labour"),
+    "christine-jardine": ("wikidata", "Q30164696", "liberal-democrats"),
+    "llyr-powell": ("wikidata", "Q139715108", "reform-uk"),
 }
 PARTIES = {
     "Scottish Conservatives": "conservative",
