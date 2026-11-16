@@ -1,0 +1,1203 @@
+{
+  "polity": "EG",
+  "name": "Egypt",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Egypt",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "مصر",
+        "lang": "ar",
+        "kind": "native"
+      }
+    ],
+    "slug": "eg",
+    "wikidata": "Q79",
+    "source": "constitution"
+  },
+  "region_schemes": [
+    "eg.muhafaza"
+  ],
+  "sources": {
+    "constitution": {
+      "title": "دستور جمهورية مصر العربية الصادر في يناير 2014 والمعدل بالاستفتاء على تعديل بعض مواد الدستور 2019",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf",
+      "kind": "official_body",
+      "note": "The 2014 Constitution as amended by the April 2019 referendum, from the authority's digital library. Page 4 reprints High Elections Committee decree 7 of 2014 announcing the 14-15 January 2014 referendum result."
+    },
+    "law46": {
+      "title": "قانون رقم 46 لسنة 2014 بإصدار قانون مجلس النواب وتعديلاته",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/prlaman-46-2014.pdf",
+      "kind": "official_body",
+      "note": "House of Representatives law as amended by Laws 92 of 2015, 140 of 2020, and 85 of 2025. Art. 1: 568 elected members, at least a quarter women, and up to 5 percent appointed. Art. 3: 284 individual seats and 284 closed-list seats; art. 4: four list districts (two of 40 seats and two of 102 seats as amended in 2025)."
+    },
+    "law174": {
+      "title": "قانون رقم 174 لسنة 2020 في شأن تقسيم دوائر انتخابات مجلس النواب",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/senate_2025/174-2020.pdf",
+      "kind": "official_body",
+      "note": "Boundary law for the House: the individual-seat constituencies and the four list districts, with their seats."
+    },
+    "law141": {
+      "title": "قانون رقم 141 لسنة 2020 بإصدار قانون مجلس الشيوخ",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/Senate-2020-141.pdf",
+      "kind": "official_body",
+      "note": "Senate law: 300 members, two thirds elected (100 individual seats in 27 governorate districts and 100 closed-list seats in 4 districts) and one third appointed by the President."
+    },
+    "law45": {
+      "title": "قانون رقم 45 لسنة 2014 بتنظيم مباشرة الحقوق السياسية",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/PoliRights-2014-45.pdf",
+      "kind": "official_body",
+      "note": "Political rights law: voter registration from the national ID database, voting procedure, referendums, and counting."
+    },
+    "law198": {
+      "title": "قانون رقم 198 لسنة 2017 بشأن الهيئة الوطنية للانتخابات",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/NEAlaw-2017-198.pdf",
+      "kind": "official_body",
+      "note": "Establishes the National Election Authority, which runs referendums and presidential, parliamentary, and local elections (Constitution arts. 208-210)."
+    },
+    "nea_archive": {
+      "title": "الاستحقاقات الإنتخابية: نتائج انتخابات مجلس النواب والشيوخ والانتخابات الرئاسية",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/prev-elecyions",
+      "kind": "official_body",
+      "note": "Results archive of the authority's site: House 2020 and 2025, Senate 2020 and 2025, presidential 2018 and 2024 pages, with links to the 2011-2015 election sites.",
+      "license": "none stated"
+    },
+    "house2025": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 37 لسنة 2025 بدعوة الناخبين لانتخابات مجلس النواب",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/parliament_2025/37.pdf",
+      "kind": "official_body",
+      "note": "Two stages: 14 governorates voting 10-11 November 2025 (runoff 3-4 December) and 13 governorates voting 24-25 November 2025 (runoff 17-18 December); abroad a few days earlier."
+    },
+    "house2025_results": {
+      "title": "نتائج انتخابات مجلس النواب 2025",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/house-2025/h-2025-results/h-2025-stage1-round1-results",
+      "kind": "official_body",
+      "note": "Results by constituency as HTML fragments under /static/house_2025/results/<stage>/html/<code>.html: winners and runoff candidates with votes for individual seats, and votes for and against each list. Stage 1 lists 70 individual constituencies, stage 2 lists 73, and the 4 list districts.",
+      "license": "none stated"
+    },
+    "house2020": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 52 لسنة 2020 بدعوة الناخبين لانتخابات مجلس النواب",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/parliament_2020/52.pdf",
+      "kind": "official_body",
+      "note": "Two stages: 14 governorates voting 24-25 October 2020 (runoff 23-24 November) and 13 governorates voting 7-8 November 2020 (runoff 7-8 December)."
+    },
+    "house2020_results": {
+      "title": "نتائج انتخابات مجلس النواب 2020",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/house-2020/hor20-results/hor-20-stage2-round1-results",
+      "kind": "official_body",
+      "note": "Results by constituency as HTML fragments under /static/house_2020/results/<stage>/html/<code>.html; the stage pages list 71 and 72 individual constituencies and the 4 list districts.",
+      "license": "none stated"
+    },
+    "hor2015": {
+      "title": "Report on the 2015 House of Representatives Elections (summary)",
+      "publisher": "اللجنة العليا للانتخابات (High Elections Committee)",
+      "url": "https://parliament2015.elections.eg/images/pdfs/reports/2015HoR-ReportSummary_En.pdf",
+      "kind": "official_body",
+      "note": "The committee's own report: Decree-Law 202 of 2014 as amended by 88 of 2015 set 205 individual constituencies and 4 list constituencies; 568 elected and 28 appointed (596). Phase 1 voted from 18 October 2015 and phase 2 from 22 November 2015; final results 18 December 2015. Also outlines women's representation since 1957."
+    },
+    "senate2025": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 5 لسنة 2025 بدعوة الناخبين لانتخابات مجلس الشيوخ",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/senate_2025/5.pdf",
+      "kind": "official_body",
+      "note": "Voting abroad 1-2 August 2025 and in Egypt 4-5 August 2025."
+    },
+    "senate2020": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 32 لسنة 2020 بدعوة الناخبين لانتخابات مجلس الشيوخ",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/senate_2020/32.pdf",
+      "kind": "official_body",
+      "note": "Voting abroad 9-10 August 2020 and in Egypt 11-12 August 2020."
+    },
+    "senate_results": {
+      "title": "نتائج انتخابات مجلس الشيوخ 2020 و2025",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/senate-2025/s-2025-results/s-2025-s1-r1-results",
+      "kind": "official_body",
+      "note": "Results by constituency as HTML fragments: 27 individual districts (one per governorate) and 4 list districts in both 2020 and 2025.",
+      "license": "none stated"
+    },
+    "pres2024": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 3 لسنة 2023 بدعوة الناخبين لانتخاب رئيس الجمهورية",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/pres_2024/3_2023.pdf",
+      "kind": "official_body",
+      "note": "Voting abroad 1-3 December 2023 and in Egypt 10-12 December 2023; runoff, if needed, 8-10 January 2024."
+    },
+    "pres2024_results": {
+      "title": "النتيجة الكلية للإنتخابات الرئاسية 2024",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/pres-2024/pres-2024-result",
+      "kind": "official_body",
+      "note": "National totals (67,032,438 registered, 44,777,668 voting, 44,288,361 valid) and a companion page by governorate.",
+      "license": "none stated"
+    },
+    "pres2018": {
+      "title": "قرار الهيئة الوطنية للانتخابات رقم 1 لسنة 2018 بشأن دعوة الناخبين لانتخاب رئيس الجمهورية",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/images/pdfs/laws/pres_2018/1.pdf",
+      "kind": "official_body",
+      "note": "Voting abroad 16-18 March 2018 and in Egypt 26-28 March 2018."
+    },
+    "pres2018_results": {
+      "title": "النتيجة الكلية للإنتخابات الرئاسية 2018",
+      "publisher": "الهيئة الوطنية للانتخابات (National Election Authority)",
+      "url": "https://www.elections.eg/archive/pres-2018/pres-results-2018",
+      "kind": "official_body",
+      "note": "National totals only: 59,078,138 registered, 24,254,152 voting, 22,491,921 valid.",
+      "license": "none stated"
+    },
+    "pres2014": {
+      "title": "بيان النتيجة: الانتخابات الرئاسية 2014",
+      "publisher": "لجنة الانتخابات الرئاسية (Presidential Elections Commission)",
+      "url": "https://pres2014.elections.eg/images/pdfs/statement_of_results.pdf",
+      "kind": "official_body",
+      "note": "The commission's statement of results, read out at the declaration; p. 21 gives the polling days."
+    },
+    "pres2012": {
+      "title": "جدول مواعيد إجراءات الانتخابات الرئاسية 2012",
+      "publisher": "لجنة الانتخابات الرئاسية (Presidential Elections Commission)",
+      "url": "https://pres2012.elections.eg/images/docs/Schedule.pdf",
+      "kind": "official_body",
+      "note": "Timetable: first round in Egypt 23-24 May 2012, second round 16-17 June 2012."
+    },
+    "ref2012": {
+      "title": "الموقع الرسمى للجنة الإستفتاء على الدستور 2012",
+      "publisher": "اللجنة العليا للانتخابات (High Elections Committee)",
+      "url": "https://referendum2012.elections.eg/",
+      "kind": "official_body",
+      "note": "The referendum was held in two phases, on Saturday 15 December 2012 and Saturday 22 December 2012, each in half the governorates. The results pages embed an application on egelections-2011.appspot.com that no longer answers."
+    },
+    "prev_results": {
+      "title": "نتائج الانتخابات والاستفتاءات السابقة",
+      "publisher": "اللجنة العليا للانتخابات (High Elections Committee)",
+      "url": "https://referendum2014.elections.eg/previous-stages-results",
+      "kind": "official_body",
+      "note": "Links to the results of the March 2011 referendum, the 2011-2012 People's Assembly and Shura Council elections, the 2012 presidential election, and the 2012 referendum. The 2011 sites now redirect to the authority's home page."
+    },
+    "parl_1952": {
+      "title": "الحياة النيابية فى مصر بعد ثورة 1952",
+      "publisher": "مجلس النواب (House of Representatives)",
+      "url": "https://www.parliament.gov.eg/Documents/History/Year1952.aspx",
+      "kind": "official_body",
+      "note": "National Assembly of 350 elected members formed 22 July 1957; Assembly elected under the 1964 provisional constitution sat from 26 March 1964; new Assembly elected 20 January 1969; 1971 constitution; 1976 elections among platforms of the Arab Socialist Union; 1979 the first multiparty elections since 1952; Shura Council created 1980."
+    },
+    "parl_1923": {
+      "title": "دستور 1923",
+      "publisher": "مجلس النواب (House of Representatives)",
+      "url": "https://www.parliament.gov.eg/Documents/History/dostor_1923.aspx",
+      "kind": "official_body",
+      "note": "The 1923 constitution set up a Senate and a Chamber of Deputies; the Chamber had 214 members 1924-1930, 150 under the 1930 constitution (1931-1934), 232 from 1936, 264 from 1938, and 319 from 1950 until the July 1952 revolution."
+    },
+    "parl_1866": {
+      "title": "مجلس شورى النواب",
+      "publisher": "مجلس النواب (House of Representatives)",
+      "url": "https://www.parliament.gov.eg/Documents/History/shoraa.aspx",
+      "kind": "official_body",
+      "note": "The Consultative Assembly of Deputies sat from 25 November 1866 to July 1879; the Chamber of Deputies of 1881-1882, the Consultative Council of Laws and General Assembly of 1883-1913, and the Legislative Assembly of 1914 followed (sibling pages maglesnowab, Sura_Laws, and Gamia_Sharia)."
+    },
+    "sis_basic": {
+      "title": "معلومات أساسية: التقسيم الإداري",
+      "publisher": "الهيئة العامة للاستعلامات (State Information Service)",
+      "url": "https://sis.gov.eg/ar/%D9%85%D8%B5%D8%B1/%D9%85%D8%B9%D9%84%D9%88%D9%85%D8%A7%D8%AA-%D8%A3%D8%B3%D8%A7%D8%B3%D9%8A%D8%A9/",
+      "kind": "official_body",
+      "note": "Administrative division as published by the State Information Service: 27 governorates, about 185 marakiz, about 212 aqsam, 91 districts (ahya'), 225 cities, 4,727 villages under rural local units, and 837 shiakhas. Undated; read 16 November 2026."
+    },
+    "sis_local": {
+      "title": "الإدارة المحلية",
+      "publisher": "الهيئة العامة للاستعلامات (State Information Service)",
+      "url": "https://sis.gov.eg/ar/%D9%85%D8%B5%D8%B1/%D9%86%D8%B8%D8%A7%D9%85-%D8%A7%D9%84%D8%AD%D9%83%D9%85/%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%8A%D8%A9/%D8%A7%D9%84%D8%A7%D8%AF%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D9%85%D8%AD%D9%84%D9%8A%D8%A9/",
+      "kind": "official_body",
+      "note": "Local administration: the units of the state (governorates, cities, villages) and the elected local councils of Constitution arts. 175-183, with the governorate council settling disputes between village, markaz, and city councils."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "جمهورية مصر العربية",
+      "name_en": "Arab Republic of Egypt",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "eg.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "muhafaza",
+      "name": "المحافظات",
+      "name_en": "Governorates",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "eg.muhafaza",
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 27,
+          "source": "sis_basic",
+          "locator": "\"يبلغ عدد محافظات مصر 27 محافظة\""
+        }
+      ]
+    },
+    {
+      "key": "markaz",
+      "name": "المراكز",
+      "name_en": "Marakiz (rural counties of the governorates that have villages)",
+      "parent": "muhafaza",
+      "polity_kind": "county",
+      "scheme": "eg.markaz",
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 185,
+          "source": "sis_basic",
+          "locator": "\"المراكز: توجد في المحافظات التي بها ريف، ويبلغ عددها حوالي 185 مركزاً\" (given as approximate)"
+        }
+      ]
+    },
+    {
+      "key": "madina",
+      "name": "المدن",
+      "name_en": "Cities",
+      "parent": "markaz",
+      "polity_kind": "municipality",
+      "scheme": "eg.madina",
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 225,
+          "source": "sis_basic",
+          "locator": "\"المدن: يبلغ عددها 225 مدينة\""
+        }
+      ]
+    },
+    {
+      "key": "hayy",
+      "name": "الأحياء",
+      "name_en": "Districts of the large cities and urban governorates",
+      "parent": "madina",
+      "polity_kind": "submunicipal",
+      "scheme": "eg.hayy",
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 91,
+          "source": "sis_basic",
+          "locator": "\"الأحياء: تقسيمات داخل المدن الكبيرة والمحافظات الحضرية، ويبلغ عددها 91 حياً\""
+        }
+      ]
+    },
+    {
+      "key": "qarya",
+      "name": "الوحدات المحلية القروية",
+      "name_en": "Rural local units, each a main village with its satellite villages",
+      "parent": "markaz",
+      "polity_kind": "submunicipal",
+      "scheme": "eg.qarya",
+      "source": "sis_basic"
+    },
+    {
+      "key": "shiakha",
+      "name": "الشياخات",
+      "name_en": "Shiakhas, the smallest urban subdivisions",
+      "parent": "hayy",
+      "polity_kind": "submunicipal",
+      "scheme": "eg.shiakha",
+      "elects": false,
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 837,
+          "source": "sis_basic",
+          "locator": "\"الشياخات: أصغر تقسيم إداري في المناطق الحضرية، ويبلغ عددها 837 شياخة\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "nuwwab",
+      "tier": "national",
+      "name": "انتخابات مجلس النواب (مجلس الأمة ومجلس الشعب من قبل)",
+      "name_en": "House of Representatives, formerly the National Assembly (1957-1971) and People's Assembly (1971-2013)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "eg.dairah"
+        ],
+        "fine": [
+          "eg.lagna_amma",
+          "eg.lagna_far3iya"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (arts. 102, 106)",
+      "valid_from": "1957-07-22",
+      "first_held": "1957-07-03",
+      "earliest_record": "2015-10-18",
+      "note": "The elected lower chamber of the republic: the National Assembly of 1957, 1964, and 1969, the People's Assembly from 1971 to its dissolution in June 2012, and the House of Representatives from 2015. The 1957 Assembly had 350 elected members. Under the 1964-2012 rules half the seats were reserved for workers and farmers. Systems: two-round majority voting in single- and two-member districts for most of the period, party lists in 1984 and 1987, and a mixed system since 2011. Since 2020, 568 elected seats: 284 individual seats in 143 constituencies by two-round majority and 284 seats in 4 closed-list districts won whole by the list with an absolute majority; up to 5 percent more are appointed by the President (Constitution art. 102; Law 46 of 2014 arts. 1, 3, and 4). Elections are held in two or three regional stages, each with a runoff.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "EG",
+          "valid_from": "1957-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 106: \"مدة عضوية مجلس النواب خمس سنوات ميلادية ... ويجرى انتخاب المجلس الجديد خلال الستين يوما السابقة على انتهاء مدته\")",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Individual seats: candidates short of an absolute majority of valid votes go to a runoff between twice as many candidates as seats left (Law 46 of 2014).",
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEA results archive (elections.eg)",
+          "url": "https://www.elections.eg/static/house_2025/results/{stage}/html/{code}.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2020-10-24",
+          "last_date": "2025-12-18",
+          "finest": "eg.dairah",
+          "source": "house2025_results",
+          "evidence": "One fragment per individual constituency (winners and runoff candidates with their votes) and per list district (votes for and against each list, with its candidates); 2020 and 2025."
+        },
+        {
+          "platform": "High Elections Committee, 2015 House of Representatives site",
+          "url": "https://parliament2015.elections.eg/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2015-10-18",
+          "last_date": "2015-12-02",
+          "finest": "eg.dairah",
+          "source": "hor2015",
+          "evidence": "The 2015 site is still served with candidate lists by stage and the committee's report; constituency results pages not yet located."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1957-01-01",
+          "precision": "year",
+          "through": "2010-12-31",
+          "note": "The National Assembly elections of 1957, 1964, and 1969 and the People's Assembly elections of 1971-2010 aren't counted yet. The House's history page dates the 1957 and 1969 Assemblies and the 1976 and 1979 elections; no official results by constituency are online.",
+          "source": "parl_1952",
+          "quote": "\"تشكيل مجلس الأمة فى 22 من يوليو 1957 من 350 عضواً منتخباً\"; \"واجريت انتخابات المجلس الجديد فى 20 من يناير 1969\""
+        },
+        {
+          "date": "2011-11-28",
+          "precision": "month",
+          "through": "2012-01-31",
+          "note": "The 2011-2012 People's Assembly election, held in three stages from November 2011 to January 2012, isn't counted yet: its results site (parliament2011.elections.eg) now redirects to the authority's home page.",
+          "source": "prev_results",
+          "quote": "\"نتائج انتخابات مجلسي الشعب والشورى 2011\" (link to http://parliament2011.elections.eg/index.php/results)"
+        },
+        {
+          "date": "2015-10-18",
+          "contests": 209,
+          "seats": 568,
+          "note": "205 individual constituencies (448 seats) and 4 list constituencies (120 seats). Phase 1 voted from 18 October 2015 and phase 2 from 22 November 2015; four postponed constituencies voted later, and final results were announced on 18 December 2015. The President appointed 28 more members.",
+          "source": "hor2015",
+          "quote": "\"205 constituencies assigned for the Individual System\"; \"The quorum of HoR members (568) was reached and the President of the Republic issued decree #560/2015 appointing 28 members, making the total number of HoR members 596.\""
+        },
+        {
+          "date": "2020-10-24",
+          "contests": 147,
+          "seats": 568,
+          "note": "143 individual constituencies (284 seats) and 4 list districts (284 seats). Stage 1 in 14 governorates on 24-25 October 2020 and stage 2 in 13 governorates on 7-8 November 2020, with runoffs on 23-24 November and 7-8 December.",
+          "source": "house2020",
+          "quote": "\"داخل جمهورية مصر العربية يومي السبت والأحد الموافقين 24 و 25/10/2020\"; \"داخل جمهورية مصر العربية يومي السبت و الأحد الموافقين 7 و 8/11/2020\""
+        },
+        {
+          "date": "2025-11-10",
+          "contests": 147,
+          "seats": 568,
+          "note": "143 individual constituencies (70 in stage 1, 73 in stage 2; 284 seats) and 4 list districts (284 seats), counted from the results pages. Stage 1 in 14 governorates on 10-11 November 2025 and stage 2 in 13 governorates on 24-25 November 2025, with runoffs on 3-4 and 17-18 December. Voting in a number of stage 1 constituencies was annulled and rerun; the reruns are not counted separately here.",
+          "source": "house2025",
+          "quote": "\"داخل جمهورية مصر العربية يومي الاثنين و الثلاثاء الموافقين 10 و 11/11/2025\"; \"داخل جمهورية مصر العربية يومي الاثنين و الثلاثاء الموافقين 24 و 25/11/2025\""
+        }
+      ],
+      "est_votes": 45000000,
+      "effort": 2
+    },
+    {
+      "key": "nuwwab_by",
+      "tier": "national",
+      "name": "الانتخابات التكميلية لمجلس النواب",
+      "name_en": "By-elections to the House of Representatives (and earlier lower chambers)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "eg.dairah"
+        ]
+      },
+      "source": "law46",
+      "note": "A seat that falls vacant more than six months before the end of the term is filled by a by-election (انتخاب تكميلي) in its constituency for an individual seat, or from the reserve candidates of the list for a list seat (Law 46 of 2014). The 2015 site has a page on by-elections; the authority announces them in its news pages.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "EG"
+        }
+      ],
+      "dates": [],
+      "est_votes": 1500000,
+      "effort": 4
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "انتخابات مجلس الشيوخ",
+      "name_en": "Senate (since 2020)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "eg.muhafaza",
+          "eg.dairah"
+        ]
+      },
+      "source": "law141",
+      "valid_from": "2019-04-23",
+      "first_held": "2020-08-11",
+      "earliest_record": "2020-08-11",
+      "note": "Created by the 2019 amendments (Constitution arts. 248-254). 300 members: 100 elected by two-round majority in 27 individual districts, one per governorate, 100 in 4 closed-list districts, and 100 appointed by the President (Law 141 of 2020).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "EG",
+          "valid_from": "2019-04-23"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 250: \"مدة عضوية مجلس الشيوخ خمس سنوات ... وينتخب ثلثا أعضائه باالقتراع العام السرى المباشر\")",
+          "period_years": 5,
+          "term_years": 5,
+          "runoff": "majority",
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2019-04-23"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEA results archive (elections.eg)",
+          "url": "https://www.elections.eg/static/senate_2025/results/{stage}/html/{code}.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2020-08-11",
+          "last_date": "2025-08-28",
+          "finest": "eg.dairah",
+          "source": "senate_results",
+          "evidence": "One fragment per individual district and per list district, first round and runoff, 2020 and 2025."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-08-11",
+          "contests": 31,
+          "seats": 200,
+          "note": "27 individual districts (100 seats) and 4 list districts (100 seats); in Egypt on 11-12 August 2020, abroad on 9-10 August.",
+          "source": "senate2020",
+          "quote": "\"يومى: الثلاثاء و الأربعاء الموافقين: 11 و 12/8/2020\""
+        },
+        {
+          "date": "2025-08-04",
+          "contests": 31,
+          "seats": 200,
+          "note": "27 individual districts (100 seats) and 4 list districts (100 seats); in Egypt on 4-5 August 2025, abroad on 1-2 August.",
+          "source": "senate2025",
+          "quote": "\"يومى: الإثنين و الثلاثاء الموافقين: 4 و 5/8/2025\""
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 2
+    },
+    {
+      "key": "shura",
+      "tier": "national",
+      "name": "انتخابات مجلس الشورى",
+      "name_en": "Shura Council (1980-2014)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "eg.dairah"
+        ]
+      },
+      "source": "parl_1952",
+      "valid_from": "1980-05-22",
+      "valid_to": "2014-01-18",
+      "first_held": "1980-01-01",
+      "note": "Created by the 1980 constitutional amendment; two thirds elected for six years with half renewed every three years, one third appointed. Last elected in 2012 and abolished by the 2014 Constitution.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "EG",
+          "valid_from": "1980-01-01",
+          "valid_to": "2014-01-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "through": "2012-12-31",
+          "note": "The partial renewals of 1980-2010 and the 2012 election aren't counted yet.",
+          "source": "parl_1952",
+          "quote": "\"وفى عام 1980 تم إنشاء مجلس الشورى\""
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "No official results are online: the 2012 results sat on parliament2011.elections.eg, which now redirects to the authority's home page, and earlier renewals were never published online."
+    },
+    {
+      "key": "kingdom_deputies",
+      "tier": "national",
+      "name": "انتخابات مجلس النواب (1924-1952)",
+      "name_en": "Chamber of Deputies of the Kingdom of Egypt (1924-1952)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl_1923",
+      "valid_from": "1923-04-19",
+      "valid_to": "1952-12-10",
+      "first_held": "1924-01-01",
+      "note": "Elected under the 1923 constitution, and under the 1930 constitution from 1931 to 1935, with 214 to 319 members.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "EG",
+          "valid_to": "1953-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "through": "1950-12-31",
+          "note": "The general elections of 1924-1950 aren't counted yet.",
+          "source": "parl_1923",
+          "quote": "\"سنة 1923 هو 214 عضواً واستمر كذلك من عام 1924 إلى عام 1930 ... ثم زاد بعد ذلك فى عام1950 إلى 319 عضوا\""
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "No official results by constituency are online; the House's history pages give only the size of each Chamber."
+    },
+    {
+      "key": "kingdom_senate",
+      "tier": "national",
+      "name": "انتخابات مجلس الشيوخ (1924-1952)",
+      "name_en": "Senate of the Kingdom of Egypt (1924-1952), three fifths elected",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl_1923",
+      "valid_from": "1923-04-19",
+      "valid_to": "1952-12-10",
+      "first_held": "1924-01-01",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "EG",
+          "valid_to": "1953-01-01"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results are online."
+    },
+    {
+      "key": "khedival",
+      "tier": "national",
+      "name": "مجلس شورى النواب والجمعية العمومية والجمعية التشريعية",
+      "name_en": "Assemblies of the Khedivate (1866-1923)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl_1866",
+      "valid_from": "1866-11-25",
+      "valid_to": "1923-04-19",
+      "first_held": "1866-01-01",
+      "note": "The Consultative Assembly of Deputies (1866-1879), the Chamber of Deputies (1881-1882), the Consultative Council of Laws and General Assembly (1883-1913), and the Legislative Assembly (1913-1923).",
+      "match": [],
+      "dates": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members were chosen indirectly by village headmen and electoral delegates, or appointed; there was no popular vote to count."
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "الانتخابات الرئاسية",
+      "name_en": "President of the Republic, by popular vote",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "eg.muhafaza"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (arts. 140, 143)",
+      "valid_from": "2005-05-25",
+      "first_held": "2005-09-07",
+      "earliest_record": "2012-05-23",
+      "note": "Contested by popular vote since the 2005 amendment of art. 76 of the 1971 constitution. Absolute majority of valid votes, else a runoff (Constitution art. 143). Six-year term since 2019, four years from 2014 to 2019 (art. 140; art. 241 bis extended the term that began in 2018 to six years).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "EG",
+          "valid_from": "2005-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 140 as amended in 2019: \"يُنتخب رئيس الجمهورية لمدة ست سنوات ميالدية\")",
+          "period_years": 6,
+          "term_years": 6,
+          "runoff": "majority",
+          "runoff_rule": "Top two of the first round (Law 22 of 2014).",
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2019-04-23"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEA results archive (elections.eg)",
+          "url": "https://www.elections.eg/archive/pres-2024/pres-2024-result-by-gov",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2018-03-26",
+          "last_date": "2023-12-10",
+          "finest": "eg.muhafaza",
+          "source": "pres2024_results",
+          "evidence": "2023 results by governorate and national totals; 2018 national totals only."
+        },
+        {
+          "platform": "Presidential Elections Commission 2014 site",
+          "url": "https://pres2014.elections.eg/images/pdfs/statement_of_results.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2014-05-26",
+          "last_date": "2014-05-26",
+          "finest": null,
+          "source": "pres2014",
+          "evidence": "Statement of national results; the site also has results pages and a map."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "through": "2005-12-31",
+          "note": "The first contested presidential election (September 2005) isn't counted yet; its commission's results are not online."
+        },
+        {
+          "date": "2012-05-23",
+          "contests": 1,
+          "source": "pres2012",
+          "quote": "\"الانتخاب الأول بالداخل: الأربعاء 2012/5/23 والخميس 2012/5/24\""
+        },
+        {
+          "date": "2012-06-16",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "pres2012",
+          "quote": "\"الانتخاب الثانى فى الداخل: السبت 2012/6/16 والأحد 2012/6/17\""
+        },
+        {
+          "date": "2014-05-26",
+          "contests": 1,
+          "source": "pres2014",
+          "quote": "\"وفي الداخل أيام 26، 27، 28 من مايو 2014\""
+        },
+        {
+          "date": "2018-03-26",
+          "contests": 1,
+          "source": "pres2018",
+          "quote": "\"داخل جمهورية مصر العربية: أيام الاثنين و الثلاثاء و الأربعاء الموافقة 26، 27، 28 من مارس 2018\""
+        },
+        {
+          "date": "2023-12-10",
+          "contests": 1,
+          "note": "Styled the 2024 presidential election, for the term starting April 2024.",
+          "source": "pres2024",
+          "quote": "\"داخل جمهورية مصر العربية: أيام الأحد والإثنين والثلاثاء الموافقة 10 و11 و12 من ديسمبر 2023\""
+        }
+      ],
+      "est_votes": 145000000,
+      "effort": 2
+    },
+    {
+      "key": "president_referendum",
+      "tier": "national",
+      "name": "الاستفتاء على رئيس الجمهورية",
+      "name_en": "Referendums on a single presidential nominee (1956-1999)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl_1952",
+      "valid_from": "1956-06-23",
+      "valid_to": "2005-05-25",
+      "first_held": "1956-06-23",
+      "note": "The National Assembly, later the People's Assembly, nominated one candidate, whom voters approved or rejected in a referendum (1956, 1958 for the United Arab Republic, 1965, 1970, 1976, 1981, 1987, 1993, and 1999). Replaced by contested elections in 2005.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "EG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1956-01-01",
+          "precision": "year",
+          "through": "1999-12-31",
+          "note": "Not counted yet."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "No official results are online for any of these referendums."
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "الاستفتاءات",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "eg.muhafaza"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (arts. 157, 226)",
+      "first_held": "1956-06-23",
+      "earliest_record": "2012-12-15",
+      "note": "The President may call a referendum on matters of supreme national interest (art. 157); constitutional amendments passed by two thirds of the House go to a referendum (art. 226), as does a dissolution of the House (art. 137). Run by the Interior Ministry until 2011, then by judicial commissions and since 2017 by the National Election Authority.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "EG"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 157)",
+          "called": true,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "High Elections Committee decree 7 of 2014, reprinted with the Constitution",
+          "url": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2014-01-14",
+          "last_date": "2014-01-14",
+          "finest": null,
+          "source": "constitution",
+          "evidence": "National totals of the January 2014 referendum."
+        },
+        {
+          "platform": "Referendum 2012 and 2014 results application (egelections-2011.appspot.com)",
+          "url": "https://egelections-2011.appspot.com/Referendum2014/results/index.html",
+          "format": "html",
+          "access": "none",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2012-12-15",
+          "last_date": "2014-01-14",
+          "finest": "eg.muhafaza",
+          "source": "ref2012",
+          "evidence": "Embedded in the referendum sites; answers 404 now."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1956-01-01",
+          "precision": "year",
+          "through": "2007-12-31",
+          "note": "Referendums from the 1956 constitution to the 2007 amendments aren't counted yet; none has official results online."
+        },
+        {
+          "date": "2011-03-19",
+          "contests": 1,
+          "note": "Referendum on constitutional amendments; its results site (referendum2011.elections.eg) now redirects to the authority's home page.",
+          "source": "prev_results",
+          "quote": "\"نتيجة استفتاء مارس 2011\" (link to http://referendum2011.elections.eg/referendum-results.html)"
+        },
+        {
+          "date": "2012-12-15",
+          "contests": 1,
+          "note": "Held in two phases, 15 and 22 December 2012, each in half the governorates.",
+          "source": "ref2012",
+          "quote": "\"تتم المرحلة الأولى من الاستفتاء يوم السبت ١٥ ديسمبر ٢٠١٢\"; \"المرحلة الثانية من الاستفتاء يوم السبت ٢٢ ديسمبر ٢٠١٢\""
+        },
+        {
+          "date": "2014-01-14",
+          "contests": 1,
+          "note": "53,423,485 registered, 20,613,677 voting, 20,366,730 valid; 19,985,389 yes and 381,341 no.",
+          "source": "constitution",
+          "quote": "\"قرار اللجنة العليا للانتخابات رقم 7 لسنة 2014 بشأن إعلان نتيجة الاستفتاء على مشروع التعديلات الدستورية على الدستور الصادر سنة 2012 الذى أجرى يومى 14، 2014/1/15\""
+        },
+        {
+          "date": "2019-04-20",
+          "contests": 1,
+          "note": "The amendments were put to voters as one question; abroad on 19-21 April and in Egypt on 20-22 April 2019.",
+          "source": "constitution",
+          "quote": "\"بموجب الاستفتاء على تعديل الدستور الذى أجرى بالخارج أيام 19، 20، 21 وبالداخل أيام 20، 21، 22 من إبريل سنة 2019\""
+        }
+      ],
+      "est_votes": 85000000,
+      "effort": 3
+    },
+    {
+      "key": "mahalli_muhafaza",
+      "tier": "muhafaza",
+      "name": "المجالس الشعبية المحلية للمحافظات",
+      "name_en": "Governorate popular councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sis_local",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180)",
+      "note": "Every local unit elects a council for four years by direct vote; a quarter of the seats go to people under 35, a quarter to women, and at least half to workers and farmers (Constitution art. 180). The councils under Local Administration Law 43 of 1979 were last elected in April 2008 and dissolved by court order in June 2011; no election has been held since, pending a new local administration law (art. 242).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "EG*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180: \"تنتخب كل وحدة محلية مجلسا باالقتراع العام السرى المباشر، لمدة أربع سنوات\")",
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results of any local council election are online for 1979-2008, and none has been held under the 2014 Constitution."
+    },
+    {
+      "key": "mahalli_markaz",
+      "tier": "markaz",
+      "name": "المجالس الشعبية المحلية للمراكز",
+      "name_en": "Markaz popular councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sis_local",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180)",
+      "note": "Every local unit elects a council for four years by direct vote; a quarter of the seats go to people under 35, a quarter to women, and at least half to workers and farmers (Constitution art. 180). The councils under Local Administration Law 43 of 1979 were last elected in April 2008 and dissolved by court order in June 2011; no election has been held since, pending a new local administration law (art. 242).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "iso_pattern": "EG*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180: \"تنتخب كل وحدة محلية مجلسا باالقتراع العام السرى المباشر، لمدة أربع سنوات\")",
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results of any local council election are online for 1979-2008, and none has been held under the 2014 Constitution."
+    },
+    {
+      "key": "mahalli_madina",
+      "tier": "madina",
+      "name": "المجالس الشعبية المحلية للمدن",
+      "name_en": "City popular councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sis_local",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180)",
+      "note": "Every local unit elects a council for four years by direct vote; a quarter of the seats go to people under 35, a quarter to women, and at least half to workers and farmers (Constitution art. 180). The councils under Local Administration Law 43 of 1979 were last elected in April 2008 and dissolved by court order in June 2011; no election has been held since, pending a new local administration law (art. 242).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "EG*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180: \"تنتخب كل وحدة محلية مجلسا باالقتراع العام السرى المباشر، لمدة أربع سنوات\")",
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results of any local council election are online for 1979-2008, and none has been held under the 2014 Constitution."
+    },
+    {
+      "key": "mahalli_hayy",
+      "tier": "hayy",
+      "name": "المجالس الشعبية المحلية للأحياء",
+      "name_en": "District popular councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sis_local",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180)",
+      "note": "Every local unit elects a council for four years by direct vote; a quarter of the seats go to people under 35, a quarter to women, and at least half to workers and farmers (Constitution art. 180). The councils under Local Administration Law 43 of 1979 were last elected in April 2008 and dissolved by court order in June 2011; no election has been held since, pending a new local administration law (art. 242).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "iso_pattern": "EG*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180: \"تنتخب كل وحدة محلية مجلسا باالقتراع العام السرى المباشر، لمدة أربع سنوات\")",
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results of any local council election are online for 1979-2008, and none has been held under the 2014 Constitution."
+    },
+    {
+      "key": "mahalli_qarya",
+      "tier": "qarya",
+      "name": "المجالس الشعبية المحلية للقرى",
+      "name_en": "Village popular councils (one per rural local unit)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sis_local",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180)",
+      "note": "Every local unit elects a council for four years by direct vote; a quarter of the seats go to people under 35, a quarter to women, and at least half to workers and farmers (Constitution art. 180). The councils under Local Administration Law 43 of 1979 were last elected in April 2008 and dissolved by court order in June 2011; no election has been held since, pending a new local administration law (art. 242).",
+      "match": [],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 180: \"تنتخب كل وحدة محلية مجلسا باالقتراع العام السرى المباشر، لمدة أربع سنوات\")",
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "الهيئة الوطنية للانتخابات",
+          "valid_from": "2014-01-18"
+        }
+      ],
+      "dates": [],
+      "disposition": "blocked",
+      "disposition_reason": "No official results of any local council election are online for 1979-2008, and none has been held under the 2014 Constitution."
+    },
+    {
+      "key": "muhafiz",
+      "tier": "muhafaza",
+      "name": "المحافظون",
+      "name_en": "Governors",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 179)",
+      "note": "The law may provide for governors and heads of other local units to be appointed or elected (art. 179); all are appointed by the President, and village headmen (umdas) by the Interior Ministry.",
+      "match": [],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.elections.eg/images/pdfs/laws/Constitution_2014.pdf (art. 179)",
+          "selection": "appointed"
+        }
+      ],
+      "dates": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed, not elected."
+    },
+    {
+      "key": "nonstate_bodies",
+      "tier": "national",
+      "name": "انتخابات النقابات المهنية والعمالية والاتحادات الطلابية",
+      "name_en": "Professional syndicates, trade unions, and student unions",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "law198",
+      "note": "The National Election Authority's remit covers referendums and presidential, parliamentary, and local elections only (Constitution art. 208; Law 198 of 2017).",
+      "match": [],
+      "dates": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the bodies themselves under their own laws, not by the state's election authority, and their results are not published as public election results."
+    }
+  ]
+}
