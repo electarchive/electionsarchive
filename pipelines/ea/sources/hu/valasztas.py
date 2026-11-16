@@ -586,6 +586,7 @@ class Day:
         self.reasons: dict[str, str] = {}
         self.cited: set[str] = set()
         self.elections: set[str] = set()
+        self.contest_ids: dict[str, str] = {}
         for depend in depends:
             built = package.folder(depend) / "build" / "person.parquet"
             if built.exists():
@@ -603,6 +604,10 @@ class Day:
             self.cited.add(name)
             CITED.add(name)
             self.p.uses(raw.cached(SOURCE, name))
+
+    def contest_id(self, tag: str) -> str:
+        """The contest's id: an existing contest of another pipeline, or this package's own."""
+        return self.contest_ids.get(tag) or key("contest", tag)
 
     def election(
         self,
@@ -646,7 +651,10 @@ class Day:
         english: str | None = None,
     ) -> str:
         """Stage a contest and its official result set; returns the result set id."""
-        contest = key("contest", tag)
+        contest = self.contest_id(tag)
+        if tag in self.contest_ids:
+            self.p.external |= {contest, election}
+            return self._result_set(tag, election, contest, method, default=False)
         self.p.add(
             "contest",
             id=contest,
@@ -665,6 +673,9 @@ class Day:
         if english:
             self.p.name(contest, english, "en", "english", False)
         self.p.add("slug", path=path, entity_id=contest, is_current=True)
+        return self._result_set(tag, election, contest, method)
+
+    def _result_set(self, tag: str, election: str, contest: str, method: str, default: bool = True) -> str:
         result_set = key("result_set", tag)
         self.p.add(
             "result_set",
@@ -675,7 +686,7 @@ class Day:
             kind="counted",
             source_id=NVI,
             status="active",
-            is_default=True,
+            is_default=default,
             completeness=1.0,
         )
         self.p.add(
@@ -703,7 +714,7 @@ class Day:
         self.p.add(
             "contest_option",
             id=id,
-            contest_id=key("contest", tag),
+            contest_id=self.contest_id(tag),
             kind=kind,
             party_id=party(nominator) if kind != "answer" else None,
             ballot_position=position,
@@ -837,7 +848,9 @@ class Day:
         checked = {
             self.sets[tag]
             for tag in self.sets
-            if (row := kinds[key("contest", tag)])["magnitude"] == 1 or row["kind"] == "list_allocation"
+            if tag in self.contest_ids
+            or (row := kinds[key("contest", tag)])["magnitude"] == 1
+            or row["kind"] == "list_allocation"
         }
         units: dict[tuple[str, str], dict[int, int]] = defaultdict(dict)
         votes: Counter[tuple[str, str]] = Counter()
@@ -2100,29 +2113,30 @@ EP_DAYS = {
 EP_SEATS = {2004: 24, 2009: 22, 2014: 21, 2019: 21, 2024: 21}
 
 
+EP_EXISTING = {
+    2004: ("e7c661fe-79d4-5152-b5fc-5a043125f958", "b166b65a-228a-5e1b-8be2-19f3dd531d31"),
+    2009: ("afdd3d58-4062-54b1-b0f1-85f742212c07", "bf2a5330-414d-599f-8eb8-901f4e649df3"),
+    2014: ("63ecb31f-804d-5a2c-ad88-f15e237533b4", "6d916294-c6de-5cfe-927f-5105f542d65d"),
+    2019: ("b915f044-4fe1-5ae9-a5e7-5a51bdc07df1", "9fe5f9aa-109a-5b5b-b6ed-57ff97d4b16e"),
+    2024: ("b76f9384-28f7-59b8-b9f5-a553c5fed1ce", "099838e8-47fc-57b0-9b21-df55d809ec70"),
+}
+
+
 def ep_contest(d: Day) -> str:
-    path = f"hu/{d.day}-european-parliament-polling-stations"
-    election = d.election(
-        f"ep:{d.day.year}",
-        "general",
-        f"{d.day.year} European Parliament election in Hungary, by polling station",
-        f"{d.day.year}. évi európai parlamenti választás",
-        path,
-    )
+    """Stage the polling-station result set on the Hungarian contest the European Parliament pipelines hold."""
     tag = f"ep:{d.day.year}"
+    election, contest = EP_EXISTING[d.day.year]
+    d.contest_ids[tag] = contest
     d.contest(
         tag,
         election,
         "list_allocation",
         "Európai parlamenti képviselők választása",
-        f"{path}/lista",
-        magnitude=EP_SEATS[d.day.year],
-        system=EP_SYSTEM,
+        "",
         method=method(
             "The national result of this election is also held from the European Parliament's own figures; this "
-            "contest holds the National Election Office's polling-station returns."
+            "result set holds the National Election Office's polling-station returns."
         ),
-        english="Members of the European Parliament",
     )
     return tag
 
