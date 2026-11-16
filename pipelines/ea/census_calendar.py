@@ -92,6 +92,8 @@ DAY_RULES = {
     "oct_last_sunday": last_weekday(10, 6),
     "oct_fourth_sunday": nth_weekday(10, 6, 4),
     "mar_last_sunday": last_weekday(3, 6),
+    "mar_second_sunday": nth_weekday(3, 6, 2),
+    "nov_last_sunday": last_weekday(11, 6),
     "may_first_thursday": nth_weekday(5, 3, 1),
     "wednesday_from_apr_9": wednesday_from(4, 9),
     "wednesday_from_may_31_unless_jun_6": wednesday_from(5, 31),
