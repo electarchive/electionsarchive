@@ -260,9 +260,11 @@ def _csv(path: str, member: str) -> pl.DataFrame:
         .select(pl.col(column).str.strip_chars().alias(name) for column, name in CSV_COLUMNS.items())
         .with_columns(
             pl.col("cs", "distrito").str.extract(r"(\d+)"),
-            pl.col("votos").cast(pl.Int64),
+            pl.col("votos").cast(pl.Int64, strict=False),
             total=pl.lit(False),
         )
+        # Tables with no preliminary count print an empty figure.
+        .filter(pl.col("votos").is_not_null())
         .collect()
     )
     target.unlink()
@@ -326,7 +328,10 @@ def _sheet(grid: pl.DataFrame) -> pl.DataFrame | None:
     if "pais" in frame.columns and "comuna" not in frame.columns:
         frame = frame.rename({"pais": "comuna"}).with_columns(region=pl.lit("X"))
     frame = frame.filter(pl.col("votos").str.contains(r"^\d+(\.0+)?$").fill_null(False))
-    if "tipo" in frame.columns and frame["mesa"].drop_nulls().str.contains(r"^[MVX]$").mean() > 0.5:
+    if (
+        "tipo" in frame.columns
+        and 2 * frame["mesa"].drop_nulls().str.contains(r"^[MVX]$").sum() > frame["mesa"].drop_nulls().len()
+    ):
         # A sheet that prints the type of table under Mesa and the number under the type.
         frame = frame.with_columns(mesa=pl.col("tipo"), tipo=pl.col("mesa"))
     for column in ("cs", "distrito", "region"):
@@ -626,6 +631,8 @@ ELECTIONS = (
         "Elecciones presidencial, parlamentarias y de consejeros regionales 2013",
         Group("president", r"2022/12/\d\d_Resultados_Mesa_Presidente_Tricel\.xlsx"),
         Group("senators", r"2022/12/\d\d_Resultado_Mesa_Senadores_Tricel\.xlsx"),
+        # The court's table files cover six of the nine constituencies; the rest come by circunscripcion electoral.
+        Group("senators", r"2022/12/resultados_elecciones_senadores_ce_1989_2017\.xlsx", "2013-11-17:1"),
         Group("deputies", r"2022/12/\d\d_Resultados_Mesa_Diputados_Tricel(-1)?\.xlsx"),
         Group("core", r"2022/12/\d\d_Resultados_Mesa_Cores_Ter\.xlsx"),
     ),
@@ -991,7 +998,7 @@ SYSTEMS: dict[str, tuple[date, date | None, dict[str, object], str]] = {
     "binomial": (
         date(1989, 1, 1),
         REFORM,
-        {"formula": "dhondt", "lists": {"order": "open"}},
+        {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_on_list"}},
         (
             "Two seats per district, divided among lists by D'Hondt; within a list the seats go to its most voted "
             "candidates (the binomial system)."
@@ -1000,7 +1007,7 @@ SYSTEMS: dict[str, tuple[date, date | None, dict[str, object], str]] = {
     "proportional": (
         REFORM,
         None,
-        {"formula": "dhondt", "lists": {"order": "open"}},
+        {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_on_list"}},
         (
             "Seats divided among lists by D'Hondt, then within each pact among subpacts and parties, and within each "
             "list to its most voted candidates."
@@ -1009,7 +1016,7 @@ SYSTEMS: dict[str, tuple[date, date | None, dict[str, object], str]] = {
     "council": (
         date(1992, 1, 1),
         None,
-        {"formula": "dhondt", "lists": {"order": "open"}},
+        {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_on_list"}},
         "Seats divided among lists by D'Hondt (the cifra repartidora); within each list to its most voted candidates.",
     ),
     "mayor": (date(2004, 1, 1), None, {"formula": "fptp"}, "The candidate with the most votes is elected."),
@@ -1163,6 +1170,12 @@ ALIASES = {
     "PAIGUANO": "PAIHUANO",
     "OHIGGINS": "O HIGGINS",
     "NAVARINO": "CABO DE HORNOS",
+    "CABO DE HORNOS EX NAVARINO": "CABO DE HORNOS",
+    "TREHUACO": "TREGUACO",
+    # Antártica has no municipality of its own; Cabo de Hornos governs it.
+    "CABO DE HORNOS Y ANTARTICA": "CABO DE HORNOS",
+    "CABO DE HORNOS EX NAVARINO Y ANTARTICA": "CABO DE HORNOS",
+    "TIL TIL": "TILTIL",
 }
 
 
@@ -1243,6 +1256,9 @@ def prepared(election: Election) -> pl.DataFrame:
             for (kind,), part in frame.group_by("kind", maintain_order=True)
         ]
     )
+    coarse = pl.col("path").str.contains("_ce_")
+    fine = frame.filter(~coarse).select("kind", "contest").unique()
+    frame = pl.concat([frame.filter(~coarse), frame.filter(coarse).join(fine, on=["kind", "contest"], how="anti")])
     frame = frame.with_columns(unit=_unit_code(election.day))
     missing = frame.filter(pl.col("contest").is_null())
     if missing.height:
@@ -1441,7 +1457,10 @@ def build(election: Election) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"{election.en} by voting table from Servel",
-        depends=[f"{SOURCE}/registry"],
+        depends=[
+            f"{SOURCE}/registry",
+            *sorted({f"{SOURCE}/{e.day}" for g in election.groups if (e := _previous(election, g.kind)) is not None}),
+        ],
     )
     p.external.add(CHILE)
     for group in election.groups:
@@ -1623,15 +1642,21 @@ def _options(
         .group_by("unit", "option_id")
         .agg(pl.col("votos").sum(), pl.len().alias("n"))
     )
-    if votes["n"].max() not in (None, 1):
-        raise ValueError(
-            f"{day} {kind} {code}: a table repeats an option: {votes.filter(pl.col('n') > 1).head(3).rows()}"
-        )
     blank = (
         part.filter(pl.col("special").is_not_null()).group_by("unit", "special").agg(pl.col("votos").sum(), pl.len())
     )
-    if blank["len"].max() not in (None, 1):
-        raise ValueError(f"{day} {kind} {code}: a table repeats null or blank votes")
+    repeated = votes.filter(pl.col("n") > 1)["unit"].n_unique()
+    if repeated:
+        p.add(
+            "note",
+            id=key("note", result_set, "repeated"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=f"For {repeated:,} reporting unit{'s' if repeated > 1 else ''}, the source lists the same unit more "
+            "than once with different figures (rows split by district, or two tables printed under one number); "
+            "the figures are added together.",
+            lang="en",
+        )
     roll = (
         part.filter(pl.col("electores").is_not_null())
         .group_by("unit")
