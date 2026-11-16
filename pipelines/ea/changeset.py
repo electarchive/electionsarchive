@@ -660,9 +660,10 @@ class Changeset:
     def write(self) -> Path:
         pipeline = self.manifest["pipeline"]
         if self.manifest["kind"] == "import" and self.conn.execute(
-            "select exists (select from changeset where pipeline = %s and created_at < %s)",
-            (pipeline, PACKAGES_ONLY_FROM),
-        ).fetchone() == (False,):
+            """select exists (select from changeset where created_at < %(cutoff)s)
+                      and not exists (select from changeset where pipeline = %(pipeline)s and created_at < %(cutoff)s)""",
+            {"pipeline": pipeline, "cutoff": PACKAGES_ONLY_FROM},
+        ).fetchone() == (True,):
             raise SystemExit(
                 f"{pipeline} has no changeset from before {PACKAGES_ONLY_FROM:%Y-%m-%d %H:%M} UTC, so it is a new family:"
                 " build packages with ea.package and load them with `ea package load` (.agents/spec/file-first.md)"
