@@ -1,0 +1,2732 @@
+{
+  "name": "Argentina",
+  "polity": "AR",
+  "create": null,
+  "sources": {
+    "cn": {
+      "title": "Constitución de la Nación Argentina (texto de 1994, Ley 24.430)",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/0-4999/804/norma.htm",
+      "kind": "official_body",
+      "note": "Arts. 45, 50 (deputies, half renewed every two years), 54 and 56 (three senators per district, a third of the districts every two years), 94, 97, 98 (direct presidential election in two rounds), 39 and 40 (popular initiative and consulta popular), transitional clauses 4 and 5 (direct election of the whole Senate before 10 December 2001)."
+    },
+    "cen": {
+      "title": "Código Electoral Nacional (Ley 19.945, texto ordenado por Decreto 2135/83), texto actualizado",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/15000-19999/19442/texact.htm",
+      "kind": "official_body",
+      "note": "Art. 53 (Ley 27.120): national offices are elected on the fourth Sunday of October before the terms end; art. 149: 45% or 40% with a 10-point lead; art. 157: Senate seats; arts. 160-161: D'Hondt among lists with 3% of the district's registered voters."
+    },
+    "ley26571": {
+      "title": "Ley 26.571 de democratización de la representación política (PASO), texto actualizado",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/160000-164999/161453/texact.htm",
+      "kind": "official_body",
+      "note": "Art. 19: candidates for national offices are chosen in open, simultaneous, compulsory primaries; art. 20 (Ley 27.781, B.O. 18/10/2024): held on the first Sunday of August."
+    },
+    "ley27120": {
+      "title": "Ley 27.120: elección directa de parlamentarios del Mercosur",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/240000-244999/240491/norma.htm",
+      "kind": "official_body",
+      "note": "Art. 164 bis of the Código Electoral: 24 members elected by regional district (one per district) and the rest by the national district; art. 17: held with the national elections until a Día del Mercosur Ciudadano is set."
+    },
+    "ley25432": {
+      "title": "Ley 25.432 de consulta popular vinculante y no vinculante",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/65000-69999/67518/norma.htm",
+      "kind": "official_body"
+    },
+    "ley24309": {
+      "title": "Ley 24.309: declaración de la necesidad de la reforma constitucional",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/0-4999/693/norma.htm",
+      "kind": "official_body",
+      "note": "Art. 10: the convention members are elected directly in each district by D'Hondt proportional representation."
+    },
+    "dec2754_93": {
+      "title": "Decreto 2754/1993: convocatoria a elección de convencionales constituyentes",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=9392",
+      "kind": "official_body"
+    },
+    "senado_historico": {
+      "title": "Registro histórico de senadores: introducción",
+      "publisher": "Honorable Senado de la Nación",
+      "url": "https://www.senado.gob.ar/senadores/Historico/Introduccion",
+      "kind": "official_body",
+      "note": "The Senate's register of senators since 1854."
+    },
+    "dine": {
+      "title": "Resultados electorales",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+      "kind": "official_body",
+      "note": "Year pages for 1983 to 2023: xlsx summaries by district and list for 1983 to 2009; provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, and definitive results by district.",
+      "license": "CC BY 4.0"
+    },
+    "dec_2017": {
+      "title": "Decreto 227/2017: convocatoria a elecciones nacionales 2017",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=273300",
+      "kind": "official_body"
+    },
+    "dec_2019": {
+      "title": "Decreto 343/2019: convocatoria a elecciones nacionales 2019",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=322972",
+      "kind": "official_body"
+    },
+    "dec_2021": {
+      "title": "Decreto 358/2021: convocatoria a elecciones nacionales 2021",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=350680",
+      "kind": "official_body"
+    },
+    "dec_2023": {
+      "title": "Decreto 237/2023: convocatoria a elecciones nacionales 2023",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=382844",
+      "kind": "official_body"
+    },
+    "dec_2025": {
+      "title": "Decreto 335/2025: convocatoria a elecciones nacionales 2025",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=412945",
+      "kind": "official_body"
+    },
+    "cne_2025": {
+      "title": "Elecciones nacionales 2025: actas de escrutinio definitivo y datos",
+      "publisher": "Cámara Nacional Electoral",
+      "url": "https://www.electoral.gob.ar/nuevo/paginas/btn/elecc2025.php",
+      "kind": "official_body",
+      "note": "Signed definitive tally certificates per district (PDF); definitive results are queried by mesa at https://www.padron.gob.ar/publica/."
+    },
+    "georef_provincias": {
+      "title": "API de Georreferenciación: provincias",
+      "publisher": "Instituto Geográfico Nacional (Servicio de Normalización de Datos Geográficos, datos.gob.ar)",
+      "url": "https://apis.datos.gob.ar/georef/api/provincias?max=1",
+      "kind": "official_body"
+    },
+    "georef_departamentos": {
+      "title": "API de Georreferenciación: departamentos",
+      "publisher": "Instituto Geográfico Nacional (Servicio de Normalización de Datos Geográficos, datos.gob.ar)",
+      "url": "https://apis.datos.gob.ar/georef/api/departamentos?max=1",
+      "kind": "official_body"
+    },
+    "georef_municipios": {
+      "title": "API de Georreferenciación: municipios (gobiernos locales)",
+      "publisher": "Instituto Geográfico Nacional (Servicio de Normalización de Datos Geográficos, datos.gob.ar)",
+      "url": "https://apis.datos.gob.ar/georef/api/municipios?max=1",
+      "kind": "official_body",
+      "note": "By category: Municipio 1,166, Comuna 604, Junta 180, Comisión 128, Junta de Gobierno 4. The register holds no rows for Santa Cruz or Santiago del Estero, so its total undercounts the local governments."
+    },
+    "dne_spp": {
+      "title": "Sistemas políticos provinciales (octubre de 2026)",
+      "publisher": "Dirección Nacional Electoral, Observatorio Electoral",
+      "url": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf",
+      "kind": "official_body",
+      "note": "The electoral rules of each of the 24 jurisdictions with their constitutional articles and laws: legislatures (8 bicameral, 16 unicameral), executive election rules, provincial primaries, local governments, and the other elected offices.",
+      "license": "CC BY 4.0"
+    },
+    "dne_mapa": {
+      "title": "Mapa de poder provincial (julio de 2026)",
+      "publisher": "Dirección Nacional Electoral, Observatorio Electoral",
+      "url": "https://www.argentina.gob.ar/sites/default/files/2026/02/mapa_de_poder_provincial_-_julio2026_4.pdf",
+      "kind": "official_body",
+      "note": "\"las 1.201 bancas legislativas provinciales actualmente en ejercicio y la pertenencia política de 1.275 intendentes que integran el mapa municipal argentino\".",
+      "license": "CC BY 4.0"
+    },
+    "dne_bancas2025": {
+      "title": "Bancas en juego 2025: nacional y provincial",
+      "publisher": "Dirección Nacional Electoral, Observatorio Electoral",
+      "url": "https://www.argentina.gob.ar/sites/default/files/2025/09/bancas_en_juego_2025_nacional_y_provincial.pdf",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "caba_ley1777": {
+      "title": "Ley 1777 Orgánica de Comunas",
+      "publisher": "Legislatura de la Ciudad Autónoma de Buenos Aires (Boletín Oficial de la Ciudad)",
+      "url": "https://boletinoficial.buenosaires.gob.ar/normativaba/norma/77544",
+      "kind": "official_body",
+      "note": "Art. 19: each comuna is governed by a Junta Comunal of seven members; the annex divides the City into fifteen comunas."
+    },
+    "dec50_96": {
+      "title": "Decreto 50/96: convocatoria del electorado de la Ciudad de Buenos Aires para el 30 de junio de 1996",
+      "publisher": "Ministerio de Justicia de la Nación (argentina.gob.ar/normativa)",
+      "url": "https://www.argentina.gob.ar/normativa/nacional/norma-32583/texto",
+      "kind": "official_body"
+    },
+    "caba_estadistica": {
+      "title": "Elecciones en la Ciudad de Buenos Aires 1996-2023",
+      "publisher": "Instituto de Estadística y Censos de la Ciudad de Buenos Aires",
+      "url": "https://www.estadisticaciudad.gob.ar/eyc/wp-content/uploads/2023/12/elecciones_2023.pdf",
+      "kind": "official_body"
+    },
+    "caba_te": {
+      "title": "Resultados electorales de la Ciudad",
+      "publisher": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+      "url": "https://resultados.electoralcaba.gob.ar/index.php",
+      "kind": "official_body"
+    },
+    "caba_tsj": {
+      "title": "Resultados de elecciones en la Ciudad (2015-2023, anteriores 1999-2013)",
+      "publisher": "Tribunal Superior de Justicia de la Ciudad Autónoma de Buenos Aires",
+      "url": "https://www.eleccionesciudad.gob.ar/resultados",
+      "kind": "official_body"
+    },
+    "pba_junta": {
+      "title": "Estadísticas históricas por distrito",
+      "publisher": "Junta Electoral de la Provincia de Buenos Aires",
+      "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+      "kind": "official_body",
+      "note": "One page and CSV per partido and election from 2003 (columns eleccion, seccion_id, distrito_id, lista, cargo, votos); polling-table counts but no votes by table."
+    },
+    "cba_jel": {
+      "title": "Escrutinios",
+      "publisher": "Justicia Electoral de la Provincia de Córdoba",
+      "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+      "kind": "official_body",
+      "note": "Report applications for 2003, 2007, 2011, 2015, 2019, and 2023 by province, section (department), circuit, and locality; 2001 as PDF certificates. The 2023 application lists Tribunal de Cuentas Provincial, Tribunal de Cuentas Municipal, Tribunal de Cuentas Comunal, Intendente y Concejal, and Comisión Comunal."
+    },
+    "cba_2001": {
+      "title": "Consulta Popular Provincial del 22 de julio de 2001: escrutinio definitivo",
+      "publisher": "Justicia Electoral de la Provincia de Córdoba",
+      "url": "https://www.justiciacordoba.gob.ar/Jel/pdf/procesos/2001.07.22%20-%20Escrutinio%20Definitivo.pdf",
+      "kind": "official_body"
+    },
+    "santafe_te": {
+      "title": "Elecciones",
+      "publisher": "Tribunal Electoral de la Provincia de Santa Fe",
+      "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+      "kind": "official_body",
+      "note": "Pages per election from 1983; 2025 results by department (PDF) and by polling table (CSV and ODS)."
+    },
+    "santafe_conv2025": {
+      "title": "Juraron los convencionales electos que reformarán la Constitución de Santa Fe",
+      "publisher": "Gobierno de la Provincia de Santa Fe",
+      "url": "https://www.santafe.gob.ar/ms/reforma-constitucion/2025/07/14/juraron-los-convencionales-electos-que-reformaran-la-constitucion-de-santa-fe/",
+      "kind": "official_body"
+    },
+    "mza_junta": {
+      "title": "Escrutinios definitivos: elecciones generales de Mendoza",
+      "publisher": "Junta Electoral de la Provincia de Mendoza (Poder Judicial de Mendoza)",
+      "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+      "kind": "official_body"
+    },
+    "tuc_junta": {
+      "title": "Elecciones",
+      "publisher": "Junta Electoral Provincial de Tucumán",
+      "url": "https://electoraltucuman.gob.ar/elecciones/",
+      "kind": "official_body"
+    },
+    "dine_1983": {
+      "title": "Elecciones 1983: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1983",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1985": {
+      "title": "Elecciones 1985: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1985",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1987": {
+      "title": "Elecciones 1987: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1987",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1989": {
+      "title": "Elecciones 1989: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1989",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1991": {
+      "title": "Elecciones 1991: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1991",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1992": {
+      "title": "Elecciones 1992: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1992",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1993": {
+      "title": "Elecciones 1993: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1993",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1995": {
+      "title": "Elecciones 1995: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1995",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1997": {
+      "title": "Elecciones 1997: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1997",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_1999": {
+      "title": "Elecciones 1999: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-1999",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2001": {
+      "title": "Elecciones 2001: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2001",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2003": {
+      "title": "Elecciones 2003: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2003",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2005": {
+      "title": "Elecciones 2005: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2005",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2007": {
+      "title": "Elecciones 2007: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2007",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2009": {
+      "title": "Elecciones 2009: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2009",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2011": {
+      "title": "Elecciones 2011: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2011",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2013": {
+      "title": "Elecciones 2013: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2013",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "dine_2015": {
+      "title": "Elecciones 2015: resultados",
+      "publisher": "Dirección Nacional Electoral",
+      "url": "https://www.argentina.gob.ar/dine/resultados-electorales/elecciones-2015",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    }
+  },
+  "tiers": [
+    {
+      "key": "nacion",
+      "name": "República Argentina",
+      "name_en": "Argentine Republic",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "cn"
+    },
+    {
+      "key": "provincia",
+      "name": "Provincias y Ciudad Autónoma de Buenos Aires",
+      "name_en": "Provinces and the Autonomous City of Buenos Aires (the 24 electoral districts)",
+      "parent": "nacion",
+      "polity_kind": "federal_unit",
+      "scheme": "ar.distrito",
+      "source": "georef_provincias",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 24,
+          "source": "georef_provincias",
+          "locator": "https://apis.datos.gob.ar/georef/api/provincias?max=1 (\"total\": 24, the 23 provinces and the City)"
+        }
+      ]
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos, partidos y comunas",
+      "name_en": "Departments (partidos in Buenos Aires province, comunas in the City): electoral sections, electing nothing of their own",
+      "parent": "provincia",
+      "elects": false,
+      "scheme": "ar.seccion",
+      "source": "georef_departamentos",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 529,
+          "source": "georef_departamentos",
+          "locator": "https://apis.datos.gob.ar/georef/api/departamentos?max=1 (\"total\": 529: 379 departamentos, 135 partidos, 15 comunas)"
+        }
+      ]
+    },
+    {
+      "key": "gobierno_local",
+      "name": "Gobiernos locales: municipios, comunas, comisiones y juntas de gobierno",
+      "name_en": "Local governments: municipalities, comunas, commissions, and juntas",
+      "parent": "provincia",
+      "polity_kind": "municipality",
+      "source": "georef_municipios",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 2082,
+          "source": "georef_municipios",
+          "locator": "https://apis.datos.gob.ar/georef/api/municipios?max=1 (\"total\": 2082; no rows for Santa Cruz or Santiago del Estero)"
+        }
+      ]
+    },
+    {
+      "key": "comuna",
+      "name": "Comunas de la Ciudad Autónoma de Buenos Aires",
+      "name_en": "Comunas of the City of Buenos Aires",
+      "parent": "provincia",
+      "polity_kind": "submunicipal",
+      "source": "caba_ley1777",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 15,
+          "source": "caba_ley1777",
+          "locator": "Ley 1777, Anexo: \"La Ciudad Autónoma de Buenos Aires se divide en quince comunas\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "nacion",
+      "name": "Elección directa de presidente y vicepresidente",
+      "name_en": "Direct presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "cn",
+      "valid_from": "1972-10-05",
+      "first_held": "1973-03-11",
+      "note": "President and vice president run on one ticket in a single national district. Under the 1994 Constitution (arts. 94-98) a ticket wins in the first round with more than 45% of the valid affirmative votes, or 40% and a lead of more than 10 points; otherwise the top two meet in a runoff 30 days later (2015 and 2023; in 2003 the runoff was called but not held because one ticket withdrew). Four-year term, one consecutive re-election. The two elections of 1973 (11 March and 23 September) were direct under Ley 19.862, with a majority runoff; the 1951 election under the 1949 Constitution was also direct but is not yet cited from an official text. Every other president from 1854 to 1989 was chosen by an electoral college (class electores_presidente). Since 1995 every presidential election is direct.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "AR",
+          "valid_from": "1973-01-01",
+          "valid_to": "1974-01-01"
+        },
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "AR",
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1973-03-11",
+          "note": "First round under Ley 19.862; not yet counted from an official results source."
+        },
+        {
+          "date": "1973-09-23",
+          "note": "New election after the resignation of the president elected in March; not yet counted from an official results source."
+        },
+        {
+          "date": "1995-05-14",
+          "contests": 1,
+          "source": "dine_1995",
+          "quote": "Elecciones Presidenciales 14 de mayo Diputados Nacionales 14 de mayo Senadores Nacionales 8 de octubre",
+          "note": "First direct election under the 1994 Constitution."
+        },
+        {
+          "date": "1999-10-24",
+          "contests": 1,
+          "source": "dine_1999",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 24 de octubre de 1999 ... Elecciones Presidenciales Diputados Nacionales"
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "note": "The runoff called for 18 May 2003 was not held: the runner-up withdrew."
+        },
+        {
+          "date": "2007-10-28",
+          "contests": 1,
+          "source": "dine_2007",
+          "quote": "Elecciones Presidenciales 28 de Octubre Diputados Nacionales Senadores Nacionales"
+        },
+        {
+          "date": "2011-10-23",
+          "contests": 1,
+          "source": "dine_2011",
+          "quote": "P.A.S.O Presidente y Vicepresidente 14 agosto P.A.S.O Diputados Nacionales 14 agosto P.A.S.O Senadores Nacionales 14 agosto Generales Presidente y Vicepresidente 23 de octubre Generales Diputados Nacionales 23 de octubre Generales Senadores Nacionales 23 de octubre"
+        },
+        {
+          "date": "2015-10-25",
+          "contests": 1,
+          "source": "dine_2015",
+          "quote": "P.A.S.O Presidente y Vicepresidente 9 agosto P.A.S.O Diputados Nacionales 9 agosto P.A.S.O Senadores Nacionales 9 agosto P.A.S.O Parlamentarios del Mercosur Nacional 9 agosto P.A.S.O Parlamentarios del Mercosur Regional 9 agosto Generales Presidente y Vicepresidente 25 de Octubre Generales Diputados Nacionales 25 de Octubre Generales Senadores Nacionales 25 de Octubre"
+        },
+        {
+          "date": "2015-11-22",
+          "contests": 1,
+          "election_kind": "runoff",
+          "source": "dine",
+          "quote": "Resultados provisorios - Elecciones 2015 ... Segunda vuelta (2015-provisorios_ballotage.zip)"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 1,
+          "source": "dec_2019",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a elegir PRESIDENTE y VICEPRESIDENTE de la Nación el día 27 de octubre de 2019"
+        },
+        {
+          "date": "2023-10-22",
+          "contests": 1,
+          "source": "dec_2023",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a elegir PRESIDENTE o PRESIDENTA DE LA NACIÓN y VICEPRESIDENTE o VICEPRESIDENTA DE LA NACIÓN y a DIECINUEVE (19) PARLAMENTARIOS y PARLAMENTARIAS del MERCOSUR, distrito Nacional"
+        },
+        {
+          "date": "2023-11-19",
+          "contests": 1,
+          "election_kind": "runoff",
+          "source": "dine",
+          "quote": "Elecciones 2023 ... segunda vuelta (2023_segundavuelta.zip)"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "cen",
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "day_rule": "oct_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "runoff": "threshold",
+          "runoff_threshold": 45,
+          "administered_by": "Dirección Nacional Electoral (Ministerio del Interior) and the national electoral courts under the Cámara Nacional Electoral",
+          "valid_from": "2009-12-11",
+          "locator": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/15000-19999/19442/texact.htm (art. 53: cuarto domingo de octubre; arts. 148-149: runoff)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx (1983-2009), csv in zip (2011-2025)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "1983-10-30",
+          "last_date": "2025-10-26",
+          "finest": "ar.mesa",
+          "evidence": "Definitive results by district and list as xlsx for 1983-2009; the provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, with definitive results by district; 2025 by polling table on datos.mininterior.gob.ar"
+        },
+        {
+          "platform": "Cámara Nacional Electoral: actas de escrutinio definitivo and the results query at padron.gob.ar",
+          "url": "https://www.electoral.gob.ar/nuevo/paginas/btn/elecc2025.php",
+          "format": "pdf, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cne_2025",
+          "finest": "ar.mesa",
+          "evidence": "The national electoral courts' definitive count: signed certificates per district (PDF) and a query form by polling table, area, and office (https://www.padron.gob.ar/publica/), whose terms say only the signed certificate has legal value",
+          "role": "administers"
+        }
+      ],
+      "finest_note": "polling table (mesa) from 2011; district before",
+      "est_votes": 27700000,
+      "effort": 1
+    },
+    {
+      "key": "electores_presidente",
+      "tier": "nacion",
+      "name": "Elección de electores de presidente y vicepresidente",
+      "name_en": "Presidential elector elections (electoral college)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dine_1983",
+      "valid_from": "1853-05-01",
+      "valid_to": "1994-08-24",
+      "note": "Under the 1853 Constitution the voters of each province and the Capital chose electors (twice the district's deputies and senators), who met in district colleges to elect the president and vice president. DINE's 1983 file: \"ELECTOS POR UN COLEGIO ELECTORAL ... CUYOS INTEGRANTES SON ELEGIDOS DIRECTAMENTE POR EL PUEBLO\"; 600 electors in 1983 and 1989. The 1994 Constitution replaced the college with direct election. The elections of 1951 and 1973 were direct (class presidente).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "AR",
+          "valid_to": "1973-01-01"
+        },
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "AR",
+          "valid_from": "1974-01-01",
+          "valid_to": "1995-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1854-01-01",
+          "through": "1972-12-31",
+          "note": "Elector elections from 1854 to 1963 (1951 was direct) are not yet enumerated from an official source."
+        },
+        {
+          "date": "1983-10-30",
+          "contests": 1,
+          "source": "dine_1983",
+          "quote": "Resultados Elecciones Nacionales - 30 de octubre de 1983 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 600
+        },
+        {
+          "date": "1989-05-14",
+          "contests": 1,
+          "source": "dine_1989",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 1989 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 600
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "1983-10-30",
+          "last_date": "1989-05-14",
+          "finest": "ar.distrito",
+          "evidence": "Votes for elector lists and electors won by district and party, 1983 and 1989"
+        }
+      ],
+      "finest_note": "district (1983 and 1989)",
+      "est_votes": 15000000,
+      "effort": 4
+    },
+    {
+      "key": "diputados",
+      "tier": "nacion",
+      "name": "Elección de diputados nacionales",
+      "name_en": "Chamber of Deputies elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "cn",
+      "valid_from": "1853-05-01",
+      "note": "The Chamber of Deputies is elected by district (the 23 provinces and the City of Buenos Aires), half every two years for four-year terms (Constitution arts. 45 and 50). Since 1983, closed lists by D'Hondt among lists with 3% of the district's registered voters (Código Electoral arts. 160-161; Ley 22.838); 254 seats in 1983, 257 since Tierra del Fuego became a province, renewed 127 and 130 in alternation. Earlier systems: the complete list, single-member districts in 1904 (Ley 4.161), the incomplete list of the Sáenz Peña law from 1912 (Ley 8.871), single-member circumscriptions in 1951 and 1954 (Ley 14.032), and proportional representation from 1963. Each district's election counts as one contest; dates are those DINE prints on each district's sheet.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "AR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1854-01-01",
+          "through": "1976-03-23",
+          "note": "Deputies elections from 1854 to 1975 are not yet enumerated from an official source."
+        },
+        {
+          "date": "1983-10-30",
+          "contests": 24,
+          "source": "dine_1983",
+          "quote": "Resultados Elecciones Nacionales - 30 de octubre de 1983 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 254
+        },
+        {
+          "date": "1985-11-03",
+          "contests": 24,
+          "source": "dine_1985",
+          "quote": "Resultados Diputados Nacionales - 3 de Noviembre de 1985",
+          "seats": 127
+        },
+        {
+          "date": "1987-09-06",
+          "contests": 23,
+          "source": "dine_1987",
+          "quote": "Resultados Diputados Nacionales - 6 de Septiembre de 1987",
+          "seats": 127,
+          "note": "DINE's 1987 file has no sheet for Tierra del Fuego."
+        },
+        {
+          "date": "1989-05-14",
+          "contests": 24,
+          "source": "dine_1989",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 1989 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 127
+        },
+        {
+          "date": "1991-09-08",
+          "contests": 14,
+          "source": "dine_1991",
+          "quote": "Resultados Diputados Nacionales - 8 de Septiembre de 1991",
+          "seats": 91,
+          "note": "Districts voted on different days in 1991; DINE's district sheets put 14 districts on 8 September (its national sheet puts San Juan and San Luis on 11 August)."
+        },
+        {
+          "date": "1991-10-27",
+          "contests": 10,
+          "source": "dine_1991",
+          "quote": "Resultados Diputados Nacionales - 8 de Septiembre de 1991",
+          "seats": 39,
+          "note": "DINE's district sheets put 10 districts on 27 October (its national sheet puts Catamarca and Tierra del Fuego on 1 December)."
+        },
+        {
+          "date": "1993-10-03",
+          "contests": 24,
+          "source": "dine_1993",
+          "quote": "Resultados Diputados Nacionales - 3 de octubre de 1993",
+          "seats": 127
+        },
+        {
+          "date": "1995-05-14",
+          "contests": 24,
+          "source": "dine_1995",
+          "quote": "Elecciones Presidenciales 14 de mayo Diputados Nacionales 14 de mayo Senadores Nacionales 8 de octubre",
+          "seats": 130
+        },
+        {
+          "date": "1997-10-26",
+          "contests": 24,
+          "source": "dine_1997",
+          "quote": "Resultados Elecciones Nacionales - 26 de Octubre 1997 ... Diputados Nacionales",
+          "seats": 127
+        },
+        {
+          "date": "1999-10-24",
+          "contests": 24,
+          "source": "dine_1999",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 24 de octubre de 1999 ... Elecciones Presidenciales Diputados Nacionales",
+          "seats": 130
+        },
+        {
+          "date": "2001-10-14",
+          "contests": 24,
+          "source": "dine_2001",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 14 de octubre de 2001 ... Diputados Nacionales Senadores Nacionales",
+          "seats": 127
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 2,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 7,
+          "note": "In 2003 each district chose its own day; the day is that of DINE's district sheet."
+        },
+        {
+          "date": "2003-08-24",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 12
+        },
+        {
+          "date": "2003-08-31",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2003-09-07",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 10
+        },
+        {
+          "date": "2003-09-14",
+          "contests": 4,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 43
+        },
+        {
+          "date": "2003-09-28",
+          "contests": 2,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 6
+        },
+        {
+          "date": "2003-10-05",
+          "contests": 2,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 12
+        },
+        {
+          "date": "2003-10-19",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2003-10-26",
+          "contests": 4,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 14
+        },
+        {
+          "date": "2003-11-09",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2003-11-16",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 4
+        },
+        {
+          "date": "2003-11-23",
+          "contests": 4,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 13
+        },
+        {
+          "date": "2005-10-23",
+          "contests": 24,
+          "source": "dine_2005",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 2005 | 23 de octubre ... Diputados Nacionales Senadores Nacionales",
+          "seats": 127
+        },
+        {
+          "date": "2007-10-28",
+          "contests": 24,
+          "source": "dine_2007",
+          "quote": "Elecciones Presidenciales 28 de Octubre Diputados Nacionales Senadores Nacionales",
+          "seats": 130
+        },
+        {
+          "date": "2009-06-28",
+          "contests": 24,
+          "source": "dine_2009",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 2009 | 28 de Junio ... Diputados Nacionales Senadores Nacionales",
+          "seats": 127
+        },
+        {
+          "date": "2011-10-23",
+          "contests": 24,
+          "source": "dine_2011",
+          "quote": "P.A.S.O Presidente y Vicepresidente 14 agosto P.A.S.O Diputados Nacionales 14 agosto P.A.S.O Senadores Nacionales 14 agosto Generales Presidente y Vicepresidente 23 de octubre Generales Diputados Nacionales 23 de octubre Generales Senadores Nacionales 23 de octubre",
+          "seats": 130
+        },
+        {
+          "date": "2013-10-27",
+          "contests": 24,
+          "source": "dine_2013",
+          "quote": "P.A.S.O Diputados Nacionales 11 agosto P.A.S.O Senadores Nacionales 11 agosto Generales Diputados Nacionales 27 de octubre Generales Senadores Nacionales 27 de octubre",
+          "seats": 127
+        },
+        {
+          "date": "2015-10-25",
+          "contests": 24,
+          "source": "dine_2015",
+          "quote": "P.A.S.O Presidente y Vicepresidente 9 agosto P.A.S.O Diputados Nacionales 9 agosto P.A.S.O Senadores Nacionales 9 agosto P.A.S.O Parlamentarios del Mercosur Nacional 9 agosto P.A.S.O Parlamentarios del Mercosur Regional 9 agosto Generales Presidente y Vicepresidente 25 de Octubre Generales Diputados Nacionales 25 de Octubre Generales Senadores Nacionales 25 de Octubre",
+          "seats": 130
+        },
+        {
+          "date": "2017-10-22",
+          "contests": 24,
+          "source": "dec_2017",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el 22 de octubre de 2017, proceda a elegir SENADORES y DIPUTADOS NACIONALES según corresponda a cada distrito",
+          "seats": 127
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 24,
+          "source": "dec_2019",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a elegir PRESIDENTE y VICEPRESIDENTE de la Nación el día 27 de octubre de 2019",
+          "seats": 130
+        },
+        {
+          "date": "2021-11-14",
+          "contests": 24,
+          "source": "dec_2021",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el 14 de noviembre de 2021 proceda a elegir SENADORES y SENADORAS y DIPUTADOS y DIPUTADAS NACIONALES según corresponda a cada distrito",
+          "seats": 127
+        },
+        {
+          "date": "2023-10-22",
+          "contests": 24,
+          "source": "dec_2023",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el día 22 de octubre de 2023 proceda a elegir SENADORES y SENADORAS NACIONALES y DIPUTADOS y DIPUTADAS NACIONALES según corresponda a cada distrito ... y de PARLAMENTARIOS y PARLAMENTARIAS del MERCOSUR, distrito Regional",
+          "seats": 130
+        },
+        {
+          "date": "2025-10-26",
+          "contests": 24,
+          "source": "dec_2025",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el día 26 de octubre de 2025 proceda a elegir SENADORES NACIONALES y DIPUTADOS NACIONALES según corresponda a cada distrito",
+          "seats": 127
+        }
+      ],
+      "cadence": [
+        {
+          "source": "cen",
+          "period_years": 2,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Dirección Nacional Electoral (Ministerio del Interior) and the national electoral courts under the Cámara Nacional Electoral",
+          "valid_from": "2009-12-11",
+          "locator": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/15000-19999/19442/texact.htm (art. 53: cuarto domingo de octubre)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx (1983-2009), csv in zip (2011-2025)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "1983-10-30",
+          "last_date": "2025-10-26",
+          "finest": "ar.mesa",
+          "evidence": "Definitive results by district and list as xlsx for 1983-2009; the provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, with definitive results by district; 2025 by polling table on datos.mininterior.gob.ar"
+        },
+        {
+          "platform": "Cámara Nacional Electoral: actas de escrutinio definitivo and the results query at padron.gob.ar",
+          "url": "https://www.electoral.gob.ar/nuevo/paginas/btn/elecc2025.php",
+          "format": "pdf, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cne_2025",
+          "finest": "ar.mesa",
+          "evidence": "The national electoral courts' definitive count: signed certificates per district (PDF) and a query form by polling table, area, and office (https://www.padron.gob.ar/publica/), whose terms say only the signed certificate has legal value",
+          "role": "administers"
+        }
+      ],
+      "finest_note": "polling table (mesa) from 2011; district before",
+      "est_votes": 25000000,
+      "effort": 1
+    },
+    {
+      "key": "electores_senador",
+      "tier": "nacion",
+      "name": "Elección de electores de senadores por la Capital Federal",
+      "name_en": "Capital senator elector elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dine_1983",
+      "valid_from": "1853-05-01",
+      "valid_to": "1994-08-24",
+      "note": "Before 1995 the Capital's senators were chosen by an electoral college whose 54 electors the Capital's voters elected (DINE's 1983 and 1992 files: \"LOS DOS SENADORES ... POR LA CAPITAL FEDERAL ... ELEGIR 54 ELECTORES DE SENADORES QUE INTEGRARÁN UN COLEGIO ELECTORAL\"). DINE publishes 1983, 1989, and 1992; earlier ones are not enumerated.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "AR",
+          "valid_to": "1995-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1854-01-01",
+          "through": "1976-03-23",
+          "note": "Capital senator elector elections before 1983 are not yet enumerated."
+        },
+        {
+          "date": "1983-10-30",
+          "contests": 1,
+          "source": "dine_1983",
+          "quote": "Resultados Elecciones Nacionales - 30 de octubre de 1983 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 54
+        },
+        {
+          "date": "1989-05-14",
+          "contests": 1,
+          "source": "dine_1989",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 1989 ... Elecciones Presidenciales Diputados Nacionales Senadores Nacionales",
+          "seats": 54
+        },
+        {
+          "date": "1992-06-28",
+          "contests": 1,
+          "source": "dine_1992",
+          "quote": "Resultados Senadores Nacionales - 28 de Junio 1992",
+          "seats": 54
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "1983-10-30",
+          "last_date": "1992-06-28",
+          "finest": "ar.distrito",
+          "evidence": "Votes for elector lists in the Capital, 1983, 1989, and 1992"
+        }
+      ],
+      "finest_note": "district",
+      "est_votes": 2000000,
+      "effort": 3
+    },
+    {
+      "key": "senado",
+      "tier": "nacion",
+      "name": "Elección directa de senadores nacionales",
+      "name_en": "Direct Senate elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "cn",
+      "valid_from": "1994-08-24",
+      "first_held": "1995-10-08",
+      "note": "Three senators per district, elected directly and jointly: two to the most-voted list and one to the runner-up (Constitution art. 54; Código Electoral art. 157), for six years, a third of the districts every two years (art. 56) in three fixed groups: Catamarca, Chubut, Córdoba, Corrientes, La Pampa, Mendoza, Santa Fe, and Tucumán (2003, 2009, 2015, 2021); Buenos Aires, Formosa, Jujuy, La Rioja, Misiones, San Juan, San Luis, and Santa Cruz (2005, 2011, 2017, 2023); and the City of Buenos Aires, Chaco, Entre Ríos, Neuquén, Río Negro, Salta, Santiago del Estero, and Tierra del Fuego (2007, 2013, 2019, 2025). Senators were also elected directly in 1951, 1954, and 1973; those elections are not yet cited from an official source. Otherwise provincial legislatures chose them (class senado_legislaturas) and the Capital's by electoral college (class electores_senador).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "AR",
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-10-08",
+          "contests": 1,
+          "source": "dine_1995",
+          "quote": "Elecciones Presidenciales 14 de mayo Diputados Nacionales 14 de mayo Senadores Nacionales 8 de octubre",
+          "seats": 1,
+          "note": "The Capital's third senator, the first elected directly (transitional clause 4)."
+        },
+        {
+          "date": "2001-10-14",
+          "contests": 24,
+          "source": "dine_2001",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 14 de octubre de 2001 ... Diputados Nacionales Senadores Nacionales",
+          "seats": 72,
+          "note": "All 72 senators, with terms of two, four, or six years drawn by lot (transitional clause 5)."
+        },
+        {
+          "date": "2003-10-05",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2003-10-26",
+          "contests": 5,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 15,
+          "note": "DINE's sheets put Santa Fe on 26 October, though the province voted on 7 September."
+        },
+        {
+          "date": "2003-11-09",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2003-11-23",
+          "contests": 1,
+          "source": "dine_2003",
+          "quote": "Elecciones Presidenciales 27 de abril Diputados Nacionales 14 de septiembre Senadores Nacionales 26 de octubre",
+          "seats": 3
+        },
+        {
+          "date": "2005-10-23",
+          "contests": 8,
+          "source": "dine_2005",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 2005 | 23 de octubre ... Diputados Nacionales Senadores Nacionales",
+          "seats": 24
+        },
+        {
+          "date": "2007-10-28",
+          "contests": 8,
+          "source": "dine_2007",
+          "quote": "Elecciones Presidenciales 28 de Octubre Diputados Nacionales Senadores Nacionales",
+          "seats": 24
+        },
+        {
+          "date": "2009-06-28",
+          "contests": 8,
+          "source": "dine_2009",
+          "quote": "Resultados Elecciones Nacionales - Elecciones 2009 | 28 de Junio ... Diputados Nacionales Senadores Nacionales",
+          "seats": 24
+        },
+        {
+          "date": "2011-10-23",
+          "contests": 8,
+          "source": "dine_2011",
+          "quote": "P.A.S.O Presidente y Vicepresidente 14 agosto P.A.S.O Diputados Nacionales 14 agosto P.A.S.O Senadores Nacionales 14 agosto Generales Presidente y Vicepresidente 23 de octubre Generales Diputados Nacionales 23 de octubre Generales Senadores Nacionales 23 de octubre",
+          "seats": 24
+        },
+        {
+          "date": "2013-10-27",
+          "contests": 8,
+          "source": "dine_2013",
+          "quote": "P.A.S.O Diputados Nacionales 11 agosto P.A.S.O Senadores Nacionales 11 agosto Generales Diputados Nacionales 27 de octubre Generales Senadores Nacionales 27 de octubre",
+          "seats": 24
+        },
+        {
+          "date": "2015-10-25",
+          "contests": 8,
+          "source": "dine_2015",
+          "quote": "P.A.S.O Presidente y Vicepresidente 9 agosto P.A.S.O Diputados Nacionales 9 agosto P.A.S.O Senadores Nacionales 9 agosto P.A.S.O Parlamentarios del Mercosur Nacional 9 agosto P.A.S.O Parlamentarios del Mercosur Regional 9 agosto Generales Presidente y Vicepresidente 25 de Octubre Generales Diputados Nacionales 25 de Octubre Generales Senadores Nacionales 25 de Octubre",
+          "seats": 24
+        },
+        {
+          "date": "2017-10-22",
+          "contests": 8,
+          "source": "dec_2017",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el 22 de octubre de 2017, proceda a elegir SENADORES y DIPUTADOS NACIONALES según corresponda a cada distrito",
+          "seats": 24
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 8,
+          "source": "dec_2019",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a elegir PRESIDENTE y VICEPRESIDENTE de la Nación el día 27 de octubre de 2019",
+          "seats": 24
+        },
+        {
+          "date": "2021-11-14",
+          "contests": 8,
+          "source": "dec_2021",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el 14 de noviembre de 2021 proceda a elegir SENADORES y SENADORAS y DIPUTADOS y DIPUTADAS NACIONALES según corresponda a cada distrito",
+          "seats": 24
+        },
+        {
+          "date": "2023-10-22",
+          "contests": 8,
+          "source": "dec_2023",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el día 22 de octubre de 2023 proceda a elegir SENADORES y SENADORAS NACIONALES y DIPUTADOS y DIPUTADAS NACIONALES según corresponda a cada distrito ... y de PARLAMENTARIOS y PARLAMENTARIAS del MERCOSUR, distrito Regional",
+          "seats": 24
+        },
+        {
+          "date": "2025-10-26",
+          "contests": 8,
+          "source": "dec_2025",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el día 26 de octubre de 2025 proceda a elegir SENADORES NACIONALES y DIPUTADOS NACIONALES según corresponda a cada distrito",
+          "seats": 24
+        }
+      ],
+      "cadence": [
+        {
+          "source": "cen",
+          "period_years": 2,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_fourth_sunday",
+          "term_years": 6,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Dirección Nacional Electoral (Ministerio del Interior) and the national electoral courts under the Cámara Nacional Electoral",
+          "valid_from": "2009-12-11",
+          "locator": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/15000-19999/19442/texact.htm (art. 53: cuarto domingo de octubre)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx (1983-2009), csv in zip (2011-2025)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "1983-10-30",
+          "last_date": "2025-10-26",
+          "finest": "ar.mesa",
+          "evidence": "Definitive results by district and list as xlsx for 1983-2009; the provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, with definitive results by district; 2025 by polling table on datos.mininterior.gob.ar"
+        },
+        {
+          "platform": "Cámara Nacional Electoral: actas de escrutinio definitivo and the results query at padron.gob.ar",
+          "url": "https://www.electoral.gob.ar/nuevo/paginas/btn/elecc2025.php",
+          "format": "pdf, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cne_2025",
+          "finest": "ar.mesa",
+          "evidence": "The national electoral courts' definitive count: signed certificates per district (PDF) and a query form by polling table, area, and office (https://www.padron.gob.ar/publica/), whose terms say only the signed certificate has legal value",
+          "role": "administers"
+        }
+      ],
+      "finest_note": "polling table (mesa) from 2011; district before",
+      "est_votes": 8000000,
+      "effort": 1
+    },
+    {
+      "key": "senado_legislaturas",
+      "tier": "provincia",
+      "name": "Elección de senadores nacionales por las legislaturas provinciales",
+      "name_en": "Senators chosen by provincial legislatures",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "senado_historico",
+      "valid_from": "1853-05-01",
+      "valid_to": "2001-12-10",
+      "note": "From 1854 to 2001 (except the direct elections of 1951, 1954, and 1973) each provincial legislature chose its province's senators for nine-year terms; the 1994 Constitution kept the system until the whole Senate was elected directly in 2001 (transitional clauses 4 and 5). The Senate's historical register lists the senators since 1854, but no official source publishes the legislatures' votes.",
+      "dates": [
+        {
+          "date": "1854-01-01",
+          "through": "2001-12-09",
+          "note": "Not enumerated: the legislatures' choices are listed only as the senators who took office."
+        }
+      ],
+      "est_votes": 2000,
+      "effort": 4
+    },
+    {
+      "key": "parlasur",
+      "tier": "nacion",
+      "name": "Elección de parlamentarios del Mercosur",
+      "name_en": "Mercosur Parliament elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "ley27120",
+      "valid_from": "2015-01-08",
+      "first_held": "2015-10-25",
+      "note": "43 members: 19 from closed national lists by D'Hondt and one per district by plurality (Ley 27.120, Código Electoral art. 164 bis), held with the national elections until a Día del Mercosur Ciudadano is set. Elected in 2015 and 2023; in 2019 Decree 343/2019 did not call the category, the member states having suspended direct elections by a joint declaration of 16 April 2019. Each of the 25 districts (national plus 24 regional) counts as a contest.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "AR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2015-10-25",
+          "contests": 25,
+          "source": "dine_2015",
+          "quote": "P.A.S.O Presidente y Vicepresidente 9 agosto P.A.S.O Diputados Nacionales 9 agosto P.A.S.O Senadores Nacionales 9 agosto P.A.S.O Parlamentarios del Mercosur Nacional 9 agosto P.A.S.O Parlamentarios del Mercosur Regional 9 agosto Generales Presidente y Vicepresidente 25 de Octubre Generales Diputados Nacionales 25 de Octubre Generales Senadores Nacionales 25 de Octubre",
+          "seats": 43
+        },
+        {
+          "date": "2023-10-22",
+          "contests": 25,
+          "source": "dec_2023",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA para que el día 22 de octubre de 2023 proceda a elegir SENADORES y SENADORAS NACIONALES y DIPUTADOS y DIPUTADAS NACIONALES según corresponda a cada distrito ... y de PARLAMENTARIOS y PARLAMENTARIAS del MERCOSUR, distrito Regional",
+          "seats": 43
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx (1983-2009), csv in zip (2011-2025)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "2015-10-25",
+          "last_date": "2023-10-22",
+          "finest": "ar.mesa",
+          "evidence": "Definitive results by district and list as xlsx for 1983-2009; the provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, with definitive results by district; 2025 by polling table on datos.mininterior.gob.ar"
+        }
+      ],
+      "finest_note": "polling table (mesa)",
+      "est_votes": 25000000,
+      "effort": 1
+    },
+    {
+      "key": "paso",
+      "tier": "nacion",
+      "name": "Elecciones primarias, abiertas, simultáneas y obligatorias (PASO)",
+      "name_en": "Open, simultaneous, and compulsory primaries for national offices",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "ley26571",
+      "valid_from": "2009-12-11",
+      "first_held": "2011-08-14",
+      "note": "State-run primaries in which every party or front chooses its candidates for president, deputies, senators, and Mercosur Parliament on one day, voting compulsory for all voters; a front needs 1.5% of the valid votes of the category in the district to stand in the general election (Ley 26.571). Each category in each district counts as a contest. Suspended for 2025 by Ley 27.783; still law for 2027, now on the first Sunday of August (Ley 27.781).",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "AR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-08-14",
+          "contests": 33,
+          "source": "dine_2011",
+          "quote": "P.A.S.O Presidente y Vicepresidente 14 agosto P.A.S.O Diputados Nacionales 14 agosto P.A.S.O Senadores Nacionales 14 agosto Generales Presidente y Vicepresidente 23 de octubre Generales Diputados Nacionales 23 de octubre Generales Senadores Nacionales 23 de octubre",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2013-08-11",
+          "contests": 32,
+          "source": "dine_2013",
+          "quote": "P.A.S.O Diputados Nacionales 11 agosto P.A.S.O Senadores Nacionales 11 agosto Generales Diputados Nacionales 27 de octubre Generales Senadores Nacionales 27 de octubre",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2015-08-09",
+          "contests": 58,
+          "source": "dine_2015",
+          "quote": "P.A.S.O Presidente y Vicepresidente 9 agosto P.A.S.O Diputados Nacionales 9 agosto P.A.S.O Senadores Nacionales 9 agosto P.A.S.O Parlamentarios del Mercosur Nacional 9 agosto P.A.S.O Parlamentarios del Mercosur Regional 9 agosto Generales Presidente y Vicepresidente 25 de Octubre Generales Diputados Nacionales 25 de Octubre Generales Senadores Nacionales 25 de Octubre",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2017-08-13",
+          "contests": 32,
+          "source": "dec_2017",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a las elecciones primarias, abiertas, simultáneas y obligatorias para la elección de candidatos a SENADORES y DIPUTADOS NACIONALES el día 13 de agosto de 2017",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2019-08-11",
+          "contests": 33,
+          "source": "dec_2019",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a las elecciones primarias, abiertas, simultáneas y obligatorias para la elección de candidatos a PRESIDENTE y VICEPRESIDENTE DE LA NACIÓN, SENADORES y DIPUTADOS NACIONALES el día 11 de agosto de 2019",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2021-09-12",
+          "contests": 32,
+          "source": "dec_2021",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a las elecciones primarias, abiertas, simultáneas y obligatorias para la elección de candidatos y candidatas a SENADORES y SENADORAS y DIPUTADOS y DIPUTADAS NACIONALES el día 12 de septiembre de 2021",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2023-08-13",
+          "contests": 58,
+          "source": "dec_2023",
+          "quote": "Convócase al electorado de la NACIÓN ARGENTINA a las Elecciones Primarias, Abiertas, Simultáneas y Obligatorias para la elección de candidatos y candidatas a PRESIDENTE o PRESIDENTA DE LA NACIÓN ... SENADORES y SENADORAS NACIONALES, DIPUTADOS y DIPUTADAS NACIONALES y PARLAMENTARIOS y PARLAMENTARIAS del MERCOSUR de los distritos Nacional y Regionales el día 13 de agosto de 2023",
+          "election_kind": "primary"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ley26571",
+          "period_years": 2,
+          "month": 8,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Dirección Nacional Electoral and the national electoral courts",
+          "valid_from": "2009-12-11",
+          "valid_to": "2024-10-18",
+          "locator": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/160000-164999/161453/texact.htm (art. 20 as enacted: segundo domingo de agosto)"
+        },
+        {
+          "source": "ley26571",
+          "period_years": 2,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_first_sunday",
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Dirección Nacional Electoral and the national electoral courts",
+          "valid_from": "2024-10-18",
+          "locator": "https://servicios.infoleg.gob.ar/infolegInternet/anexos/160000-164999/161453/texact.htm (art. 20, Ley 27.781: primer domingo de agosto)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dirección Nacional Electoral: resultados electorales",
+          "url": "https://www.argentina.gob.ar/dine/resultados-electorales",
+          "format": "xlsx (1983-2009), csv in zip (2011-2025)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "dine",
+          "license": "CC BY 4.0",
+          "first_date": "2011-08-14",
+          "last_date": "2023-08-13",
+          "finest": "ar.mesa",
+          "evidence": "Definitive results by district and list as xlsx for 1983-2009; the provisional count by polling table (mesa) in the results preservation standard's CSVs from 2011, with definitive results by district; 2025 by polling table on datos.mininterior.gob.ar"
+        }
+      ],
+      "finest_note": "polling table (mesa)",
+      "est_votes": 25000000,
+      "effort": 1
+    },
+    {
+      "key": "consulta_popular",
+      "tier": "nacion",
+      "name": "Consulta popular nacional",
+      "name_en": "National consultations and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ]
+      },
+      "source": "ley25432",
+      "valid_from": "1983-12-10",
+      "first_held": "1984-11-25",
+      "note": "Constitution art. 40 (1994) and Ley 25.432 let Congress call a binding consulta and Congress or the president a non-binding one. The only national vote held is the non-binding consulta on the Beagle Channel treaty with Chile, called by decree for 25 November 1984; its decree and an official results source are not yet found (DINE's results series skips 1984). A non-binding consultation on constitutional reform was called by Decree 2181/1993 and dropped after the reform pact.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "AR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1984-11-25",
+          "note": "Beagle Channel consulta; not yet cited from an official source."
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "convencion_constituyente",
+      "tier": "nacion",
+      "name": "Elección de convencionales constituyentes nacionales",
+      "name_en": "National constitutional convention elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ar.distrito"
+        ]
+      },
+      "source": "ley24309",
+      "valid_from": "1853-05-01",
+      "note": "Conventions to reform the Constitution, called by a law of Congress declaring the need for reform (art. 30). The 1994 convention (305 members) was elected by district by D'Hondt (Ley 24.309 art. 10) on 10 April 1994 (Decree 2754/1993). Earlier conventions (1860, 1866, 1898, 1948, and 1957) are not yet cited from an official source. DINE publishes no results for 1994.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "AR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1859-01-01",
+          "through": "1993-12-31",
+          "note": "Convention elections before 1994 are not yet enumerated from an official source."
+        },
+        {
+          "date": "1994-04-10",
+          "source": "dec2754_93",
+          "quote": "CONVOCASE PARA LA ELECCION DE LOS CONVENCIONALES CONSTITUYENTES PARA EL DIA 10/4/94.",
+          "contests": 24,
+          "seats": 305
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 4
+    },
+    {
+      "key": "gobernador",
+      "tier": "provincia",
+      "name": "Elección de gobernador y vicegobernador, y de jefe de Gobierno de la Ciudad",
+      "name_en": "Gubernatorial elections (and Head of Government of the City of Buenos Aires)",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "Governor and vice governor on one ticket in each of the 23 provinces, and the Head of Government of the City of Buenos Aires, elected since 30 June 1996 (Ley 24.620; Decree 50/96). Four-year terms. Most provinces elect by plurality; the City (absolute majority), Chaco and Corrientes (45%, or 40% with a 10-point lead), and Tierra del Fuego (absolute majority) hold runoffs. Provinces set their own days, some with the national election and many apart. In the 19th century and until 1912 many governors were chosen by legislatures or provincial electoral colleges; those choices are not enumerated. All 22 provinces elected governors with the national election of 30 October 1983; Tierra del Fuego from 1991.",
+      "match": [
+        {
+          "office_kinds": [
+            "governor",
+            "head_of_government"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Provincial elections since 1983 are not yet enumerated by province; the 24 jurisdictions set their own days."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "dne_spp",
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Each province's electoral court or board (tribunal, junta, or juzgado electoral)",
+          "valid_from": "1983-12-10",
+          "locator": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf (each jurisdiction's constitution sets the day within its own window)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        },
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        },
+        {
+          "platform": "Junta Electoral Provincial de Tucumán",
+          "url": "https://electoraltucuman.gob.ar/elecciones/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tuc_junta",
+          "first_date": "2007-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2007, 2011, and 2015 general elections as PDF per section, municipality, and comuna; 2019 and 2023 not found"
+        }
+      ],
+      "finest_note": "varies by province: polling table in Santa Fe, department or circuit elsewhere",
+      "est_votes": 20000000,
+      "effort": 4
+    },
+    {
+      "key": "legislatura",
+      "tier": "provincia",
+      "name": "Elección de legislaturas unicamerales y cámaras de diputados provinciales",
+      "name_en": "Provincial legislature and lower chamber elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion",
+          "ar.mesa"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "Sixteen jurisdictions have one chamber (the City of Buenos Aires, Chaco, Chubut, Córdoba, Formosa, Jujuy, La Pampa, La Rioja, Misiones, Neuquén, Río Negro, San Juan, Santa Cruz, Santiago del Estero, Tierra del Fuego, and Tucumán) and eight two (Buenos Aires, Catamarca, Corrientes, Entre Ríos, Mendoza, Salta, San Luis, and Santa Fe); this class holds the single and lower chambers, 1,018 of the 1,201 provincial seats (DNE). Systems range from list PR by province or section to mixed systems (Córdoba, Río Negro, San Juan), with half or whole renewals.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Provincial elections since 1983 are not yet enumerated by province; the 24 jurisdictions set their own days."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "dne_spp",
+          "period_years": 2,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Each province's electoral court or board (tribunal, junta, or juzgado electoral)",
+          "valid_from": "1983-12-10",
+          "locator": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf (each jurisdiction's constitution sets the day within its own window)",
+          "classes": 2
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        },
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        },
+        {
+          "platform": "Junta Electoral Provincial de Tucumán",
+          "url": "https://electoraltucuman.gob.ar/elecciones/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tuc_junta",
+          "first_date": "2007-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2007, 2011, and 2015 general elections as PDF per section, municipality, and comuna; 2019 and 2023 not found"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 22000000,
+      "effort": 4
+    },
+    {
+      "key": "senado_provincial",
+      "tier": "provincia",
+      "name": "Elección de senados provinciales",
+      "name_en": "Provincial senate elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.distrito"
+        ],
+        "fine": [
+          "ar.seccion"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "The senates of Buenos Aires (46), Catamarca (16), Corrientes (15), Entre Ríos (17), Mendoza (38), Salta (23), San Luis (9), and Santa Fe (19): 183 seats, mostly by department or electoral section.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Provincial elections since 1983 are not yet enumerated by province; the 24 jurisdictions set their own days."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "dne_spp",
+          "period_years": 2,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Each province's electoral court or board (tribunal, junta, or juzgado electoral)",
+          "valid_from": "1983-12-10",
+          "locator": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf (each jurisdiction's constitution sets the day within its own window)",
+          "classes": 2
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "paso_provincial",
+      "tier": "provincia",
+      "name": "Primarias abiertas provinciales",
+      "name_en": "Provincial open primaries",
+      "category": "nominating",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "2009-12-11",
+      "note": "State-run open primaries for provincial and local offices: Buenos Aires (Ley 14.086), the City of Buenos Aires, Catamarca (Ley 5.437), Chaco (Ley 2073-Q), Entre Ríos (Ley 9.659), Mendoza (Ley 8.619), and Santa Fe (Ley 14.478); La Pampa's open internal elections (Ley 2.042) and San Juan's SiPAD are similar. Salta repealed its PASO in 2024 (Ley 8463); Buenos Aires, Catamarca, and Chaco suspended theirs for 2025. The year each province first held them is not yet cited.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2009-12-11",
+          "through": "2026-11-15",
+          "note": "Not yet enumerated by province."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        },
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 15000000,
+      "effort": 4
+    },
+    {
+      "key": "convencion_provincial",
+      "tier": "provincia",
+      "name": "Elección de convencionales constituyentes provinciales y estatuyentes",
+      "name_en": "Provincial constitutional convention elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "Conventions elected to write or reform a provincial constitution, and the City of Buenos Aires's Convención Estatuyente of 60 members elected on 30 June 1996 (Ley 24.620). Recent ones: Córdoba (2 September 2001, after the consulta of 22 July 2001), Santa Fe (69 members, 13 April 2025), and Formosa (30 members, 29 June 2025, Ley 1.736). Others since 1983 are not yet enumerated.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Conventions since 1983 are not yet enumerated by province."
+        },
+        {
+          "date": "1996-06-30",
+          "contests": 1,
+          "seats": 60,
+          "source": "dec50_96",
+          "quote": "para que el día 30 de junio de 1996 proceda a elegir UN (1) Jefe de Gobierno ... SESENTA (60) Representantes titulares y DIEZ (10) Representantes suplentes",
+          "note": "City of Buenos Aires, Convención Estatuyente."
+        },
+        {
+          "date": "2025-04-13",
+          "contests": 1,
+          "seats": 69,
+          "source": "santafe_conv2025",
+          "quote": "juraron los 68 de los 69 convencionales electos ... elegidos por la ciudadanía el pasado 13 de abril",
+          "note": "Santa Fe."
+        },
+        {
+          "date": "2025-06-29",
+          "contests": 1,
+          "seats": 30,
+          "source": "dne_bancas2025",
+          "quote": "elecciones legislativas y constituyentes para el próximo 29 de junio ... se elegirán 30 convencionales constituyentes para la reforma de la Constitución Provincial en los términos de la Ley N° 1.736",
+          "note": "Formosa."
+        }
+      ],
+      "est_votes": 2000000,
+      "effort": 4
+    },
+    {
+      "key": "tribunal_cuentas_provincial",
+      "tier": "provincia",
+      "name": "Elección del Tribunal de Cuentas de la Provincia de Córdoba",
+      "name_en": "Córdoba provincial audit court elections",
+      "category": "special_purpose",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dne_spp",
+      "note": "Córdoba elects its Tribunal de Cuentas with the governor and legislature (Ley 9571 art. 44: \"Gobernador, Vice, Legisladores y Tribunal de Cuentas\"). The Justicia Electoral publishes its results with the other categories.",
+      "match": [
+        {
+          "name_pattern": "Tribunal de Cuentas",
+          "iso_pattern": "AR-X"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-12-10",
+          "through": "2026-11-15",
+          "note": "Not yet enumerated."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        }
+      ],
+      "finest_note": "circuit or locality",
+      "est_votes": 2000000,
+      "effort": 3
+    },
+    {
+      "key": "judicial",
+      "tier": "provincia",
+      "name": "Elección de jueces de paz y de consejeros de la magistratura",
+      "name_en": "Elected justices of the peace and judicial council members",
+      "category": "judicial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dne_spp",
+      "valid_from": "1983-12-10",
+      "note": "Chubut elects justices of the peace and the popular members of its Consejo de la Magistratura (Ley V N° 78 and Ley V N° 70), and La Pampa elects justices of the peace with its provincial authorities (Ley 1593 art. 7). Other provinces are not confirmed.",
+      "match": [
+        {
+          "name_pattern": "Juez|Jueces|Magistratura",
+          "iso_pattern": "AR-*"
+        },
+        {
+          "name_pattern": "Juez|Jueces",
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-12-10",
+          "through": "2026-11-15",
+          "note": "Not yet enumerated."
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "consulta_provincial",
+      "tier": "provincia",
+      "name": "Consultas populares y referendos provinciales",
+      "name_en": "Provincial referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ar.distrito"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "first_held": "2001-07-22",
+      "note": "Most provincial constitutions provide for a binding or non-binding consulta. The one cited so far is Córdoba's consulta of 22 July 2001 on a unicameral legislature and other reforms (yes 1,052,588, no 272,919). Others are not yet enumerated.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "AR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-07-22",
+          "contests": 1,
+          "source": "cba_2001",
+          "quote": "Consulta Popular Provincial del 22 de Julio de 2001 ... Votos por SI 1.052.588 / Votos por NO 272.919",
+          "note": "Córdoba."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 3
+    },
+    {
+      "key": "intendente",
+      "tier": "gobierno_local",
+      "name": "Elección de intendentes",
+      "name_en": "Mayoral elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.seccion"
+        ]
+      },
+      "source": "dne_mapa",
+      "valid_from": "1853-05-01",
+      "note": "Each municipality elects an intendente (1,275 in office in July 2026, DNE), mostly by plurality for four years, on the day its province sets. Municipal regimes are provincial: some provinces give municipalities their own charters (cartas orgánicas).",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Municipal elections are not yet enumerated by province."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "dne_spp",
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "The province's electoral court or board, or the municipal electoral board where a charter provides one",
+          "valid_from": "1983-12-10",
+          "locator": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf (each jurisdiction's constitution sets the day within its own window)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        },
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        },
+        {
+          "platform": "Junta Electoral Provincial de Tucumán",
+          "url": "https://electoraltucuman.gob.ar/elecciones/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tuc_junta",
+          "first_date": "2007-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2007, 2011, and 2015 general elections as PDF per section, municipality, and comuna; 2019 and 2023 not found"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 20000000,
+      "effort": 5
+    },
+    {
+      "key": "concejo",
+      "tier": "gobierno_local",
+      "name": "Elección de concejos deliberantes",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.seccion"
+        ]
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "Each municipality's concejo deliberante, mostly by list PR, often renewed by halves every two years (Buenos Aires province elected 1,097 councillors on 7 September 2025, DNE).",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Municipal elections are not yet enumerated by province."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "dne_spp",
+          "period_years": 2,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Each province's electoral court or board (tribunal, junta, or juzgado electoral)",
+          "valid_from": "1983-12-10",
+          "locator": "https://www.argentina.gob.ar/sites/default/files/2026/02/sistemas_politicos_provinciales_4.pdf (each jurisdiction's constitution sets the day within its own window)",
+          "classes": 2
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        },
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral de la Provincia de Mendoza",
+          "url": "https://jusmendoza.gob.ar/escrutinios-definitivos-elecciones-generales-de-mendoza/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "mza_junta",
+          "first_date": "2023-06-11",
+          "finest": "ar.seccion",
+          "evidence": "Definitive counts as PDF per department and office from 2023"
+        },
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        },
+        {
+          "platform": "Junta Electoral Provincial de Tucumán",
+          "url": "https://electoraltucuman.gob.ar/elecciones/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tuc_junta",
+          "first_date": "2007-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2007, 2011, and 2015 general elections as PDF per section, municipality, and comuna; 2019 and 2023 not found"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 22000000,
+      "effort": 5
+    },
+    {
+      "key": "comision_comunal",
+      "tier": "gobierno_local",
+      "name": "Elección de comisiones comunales, comisiones de fomento, juntas de gobierno y comisionados",
+      "name_en": "Elections of smaller local governments (comunas, commissions, and commissioners)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "dne_spp",
+      "valid_from": "1853-05-01",
+      "note": "Local governments below municipal rank: Córdoba's and Santa Fe's comisiones comunales, La Pampa's comisiones de fomento, Entre Ríos's juntas de gobierno, Jujuy's comunas, and the elected comisionados of Tucumán, Santiago del Estero, and San Luis. The national register lists 604 comunas, 180 juntas, 128 comisiones, and 4 juntas de gobierno.",
+      "match": [
+        {
+          "name_pattern": "Comisi[oó]n|Comisionad|Junta de Gobierno|Comuna",
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Municipal elections are not yet enumerated by province."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        },
+        {
+          "platform": "Tribunal Electoral de la Provincia de Santa Fe",
+          "url": "https://www.santafe.gob.ar/ms/tribunalelectoral/elecciones/",
+          "format": "html, pdf, csv, ods",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "santafe_te",
+          "first_date": "1983-01-01",
+          "finest": "ar.mesa",
+          "evidence": "Pages per election from 1983; 2025 by polling table as CSV (renglones2025.csv)"
+        },
+        {
+          "platform": "Junta Electoral Provincial de Tucumán",
+          "url": "https://electoraltucuman.gob.ar/elecciones/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tuc_junta",
+          "first_date": "2007-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2007, 2011, and 2015 general elections as PDF per section, municipality, and comuna; 2019 and 2023 not found"
+        }
+      ],
+      "finest_note": "varies by province",
+      "est_votes": 1500000,
+      "effort": 5
+    },
+    {
+      "key": "consejo_escolar",
+      "tier": "gobierno_local",
+      "name": "Elección de consejos escolares de la Provincia de Buenos Aires",
+      "name_en": "Buenos Aires province school council elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ar.seccion"
+        ]
+      },
+      "source": "dne_spp",
+      "note": "Each of the 135 partidos of Buenos Aires province elects a consejo escolar with its council, by list PR (Ley 14.249 apportions \"Concejales y Consejeros Escolares\"). The Junta Electoral's CSVs carry the category by partido from 2003.",
+      "match": [
+        {
+          "name_pattern": "Consej[oe]r?o?s? Escolar",
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Municipal elections are not yet enumerated by province."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Junta Electoral de la Provincia de Buenos Aires",
+          "url": "https://www.juntaelectoral.gba.gov.ar/mapa-estadisticas-historicas.php",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "pba_junta",
+          "first_date": "2003-01-01",
+          "finest": "ar.seccion",
+          "evidence": "CSV per partido and election from 2003, by list and office; no votes by polling table"
+        }
+      ],
+      "finest_note": "partido",
+      "est_votes": 8000000,
+      "effort": 3
+    },
+    {
+      "key": "tribunal_cuentas_municipal",
+      "tier": "gobierno_local",
+      "name": "Elección de tribunales de cuentas municipales y comunales de Córdoba",
+      "name_en": "Córdoba municipal and communal audit court elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cba_jel",
+      "valid_from": "1983-12-10",
+      "note": "Córdoba's municipalities and comunas elect their own tribunales de cuentas with the intendente and council (the Justicia Electoral's 2023 application lists Tribunal de Cuentas Municipal and Comunal).",
+      "match": [
+        {
+          "name_pattern": "Tribunal de Cuentas",
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-10-30",
+          "through": "2026-11-15",
+          "note": "Municipal elections are not yet enumerated by province."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Justicia Electoral de la Provincia de Córdoba",
+          "url": "https://www.justiciacordoba.gob.ar/Jel/Contenido/escrutinios.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "cba_jel",
+          "first_date": "2001-01-01",
+          "finest": "ar.seccion",
+          "evidence": "Report applications for 2003-2023 by department, circuit, and locality; 2001 as PDF certificates"
+        }
+      ],
+      "finest_note": "circuit or locality",
+      "est_votes": 1500000,
+      "effort": 4
+    },
+    {
+      "key": "convencion_municipal",
+      "tier": "gobierno_local",
+      "name": "Elección de convencionales municipales",
+      "name_en": "Municipal charter convention elections",
+      "category": "legislature",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dne_bancas2025",
+      "valid_from": "1983-12-10",
+      "note": "Municipalities with autonomy elect conventions to write or reform their charters (cartas orgánicas), for example 232 municipal convention members in Salta on 11 May 2025; Santa Fe provides for them in Ley 14.478.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1983-12-10",
+          "through": "2026-11-15",
+          "note": "Not yet enumerated."
+        },
+        {
+          "date": "2025-05-11",
+          "seats": 232,
+          "source": "dne_bancas2025",
+          "quote": "se votarán 232 convencionales municipales, que estarán encargados de reformar las cartas orgánicas de sus distritos",
+          "note": "Salta; the number of municipalities is not given."
+        }
+      ],
+      "est_votes": 500000,
+      "effort": 4
+    },
+    {
+      "key": "consulta_municipal",
+      "tier": "gobierno_local",
+      "name": "Consultas populares municipales",
+      "name_en": "Municipal referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dne_spp",
+      "valid_from": "1983-12-10",
+      "note": "Municipal charters and laws provide for consultas and plebiscites; none is yet cited from an official source (the 2003 Esquel plebiscite on mining is known only from secondary sources).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 5
+    },
+    {
+      "key": "junta_comunal",
+      "tier": "comuna",
+      "name": "Elección de juntas comunales de la Ciudad de Buenos Aires",
+      "name_en": "City of Buenos Aires community board elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "caba_ley1777",
+      "valid_from": "2005-09-01",
+      "first_held": "2011-07-10",
+      "note": "Each of the 15 comunas elects a seven-member Junta Comunal (105 seats) by list PR for four years with the Head of Government (Ley 1777 art. 19): 2011, 2015, 2019, and 2023.",
+      "match": [
+        {
+          "name_pattern": "Junta Comunal"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 15,
+          "seats": 105,
+          "source": "caba_estadistica",
+          "quote": "Miembros de Junta Comunal electos ... Año 2011"
+        },
+        {
+          "date": "2015-01-01",
+          "through": "2023-12-31",
+          "note": "2015, 2019, and 2023 not yet counted."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+          "url": "https://resultados.electoralcaba.gob.ar/index.php",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_te",
+          "first_date": "2025-01-01",
+          "finest": "ar.seccion",
+          "evidence": "2025 results by comuna; 2015-2023 on the Tribunal Superior's site and 1999-2013 in a linked folder"
+        },
+        {
+          "platform": "Tribunal Superior de Justicia de la Ciudad: resultados 2015-2023",
+          "url": "https://www.eleccionesciudad.gob.ar/resultados",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "caba_tsj",
+          "first_date": "2015-01-01",
+          "last_date": "2023-12-31",
+          "finest": "ar.seccion",
+          "evidence": "Results by comuna, 2015-2023"
+        }
+      ],
+      "finest_note": "comuna",
+      "est_votes": 1800000,
+      "effort": 2
+    },
+    {
+      "key": "internas_partidarias",
+      "tier": "nacion",
+      "name": "Elecciones internas de partidos",
+      "name_en": "Party-run internal elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ley26571",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Party-internal votes that the parties run under their own charters; the state-run primaries are the classes paso and paso_provincial.",
+      "note": "Internal elections of party authorities, and candidate selection in provinces without state-run primaries, where the DNE notes \"No hay PASO. A criterio de los partidos\"."
+    },
+    {
+      "key": "consejos_profesionales",
+      "tier": "nacion",
+      "name": "Consejo de la Magistratura y otros cuerpos de elección estamental",
+      "name_en": "Judicial council and other peer-elected bodies",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cn",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Not public elections: judges, lawyers, and academics elect their own members of the national Consejo de la Magistratura (Constitution art. 114), and bar, union, and university bodies vote under their own rules. Chubut's popularly elected council members are in class judicial."
+    },
+    {
+      "key": "juntas_vecinales",
+      "tier": "gobierno_local",
+      "name": "Comisiones y juntas vecinales",
+      "name_en": "Neighborhood association elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "dne_spp",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Neighborhood commissions and centros vecinales are civil associations whose votes municipalities supervise under ordinances; no electoral authority runs or publishes them."
+    }
+  ]
+}
