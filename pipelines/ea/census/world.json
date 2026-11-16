@@ -427,12 +427,6 @@
       "url": "https://jce.gob.do/",
       "kind": "official_body"
     },
-    "ec-cne": {
-      "title": "Electores habilitados Elecciones Generales 2025",
-      "publisher": "Consejo Nacional Electoral (Ecuador)",
-      "url": "https://www.cne.gob.ec/",
-      "kind": "official_body"
-    },
     "ee-valimised": {
       "title": "Statistics about Internet voting in Estonia",
       "publisher": "Estonian National Electoral Committee",
@@ -719,12 +713,6 @@
       "title": "Instance Supérieure Indépendante pour les Élections",
       "publisher": "ISIE",
       "url": "https://www.isie.tn/",
-      "kind": "official_body"
-    },
-    "tr-ysk": {
-      "title": "Yuksek Secim Kurulu 2023 Yili Faaliyet Raporu",
-      "publisher": "Yuksek Secim Kurulu",
-      "url": "https://www.ysk.gov.tr/",
       "kind": "official_body"
     },
     "tt-ebc": {
@@ -1358,14 +1346,7 @@
       "name_en": "Ecuador",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/EC/",
-      "electorate": {
-        "value": 13736314,
-        "date": "2025-02-09",
-        "precision": "day",
-        "source": "ec-cne",
-        "locator": "https://www.cne.gob.ec/13736-314-electores-habilitados-para-sufragar-en-las-elecciones-generales-2025/"
-      }
+      "locator": "https://data.ipu.org/parliament/EC/"
     },
     {
       "iso": "EE",
@@ -2846,14 +2827,7 @@
       "name_en": "Türkiye",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/TR/",
-      "electorate": {
-        "value": 64145504,
-        "date": "2023-05-14",
-        "precision": "day",
-        "source": "tr-ysk",
-        "locator": "https://www.ysk.gov.tr/doc/dosyalar/docs/Faaliyet_Raporlari/2023_Yili_Faaliyet_Raporu.pdf"
-      }
+      "locator": "https://data.ipu.org/parliament/TR/"
     },
     {
       "iso": "TT",
