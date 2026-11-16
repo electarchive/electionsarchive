@@ -1,0 +1,1188 @@
+{
+  "polity": "HN",
+  "name": "Honduras",
+  "region_schemes": [
+    "hn.departamento"
+  ],
+  "sources": {
+    "constitucion": {
+      "title": "Constitución de la República de Honduras, 1982, con las reformas desde 1982 hasta 2004 (Decreto 131 de 11 de enero de 1982)",
+      "publisher": "Tribunal Superior de Cuentas (TSC), Biblioteca Virtual",
+      "url": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf",
+      "note": "Consolidated text with footnotes giving each reforming decree. Art. 202 fixes 128 deputies (Decreto 28-88); art. 236 elects the presidential formula by simple majority; art. 237 sets a four-year term from 27 January; art. 311 has the Congress elect the Supreme Court. Footnote 1 records Decreto 242-2003 adding the referéndum and plebiscito to art. 5, pending ratification in this text.",
+      "kind": "official_body"
+    },
+    "ley2021": {
+      "title": "Ley Electoral de Honduras, Decreto 35-2021 (La Gaceta No. 35,610, 26 de mayo de 2021)",
+      "publisher": "Tribunal Superior de Cuentas (TSC), Biblioteca Virtual",
+      "url": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf",
+      "note": "Art. 42: a departmental electoral council in each of the 18 departments; art. 44: a municipal electoral council in each of the 298 municipalities; art. 80: voters abroad vote only for President and Designados; art. 193: primaries on the second Sunday of March of the election year; art. 211: general elections on the last Sunday of November; art. 212: the offices elected; arts. 285-288: how the presidential formula, the 128 deputies, the 20 PARLACEN deputies, and the municipal corporations are declared; art. 289: a separate ballot and box for each level.",
+      "kind": "official_body"
+    },
+    "ley2004": {
+      "title": "Ley Electoral y de las Organizaciones Políticas, Decreto 44-2004 (15 de mayo de 2004)",
+      "publisher": "Tribunal Superior de Cuentas (TSC), Biblioteca Virtual",
+      "url": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf",
+      "note": "Art. 113: party primaries on the third Sunday of February of the election year, run by the Tribunal Supremo Electoral; art. 159: general elections on the last Sunday of November. Replaced by Decreto 35-2021.",
+      "kind": "official_body"
+    },
+    "municipalidades": {
+      "title": "Ley de Municipalidades, Decreto 134-90, con sus reformas",
+      "publisher": "Tribunal Superior de Cuentas (TSC), Biblioteca Virtual",
+      "url": "https://www.tsc.gob.hn/web/leyes/Ley_de_municipalidades.pdf",
+      "note": "Art. 25(10): the corporation may call a binding plebiscito of the municipality's citizens; art. 26: a corporation of an alcalde and 4, 6, 8, or 10 regidores by population; art. 59: alcaldes auxiliares of barrios, colonias, aldeas, and caseríos, chosen by the corporation from a terna that a public assembly selects, and patronatos of residents. Its preamble replaces the Ley de Municipalidades y del Régimen Político of 1 April 1927.",
+      "kind": "official_body"
+    },
+    "lopl": {
+      "title": "Ley Orgánica del Poder Legislativo, Decreto 363-2013 (2014)",
+      "publisher": "Tribunal Superior de Cuentas (TSC), Biblioteca Virtual",
+      "url": "https://www.tsc.gob.hn/web/leyes/Ley_organica_poder_legislativo_2014.pdf",
+      "note": "The Congress of 128 deputies and their substitutes, elected for four years by direct vote; it also elects the officials the Constitution assigns to it.",
+      "kind": "official_body"
+    },
+    "parlacen": {
+      "title": "Periodos Parlamentarios",
+      "publisher": "Parlamento Centroamericano (PARLACEN)",
+      "url": "https://parlacen.int/assets/pdf/Periodos%20Parlamentarios.pdf",
+      "note": "The Parliament's own history of its terms. It says Honduras was the first country to elect deputies to it, in the elections of November 1989, per Punto de Acta No. 850 of the Tribunal Nacional de Elecciones, and lists 20 Honduran deputies by party for each term.",
+      "kind": "official_body"
+    },
+    "cne": {
+      "title": "Consejo Nacional Electoral: resultados electorales",
+      "publisher": "Consejo Nacional Electoral (CNE)",
+      "url": "https://www.cne.hn/",
+      "note": "The election authority since 2019 (Tribunal Nacional de Elecciones to 2004, Tribunal Supremo Electoral 2004-2019). Its site and its results portals answer automated clients with a Cloudflare challenge.",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República de Honduras",
+      "name_en": "Republic of Honduras",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "hn.pais",
+      "source": "constitucion"
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos",
+      "name_en": "Departments: constituencies of the National Congress, with governors the President appoints",
+      "parent": "national",
+      "elects": false,
+      "scheme": "hn.departamento",
+      "source": "ley2021",
+      "counts": [
+        {
+          "date": "2021-05-26",
+          "value": 18,
+          "source": "ley2021",
+          "locator": "Art. 42: \"En los dieciocho (18) departamentos del territorio nacional debe funcionar un Consejo Departamental Electoral\""
+        }
+      ]
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios",
+      "name_en": "Municipalities, each governed by an elected municipal corporation",
+      "parent": "departamento",
+      "polity_kind": "municipality",
+      "scheme": "hn.municipio",
+      "source": "ley2021",
+      "counts": [
+        {
+          "date": "2021-05-26",
+          "value": 298,
+          "source": "ley2021",
+          "locator": "Art. 44: \"En los doscientos noventa y ocho (298) municipios del territorio nacional funcionará un Consejo Municipal Electoral\""
+        }
+      ]
+    },
+    {
+      "key": "aldea",
+      "name": "Aldeas, caseríos, barrios y colonias",
+      "name_en": "Villages, hamlets, and urban neighborhoods, whose assemblies propose alcaldes auxiliares",
+      "parent": "municipio",
+      "polity_kind": "submunicipal",
+      "scheme": "hn.aldea",
+      "source": "municipalidades"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Presidente y Designados a la Presidencia de la República",
+      "name_en": "President of the Republic, with the Designados (a single Vice President under the 2002 reform) on the same formula",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "hn.departamento",
+          "hn.municipio"
+        ],
+        "fine": [
+          "hn.centro",
+          "hn.jrv"
+        ]
+      },
+      "source": "constitucion",
+      "valid_from": "1839-01-01",
+      "first_held": "1981-11-29",
+      "earliest_record": "1981-11-29",
+      "est_votes": 30000000,
+      "effort": 2,
+      "note": "Elected with three Designados (a Vice President under the 2002 reform) on one formula by simple majority, with no runoff (Constitution art. 236; Ley Electoral 2021 art. 285), for four years from 27 January. Hondurans abroad vote only for this office (Ley Electoral 2021 art. 80). first_held is the first election under the 1982 Constitution; earlier presidents back to 1839 are in a span row.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "HN"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Nacional de Elecciones",
+          "valid_from": "1982-01-20",
+          "valid_to": "2004-05-15",
+          "runoff": "none",
+          "runoff_rule": "Simple majority of valid votes; no runoff (Constitution art. 236; Ley Electoral 2021 art. 285).",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (arts. 51, 237; the term is four years from 27 January)"
+        },
+        {
+          "source": "ley2004",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26",
+          "runoff": "none",
+          "runoff_rule": "Simple majority of valid votes; no runoff (Constitution art. 236; Ley Electoral 2021 art. 285).",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 159)"
+        },
+        {
+          "source": "ley2021",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26",
+          "runoff": "none",
+          "runoff_rule": "Simple majority of valid votes; no runoff (Constitution art. 236; Ley Electoral 2021 art. 285).",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (arts. 211-212)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2013-11-24",
+          "last_date": "2025-11-30",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "Results by department, municipality, voting center, and JRV with acta images for the 2013 to 2025 general elections"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1839-01-01",
+          "precision": "year",
+          "through": "1971-12-31",
+          "note": "Presidential elections under the constitutions of 1839 to 1965, direct or by the Congress or a constituent assembly; the last direct one before military rule was in 1971. Not yet listed."
+        },
+        {
+          "date": "1981-11-29",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "1985-11-24",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "1989-11-26",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "1993-11-28",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "1997-11-30",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "2001-11-25",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Art. 236: \"El Presidente y Vicepresidente de la República serán elegidos conjunta y directamente por el pueblo por simple mayoría de votos.\" Elections are held on the last Sunday of November before the term ends."
+        },
+        {
+          "date": "2005-11-27",
+          "contests": 1,
+          "source": "ley2004",
+          "quote": "Art. 159: \"Las elecciones generales se llevarán a cabo el último domingo del mes de noviembre del año anterior a aquel en que finaliza el periodo Constitucional.\""
+        },
+        {
+          "date": "2009-11-29",
+          "contests": 1,
+          "source": "ley2004",
+          "quote": "Art. 159: \"Las elecciones generales se llevarán a cabo el último domingo del mes de noviembre del año anterior a aquel en que finaliza el periodo Constitucional.\""
+        },
+        {
+          "date": "2013-11-24",
+          "contests": 1,
+          "source": "ley2004",
+          "quote": "Art. 159: \"Las elecciones generales se llevarán a cabo el último domingo del mes de noviembre del año anterior a aquel en que finaliza el periodo Constitucional.\""
+        },
+        {
+          "date": "2017-11-26",
+          "contests": 1,
+          "source": "ley2004",
+          "quote": "Art. 159: \"Las elecciones generales se llevarán a cabo el último domingo del mes de noviembre del año anterior a aquel en que finaliza el periodo Constitucional.\""
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 1,
+          "source": "ley2021",
+          "quote": "Art. 211: \"El Consejo Nacional Electoral (CNE) debe realizar las elecciones generales el último domingo del mes de noviembre del año anterior a aquel en que finaliza el período de gobierno respectivo.\""
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 1,
+          "source": "ley2021",
+          "quote": "Art. 211: \"El Consejo Nacional Electoral (CNE) debe realizar las elecciones generales el último domingo del mes de noviembre del año anterior a aquel en que finaliza el período de gobierno respectivo.\""
+        }
+      ]
+    },
+    {
+      "key": "congreso",
+      "tier": "national",
+      "name": "Diputados al Congreso Nacional",
+      "name_en": "National Congress",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "hn.departamento"
+        ],
+        "fine": [
+          "hn.municipio",
+          "hn.centro",
+          "hn.jrv"
+        ]
+      },
+      "source": "constitucion",
+      "valid_from": "1839-01-01",
+      "first_held": "1981-11-29",
+      "earliest_record": "1981-11-29",
+      "est_votes": 30000000,
+      "effort": 3,
+      "note": "128 deputies and substitutes since 1989 (Constitution art. 202, Decreto 28-88), elected in the 18 departments by open-list proportional representation: a departmental quotient, then largest remainders, with candidates ranked by their individual marks; departments with one seat elect it by simple majority (Ley Electoral 2021 art. 286). Separate ballots for each level since 1993 (art. 289 in the 2021 law).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "HN"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Nacional de Elecciones",
+          "valid_from": "1982-01-20",
+          "valid_to": "2004-05-15",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (arts. 51, 237; the term is four years from 27 January)"
+        },
+        {
+          "source": "ley2004",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 159)"
+        },
+        {
+          "source": "ley2021",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (arts. 211-212)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2013-11-24",
+          "last_date": "2025-11-30",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "Party and candidate marks by department, municipality, and JRV for the 2013 to 2025 general elections"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1839-01-01",
+          "precision": "year",
+          "through": "1971-12-31",
+          "note": "Congress elections under the constitutions of 1839 to 1965, including a bicameral period. Not yet listed."
+        },
+        {
+          "date": "1981-11-29",
+          "note": "Seats by department were set from the population quotient before Decreto 28-88 fixed 128; not yet counted."
+        },
+        {
+          "date": "1985-11-24",
+          "note": "Seats by department were set from the population quotient before Decreto 28-88 fixed 128; not yet counted."
+        },
+        {
+          "date": "1989-11-26",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "1993-11-28",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "1997-11-30",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2001-11-25",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2005-11-27",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2009-11-29",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2013-11-24",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2017-11-26",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 18,
+          "seats": 128,
+          "source": "constitucion",
+          "quote": "Art. 202: \"El Congreso Nacional estará integrado por un número fijo de ciento veintiocho (128) diputados propietarios y sus respectivos suplentes\"; \"su distribución departamental se hará con base al cociente que señale el Tribunal Supremo Electoral\"",
+          "note": "One contest per department; 128 seats since Decreto 28-88 (La Gaceta 21 April 1988)."
+        }
+      ]
+    },
+    {
+      "key": "parlacen",
+      "tier": "national",
+      "name": "Diputados al Parlamento Centroamericano",
+      "name_en": "Honduran deputies to the Central American Parliament",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parlacen",
+      "valid_from": "1989-01-01",
+      "first_held": "1989-11-26",
+      "earliest_record": "1989-11-26",
+      "est_votes": 25000000,
+      "effort": 2,
+      "finest_note": "Seats follow the national presidential vote, so the finest unit is the presidential count's",
+      "note": "20 deputies and substitutes from party lists, allocated by a national quotient of the presidential vote (Ley Electoral 2021 art. 287); there is no separate PARLACEN ballot. Former presidents and vice presidents also sit by right; they are not elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "HN",
+          "name_pattern": "(Parlamento Centroamericano|Central American Parliament|PARLACEN)"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Nacional de Elecciones",
+          "valid_from": "1989-01-01",
+          "valid_to": "2004-05-15",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (arts. 51, 237; the term is four years from 27 January)"
+        },
+        {
+          "source": "ley2004",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 159)"
+        },
+        {
+          "source": "ley2021",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (arts. 211-212)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2013-11-24",
+          "last_date": "2025-11-30",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "The presidential count by party, from which the 20 seats are allocated"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-11-26",
+          "contests": 1,
+          "seats": 20,
+          "source": "parlacen",
+          "quote": "\"Fue el primer país en elegir Diputados al Parlamento Centroamericano en las elecciones de noviembre de 1989, según certificación del Punto de Acta No. 850 del Tribunal Nacional Electoral.\""
+        },
+        {
+          "date": "1993-11-28",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "1997-11-30",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2001-11-25",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2005-11-27",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2009-11-29",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2013-11-24",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2017-11-26",
+          "note": "Elected with the general election; not yet counted."
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 1,
+          "seats": 20,
+          "source": "ley2021",
+          "quote": "Art. 287: \"el Consejo Nacional Electoral (CNE) establecerá la distribución de los veinte (20) candidatos propietarios y sus respectivos suplentes\""
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 1,
+          "seats": 20,
+          "source": "ley2021",
+          "quote": "Art. 287: \"el Consejo Nacional Electoral (CNE) establecerá la distribución de los veinte (20) candidatos propietarios y sus respectivos suplentes\""
+        }
+      ]
+    },
+    {
+      "key": "corporacion_municipal",
+      "tier": "municipio",
+      "name": "Corporaciones Municipales (regidores)",
+      "name_en": "Municipal corporations: regidores elected with the alcalde on one list",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "hn.centro",
+          "hn.jrv"
+        ]
+      },
+      "source": "ley2021",
+      "first_held": "1981-11-29",
+      "earliest_record": "1981-11-29",
+      "est_votes": 30000000,
+      "effort": 3,
+      "note": "Each party presents one planilla of alcalde, vicealcalde, and 4 to 10 regidores (Ley de Municipalidades art. 26). The list with most votes takes the alcalde and vicealcalde; the regidores are shared by a municipal quotient and largest remainders after deducting the quotient that elected the alcalde (Ley Electoral 2021 art. 288). Separate municipal ballot since 1993; before it, one vote for all levels.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "HN*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Nacional de Elecciones",
+          "valid_from": "1982-01-20",
+          "valid_to": "2004-05-15",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (arts. 51, 237; the term is four years from 27 January)"
+        },
+        {
+          "source": "ley2004",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 159)"
+        },
+        {
+          "source": "ley2021",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (arts. 211-212)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2013-11-24",
+          "last_date": "2025-11-30",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "Party votes and the corporation declared in each of the 298 municipalities, by JRV, for 2013 to 2025"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1927-04-01",
+          "precision": "year",
+          "through": "1971-12-31",
+          "note": "Municipal elections under the Ley de Municipalidades y del Régimen Político of 1927 and earlier laws. Not yet listed."
+        },
+        {
+          "date": "1981-11-29",
+          "note": "One ballot for all levels; municipal votes were the presidential votes until the separate ballot of 1993. Not yet counted."
+        },
+        {
+          "date": "1985-11-24",
+          "note": "One ballot for all levels; municipal votes were the presidential votes until the separate ballot of 1993. Not yet counted."
+        },
+        {
+          "date": "1989-11-26",
+          "note": "One ballot for all levels; municipal votes were the presidential votes until the separate ballot of 1993. Not yet counted."
+        },
+        {
+          "date": "1993-11-28"
+        },
+        {
+          "date": "1997-11-30"
+        },
+        {
+          "date": "2001-11-25"
+        },
+        {
+          "date": "2005-11-27"
+        },
+        {
+          "date": "2009-11-29"
+        },
+        {
+          "date": "2013-11-24"
+        },
+        {
+          "date": "2017-11-26"
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 298,
+          "source": "ley2021",
+          "quote": "Art. 44: \"En los doscientos noventa y ocho (298) municipios del territorio nacional funcionará un Consejo Municipal Electoral\"; art. 212(4): \"Miembros de las Corporaciones Municipales\""
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 298,
+          "source": "ley2021",
+          "quote": "Art. 44: \"En los doscientos noventa y ocho (298) municipios del territorio nacional funcionará un Consejo Municipal Electoral\"; art. 212(4): \"Miembros de las Corporaciones Municipales\""
+        }
+      ]
+    },
+    {
+      "key": "alcalde",
+      "tier": "municipio",
+      "name": "Alcalde y Vicealcalde Municipal",
+      "name_en": "Mayors, with their deputy mayors, elected as the head of the winning municipal list",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "hn.centro",
+          "hn.jrv"
+        ]
+      },
+      "source": "ley2021",
+      "first_held": "1981-11-29",
+      "earliest_record": "1981-11-29",
+      "est_votes": 30000000,
+      "effort": 3,
+      "note": "Not a separate vote: the alcalde and vicealcalde head the planilla with most votes in the municipality (Ley Electoral 2021 art. 288(2)). The class holds mayoral contests a pipeline records apart from the corporation.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "HN*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Nacional de Elecciones",
+          "valid_from": "1982-01-20",
+          "valid_to": "2004-05-15",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (arts. 51, 237; the term is four years from 27 January)"
+        },
+        {
+          "source": "ley2004",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 159)"
+        },
+        {
+          "source": "ley2021",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (arts. 211-212)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2013-11-24",
+          "last_date": "2025-11-30",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "The winning planilla in each municipality, by JRV"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1927-04-01",
+          "precision": "year",
+          "through": "1971-12-31",
+          "note": "Municipal elections under the Ley de Municipalidades y del Régimen Político of 1927 and earlier laws. Not yet listed."
+        },
+        {
+          "date": "1981-11-29",
+          "note": "Elected on the general ballot before 1993. Not yet counted."
+        },
+        {
+          "date": "1985-11-24",
+          "note": "Elected on the general ballot before 1993. Not yet counted."
+        },
+        {
+          "date": "1989-11-26",
+          "note": "Elected on the general ballot before 1993. Not yet counted."
+        },
+        {
+          "date": "1993-11-28"
+        },
+        {
+          "date": "1997-11-30"
+        },
+        {
+          "date": "2001-11-25"
+        },
+        {
+          "date": "2005-11-27"
+        },
+        {
+          "date": "2009-11-29"
+        },
+        {
+          "date": "2013-11-24"
+        },
+        {
+          "date": "2017-11-26"
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 298,
+          "source": "ley2021",
+          "quote": "Art. 44: \"En los doscientos noventa y ocho (298) municipios del territorio nacional funcionará un Consejo Municipal Electoral\"; art. 212(4): \"Miembros de las Corporaciones Municipales\""
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 298,
+          "source": "ley2021",
+          "quote": "Art. 44: \"En los doscientos noventa y ocho (298) municipios del territorio nacional funcionará un Consejo Municipal Electoral\"; art. 212(4): \"Miembros de las Corporaciones Municipales\""
+        }
+      ]
+    },
+    {
+      "key": "primarias",
+      "tier": "national",
+      "name": "Elecciones primarias e internas",
+      "name_en": "State-run party primaries for president, deputies, and municipal corporations",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "hn.jrv"
+        ]
+      },
+      "source": "ley2021",
+      "first_held": "2005-02-20",
+      "earliest_record": "2005-02-20",
+      "est_votes": 12000000,
+      "effort": 3,
+      "note": "Every party with more than one internal movement must nominate its presidential formula, deputies, and municipal planillas in primaries run by the election authority on the same day (Ley Electoral 2021 arts. 193-195 and 289); parties with one movement nominate without a vote. Internal elections preceded the 2004 law's primaries; first_held is the first primary under that law. The 2008 and 2012 primaries were held in November of the year before the general election under reforms of the 2004 law.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "HN*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "ley2004",
+          "locator": "https://www.tsc.gob.hn/web/leyes/LEY%20ELECTORAL%202004.pdf (art. 113: third Sunday of February of the election year)",
+          "period_years": 4,
+          "phase": 1,
+          "month": 2,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-15",
+          "valid_to": "2021-05-26"
+        },
+        {
+          "source": "ley2021",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Decreto-35-2021.pdf (art. 193: second Sunday of March of the election year)",
+          "period_years": 4,
+          "phase": 1,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)",
+          "valid_from": "2021-05-26"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CNE results portals (resultadosgenerales and resultados subdomains of cne.hn)",
+          "url": "https://www.cne.hn/",
+          "format": "html, json, pdf (acta images)",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2017-03-12",
+          "last_date": "2025-03-09",
+          "finest": "hn.jrv",
+          "source": "cne",
+          "evidence": "Movement and candidate marks by department, municipality, and JRV for each party's primary"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "through": "2004-12-31",
+          "note": "Party internal elections held under the Tribunal Nacional de Elecciones between the 1982 Constitution and the 2004 law. Not yet listed."
+        },
+        {
+          "date": "2005-02-20",
+          "election_kind": "primary",
+          "source": "ley2004",
+          "quote": "Art. 113: \"las que se llevarán a cabo el tercer domingo del mes de febrero del año electoral\""
+        },
+        {
+          "date": "2008-11-30",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2012-11-18",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2017-03-12",
+          "election_kind": "primary"
+        },
+        {
+          "date": "2021-03-14",
+          "election_kind": "primary",
+          "source": "ley2021",
+          "quote": "Art. 193: primaries are called \"seis (6) meses antes del segundo domingo del mes de marzo del año en que se celebren las elecciones\""
+        },
+        {
+          "date": "2025-03-09",
+          "election_kind": "primary",
+          "source": "ley2021",
+          "quote": "Art. 193: primaries are called \"seis (6) meses antes del segundo domingo del mes de marzo del año en que se celebren las elecciones\""
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Plebiscito y referéndum nacional",
+      "name_en": "National plebiscites and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ley2021",
+      "est_votes": 0,
+      "effort": 1,
+      "note": "Instituted by the reform of Constitution art. 5 (Decreto 242-2003); the CNE administers plebiscites and referendums along with primaries and general elections (Ley Electoral 2021 art. 6). None has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "HN"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "locator": "https://www.tsc.gob.hn/web/leyes/Constitucion_de_la_republica.pdf (art. 5 and its note 1)",
+          "called": true,
+          "administered_by": "Consejo Nacional Electoral (CNE)"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "plebiscito_municipal",
+      "tier": "municipio",
+      "name": "Plebiscito municipal",
+      "name_en": "Municipal plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "municipalidades",
+      "disposition": "blocked",
+      "disposition_reason": "Called and counted by each municipal corporation (Ley de Municipalidades art. 25(10)); no national body compiles or publishes the results.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "HN-*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "constituyente",
+      "tier": "national",
+      "name": "Asamblea Nacional Constituyente",
+      "name_en": "National Constituent Assemblies",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "valid_to": "1982-01-20",
+      "first_held": "1980-04-20",
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of constituent assembly results is online: the election authority's portals start with later general elections, and the 1980 declaratoria of the Tribunal Nacional de Elecciones would have to be found in La Gaceta.",
+      "note": "The last, elected on 20 April 1980 by department, wrote the 1982 Constitution (Decreto 131 of 11 January 1982) and named the provisional president. Earlier assemblies (among them 1957 and 1965) are in a span row.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "HN"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1824-01-01",
+          "precision": "year",
+          "through": "1979-12-31",
+          "note": "Constituent assemblies before 1980. Not yet listed."
+        },
+        {
+          "date": "1980-04-20",
+          "note": "Elected the assembly that adopted the 1982 Constitution. Not yet counted."
+        }
+      ]
+    },
+    {
+      "key": "magistrados_csj",
+      "tier": "national",
+      "name": "Magistrados de la Corte Suprema de Justicia",
+      "name_en": "Supreme Court justices",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by two thirds of the Congress from a nominating board's list (Constitution arts. 311-312), not by voters.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "segundo_grado",
+      "tier": "national",
+      "name": "Elecciones de segundo grado del Congreso Nacional",
+      "name_en": "Officials the Congress elects: the electoral councils, the Attorney General, the auditors, and others",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lopl",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the Congress (for the electoral authority, Constitution art. 52), not by voters.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "alcalde_auxiliar",
+      "tier": "aldea",
+      "name": "Alcaldes auxiliares",
+      "name_en": "Auxiliary mayors of villages, hamlets, and neighborhoods",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "municipalidades",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A public assembly proposes a terna and the municipal corporation appoints one of them (Ley de Municipalidades art. 59); there is no ballot or count.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "patronato",
+      "tier": "aldea",
+      "name": "Patronatos",
+      "name_en": "Residents' boards (patronatos) of barrios, colonias, and aldeas",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "municipalidades",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Civil associations whose boards residents elect in assemblies under municipal and Interior ministry rules (Ley de Municipalidades art. 59); not public elections and no compiled results.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}

@@ -232,3 +232,11 @@ def show(as_json: bool) -> str:
     if as_json:
         return json.dumps(rows, indent=1)
     return "\n".join(f"{r['date']}\t{r['after']}\t{r['polity']}\t{r['kind']}" for r in rows)
+
+
+# Added with setdefault so a rule another census already registered is kept as is.
+for _name, _rule in {
+    "mar_second_sunday": nth_weekday(3, 6, 2),
+    "nov_last_sunday": last_weekday(11, 6),
+}.items():
+    DAY_RULES.setdefault(_name, _rule)
