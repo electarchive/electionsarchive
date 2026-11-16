@@ -1,0 +1,1008 @@
+{
+ "polity": "DZ",
+ "name": "Algeria",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Algeria",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "الجزائر",
+    "lang": "ar",
+    "kind": "native"
+   }
+  ],
+  "slug": "dz",
+  "wikidata": "Q262",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "Constitution de la République algérienne démocratique et populaire, révision promulguée par le décret présidentiel n° 20-442 du 30 décembre 2020 (Journal officiel n° 82 du 30 décembre 2020)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf",
+   "kind": "official_body",
+   "note": "Arts. 85 and 88 (President by direct universal suffrage, absolute majority of votes cast, five-year term), 121 and 122 (APN by direct suffrage for five years; two thirds of the Council of the Nation elected indirectly, two seats per wilaya, by the members of the APC and APW, one third appointed; six-year term renewed by half every three years), 186 (six Constitutional Court members elected among professors of constitutional law, one each by the Supreme Court and the Council of State)."
+  },
+  "o21-01": {
+   "title": "Ordonnance n° 21-01 du 10 mars 2021 portant loi organique relative au régime électoral (Journal officiel n° 17 du 10 mars 2021)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf",
+   "kind": "official_body",
+   "note": "Art. 169 (APC and APW members elected for five years by open-list proportional representation with a preferential vote, without panachage, in the three months before the term ends), 191 (APN by the same system for five years), 217 and 218 (elected two thirds of the Council of the Nation for six years, renewed by half every three years, by single-round plurality vote at wilaya level by an electoral college of APC and APW members), 247 and 248 (President by a two-round absolute-majority vote; the top two meet in the runoff)."
+  },
+  "l84-09": {
+   "title": "Loi n° 84-09 du 4 février 1984 relative à l'organisation territoriale du pays (Journal officiel n° 6 du 7 février 1984)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/1984/F1984006.pdf",
+   "kind": "official_body",
+   "note": "Art. 3 sets the territorial organization at 48 wilayas and 1,541 communes. The scanned French issue has no text layer; Loi 19-12 and Loi 26-06 amend this same article."
+  },
+  "l19-12": {
+   "title": "Loi n° 19-12 du 11 décembre 2019 modifiant et complétant la loi n° 84-09 du 4 février 1984 relative à l'organisation territoriale du pays (Journal officiel n° 78 du 18 décembre 2019)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2019/F2019078.pdf",
+   "kind": "official_body"
+  },
+  "l26-06": {
+   "title": "Loi n° 26-06 du 4 avril 2026 modifiant et complétant la loi n° 84-09 du 4 février 1984 relative à l'organisation territoriale du pays (Journal officiel n° 25 du 5 avril 2026)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2026/F2026025.pdf",
+   "kind": "official_body"
+  },
+  "d26-284": {
+   "title": "Décret présidentiel n° 26-284 du 29 août 2026 portant convocation du corps électoral pour l'élection des membres des assemblées populaires communales et de wilayas (Journal officiel n° 62 du 29 août 2026)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2026/F2026062.pdf",
+   "kind": "official_body"
+  },
+  "p01-cc-21": {
+   "title": "Proclamation n° 01/P.CC/21 du 23 juin 2021 portant résultats définitifs de l'élection des membres de l'Assemblée Populaire Nationale (Journal officiel n° 51 du 29 juin 2021)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2021/F2021051.pdf",
+   "kind": "official_body",
+   "note": "Gives registered voters, voters, and votes cast for each of the 62 constituencies (58 wilayas and four zones abroad) and the votes and seats of each list that won a seat; losing lists are not listed."
+  },
+  "p09-ccc-24": {
+   "title": "Proclamation n° 09/P.C.C/24 du 14 septembre 2024 portant résultats définitifs de l'élection du Président de la République (Journal officiel n° 63 du 15 septembre 2024)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2024/F2024063.pdf",
+   "kind": "official_body",
+   "note": "National totals in the proclamation; the issue also tabulates each candidate's votes by wilaya."
+  },
+  "joradp": {
+   "title": "Journal officiel de la République algérienne, collection 1962 to date",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/HFR/Index.htm",
+   "kind": "official_body",
+   "note": "Every decree convening the electorate and every proclamation of final national results (Constitutional Council, since 2021 Constitutional Court) is published here, in Arabic and French, as one PDF per issue under /FTP/jo-francais/<year>/F<year><issue>.pdf. Dates listed against this source have not yet been tied to their issue."
+  },
+  "anie": {
+   "title": "Autorité nationale indépendante des élections (ANIE), results pages",
+   "publisher": "Autorité nationale indépendante des élections (ANIE)",
+   "url": "https://ina-elections.dz/",
+   "kind": "official_body",
+   "note": "ANIE (Loi organique 19-07, then Ordinance 21-01) has run and announced every election since December 2019; before that the Ministry of the Interior did. The host reset the connection from a cloud network on 2026-11-16, and the Ministry's host failed TLS verification."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "الجمهورية الجزائرية الديمقراطية الشعبية",
+   "name_en": "People's Democratic Republic of Algeria",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "dz.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "wilaya",
+   "name": "Wilayas",
+   "name_en": "Wilayas (provinces)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "dz.wilaya",
+   "source": "l84-09",
+   "counts": [
+    {
+     "date": "1984-02-04",
+     "value": 48,
+     "source": "l84-09",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/1984/F1984006.pdf (art. 3: 48 wilayas)"
+    },
+    {
+     "date": "2019-12-11",
+     "value": 58,
+     "source": "l19-12",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2019/F2019078.pdf (art. 3 as amended: \"cinquante-huit (58) wilayas et mille cinq cent quarante-et-une (1541) communes\")"
+    },
+    {
+     "date": "2026-04-04",
+     "value": 69,
+     "source": "l26-06",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2026/F2026025.pdf (art. 3 as amended: \"soixante-neuf (69) wilayas et mille cinq cent quarante-et-une (1541) communes\")"
+    }
+   ]
+  },
+  {
+   "key": "commune",
+   "name": "Communes",
+   "name_en": "Communes (baladiyat)",
+   "parent": "wilaya",
+   "polity_kind": "municipality",
+   "scheme": "dz.commune",
+   "source": "l84-09",
+   "counts": [
+    {
+     "date": "1984-02-04",
+     "value": 1541,
+     "source": "l84-09",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/1984/F1984006.pdf (art. 3: 1,541 communes)"
+    },
+    {
+     "date": "2019-12-11",
+     "value": 1541,
+     "source": "l19-12",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2019/F2019078.pdf (art. 3 as amended: 1541 communes)"
+    },
+    {
+     "date": "2026-04-04",
+     "value": 1541,
+     "source": "l26-06",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2026/F2026025.pdf (art. 3 as amended: 1541 communes)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Élection du Président de la République",
+   "name_en": "President of the Republic",
+   "category": "executive",
+   "goal": "national",
+   "first_held": "1963-09-15",
+   "earliest_record": "1963-09-15",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "dz.wilaya"
+    ]
+   },
+   "note": "Direct election by two-round absolute majority; five-year term, renewable once (Constitution arts. 85 and 88; Ordinance 21-01 arts. 247 and 248). No vote has yet gone to a second round.",
+   "source": "constitution",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf (arts. 85 and 88)",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "DZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1963-09-15",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Single candidate (Ahmed Ben Bella) under the 1963 Constitution."
+    },
+    {
+     "date": "1976-12-10",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Single candidate under the 1976 Constitution."
+    },
+    {
+     "date": "1979-02-07",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "1984-01-12",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "1988-12-22",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "1995-11-16",
+     "contests": 1,
+     "source": "joradp",
+     "note": "First contested presidential election."
+    },
+    {
+     "date": "1999-04-15",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "2004-04-08",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "2009-04-09",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "2014-04-17",
+     "contests": 1,
+     "source": "joradp"
+    },
+    {
+     "date": "2019-12-12",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Votes set for 18 April and 4 July 2019 were called off; neither was held."
+    },
+    {
+     "date": "2024-09-07",
+     "contests": 1,
+     "source": "p09-ccc-24",
+     "quote": "Proclamation n° 09/P.C.C/24 du 10 Rabie El Aouel 1446 correspondant au 14 septembre 2024 portant résultats définitifs de l'élection du Président de la République",
+     "note": "Early election (élections présidentielles anticipées)."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "o21-01",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (arts. 245 to 248)",
+     "period_years": 5,
+     "phase": 4,
+     "month": 9,
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Absolute majority of votes cast, else a second round between the top two (Ordinance 21-01 art. 248).",
+     "administered_by": "Autorité nationale indépendante des élections; final results by the Constitutional Court",
+     "valid_from": "2021-03-10"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Journal officiel (JORADP)",
+     "url": "https://www.joradp.dz/FTP/jo-francais/{year}/F{year}{issue}.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "joradp",
+     "first_date": "1963-09-15",
+     "last_date": "2024-09-07",
+     "finest": "dz.wilaya",
+     "evidence": "Proclamation 09/P.C.C/24 (JO 63/2024) gives national totals and each candidate's votes by wilaya; earlier proclamations are in their issues, pre-1990 issues as scans"
+    },
+    {
+     "platform": "ANIE website",
+     "url": "https://ina-elections.dz/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "anie",
+     "first_date": "2019-12-12",
+     "evidence": "Provisional results by wilaya announced by ANIE since 2019; not reachable from this network"
+    }
+   ],
+   "est_votes": 115000000,
+   "effort": 2
+  },
+  {
+   "key": "apn",
+   "tier": "national",
+   "name": "Élection des membres de l'Assemblée Populaire Nationale",
+   "name_en": "People's National Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1976-11-22",
+   "first_held": "1977-02-25",
+   "earliest_record": "1977-02-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "dz.wilaya"
+    ]
+   },
+   "note": "407 members since 2021, elected for five years by open-list proportional representation with a preferential vote in each wilaya and in four zones abroad (Ordinance 21-01 art. 191; Ordinance 21-02). The sole chamber until 1997, the lower house since. A vacancy passes to the next candidate on the list, so there are no by-elections. Single-party lists (FLN) until 1987; the 1991 first round was annulled.",
+   "source": "o21-01",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (art. 191)",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "DZ",
+     "valid_from": "1976-11-22"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1977-02-25"
+    },
+    {
+     "date": "1982-03-05"
+    },
+    {
+     "date": "1987-02-26"
+    },
+    {
+     "date": "1991-12-26",
+     "note": "First multiparty election, two-round single-member system; the second round set for 16 January 1992 was cancelled and the first-round results were annulled with the January 1992 interruption of the electoral process."
+    },
+    {
+     "date": "1997-06-05",
+     "seats": 380
+    },
+    {
+     "date": "2002-05-30",
+     "seats": 389
+    },
+    {
+     "date": "2007-05-17",
+     "seats": 389
+    },
+    {
+     "date": "2012-05-10",
+     "seats": 462
+    },
+    {
+     "date": "2017-05-04",
+     "seats": 462
+    },
+    {
+     "date": "2021-06-12",
+     "contests": 62,
+     "source": "p01-cc-21",
+     "seats": 407,
+     "quote": "Les résultats définitifs de l'élection des membres de l'Assemblée Populaire Nationale ayant eu lieu le Aouel Dhou El Kaâda 1442 correspondant au 12 juin 2021",
+     "note": "62 constituencies: the 58 wilayas (table 'Résultats du scrutin par circonscription électorale') and Zones I to IV abroad; 407 seats under Ordinance 21-02."
+    },
+    {
+     "date": "2026-07-02",
+     "note": "Proclaimed by the Constitutional Court on 18 July 2026; the issue carrying the proclamation is not yet tied here."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitution",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf (art. 122)",
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Autorité nationale indépendante des élections; final results by the Constitutional Court",
+     "valid_from": "2020-12-30",
+     "vacancy_rule": "The seat passes to the next candidate on the list."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Journal officiel (JORADP)",
+     "url": "https://www.joradp.dz/FTP/jo-francais/{year}/F{year}{issue}.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "joradp",
+     "first_date": "1977-02-25",
+     "last_date": "2021-06-12",
+     "finest": "dz.wilaya",
+     "evidence": "Proclamation 01/P.CC/21 (JO 51/2021) tabulates each constituency's registered voters, voters, and votes cast, and the votes and seats of each list that won a seat; lists without a seat are not given"
+    },
+    {
+     "platform": "ANIE website",
+     "url": "https://ina-elections.dz/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "anie",
+     "first_date": "2019-12-12",
+     "evidence": "Provisional results announced by ANIE since 2021; not reachable from this network"
+    }
+   ],
+   "est_votes": 80000000,
+   "effort": 3
+  },
+  {
+   "key": "conseil_nation",
+   "tier": "national",
+   "name": "Élection des deux tiers des membres du Conseil de la Nation",
+   "name_en": "Council of the Nation (elected two thirds)",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1996-12-08",
+   "first_held": "1997-12-25",
+   "earliest_record": "1997-12-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "dz.wilaya"
+    ]
+   },
+   "note": "Two seats per wilaya elected for six years, half renewed every three years, by single-round plurality vote of an electoral college of the wilaya's APC and APW members (Constitution arts. 121 and 122; Ordinance 21-01 arts. 217 and 218). The other third is appointed by the President. The wilayas created in 2026 will first elect at the next renewal.",
+   "source": "constitution",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf (arts. 121 and 122)",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect",
+      "general"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "DZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-12-25",
+     "note": "First election of the Council of the Nation: both seats of each of the 48 wilayas."
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "through": "2019-12-31",
+     "note": "Seven half renewals, every three years from December 2000; not yet listed or counted."
+    },
+    {
+     "date": "2022-02-05",
+     "note": "Half renewal; the ten wilayas created by Loi 19-12 elected both their seats."
+    },
+    {
+     "date": "2025-03-09",
+     "note": "Half renewal."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "o21-01",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (arts. 217 and 218)",
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 6,
+     "classes": 2,
+     "called": false,
+     "administered_by": "Autorité nationale indépendante des élections; final results by the Constitutional Court",
+     "valid_from": "2021-03-10"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Journal officiel (JORADP)",
+     "url": "https://www.joradp.dz/FTP/jo-francais/{year}/F{year}{issue}.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "joradp",
+     "first_date": "1997-12-25",
+     "last_date": "2025-03-09",
+     "finest": "dz.wilaya",
+     "evidence": "The Constitutional Council (Court) proclaims the elected members by wilaya in the Journal officiel"
+    }
+   ],
+   "est_votes": 300000,
+   "effort": 3
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "Référendums",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1962-07-01",
+   "earliest_record": "1962-07-01",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "dz.wilaya"
+    ]
+   },
+   "note": "Called by the President (Constitution art. 91, 9°); a constitutional revision goes to referendum unless the Constitutional Court finds it leaves the institutional balance untouched (arts. 219 to 221). Results proclaimed by the Constitutional Council (Court).",
+   "source": "constitution",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf (arts. 91, 9°, and 219 to 221)",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "DZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1962-07-01",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Self-determination referendum under the Évian accords, run by the Provisional Executive; independence was proclaimed on its result."
+    },
+    {
+     "date": "1963-09-08",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitution."
+    },
+    {
+     "date": "1976-06-27",
+     "contests": 1,
+     "source": "joradp",
+     "note": "National Charter."
+    },
+    {
+     "date": "1976-11-19",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitution."
+    },
+    {
+     "date": "1986-01-16",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Revised National Charter."
+    },
+    {
+     "date": "1988-11-03",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitutional amendment."
+    },
+    {
+     "date": "1989-02-23",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitution."
+    },
+    {
+     "date": "1996-11-28",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitutional revision."
+    },
+    {
+     "date": "1999-09-16",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Civil Concord law."
+    },
+    {
+     "date": "2005-09-29",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Charter for Peace and National Reconciliation."
+    },
+    {
+     "date": "2020-11-01",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constitutional revision."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "o21-01",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (provisions on the referendum, after art. 260)",
+     "called": true,
+     "administered_by": "Autorité nationale indépendante des élections; final results by the Constitutional Court",
+     "valid_from": "2021-03-10"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Journal officiel (JORADP)",
+     "url": "https://www.joradp.dz/FTP/jo-francais/{year}/F{year}{issue}.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "joradp",
+     "first_date": "1962-07-01",
+     "last_date": "2020-11-01",
+     "finest": "dz.nation",
+     "evidence": "Proclamations of national results; wilaya breakdowns only in some issues"
+    }
+   ],
+   "est_votes": 110000000,
+   "effort": 3
+  },
+  {
+   "key": "assemblee_nationale",
+   "tier": "national",
+   "name": "Assemblée nationale constituante (1962) et Assemblée nationale (1964)",
+   "name_en": "National Constituent Assembly and National Assembly, 1962-1965",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1962-07-03",
+   "valid_to": "1965-06-19",
+   "first_held": "1962-09-20",
+   "earliest_record": "1962-09-20",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single national lists approved by plebiscite: the Constituent Assembly of 20 September 1962 and the National Assembly of 20 September 1964 under the 1963 Constitution. The Assembly ceased with the 19 June 1965 coup; no legislature sat until 1977.",
+   "source": "joradp",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly",
+      "unicameral"
+     ],
+     "iso_pattern": "DZ",
+     "valid_to": "1965-06-19"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1962-09-20",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Constituent Assembly, one national list."
+    },
+    {
+     "date": "1964-09-20",
+     "contests": 1,
+     "source": "joradp",
+     "note": "National Assembly, one national list."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Journal officiel (JORADP)",
+     "url": "https://www.joradp.dz/FTP/jo-francais/{year}/F{year}{issue}.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "joradp",
+     "first_date": "1962-09-20",
+     "last_date": "1964-09-20",
+     "finest": "dz.nation",
+     "evidence": "Proclaimed results in the first volumes of the Journal officiel, as scans"
+    }
+   ],
+   "est_votes": 11000000,
+   "effort": 4
+  },
+  {
+   "key": "assemblee_algerienne",
+   "tier": "national",
+   "name": "Assemblée algérienne",
+   "name_en": "Algerian Assembly under French rule, 1948-1956",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1947-09-20",
+   "valid_to": "1956-04-12",
+   "first_held": "1948-04-04",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Created by the French Statute of Algeria (law of 20 September 1947), elected by two separate colleges in 1948 and 1951, dissolved in 1956. The French-era Financial Delegations and Algeria's seats in the French parliament belong with it.",
+   "source": "joradp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections held under French sovereignty before independence; they belong under France or a colonial polity if the archive adds one, and Algeria's Journal officiel does not cover them.",
+   "match": [
+    {
+     "name_pattern": "Assembl.e alg.rienne",
+     "iso_pattern": "DZ"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "cour_constitutionnelle",
+   "tier": "national",
+   "name": "Élection des membres de la Cour constitutionnelle parmi les professeurs de droit constitutionnel",
+   "name_en": "Constitutional Court members elected by professors of constitutional law",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2020-12-30",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Six of the twelve members are elected among professors of constitutional law, one by the Supreme Court and one by the Council of State (Constitution art. 186). The judges' own elections to the Conseil supérieur de la magistrature are of the same kind.",
+   "source": "constitution",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2020/F2020082.pdf (art. 186)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "A professional electorate of a few hundred academics and judges, not a public election; no votes are published.",
+   "match": [
+    {
+     "name_pattern": "(Cour constitutionnelle|magistrature)",
+     "iso_pattern": "DZ"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "apw",
+   "tier": "wilaya",
+   "name": "Élection des membres des assemblées populaires de wilayas",
+   "name_en": "Wilaya People's Assemblies (APW)",
+   "category": "legislature",
+   "goal": "local",
+   "first_held": "1969-05-25",
+   "earliest_record": "1990-06-12",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "dz.commune"
+    ]
+   },
+   "note": "Elected on the same day as the APC, for five years by open-list proportional representation with a preferential vote, without panachage (Ordinance 21-01 art. 169). The APW elects its own president.",
+   "source": "o21-01",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (art. 169)",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "iso_pattern": "DZ-*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1969-01-01",
+     "precision": "year",
+     "through": "1989-12-31",
+     "note": "Single-party APW elections from 1969 (Ordinance 69-38, the wilaya code) to 1989; not yet counted."
+    },
+    {
+     "date": "1990-06-12",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force. First multiparty local elections."
+    },
+    {
+     "date": "1997-10-23",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force."
+    },
+    {
+     "date": "2002-10-10",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force."
+    },
+    {
+     "date": "2007-11-29",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force."
+    },
+    {
+     "date": "2012-11-29",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force."
+    },
+    {
+     "date": "2017-11-23",
+     "contests": 48,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force."
+    },
+    {
+     "date": "2021-11-27",
+     "contests": 58,
+     "source": "l19-12",
+     "note": "Contests derived, not stated: one per wilaya counted by the territorial-organization law then in force. First election in the ten wilayas created by Loi 19-12."
+    },
+    {
+     "date": "2026-11-28",
+     "contests": 69,
+     "source": "d26-284",
+     "quote": "En vue de l'élection des membres des assemblées populaires communales et de wilayas, le corps électoral est convoqué le samedi 28 novembre 2026.",
+     "note": "Scheduled. 69 contests derived from Loi 26-06 art. 3; first election in the eleven wilayas it created."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "o21-01",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (art. 169: \"dans les trois (3) mois précédant l'expiration du mandat en cours\")",
+     "period_years": 5,
+     "phase": 1,
+     "month": 11,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Autorité nationale indépendante des élections; results proclaimed by the wilaya electoral commissions",
+     "valid_from": "2021-03-10"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ANIE website",
+     "url": "https://ina-elections.dz/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "anie",
+     "first_date": "2021-11-27",
+     "finest": "dz.commune",
+     "evidence": "Local results are announced by ANIE and the wilaya electoral commissions; no issue of the Journal officiel checked carries them"
+    }
+   ],
+   "est_votes": 80000000,
+   "effort": 4
+  },
+  {
+   "key": "apc",
+   "tier": "commune",
+   "name": "Élection des membres des assemblées populaires communales",
+   "name_en": "Communal People's Assemblies (APC)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1967-02-05",
+   "earliest_record": "1990-06-12",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Each of the 1,541 communes elects its assembly with the APW, by the same system (Ordinance 21-01 art. 169). The assembly then chooses its president (class apc_president).",
+   "source": "o21-01",
+   "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (art. 169)",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "iso_pattern": "DZ*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1967-01-01",
+     "precision": "year",
+     "through": "1989-12-31",
+     "note": "Single-party APC elections from 5 February 1967 (Ordinance 67-24, the commune code) to 1989; not yet counted."
+    },
+    {
+     "date": "1990-06-12",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "1997-10-23",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "2002-10-10",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06. Some Kabylie communes did not complete the 2002 vote; the count is an upper bound."
+    },
+    {
+     "date": "2007-11-29",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "2012-11-29",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "2017-11-23",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "2021-11-27",
+     "contests": 1541,
+     "source": "l84-09",
+     "note": "Contests derived, not stated: one per commune counted by Loi 84-09 art. 3, unchanged by Loi 19-12 and Loi 26-06."
+    },
+    {
+     "date": "2026-11-28",
+     "contests": 1541,
+     "source": "d26-284",
+     "quote": "En vue de l'élection des membres des assemblées populaires communales et de wilayas, le corps électoral est convoqué le samedi 28 novembre 2026.",
+     "note": "Scheduled. 1,541 communes per Loi 26-06 art. 3."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "o21-01",
+     "locator": "https://www.joradp.dz/FTP/jo-francais/2021/F2021017.pdf (art. 169)",
+     "period_years": 5,
+     "phase": 1,
+     "month": 11,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Autorité nationale indépendante des élections; results proclaimed by the wilaya electoral commissions",
+     "valid_from": "2021-03-10"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ANIE website",
+     "url": "https://ina-elections.dz/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "license": "none stated",
+     "source": "anie",
+     "first_date": "2021-11-27",
+     "finest": "dz.commune",
+     "evidence": "Commune results are announced by ANIE and the wilaya electoral commissions; no national compilation in the Journal officiel"
+    }
+   ],
+   "est_votes": 85000000,
+   "effort": 5
+  },
+  {
+   "key": "apc_president",
+   "tier": "commune",
+   "name": "Président de l'assemblée populaire communale",
+   "name_en": "APC president, chosen within the assembly",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Chosen within the newly elected APC under the commune code (Loi 11-10 of 22 June 2011); the APW president is chosen within the APW under the wilaya code (Loi 12-07 of 21 February 2012).",
+   "source": "joradp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen inside the council with no popular vote; the vote, where one is held, is recorded only in the council's minutes.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "DZ*"
+    }
+   ],
+   "dates": []
+  }
+ ]
+}
