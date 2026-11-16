@@ -8,6 +8,7 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
+from html import unescape
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -18,6 +19,11 @@ API = "https://px.hagstofa.is/pxen/api/v1/en/Ibuar/kosningar"
 ICELAND = str(uuid5(package.NAMESPACE, "polity\x1fIS"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fISL"))
 
+COMMISSION = "is.landskjorstjorn"
+NOTICES = {
+    "count": "https://island.is/s/landskjorstjorn/frett/tilkynning-um-nidurstodu-talningar-vid-thjodaratkvaedagreidslu-29-agust-2026",
+    "final": "https://island.is/s/landskjorstjorn/frett/landskjorstjorn-tilkynnir-nidurstodu-thjodaratkvaedagreidslu",
+}
 TABLES = {
     # Althing
     "KOS02121": "althingi/althurslit",
@@ -99,6 +105,8 @@ def body(table: str) -> dict[str, object]:
 
 
 def fetch() -> None:
+    for notice in NOTICES.values():
+        raw.fetch(COMMISSION, notice, suffix=".html")
     for table in TABLES:
         raw.fetch(SOURCE, url(table), suffix=".json")
         raw.fetch(SOURCE, url(table), suffix=".json", body=body(table))
@@ -513,6 +521,7 @@ def geo() -> Package:
 # ---------------------------------------------------------------- registry
 
 STATS = key("source", SOURCE)
+COMMISSION_SOURCE = key("source", COMMISSION)
 ALTHING_BODY = key("body", "althing")
 COUNCIL_BODY = key("body", "municipal-council")
 PRESIDENCY = key("office", "president")
@@ -595,6 +604,19 @@ def registry() -> Package:
         license_url="https://hagstofa.is/en/about-us/terms-of-use",
         attribution="Source: Statistics Iceland, hagstofa.is",
     )
+    p.add(
+        "source",
+        id=COMMISSION_SOURCE,
+        kind="official_body",
+        publisher="Landskjörstjórn (National Electoral Commission of Iceland)",
+        title="Notices of the count of the 29 August 2026 referendum",
+        url="https://island.is/s/landskjorstjorn",
+        license="Public notices of the National Electoral Commission",
+        license_url="https://island.is/s/landskjorstjorn",
+        attribution="Landskjörstjórn, island.is",
+    )
+    for notice in NOTICES.values():
+        p.artifact(raw.cached(COMMISSION, notice), COMMISSION_SOURCE)
     for table in TABLES:
         p.artifact(raw.cached(SOURCE, url(table)), STATS)
         p.artifact(raw.cached(SOURCE, url(table), body(table)), STATS)
@@ -772,19 +794,30 @@ class Build:
         self.p.add("slug", path=f"{self.event.path}/{changeset.slug(title[0])}", entity_id=id, is_current=True)
         return id
 
-    def result_set(self, suffix: str, contest: str | None, note: str) -> str:
+    def result_set(
+        self,
+        suffix: str,
+        contest: str | None,
+        note: str,
+        *,
+        source: str | None = None,
+        stage: str = "official",
+        default: bool = True,
+        supersedes: str | None = None,
+    ) -> str:
         id = key("result_set", self.ekey, suffix)
         self.p.add(
             "result_set",
             id=id,
             election_id=self.election,
             contest_id=contest,
-            stage="official",
+            stage=stage,
             kind="counted",
-            source_id=STATS,
-            status="active",
-            is_default=True,
+            source_id=source or STATS,
+            status="active" if default else "superseded",
+            is_default=default,
             completeness=1.0,
+            supersedes_id=supersedes,
         )
         self.p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
         self.sets.append(id)
@@ -916,6 +949,7 @@ def events() -> list[Event]:
         for label in grid("KOS04101").labels["Referenda"]
         if label.startswith(("1908", "1916"))
     ]
+    found.append(Event("referendum", Day(date(2026, 8, 29), date(2026, 8, 29), "day", "2026, 29 August"), "2026"))
     for label in grid("KOS02005").labels["Year"]:
         year = int(label)
         day = Day(LOCAL_DAYS[year], LOCAL_DAYS[year], "day", label) if year in LOCAL_DAYS else day_of(label)
@@ -1498,8 +1532,99 @@ def referendum_titles(year: int) -> list[tuple[str, str]]:
     return [(clean(label[4:]).split(" ")[0].strip(".") if len(found) > 1 else "q", label) for label in found]
 
 
+def notice_text(name: str) -> str:
+    html = raw.cached(COMMISSION, NOTICES[name]).path.read_text(encoding="utf-8", errors="replace")
+    html = re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.DOTALL)
+    return " ".join(unescape(re.sub(r"<[^>]+>", " ", html)).split())
+
+
+def notice_number(text: str, pattern: str) -> int:
+    match = re.search(pattern, text)
+    if match is None:
+        raise LookupError(f"the notice has nothing for {pattern}")
+    return int(match.group(1).replace(".", ""))
+
+
+def referendum_2026(event: Event) -> Package:
+    b = Build(event, "The 29 August 2026 Icelandic referendum on resuming accession negotiations, national totals")
+    for notice in NOTICES.values():
+        b.p.uses(raw.cached(COMMISSION, notice))
+    counted, final = notice_text("count"), notice_text("final")
+    registered = notice_number(counted, r"Fjöldi kjósenda á kjörskrá var ([\d.]+)")
+    cast = notice_number(counted, r"Greidd atkvæði voru ([\d.]+)")
+    valid = notice_number(counted, r"Gild atkvæði: ([\d.]+)")
+    blank = notice_number(counted, r"Auðir seðlar: ([\d.]+)")
+    void = notice_number(counted, r"Ógildir seðlar: ([\d.]+)")
+    yes0 = notice_number(counted, r"Já: ([\d.]+)")
+    no0 = notice_number(counted, r"Nei: ([\d.]+)")
+    yes = notice_number(final, r"Já sögðu ([\d.]+) eða")
+    no = notice_number(final, r"Nei sögðu ([\d.]+) eða")
+    combined = notice_number(final, r"Auðir og ógildir seðlar voru ([\d.]+)")
+    mismatch(b, "2026 valid votes", yes0 + no0, valid)
+    mismatch(b, "2026 ballots", valid + blank + void, cast)
+    mismatch(b, "2026 ballots in the final notice", yes + no + combined, cast)
+    question = "Should Iceland resume accession negotiations with the European Union?"
+    contest = b.contest(
+        "referendum:q",
+        (
+            f"2026 Icelandic referendum: {question}",
+            "Þjóðaratkvæðagreiðsla 2026: Á Ísland að hefja á ný aðildarviðræður við Evrópusambandið?",
+        ),
+        kind="ballot_question",
+        where=TERRITORY,
+        system=SYSTEM_REFERENDUM,
+    )
+    b.p.add("ballot_question", contest_id=contest, type="referendum")
+    yes_option = b.option(contest, "yes", "Já", 1, "answer")
+    no_option = b.option(contest, "no", "Nei", 2, "answer")
+    unit = b.national()
+    first = b.result_set(
+        "count",
+        contest,
+        "The National Electoral Commission's notice of 30 August 2026, after the district election boards' counts "
+        "reached it and before it ruled on the disputed ballots. Voters on the electoral roll are published subject "
+        "to corrections made after the roll was issued on 24 July.",
+        source=COMMISSION_SOURCE,
+        stage="preliminary",
+        default=False,
+    )
+    for option, v in ((yes_option, yes0), (no_option, no0)):
+        b.value(first, unit, option, 1, v)
+        b.declare(first, option, 1, v)
+    for measure, value in ((2, registered), (3, cast), (4, valid), (6, blank), (5, void)):
+        b.value(first, unit, None, measure, value)
+        b.declare(first, None, measure, value)
+    b.outcome(first, yes_option, None, "won" if yes0 > no0 else "lost")
+    b.outcome(first, no_option, None, "won" if no0 > yes0 else "lost")
+    last = b.result_set(
+        "final",
+        contest,
+        "The National Electoral Commission's ruling of 22 September 2026 on the disputed ballots, which declared the "
+        "result. Its notice gives blank and void ballots together, and gives neither the voters on the roll nor the "
+        "votes cast, which the count notice gives. The result is advisory.",
+        source=COMMISSION_SOURCE,
+        supersedes=first,
+    )
+    for option, v in ((yes_option, yes), (no_option, no)):
+        b.value(last, unit, option, 1, v)
+        b.declare(last, option, 1, v)
+    b.value(last, unit, None, 5, combined)
+    b.declare(last, None, 5, combined)
+    b.note(
+        last,
+        "caveat",
+        "The National Electoral Commission counts blank and void ballots together after its ruling. The figure is "
+        "stored as invalid ballots.",
+    )
+    b.outcome(last, yes_option, None, "won" if yes > no else "lost")
+    b.outcome(last, no_option, None, "won" if no > yes else "lost")
+    return b.finish()
+
+
 def referendum(event: Event) -> Package:
     year = event.day.first.year
+    if year == 2026:
+        return referendum_2026(event)
     b = Build(event, f"The {year} Icelandic referendum from Statistics Iceland")
     b.cite("KOS04101", "KOS02000")
     questions = referendum_titles(year)
