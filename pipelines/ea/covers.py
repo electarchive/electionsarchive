@@ -93,7 +93,9 @@ people(id, option_id) as (
   union select cy.person_id, cy.option_id from candidacy cy join options o on o.id = cy.option_id
 ),
 named(id) as (
-  select id from people
+  (select id from people
+   except (select pe.id from person pe where pe.changeset_id = %(id)s
+           except select h.id from person_history h where h.superseded_by = %(id)s))
   union select m.into_id from entity_merge m join people p on p.id = m.entity_id
 ),
 seed(id) as (
