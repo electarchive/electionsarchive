@@ -1,0 +1,4196 @@
+{
+ "polity": "AM",
+ "name": "Armenia",
+ "sources": {
+  "const": {
+   "title": "Constitution of the Republic of Armenia (as amended 6 December 2015)",
+   "publisher": "Ministry of Justice of the Republic of Armenia (ARLIS legal information system)",
+   "url": "https://www.arlis.am/hy/acts/143723/latest",
+   "kind": "official_body"
+  },
+  "code": {
+   "title": "Constitutional Law of the Republic of Armenia: Electoral Code (in force from 1 June 2016)",
+   "publisher": "Ministry of Justice of the Republic of Armenia (ARLIS legal information system)",
+   "url": "https://www.arlis.am/hy/acts/105967/latest",
+   "kind": "official_body"
+  },
+  "refl": {
+   "title": "Constitutional Law of the Republic of Armenia on Referendum",
+   "publisher": "Ministry of Justice of the Republic of Armenia (ARLIS legal information system)",
+   "url": "https://www.arlis.am/DocumentView.aspx?DocID=120709",
+   "kind": "official_body"
+  },
+  "lrefl": {
+   "title": "Law of the Republic of Armenia on Local Referendum",
+   "publisher": "Ministry of Justice of the Republic of Armenia (ARLIS legal information system)",
+   "url": "https://arlis.am/hy/acts/204207/latest",
+   "kind": "official_body"
+  },
+  "cec_na": {
+   "title": "National Assembly elections, 2017, 2018, 2021, and 2026 (election pages with results by precinct)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/Parliamentary",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license"
+  },
+  "cec_na_pr": {
+   "title": "National Assembly proportional elections, 12 May 2007 and 6 May 2012",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/ParliamentaryProportional",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license"
+  },
+  "cec_na_maj": {
+   "title": "National Assembly majoritarian elections and by-elections, 2007-2013",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/ParliamentaryMajoritarian",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "The election selector lists ten majoritarian polls from 12 May 2007 to 29 September 2013; the 2007 and 2012 general elections each list districts Թիվ 1 to Թիվ 41 ԸԸՀ."
+  },
+  "cec_pres": {
+   "title": "Presidential elections, 19 February 2008 and 18 February 2013",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/Presidential",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license"
+  },
+  "cec_ref": {
+   "title": "Referendums, 6 December 2015 and 5 April 2020",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Referendum/Referendum",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license"
+  },
+  "cec_9905": {
+   "title": "Elections 1999-2005 (national summary protocols)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/PageFor/Elections%201999-2005",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "Six tabs of national totals only: the 2005 and 2003 referendums, the 2003 National Assembly proportional election, the 2003 presidential first and second rounds, and the 1999 National Assembly proportional election."
+  },
+  "cec_head": {
+   "title": "Elections of community heads (search list of every poll from 2005)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/HeadofCommunity",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "The list totals 3,602 polls (ընդհանուր 3602), dated 31.01.2005 to 29.11.2026, each with candidates and per-precinct protocol figures."
+  },
+  "cec_council": {
+   "title": "Elections of members of community councils of elders, majoritarian (search list from 2005)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/MemberofCouncil",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "The list totals 3,549 polls (ընդհանուր 3549), dated 21.08.2005 to 29.11.2026."
+  },
+  "cec_prop": {
+   "title": "Elections of community councils of elders by the proportional system (search list from 2009)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Elections/LocalProportional",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "The list totals 110 polls, dated 31.05.2009 (Yerevan) to 13.12.2026."
+  },
+  "cec_lref": {
+   "title": "Local referendums (search list)",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://www.elections.am/Referendum/LocalReferendum",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "The list totals 22 local referendums, all on 17.05.2015."
+  },
+  "cec_comm2026": {
+   "title": "National Assembly elections of 7 June 2026: results by community",
+   "publisher": "Central Electoral Commission of the Republic of Armenia",
+   "url": "https://res.elections.am/images/forGenerals/NA2026/resultsByCommunities_17-06-2026.pdf",
+   "kind": "official_body",
+   "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+   "note": "Rows are named «Մարզ:համայնք»: 12 Yerevan administrative districts and 69 communities in the 10 marzer, plus the electronic vote."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Հայաստանի Հանրապետություն",
+   "name_en": "Republic of Armenia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "am.nation",
+   "source": "const"
+  },
+  {
+   "key": "marz",
+   "name": "Մարզեր",
+   "name_en": "Regions (marzer); governors are appointed by the government",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "am.marz",
+   "elects": false,
+   "source": "cec_comm2026",
+   "counts": [
+    {
+     "date": "2026-06-07",
+     "value": 10,
+     "source": "cec_comm2026",
+     "locator": "Rows prefixed Արագածոտն, Արարատ, Արմավիր, Գեղարքունիք, Լոռի, Կոտայք, Շիրակ, Սյունիք, Վայոց ձոր, and Տավուշ (10 marzer); Yerevan is listed by its districts"
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "name": "Համայնքներ",
+   "name_en": "Communities (hamaynkner), including the city of Yerevan",
+   "parent": "marz",
+   "polity_kind": "municipality",
+   "scheme": "am.community",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2026-06-07",
+     "value": 70,
+     "source": "cec_comm2026",
+     "locator": "First table block: 69 rows «Մարզ:համայնք» outside Yerevan (Արագածոտն 8, Արարատ 5, Արմավիր 7, Գեղարքունիք 5, Լոռի 11, Կոտայք 11, Շիրակ 6, Սյունիք 7, Վայոց ձոր 5, Տավուշ 4) plus the community of Yerevan"
+    }
+   ]
+  },
+  {
+   "key": "yerevan_district",
+   "name": "Երևանի վարչական շրջաններ",
+   "name_en": "Administrative districts of Yerevan (communities with elected heads and councils until 2009)",
+   "parent": "community",
+   "polity_kind": "submunicipal",
+   "scheme": "am.yerevan_district",
+   "elects": false,
+   "source": "cec_comm2026",
+   "counts": [
+    {
+     "date": "2026-06-07",
+     "value": 12,
+     "source": "cec_comm2026",
+     "locator": "12 rows «Երևան:...», Աջափնյակ to Շենգավիթ"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "na",
+   "tier": "national",
+   "name": "Ազգային ժողովի ընտրություններ (համամասնական)",
+   "name_en": "National Assembly, nationwide party lists",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.nation"
+    ],
+    "fine": [
+     "am.marz",
+     "am.community",
+     "am.precinct"
+    ]
+   },
+   "source": "const",
+   "locator": "https://www.arlis.am/hy/acts/143723/latest (Art. 89(1): at least 101 deputies; Art. 89(3): elected by the proportional system; Art. 90(1): five-year term)",
+   "valid_from": "1995-07-05",
+   "first_held": "1995-07-05",
+   "earliest_record": "1999-05-30",
+   "finest_note": "Precinct protocols as spreadsheets from 2007 (resultarm.xls) to 2026; 1999 and 2003 only as national summary protocols; 1995 not published by the CEC. Four seats go to the national minorities named in Electoral Code Art. 95(9), filled from the second part of the party lists, not by a separate vote.",
+   "note": "From 1995 to 2012 the nationwide list tier elected 40 (1995), 56 (1999), 75 (2003), and 90 (2007, 2012) members beside single-member districts; since the 2016 Electoral Code the whole Assembly is elected from party lists, with bonus seats for a stable majority (Art. 96) and a second round between the top two when no majority forms (Art. 98, never yet held). In 2017 voters also cast a preference vote for district list candidates in 13 territorial districts.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "AM",
+     "contest_kinds": [
+      "list_allocation"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-07-05",
+     "through": "1995-07-05",
+     "note": "First National Assembly election, held with the constitutional referendum; the CEC publishes no results for it."
+    },
+    {
+     "date": "1999-05-30",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "30 Մայիսի 1999թ․ ԱԺ Համամասնական ընտրություններ"
+    },
+    {
+     "date": "2003-05-25",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "25 Մայիսի 2003թ․ ՀՀ ԱԺ Համամասնական ընտրություններ"
+    },
+    {
+     "date": "2007-05-12",
+     "contests": 1,
+     "source": "cec_na_pr",
+     "quote": "12 Մայիս, 2007 ԱԺ Համամասնական ընտրություններ"
+    },
+    {
+     "date": "2012-05-06",
+     "contests": 1,
+     "source": "cec_na_pr",
+     "quote": "6 Մայիս, 2012 ԱԺ Համամասնական ընտրություններ"
+    },
+    {
+     "date": "2017-04-02",
+     "contests": 1,
+     "source": "cec_na",
+     "quote": "Ազգային Ժողովի Ընտրություններ, 2017 (resultarm02.04.17v.xlsx)"
+    },
+    {
+     "date": "2018-12-09",
+     "contests": 1,
+     "source": "cec_na",
+     "quote": "Ազգային Ժողովի Արտահերթ Ընտրություններ, 2018 (resultarm09.12.18v.xlsx)"
+    },
+    {
+     "date": "2021-06-20",
+     "contests": 1,
+     "source": "cec_na",
+     "quote": "Ազգային Ժողովի Արտահերթ Ընտրություններ, 2021 (resultsarm20.06.21v.xlsx)"
+    },
+    {
+     "date": "2026-06-07",
+     "contests": 1,
+     "source": "cec_na",
+     "quote": "Ազգային Ժողովի 2026 թվականի հունիսի 7-ի հերթական ընտրություններ"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://www.arlis.am/hy/acts/143723/latest (Art. 90(1): «Ազգային ժողովն ընտրվում է հինգ տարի ժամկետով»; Art. 91(1): 60 to 50 days before the term ends)",
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": true,
+     "valid_from": "2021-06-20",
+     "administered_by": "Central Electoral Commission of the Republic of Armenia",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same party list (Electoral Code Art. 100)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC election pages (results by precinct as spreadsheets)",
+     "url": "https://www.elections.am/Elections/Parliamentary",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_na",
+     "first_date": "2017-04-02",
+     "last_date": "2026-06-07",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "resultarm02.04.17v.xlsx, resultarm09.12.18v.xlsx, resultsarm20.06.21v.xlsx, and resultsarm07.06.26v_14-06-2026.xlsx (2,004 precincts in 38 territorial commissions in 2026); scanned precinct protocol extracts for 2026"
+    },
+    {
+     "platform": "CEC election pages, 2007 and 2012 proportional elections",
+     "url": "https://www.elections.am/Elections/ParliamentaryProportional",
+     "format": "xls",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_na_pr",
+     "first_date": "2007-05-12",
+     "last_date": "2012-05-06",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "res.elections.am/images/doc/resultarm.xls (2007) and resultarm06.05.12.xls (2012), «ըստ տեղամասերի»"
+    },
+    {
+     "platform": "CEC page Elections 1999-2005",
+     "url": "https://www.elections.am/PageFor/Elections%201999-2005",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.nation",
+     "source": "cec_9905",
+     "first_date": "1999-05-30",
+     "last_date": "2003-05-25",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "National summary protocol only: electors, ballots, invalid ballots, and votes per party"
+    }
+   ],
+   "est_votes": 11500000,
+   "effort": 2
+  },
+  {
+   "key": "na_majoritarian",
+   "tier": "national",
+   "name": "Ազգային ժողովի մեծամասնական ընտրություններ",
+   "name_en": "National Assembly, single-member districts (abolished 2016)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.na_district"
+    ],
+    "fine": [
+     "am.precinct"
+    ]
+   },
+   "source": "cec_na_maj",
+   "valid_from": "1995-07-05",
+   "valid_to": "2016-06-01",
+   "first_held": "1995-07-05",
+   "earliest_record": "2007-05-12",
+   "finest_note": "Per-precinct results for each district from 2007 (resultarm06.05.12.xls covers both tiers in 2012); none published for 1995, 1999, or 2003.",
+   "note": "Plurality in single-member districts beside the list tier; the Electoral Code of 2016 (in force 1 June 2016, Constitution Art. 210(1)) ended them.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "AM",
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "valid_to": "2016-06-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-01-01",
+     "through": "2003-12-31",
+     "precision": "year",
+     "note": "District contests of 1995, 1999, and 2003; the CEC publishes no district results for them."
+    },
+    {
+     "date": "2007-05-12",
+     "contests": 41,
+     "source": "cec_na_maj",
+     "quote": "12 Մայիս, 2007 ԱԺ մեծամասնական ընտրություններ: Թիվ 1 ԸԸՀ ... Թիվ 41 ԸԸՀ"
+    },
+    {
+     "date": "2012-05-06",
+     "contests": 41,
+     "source": "cec_na_maj",
+     "quote": "6 Մայիս, 2012 ԱԺ մեծամասնական ընտրություններ: Թիվ 1 ԸԸՀ ... Թիվ 41 ԸԸՀ"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC majoritarian election pages",
+     "url": "https://www.elections.am/Elections/ParliamentaryMajoritarian",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_na_maj",
+     "first_date": "2007-05-12",
+     "last_date": "2013-09-29",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "Election selector with district (ԸԸՀ) and precinct pickers; election pages are reached by form posts carrying the election id"
+    }
+   ],
+   "est_votes": 4500000,
+   "effort": 3
+  },
+  {
+   "key": "na_by",
+   "tier": "national",
+   "name": "Ազգային ժողովի մեծամասնական արտահերթ ընտրություններ",
+   "name_en": "National Assembly district by-elections (abolished 2016)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.na_district"
+    ],
+    "fine": [
+     "am.precinct"
+    ]
+   },
+   "source": "cec_na_maj",
+   "valid_from": "1995-07-05",
+   "valid_to": "2016-06-01",
+   "earliest_record": "2007-08-26",
+   "finest_note": "Per-precinct results from 2007.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "AM",
+     "valid_to": "2016-06-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-07-06",
+     "through": "2007-05-11",
+     "note": "District by-elections of the 1995, 1999, and 2003 Assemblies; not published by the CEC."
+    },
+    {
+     "date": "2007-08-26",
+     "contests": 1,
+     "source": "cec_na_maj",
+     "quote": "26 Օգոստոս, 2007 ԱԺ մեծամասնական"
+    },
+    {
+     "date": "2008-08-24",
+     "contests": 1,
+     "source": "cec_na_maj",
+     "quote": "24 Օգոստոս, 2008 ԱԺ մեծամասնական ընտրություններ"
+    },
+    {
+     "date": "2009-12-06",
+     "contests": 2,
+     "source": "cec_na_maj",
+     "quote": "6 Դեկտեմբեր, 2009 ԱԺ մեծամասնական ընտրություններ (listed twice)"
+    },
+    {
+     "date": "2010-01-10",
+     "contests": 1,
+     "source": "cec_na_maj",
+     "quote": "10 Հունվար, 2010 ԱԺ մեծամասնական ընտրություններ"
+    },
+    {
+     "date": "2012-12-02",
+     "contests": 2,
+     "source": "cec_na_maj",
+     "quote": "2  Դեկտեմբեր, 2012 ԱԺ մեծամասնական ընտրություններ (listed twice)"
+    },
+    {
+     "date": "2013-09-29",
+     "contests": 1,
+     "source": "cec_na_maj",
+     "quote": "29  Սեպտեմբեր, 2013 ԱԺ մեծամասնական ընտրություններ"
+    }
+   ],
+   "est_votes": 400000,
+   "effort": 3
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Հանրապետության նախագահի ընտրություններ",
+   "name_en": "President of the Republic, by popular vote (1991-2013)",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.nation"
+    ],
+    "fine": [
+     "am.marz",
+     "am.community",
+     "am.precinct"
+    ]
+   },
+   "source": "cec_pres",
+   "valid_from": "1991-10-16",
+   "valid_to": "2018-04-09",
+   "first_held": "1991-10-16",
+   "earliest_record": "2003-02-19",
+   "finest_note": "Precinct spreadsheets for 2008 (resultarm2008.xls) and 2013 (resultarm18.02.13v.xls); 2003 national totals for both rounds; 1991, 1996, and 1998 not published by the CEC.",
+   "note": "Two-round majority vote. The 2015 amendments moved the election to the National Assembly (Constitution Art. 125(1)); the last president chosen by popular vote served until 9 April 2018.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "AM",
+     "valid_to": "2018-04-09"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-10-16",
+     "through": "1998-12-31",
+     "note": "Elections of 1991, 1996, and 1998 (with the 1998 second round); the CEC publishes no results for them."
+    },
+    {
+     "date": "2003-02-19",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "19 Փետրվարի 2003թ․ Նախագահի ընտրություններ (I փուլ)"
+    },
+    {
+     "date": "2003-03-05",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "05 Մարտի 2003թ․ Նախագահի ընտրություններ (II փուլ)"
+    },
+    {
+     "date": "2008-02-19",
+     "contests": 1,
+     "source": "cec_pres",
+     "quote": "19 Փետրվար, 2008 ՀՀ Նախագահի ընտրություններ"
+    },
+    {
+     "date": "2013-02-18",
+     "contests": 1,
+     "source": "cec_pres",
+     "quote": "18 Փետրվար, 2013 ՀՀ Նախագահի ընտրություններ"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC presidential election pages",
+     "url": "https://www.elections.am/Elections/Presidential",
+     "format": "xls",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_pres",
+     "first_date": "2008-02-19",
+     "last_date": "2013-02-18",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "res.elections.am/images/doc/resultarm2008.xls and resultarm18.02.13v.xls («ըստ տեղամասերի»)"
+    },
+    {
+     "platform": "CEC page Elections 1999-2005",
+     "url": "https://www.elections.am/PageFor/Elections%201999-2005",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.nation",
+     "source": "cec_9905",
+     "first_date": "2003-02-19",
+     "last_date": "2003-03-05",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "National summary protocols of both 2003 rounds"
+    }
+   ],
+   "est_votes": 8500000,
+   "effort": 2
+  },
+  {
+   "key": "president_na",
+   "tier": "national",
+   "name": "Հանրապետության նախագահի ընտրություն Ազգային ժողովի կողմից",
+   "name_en": "President of the Republic, elected by the National Assembly (from 2018)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "locator": "https://www.arlis.am/hy/acts/143723/latest (Art. 124(1): seven-year term; Art. 125(1): «Հանրապետության նախագահն ընտրվում է Ազգային ժողովի կողմից»)",
+   "valid_from": "2018-03-02",
+   "note": "Deputies vote by secret ballot; a candidate needs three quarters of all deputies in the first round, three fifths in a second, and a majority of votes cast in the third (Art. 125). Held on 2 March 2018 and, after a resignation, on 3 March 2022. The National Assembly, not the CEC, records the votes.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "AM"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://www.arlis.am/hy/acts/143723/latest (Art. 124(1): «Հանրապետության նախագահն ընտրվում է յոթ տարի ժամկետով»; Art. 124(3): one term)",
+     "period_years": 7,
+     "phase": 6,
+     "term_years": 7,
+     "called": true,
+     "valid_from": "2022-03-03",
+     "administered_by": "National Assembly"
+    }
+   ],
+   "est_votes": 210,
+   "effort": 1
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "Հանրաքվեներ",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "am.nation"
+    ],
+    "fine": [
+     "am.marz",
+     "am.community",
+     "am.precinct"
+    ]
+   },
+   "source": "refl",
+   "valid_from": "1991-09-21",
+   "first_held": "1991-09-21",
+   "earliest_record": "2003-05-25",
+   "finest_note": "Precinct spreadsheet for 2015 (resultarm06.12.15v.xlsx) with a marz table; 2003 and 2005 national totals only; 1991 and 1995 not published by the CEC.",
+   "note": "Constitutional amendments, laws proposed by citizens' initiative and rejected by the Assembly, and questions of membership in supranational organizations or of territory go to referendum (Constitution Arts. 202, 204, 205). The referendum called for 5 April 2020 on the Constitutional Court was suspended under the COVID-19 state of emergency and never held; the CEC page keeps its preparation files only.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "AM"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-09-21",
+     "through": "1995-12-31",
+     "note": "The independence referendum of 21 September 1991 and the constitutional referendum of 5 July 1995 (the Constitution's own title dates it «1995 թվականի հուլիսի 5»); the CEC publishes no results for them."
+    },
+    {
+     "date": "2003-05-25",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "25 Մայիսի 2003թ․ Հանրաքվե (ՀՀ Սահմանադրությունում փոփոխություններ կատարելու մասին)"
+    },
+    {
+     "date": "2005-11-27",
+     "contests": 1,
+     "source": "cec_9905",
+     "quote": "27 Նոյեմբեր 2005թ․ Հանրաքվե (ՀՀ Սահմանադրությունում փոփոխություններ կատարելու մասին)"
+    },
+    {
+     "date": "2015-12-06",
+     "contests": 1,
+     "source": "cec_ref",
+     "quote": "6 Դեկտեմբեր, 2015 Հանրաքվե"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC referendum pages",
+     "url": "https://www.elections.am/Referendum/Referendum",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_ref",
+     "first_date": "2015-12-06",
+     "last_date": "2015-12-06",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "res.elections.am/images/doc/resultarm06.12.15v.xlsx and result06.12.15bymarzesv.xlsx"
+    },
+    {
+     "platform": "CEC page Elections 1999-2005",
+     "url": "https://www.elections.am/PageFor/Elections%201999-2005",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.nation",
+     "source": "cec_9905",
+     "first_date": "2003-05-25",
+     "last_date": "2005-11-27",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "National summary protocols of the 2003 and 2005 referendums"
+    }
+   ],
+   "est_votes": 6500000,
+   "effort": 2
+  },
+  {
+   "key": "supreme_council",
+   "tier": "national",
+   "name": "Հայաստանի Հանրապետության Գերագույն խորհուրդ",
+   "name_en": "Supreme Council of the Republic of Armenia (Armenian SSR to 1990), 1990-1995",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "valid_from": "1990-05-20",
+   "valid_to": "1995-07-05",
+   "first_held": "1990-05-20",
+   "note": "Elected in single-member districts from 20 May 1990 with later rounds and repeat polls; it declared independence and served until the first National Assembly of 1995.",
+   "disposition": "blocked",
+   "disposition_reason": "No official body publishes the 1990 district results: the CEC's archive begins in 1999, and the returns survive only in the contemporary press and the National Archives.",
+   "match": [
+    {
+     "name_pattern": "(Supreme Council|Գերագույն խորհուրդ)",
+     "iso_pattern": "AM",
+     "valid_from": "1990-01-01",
+     "valid_to": "1995-07-05"
+    }
+   ]
+  },
+  {
+   "key": "supreme_soviet_ssr",
+   "tier": "national",
+   "name": "Հայկական ՍՍՀ Գերագույն խորհուրդ",
+   "name_en": "Supreme Soviet of the Armenian SSR, 1938-1985",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "valid_from": "1938-06-24",
+   "valid_to": "1990-05-20",
+   "note": "Single-candidate district elections every four, later five, years under the 1937 and 1978 constitutions of the Armenian SSR; the local soviets were elected the same way.",
+   "disposition": "blocked",
+   "disposition_reason": "Results were printed only in the official press of the time; no current official body publishes them, and the CEC's archive begins in 1999.",
+   "match": [
+    {
+     "name_pattern": "(Supreme Soviet|Գերագույն խորհուրդ)",
+     "iso_pattern": "AM",
+     "valid_from": "1938-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ]
+  },
+  {
+   "key": "parliament_1919",
+   "tier": "national",
+   "name": "Հայաստանի Հանրապետության Խորհրդարան",
+   "name_en": "Parliament of the First Republic of Armenia, 1919",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "valid_from": "1919-06-21",
+   "valid_to": "1920-12-02",
+   "first_held": "1919-06-21",
+   "note": "The First Republic's only general election, by party lists on 21-23 June 1919; the Republic ended with the Soviet takeover of 2 December 1920.",
+   "disposition": "blocked",
+   "disposition_reason": "No official body publishes the 1919 returns; they survive in the National Archives of Armenia and the press of the time, neither reachable as an official results publication.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "iso_pattern": "AM",
+     "valid_from": "1918-05-28",
+     "valid_to": "1920-12-02"
+    }
+   ]
+  },
+  {
+   "key": "minority_seats",
+   "tier": "national",
+   "name": "Ազգային փոքրամասնությունների մանդատներ",
+   "name_en": "National minority seats in the National Assembly",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 83(5)-(6) and Art. 95(9): four seats, one each for the four largest national minorities, from the second part of the party lists)",
+   "valid_from": "2016-06-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "There is no separate minority vote: the four seats are allocated from the second part of the nationwide party lists, so they are counted in the National Assembly list contest."
+  },
+  {
+   "key": "na_appointments",
+   "tier": "national",
+   "name": "Ազգային ժողովի կողմից ընտրվող պաշտոնատար անձինք",
+   "name_en": "Officers elected by the National Assembly (Prime Minister, Speaker, Constitutional Court judges, Human Rights Defender)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parliamentary votes on officers are part of the Assembly's proceedings, not elections run by an electoral authority; no judge, prosecutor, or police officer is elected by voters."
+  },
+  {
+   "key": "nominations",
+   "tier": "national",
+   "name": "Կուսակցությունների թեկնածուների առաջադրում",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 83(8): lists approved by the party congress or its standing governing body)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties approve their lists at congresses under their own rules; the state neither runs nor publishes any nominating contest.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "AM*"
+    }
+   ]
+  },
+  {
+   "key": "community_head",
+   "tier": "community",
+   "name": "Համայնքի ղեկավարի ընտրություններ",
+   "name_en": "Community heads, by popular vote",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.community"
+    ],
+    "fine": [
+     "am.precinct"
+    ]
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 104.1(2)(1): one single-member district per community; Art. 104.1(4): majoritarian in communities of up to 4,000 voters)",
+   "earliest_record": "2005-01-31",
+   "finest_note": "Each poll's page gives candidates and per-precinct protocol figures; reached by form posts with the election id.",
+   "note": "Plurality, five-year term (Constitution Art. 181(1)). Regular polls fall on up to four days a year set by the CEC (Electoral Code Art. 122(1)); extraordinary polls follow vacancies. Before 2009 the 12 districts of Yerevan were communities and elected heads here; since 2009 Yerevan's mayor, and since 2021 the head of every community over 4,000 voters, is chosen by the council (community_head_council).",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-01-01",
+     "through": "2004-12-31",
+     "precision": "year",
+     "note": "Local self-government elections of 1996, 1999, and 2002 and the by-elections between them; the CEC publishes no list or results for polls before 2005."
+    },
+    {
+     "date": "2005-01-31",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "31.01.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-02-06",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "06.02.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-02-28",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "28.02.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-03-20",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "20.03.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-03-22",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "22.03.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-03-27",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "27.03.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-04-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.04.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-04-19",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "19.04.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-05-08",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "08.05.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-05-15",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "15.05.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-05-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.05.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-05-22",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "22.05.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-05-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.05.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-06-03",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "03.06.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-06-05",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "05.06.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-06-06",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "06.06.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-06-09",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "09.06.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-06-20",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "20.06.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-06-26",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "26.06.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-06-28",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "28.06.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-07-03",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "03.07.2005: 6 community head polls in the list"
+    },
+    {
+     "date": "2005-07-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.07.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-07-17",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "17.07.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-07-31",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "31.07.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-08-21",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "21.08.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-09-09",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "09.09.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-09-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.09.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-09-18",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "18.09.2005: 3 community head polls in the list"
+    },
+    {
+     "date": "2005-09-25",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "25.09.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-10-02",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "02.10.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-10-09",
+     "contests": 228,
+     "source": "cec_head",
+     "quote": "09.10.2005: 228 community head polls in the list"
+    },
+    {
+     "date": "2005-10-16",
+     "contests": 201,
+     "source": "cec_head",
+     "quote": "16.10.2005: 201 community head polls in the list"
+    },
+    {
+     "date": "2005-10-23",
+     "contests": 230,
+     "source": "cec_head",
+     "quote": "23.10.2005: 230 community head polls in the list"
+    },
+    {
+     "date": "2005-10-30",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "30.10.2005: 3 community head polls in the list"
+    },
+    {
+     "date": "2005-11-06",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "06.11.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-11-13",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "13.11.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-11-20",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "20.11.2005: 2 community head polls in the list"
+    },
+    {
+     "date": "2005-12-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.12.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2005-12-30",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "30.12.2005: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-01-15",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "15.01.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-01-22",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "22.01.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-02-05",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "05.02.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-02-19",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "19.02.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-02-24",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "24.02.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-03-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.03.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-03-12",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "12.03.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-03-26",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "26.03.2006: 6 community head polls in the list"
+    },
+    {
+     "date": "2006-04-16",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "16.04.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-04-23",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "23.04.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-04-25",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "25.04.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-05-21",
+     "contests": 11,
+     "source": "cec_head",
+     "quote": "21.05.2006: 11 community head polls in the list"
+    },
+    {
+     "date": "2006-05-28",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "28.05.2006: 4 community head polls in the list"
+    },
+    {
+     "date": "2006-06-04",
+     "contests": 10,
+     "source": "cec_head",
+     "quote": "04.06.2006: 10 community head polls in the list"
+    },
+    {
+     "date": "2006-06-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.06.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-06-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.06.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-06-18",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "18.06.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-06-25",
+     "contests": 17,
+     "source": "cec_head",
+     "quote": "25.06.2006: 17 community head polls in the list"
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "02.07.2006: 4 community head polls in the list"
+    },
+    {
+     "date": "2006-07-09",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "09.07.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-07-16",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "16.07.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-08-06",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "06.08.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-08-08",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "08.08.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-08-13",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "13.08.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-09-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.09.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-09-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.09.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "01.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-02",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "02.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-08",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "08.10.2006: 3 community head polls in the list"
+    },
+    {
+     "date": "2006-10-09",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "09.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-15",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "15.10.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-10-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-25",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "25.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-10-29",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "29.10.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-11-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.11.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-11-12",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "12.11.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-11-19",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "19.11.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2006-11-27",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "27.11.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-12-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.12.2006: 1 community head polls in the list"
+    },
+    {
+     "date": "2006-12-24",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "24.12.2006: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-01-14",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "14.01.2007: 4 community head polls in the list"
+    },
+    {
+     "date": "2007-01-21",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "21.01.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-01-28",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "28.01.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-02-04",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "04.02.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-02-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.02.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-02-11",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "11.02.2007: 4 community head polls in the list"
+    },
+    {
+     "date": "2007-02-18",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "18.02.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-02-25",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "25.02.2007: 4 community head polls in the list"
+    },
+    {
+     "date": "2007-02-26",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "26.02.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-03-04",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "04.03.2007: 6 community head polls in the list"
+    },
+    {
+     "date": "2007-03-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.03.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-03-19",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "19.03.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-03-25",
+     "contests": 9,
+     "source": "cec_head",
+     "quote": "25.03.2007: 9 community head polls in the list"
+    },
+    {
+     "date": "2007-03-27",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "27.03.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-04-01",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "01.04.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-06-03",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "03.06.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-06-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.06.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-06-17",
+     "contests": 5,
+     "source": "cec_head",
+     "quote": "17.06.2007: 5 community head polls in the list"
+    },
+    {
+     "date": "2007-06-24",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "24.06.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-07-01",
+     "contests": 7,
+     "source": "cec_head",
+     "quote": "01.07.2007: 7 community head polls in the list"
+    },
+    {
+     "date": "2007-07-08",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "08.07.2007: 3 community head polls in the list"
+    },
+    {
+     "date": "2007-07-22",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "22.07.2007: 6 community head polls in the list"
+    },
+    {
+     "date": "2007-07-29",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "29.07.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-08-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.08.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-08-12",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "12.08.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-08-19",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "19.08.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-08-26",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "26.08.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-09-02",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "02.09.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-09-09",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "09.09.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-09-16",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "16.09.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-09-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.09.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-09-30",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "30.09.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-10-01",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "01.10.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-10-07",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "07.10.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-10-14",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "14.10.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-10-15",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "15.10.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-11-04",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "04.11.2007: 3 community head polls in the list"
+    },
+    {
+     "date": "2007-11-18",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "18.11.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-11-25",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "25.11.2007: 2 community head polls in the list"
+    },
+    {
+     "date": "2007-12-02",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "02.12.2007: 1 community head polls in the list"
+    },
+    {
+     "date": "2007-12-16",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "16.12.2007: 6 community head polls in the list"
+    },
+    {
+     "date": "2007-12-23",
+     "contests": 7,
+     "source": "cec_head",
+     "quote": "23.12.2007: 7 community head polls in the list"
+    },
+    {
+     "date": "2008-01-13",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "13.01.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-04-06",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "06.04.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-04-20",
+     "contests": 8,
+     "source": "cec_head",
+     "quote": "20.04.2008: 8 community head polls in the list"
+    },
+    {
+     "date": "2008-04-27",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "27.04.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-05-04",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "04.05.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-05-11",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "11.05.2008: 2 community head polls in the list"
+    },
+    {
+     "date": "2008-05-18",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "18.05.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-05-25",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "25.05.2008: 6 community head polls in the list"
+    },
+    {
+     "date": "2008-06-01",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "01.06.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-06-15",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "15.06.2008: 3 community head polls in the list"
+    },
+    {
+     "date": "2008-06-22",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "22.06.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-07-06",
+     "contests": 5,
+     "source": "cec_head",
+     "quote": "06.07.2008: 5 community head polls in the list"
+    },
+    {
+     "date": "2008-07-20",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "20.07.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-07-27",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "27.07.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-08-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.08.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-08-17",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "17.08.2008: 3 community head polls in the list"
+    },
+    {
+     "date": "2008-08-31",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "31.08.2008: 2 community head polls in the list"
+    },
+    {
+     "date": "2008-09-07",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "07.09.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-09-28",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "28.09.2008: 2 community head polls in the list"
+    },
+    {
+     "date": "2008-10-12",
+     "contests": 218,
+     "source": "cec_head",
+     "quote": "12.10.2008: 218 community head polls in the list"
+    },
+    {
+     "date": "2008-10-19",
+     "contests": 197,
+     "source": "cec_head",
+     "quote": "19.10.2008: 197 community head polls in the list"
+    },
+    {
+     "date": "2008-10-26",
+     "contests": 226,
+     "source": "cec_head",
+     "quote": "26.10.2008: 226 community head polls in the list"
+    },
+    {
+     "date": "2008-11-02",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "02.11.2008: 4 community head polls in the list"
+    },
+    {
+     "date": "2008-11-09",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "09.11.2008: 3 community head polls in the list"
+    },
+    {
+     "date": "2008-11-16",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "16.11.2008: 6 community head polls in the list"
+    },
+    {
+     "date": "2008-11-30",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "30.11.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2008-12-14",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "14.12.2008: 2 community head polls in the list"
+    },
+    {
+     "date": "2008-12-21",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "21.12.2008: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-01-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.01.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-03-08",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "08.03.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-05-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.05.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-05-31",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "31.05.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-06-21",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "21.06.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-07-12",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "12.07.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-08-02",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "02.08.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-12-06",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "06.12.2009: 2 community head polls in the list"
+    },
+    {
+     "date": "2009-12-13",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "13.12.2009: 1 community head polls in the list"
+    },
+    {
+     "date": "2009-12-20",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "20.12.2009: 2 community head polls in the list"
+    },
+    {
+     "date": "2009-12-27",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "27.12.2009: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-01-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.01.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-01-24",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "24.01.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-01-31",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "31.01.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-02-14",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "14.02.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-02-28",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "28.02.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-03-07",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "07.03.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-03-21",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "21.03.2010: 6 community head polls in the list"
+    },
+    {
+     "date": "2010-03-28",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "28.03.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-04-04",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "04.04.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-04-18",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "18.04.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-04-25",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "25.04.2010: 6 community head polls in the list"
+    },
+    {
+     "date": "2010-05-16",
+     "contests": 10,
+     "source": "cec_head",
+     "quote": "16.05.2010: 10 community head polls in the list"
+    },
+    {
+     "date": "2010-05-23",
+     "contests": 12,
+     "source": "cec_head",
+     "quote": "23.05.2010: 12 community head polls in the list"
+    },
+    {
+     "date": "2010-05-30",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "30.05.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-06-13",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "13.06.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-06-20",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "20.06.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-06-27",
+     "contests": 16,
+     "source": "cec_head",
+     "quote": "27.06.2010: 16 community head polls in the list"
+    },
+    {
+     "date": "2010-07-04",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "04.07.2010: 4 community head polls in the list"
+    },
+    {
+     "date": "2010-07-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.07.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-08-08",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "08.08.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-08-29",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "29.08.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-09-05",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "05.09.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-09-12",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "12.09.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-09-19",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "19.09.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-09-26",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "26.09.2010: 2 community head polls in the list"
+    },
+    {
+     "date": "2010-10-10",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "10.10.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-10-24",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "24.10.2010: 3 community head polls in the list"
+    },
+    {
+     "date": "2010-10-31",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "31.10.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-11-07",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "07.11.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-11-14",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "14.11.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-11-28",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "28.11.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2010-12-12",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "12.12.2010: 6 community head polls in the list"
+    },
+    {
+     "date": "2010-12-26",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "26.12.2010: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-01-09",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "09.01.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-01-16",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "16.01.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-01-23",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "23.01.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-01-30",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "30.01.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-02-13",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "13.02.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-02-20",
+     "contests": 9,
+     "source": "cec_head",
+     "quote": "20.02.2011: 9 community head polls in the list"
+    },
+    {
+     "date": "2011-02-27",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "27.02.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-03-06",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "06.03.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-03-13",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "13.03.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-03-20",
+     "contests": 7,
+     "source": "cec_head",
+     "quote": "20.03.2011: 7 community head polls in the list"
+    },
+    {
+     "date": "2011-03-27",
+     "contests": 6,
+     "source": "cec_head",
+     "quote": "27.03.2011: 6 community head polls in the list"
+    },
+    {
+     "date": "2011-04-03",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "03.04.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-04-17",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "17.04.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-05-01",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "01.05.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-05-22",
+     "contests": 5,
+     "source": "cec_head",
+     "quote": "22.05.2011: 5 community head polls in the list"
+    },
+    {
+     "date": "2011-05-29",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "29.05.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-06-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.06.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-06-12",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "12.06.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-06-19",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "19.06.2011: 4 community head polls in the list"
+    },
+    {
+     "date": "2011-06-26",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "26.06.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-07-03",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "03.07.2011: 4 community head polls in the list"
+    },
+    {
+     "date": "2011-07-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.07.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-07-17",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "17.07.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-07-31",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "31.07.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-08-07",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "07.08.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-08-14",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "14.08.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-08-21",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "21.08.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-09-11",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "11.09.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-09-25",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "25.09.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-10-16",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "16.10.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-11-06",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "06.11.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-11-13",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "13.11.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-11-27",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "27.11.2011: 2 community head polls in the list"
+    },
+    {
+     "date": "2011-12-04",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "04.12.2011: 1 community head polls in the list"
+    },
+    {
+     "date": "2011-12-18",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "18.12.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2011-12-25",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "25.12.2011: 3 community head polls in the list"
+    },
+    {
+     "date": "2012-02-12",
+     "contests": 39,
+     "source": "cec_head",
+     "quote": "12.02.2012: 39 community head polls in the list"
+    },
+    {
+     "date": "2012-06-10",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "10.06.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-06-24",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "24.06.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-07-08",
+     "contests": 16,
+     "source": "cec_head",
+     "quote": "08.07.2012: 16 community head polls in the list"
+    },
+    {
+     "date": "2012-08-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.08.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-08-26",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "26.08.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-09-09",
+     "contests": 379,
+     "source": "cec_head",
+     "quote": "09.09.2012: 379 community head polls in the list"
+    },
+    {
+     "date": "2012-09-23",
+     "contests": 259,
+     "source": "cec_head",
+     "quote": "23.09.2012: 259 community head polls in the list"
+    },
+    {
+     "date": "2012-09-30",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "30.09.2012: 2 community head polls in the list"
+    },
+    {
+     "date": "2012-10-14",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "14.10.2012: 2 community head polls in the list"
+    },
+    {
+     "date": "2012-10-28",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "28.10.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-11-04",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "04.11.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2012-12-09",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "09.12.2012: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-03-24",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "24.03.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-05-26",
+     "contests": 4,
+     "source": "cec_head",
+     "quote": "26.05.2013: 4 community head polls in the list"
+    },
+    {
+     "date": "2013-06-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.06.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-07-14",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "14.07.2013: 2 community head polls in the list"
+    },
+    {
+     "date": "2013-08-11",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "11.08.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-08-25",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "25.08.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-09-08",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "08.09.2013: 2 community head polls in the list"
+    },
+    {
+     "date": "2013-09-15",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "15.09.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2013-11-10",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "10.11.2013: 2 community head polls in the list"
+    },
+    {
+     "date": "2013-11-17",
+     "contests": 7,
+     "source": "cec_head",
+     "quote": "17.11.2013: 7 community head polls in the list"
+    },
+    {
+     "date": "2013-12-08",
+     "contests": 11,
+     "source": "cec_head",
+     "quote": "08.12.2013: 11 community head polls in the list"
+    },
+    {
+     "date": "2013-12-15",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "15.12.2013: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-03-09",
+     "contests": 40,
+     "source": "cec_head",
+     "quote": "09.03.2014: 40 community head polls in the list"
+    },
+    {
+     "date": "2014-06-08",
+     "contests": 39,
+     "source": "cec_head",
+     "quote": "08.06.2014: 39 community head polls in the list"
+    },
+    {
+     "date": "2014-06-29",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "29.06.2014: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-08-03",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "03.08.2014: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-08-17",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "17.08.2014: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-10-19",
+     "contests": 13,
+     "source": "cec_head",
+     "quote": "19.10.2014: 13 community head polls in the list"
+    },
+    {
+     "date": "2014-11-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.11.2014: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-12-07",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "07.12.2014: 1 community head polls in the list"
+    },
+    {
+     "date": "2014-12-14",
+     "contests": 26,
+     "source": "cec_head",
+     "quote": "14.12.2014: 26 community head polls in the list"
+    },
+    {
+     "date": "2015-01-18",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "18.01.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-03-15",
+     "contests": 26,
+     "source": "cec_head",
+     "quote": "15.03.2015: 26 community head polls in the list"
+    },
+    {
+     "date": "2015-04-05",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "05.04.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-05-24",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "24.05.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 20,
+     "source": "cec_head",
+     "quote": "07.06.2015: 20 community head polls in the list"
+    },
+    {
+     "date": "2015-08-23",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "23.08.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-09-13",
+     "contests": 15,
+     "source": "cec_head",
+     "quote": "13.09.2015: 15 community head polls in the list"
+    },
+    {
+     "date": "2015-09-20",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "20.09.2015: 2 community head polls in the list"
+    },
+    {
+     "date": "2015-10-25",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "25.10.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-11-08",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "08.11.2015: 1 community head polls in the list"
+    },
+    {
+     "date": "2015-12-06",
+     "contests": 28,
+     "source": "cec_head",
+     "quote": "06.12.2015: 28 community head polls in the list"
+    },
+    {
+     "date": "2016-01-03",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "03.01.2016: 1 community head polls in the list"
+    },
+    {
+     "date": "2016-01-24",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "24.01.2016: 1 community head polls in the list"
+    },
+    {
+     "date": "2016-02-14",
+     "contests": 3,
+     "source": "cec_head",
+     "quote": "14.02.2016: 3 community head polls in the list"
+    },
+    {
+     "date": "2016-03-20",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "20.03.2016: 1 community head polls in the list"
+    },
+    {
+     "date": "2016-04-17",
+     "contests": 33,
+     "source": "cec_head",
+     "quote": "17.04.2016: 33 community head polls in the list"
+    },
+    {
+     "date": "2016-07-03",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "03.07.2016: 2 community head polls in the list"
+    },
+    {
+     "date": "2016-07-10",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "10.07.2016: 2 community head polls in the list"
+    },
+    {
+     "date": "2016-09-18",
+     "contests": 237,
+     "source": "cec_head",
+     "quote": "18.09.2016: 237 community head polls in the list"
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 290,
+     "source": "cec_head",
+     "quote": "02.10.2016: 290 community head polls in the list"
+    },
+    {
+     "date": "2016-10-23",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "23.10.2016: 2 community head polls in the list"
+    },
+    {
+     "date": "2017-02-12",
+     "contests": 7,
+     "source": "cec_head",
+     "quote": "12.02.2017: 7 community head polls in the list"
+    },
+    {
+     "date": "2017-03-26",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "26.03.2017: 1 community head polls in the list"
+    },
+    {
+     "date": "2017-06-18",
+     "contests": 9,
+     "source": "cec_head",
+     "quote": "18.06.2017: 9 community head polls in the list"
+    },
+    {
+     "date": "2017-11-05",
+     "contests": 52,
+     "source": "cec_head",
+     "quote": "05.11.2017: 52 community head polls in the list"
+    },
+    {
+     "date": "2018-03-11",
+     "contests": 14,
+     "source": "cec_head",
+     "quote": "11.03.2018: 14 community head polls in the list"
+    },
+    {
+     "date": "2018-06-10",
+     "contests": 12,
+     "source": "cec_head",
+     "quote": "10.06.2018: 12 community head polls in the list"
+    },
+    {
+     "date": "2018-10-21",
+     "contests": 42,
+     "source": "cec_head",
+     "quote": "21.10.2018: 42 community head polls in the list"
+    },
+    {
+     "date": "2019-02-17",
+     "contests": 20,
+     "source": "cec_head",
+     "quote": "17.02.2019: 20 community head polls in the list"
+    },
+    {
+     "date": "2019-06-09",
+     "contests": 15,
+     "source": "cec_head",
+     "quote": "09.06.2019: 15 community head polls in the list"
+    },
+    {
+     "date": "2019-06-30",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "30.06.2019: 1 community head polls in the list"
+    },
+    {
+     "date": "2019-09-29",
+     "contests": 13,
+     "source": "cec_head",
+     "quote": "29.09.2019: 13 community head polls in the list"
+    },
+    {
+     "date": "2019-12-08",
+     "contests": 12,
+     "source": "cec_head",
+     "quote": "08.12.2019: 12 community head polls in the list"
+    },
+    {
+     "date": "2020-01-19",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "19.01.2020: 1 community head polls in the list"
+    },
+    {
+     "date": "2020-03-15",
+     "contests": 5,
+     "source": "cec_head",
+     "quote": "15.03.2020: 5 community head polls in the list"
+    },
+    {
+     "date": "2021-10-17",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "17.10.2021: 2 community head polls in the list"
+    },
+    {
+     "date": "2021-11-14",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "14.11.2021: 1 community head polls in the list"
+    },
+    {
+     "date": "2021-12-05",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "05.12.2021: 2 community head polls in the list"
+    },
+    {
+     "date": "2022-09-25",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "25.09.2022: 1 community head polls in the list"
+    },
+    {
+     "date": "2023-10-29",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "29.10.2023: 2 community head polls in the list"
+    },
+    {
+     "date": "2024-10-20",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "20.10.2024: 1 community head polls in the list"
+    },
+    {
+     "date": "2026-09-27",
+     "contests": 1,
+     "source": "cec_head",
+     "quote": "27.09.2026: 1 community head polls in the list"
+    },
+    {
+     "date": "2026-10-25",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "25.10.2026: 2 community head polls in the list"
+    },
+    {
+     "date": "2026-11-29",
+     "contests": 2,
+     "source": "cec_head",
+     "quote": "29.11.2026: 2 community head polls in the list"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "code",
+     "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 122(1): «Համայնքի ղեկավարի և ավագանու անդամի հերթական ընտրություններ կարող են անցկացվել տարին մինչև չորս անգամ»)",
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Territorial electoral commissions, under the CEC"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC local election search (community heads)",
+     "url": "https://www.elections.am/Elections/HeadofCommunity",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_head",
+     "first_date": "2005-01-31",
+     "last_date": "2026-11-29",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "3,602 polls listed; election pages by form post (Input.ElectionId) with per-precinct protocols and an Excel export of precincts"
+    }
+   ],
+   "est_votes": 4000000,
+   "effort": 4
+  },
+  {
+   "key": "community_council",
+   "tier": "community",
+   "name": "Համայնքի ավագանու անդամի ընտրություններ (մեծամասնական)",
+   "name_en": "Community councils of elders, majoritarian",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.community"
+    ],
+    "fine": [
+     "am.precinct"
+    ]
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 104.1(2)(2): one multi-member district per community; Art. 104.1(6): 5, 7, or 9 members by number of voters)",
+   "earliest_record": "2005-08-21",
+   "finest_note": "Per-precinct protocol figures for each poll; reached by form posts with the election id.",
+   "note": "Block vote in one multi-member district per community, five-year term. Since the 2021 amendments only communities of up to 4,000 voters elect this way; before 2009 Yerevan's 12 districts elected councils here too.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-01-01",
+     "through": "2004-12-31",
+     "precision": "year",
+     "note": "Local self-government elections of 1996, 1999, and 2002 and the by-elections between them; the CEC publishes no list or results for polls before 2005."
+    },
+    {
+     "date": "2005-08-21",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "21.08.2005: 1 council polls in the list"
+    },
+    {
+     "date": "2005-09-09",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "09.09.2005: 2 council polls in the list"
+    },
+    {
+     "date": "2005-09-18",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "18.09.2005: 4 council polls in the list"
+    },
+    {
+     "date": "2005-09-25",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "25.09.2005: 7 council polls in the list"
+    },
+    {
+     "date": "2005-10-02",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "02.10.2005: 1 council polls in the list"
+    },
+    {
+     "date": "2005-10-09",
+     "contests": 267,
+     "source": "cec_council",
+     "quote": "09.10.2005: 267 council polls in the list"
+    },
+    {
+     "date": "2005-10-16",
+     "contests": 227,
+     "source": "cec_council",
+     "quote": "16.10.2005: 227 council polls in the list"
+    },
+    {
+     "date": "2005-10-23",
+     "contests": 220,
+     "source": "cec_council",
+     "quote": "23.10.2005: 220 council polls in the list"
+    },
+    {
+     "date": "2005-11-06",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "06.11.2005: 2 council polls in the list"
+    },
+    {
+     "date": "2005-11-20",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "20.11.2005: 7 council polls in the list"
+    },
+    {
+     "date": "2005-12-11",
+     "contests": 13,
+     "source": "cec_council",
+     "quote": "11.12.2005: 13 council polls in the list"
+    },
+    {
+     "date": "2005-12-18",
+     "contests": 5,
+     "source": "cec_council",
+     "quote": "18.12.2005: 5 council polls in the list"
+    },
+    {
+     "date": "2005-12-25",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "25.12.2005: 3 council polls in the list"
+    },
+    {
+     "date": "2005-12-30",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "30.12.2005: 4 council polls in the list"
+    },
+    {
+     "date": "2006-01-15",
+     "contests": 15,
+     "source": "cec_council",
+     "quote": "15.01.2006: 15 council polls in the list"
+    },
+    {
+     "date": "2006-01-22",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "22.01.2006: 6 council polls in the list"
+    },
+    {
+     "date": "2006-01-23",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "23.01.2006: 2 council polls in the list"
+    },
+    {
+     "date": "2006-02-05",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "05.02.2006: 3 council polls in the list"
+    },
+    {
+     "date": "2006-02-19",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "19.02.2006: 6 council polls in the list"
+    },
+    {
+     "date": "2006-03-12",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "12.03.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-03-26",
+     "contests": 9,
+     "source": "cec_council",
+     "quote": "26.03.2006: 9 council polls in the list"
+    },
+    {
+     "date": "2006-04-23",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "23.04.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-05-07",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "07.05.2006: 2 council polls in the list"
+    },
+    {
+     "date": "2006-05-21",
+     "contests": 9,
+     "source": "cec_council",
+     "quote": "21.05.2006: 9 council polls in the list"
+    },
+    {
+     "date": "2006-05-28",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "28.05.2006: 7 council polls in the list"
+    },
+    {
+     "date": "2006-06-04",
+     "contests": 14,
+     "source": "cec_council",
+     "quote": "04.06.2006: 14 council polls in the list"
+    },
+    {
+     "date": "2006-06-11",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "11.06.2006: 2 council polls in the list"
+    },
+    {
+     "date": "2006-06-18",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "18.06.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-06-25",
+     "contests": 17,
+     "source": "cec_council",
+     "quote": "25.06.2006: 17 council polls in the list"
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "02.07.2006: 2 council polls in the list"
+    },
+    {
+     "date": "2006-07-09",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "09.07.2006: 4 council polls in the list"
+    },
+    {
+     "date": "2006-07-16",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "16.07.2006: 2 council polls in the list"
+    },
+    {
+     "date": "2006-09-03",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "03.09.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-09-10",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "10.09.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-10-08",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "08.10.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-10-29",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "29.10.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2006-11-12",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "12.11.2006: 1 council polls in the list"
+    },
+    {
+     "date": "2007-01-14",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "14.01.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-02-25",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "25.02.2007: 7 council polls in the list"
+    },
+    {
+     "date": "2007-03-18",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "18.03.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-03-25",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "25.03.2007: 6 council polls in the list"
+    },
+    {
+     "date": "2007-06-03",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "03.06.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-06-17",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "17.06.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-06-24",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "24.06.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-07-01",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "01.07.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-07-22",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "22.07.2007: 4 council polls in the list"
+    },
+    {
+     "date": "2007-07-29",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "29.07.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-08-26",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "26.08.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-09-09",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "09.09.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-09-23",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "23.09.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-10-07",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "07.10.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-10-14",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "14.10.2007: 2 council polls in the list"
+    },
+    {
+     "date": "2007-12-16",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "16.12.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2007-12-23",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "23.12.2007: 1 council polls in the list"
+    },
+    {
+     "date": "2008-04-13",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "13.04.2008: 2 council polls in the list"
+    },
+    {
+     "date": "2008-04-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.04.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-05-11",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "11.05.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-06-01",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "01.06.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-07-13",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "13.07.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-07-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.07.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-07-27",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "27.07.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2008-09-07",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "07.09.2008: 6 council polls in the list"
+    },
+    {
+     "date": "2008-09-28",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "28.09.2008: 6 council polls in the list"
+    },
+    {
+     "date": "2008-10-12",
+     "contests": 271,
+     "source": "cec_council",
+     "quote": "12.10.2008: 271 council polls in the list"
+    },
+    {
+     "date": "2008-10-19",
+     "contests": 232,
+     "source": "cec_council",
+     "quote": "19.10.2008: 232 council polls in the list"
+    },
+    {
+     "date": "2008-10-26",
+     "contests": 226,
+     "source": "cec_council",
+     "quote": "26.10.2008: 226 council polls in the list"
+    },
+    {
+     "date": "2008-11-16",
+     "contests": 5,
+     "source": "cec_council",
+     "quote": "16.11.2008: 5 council polls in the list"
+    },
+    {
+     "date": "2008-11-23",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "23.11.2008: 2 council polls in the list"
+    },
+    {
+     "date": "2008-11-30",
+     "contests": 16,
+     "source": "cec_council",
+     "quote": "30.11.2008: 16 council polls in the list"
+    },
+    {
+     "date": "2008-12-14",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "14.12.2008: 1 council polls in the list"
+    },
+    {
+     "date": "2009-08-16",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "16.08.2009: 1 council polls in the list"
+    },
+    {
+     "date": "2009-08-23",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "23.08.2009: 1 council polls in the list"
+    },
+    {
+     "date": "2009-09-27",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "27.09.2009: 2 council polls in the list"
+    },
+    {
+     "date": "2009-11-22",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "22.11.2009: 7 council polls in the list"
+    },
+    {
+     "date": "2009-12-06",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "06.12.2009: 1 council polls in the list"
+    },
+    {
+     "date": "2009-12-20",
+     "contests": 14,
+     "source": "cec_council",
+     "quote": "20.12.2009: 14 council polls in the list"
+    },
+    {
+     "date": "2010-01-17",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "17.01.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-01-24",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "24.01.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-01-31",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "31.01.2010: 4 council polls in the list"
+    },
+    {
+     "date": "2010-02-14",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "14.02.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-02-21",
+     "contests": 8,
+     "source": "cec_council",
+     "quote": "21.02.2010: 8 council polls in the list"
+    },
+    {
+     "date": "2010-03-07",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "07.03.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-03-14",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "14.03.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-03-21",
+     "contests": 9,
+     "source": "cec_council",
+     "quote": "21.03.2010: 9 council polls in the list"
+    },
+    {
+     "date": "2010-04-18",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "18.04.2010: 3 council polls in the list"
+    },
+    {
+     "date": "2010-04-25",
+     "contests": 5,
+     "source": "cec_council",
+     "quote": "25.04.2010: 5 council polls in the list"
+    },
+    {
+     "date": "2010-05-09",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "09.05.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-05-16",
+     "contests": 12,
+     "source": "cec_council",
+     "quote": "16.05.2010: 12 council polls in the list"
+    },
+    {
+     "date": "2010-05-23",
+     "contests": 10,
+     "source": "cec_council",
+     "quote": "23.05.2010: 10 council polls in the list"
+    },
+    {
+     "date": "2010-05-30",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "30.05.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-06-06",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "06.06.2010: 3 council polls in the list"
+    },
+    {
+     "date": "2010-06-13",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "13.06.2010: 3 council polls in the list"
+    },
+    {
+     "date": "2010-06-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.06.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-06-27",
+     "contests": 17,
+     "source": "cec_council",
+     "quote": "27.06.2010: 17 council polls in the list"
+    },
+    {
+     "date": "2010-07-04",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "04.07.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-07-11",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "11.07.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-07-18",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "18.07.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-09-05",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "05.09.2010: 2 council polls in the list"
+    },
+    {
+     "date": "2010-09-26",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "26.09.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-10-10",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "10.10.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2010-11-07",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "07.11.2010: 1 council polls in the list"
+    },
+    {
+     "date": "2011-01-09",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "09.01.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-01-23",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "23.01.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-02-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.02.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-02-27",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "27.02.2011: 6 council polls in the list"
+    },
+    {
+     "date": "2011-03-13",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "13.03.2011: 2 council polls in the list"
+    },
+    {
+     "date": "2011-03-20",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "20.03.2011: 3 council polls in the list"
+    },
+    {
+     "date": "2011-03-27",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "27.03.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-05-01",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "01.05.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-05-22",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "22.05.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-05-29",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "29.05.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-06-19",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "19.06.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-06-26",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "26.06.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-07-03",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "03.07.2011: 2 council polls in the list"
+    },
+    {
+     "date": "2011-07-17",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "17.07.2011: 6 council polls in the list"
+    },
+    {
+     "date": "2011-07-24",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "24.07.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-07-31",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "31.07.2011: 2 council polls in the list"
+    },
+    {
+     "date": "2011-08-07",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "07.08.2011: 2 council polls in the list"
+    },
+    {
+     "date": "2011-08-21",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "21.08.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-09-04",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "04.09.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-09-18",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "18.09.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-09-25",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "25.09.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-10-02",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "02.10.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-10-16",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "16.10.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-11-06",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "06.11.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-12-11",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "11.12.2011: 1 council polls in the list"
+    },
+    {
+     "date": "2011-12-18",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "18.12.2011: 3 council polls in the list"
+    },
+    {
+     "date": "2012-02-12",
+     "contests": 8,
+     "source": "cec_council",
+     "quote": "12.02.2012: 8 council polls in the list"
+    },
+    {
+     "date": "2012-04-22",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "22.04.2012: 1 council polls in the list"
+    },
+    {
+     "date": "2012-05-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.05.2012: 1 council polls in the list"
+    },
+    {
+     "date": "2012-07-08",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "08.07.2012: 4 council polls in the list"
+    },
+    {
+     "date": "2012-08-05",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "05.08.2012: 1 council polls in the list"
+    },
+    {
+     "date": "2012-09-09",
+     "contests": 451,
+     "source": "cec_council",
+     "quote": "09.09.2012: 451 council polls in the list"
+    },
+    {
+     "date": "2012-09-23",
+     "contests": 272,
+     "source": "cec_council",
+     "quote": "23.09.2012: 272 council polls in the list"
+    },
+    {
+     "date": "2012-09-30",
+     "contests": 12,
+     "source": "cec_council",
+     "quote": "30.09.2012: 12 council polls in the list"
+    },
+    {
+     "date": "2012-11-04",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "04.11.2012: 1 council polls in the list"
+    },
+    {
+     "date": "2012-11-18",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "18.11.2012: 1 council polls in the list"
+    },
+    {
+     "date": "2013-05-05",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "05.05.2013: 1 council polls in the list"
+    },
+    {
+     "date": "2013-05-26",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "26.05.2013: 3 council polls in the list"
+    },
+    {
+     "date": "2013-08-25",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "25.08.2013: 1 council polls in the list"
+    },
+    {
+     "date": "2013-11-17",
+     "contests": 32,
+     "source": "cec_council",
+     "quote": "17.11.2013: 32 council polls in the list"
+    },
+    {
+     "date": "2013-12-08",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "08.12.2013: 6 council polls in the list"
+    },
+    {
+     "date": "2014-03-09",
+     "contests": 43,
+     "source": "cec_council",
+     "quote": "09.03.2014: 43 council polls in the list"
+    },
+    {
+     "date": "2014-06-08",
+     "contests": 31,
+     "source": "cec_council",
+     "quote": "08.06.2014: 31 council polls in the list"
+    },
+    {
+     "date": "2014-09-21",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "21.09.2014: 1 council polls in the list"
+    },
+    {
+     "date": "2014-10-19",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "19.10.2014: 2 council polls in the list"
+    },
+    {
+     "date": "2014-11-09",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "09.11.2014: 1 council polls in the list"
+    },
+    {
+     "date": "2014-12-14",
+     "contests": 9,
+     "source": "cec_council",
+     "quote": "14.12.2014: 9 council polls in the list"
+    },
+    {
+     "date": "2014-12-21",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "21.12.2014: 1 council polls in the list"
+    },
+    {
+     "date": "2015-01-04",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "04.01.2015: 1 council polls in the list"
+    },
+    {
+     "date": "2015-03-15",
+     "contests": 8,
+     "source": "cec_council",
+     "quote": "15.03.2015: 8 council polls in the list"
+    },
+    {
+     "date": "2015-05-03",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "03.05.2015: 1 council polls in the list"
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 14,
+     "source": "cec_council",
+     "quote": "07.06.2015: 14 council polls in the list"
+    },
+    {
+     "date": "2015-09-13",
+     "contests": 8,
+     "source": "cec_council",
+     "quote": "13.09.2015: 8 council polls in the list"
+    },
+    {
+     "date": "2015-09-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.09.2015: 1 council polls in the list"
+    },
+    {
+     "date": "2015-12-06",
+     "contests": 8,
+     "source": "cec_council",
+     "quote": "06.12.2015: 8 council polls in the list"
+    },
+    {
+     "date": "2016-02-14",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "14.02.2016: 3 council polls in the list"
+    },
+    {
+     "date": "2016-03-20",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "20.03.2016: 1 council polls in the list"
+    },
+    {
+     "date": "2016-04-17",
+     "contests": 6,
+     "source": "cec_council",
+     "quote": "17.04.2016: 6 council polls in the list"
+    },
+    {
+     "date": "2016-09-18",
+     "contests": 295,
+     "source": "cec_council",
+     "quote": "18.09.2016: 295 council polls in the list"
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 339,
+     "source": "cec_council",
+     "quote": "02.10.2016: 339 council polls in the list"
+    },
+    {
+     "date": "2017-02-12",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "12.02.2017: 3 council polls in the list"
+    },
+    {
+     "date": "2017-06-18",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "18.06.2017: 1 council polls in the list"
+    },
+    {
+     "date": "2017-11-05",
+     "contests": 54,
+     "source": "cec_council",
+     "quote": "05.11.2017: 54 council polls in the list"
+    },
+    {
+     "date": "2018-03-11",
+     "contests": 16,
+     "source": "cec_council",
+     "quote": "11.03.2018: 16 council polls in the list"
+    },
+    {
+     "date": "2018-06-10",
+     "contests": 11,
+     "source": "cec_council",
+     "quote": "10.06.2018: 11 council polls in the list"
+    },
+    {
+     "date": "2018-06-24",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "24.06.2018: 1 council polls in the list"
+    },
+    {
+     "date": "2018-10-21",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "21.10.2018: 7 council polls in the list"
+    },
+    {
+     "date": "2019-02-17",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "17.02.2019: 4 council polls in the list"
+    },
+    {
+     "date": "2019-06-09",
+     "contests": 11,
+     "source": "cec_council",
+     "quote": "09.06.2019: 11 council polls in the list"
+    },
+    {
+     "date": "2019-09-29",
+     "contests": 7,
+     "source": "cec_council",
+     "quote": "29.09.2019: 7 council polls in the list"
+    },
+    {
+     "date": "2019-12-08",
+     "contests": 4,
+     "source": "cec_council",
+     "quote": "08.12.2019: 4 council polls in the list"
+    },
+    {
+     "date": "2021-10-17",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "17.10.2021: 3 council polls in the list"
+    },
+    {
+     "date": "2021-11-14",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "14.11.2021: 2 council polls in the list"
+    },
+    {
+     "date": "2021-12-05",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "05.12.2021: 2 council polls in the list"
+    },
+    {
+     "date": "2022-09-25",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "25.09.2022: 1 council polls in the list"
+    },
+    {
+     "date": "2023-10-29",
+     "contests": 1,
+     "source": "cec_council",
+     "quote": "29.10.2023: 1 council polls in the list"
+    },
+    {
+     "date": "2026-09-27",
+     "contests": 3,
+     "source": "cec_council",
+     "quote": "27.09.2026: 3 council polls in the list"
+    },
+    {
+     "date": "2026-10-25",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "25.10.2026: 2 council polls in the list"
+    },
+    {
+     "date": "2026-11-29",
+     "contests": 2,
+     "source": "cec_council",
+     "quote": "29.11.2026: 2 council polls in the list"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC local election search (council members)",
+     "url": "https://www.elections.am/Elections/MemberofCouncil",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_council",
+     "first_date": "2005-08-21",
+     "last_date": "2026-11-29",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "3,549 polls listed; election pages by form post with per-precinct protocols"
+    }
+   ],
+   "est_votes": 3500000,
+   "effort": 4
+  },
+  {
+   "key": "community_council_pr",
+   "tier": "community",
+   "name": "Համայնքի ավագանու ընտրություններ համամասնական ընտրակարգով",
+   "name_en": "Community councils of elders, proportional (Yerevan from 2009; communities over 4,000 voters from 2021)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "am.community"
+    ],
+    "fine": [
+     "am.yerevan_district",
+     "am.precinct"
+    ]
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 104.1(3) and (5): party lists in one multi-member district in communities of more than 4,000 voters; Art. 104.1(6): 15 to 65 members)",
+   "valid_from": "2009-05-31",
+   "first_held": "2009-05-31",
+   "earliest_record": "2009-05-31",
+   "finest_note": "Per-precinct protocol extracts for each poll; Yerevan pages add district breakdowns.",
+   "note": "Party-list PR with a threshold; the list winning more than half the seats names the community head (Art. 142.2). Yerevan (65 members) voted in 2009, 2013, 2017, 2018, and 2023; Gyumri and Vanadzor from 2016; every community over 4,000 voters from the 2021 amendments.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-05-31",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "31.05.2009: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2013-05-05",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "05.05.2013: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2015-02-27",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "27.02.2015: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 2,
+     "source": "cec_prop",
+     "quote": "02.10.2016: 2 proportional council polls in the list"
+    },
+    {
+     "date": "2017-05-14",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "14.05.2017: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2018-09-23",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "23.09.2018: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2021-10-17",
+     "contests": 6,
+     "source": "cec_prop",
+     "quote": "17.10.2021: 6 proportional council polls in the list"
+    },
+    {
+     "date": "2021-11-14",
+     "contests": 3,
+     "source": "cec_prop",
+     "quote": "14.11.2021: 3 proportional council polls in the list"
+    },
+    {
+     "date": "2021-12-05",
+     "contests": 36,
+     "source": "cec_prop",
+     "quote": "05.12.2021: 36 proportional council polls in the list"
+    },
+    {
+     "date": "2022-03-27",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "27.03.2022: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2022-09-25",
+     "contests": 17,
+     "source": "cec_prop",
+     "quote": "25.09.2022: 17 proportional council polls in the list"
+    },
+    {
+     "date": "2023-03-26",
+     "contests": 2,
+     "source": "cec_prop",
+     "quote": "26.03.2023: 2 proportional council polls in the list"
+    },
+    {
+     "date": "2023-09-17",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "17.09.2023: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2025-03-30",
+     "contests": 2,
+     "source": "cec_prop",
+     "quote": "30.03.2025: 2 proportional council polls in the list"
+    },
+    {
+     "date": "2025-11-16",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "16.11.2025: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2026-09-27",
+     "contests": 1,
+     "source": "cec_prop",
+     "quote": "27.09.2026: 1 proportional council polls in the list"
+    },
+    {
+     "date": "2026-10-25",
+     "contests": 19,
+     "source": "cec_prop",
+     "quote": "25.10.2026: 19 proportional council polls in the list"
+    },
+    {
+     "date": "2026-11-29",
+     "contests": 10,
+     "source": "cec_prop",
+     "quote": "29.11.2026: 10 proportional council polls in the list"
+    },
+    {
+     "date": "2026-12-13",
+     "contests": 4,
+     "source": "cec_prop",
+     "quote": "13.12.2026: 4 proportional council polls in the list"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC local election search (proportional councils)",
+     "url": "https://www.elections.am/Elections/LocalProportional",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_prop",
+     "first_date": "2009-05-31",
+     "last_date": "2026-12-13",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "110 polls listed, Yerevan on 31.05.2009, 05.05.2013, 14.05.2017, 23.09.2018, and 17.09.2023"
+    }
+   ],
+   "est_votes": 3500000,
+   "effort": 3
+  },
+  {
+   "key": "community_head_council",
+   "tier": "community",
+   "name": "Համայնքի ղեկավարի ընտրություն ավագանու կողմից",
+   "name_en": "Community heads and the mayor of Yerevan, chosen by the council",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "code",
+   "locator": "https://www.arlis.am/hy/acts/105967/latest (Art. 142.1-142.3: head chosen by the newly elected council at its first sitting)",
+   "valid_from": "2009-05-31",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The head follows from the council result (the first name on a majority list) or from an open council vote, which the CEC does not run or publish; the council election itself is held in community_council_pr.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "local_referendum",
+   "tier": "community",
+   "name": "Տեղական հանրաքվեներ",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "am.community"
+    ],
+    "fine": [
+     "am.precinct"
+    ]
+   },
+   "source": "lrefl",
+   "earliest_record": "2015-05-17",
+   "note": "Constitution Art. 183(1) lets residents decide community questions by local referendum. The 22 polls of 17 May 2015 put the merger of communities in Lori (around Tumanyan), Tavush (around Dilijan), and Syunik (around Tatev) to the vote: «Համաձայն ե՞ք, որպեսզի Թումանյան, Մարց, ... համայնքները միավորվեն».",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "local"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-05-17",
+     "contests": 22,
+     "source": "cec_lref",
+     "quote": "17.05.2015: 22 local referendums in the list"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CEC local referendum search",
+     "url": "https://www.elections.am/Referendum/LocalReferendum",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "finest": "am.precinct",
+     "source": "cec_lref",
+     "first_date": "2015-05-17",
+     "last_date": "2015-05-17",
+     "license": "Official election records published by the CEC; the site footer reads «Բոլոր իրավունքները պաշտպանված են» (all rights reserved) and states no open license",
+     "evidence": "22 local referendums on 17.05.2015"
+    }
+   ],
+   "est_votes": 15000,
+   "effort": 2
+  }
+ ]
+}
