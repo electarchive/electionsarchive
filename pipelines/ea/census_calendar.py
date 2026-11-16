@@ -105,6 +105,8 @@ DAY_RULES = {
     "may_fourth_sunday": nth_weekday(5, 6, 4),
     "mar_second_sunday": nth_weekday(3, 6, 2),
     "may_last_sunday": last_weekday(5, 6),
+    "may_third_sunday": nth_weekday(5, 6, 3),
+    "feb_third_sunday": nth_weekday(2, 6, 3),
 }
 
 
