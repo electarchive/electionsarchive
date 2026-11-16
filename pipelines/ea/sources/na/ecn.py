@@ -3,9 +3,11 @@
 The Commission publishes results as Government Gazette notices and printed tables on its website. Constituency
 results come from regional council elections (2010, 2015, 2020, and the 2025 by-elections) and from the 2014 National
 Assembly table; local authority results come from the 2020 gazette; the 2024 presidential and National Assembly
-results are gazetted nationally. Every file has a text layer, read here with ``pdftotext -layout``.
+results are gazetted nationally. Every file has a text layer, read here with ``pdftotext -layout``. The 1998 and 2004
+regional council and local authority tables are spreadsheets, read here with ``xlrd``.
 """
 
+import difflib
 import re
 import subprocess
 import unicodedata
@@ -13,6 +15,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from functools import cache
 from uuid import uuid5
+
+import xlrd
 
 from ea import package, raw
 from ea.package import Package
@@ -33,8 +37,15 @@ URLS = {
     "la2020": f"{UPLOADS}/2021/06/7497-Gov-N65-Results-LA-2020.pdf",
     "pna2024": f"{UPLOADS}/2025/03/Results-publication-2024PNA.pdf",
     "rcby2025": f"{UPLOADS}/2025/10/Govt-Gazette-five-by-elections-result.pdf",
+    "rc1998": f"{UPLOADS}/2021/06/REgional-Councils-Elections-1998.xls",
+    "la1998": f"{UPLOADS}/2021/06/Local-Authourities-Elections-1998.xls",
+    "rc2004": f"{UPLOADS}/2021/06/Regional-Councils-Election-2004.xls",
+    "la2004": f"{UPLOADS}/2021/06/local-Authourity-Election-2004.xls",
 }
 DAYS = {
+    "1998-02-16": date(1998, 2, 16),
+    "1998-11-30": date(1998, 11, 30),
+    "2004-11-15": date(2004, 11, 15),
     "2010-11-27": date(2010, 11, 27),
     "2014-11-28": date(2014, 11, 28),
     "2015-11-27": date(2015, 11, 27),
@@ -66,6 +77,9 @@ PARTIES = {
     "BCP": "Body of Christ Party",
     "CDV": "Christian Democratic Voice Party",
     "COD": "Congress of Democrats",
+    "DCN": "Democratic Coalition of Namibia",
+    "FCN": "Federal Convention of Namibia",
+    "NDMC": "Namibia Democratic Movement for Change",
     "DPN": "Democratic Party of Namibia",
     "DTA": "Democratic Turnhalle Alliance of Namibia",
     "IPC": "Independent Patriots for Change",
@@ -152,6 +166,15 @@ ALIASES = {
     "cod of namibia": "COD",
     "swapo party": "SWAPO",
     "app of namibia": "APP",
+    "swapo-party": "SWAPO",
+    "dcn": "DCN",
+    "democratic coalition of namibia": "DCN",
+    "fcn": "FCN",
+    "federal convention of namibia": "FCN",
+    "ndmc": "NDMC",
+    "namibia dmc": "NDMC",
+    "namibia-dmc": "NDMC",
+    "namibia democratic movement for change": "NDMC",
 }
 HEADER_ROWS = {"IN RESPECT OF A", "REGIONAL COUNCIL", "CONSTITUENCY FOR", "CONSTITUENCY", "AND", "COUNCIL"}
 INDEPENDENT = "independent candidate"
@@ -227,6 +250,7 @@ class Contest:
     name: str
     registered: int | None = None
     counted: int | None = None  # votes counted, which the printed tables sum from the candidates' votes
+    cast: int | None = None  # ballots cast, valid and rejected together, where the table prints them
     rejected: int | None = None
     candidates: list[Candidate] = field(default_factory=list)
     declared: str = ""  # the printed name of the candidate declared elected
@@ -531,6 +555,9 @@ class Area:
     cast: int | None = None
     quota: str = ""
     lists: list[Entry] = field(default_factory=list)
+    registered: int | None = None
+    valid: int | None = None
+    rejected: int | None = None
 
 
 def read_local() -> list[Area]:
@@ -680,6 +707,251 @@ def read_2024() -> National:
     )
 
 
+# --- 1998 and 2004 regional councils and local authorities (spreadsheets) ---------------------------------------------
+
+# Local associations on the 1998 and 2004 ballots. The tables truncate the names, so each is found by its opening words.
+ASSOCIATION_NAMES = {
+    "CONCERNED_PEOPLES_ORGANISATION_KEETMANSHOOP": "Concerned Peoples Organisation Keetmanshoop",
+    "GOBABIS_RESIDENTS_ASSOCIATION": "Gobabis Residents Association",
+    "LOCAL_COMMUNITY_ASSOCIATION": "Local Community Association",
+    "OKAHANDJA_RATE_PAYERS_ASSOCIATION": "Okahandja Rate Payers Association",
+    "OMARURU_RESIDENTS_ASSOCIATION": "Omaruru Residents Association",
+    "OTAVI_RESIDENTS_ASSOCIATION": "Otavi Residents Association",
+    "REHOBOTH_RATE_PAYERS_ASSOCIATION": "Rehoboth Rate Payers Association",
+    "SWAKOPMUND_RESIDENTS_ASSOCIATION": "Swakopmund Residents Association",
+    "CIVIC_ASSOCIATION_OF_HENTIES_BAY": "Civic Association of Henties Bay",
+    "KATIMA_ALLIANCE_DEVELOPMENT_ASSOCIATION": "Katima Alliance Development Association",
+    "OTJIWARONGO_RESIDENTS_ASSOCIATION": "Otjiwarongo Residents Association",
+    "ADA_GUI_SENIOR_CITIZENS_AND_DESTITUTE_CHILDRENS_ASSOCIATION": (
+        "Ada /Gui Senior Citizens and Destitute Children's Association"
+    ),
+}
+ASSOCIATIONS = {
+    r"concerned peop": "CONCERNED_PEOPLES_ORGANISATION_KEETMANSHOOP",
+    r"gobabis res": "GOBABIS_RESIDENTS_ASSOCIATION",
+    r"local community": "LOCAL_COMMUNITY_ASSOCIATION",
+    r"lca$": "LOCAL_COMMUNITY_ASSOCIATION",
+    r"okahandja rate": "OKAHANDJA_RATE_PAYERS_ASSOCIATION",
+    r"omaruru res": "OMARURU_RESIDENTS_ASSOCIATION",
+    r"otavi res": "OTAVI_RESIDENTS_ASSOCIATION",
+    r"rehoboth rate": "REHOBOTH_RATE_PAYERS_ASSOCIATION",
+    r"swakopmund res": "SWAKOPMUND_RESIDENTS_ASSOCIATION",
+    r"civic assoc": "CIVIC_ASSOCIATION_OF_HENTIES_BAY",
+    r"katima alliance": "KATIMA_ALLIANCE_DEVELOPMENT_ASSOCIATION",
+    r"ot(?:ij|i)warongo res": "OTJIWARONGO_RESIDENTS_ASSOCIATION",
+    r"ada ?/ ?gui": "ADA_GUI_SENIOR_CITIZENS_AND_DESTITUTE_CHILDRENS_ASSOCIATION",
+}
+
+
+def old_party(label: str) -> str | None:
+    """The key of the party or association a printed label of the 1998 and 2004 tables names."""
+    label = clean(label)
+    lowered = label.casefold()
+    if lowered.startswith("independent"):
+        return None
+    for pattern, code in ASSOCIATIONS.items():
+        if re.match(pattern, lowered):
+            LOCAL_PARTIES.setdefault(code, ASSOCIATION_NAMES[code])
+            return code
+    if lowered in ALIASES:
+        return ALIASES[lowered]
+    raise ValueError(f"party {label!r} is not in the list of the Commission's parties")
+
+
+def party_label(code: str | None) -> str:
+    return INDEPENDENT.capitalize() if code is None else PARTIES.get(code) or LOCAL_PARTIES[code]
+
+
+def sheet(name: str, tab: str) -> list[list[object]]:
+    book = xlrd.open_workbook(str(raw.cached(SOURCE, URLS[name]).path))
+    page = book.sheet_by_name(tab)
+    return [[cell.value for cell in page.row(r)] for r in range(page.nrows)]
+
+
+def cell(row: list[object], column: int) -> object:
+    return row[column] if column < len(row) else ""
+
+
+def amount(value: object) -> int | None:
+    """A printed count: a number, or text with spaces for thousands; None for an empty cell or a dash."""
+    if isinstance(value, float):
+        return round(value)
+    digits = re.sub(r"[\s,]", "", str(value))
+    return int(digits) if digits.isdigit() else None
+
+
+def words(value: object) -> str:
+    return clean(str(value))
+
+
+def _fold(value: str) -> str:
+    plain = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z]", "", plain.casefold())
+
+
+def _closest(name: str, options: list[str]) -> str | None:
+    found = difflib.get_close_matches(_fold(name), [_fold(o) for o in options], n=1, cutoff=0.8)
+    return next((o for o in options if _fold(o) == found[0]), None) if found else None
+
+
+def read_rc1998() -> list[Contest]:
+    rows = sheet("rc1998", "rc")
+    stop = next(i for i, row in enumerate(rows) if "Uncontested Constituencies" in words(cell(row, 2)))
+    contests: list[Contest] = []
+    region = ""
+    current: Contest | None = None
+    for row in rows[39:stop]:
+        first, label, votes = words(cell(row, 0)), words(cell(row, 5)), cell(row, 7)
+        if first and not label and not cell(row, 1):
+            region = first
+            continue
+        if not label:
+            continue
+        if first:
+            current = Contest(region_name(region), first, amount(cell(row, 1)), amount(cell(row, 2)))
+            current.rejected, current.cast = amount(cell(row, 3)), amount(cell(row, 4))
+            contests.append(current)
+        if current is None:
+            raise ValueError(f"1998 regional council row without a constituency: {row!r}")
+        if str(votes).strip().casefold() == "uncontested":
+            current.tacit = True
+        current.candidates.append(Candidate(words(cell(row, 6)), old_party(label), amount(votes)))
+    for contest in contests:
+        if contest.tacit:
+            contest.candidates[0].elected = True
+    # The constituencies the table leaves to its list of uncontested seats
+    names = {(c.region, c.name): c for c in contests}
+    region = ""
+    for row in rows[stop + 4 :]:
+        if words(cell(row, 0)) == "Independent candidate":
+            break
+        region = region_name(words(cell(row, 0))) if words(cell(row, 0)) else region
+        name, who, label = words(cell(row, 1)), words(cell(row, 2)), words(cell(row, 4))
+        if not name or not label:
+            continue
+        known = _closest(name, [n for r, n in names if r == region])
+        if known is None:
+            contest = Contest(region, name, tacit=True)
+            contest.candidates.append(Candidate(who, old_party(label), None, True))
+            contests.append(contest)
+            names[(region, name)] = contest
+    declared = read_elected1998()
+    for contest in contests:
+        if contest.tacit:
+            continue
+        known = _closest(contest.name, [n for r, n in declared if r == contest.region])
+        if known is None:
+            print(f"note: rc1998 {contest.region} {contest.name}: no declared winner is printed")
+            continue
+        who, party = declared[(contest.region, known)]
+        surname = _fold(who.split(",")[0])
+        names = [_fold(c.name.split(",")[0]) for c in contest.candidates]
+        close = difflib.get_close_matches(surname, names, n=1, cutoff=0.7)
+        match = [c for c, n in zip(contest.candidates, names, strict=True) if close and n == close[0]]
+        if len(match) != 1:
+            match = [c for c in contest.candidates if party and c.party == party]
+        if len(match) != 1:
+            print(f"note: rc1998 {contest.region} {contest.name}: declared {who!r} ({party}) matches {len(match)}")
+            continue
+        match[0].elected = True
+        contest.declared = who
+    for contest in contests:
+        if contest.tacit and not contest.candidates[0].name:
+            for r, n in declared:
+                if r == contest.region and _fold(n) == _fold(contest.name):
+                    contest.candidates[0].name = declared[(r, n)][0]
+    return contests
+
+
+def read_elected1998() -> dict[tuple[str, str], tuple[str, str | None]]:
+    elected: dict[tuple[str, str], tuple[str, str | None]] = {}
+    region = ""
+    for row in sheet("rc1998", "Ele")[5:]:
+        region = region_name(words(cell(row, 0))) if words(cell(row, 0)) else region
+        name, who, label = words(cell(row, 1)), words(cell(row, 2)), words(cell(row, 4))
+        if name:
+            elected[(region, name)] = (who, old_party(label) if label else None)
+    return elected
+
+
+def read_rc2004() -> list[Contest]:
+    rows = sheet("rc2004", "Sheet1")
+    heads = [words(cell(rows[5], c)) for c in range(2, 10)] + ["Independent candidates"]
+    contests: list[Contest] = []
+    region = ""
+    for row in rows[7:]:
+        name = words(cell(row, 0))
+        if not name:
+            continue
+        if not cell(row, 1):
+            region = name
+            continue
+        if name == "Regional Total":
+            continue
+        contest = Contest(region_name(region), name, amount(cell(row, 1)), amount(cell(row, 11)))
+        contest.rejected, contest.cast = amount(cell(row, 12)), amount(cell(row, 13))
+        for offset, head in enumerate(heads):
+            votes = amount(cell(row, 2 + offset))
+            if votes is not None:
+                contest.candidates.append(Candidate("", old_party(head), votes))
+        if contest.rejected is None and len(contest.candidates) == 1:
+            # The table prints the registered voters as the votes of a candidate nobody stood against.
+            contest.tacit = True
+            contest.counted = contest.cast = None
+            contest.candidates[0].votes = None
+            contest.candidates[0].elected = True
+        contests.append(contest)
+    return contests
+
+
+def read_la1998() -> list[Area]:
+    areas: list[Area] = []
+    region = ""
+    current: Area | None = None
+    for row in sheet("la1998", "la")[38:]:
+        first, label = words(cell(row, 0)), words(cell(row, 5))
+        if first.startswith("1998 - Women"):
+            break
+        if first and not label and not cell(row, 1):
+            region = first
+            continue
+        if not label:
+            continue
+        if first:
+            current = Area(region_name(region), first, amount(cell(row, 4)))
+            current.registered, current.rejected = amount(cell(row, 1)), amount(cell(row, 3))
+            areas.append(current)
+        if current is None:
+            raise ValueError(f"1998 local authority row without an area: {row!r}")
+        current.lists.append(Entry(label, amount(cell(row, 6)) or 0, amount(cell(row, 7)) or 0))
+    return areas
+
+
+def read_la2004() -> list[Area]:
+    areas: list[Area] = []
+    current: Area | None = None
+    pending = ""
+    for row in sheet("la2004", "lc")[50:]:
+        first, label = words(cell(row, 0)), words(cell(row, 6))
+        if first == "TOTALS":
+            break
+        if label and amount(cell(row, 7)) is None:
+            pending = label  # a long name printed over two lines
+            continue
+        if not label:
+            continue
+        label, pending = clean(f"{pending} {label}"), ""
+        if first:
+            current = Area("", first.title(), amount(cell(row, 4)))
+            current.valid, current.rejected = amount(cell(row, 2)), amount(cell(row, 3))
+            current.registered = amount(cell(row, 1))
+            areas.append(current)
+        if current is None:
+            raise ValueError(f"2004 local authority row without an area: {row!r}")
+        current.lists.append(Entry(label, amount(cell(row, 7)) or 0, amount(cell(row, 9)) or 0))
+    return areas
+
+
 # --- packages ---------------------------------------------------------------------------------------------------------
 
 
@@ -694,7 +966,7 @@ def packages() -> list[str]:
 
 def fetch() -> None:
     for url in URLS.values():
-        raw.fetch(SOURCE, url, suffix=".pdf")
+        raw.fetch(SOURCE, url, suffix=url[url.rfind(".") :])
 
 
 def parse() -> None:
@@ -711,12 +983,21 @@ def emit() -> None:
 def regional(name: str) -> tuple[Contest, ...]:
     if name == "rc2010":
         return tuple(read_2010())
+    if name == "rc1998":
+        return tuple(read_rc1998())
+    if name == "rc2004":
+        return tuple(read_rc2004())
     return tuple(read_regional(name, (8, 28, 48) if name == "rcby2025" else None))
 
 
 @cache
 def local() -> tuple[Area, ...]:
     return tuple(read_local())
+
+
+@cache
+def old_local(name: str) -> tuple[Area, ...]:
+    return tuple(read_la1998() if name == "la1998" else read_la2004())
 
 
 @cache
@@ -731,9 +1012,11 @@ def assembly_2014() -> tuple[list[Row], Row, int]:
 
 def everything() -> None:
     """Read every file once, so the registry sees every party any package uses."""
-    for name in ("rc2010", "rc2015", "rc2020", "rcby2025"):
+    for name in ("rc2010", "rc2015", "rc2020", "rcby2025", "rc1998", "rc2004"):
         regional(name)
     local()
+    for name in ("la1998", "la2004"):
+        old_local(name)
     assembly_2014()
     for _, label, _ in national().president:
         party_of(label)
@@ -814,7 +1097,8 @@ def registry() -> Package:
         id = party_id(code)
         p.add("party", id=id, kind="party", polity_id=NAMIBIA)
         p.name(id, name, "en", "official")
-        p.name(id, "PDM" if code == "DTA" else code.replace("_", " "), "en", "abbreviation", False)
+        if code not in ASSOCIATIONS.values():
+            p.name(id, "PDM" if code == "DTA" else code.replace("_", " "), "en", "abbreviation", False)
         if code == "DTA":
             p.name(id, "Popular Democratic Movement", "en", "official", False)
             p.name(id, "DTA", "en", "abbreviation", False)
@@ -892,6 +1176,17 @@ def _unit(p: Package, tag: str, scheme: str, code: str, english: str) -> str:
 
 def _candidate(p: Package, tag: str, contest: str, position: int, name: str, party: str | None) -> str:
     option = key("option", tag, position)
+    if not name:  # the table prints the party or the independent label without a name
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            party_id=party_id(party) if party else None,
+            ballot_position=position,
+            ballot_label=party_label(party),
+        )
+        return option
     person = key("person", tag, position, name)
     p.add("person", id=person)
     p.name(person, name, "en", "official")
@@ -962,6 +1257,7 @@ def _constituencies(
             _put(p, result_set, unit, None, REGISTERED, contest.registered)
             _put(p, result_set, unit, None, VALID if valid_printed else CAST, contest.counted)
             _put(p, result_set, unit, None, INVALID, contest.rejected)
+            _put(p, result_set, unit, None, CAST, contest.cast) if valid_printed else None
         for position, candidate in enumerate(contest.candidates, 1):
             option = _candidate(p, ctag, node, position, candidate.name, candidate.party)
             _put(p, result_set, unit, option, VOTES, candidate.votes)
@@ -1061,6 +1357,66 @@ def build(day: str) -> Package:
             121,
         )
         _local_2020(p, day, first)
+    elif day == "1998-02-16":
+        p.uses(raw.cached(SOURCE, URLS["la1998"]))
+        _local_old(p, "la1998", day, first, first, "1998 Namibian local authority council elections", 0)
+    elif day == "1998-11-30":
+        p.uses(raw.cached(SOURCE, URLS["rc1998"]))
+        _constituencies(
+            p,
+            day,
+            "rc1998",
+            "local",
+            "1998 Namibian regional council elections",
+            f"na/{day}-regional-councils",
+            first,
+            date(1998, 12, 1),
+            regional("rc1998"),
+            len(regional("rc1998")),
+            valid_printed=True,
+        )
+        p.add(
+            "note",
+            id=key("note", "rc1998", "summary"),
+            entity_id=key("election", "rc1998"),
+            kind="caveat",
+            body_md=(
+                "The Commission's summary page of this election prints totals that differ from its constituency "
+                "table: 213,789 votes cast and 4,757 rejected against 213,924 and 5,116 summed over the "
+                "constituencies, and 82 seats for SWAPO and 16 for the DTA against 83 and 15 by the party printed "
+                "beside each constituency winner (the Opuwo and Outjo tables and the list of elected "
+                "representatives name different parties for the same winners). It lists 26 uncontested "
+                "constituencies; the tables show 28. Every figure is stored as printed in its own table."
+            ),
+            lang="en",
+        )
+    elif day == "2004-11-15":
+        p.uses(raw.cached(SOURCE, URLS["rc2004"]))
+        p.uses(raw.cached(SOURCE, URLS["la2004"]))
+        end = date(2004, 11, 16)
+        _constituencies(
+            p,
+            day,
+            "rc2004",
+            "local",
+            "2004 Namibian regional council elections",
+            f"na/{day}-regional-councils",
+            first,
+            end,
+            regional("rc2004"),
+            len(regional("rc2004")),
+            valid_printed=True,
+        )
+        _local_old(p, "la2004", day, first, end, "2004 Namibian local authority council elections", 0)
+        p.add(
+            "note",
+            id=key("note", "la2004", "date"),
+            entity_id=key("election", "la2004"),
+            kind="caveat",
+            body_md="The local authority table prints no date. It is dated with the regional council election of "
+            "the same year, whose table prints 15 and 16 November 2004.",
+            lang="en",
+        )
     elif day == "2024-11-27":
         _national_2024(p, day, first)
     elif day == "2025-06-17":
@@ -1134,6 +1490,90 @@ def _assembly_2014(p: Package, day: str, first: date) -> None:
         "The Commission's printed national row exceeds the sum of its constituency rows by two votes for the "
         "Congress of Democrats. The table declares no seats or winners, so none are stored.",
     )
+
+
+def _local_old(p: Package, tag: str, day: str, first: date, last: date, english: str, total: int) -> None:
+    """Local authority councils with the votes and seats of each list, and the area's ballot counts where printed."""
+    path = f"na/{day}-local-authorities"
+    election = _election(p, tag, "local", first, last, english, path)
+    unequal: list[str] = []
+    cast: list[str] = []
+    for area in old_local(tag):
+        code = f"{slug(area.region)}-{slug(area.name)}".strip("-")
+        where = f"{area.name} ({area.region} region)" if area.region else area.name
+        ctag = f"{tag}:{code}"
+        contest = _contest(
+            p,
+            ctag,
+            election,
+            "list_allocation",
+            f"{english}, {where}",
+            f"{path}/{slug(area.region)}/{slug(area.name)}" if area.region else f"{path}/{slug(area.name)}",
+            body_id=LOCAL,
+            magnitude=sum(entry.seats for entry in area.lists),
+            electoral_system_id=SYSTEM_LOCAL,
+        )
+        unit = _unit(
+            p,
+            tag,
+            "na.local_authority",
+            code,
+            f"{area.name} local authority area" + (f", {area.region} region" if area.region else ""),
+        )
+        result_set = _result_set(p, ctag, election, contest)
+        _put(p, result_set, unit, None, REGISTERED, area.registered)
+        _put(p, result_set, unit, None, CAST, area.cast)
+        _put(p, result_set, unit, None, VALID, area.valid)
+        _put(p, result_set, unit, None, INVALID, area.rejected)
+        for position, entry in enumerate(area.lists, 1):
+            party = old_party(entry.label)
+            option = key("option", ctag, position)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party_id(party) if party else None,
+                ballot_position=position,
+                ballot_label=party_label(party),
+            )
+            _put(p, result_set, unit, option, VOTES, entry.votes)
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=None,
+                kind="won" if entry.seats else "lost",
+                seats=entry.seats,
+            )
+        if area.valid is not None and area.valid + (area.rejected or 0) != area.cast:
+            cast.append(
+                f"{area.name} (valid {area.valid:,} and rejected {area.rejected or 0:,}, cast {area.cast or 0:,})"
+            )
+        summed = sum(entry.votes for entry in area.lists)
+        printed = area.valid if area.valid is not None else (area.cast or 0) - (area.rejected or 0)
+        if summed != printed:
+            unequal.append(f"{area.name} (printed {printed:,}, lists {summed:,})")
+    if cast:
+        p.accept(
+            "accounting.ballots_sum",
+            "The Commission's printed votes cast differ from its printed valid and rejected votes for "
+            + "; ".join(cast)
+            + ". Each is stored as printed.",
+        )
+    if unequal:
+        p.add(
+            "note",
+            id=key("note", tag, "valid"),
+            entity_id=election,
+            kind="caveat",
+            body_md="In "
+            + str(len(unequal))
+            + " areas the Commission's printed total of valid votes differs from the sum of its lists' votes: "
+            + "; ".join(unequal)
+            + ". Both are stored as printed.",
+            lang="en",
+        )
 
 
 def _local_2020(p: Package, day: str, first: date) -> None:
