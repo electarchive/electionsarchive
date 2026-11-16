@@ -23,6 +23,7 @@ SPARQL = "https://query.wikidata.org/sparql?" + urlencode(
         "format": "json",
     }
 )
+OVERRIDES = Path(__file__).with_name("prg_wikidata.tsv")
 AS_OF = date(2026, 11, 10)
 TOLERANCE = 10
 PUBLISHER = "Główny Urząd Geodezji i Kartografii"
@@ -198,6 +199,16 @@ def emit() -> Path:
     items: dict[str, str] = {}
     for row in json.loads(raw.cached(SOURCE, SPARQL).path.read_text())["results"]["bindings"]:
         items.setdefault(row["code"]["value"], row["item"]["value"].rsplit("/", 1)[1])
+    # Items whose TERYT code on Wikidata is missing or in another format, matched by label, powiat, and class.
+    codes = set(frame["code"])
+    held = {qid for code, qid in items.items() if code in codes}
+    added: set[str] = set()
+    for line in OVERRIDES.read_text().splitlines()[1:]:
+        code, qid = line.split("\t")
+        if code in items or code not in codes or qid in held or qid in added:
+            raise ValueError(f"override {code} {qid} is unmatched, taken, or repeated")
+        items[code] = qid
+        added.add(qid)
     layers = {layer: lines.sort("code") for (layer,), lines in frame.group_by("layer")}
     with connect() as conn:
         cs = Changeset(
