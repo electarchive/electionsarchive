@@ -1,0 +1,1263 @@
+"""Iceland's elections from Statistics Iceland's PxWeb tables, down to the municipality."""
+
+import json
+import os
+import re
+import unicodedata
+from collections import Counter, defaultdict
+from collections.abc import Iterator
+from dataclasses import dataclass
+from datetime import date
+from uuid import uuid5
+
+from ea import changeset, package, raw
+from ea.package import Package
+
+SOURCE = "is.hagstofa"
+API = "https://px.hagstofa.is/pxen/api/v1/en/Ibuar/kosningar"
+ICELAND = str(uuid5(package.NAMESPACE, "polity\x1fIS"))
+TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fISL"))
+
+TABLES = {
+    # Althing
+    "KOS02121": "althingi/althurslit",
+    "KOS02124": "althingi/althurslit",
+    "KOS02122": "althingi/althurslit",
+    "KOS02118c": "althingi/althurslit",
+    "KOS02118b": "althingi/althurslit",
+    "KOS02118a": "althingi/althurslit",
+    "KOS02019": "althingi/althurslit",
+    "KOS02018": "althingi/althurslit",
+    "KOS02123": "althingi/althurslit",
+    "KOS02101": "althingi/althkjosendur",
+    "KOS02100": "althingi/althkjosendur",
+    "KOS02057": "althingi/althkjornir",
+    # presidential
+    "KOS07100": "forsetakosningar",
+    "KOS07102": "forsetakosningar",
+    "KOS07104": "forsetakosningar",
+    "KOS07110": "forsetakosningar",
+    "KOS07112": "forsetakosningar",
+    "KOS07002": "forsetakosningar",
+    "KOS07000": "forsetakosningar",
+    # referenda
+    "KOS04101": "thjodaratkv",
+    "KOS04102": "thjodaratkv",
+    "KOS04103": "thjodaratkv",
+    "KOS04105": "thjodaratkv",
+    "KOS04108": "thjodaratkv",
+    "KOS04109": "thjodaratkv",
+    # overview
+    "KOS01900": "kosningayfirlit",
+    "KOS02000": "kosningayfirlit",
+    "KOS02001": "kosningayfirlit",
+    "KOS02001": "kosningayfirlit",
+    "KOS02002": "kosningayfirlit",
+    "KOS02003": "kosningayfirlit",
+    "KOS02004": "kosningayfirlit",
+    "KOS02005": "kosningayfirlit",
+    "KOS02006": "kosningayfirlit",
+    # local government
+    "KOS03101": "sveitastjorn/svf_yfirlit",
+    "KOS03103": "sveitastjorn/svf_yfirlit",
+    "KOS03107": "sveitastjorn/svf_yfirlit",
+    "KOS03201": "sveitastjorn/svf_urslit",
+    "KOS03202": "sveitastjorn/svf_urslit",
+    "KOS03203": "sveitastjorn/svf_urslit",
+    "KOS03204": "sveitastjorn/svf_urslit",
+    "KOS03204a": "sveitastjorn/svf_urslit",
+    "KOS03204b": "sveitastjorn/svf_urslit",
+    "KOS03205": "sveitastjorn/svf_urslit",
+    "KOS03206": "sveitastjorn/svf_urslit",
+    "KOS03207": "sveitastjorn/svf_urslit",
+    "KOS03208": "sveitastjorn/svf_urslit",
+    "KOS03208a": "sveitastjorn/svf_urslit",
+    "KOS03210": "sveitastjorn/svf_urslit",
+    "KOS03211": "sveitastjorn/svf_urslit",
+    "KOS03212": "sveitastjorn/svf_urslit",
+    "KOS03213": "sveitastjorn/svf_urslit",
+    "KOS03214": "sveitastjorn/svf_urslit",
+    "KOS03214a": "sveitastjorn/svf_urslit",
+    "KOS03302": "sveitastjorn/svf_frambj",
+    "KOS03304": "sveitastjorn/svf_frambj",
+    "KOS03305": "sveitastjorn/svf_frambj",
+    "KOS03306": "sveitastjorn/svf_frambj",
+    "KOS03307": "sveitastjorn/svf_frambj",
+    "KOS03308": "sveitastjorn/svf_frambj",
+}
+
+
+def url(table: str) -> str:
+    return f"{API}/{TABLES[table]}/{table}.px"
+
+
+def body(table: str) -> dict[str, object]:
+    variables = json.loads(raw.cached(SOURCE, url(table)).path.read_bytes())["variables"]
+    return {
+        "query": [{"code": v["code"], "selection": {"filter": "all", "values": ["*"]}} for v in variables],
+        "response": {"format": "json-stat2"},
+    }
+
+
+def fetch() -> None:
+    for table in TABLES:
+        raw.fetch(SOURCE, url(table), suffix=".json")
+        raw.fetch(SOURCE, url(table), suffix=".json", body=body(table))
+
+
+# ---------------------------------------------------------------- tables
+
+
+class Grid:
+    """One json-stat2 table: dimension names, their labels, and cells addressed by a label for each dimension."""
+
+    def __init__(self, document: dict[str, object]) -> None:
+        self.title = str(document.get("label", ""))
+        self.dims: list[str] = [str(d) for d in document["id"]]  # type: ignore[attr-defined]
+        dimension = document["dimension"]
+        assert isinstance(dimension, dict)
+        self.labels: dict[str, list[str]] = {}
+        for dim in self.dims:
+            category = dimension[dim]["category"]
+            index, label = category["index"], category["label"]
+            order = sorted(index, key=lambda k: index[k]) if isinstance(index, dict) else index
+            self.labels[dim] = [str(label[k]) for k in order]
+        sizes = [len(self.labels[d]) for d in self.dims]
+        values = document["value"]
+        assert isinstance(values, list) and len(values) == _product(sizes)
+        self.cells: dict[tuple[str, ...], float | None] = {}
+        position = 0
+        for combo in _combos([self.labels[d] for d in self.dims]):
+            self.cells[combo] = values[position]
+            position += 1
+
+    def get(self, **where: str) -> int | None:
+        """The one integer cell that matches the labels given for every dimension."""
+        key = tuple(where[d] for d in self.dims)
+        value = self.cells[key]
+        if value is None:
+            return None
+        if value != int(value):
+            raise ValueError(f"{self.title}: {key} is {value}, not a count")
+        return int(value)
+
+
+def _product(sizes: list[int]) -> int:
+    n = 1
+    for size in sizes:
+        n *= size
+    return n
+
+
+def _combos(lists: list[list[str]]) -> Iterator[tuple[str, ...]]:
+    if not lists:
+        yield ()
+        return
+    for head in lists[0]:
+        for rest in _combos(lists[1:]):
+            yield (head, *rest)
+
+
+_GRIDS: dict[str, Grid] = {}
+
+
+def grid(table: str) -> Grid:
+    if table not in _GRIDS:
+        _GRIDS[table] = Grid(json.loads(raw.cached(SOURCE, url(table), body(table)).path.read_bytes()))
+    return _GRIDS[table]
+
+
+def key(kind: str, *parts: object) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+def clean(text: str) -> str:
+    text = unicodedata.normalize("NFC", text).replace("\x96", "-").replace("Ž", "'").replace("´", "'")
+    return " ".join(text.split())
+
+
+# ---------------------------------------------------------------- dates
+
+MONTHS = {
+    name: number
+    for number, name in enumerate(
+        "january february march april may june july august september october november december".split(), 1
+    )
+}
+
+
+@dataclass(frozen=True)
+class Day:
+    first: date
+    last: date
+    precision: str
+    text: str
+
+
+def day_of(label: str) -> Day:
+    """A date from a label such as '1944, 20-23 May Referendum', '1880, September', or '1874, autumn'."""
+    text = clean(label)
+    match = re.match(r"^(\d{4})\.?,?\s*(.*)$", text)
+    assert match, label
+    year, rest = int(match.group(1)), match.group(2).lower()
+    month = next((n for name, n in MONTHS.items() if name in rest), None)
+    days = re.search(r"(\d{1,2})(?:\s*-\s*(\d{1,2}))?\.?\s+(?:" + "|".join(MONTHS) + ")", rest)
+    if month is None:
+        return Day(date(year, 1, 1), date(year, 12, 31), "year", text)
+    if days is None:
+        end = date(year + (month == 12), month % 12 + 1, 1)
+        return Day(date(year, month, 1), date.fromordinal(end.toordinal() - 1), "month", text)
+    first = int(days.group(1))
+    last = int(days.group(2) or first)
+    return Day(date(year, month, first), date(year, month, last), "day", text)
+
+
+# ---------------------------------------------------------------- names
+
+REGIONS = {
+    "Whole country",
+    "Whole Country",
+    "Iceland total",
+    "Total",
+    "Capital area",
+    "Capital region",
+    "Southwest",
+    "West",
+    "Westfjord",
+    "Westfjords",
+    "Northwest",
+    "Northeast",
+    "East",
+    "South",
+}
+ALIASES = {
+    "Akraneskaupstaður": "Akranes",
+    "Akureyrarkaupstaður": "Akureyri",
+    "Akureyrarbær": "Akureyri",
+    "Akureyarbær": "Akureyri",
+    "Blönduósbær": "Blönduóssbær",
+    "Bolungarvíkurkaupstaður": "Bolungarvík",
+    "Grindavíkurbær": "Grindavík",
+    "Grindarvíkurbær": "Grindavík",
+    "Grundafjarðarbær": "Grundarfjarðarbær",
+    "Grímsnes- og Grafningshr.": "Grímsnes- og Grafningshreppur",
+    "Hafnarfjarðarkaupstaður": "Hafnarfjörður",
+    "Hveragerðisbær": "Hveragerði",
+    "Kópavogsbær": "Kópavogur",
+    "Reykjavíkurborg": "Reykjavík",
+    "Sandgerðisbær": "Sandgerði",
+    "Seltjarnarnesbær": "Seltjarnarnes",
+    "Seltjarnarneskaupstaður": "Seltjarnarnes",
+    "Seyðisfjarðarkaupstaður": "Seyðisfjörður",
+    "Sveitarfélagið Skagafjörður": "Skagafjörður",
+    "Skagaströnd": "Sveitarfélagið Skagaströnd",
+    "Skeiða og Gnúpverjahreppur": "Skeiða- og Gnúpverjahreppur",
+    "Sveitarfélagið Stykkishólmur": "Stykkishólmur",
+    "Stykkishólmsbær": "Stykkishólmur",
+    "Vestmannaeyjabær": "Vestmannaeyjar",
+    "Ólafsfjörður": "Ólafsfjarðarbær",
+}
+CONSTITUENCIES = {
+    # code: (name, native name, valid from, valid to)
+    "reykjavik-1959": ("Reykjavík", None),
+    "reykjanes-1959": ("Reykjanes", None),
+    "west-1959": ("West", "Vesturland"),
+    "westfjords-1959": ("Westfjords", "Vestfirðir"),
+    "northwest-1959": ("Northwest", "Norðurland vestra"),
+    "northeast-1959": ("Northeast", "Norðurland eystra"),
+    "east-1959": ("East", "Austurland"),
+    "south-1959": ("South", "Suðurland"),
+    "northwest-2003": ("Northwest", "Norðvesturkjördæmi"),
+    "northeast-2003": ("Northeast", "Norðausturkjördæmi"),
+    "south-2003": ("South", "Suðurkjördæmi"),
+    "southwest-2003": ("Southwest", "Suðvesturkjördæmi"),
+    "reykjavik-south-2003": ("Reykjavík south", "Reykjavíkurkjördæmi suður"),
+    "reykjavik-north-2003": ("Reykjavík north", "Reykjavíkurkjördæmi norður"),
+}
+OLD = {
+    "Reykjavík": "reykjavik-1959",
+    "Reykjanes": "reykjanes-1959",
+    "West": "west-1959",
+    "Westfjords": "westfjords-1959",
+    "Westfjord": "westfjords-1959",
+    "Northwest": "northwest-1959",
+    "North West": "northwest-1959",
+    "Northeast": "northeast-1959",
+    "North East": "northeast-1959",
+    "East": "east-1959",
+    "South": "south-1959",
+}
+NEW = {
+    "Northwest": "northwest-2003",
+    "Northeast": "northeast-2003",
+    "Notheast": "northeast-2003",
+    "South": "south-2003",
+    "Southwest": "southwest-2003",
+    "Reykjavík south": "reykjavik-south-2003",
+    "Reykjavík north": "reykjavik-north-2003",
+    "Reykjavík (south)": "reykjavik-south-2003",
+    "Reykjavík (north)": "reykjavik-north-2003",
+}
+
+LOCAL_DAYS = {
+    2002: date(2002, 5, 25),
+    2006: date(2006, 5, 27),
+    2010: date(2010, 5, 29),
+    2014: date(2014, 5, 31),
+    2018: date(2018, 5, 26),
+    2022: date(2022, 5, 14),
+}
+
+MEASURE = {"votes": 1, "registered": 2, "cast": 3, "valid": 4, "invalid": 5, "blank": 6}
+
+
+def canon(name: str) -> str:
+    text = clean(name)
+    return ALIASES.get(text, text)
+
+
+def constituency(label: str, era: str) -> str | None:
+    text = clean(label)
+    text = re.sub(r" constituency$| total$", "", text)
+    text = re.sub(r"^Constituency of ", "", text).replace("sourth", "south")
+    if era == "old":
+        return OLD.get(text)
+    return NEW.get(text) if "(" not in text else None
+
+
+def is_region(label: str) -> bool:
+    text = clean(label)
+    return (
+        text in REGIONS
+        or text.endswith(" total")
+        or text.endswith(" constituency")
+        or text.startswith("Constituency of ")
+        or text.startswith("Reykjavík south")
+        or text.startswith("Reykjavík north")
+    )
+
+
+def area(scheme: str, code: str) -> str:
+    return key("area", scheme, code)
+
+
+# ---------------------------------------------------------------- parties
+
+PARTY_FIXES = {"alliance": "social democratic alliance"}
+OTHERS = {"other", "others", "others and outside parties"}
+INDEPENDENTS = {"outside parties"}
+NATIVE = {
+    "independence party": "Sjálfstæðisflokkurinn",
+    "progressive party": "Framsóknarflokkurinn",
+    "social democratic alliance": "Samfylkingin",
+    "left-green movement": "Vinstrihreyfingin – grænt framboð",
+    "pirate party": "Píratar",
+    "reform": "Viðreisn",
+    "central party": "Miðflokkurinn",
+    "people's party": "Flokkur fólksins",
+    "socialist party of iceland": "Sósíalistaflokkur Íslands",
+    "social democratic party": "Alþýðuflokkurinn",
+    "people's alliance": "Alþýðubandalagið",
+    "women's alliance": "Samtök um kvennalista",
+    "bright future": "Björt framtíð",
+    "liberal party": "Frjálslyndi flokkurinn",
+}
+LOCAL_PARTIES = [
+    (r"sjálfstæðisflokk", "independence party"),
+    (r"framsóknarflokk|^framsókn$", "progressive party"),
+    (r"samfylking", "social democratic alliance"),
+    (r"vinstri.?hreyfing.*græn|vinstri.?græn", "left-green movement"),
+    (r"píratar", "pirate party"),
+    (r"viðreisn", "reform"),
+    (r"miðflokk", "central party"),
+    (r"flokk(?:ur|s) fólksins", "people's party"),
+    (r"sósíalistaflokk", "socialist party of iceland"),
+    (r"alþýðuflokk", "social democratic party"),
+    (r"alþýðubandalag", "people's alliance"),
+    (r"kvennalist", "women's alliance"),
+    (r"björt framtíð", "bright future"),
+    (r"frjálslyndi flokk", "liberal party"),
+]
+ALTHING_NAMES = {
+    "KOS02121": "Political organisation",
+    "KOS02124": "Political party",
+    "KOS02122": "Political organisation",
+    "KOS02118c": "Political organisation",
+    "KOS02118b": "Political organisation",
+    "KOS02118a": "Political organisation",
+    "KOS02019": "Political organisation",
+    "KOS02018": "Political organisation",
+}
+
+
+def party_text(label: str) -> str:
+    text = clean(label).replace("Peoples Party", "People's Party")
+    return re.sub(r"\s*\([A-ZÞÆÖÐÁÉÍÓÚÝ]\)$", "", text)
+
+
+def party_id_of(label: str) -> str:
+    text = party_text(label).lower()
+    text = re.sub(r"^the ", "", text)
+    return PARTY_FIXES.get(text, text)
+
+
+def party(pid: str) -> str:
+    return key("party", pid)
+
+
+def parties() -> dict[str, str]:
+    """Every national party named in an Althing table, by its normalized key, with the longest printed name."""
+    found: dict[str, str] = {}
+    for table, dim in ALTHING_NAMES.items():
+        for label in grid(table).labels[dim]:
+            text = party_text(label)
+            pid = party_id_of(label)
+            if text in ("Total", "Valid votes") or pid in OTHERS or pid in INDEPENDENTS:
+                continue
+            if len(text) > len(found.get(pid, "")) or (pid in PARTY_FIXES.values() and text.startswith("The Social")):
+                found[pid] = text
+    return found
+
+
+def local_party(text: str) -> str | None:
+    """The national party a local list names, when it names exactly one and nobody else."""
+    rest = re.sub(r"^[A-ZÞÆÖÐÁÉÍÓÚÝ]{1,2}\s*[-–]?\s*(?:listi|listinn)?\s*[-–]?\s*", "", clean(text)).lower()
+    rest = re.sub(r"^(?:b|d|s|v|p|c|m|f|j)[-\s]*(?:listi|listinn)\s*", "", rest)
+    if " og " in rest or "," in rest:
+        return None
+    hits = {pid for pattern, pid in LOCAL_PARTIES if re.search(pattern, rest)}
+    return hits.pop() if len(hits) == 1 else None
+
+
+# ---------------------------------------------------------------- geography
+
+MUNI_TABLES = {
+    "KOS02101": "Municipality",
+    "KOS07002": "Constituency/Municipality",
+    "KOS04105": "Constituency/Municipality",
+    **{t: "Municipality" for t in ("KOS03201", "KOS03202", "KOS03203", "KOS03204", "KOS03204a", "KOS03204b")},
+    **{t: "Municipality" for t in ("KOS03205", "KOS03206", "KOS03207", "KOS03208", "KOS03208a")},
+}
+
+
+def hierarchy(table: str) -> list[tuple[str | None, str, str]]:
+    """The municipalities of a table as (constituency, canonical name, printed label), skipping its total rows."""
+    out: list[tuple[str | None, str, str]] = []
+    current: str | None = None
+    for label in grid(table).labels[MUNI_TABLES[table]]:
+        text = clean(label)
+        if text in REGIONS and not text.endswith(" total"):
+            continue
+        if text.endswith(" constituency") or text.endswith(" total") or text.startswith("Constituency of "):
+            current = constituency(text, "new")
+            continue
+        if text in ("Reykjavík south", "Reykjavík north"):
+            current = NEW[text]
+            text = f"Reykjavík ({text.split()[1]})"
+        out.append((current, canon(text), label))
+    return out
+
+
+def municipalities() -> list[str]:
+    names = {name for table in MUNI_TABLES for _, name, _ in hierarchy(table)}
+    names |= {"Reykjavík"}
+    return sorted(names)
+
+
+def geo() -> Package:
+    p = Package(
+        "is.hagstofa/geo",
+        SOURCE,
+        "Iceland's Althing constituencies of 1959 to 1999 and since 2003, and the municipalities that Statistics "
+        "Iceland names in its election tables",
+    )
+    p.external |= {ICELAND, TERRITORY}
+    p.add("scheme", code="is.landid", polity_id=ICELAND, kind="administrative", rank=0, noun="country")
+    p.add(
+        "scheme", code="is.kjordaemi", polity_id=ICELAND, kind="electoral_district", rank=1, noun="constituency"
+    )
+    p.add("scheme", code="is.sveitarfelag", polity_id=ICELAND, kind="administrative", rank=2, noun="municipality")
+    for code, (english, native) in CONSTITUENCIES.items():
+        id = area("is.kjordaemi", code)
+        p.add("area", id=id, scheme_code="is.kjordaemi")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY)
+        p.name(id, english, "en", "official")
+        if native:
+            p.name(id, native, "is", "native", False)
+    for name in municipalities():
+        id = area("is.sveitarfelag", name)
+        p.add("area", id=id, scheme_code="is.sveitarfelag")
+        p.add("area_code", area_id=id, code=name)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY)
+        p.name(id, name, "is", "official")
+    return p
+
+
+# ---------------------------------------------------------------- registry
+
+STATS = key("source", SOURCE)
+ALTHING_BODY = key("body", "althing")
+COUNCIL_BODY = key("body", "municipal-council")
+PRESIDENCY = key("office", "president")
+SYSTEM_1959 = key("electoral_system", "althing", 1959)
+SYSTEM_2003 = key("electoral_system", "althing", 2003)
+SYSTEM_LOCAL = key("electoral_system", "local")
+SYSTEM_PRESIDENT = key("electoral_system", "president")
+SYSTEM_REFERENDUM = key("electoral_system", "referendum")
+LOCAL_NOTE = (
+    "Each municipal council is elected by proportional representation from candidate lists, or, in the "
+    "municipalities with no list, by direct personal voting."
+)
+SYSTEMS = [
+    (
+        SYSTEM_1959,
+        date(1959, 1, 1),
+        date(2003, 1, 1),
+        {"formula": "dhondt"},
+        "Constituency seats are allocated to lists by the D'Hondt method, and a fixed number of adjustment seats are "
+        "allocated to lists nationwide to even out the disproportion between the parties' votes and seats.",
+    ),
+    (
+        SYSTEM_2003,
+        date(2003, 1, 1),
+        None,
+        {"formula": "dhondt"},
+        "Constituency seats are allocated to lists by the D'Hondt method, and nine adjustment seats are allocated to "
+        "the parties that win at least five percent of the valid votes nationwide, so that each party's seats follow "
+        "its votes. The adjustment seats are assigned to constituencies, and Statistics Iceland counts a member "
+        "under the constituency that seat was assigned to.",
+    ),
+    (SYSTEM_LOCAL, date(1900, 1, 1), None, {"formula": "dhondt"}, LOCAL_NOTE),
+    (
+        SYSTEM_PRESIDENT,
+        date(1944, 1, 1),
+        None,
+        {"formula": "fptp"},
+        "The president is elected directly for four years. The candidate with the most votes is elected, and an "
+        "election with a single candidate is not held.",
+    ),
+    (SYSTEM_REFERENDUM, date(1900, 1, 1), None, {"formula": "referendum"}, "A referendum is decided by a majority."),
+]
+
+
+def registry() -> Package:
+    p = Package(
+        "is.hagstofa/registry",
+        SOURCE,
+        "Iceland's Althing, municipal councils, and presidency, its parties, and the electoral systems, from "
+        "Statistics Iceland's election tables",
+        depends=["is.hagstofa/geo"],
+    )
+    p.external.add(ICELAND)
+    p.add(
+        "source",
+        id=STATS,
+        kind="official_body",
+        publisher="Hagstofa Íslands (Statistics Iceland)",
+        title="Elections: PxWeb statistical database",
+        url="https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar/",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="Statistics Iceland, hagstofa.is",
+    )
+    for table in TABLES:
+        p.artifact(raw.cached(SOURCE, url(table)), STATS)
+        p.artifact(raw.cached(SOURCE, url(table), body(table)), STATS)
+    p.add("body", id=ALTHING_BODY, polity_id=ICELAND, kind="unicameral")
+    p.name(ALTHING_BODY, "Althing", "en", "official")
+    p.name(ALTHING_BODY, "Alþingi", "is", "native", False)
+    p.add("body", id=COUNCIL_BODY, polity_id=ICELAND, kind="council")
+    p.name(COUNCIL_BODY, "Municipal councils", "en", "official")
+    p.name(COUNCIL_BODY, "Sveitarstjórnir", "is", "native", False)
+    p.add("office", id=PRESIDENCY, polity_id=ICELAND, kind="head_of_state")
+    p.name(PRESIDENCY, "President of Iceland", "en", "official")
+    p.name(PRESIDENCY, "Forseti Íslands", "is", "native", False)
+    for id, since, until, rules, method in SYSTEMS:
+        p.add(
+            "electoral_system", id=id, polity_id=ICELAND, valid_from=since, valid_to=until, rules=rules, rules_version=1
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for pid, text in sorted(parties().items()):
+        id = party(pid)
+        p.add("party", id=id, kind="party", polity_id=ICELAND)
+        p.name(id, text, "en", "official")
+        if pid in NATIVE:
+            p.name(id, NATIVE[pid], "is", "native", False)
+    return p
+
+
+# ---------------------------------------------------------------- building blocks
+
+ENGLISH_MONTHS = [None, *(name.capitalize() for name in MONTHS)]
+ICELANDIC_MONTHS = [
+    None, "janúar", "febrúar", "mars", "apríl", "maí", "júní", "júlí", "ágúst", "september", "október", "nóvember",
+    "desember",
+]  # fmt: skip
+KINDS = {
+    "general": ("general", "Icelandic parliamentary election", "Alþingiskosningar"),
+    "special": ("special", "Icelandic parliamentary election of nationally elected members", "Landskjör til Alþingis"),
+    "presidential": ("general", "Icelandic presidential election", "Forsetakosningar"),
+    "referendum": ("referendum", "Icelandic referendum", "Þjóðaratkvæðagreiðsla"),
+    "local": ("local", "Icelandic local government elections", "Sveitarstjórnarkosningar"),
+    "reykjavik": ("local", "Reykjavík City Council election", "Borgarstjórnarkosningar í Reykjavík"),
+}
+
+
+@dataclass(frozen=True)
+class Event:
+    kind: str
+    day: Day
+    label: str = ""
+
+    @property
+    def stamp(self) -> str:
+        day = self.day
+        if day.precision == "day":
+            return day.first.isoformat()
+        if day.precision == "month":
+            return f"{day.first.year}-{day.first.month:02d}"
+        return str(day.first.year)
+
+    @property
+    def ekey(self) -> str:
+        return f"{self.kind}-{self.stamp}"
+
+    @property
+    def package(self) -> str:
+        return f"{SOURCE}/{self.ekey}"
+
+    @property
+    def path(self) -> str:
+        return f"is/{self.stamp}-{self.kind}"
+
+
+class Build:
+    """One election's package and the helpers that every family of elections shares."""
+
+    def __init__(self, event: Event, summary: str, names: list[tuple[str, str, str]] | None = None) -> None:
+        self.event = event
+        self.ekey = event.ekey
+        self.p = Package(event.package, SOURCE, summary, depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"])
+        self.p.external |= {ICELAND, TERRITORY}
+        self.units: dict[tuple[str, str], str] = {}
+        self.counts: Counter[str] = Counter()
+        self.sets: list[str] = []
+        self.cited: set[str] = set()
+        kind, english, native = KINDS[event.kind]
+        day = event.day
+        english_date = (
+            f"{ENGLISH_MONTHS[day.first.month]} {day.first.year}" if day.precision != "year" else str(day.first.year)
+        )
+        native_date = (
+            f"{ICELANDIC_MONTHS[day.first.month]} {day.first.year}" if day.precision != "year" else str(day.first.year)
+        )
+        self.election = key("election", self.ekey)
+        self.p.add(
+            "election",
+            id=self.election,
+            polity_id=ICELAND,
+            kind=kind,
+            date_from=day.first,
+            date_to=day.last,
+            date_precision=day.precision,
+            original_text=day.text,
+            status="held",
+        )
+        self.p.name(self.election, f"{english_date} {english}", "en", "official")
+        self.p.name(self.election, f"{native} {native_date}", "is", "native", False)
+        self.p.add("slug", path=event.path, entity_id=self.election, is_current=True)
+
+    def cite(self, *tables: str) -> None:
+        for table in tables:
+            if table not in self.cited:
+                self.cited.add(table)
+                self.p.uses(raw.cached(SOURCE, url(table), body(table)))
+
+    def unit(self, scheme: str, code: str, where: str) -> str:
+        found = self.units.get((scheme, code))
+        if found is not None:
+            return found
+        id = self.units[(scheme, code)] = key("unit", scheme, self.ekey, code)
+        self.p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=ICELAND,
+            scheme_code=scheme,
+            code=f"{self.ekey}:{code}",
+            area_relation="equals",
+            area_id=where,
+            kind="standard",
+        )
+        return id
+
+    def national(self) -> str:
+        return self.unit("is.landid", "IS", TERRITORY)
+
+    def constituency(self, code: str) -> str:
+        return self.unit("is.kjordaemi", code, area("is.kjordaemi", code))
+
+    def municipality(self, name: str) -> str:
+        return self.unit("is.sveitarfelag", name, area("is.sveitarfelag", name))
+
+    def contest(
+        self,
+        suffix: str,
+        title: tuple[str, str | None],
+        *,
+        kind: str,
+        where: str,
+        system: str,
+        body_id: str | None = None,
+        office: str | None = None,
+        magnitude: int | None = None,
+        round_number: int | None = None,
+    ) -> str:
+        id = key("contest", self.ekey, suffix)
+        self.p.add(
+            "contest",
+            id=id,
+            election_id=self.election,
+            kind=kind,
+            office_id=office,
+            body_id=body_id,
+            district_area_id=where,
+            magnitude=magnitude,
+            round_number=round_number,
+            electoral_system_id=system,
+            default_result_kind="counted",
+        )
+        self.p.name(id, title[0], "en", "official")
+        if title[1]:
+            self.p.name(id, title[1], "is", "native", False)
+        self.p.add(
+            "slug", path=f"{self.event.path}/{changeset.slug(title[0])}", entity_id=id, is_current=True
+        )
+        return id
+
+    def result_set(self, suffix: str, contest: str | None, note: str) -> str:
+        id = key("result_set", self.ekey, suffix)
+        self.p.add(
+            "result_set",
+            id=id,
+            election_id=self.election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=STATS,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        self.p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
+        self.sets.append(id)
+        return id
+
+    def option(
+        self,
+        contest: str,
+        suffix: str,
+        label: str,
+        position: int,
+        kind: str,
+        party_id: str | None = None,
+    ) -> str:
+        id = key("option", self.ekey, contest, suffix)
+        self.p.add(
+            "contest_option",
+            id=id,
+            contest_id=contest,
+            kind=kind,
+            party_id=party_id,
+            ballot_position=position,
+            ballot_label=label,
+        )
+        return id
+
+    def value(self, result_set: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
+        if value is None:
+            return
+        self.counts["values"] += 1
+        self.p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=0,
+            value=value,
+        )
+
+    def declare(self, result_set: str, option: str | None, measure: int, value: int | None) -> None:
+        if value is None:
+            return
+        self.p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+
+    def outcome(self, result_set: str, option: str, seats: int | None, kind: str = "won") -> None:
+        self.p.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+
+    def note(self, entity: str, kind: str, text: str, suffix: str = "") -> None:
+        self.p.add("note", id=key("note", entity, kind, suffix), entity_id=entity, kind=kind, body_md=text, lang="en")
+
+    def caveat(self, text: str) -> None:
+        self.note(self.election, "caveat", text, text[:40])
+
+
+# Where two of Statistics Iceland's own tables disagree, the pair of figures and what the package does about it.
+KNOWN: dict[str, tuple[int, int]] = {}
+
+
+def mismatch(b: Build, what: str, ours: int | None, theirs: int | None) -> None:
+    if ours == theirs:
+        return
+    if KNOWN.get(what) == (ours, theirs):
+        b.caveat(
+            f"Statistics Iceland's tables disagree on {what.split(' ', 1)[1]}: {ours:,} in one table and "
+            f"{theirs:,} in another. Both figures are kept as printed."
+        )
+        return
+    if os.environ.get("IS_DISCOVER"):
+        print("DIFF", repr(what), (ours, theirs))
+        return
+    raise ValueError(f"{what}: parsed {ours}, the source prints {theirs}")
+
+
+SOURCE_NOTE = (
+    "Counted by the election authorities and published by Statistics Iceland in its PxWeb tables. "
+)
+
+
+# ---------------------------------------------------------------- events
+
+
+def day_icelandic(label: str) -> Day:
+    text = clean(label)
+    match = re.match(r"^(\d{4}),\s*(jan|nóv|des)\.?$", text)
+    if match is None:
+        return day_of(text)
+    month = {"jan": 1, "nóv": 11, "des": 12}[match.group(2)]
+    year = int(match.group(1))
+    end = date(year + (month == 12), month % 12 + 1, 1)
+    return Day(date(year, month, 1), date.fromordinal(end.toordinal() - 1), "month", text)
+
+
+def events() -> list[Event]:
+    found: list[Event] = []
+    for label in grid("KOS01900").labels["Year"]:
+        if not re.search("presidential|pesidential|referendum", label, re.IGNORECASE):
+            found.append(Event("general", day_of(label), label))
+    found += [Event("special", day_of(label), label) for label in grid("KOS02002").labels["Year"]]
+    found += [Event("presidential", day_of(label), label) for label in grid("KOS02004").labels["Year"]]
+    found += [Event("referendum", day_of(label), label) for label in grid("KOS02003").labels["Year"]]
+    found += [
+        Event("referendum", day_of(label.split()[0]), label)
+        for label in grid("KOS04101").labels["Referenda"]
+        if label.startswith(("1908", "1916"))
+    ]
+    for label in grid("KOS02005").labels["Year"]:
+        year = int(label)
+        day = Day(LOCAL_DAYS[year], LOCAL_DAYS[year], "day", label) if year in LOCAL_DAYS else day_of(label)
+        found.append(Event("local", day, label))
+    for label in grid("KOS02006").labels["Year"]:
+        if int(label[:4]) < 1938:
+            found.append(Event("reykjavik", day_icelandic(label), label))
+    return sorted(found, key=lambda e: (e.day.first, e.kind))
+
+
+def packages() -> list[str]:
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(e.package for e in events())]
+
+
+def blank_void(event: Event, kind: str) -> tuple[int | None, int | None]:
+    """Blank and void ballots of a general election, from the table that covers every election since 1908."""
+    g = grid("KOS02000")
+    if event.kind == "special":
+        return None, None
+    year, month = event.day.first.year, event.day.first.month
+    found = [
+        label
+        for label in g.labels["Year"]
+        if int(label[:4]) == year
+        and ("presidential" in label.lower()) == (kind == "presidential")
+        and ("referendum" in label.lower()) == (kind == "referendum")
+    ]
+    if len(found) > 1:
+        found = [label for label in found if ENGLISH_MONTHS[month].lower() in label.lower()]
+    if len(found) != 1:
+        return None, None
+    label = found[0]
+    return (
+        g.get(Year=label, Unit="Number", Ballots="Blank ballots"),
+        g.get(Year=label, Unit="Number", Ballots="Void ballots"),
+    )
+
+
+TURNOUT = {
+    "KOS01900": ("Votes", "Voters on the electoral roll", "Votes cast"),
+    "KOS02001": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
+    "KOS02002": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
+    "KOS02003": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
+    "KOS02004": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
+    "KOS02005": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
+    "KOS02006": ("Votes", "Voters on the electoral roll", "Votes cast"),
+}
+
+
+def turnout(table: str, label: str) -> tuple[int | None, int | None]:
+    """Registered voters and votes cast, in total, for one election of a national overview table."""
+    dim, registered, cast = TURNOUT[table]
+    g = grid(table)
+    return (
+        g.get(Year=label, **{dim: registered, "Sex": "Total"}),
+        g.get(Year=label, **{dim: cast, "Sex": "Total"}),
+    )
+
+
+# ---------------------------------------------------------------- Althing
+
+CONSTITUENCY_TABLES = {
+    2003: "KOS02122",
+    2007: "KOS02122",
+    2009: "KOS02122",
+    2013: "KOS02118c",
+    2016: "KOS02118b",
+    2017: "KOS02118a",
+    2021: "KOS02019",
+    2024: "KOS02018",
+}
+ALTHING_METHOD = (
+    SOURCE_NOTE
+    + "Votes are the valid votes for each list. Voters on the electoral roll and votes cast are counted in each "
+    "municipality, and blank and void ballots in each constituency, so each is stored at the unit where the source "
+    "counts it."
+)
+
+
+def lookup(g: Grid, **by: str) -> int | None:
+    """One cell of a table whose dimension names differ from table to table, addressed by role."""
+    where: dict[str, str] = {}
+    for dim in g.dims:
+        role = (
+            "year"
+            if dim.startswith("Year")
+            else "cat"
+            if dim == "Category"
+            else "org"
+            if dim.startswith("Political")
+            else "const"
+            if dim.startswith("Constituency")
+            else dim
+        )
+        where[dim] = by[role]
+    return g.get(**where)
+
+
+def year_of(label: str) -> int:
+    match = re.search(r"(\d{4})\s*$", label)
+    if match:
+        return int(match.group(1))
+    return 1900 + int(label.split()[-1])
+
+
+def option_kind(label: str) -> str:
+    pid = party_id_of(label)
+    return "others" if pid in OTHERS else "independents" if pid in INDEPENDENTS else "list"
+
+
+def althing(event: Event) -> Package:
+    year = event.day.first.year
+    if event.kind == "special" or event.day.first < date(1959, 10, 1):
+        return turnout_only(event)
+    b = Build(event, f"The {event.stamp} Althing election by constituency from Statistics Iceland")
+    registered, cast = turnout("KOS01900", event.label)
+    blank, void = blank_void(event, "general")
+    b.cite("KOS01900", "KOS02000")
+    if year < 2003:
+        return althing_national(b, event, registered, cast, blank, void)
+    return althing_constituencies(b, event, registered, cast)
+
+
+def turnout_only(event: Event) -> Package:
+    table = "KOS02002" if event.kind == "special" else "KOS01900"
+    b = Build(
+        event,
+        f"The {event.stamp} Althing election, national turnout from Statistics Iceland"
+        if event.kind != "special"
+        else f"The {event.stamp} election of nationally elected Althing members, national turnout",
+    )
+    b.cite(table, "KOS02000")
+    registered, cast = turnout(table, event.label)
+    blank, void = blank_void(event, "general")
+    result_set = b.result_set(
+        "turnout",
+        None,
+        SOURCE_NOTE + "Statistics Iceland publishes only the number of voters on the electoral roll and of votes cast "
+        "for this election, nationwide, and the blank and void ballots where its table of them lists the election. "
+        "No results by party or constituency are published.",
+    )
+    unit = b.national()
+    for measure, value in ((2, registered), (3, cast), (6, blank), (5, void)):
+        b.value(result_set, unit, None, measure, value)
+        b.declare(result_set, None, measure, value)
+    dated(b, event)
+    return b.p
+
+
+def dated(b: Build, event: Event) -> None:
+    if event.kind == "general" and event.day.first.year in (1908, 1914):
+        other = "11 April 1908" if event.day.first.year == 1908 else "10 September 1914"
+        b.caveat(
+            f"Statistics Iceland's overview table dates this election {event.day.text.split(', ', 1)[1]}, "
+            f"while its table of participation in Althing elections dates it {other}."
+        )
+    if event.kind == "presidential" and event.day.first.year in (1952, 2004):
+        other = {1952: "29 July 1952", 2004: "26 May 2004"}[event.day.first.year]
+        b.caveat(
+            f"Statistics Iceland's overview table dates this election {other}, while its table of presidential "
+            f"elections dates it {event.day.text.split(', ', 1)[1]} {event.day.first.year}."
+        )
+
+
+def althing_national(
+    b: Build, event: Event, registered: int | None, cast: int | None, blank: int | None, void: int | None
+) -> Package:
+    year = event.day.first.year
+    g = grid("KOS02124")
+    label = next(text for text in g.labels["Year"] if year_of(text) == year)
+    b.cite("KOS02124")
+    seats = None
+    national = grid("KOS02121")
+    if year >= 1963:
+        b.cite("KOS02121")
+        seats = national.get(Category="Members elected", **{"Political organisation": "Total"}, Year=str(year))
+    contest = b.contest(
+        "althing",
+        (f"{event.day.first.year} Althing election", f"Alþingiskosningar {year}"),
+        kind="list_allocation",
+        where=TERRITORY,
+        system=SYSTEM_1959,
+        body_id=ALTHING_BODY,
+        magnitude=seats,
+        round_number=1,
+    )
+    result_set = b.result_set(
+        "althing",
+        contest,
+        ALTHING_METHOD.replace(
+            "Voters on the electoral roll and votes cast are counted in each municipality, and blank and void "
+            "ballots in each constituency, so each is stored at the unit where the source counts it.",
+            "Votes are published for each of the eight constituencies in force until 1999. Voters on the electoral "
+            "roll, votes cast, and blank and void ballots are published only for the whole country and are stored "
+            "at a national unit. Seats are published only for the whole country.",
+        ),
+    )
+    consts = [c for c in g.labels["Constituency"] if c != "Whole Country"]
+    options: dict[str, str] = {}
+    names = [n for n in g.labels["Political party"] if n != "Valid votes"]
+    for position, name in enumerate(names, 1):
+        totals = [g.get(Year=label, **{"Political party": name}, Constituency=c) for c in consts]
+        if all(v is None for v in totals) and g.get(Year=label, **{"Political party": name}, Constituency="Whole Country") is None:
+            continue
+        pid = party_id_of(name)
+        text = clean(name)
+        options[pid] = b.option(
+            contest,
+            pid,
+            text,
+            position,
+            option_kind(name),
+            party(pid) if option_kind(name) == "list" and pid in parties() else None,
+        )
+    sums: Counter[str] = Counter()
+    valid_sum = 0
+    for c in consts:
+        code = OLD[c]
+        unit = b.constituency(code)
+        valid = g.get(Year=label, **{"Political party": "Valid votes"}, Constituency=c)
+        b.value(result_set, unit, None, 4, valid)
+        valid_sum += valid or 0
+        for pid, option in options.items():
+            name = next(n for n in names if party_id_of(n) == pid)
+            v = g.get(Year=label, **{"Political party": name}, Constituency=c)
+            b.value(result_set, unit, option, 1, v)
+            sums[pid] += v or 0
+    whole = g.get(Year=label, **{"Political party": "Valid votes"}, Constituency="Whole Country")
+    mismatch(b, f"{year} valid votes by constituency", valid_sum, whole)
+    b.declare(result_set, None, 4, whole)
+    for pid, option in options.items():
+        name = next(n for n in names if party_id_of(n) == pid)
+        published = g.get(Year=label, **{"Political party": name}, Constituency="Whole Country")
+        mismatch(b, f"{year} {name}", sums[pid], published)
+        b.declare(result_set, option, 1, published)
+        if year >= 1963 and option_kind(name) == "list":
+            seated = national_seats(year, pid)
+            if seated:
+                b.outcome(result_set, option, seated)
+    national_unit = b.national()
+    for measure, value in ((2, registered), (3, cast), (6, blank), (5, void)):
+        b.value(result_set, national_unit, None, measure, value)
+        b.declare(result_set, None, measure, value)
+    if None not in (cast, blank, void):
+        mismatch(b, f"{year} ballots", whole, (cast or 0) - (blank or 0) - (void or 0))
+    dated(b, event)
+    return b.p
+
+
+def national_seats(year: int, pid: str) -> int | None:
+    g = grid("KOS02121")
+    for name in g.labels["Political organisation"]:
+        if party_id_of(name) == pid and name != "Total":
+            return g.get(Category="Members elected", **{"Political organisation": name}, Year=str(year))
+    return None
+
+
+def althing_constituencies(b: Build, event: Event, registered: int | None, cast: int | None) -> Package:
+    year = event.day.first.year
+    table = CONSTITUENCY_TABLES[year]
+    g = grid(table)
+    b.cite(table, "KOS02101", "KOS02123")
+    munis = grid("KOS02101")
+    ballots = grid("KOS02123")
+    by_constituency: dict[str, list[tuple[str, str]]] = {}
+    for c, name, label in hierarchy("KOS02101"):
+        if c is not None:
+            by_constituency.setdefault(c, []).append((name, label))
+    org_dim = next(d for d in g.dims if d.startswith("Political"))
+    const_dim = next(d for d in g.dims if d.startswith("Constituency"))
+    orgs = [n for n in g.labels[org_dim] if n != "Total"]
+    consts = {c: constituency(c, "new") for c in g.labels[const_dim]}
+    ballot_labels = {constituency(c, "new"): c for c in ballots.labels["Constituency"]}
+    ballot_labels["whole"] = "Whole country"
+    year_key = {"year": str(year)}
+
+    def cell(cat: str, org: str, const: str) -> int | None:
+        return lookup(g, cat=cat, org=org, const=const, **year_key)
+
+    def total_label(const: str) -> str:
+        return next(c for c in g.labels[const_dim] if consts[c] is None and c in ("Total", "Whole country"))
+
+    whole = total_label("")
+    reg_sum = cast_sum = 0
+    apart: list[str] = []
+    totals: Counter[str] = Counter()
+    for label, code in consts.items():
+        if code is None:
+            continue
+        seats = cell("Members elected", "Total", label)
+        english = CONSTITUENCIES[code][0]
+        contest = b.contest(
+            f"althing:{code}",
+            (f"{year} Althing election, {english}", f"Alþingiskosningar {year}, {CONSTITUENCIES[code][1]}"),
+            kind="list_allocation",
+            where=area("is.kjordaemi", code),
+            system=SYSTEM_2003,
+            body_id=ALTHING_BODY,
+            magnitude=seats,
+            round_number=1,
+        )
+        result_set = b.result_set(f"althing:{code}", contest, ALTHING_METHOD)
+        options: dict[str, str] = {}
+        for position, name in enumerate(orgs, 1):
+            votes = cell("Valid votes", name, label)
+            if votes is None:
+                continue
+            pid = party_id_of(name)
+            options[name] = b.option(
+                contest,
+                pid,
+                clean(name),
+                position,
+                option_kind(name),
+                party(pid) if option_kind(name) == "list" and pid in parties() else None,
+            )
+        unit = b.constituency(code)
+        valid = cell("Valid votes", "Total", label)
+        row = ballot_labels[code]
+        b.value(result_set, unit, None, 4, valid)
+        b.declare(result_set, None, 4, valid)
+        void = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Void ballots"})
+        blank = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Blank ballots"})
+        const_cast = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Votes cast"})
+        const_valid = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Valid votes"})
+        mismatch(b, f"{year} {english} valid votes", const_valid, valid)
+        mismatch(b, f"{year} {english} ballots", const_cast, (valid or 0) + (blank or 0) + (void or 0))
+        for measure, value in ((5, void), (6, blank)):
+            b.value(result_set, unit, None, measure, value)
+            b.declare(result_set, None, measure, value)
+        listed = 0
+        for name, option in options.items():
+            v = cell("Valid votes", name, label)
+            b.value(result_set, unit, option, 1, v)
+            b.declare(result_set, option, 1, v)
+            listed += v or 0
+            totals[party_id_of(name)] += v or 0
+            won = cell("Members elected", name, label)
+            if won:
+                b.outcome(result_set, option, won)
+        mismatch(b, f"{year} {english} list votes", listed, valid)
+        registered_here = cast_here = 0
+        for name, printed in by_constituency.get(code, []):
+            r = munis.get(Municipality=printed, Year=str(year), Category="Voters on the electroral roll", Sex="Total")
+            c = munis.get(Municipality=printed, Year=str(year), Category="Votes cast", Sex="Total")
+            if r is None and c is None:
+                continue
+            mu = b.municipality(name)
+            b.value(result_set, mu, None, 2, r)
+            b.value(result_set, mu, None, 3, c)
+            registered_here += r or 0
+            cast_here += c or 0
+        constituency_label = next(
+            lab for lab in munis.labels["Municipality"] if constituency(lab, "new") == code
+        )
+        published_registered = munis.get(
+            Municipality=constituency_label, Year=str(year), Category="Voters on the electroral roll", Sex="Total"
+        )
+        published_cast = munis.get(Municipality=constituency_label, Year=str(year), Category="Votes cast", Sex="Total")
+        mismatch(b, f"{year} {english} registered voters by municipality", registered_here, published_registered)
+        mismatch(b, f"{year} {english} votes cast by municipality", cast_here, published_cast)
+        if cast_here != const_cast:
+            apart.append(f"{english} {cast_here:,} against {const_cast:,}")
+        b.declare(result_set, None, 2, published_registered)
+        b.declare(result_set, None, 3, published_cast)
+        reg_sum += registered_here
+        cast_sum += cast_here
+    mismatch(b, f"{year} registered voters", reg_sum, registered)
+    mismatch(b, f"{year} votes cast", cast_sum, cast)
+    if apart:
+        b.caveat(
+            "Statistics Iceland's table of votes cast by municipality and its table of ballots by constituency add up "
+            "to the same national total but differ in some constituencies (municipal total against constituency "
+            "total: " + "; ".join(apart) + "). Votes cast are stored for each municipality, and blank and void "
+            "ballots and list votes for each constituency, as printed."
+        )
+    for name in orgs:
+        published = cell("Valid votes", name, whole)
+        if published is not None:
+            mismatch(b, f"{year} {name} nationwide", totals[party_id_of(name)], published)
+    dated(b, event)
+    return b.p
+
+
+# ---------------------------------------------------------------- run
+
+
+def build(event: Event) -> Package:
+    if event.kind in ("general", "special"):
+        return althing(event)
+    raise NotImplementedError(event.ekey)
+
+
+def parse() -> None:
+    geo().write()
+    registry().write()
+    for event in events():
+        try:
+            build(event).write()
+        except NotImplementedError:
+            pass
+
+
+def emit() -> None:
+    package.run("load", packages())
