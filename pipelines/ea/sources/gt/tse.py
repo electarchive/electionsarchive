@@ -332,7 +332,7 @@ def geo() -> Package:
         "note",
         id=key("note", area("gt.distrito", "01")),
         entity_id=area("gt.distrito", "01"),
-        kind="description",
+        kind="context",
         body_md="The department of Guatemala without Guatemala City, which elects its deputies as the Distrito "
         "Central.",
         lang="en",
