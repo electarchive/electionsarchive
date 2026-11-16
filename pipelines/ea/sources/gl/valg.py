@@ -117,14 +117,39 @@ def stamps() -> list[str]:
 
 def fetch() -> None:
     missing = [e for e in ELECTIONS if e.url not in raw.keys(SOURCE)]
-    if not missing:
-        return
-    with tempfile.TemporaryDirectory() as folder:
-        subprocess.run(["node", str(CRAWLER), folder, *(e.label for e in missing)], check=True, timeout=7200)
-        for e in missing:
-            content = (Path(folder) / f"{e.label.replace(' ', '-')}.json").read_bytes()
-            when = datetime.fromisoformat(json.loads(content)["retrieved_at"])
-            raw.store(SOURCE, e.url, content, suffix=".json", retrieved_at=when, media_type="application/json")
+    for attempt in range(3):
+        if not missing:
+            return
+        with tempfile.TemporaryDirectory() as folder:
+            subprocess.run(["node", str(CRAWLER), folder, *(e.label for e in missing)], check=True, timeout=7200)
+            again = []
+            for e in missing:
+                content = (Path(folder) / f"{e.label.replace(' ', '-')}.json").read_bytes()
+                try:
+                    reconcile(load(content))
+                except ValueError as error:
+                    print(f"{e.label}: {error}", flush=True)
+                    again.append(e)
+                    continue
+                when = datetime.fromisoformat(json.loads(content)["retrieved_at"])
+                raw.store(SOURCE, e.url, content, suffix=".json", retrieved_at=when, media_type="application/json")
+        missing = again
+    if missing:
+        raise ValueError(f"the polling places of {', '.join(e.label for e in missing)} do not add up to the totals")
+
+
+def reconcile(data: Crawl) -> None:
+    """Check that the polling places add up to the party totals the site prints for every municipality and for the
+    country. The site draws a table a moment after it is chosen, so a crawl that read one too early shows here."""
+    stations = {name: results(page) for name, page in data.stations.items()}
+    for scope, page in data.totals.items():
+        printed = {line.party: line.votes for line in results(page)}
+        found: dict[str, int] = {}
+        for name in data.kommuner.get(scope, stations):
+            for line in stations[name]:
+                found[line.party] = found.get(line.party, 0) + line.votes
+        if found != printed:
+            raise ValueError(f"{data.election}, {scope}: polling places add up to {found}, the site prints {printed}")
 
 
 def parse() -> None:
@@ -138,10 +163,27 @@ def emit() -> None:
     package.run("load", packages())
 
 
+@dataclass(frozen=True)
+class Crawl:
+    election: str
+    overview: str  # the overview page's HTML
+    mandates: str  # the seats and substitutes page's HTML
+    totals: dict[str, str]  # the results table of the whole country ("Alle") and of each municipality
+    kommuner: dict[str, list[str]]  # each municipality's polling places
+    stations: dict[str, str]  # each polling place's results table
+
+
+def load(content: bytes) -> Crawl:
+    found = json.loads(content)
+    return Crawl(
+        found["election"], found["overview"], found["mandates"], found["totals"], found["kommuner"], found["stations"]
+    )
+
+
 @functools.cache
-def crawl(label: str) -> dict[str, object]:
+def crawl(label: str) -> Crawl:
     e = next(e for e in ELECTIONS if e.label == label)
-    return json.loads(raw.cached(SOURCE, e.url).path.read_bytes())
+    return load(raw.cached(SOURCE, e.url).path.read_bytes())
 
 
 # Reading the rendered pages.
@@ -160,11 +202,11 @@ class Line:
     party: str  # the site's letters for the party
     name: str  # the party's name
     own: int  # votes for the list alone
-    candidates: tuple[tuple[str, int], ...]
+    candidates: tuple[tuple[str, str, int], ...]  # an id that tells apart two candidates of one name, the name, votes
 
     @property
     def votes(self) -> int:
-        return self.own + sum(n for _, n in self.candidates)
+        return self.own + sum(n for _, _, n in self.candidates)
 
 
 def results(page: str) -> list[Line]:
@@ -175,7 +217,7 @@ def results(page: str) -> list[Line]:
     lines: list[Line] = []
     code = name = ""
     own = 0
-    people: list[tuple[str, int]] = []
+    people: list[tuple[str, str, int]] = []
     for kind, row in re.findall(
         r'<tr class="th +(party|small)">(.*?)</tr>', page[start : page.find("</table>")], flags=re.DOTALL
     ):
@@ -192,7 +234,9 @@ def results(page: str) -> list[Line]:
                 raise ValueError(f"party row without a code: {row[:200]}")
             code, name, own, people = clean(tag.group(1)), clean(tag.group(2)), votes, []
         else:
-            people.append((clean(cells[0]), votes))
+            who = clean(cells[0])
+            same = sum(1 for _, name_, _ in people if name_ == who)
+            people.append((who if not same else f"{who} #{same + 1}", who, votes))
     if code:
         lines.append(Line(code, name, own, tuple(people)))
     return lines
@@ -210,7 +254,8 @@ def members(page: str) -> tuple[list[Member], list[Member]]:
     """The elected members and the substitutes the site lists, by district and party."""
     out: dict[str, list[Member]] = {"Mandatliste": [], "Stedfortræderliste": []}
     for table in re.findall(r"<table>.*?</table>", page, flags=re.DOTALL):
-        title = clean(re.search(r"<th[^>]*>(.*?)</th>", table, flags=re.DOTALL).group(1))  # ty: ignore[possibly-unbound-attribute]
+        heading = re.search(r"<th[^>]*>(.*?)</th>", table, flags=re.DOTALL)
+        title = clean(heading.group(1)) if heading else ""
         district = code = ""
         for cls, row in re.findall(r'<tr class="([^"]*)">(.*?)</tr>', table, flags=re.DOTALL):
             cells = re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.DOTALL)
@@ -219,16 +264,29 @@ def members(page: str) -> tuple[list[Member], list[Member]]:
             elif "party" in cls.split():
                 tag = re.search(r'<span class="party-logo[^"]*">(.*?)</span>', cells[0], flags=re.DOTALL)
                 code = clean(tag.group(1)) if tag else ""
+                code = "?" if code == "Others" else code  # the seat list's own letters for independent candidates
             else:
                 out[title].append(Member(district, code, clean(cells[0]), number(cells[1])))
     return out["Mandatliste"], out["Stedfortræderliste"]
 
 
-def totals(page: str) -> tuple[int, int] | None:
-    """The ballots counted and the registered voters the overview prints."""
+def totals(page: str) -> tuple[int, int | None] | None:
+    """The ballots counted and the registered voters the overview prints; the registered voters of the first
+    municipal elections are printed as 0, which stands for unknown."""
     text = clean(page)
     found = re.search(r"Stemmer optalt ([\d.]+) ud af ([\d.]+)", text)
-    return None if found is None else (number(found.group(1)), number(found.group(2)))
+    if found is None:
+        return None
+    return number(found.group(1)), number(found.group(2)) or None
+
+
+def notices(page: str) -> list[str]:
+    """The paragraphs the authority prints above the seat lists, such as a correction."""
+    return [
+        clean(text)
+        for text in re.findall(r'<p style="padding-bottom:1rem">(.*?)</p>', page, flags=re.DOTALL)
+        if clean(text)
+    ]
 
 
 def overview_votes(page: str) -> dict[str, int]:
@@ -264,7 +322,7 @@ def municipalities() -> dict[str, str]:
     """The municipality names the site lists in any election, by area code."""
     found: dict[str, str] = {}
     for e in ELECTIONS:
-        for name in crawl(e.label)["kommuner"]:  # ty: ignore[invalid-argument-type]
+        for name in crawl(e.label).kommuner:
             found.setdefault(slug(place_name(str(name))), place_name(str(name)))
     return found
 
@@ -303,17 +361,18 @@ def geo() -> Package:
 
 
 def municipality_spans() -> dict[str, tuple[date | None, date | None]]:
-    """The years a municipality's name appears in the site's lists, as the span its code is valid."""
-    years: dict[str, list[int]] = {}
+    """When a municipality's code stops being valid. The 18 municipalities of the first elections were merged into
+    four on 1 January 2009, and Qaasuitsup was split into Avannaata and Qeqertalik on 1 January 2018. The site names a
+    municipality in the elections held while it existed, and in later ones for the polling places it now covers."""
+    last: dict[str, int] = {}
     for e in ELECTIONS:
-        for name in crawl(e.label)["kommuner"]:  # ty: ignore[invalid-argument-type]
-            years.setdefault(slug(place_name(str(name))), []).append(e.day.year)
+        for name in crawl(e.label).kommuner:
+            code = slug(place_name(name))
+            last[code] = max(last.get(code, 0), e.day.year)
     spans: dict[str, tuple[date | None, date | None]] = {}
-    for code, found in years.items():
-        first, last = min(found), max(found)
-        since = None if first <= 2005 else date(first if first not in (2008, 2009) else 2009, 1, 1)
-        until = None if last >= 2025 else date(last + 1, 1, 1)
-        spans[code] = (since, until)
+    for code, year in last.items():
+        until = OLD_MUNICIPALITIES_END if year <= 2005 else QAASUITSUP_END if year < 2017 else None
+        spans[code] = (None, until)
     return spans
 
 
@@ -327,8 +386,8 @@ def party_key(code: str, name: str) -> str:
 def parties() -> dict[tuple[str, str], str]:
     found: dict[tuple[str, str], str] = {}
     for e in ELECTIONS:
-        for scope in crawl(e.label)["totals"].values():  # ty: ignore[invalid-argument-type, possibly-unbound-attribute]
-            for line in results(str(scope)):
+        for scope in crawl(e.label).totals.values():
+            for line in results(scope):
                 if line.party != "?":
                     found[(line.party, line.name)] = party_key(line.party, line.name)
     return found
@@ -417,12 +476,8 @@ def build(p: Package, e: Election, units: dict[str, str]) -> None:
     p.name(election, NATIVE[e.family].format(year=year), "da", "native", False)
     path = f"gl/{e.stamp}-{SLUGS[e.family]}"
     p.add("slug", path=path, entity_id=election, is_current=True)
-    stations: dict[str, str] = data["stations"]  # ty: ignore[invalid-assignment]
-    of_kommune = {
-        station: place_name(kommune)
-        for kommune, found in data["kommuner"].items()  # ty: ignore[possibly-unbound-attribute]
-        for station in found
-    }
+    stations = data.stations
+    of_kommune = {station: place_name(kommune) for kommune, found in data.kommuner.items() for station in found}
     for station in stations:
         if station not in units:
             units[station] = key("unit", e.stamp, station)
@@ -437,14 +492,24 @@ def build(p: Package, e: Election, units: dict[str, str]) -> None:
                 area_id=area(slug(home)) if home else COUNTRY,
                 kind="standard",
             )
-    listed, substitutes = members(str(data["mandates"]))
+    listed, _ = members(data.mandates)
+    for n, text in enumerate(notices(data.mandates)):
+        p.add(
+            "note",
+            id=key("note", election, "notice", n),
+            entity_id=election,
+            kind="caveat",
+            body_md=f"The authority's results site prints this notice (in Danish): {text}",
+            lang="en",
+        )
     if e.family == "local":
-        scopes = {place_name(k): k for k in data["kommuner"]}  # ty: ignore[possibly-unbound-attribute]
+        scopes = {place_name(k): k for k in data.kommuner}
     else:
         scopes = {"Grønland": "Alle"}
-    overview = totals(str(data["overview"]))
-    printed = {line.party: line.votes for line in results(str(data["totals"]["Alle"]))}  # ty: ignore[not-subscriptable]
-    if overview_votes(str(data["overview"])) != printed:
+    overview = totals(data.overview)
+    reconcile(data)
+    printed = {line.party: line.votes for line in results(data.totals["Alle"])}
+    if overview_votes(data.overview) != printed:
         raise ValueError(f"{e.label}: the overview and the results page print different party totals")
     for district, scope in scopes.items():
         contest(p, e, election, path, district, scope, data, units, of_kommune, listed, overview)
@@ -454,11 +519,11 @@ def build(p: Package, e: Election, units: dict[str, str]) -> None:
             id=key("note", election, "overview"),
             entity_id=election,
             kind="context",
-            body_md=f"The site's overview counts {overview[0]:,} ballots from {overview[1]:,} registered voters "
-            "across all the municipal councils.",
+            body_md=f"The site's overview counts {overview[0]:,} ballots"
+            + ("" if overview[1] is None else f" from {overview[1]:,} registered voters")
+            + " across all the municipal councils.",
             lang="en",
         )
-    _ = substitutes
 
 
 def contest(
@@ -468,16 +533,16 @@ def contest(
     path: str,
     district: str,
     scope: str,
-    data: dict[str, object],
+    data: Crawl,
     units: dict[str, str],
     of_kommune: dict[str, str],
     listed: list[Member],
-    overview: tuple[int, int] | None,
+    overview: tuple[int, int | None] | None,
 ) -> None:
     code = slug(district)
     here = [m for m in listed if m.district == district]
     contest = key("contest", e.stamp, e.family, code)
-    stations: dict[str, str] = data["stations"]  # ty: ignore[invalid-assignment]
+    stations = data.stations
     if e.family == "local":
         body, area_id = council(code), area(code)
         in_scope = [s for s in stations if of_kommune.get(s) == district]
@@ -519,7 +584,7 @@ def contest(
     options: dict[tuple[str, str], str] = {}
     lines: dict[tuple[str, str, str], str] = {}
     persons: dict[tuple[str, str], str] = {}
-    published: dict[str, list[Line]] = {station: results(str(stations[station])) for station in in_scope}
+    published: dict[str, list[Line]] = {station: results(stations[station]) for station in in_scope}
     named: dict[str, str] = {}
     for station in in_scope:
         for line in published[station]:
@@ -539,11 +604,11 @@ def contest(
             )
     for station in in_scope:
         for line in published[station]:
-            for person_name, _ in line.candidates:
-                if (line.party, person_name) in persons:
+            for ident, person_name, _ in line.candidates:
+                if (line.party, ident) in persons:
                     continue
-                tag = f"{e.stamp}:{e.family}:{code}:{line.party}:{person_name}"
-                person = persons[(line.party, person_name)] = key("person", tag)
+                tag = f"{e.stamp}:{e.family}:{code}:{line.party}:{ident}"
+                person = persons[(line.party, ident)] = key("person", tag)
                 p.add("person", id=person)
                 p.name(person, person_name, "da", "official")
                 p.add(
@@ -556,10 +621,10 @@ def contest(
                     member_of_party_id=None if line.party == "?" else party_key(line.party, line.name),
                     is_independent=line.party == "?",
                 )
-                lines[(line.party, person_name, "")] = key("option", tag)
+                lines[(line.party, ident, "")] = key("option", tag)
                 p.add(
                     "contest_option",
-                    id=lines[(line.party, person_name, "")],
+                    id=lines[(line.party, ident, "")],
                     contest_id=contest,
                     kind="candidate",
                     parent_option_id=options[(line.party, "")],
@@ -571,7 +636,7 @@ def contest(
             for option, measure, value in (
                 (options[(line.party, "")], VOTES, line.votes),
                 (options[(line.party, "")], LEGEND, line.own),
-                *((lines[(line.party, who, "")], PREFERENCE, n) for who, n in line.candidates),
+                *((lines[(line.party, ident, "")], PREFERENCE, n) for ident, _, n in line.candidates),
             ):
                 p.add(
                     "result_value",
@@ -584,35 +649,42 @@ def contest(
                     flags=0,
                     value=value,
                 )
-    published_totals = results(str(data["totals"][scope]))  # ty: ignore[not-subscriptable]
+    published_totals = results(data.totals[scope])
     for line in published_totals:
         option = options[(line.party, "")]
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=line.votes)
         p.add("declared", result_set_id=result_set, option_id=option, measure=LEGEND, value=line.own)
-        for who, n in line.candidates:
+        for ident, _, n in line.candidates:
             p.add(
                 "declared",
                 result_set_id=result_set,
-                option_id=lines[(line.party, who, "")],
+                option_id=lines[(line.party, ident, "")],
                 measure=PREFERENCE,
                 value=n,
             )
     if e.family != "local" and overview is not None:
         p.add("declared", result_set_id=result_set, option_id=None, measure=BALLOTS, value=overview[0])
-        p.add("declared", result_set_id=result_set, option_id=None, measure=REGISTERED, value=overview[1])
+        if overview[1] is not None:
+            p.add("declared", result_set_id=result_set, option_id=None, measure=REGISTERED, value=overview[1])
         p.accept(
             "accounting.declared",
             "the site prints the ballots counted and the registered voters only as national totals, not for each "
             "polling place, so there are no polling-place values to add up to them",
         )
     won: dict[str, int] = {}
+    personal = {(line.party, ident): (who, n) for line in published_totals for ident, who, n in line.candidates}
     for member in here:
         letters = member.party
-        who = [name for (code_, name, _), _ in lines.items() if code_ == letters and name == member.name]
+        # The seat list adds the candidate's place to a name that two candidates share, as "Hansen, Asmus - Narsaq".
+        who = [
+            ident
+            for (party, ident), (name, n) in personal.items()
+            if party == letters and name in (member.name, member.name.split(" - ")[0].strip()) and n == member.votes
+        ]
         if len(who) != 1:
             raise ValueError(f"{e.label} {district}: cannot place elected member {member.name} ({letters})")
         won[letters] = won.get(letters, 0) + 1
-        tag = f"{e.stamp}:{e.family}:{code}:{letters}:{member.name}"
+        tag = f"{e.stamp}:{e.family}:{code}:{letters}:{who[0]}"
         p.add(
             "outcome",
             result_set_id=result_set,

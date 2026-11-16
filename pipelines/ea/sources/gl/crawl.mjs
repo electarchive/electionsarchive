@@ -34,22 +34,28 @@ async function body(page) {
   return page.$eval(".rz-body", (element) => element.innerHTML.replace(/<svg[\s\S]*?<\/svg>/g, ""));
 }
 
-// The page redraws a moment after a choice, first with the old table or with empty counts, so wait until the
-// content has changed from what it was and then stopped changing.
-async function settle(page, before) {
+// The page redraws a moment after a choice, and on the way it shows the old table or the country's table. So wait
+// until the content is none of the tables to avoid and has stopped changing, and read it once more to be sure.
+async function settle(page, avoid) {
   let last = "";
   let steady = 0;
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 60; i++) {
     await sleep(400);
     const now = await body(page);
     if (now === last) steady++;
     else steady = 0;
     last = now;
-    if (steady >= 3 && (now !== before || i >= 15)) return;
+    if (steady >= 4 && !avoid.includes(now)) {
+      await sleep(800);
+      if ((await body(page)) === now) return;
+      steady = 0;
+    }
+    // A table equal to one to avoid that stays put for ten seconds really is that table.
+    if (i >= 25 && steady >= 4) return;
   }
 }
 
-async function pick(page, index, label) {
+async function pick(page, index, label, avoid = []) {
   const dropdown = page.locator(".rz-dropdown").nth(index);
   const id = await dropdown.getAttribute("id");
   const before = await body(page);
@@ -59,7 +65,7 @@ async function pick(page, index, label) {
     await sleep(300);
   }
   await item.click();
-  await settle(page, before);
+  await settle(page, [before, ...avoid]);
 }
 
 async function go(page, path) {
@@ -82,7 +88,12 @@ async function crawl(browser, election) {
   const kommuner = (await labels(page, 1)).filter((label) => !label.startsWith("Alle"));
   const all = (await labels(page, 3)).filter((label) => !label.startsWith("Alle"));
   for (const kommune of kommuner) {
-    await pick(page, 1, kommune);
+    for (let attempt = 0; attempt < 4; attempt++) {
+      await pick(page, 1, kommune, [result.totals["Alle"]]);
+      // A table that holds no party yet has not finished drawing.
+      if ((await body(page)).includes("party-logo")) break;
+      await pick(page, 1, "Alle Kommuner");
+    }
     result.kommuner[kommune] = (await labels(page, 3)).filter((label) => !label.startsWith("Alle"));
     result.totals[kommune] = await body(page);
   }
@@ -90,10 +101,11 @@ async function crawl(browser, election) {
   await page.close();
   page = await open(browser, "/resultater");
   await pick(page, 0, election);
+  const everything = await body(page);
   for (const station of all) {
     for (let attempt = 0; ; attempt++) {
       try {
-        await pick(page, 3, station);
+        await pick(page, 3, station, [everything]);
         result.stations[station] = await body(page);
         break;
       } catch (error) {
@@ -114,7 +126,7 @@ await first.close();
 if (only.length) elections = elections.filter((label) => only.includes(label));
 writeFileSync(`${out}/elections.json`, JSON.stringify(elections));
 const queue = [...elections];
-const workers = Array.from({ length: 3 }, async () => {
+const workers = Array.from({ length: 2 }, async () => {
   while (queue.length) {
     const election = queue.shift();
     for (let attempt = 0; ; attempt++) {
