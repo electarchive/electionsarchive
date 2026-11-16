@@ -459,7 +459,7 @@ def registry() -> Package:
         p.add("external_id", entity_id=id, scheme="gt.tse.organizacion", value=f"2023:{code}")
         color = info.get("color", "")
         if re.fullmatch(r"[0-9A-Fa-f]{6}", color):
-            p.add("party_color", party_id=id, color=f"#{color.upper()}", source_id=SOURCE_ID)
+            p.add("party_color", party_id=id, color=f"#{color.lower()}", source_id=SOURCE_ID)
     return p
 
 
