@@ -947,16 +947,16 @@ CANONICAL = {
 }
 ALIASES = {name: abbr for abbr, names in CANONICAL.items() for name in names}
 COLORS = {
-    "M": "#52BDEC",
+    "M": "#52bdec",
     "C": "#009933",
-    "L": "#006AB3",
+    "L": "#006ab3",
     "KD": "#000077",
-    "S": "#E8112D",
-    "V": "#DA291C",
-    "MP": "#83CF39",
-    "SD": "#DDDD00",
-    "FI": "#CD1B68",
-    "PP": "#572B85",
+    "S": "#e8112d",
+    "V": "#da291c",
+    "MP": "#83cf39",
+    "SD": "#dddd00",
+    "FI": "#cd1b68",
+    "PP": "#572b85",
 }
 
 

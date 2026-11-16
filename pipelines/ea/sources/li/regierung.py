@@ -51,7 +51,7 @@ PARTIES = {
     "DPL": "Demokraten Pro Liechtenstein",
 }
 # Party colors as the results site draws them.
-COLORS = {"FBP": "#4D4E50", "VU": "#CC0033", "FL": "#BBBBBB", "DPL": "#005FAB"}
+COLORS = {"FBP": "#4d4e50", "VU": "#cc0033", "FL": "#bbbbbb", "DPL": "#005fab"}
 METHOD = (
     "Counted by the municipalities and reported by the government's Landtag results site per municipality. "
     "Registered voters are the electoral roll (Stimmberechtigte). Voters are the voting cards cast (Stimmkarten), "
