@@ -806,7 +806,12 @@ class Build:
 
 
 # Where two of Statistics Iceland's own tables disagree, the pair of figures and what the package does about it.
-KNOWN: dict[str, tuple[int, int]] = {}
+KNOWN: dict[str, tuple[int, int]] = {
+    "2012 votes cast nationwide (participation table, results table)": (163294, 163251),
+    "2016 votes cast nationwide (participation table, results table)": (185430, 185390),
+    "2020 votes cast nationwide (participation table, results table)": (168790, 168821),
+    "2024 votes cast nationwide (participation table, results table)": (215644, 215635),
+}
 
 
 def mismatch(b: Build, what: str, ours: int | None, theirs: int | None) -> None:
@@ -814,8 +819,8 @@ def mismatch(b: Build, what: str, ours: int | None, theirs: int | None) -> None:
         return
     if KNOWN.get(what) == (ours, theirs):
         b.caveat(
-            f"Statistics Iceland's tables disagree on {what.split(' ', 1)[1]}: {ours:,} in one table and "
-            f"{theirs:,} in another. Both figures are kept as printed."
+            f"Statistics Iceland's tables disagree on {what.split(' ', 1)[1]}: {ours:,} in the first and "
+            f"{theirs:,} in the second. Each figure is stored as its table prints it."
         )
         return
     if os.environ.get("IS_DISCOVER"):
@@ -1240,12 +1245,171 @@ def althing_constituencies(b: Build, event: Event, registered: int | None, cast:
     return b.p
 
 
+# ---------------------------------------------------------------- presidency
+
+
+def candidate_name(label: str, year: int) -> tuple[str, bool]:
+    """A candidate's name from a label such as 'Katrín Jakobsdóttir 2024', and whether the label is the total row."""
+    text = re.sub(rf"\s*{year}\s*$", "", clean(label))
+    return text, text in ("Total", "Alls")
+
+
+def president(event: Event) -> Package:
+    year = event.day.first.year
+    old = year < 2004
+    b = Build(event, f"The {year} Icelandic presidential election by constituency from Statistics Iceland")
+    registered, cast = turnout("KOS02004", event.label)
+    blank_n, void_n = blank_void(event, "presidential")
+    totals = grid("KOS07100")
+    cons = grid("KOS07104" if old else "KOS07102")
+    cands = grid("KOS07112" if old else "KOS07110")
+    b.cite("KOS02004", "KOS02000", "KOS07100", "KOS07104" if old else "KOS07102", "KOS07112" if old else "KOS07110")
+    cand_dim = cands.dims[0]
+    unit_dim = "Unit" if old else "Valid votes"
+    number = "Number valid votes" if old else "Number"
+    whole = "Whole Country" if old else "Whole country"
+    cons_whole = "Whole Country" if old else "Whole Country"
+    labels = cands.labels[cand_dim]
+    names = []
+    for label in labels:
+        name, total = candidate_name(label, year)
+        if label.rstrip().endswith(str(year)) and not total:
+            names.append((name, label))
+    total_label = next(label for label in labels if label.rstrip().endswith(str(year)) and candidate_name(label, year)[1])
+    contest = b.contest(
+        "president",
+        (f"{year} Icelandic presidential election", f"Forsetakosningar {year}"),
+        kind="office",
+        where=TERRITORY,
+        system=SYSTEM_PRESIDENT,
+        office=PRESIDENCY,
+        magnitude=1,
+        round_number=1,
+    )
+    muni_years = grid("KOS07002").labels["Year"]
+    has_municipal = str(year) in muni_years
+    if has_municipal:
+        b.cite("KOS07002")
+    if not old:
+        b.cite("KOS07000")
+    note = SOURCE_NOTE + (
+        "Candidates' votes, valid votes, blank ballots, and void ballots are counted in each constituency. "
+        + (
+            "Voters on the electoral roll and votes cast are counted in each municipality."
+            if has_municipal
+            else "Voters on the electoral roll and votes cast are counted in each constituency."
+            if not old
+            else "Votes cast are counted in each constituency, and voters on the electoral roll nationwide."
+        )
+    )
+    result_set = b.result_set("president", contest, note)
+    ys = str(year)
+    constituency_codes = (
+        {c: constituency(c, "old") for c in cons.labels["Constituency"] if c != "Whole Country"}
+        if old
+        else {c: constituency(c, "new") for c in cons.labels["Constituency"] if c != "Whole Country"}
+    )
+    options: dict[str, str] = {}
+    people: dict[str, str] = {}
+    votes_by_name = {}
+    for position, (name, label) in enumerate(names, 1):
+        total = (
+            cands.get(**{cand_dim: label, "Unit": number, "Constituency": whole})
+            if old
+            else cands.get(**{cand_dim: label, "Valid votes": number, "Constituency": whole})
+        )
+        votes_by_name[name] = total
+        options[name] = b.option(contest, name, name, position, "candidate")
+        person = people[name] = key("person", name)
+        if (key_ := ("person", person)) not in PERSONS:
+            PERSONS.add(key_)
+        b.p.add("candidacy", id=key("candidacy", b.ekey, name), person_id=person, option_id=options[name], role="head", ballot_name=name)
+        b.p.add("person", id=person, birth_precision=None)
+        b.p.name(person, name, "is", "official")
+    leader = max(votes_by_name, key=lambda n: votes_by_name[n] or 0)
+    for name, option in options.items():
+        b.outcome(result_set, option, None, "elected" if name == leader else "lost")
+    cast_sum = valid_sum = 0
+    totals_by_name: Counter[str] = Counter()
+    for label, code in constituency_codes.items():
+        assert code is not None, label
+        unit = b.constituency(code)
+        v_total = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Votes total" if old else "Votes cast total")
+        v_valid = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Valid votes")
+        v_blank = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Blank ballots")
+        v_void = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Void ballots")
+        mismatch(b, f"{year} {label} ballots", v_total, (v_valid or 0) + (v_blank or 0) + (v_void or 0))
+        for measure, value in ((4, v_valid), (6, v_blank), (5, v_void)):
+            b.value(result_set, unit, None, measure, value)
+        listed = 0
+        for name, cand_label in names:
+            v = (
+                cands.get(**{cand_dim: cand_label, "Unit": number, "Constituency": label})
+                if old
+                else cands.get(**{cand_dim: cand_label, "Valid votes": number, "Constituency": label})
+            )
+            b.value(result_set, unit, options[name], 1, v)
+            listed += v or 0
+            totals_by_name[name] += v or 0
+        mismatch(b, f"{year} {label} candidate votes", listed, v_valid)
+        cast_sum += v_total or 0
+        valid_sum += v_valid or 0
+        if not has_municipal:
+            b.value(result_set, unit, None, 3, v_total)
+            if not old:
+                reg = grid("KOS07000").get(
+                    Year=ys, Category="Voters on the electoral roll", Sex="Total", Constituency=label
+                )
+                b.value(result_set, unit, None, 2, reg)
+    if has_municipal:
+        g = grid("KOS07002")
+        reg_sum = mcast_sum = 0
+        for code, name, label in hierarchy("KOS07002"):
+            r = g.get(**{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total")
+            c = g.get(**{"Constituency/Municipality": label}, Year=ys, Category="Votes cast", Sex="Total")
+            if r is None and c is None:
+                continue
+            mu = b.municipality(name)
+            b.value(result_set, mu, None, 2, r)
+            b.value(result_set, mu, None, 3, c)
+            reg_sum += r or 0
+            mcast_sum += c or 0
+        mismatch(b, f"{year} registered voters by municipality", reg_sum, registered)
+        mismatch(b, f"{year} votes cast by municipality", mcast_sum, cast)
+        b.declare(result_set, None, 2, registered)
+        b.declare(result_set, None, 3, cast)
+    else:
+        national = b.national()
+        if old:
+            b.value(result_set, national, None, 2, registered)
+        b.declare(result_set, None, 2, registered)
+        b.declare(result_set, None, 3, cast)
+    for name, option in options.items():
+        b.declare(result_set, option, 1, votes_by_name[name])
+        mismatch(b, f"{year} {name} nationwide", totals_by_name[name], votes_by_name[name])
+    t_cast = totals.get(Year=ys, Votes="Votes cast total", Unit="Number")
+    t_valid = totals.get(Year=ys, Votes="Valid votes", Unit="Number")
+    mismatch(b, f"{year} votes cast nationwide", cast_sum, t_cast)
+    mismatch(b, f"{year} valid votes nationwide", valid_sum, t_valid)
+    mismatch(b, f"{year} votes cast nationwide (participation table, results table)", cast, t_cast)
+    b.declare(result_set, None, 4, t_valid)
+    b.declare(result_set, None, 6, totals.get(Year=ys, Votes="Blank ballots", Unit="Number"))
+    b.declare(result_set, None, 5, totals.get(Year=ys, Votes="Void ballots", Unit="Number"))
+    dated(b, event)
+    return b.p
+
+
+PERSONS: set[tuple[str, str]] = set()
+
+
 # ---------------------------------------------------------------- run
 
 
 def build(event: Event) -> Package:
     if event.kind in ("general", "special"):
         return althing(event)
+    if event.kind == "presidential":
+        return president(event)
     raise NotImplementedError(event.ekey)
 
 
