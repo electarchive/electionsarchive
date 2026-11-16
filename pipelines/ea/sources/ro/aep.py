@@ -1,5 +1,6 @@
 import re
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 import fastexcel
@@ -30,6 +31,14 @@ URLS = {
     "2016-s-post": f"{HOST}/eb0770eb-d78d-4227-9186-74a08f19d068/resource/978d9ace-7773-4f27-bbfc-4e97b56e4bbe/download/bvcs-1.csv",
     "2016-cd-seats": f"{HOST}/eb0770eb-d78d-4227-9186-74a08f19d068/resource/cf4cb1ce-6b00-4f11-8bde-e54d506d1e1e/download/mandate-pe-competitori-pe-circumscripii-cd.xlsx",
     "2016-s-seats": f"{HOST}/eb0770eb-d78d-4227-9186-74a08f19d068/resource/8e2b05cd-e996-4d01-bd82-a705ed4b779c/download/mandate-pe-competitori-pe-circumscripii-s.xlsx",
+    "2020-local": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/2fa331fd-5890-48b4-9c2f-7aa8e1c12835/download/bd_sectii_27.09.202024.01.2021.csv",
+    "2020-runoff": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/8be694cf-b14b-44f5-ad6a-7d87da1ad945/download/bd_p_11.10.2020.csv",
+    "2020-cj": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/cdfa62a7-ee8d-4a3f-bcee-cbfc560d26a2/download/pv_final_cntry_cj.csv",
+    "2020-cl": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/334e34f1-29a0-47c3-96cc-1cfd09b6b72a/download/pv_final_cntry_cl.csv",
+    "2020-p": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/dd5512c1-7f6f-4f90-9008-6b68553973b6/download/pv_final_cntry_p.csv",
+    "2020-pcj": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/bab685cf-1939-4203-86a2-db1f7a65cc32/download/pv_final_cntry_pcj.csv",
+    "2020-p2": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/128c0dde-a961-44ea-9332-72f67ac94ad0/download/pv_final_cntry_p_tur2.csv",
+    "2020-legend": f"{HOST}/a9ac2859-b244-479b-a3ab-dd077999babb/resource/1dfdfda8-4f50-46ef-8f3d-8e7bab096911/download/legenda.txt",
     "2019-ro": f"{HOST}/0d2548eb-a211-4321-a503-5520cedeeb97/resource/ce4cc92d-a239-4492-a7d8-e956bfb6ad25/download/rezultateromania.csv",
     "2019-abroad": f"{HOST}/0d2548eb-a211-4321-a503-5520cedeeb97/resource/ea7dc2a0-2c93-4fb0-ad6a-383f94d84a6a/download/rezultatestrainatate.csv",
     "2019-legend": f"{HOST}/0d2548eb-a211-4321-a503-5520cedeeb97/resource/9b897f4d-2998-476b-94e1-5675922736a7/download/legenda-eurparlamentare-2019.xlsx",
@@ -38,6 +47,8 @@ SUFFIX = {"xlsx": ".xlsx"}
 DAYS = {
     "2016-12-11": date(2016, 12, 11),
     "2019-05-26": date(2019, 5, 26),
+    "2020-09-27": date(2020, 9, 27),
+    "2020-10-11": date(2020, 10, 11),
     "2020-12-06": date(2020, 12, 6),
 }
 MINORITY = re.compile(r"^(UNIUNEA|ASOCIAȚIA|FEDERAȚIA|COMUNITATEA|FORUMUL) ")
@@ -66,6 +77,13 @@ def key(kind: str, *parts: object) -> str:
 
 
 AEP_SOURCE = key("source", "aep")
+LOCAL_COUNCIL = key("body", "local-council")
+COUNTY_COUNCIL = key("body", "county-council")
+BUCHAREST_COUNCIL = key("body", "bucharest-council")
+MAYOR = key("office", "mayor")
+GENERAL_MAYOR = key("office", "general-mayor")
+COUNTY_PRESIDENT = key("office", "county-council-president")
+SYSTEM_PLURALITY = key("electoral_system", "plurality")
 CHAMBER = key("body", "chamber")
 SENATE = key("body", "senate")
 SYSTEM_LIST = key("electoral_system", "list", "dhondt")
@@ -95,7 +113,8 @@ def is_minority(label: str) -> bool:
 
 def fetch() -> None:
     for url in URLS.values():
-        raw.fetch(SOURCE, url, suffix=".xlsx" if url.endswith(".xlsx") else ".csv")
+        suffix = Path(url).suffix
+        raw.fetch(SOURCE, url, suffix=suffix)
 
 
 def packages() -> list[str]:
@@ -193,6 +212,10 @@ def read_registry_labels() -> dict[str, str]:
                     label = label_of(column)
                     if independent(label) is None:
                         found.setdefault(canon(label), label)
+    for name in ("2020-local", "2020-runoff"):
+        for competitor in local_table(name)["Competitor"].unique().to_list():
+            if independent(competitor) is None:
+                found.setdefault(canon(competitor), label_of(competitor))
     for number, column in legend().items():
         if int(number[1:]) <= EP_LISTS:
             found.setdefault(canon(column), column)
@@ -244,6 +267,31 @@ def registry() -> Package:
         p.add("body", id=body, polity_id=ROMANIA, kind=kind)
         p.name(body, english, "en", "official")
         p.name(body, romanian, "ro", "native", False)
+    for body, kind, english, romanian in (
+        (LOCAL_COUNCIL, "council", "Local councils of Romania", "Consiliile locale"),
+        (COUNTY_COUNCIL, "council", "County councils of Romania", "Consiliile județene"),
+        (BUCHAREST_COUNCIL, "council", "General Council of Bucharest", "Consiliul General al Municipiului București"),
+    ):
+        p.add("body", id=body, polity_id=ROMANIA, kind=kind)
+        p.name(body, english, "en", "official")
+        p.name(body, romanian, "ro", "native", False)
+    for office, kind, english, romanian in (
+        (MAYOR, "mayor", "Mayor of a Romanian municipality, town, or commune", "Primar"),
+        (GENERAL_MAYOR, "mayor", "General Mayor of Bucharest", "Primarul General al Municipiului București"),
+        (COUNTY_PRESIDENT, "other", "President of a county council", "Președintele consiliului județean"),
+    ):
+        p.add("office", id=office, polity_id=ROMANIA, kind=kind)
+        p.name(office, english, "en", "official")
+        p.name(office, romanian, "ro", "native", False)
+    p.add("electoral_system", id=SYSTEM_PLURALITY, polity_id=ROMANIA, rules={"formula": "fptp"}, rules_version=1)
+    p.add(
+        "note",
+        id=key("note", SYSTEM_PLURALITY),
+        entity_id=SYSTEM_PLURALITY,
+        kind="methodology",
+        body_md="The candidate with the most votes in a single round is elected.",
+        lang="en",
+    )
     p.add("electoral_system", id=SYSTEM_LIST, polity_id=ROMANIA, rules={"formula": "dhondt"}, rules_version=1)
     p.add(
         "note",
@@ -279,11 +327,15 @@ def build(day: str) -> Package:
         f"ro.aep/{day}",
         SOURCE,
         f"The Romanian elections of {first} by polling station, from the Permanent Electoral Authority's open data",
-        depends=["ro.aep/registry"],
+        depends=["ro.aep/registry", *(["ro.aep/2020-09-27"] if day == "2020-10-11" else [])],
     )
     p.external.add(ROMANIA)
     if day == "2019-05-26":
         european(p, day, first)
+    elif day == "2020-09-27":
+        local(p, day, first)
+    elif day == "2020-10-11":
+        runoff(p, day, first)
     else:
         parliament(p, day, first)
     accept(p)
@@ -601,3 +653,376 @@ def european(p: Package, day: str, first: date) -> None:
                 is_independent=True,
             )
     values(p, result_set, frame, options)
+
+
+def local_table(name: str) -> pl.DataFrame:
+    return csv(name).with_columns(pl.col("Competitor").str.strip_chars())
+
+
+LOCAL = {
+    # Tip: (council or office, scope, body or office id, system, English noun, Romanian noun, slug)
+    "CJ": ("list", "county", COUNTY_COUNCIL, SYSTEM_LIST, "County council", "Consiliul județean", "county-council"),
+    "PCJ": (
+        "office",
+        "county",
+        COUNTY_PRESIDENT,
+        SYSTEM_PLURALITY,
+        "County council president",
+        "Președinte de consiliu județean",
+        "county-president",
+    ),
+    "CL": ("list", "uat", LOCAL_COUNCIL, SYSTEM_LIST, "Local council", "Consiliul local", "local-council"),
+    "P": ("office", "uat", MAYOR, SYSTEM_PLURALITY, "Mayor", "Primar", "mayor"),
+    "CGMB": (
+        "list",
+        "all",
+        BUCHAREST_COUNCIL,
+        SYSTEM_LIST,
+        "General Council of Bucharest",
+        "Consiliul General al Municipiului București",
+        "bucharest-council",
+    ),
+    "PG": (
+        "office",
+        "all",
+        GENERAL_MAYOR,
+        SYSTEM_PLURALITY,
+        "General Mayor of Bucharest",
+        "Primarul General al Municipiului București",
+        "general-mayor",
+    ),
+}
+LOCAL_METHOD = (
+    "Counted per polling station and published by the Permanent Electoral Authority as open data. Registered voters "
+    "are the voters on the lists, ballots cast are the voters who took part, valid votes are the valid votes, and "
+    "invalid ballots are the null votes. A mayoral candidate and a county council president appear under the party "
+    "or alliance that nominated them, or as an independent; the station file prints no candidate names for parties. "
+    "The file covers the elections of 27 September 2020 and the partial elections of 24 January 2021 without dating "
+    "its rows."
+)
+ACCOUNTING_LOCAL = {"registered": "a", "cast": "b", "valid": "c", "invalid": "d"}
+
+
+def local_units(p: Package, data: pl.DataFrame, day: str) -> pl.DataFrame:
+    """Add one unit per polling station and return the rows with the unit id."""
+    stations = data.select("county_nce", "county_name", "nr_sv", "den_sv", "uat_name").unique(
+        ["county_nce", "nr_sv"], keep="first", maintain_order=True
+    )
+    codes = [f"{day}:{c}/{n}" for c, n in zip(stations["county_nce"], stations["nr_sv"], strict=True)]
+    ids = [key("unit", code) for code in codes]
+    p.frame(
+        "reporting_unit",
+        pl.DataFrame(
+            {
+                "id": ids,
+                "polity_id": ROMANIA,
+                "scheme_code": "ro.sv",
+                "code": codes,
+                "area_relation": "unlocated",
+                "kind": "standard",
+            }
+        ),
+    )
+    names = [
+        f"{' '.join(str(den or '').split())} ({' '.join(str(uat).split()).title()}, station {nr})"
+        for den, uat, nr in zip(stations["den_sv"], stations["uat_name"], stations["nr_sv"], strict=True)
+    ]
+    p.frame(
+        "name",
+        pl.DataFrame(
+            {
+                "id": [p.id("name", unit, "ro", "official", text) for unit, text in zip(ids, names, strict=True)],
+                "entity_id": ids,
+                "text": names,
+                "lang": "ro",
+                "kind": "official",
+                "is_preferred": True,
+            }
+        ),
+    )
+    lookup = pl.DataFrame({"county_nce": stations["county_nce"], "nr_sv": stations["nr_sv"], "unit": ids})
+    return data.join(lookup, on=["county_nce", "nr_sv"], how="left")
+
+
+def stage_values(p: Package, result_sets: pl.DataFrame, rows: pl.DataFrame, options: pl.DataFrame) -> None:
+    """`rows` holds one line per unit, contest key, and competitor; `options` maps contest and competitor to ids."""
+    accounting = rows.unique(["unit", "contest"], keep="first", maintain_order=True)
+    parts = []
+    for column, measure in (("registered", REGISTERED), ("cast", CAST), ("valid", VALID), ("invalid", INVALID)):
+        parts.append(
+            accounting.select(
+                "contest",
+                "unit",
+                pl.lit(None, pl.String).alias("option_id"),
+                pl.lit(measure, pl.Int16).alias("measure"),
+                pl.col(ACCOUNTING_LOCAL[column]).cast(pl.Int64, strict=False).alias("value"),
+            ).filter(pl.col("value").is_not_null())
+        )
+    joined = rows.join(options, on=["contest", "competitor"], how="left")
+    parts.append(
+        joined.select(
+            "contest",
+            "unit",
+            pl.col("option_id"),
+            pl.lit(VOTES, pl.Int16).alias("measure"),
+            pl.col("VVE").cast(pl.Int64, strict=False).alias("value"),
+        ).filter(pl.col("value").is_not_null())
+    )
+    stacked = pl.concat(parts).join(result_sets, on="contest", how="left")
+    p.frame(
+        "result_value",
+        stacked.select(
+            "result_set_id",
+            pl.col("unit").alias("unit_id"),
+            "option_id",
+            pl.lit(0, pl.Int16).alias("channel"),
+            "measure",
+            pl.lit(0, pl.Int16).alias("count_round"),
+            pl.lit(0, pl.Int16).alias("flags"),
+            "value",
+        ),
+    )
+
+
+def runoff(p: Package, day: str, first: date) -> None:
+    local(p, day, first, True)
+
+
+def local(p: Package, day: str, first: date, second: bool = False) -> None:
+    uses = ("2020-runoff",) if second else ("2020-local", "2020-cj", "2020-cl", "2020-p", "2020-pcj", "2020-legend")
+    for used in uses:
+        p.uses(raw.cached(SOURCE, URLS[used]))
+    election_name = "local2020-runoff" if second else "local2020"
+    table = local_table("2020-runoff") if second else local_table("2020-local")
+    if second:
+        table = table.rename({"TVVE": "VVE"}).with_columns(pl.lit("P").alias("Tip"))
+    data = local_units(p, table, day)
+    election = key("election", election_name)
+    p.add(
+        "election",
+        id=election,
+        polity_id=ROMANIA,
+        kind="runoff" if second else "local",
+        date_from=first,
+        date_to=first,
+        status="held",
+    )
+    suffix = "-runoff" if second else ""
+    p.add("slug", path=f"ro/{day}-local{suffix}", entity_id=election, is_current=True)
+    p.name(
+        election,
+        "2020 Romanian local elections, second round" if second else "2020 Romanian local elections",
+        "en",
+        "official",
+    )
+    p.name(
+        election,
+        "Alegeri locale, turul II, 11.10.2020" if second else "Alegeri locale din 27.09.2020",
+        "ro",
+        "native",
+        False,
+    )
+    built: dict[str, dict[str, set[str]]] = {}
+    for tip, (kind, scope, holder, system, english, romanian, slug) in LOCAL.items():
+        if second and tip != "P":
+            continue
+        part = data.filter(pl.col("Tip") == tip)
+        scopes = {
+            "county": pl.col("county_nce"),
+            "uat": pl.col("uat_siruta"),
+            "all": pl.lit("all"),
+        }[scope]
+        part = part.with_columns(
+            pl.format("{}-{}-{}", pl.lit("local2020r" if second else "local2020"), pl.lit(tip), scopes).alias(
+                "contest"
+            ),
+            pl.col("Competitor").map_elements(canon, return_dtype=pl.String).alias("competitor"),
+        )
+        contests = part.select(
+            "contest",
+            pl.col("county_name").first().over("contest").alias("county_name"),
+            pl.col("uat_name").first().over("contest").alias("uat_name"),
+            pl.col("county_nce").first().over("contest").alias("county_nce"),
+            pl.col("uat_siruta").first().over("contest").alias("uat_siruta"),
+        ).unique("contest", keep="first", maintain_order=True)
+        contest_ids, set_ids, rows_contest, names_en, names_ro, slugs, previous = [], [], [], [], [], [], []
+        for contest, county, uat, county_nce, siruta in contests.select(
+            "contest", "county_name", "uat_name", "county_nce", "uat_siruta"
+        ).iter_rows():
+            where = {
+                "county": f"{county.title()} County" if county_nce != "42" else "Bucharest",
+                "uat": " ".join(str(uat).split()).title(),
+                "all": "",
+            }[scope]
+            where_ro = where.replace(" County", "").replace("Bucharest", "București") if scope == "county" else where
+            cid = key("contest", contest)
+            rid = key("result_set", contest)
+            contest_ids.append(cid)
+            set_ids.append(rid)
+            rows_contest.append(contest)
+            names_en.append(
+                f"2020 Romanian local elections, {english}"
+                + (f", {where}" if where else "")
+                + (", second round" if second else "")
+            )
+            names_ro.append(
+                f"{romanian}" + (f", {where_ro}" if where_ro else "") + (", turul II" if second else "") + ", 2020"
+            )
+            slug_key = {"county": county_nce, "uat": siruta, "all": "bucharest"}[scope]
+            previous.append(key("contest", f"local2020-P-{siruta}") if second else None)
+            slugs.append(f"ro/{day}-local{suffix}/{slug}/{slug_key}")
+        fields: dict[str, object] = {
+            "election_id": election,
+            "kind": "list_allocation" if kind == "list" else "office",
+            "round_number": 2 if second else 1,
+            "default_result_kind": "counted",
+            "electoral_system_id": system,
+        }
+        if kind == "list":
+            fields["body_id"] = holder
+        else:
+            fields["office_id"] = holder
+            fields["magnitude"] = 1
+        p.frame(
+            "contest",
+            pl.DataFrame({"id": contest_ids, "previous_round_id": previous, **fields}),
+        )
+        p.frame(
+            "name",
+            pl.DataFrame(
+                {
+                    "id": [p.id("name", c, lang, "official") for c in contest_ids for lang in ("en", "ro")],
+                    "entity_id": [c for c in contest_ids for _ in range(2)],
+                    "text": [t for pair in zip(names_en, names_ro, strict=True) for t in pair],
+                    "lang": ["en", "ro"] * len(contest_ids),
+                    "kind": ["official", "native"] * len(contest_ids),
+                    "is_preferred": [True, False] * len(contest_ids),
+                }
+            ),
+        )
+        p.frame("slug", pl.DataFrame({"path": slugs, "entity_id": contest_ids, "is_current": True}))
+        p.frame(
+            "result_set",
+            pl.DataFrame(
+                {
+                    "id": set_ids,
+                    "election_id": election,
+                    "contest_id": contest_ids,
+                    "stage": "official",
+                    "kind": "counted",
+                    "source_id": AEP_SOURCE,
+                    "status": "active",
+                    "is_default": True,
+                    "completeness": 1.0,
+                }
+            ),
+        )
+        p.frame(
+            "note",
+            pl.DataFrame(
+                {
+                    "id": [key("note", r) for r in set_ids],
+                    "entity_id": set_ids,
+                    "kind": "methodology",
+                    "body_md": LOCAL_METHOD,
+                    "lang": "en",
+                }
+            ),
+        )
+        pairs = part.select("contest", "competitor", "Competitor").unique(
+            ["contest", "competitor"], keep="first", maintain_order=True
+        )
+        option_rows = []
+        for contest, competitor, label in pairs.iter_rows():
+            label = label_of(label)
+            option = key("option", contest, competitor)
+            person = independent(label)
+            option_rows.append((contest, competitor, option, label, person))
+        options = pl.DataFrame(
+            {
+                "contest": [r[0] for r in option_rows],
+                "competitor": [r[1] for r in option_rows],
+                "option_id": [r[2] for r in option_rows],
+            }
+        )
+        p.frame(
+            "contest_option",
+            pl.DataFrame(
+                {
+                    "id": [r[2] for r in option_rows],
+                    "contest_id": [key("contest", r[0]) for r in option_rows],
+                    "kind": ["candidate" if kind == "office" or r[4] else "list" for r in option_rows],
+                    "party_id": [None if r[4] else party_id(r[3]) for r in option_rows],
+                    "ballot_label": [r[4] or r[3] for r in option_rows],
+                }
+            ),
+        )
+        people = [r for r in option_rows if r[4]]
+        if people:
+            who = [key("person", r[2]) for r in people]
+            p.frame("person", pl.DataFrame({"id": who}))
+            p.frame(
+                "name",
+                pl.DataFrame(
+                    {
+                        "id": [p.id("name", w, "ro", "official") for w in who],
+                        "entity_id": who,
+                        "text": [(r[4] or "").title() for r in people],
+                        "lang": "ro",
+                        "kind": "official",
+                        "is_preferred": True,
+                    }
+                ),
+            )
+            p.frame(
+                "candidacy",
+                pl.DataFrame(
+                    {
+                        "id": [key("candidacy", r[2]) for r in people],
+                        "person_id": who,
+                        "option_id": [r[2] for r in people],
+                        "role": "head",
+                        "ballot_name": [(r[4] or "").title() for r in people],
+                        "is_independent": True,
+                    }
+                ),
+            )
+        sets = pl.DataFrame({"contest": rows_contest, "result_set_id": set_ids})
+        stage_values(p, sets, part, options)
+        built[tip] = {r[0]: set() for r in option_rows}
+        for r in option_rows:
+            built[tip][r[0]].add(r[2])
+    if not second:
+        declare_councils(p, built)
+
+
+def declare_councils(p: Package, built: dict[str, dict[str, set[str]]]) -> None:
+    """County totals and seats for the county councils and the General Council of Bucharest, as the Authority prints."""
+    frame = csv("2020-cj")
+    columns = frame.columns
+    stems = sorted({c.rsplit("-voturi", 1)[0] for c in columns if c.endswith("-voturi")})
+    for row in frame.iter_rows(named=True):
+        county = row["county_nce"]
+        tip, scope = ("CGMB", "all") if county == "42" else ("CJ", county)
+        contest = f"local2020-{tip}-{scope}"
+        result_set = key("result_set", contest)
+        known = built[tip].get(contest, set())
+        for measure, column in ((REGISTERED, "a"), (CAST, "b"), (VALID, "c"), (INVALID, "d")):
+            value = number(row[column])
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for stem in stems:
+            votes = number(row[f"{stem}-voturi"])
+            if votes is None:
+                continue
+            option = key("option", contest, canon(stem))
+            if option not in known:
+                option = key("option", contest, canon(f"CANDIDAT INDEPENDENT-{stem}"))
+            if option not in known:
+                if not votes:
+                    continue
+                raise ValueError(f"{contest}: declared votes for {stem} without a ballot line")
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+            seats = (number(row.get(f"{stem}-mandate-faza-1")) or 0) + (number(row.get(f"{stem}-mandate-faza-2")) or 0)
+            if seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
