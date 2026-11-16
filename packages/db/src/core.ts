@@ -64,6 +64,7 @@ export const areaFigureKind = pgEnum("area_figure_kind", ["population"])
 export const censusCategory = pgEnum("census_category", ["legislature", "executive", "council", "special_purpose", "judicial", "law_enforcement", "non_territorial", "indirect", "direct_democracy", "nominating"])
 export const censusDisposition = pgEnum("census_disposition", ["blocked", "out_of_scope"])
 export const censusAccessRole = pgEnum("census_access_role", ["administers", "publishes"])
+export const censusWorldStatus = pgEnum("census_world_status", ["own", "within", "none"])
 export const bodyControl = pgEnum("body_control", ["majority", "minority", "coalition", "noc", "mayor"])
 export const compositionBucket = pgEnum("composition_bucket", ["independent", "other", "vacant"])
 
@@ -982,6 +983,45 @@ export const censusMatch = pgTable("census_match", {
 	}),
 	index("census_match_class_idx").using("btree", table.classId.asc().nullsLast()),
 check("census_match_check", sql`(num_nonnulls(election_kinds, contest_kinds, body_kinds, office_kinds, polity_kinds, iso_pattern, name_pattern, body_id, office_id) > 0)`),check("census_match_check1", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),]);
+
+export const censusWorld = pgTable("census_world", {
+	isoCode: text("iso_code").primaryKey(),
+	nameEn: text("name_en").notNull(),
+	status: censusWorldStatus().notNull(),
+	withinIso: text("within_iso"),
+	reason: text(),
+	electorate: bigint({ mode: 'number' }),
+	electorateDate: date("electorate_date"),
+	electoratePrecision: datePrecision("electorate_precision"),
+	electorateSourceId: uuid("electorate_source_id"),
+	electorateLocator: text("electorate_locator"),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_world_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.electorateSourceId],
+		foreignColumns: [source.id],
+		name: "census_world_electorate_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "census_world_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.withinIso],
+		foreignColumns: [table.isoCode],
+		name: "census_world_within_iso_fkey"
+	}),
+	index("census_world_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+check("census_world_check", sql`((status = 'within'::census_world_status) = (within_iso IS NOT NULL))`),check("census_world_check1", sql`(within_iso IS DISTINCT FROM iso_code)`),check("census_world_check2", sql`((status = 'own'::census_world_status) OR (btrim(COALESCE(reason, ''::text)) <> ''::text))`),check("census_world_check3", sql`((electorate IS NULL) = (electorate_date IS NULL))`),check("census_world_check4", sql`((electorate IS NULL) OR ((electorate_source_id IS NOT NULL) AND (btrim(COALESCE(electorate_locator, ''::text)) <> ''::text)))`),check("census_world_electorate_check", sql`(electorate >= 0)`),check("census_world_iso_code_check", sql`(iso_code ~ '^[A-Z]{2}$'::text)`),check("census_world_locator_check", sql`(btrim(locator) <> ''::text)`),check("census_world_name_en_check", sql`(btrim(name_en) <> ''::text)`),]);
 
 export const censusTier = pgTable("census_tier", {
 	id: uuid().primaryKey(),
