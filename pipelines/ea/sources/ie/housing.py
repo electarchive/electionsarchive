@@ -68,6 +68,7 @@ AREAS = {
     "SOUTH": "south",
     "MIDLANDS - NORTH - WEST": "midlands-north-west",
 }
+UNITLESS = ("dublin", "south", "midlands-north-west")
 PARTIES = {
     "FF": ("Fianna Fáil", "F.F."),
     "FG": ("Fine Gael", "F.G."),
@@ -153,6 +154,23 @@ def registry() -> Package:
         "European Parliament elections in Ireland, and their electoral system",
     )
     p.external.add(IRELAND)
+    p.external.add(SCHEME)
+    for code in UNITLESS:
+        # production holds these constituencies' areas and contests but no reporting unit for them, so
+        # the registry adds the unit each contest's results hang on
+        area = existing("area:ie.ep_constituency@None", code)
+        p.external.add(area)
+        p.add(
+            "reporting_unit",
+            id=unit(code),
+            polity_id=IRELAND,
+            scheme_code=SCHEME,
+            code=code,
+            area_relation="equals",
+            area_id=area,
+            kind="standard",
+            valid_from=date(1979, 6, 7),
+        )
     id = source()
     p.add(
         "source",
@@ -267,7 +285,7 @@ def ep(year: int) -> Package:
         if ranked[seats].votes[-1] >= ranked[seats - 1].votes[-1] and ranked[seats].votes[-1] > 0:
             raise ValueError(f"{year} {table.constituency}: the elected set is not clear at the last count")
         contest = contest_id(year, code)
-        p.external |= {contest, unit(code)}
+        p.external |= {contest} | ({unit(code)} - {unit(c) for c in UNITLESS})
         result_set = key("result_set", day, code)
         p.add(
             "result_set",
