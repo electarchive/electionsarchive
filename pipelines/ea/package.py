@@ -1180,11 +1180,33 @@ READY_COLUMNS = """select a.attname, a.attnotnull,
    where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped"""
 
 
+def _minted(path: Path, batch: set[str]) -> set[str]:
+    """Ids that the packages this one depends on, inside the batch, create when they load before it."""
+    seen: set[str] = set()
+    todo = [str(key) for key in _manifest(path)["depends"]]
+    minted: set[str] = set()
+    while todo:
+        key = todo.pop()
+        if key in seen or key not in batch:
+            continue
+        seen.add(key)
+        folder_path = _resolve(key)
+        todo.extend(str(depend) for depend in _manifest(folder_path)["depends"])
+        for table in TABLES:
+            file = folder_path / f"{table}.parquet"
+            if file.exists() and "id" in pl.read_parquet_schema(file):
+                minted.update(pl.scan_parquet(file).select(pl.col("id").cast(pl.Utf8)).collect().to_series().to_list())
+    return minted
+
+
 def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
     path = _resolve(key)
     manifest = _manifest(path)
     found: list[str] = []
     missing = _missing(conn, manifest["external"])
+    if missing:
+        minted = _minted(path, batch)
+        missing = [value for value in missing if value not in minted]
     if missing:
         found.append(f"ready.external: {len(missing)} referenced ids are missing from the database: {missing[:5]}")
     for depend in manifest["depends"]:
