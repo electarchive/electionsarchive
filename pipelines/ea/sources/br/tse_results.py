@@ -377,7 +377,10 @@ def stage(year: int, only: tuple[str, ...] = ()) -> None:
     done.write_text("")
 
 
-COUNTRY = str(uuid5(package.NAMESPACE, "polity\x1fBR"))
+# Brazil came into the archive through the database path before packages existed, so its record carries a
+# database id rather than the uuid5 of its ISO code; packages reference that record directly. The court's own
+# states and sections get schemes of their own here, because br.uf and br.secao belong to that earlier record.
+COUNTRY = "01a13ba1-cd2c-7065-8397-2903884f736e"
 TSE_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1ftse"))
 UFS = {
     "AC": "Acre",
@@ -542,10 +545,10 @@ def geo() -> Package:
     )
     p.external.add(COUNTRY)
     for code, rank, kind, noun, system in (
-        ("br.uf", 1, "administrative", "state", None),
+        ("br.estado", 1, "administrative", "state", None),
         ("br.municipio", 2, "administrative", "municipality", "tse"),
         ("br.zona", 3, "electoral_district", "electoral zone", None),
-        ("br.secao", 4, "precinct", "polling section", None),
+        ("br.secao_eleitoral", 4, "precinct", "polling section", None),
     ):
         p.add("scheme", code=code, polity_id=COUNTRY, kind=kind, rank=rank, noun=noun, code_system=system)
     states: dict[str, str] = {}
@@ -562,15 +565,15 @@ def geo() -> Package:
             towns[int(code)] = (str(uf), str(name), year)
             states[str(uf)] = UFS.get(str(uf), str(uf))
     for uf, name in sorted(states.items()):
-        id = area("br.uf", uf)
-        p.add("area", id=id, scheme_code="br.uf")
+        id = area("br.estado", uf)
+        p.add("area", id=id, scheme_code="br.estado")
         p.add("area_code", area_id=id, code=uf)
         p.name(id, name, "pt", "official")
     for code, (uf, name, _) in sorted(towns.items()):
         id = area("br.municipio", code)
         p.add("area", id=id, scheme_code="br.municipio")
         p.add("area_code", area_id=id, code=str(code))
-        p.add("area_parent", area_id=id, parent_id=area("br.uf", uf))
+        p.add("area_parent", area_id=id, parent_id=area("br.estado", uf))
         p.name(id, name.title() if name.isupper() else name, "pt", "official")
     return p
 
@@ -727,7 +730,7 @@ def registry() -> Package:
     for (number, abbreviation), (_, name) in sorted(names.items()):
         id = party_id(number, abbreviation)
         p.add("party", id=id, kind="party", polity_id=COUNTRY)
-        p.add("external_id", entity_id=id, scheme="br.tse.party", value=f"{number}:{abbreviation}")
+        p.add("external_id", entity_id=id, scheme="br.tse_results.party", value=f"{number}:{abbreviation}")
         p.name(id, name, "pt", "official")
         p.name(id, abbreviation, "pt", "abbreviation", False)
     return p
@@ -1209,7 +1212,7 @@ def finish(
             body_id={5: SENATE, 6: CHAMBER, 7: ASSEMBLY, 8: DISTRICT, 13: COUNCIL}.get(cargo),
             district_area_id=None
             if cargo == 1
-            else area("br.uf", uf)
+            else area("br.estado", uf)
             if cargo in STATE_OFFICES
             else area("br.municipio", int(ue)),
             magnitude=magnitude,
@@ -1432,7 +1435,7 @@ def units(
         secs.select(
             pl.col("unit").alias("id"),
             pl.lit(COUNTRY).alias("polity_id"),
-            pl.lit("br.secao").alias("scheme_code"),
+            pl.lit("br.secao_eleitoral").alias("scheme_code"),
             pl.format("{}:{}:{}:{}:{}", pl.lit(str(day)), "SG_UF", "CD_MUNICIPIO", "zone", "NR_SECAO").alias("code"),
             pl.col("parent").alias("parent_id"),
             pl.lit("within").alias("area_relation"),
