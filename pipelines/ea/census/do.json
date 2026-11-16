@@ -1,0 +1,1869 @@
+{
+  "polity": "DO",
+  "name": "Dominican Republic",
+  "sources": {
+    "const2024": {
+      "title": "Constitución de la República Dominicana, proclamada el 27 de octubre de 2024",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=31453",
+      "kind": "official_body"
+    },
+    "ley20-23": {
+      "title": "Ley núm. 20-23 Orgánica del Régimen Electoral (G. O. núm. 11100 del 21 de febrero de 2023)",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=24762",
+      "kind": "official_body"
+    },
+    "historia": {
+      "title": "Historia de la Junta Central Electoral",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral",
+      "kind": "official_body"
+    },
+    "anteriores": {
+      "title": "Elecciones Anteriores: resultados electorales históricos 1962-2024",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores",
+      "kind": "official_body"
+    },
+    "boletines": {
+      "title": "Boletines históricos de resultados electorales, 1962-2004",
+      "publisher": "Junta Central Electoral",
+      "url": "http://resultadoselectorales.jce.gob.do/boletines/",
+      "kind": "official_body"
+    },
+    "repositorio": {
+      "title": "Portal de Transparencia: Resultados Electorales",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+      "kind": "official_body",
+      "note": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged"
+    },
+    "proclama-feb-2024": {
+      "title": "Proclama Electoral Elecciones Ordinarias Generales de los niveles de Alcaldías y Regidurías Municipales, Direcciones y Vocalías de Distritos Municipales del 18 de febrero del año 2024 (4 de diciembre de 2023)",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=28255",
+      "kind": "official_body"
+    },
+    "proclama-may-2024": {
+      "title": "Proclama Elecciones Presidenciales, Senatoriales y de Diputaciones del 19 de mayo de 2024",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=29815",
+      "kind": "official_body"
+    },
+    "ganadores-2024": {
+      "title": "Ganadores Elecciones Generales Ordinarias Presidenciales, Senatoriales y de Diputaciones 2024",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30611",
+      "kind": "official_body"
+    },
+    "escanos-2024": {
+      "title": "Resultados Escaños Congresual Elecciones Mayo 2024: relación general definitiva del cómputo electoral",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30615",
+      "kind": "official_body"
+    },
+    "municipal-2020": {
+      "title": "Resumen por posiciones, cómputo definitivo, Elecciones Extraordinarias Municipales del 15 de marzo de 2020",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=16976",
+      "kind": "official_body"
+    },
+    "computo-2020": {
+      "title": "Cómputo Electoral Definitivo, Elecciones Extraordinarias Municipales 2020",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=16969",
+      "kind": "official_body"
+    },
+    "proclama-2020": {
+      "title": "Proclama Electoral Elecciones Ordinarias Generales Presidenciales, Senatoriales y de Diputaciones del 17 de mayo del 2020",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=11462",
+      "kind": "official_body"
+    },
+    "candidatos-2020": {
+      "title": "Candidatos presidenciales y congresionales, Elecciones 5 de julio 2020",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=17865",
+      "kind": "official_body"
+    },
+    "ganadores-2016": {
+      "title": "Ganadores, cargos, votos Elecciones 2016",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=5404",
+      "kind": "official_body"
+    },
+    "res-073-2010": {
+      "title": "Resolución núm. 073-2010 de proclamación de los candidatos electos a senadores, diputados, diputados nacionales por acumulación de votos y diputados al Parlamento Centroamericano, período 2010-2016",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=3649",
+      "kind": "official_body"
+    },
+    "primarias-2023": {
+      "title": "Resultados resumido por demarcación y cargo, Primarias 2023",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=27571",
+      "kind": "official_body"
+    },
+    "primarias-2023-mesas": {
+      "title": "Resultados detalle por mesas de votos obtenidos de precandidatos por demarcación, Primarias 2023",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=27569",
+      "kind": "official_body"
+    },
+    "calendario-2020": {
+      "title": "Calendario de Actividades Administrativas y Plazos Legales 2017-2020",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=11463",
+      "kind": "official_body"
+    },
+    "primarias-2019": {
+      "title": "Informes de ingresos y gastos de precampaña para las primarias del 6 de octubre de 2019",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/portaltransparencia/Informes-de-Candidatos",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "nacion",
+      "name": "República Dominicana",
+      "name_en": "Dominican Republic",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "const2024"
+    },
+    {
+      "key": "provincia",
+      "name": "Provincias y Distrito Nacional",
+      "name_en": "Provinces and the National District",
+      "parent": "nacion",
+      "scheme": "do.provincia",
+      "source": "const2024",
+      "counts": [
+        {
+          "date": "2010-05-16",
+          "value": 32,
+          "source": "res-073-2010",
+          "locator": "Resolución 073-2010, proclamation: treinta y dos (32) senadores, uno por el Distrito Nacional y uno por cada provincia"
+        },
+        {
+          "date": "2024-05-19",
+          "value": 32,
+          "source": "proclama-may-2024",
+          "locator": "Cargos a elegir, numeral 2: Treinta y dos Senadores/as de las provincias y el Distrito Nacional"
+        }
+      ]
+    },
+    {
+      "key": "circunscripcion",
+      "name": "Circunscripciones electorales",
+      "name_en": "Chamber of Deputies circumscriptions",
+      "parent": "provincia",
+      "scheme": "do.circunscripcion",
+      "source": "ley20-23",
+      "counts": [
+        {
+          "date": "2024-05-19",
+          "value": 45,
+          "source": "escanos-2024",
+          "locator": "Relación general definitiva, DIPUTADOS: 45 tables (one per province or circumscription), 178 seats in all"
+        }
+      ]
+    },
+    {
+      "key": "exterior",
+      "name": "Circunscripciones electorales del exterior",
+      "name_en": "Circumscriptions of Dominicans abroad",
+      "parent": "nacion",
+      "scheme": "do.circunscripcion",
+      "source": "const2024",
+      "counts": [
+        {
+          "date": "2024-05-19",
+          "value": 3,
+          "source": "escanos-2024",
+          "locator": "Relación general definitiva, DIPUTADOS DE ULTRAMAR: circumscriptions 1, 2, and 3 (3, 2, and 2 seats)"
+        }
+      ]
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios y Distrito Nacional",
+      "name_en": "Municipalities and the National District",
+      "parent": "provincia",
+      "polity_kind": "municipality",
+      "scheme": "do.municipio",
+      "source": "const2024",
+      "counts": [
+        {
+          "date": "2016-05-15",
+          "value": 158,
+          "source": "ganadores-2016",
+          "locator": "Sheet2, nivel MUNICIPAL: 158 Alcalde rows, one per municipality and the Distrito Nacional"
+        },
+        {
+          "date": "2020-03-15",
+          "value": 158,
+          "source": "municipal-2020",
+          "locator": "Resumen: ALCADES ALCANZADOS, Total 158"
+        },
+        {
+          "date": "2024-02-18",
+          "value": 158,
+          "source": "proclama-feb-2024",
+          "locator": "Tercero: el Distrito Nacional and the 157 municipios; Cuarto, TOTAL NACIONAL: 158 y 158 alcaldes y vicealcaldes"
+        }
+      ]
+    },
+    {
+      "key": "distrito_municipal",
+      "name": "Distritos municipales",
+      "name_en": "Municipal districts",
+      "parent": "municipio",
+      "polity_kind": "submunicipal",
+      "scheme": "do.distrito_municipal",
+      "source": "const2024",
+      "counts": [
+        {
+          "date": "2016-05-15",
+          "value": 234,
+          "source": "ganadores-2016",
+          "locator": "Sheet2, nivel MUNICIPAL: 234 Director rows"
+        },
+        {
+          "date": "2020-03-15",
+          "value": 235,
+          "source": "municipal-2020",
+          "locator": "Resumen: DIRECTORES ALCANZADOS, Total 235"
+        },
+        {
+          "date": "2024-02-18",
+          "value": 235,
+          "source": "proclama-feb-2024",
+          "locator": "Tercero: los 235 Distritos Municipales; Cuarto, TOTAL NACIONAL: 235 y 235 directores y subdirectores"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "nacion",
+      "name": "Elección del Presidente y Vicepresidente de la República",
+      "name_en": "President and vice president",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ],
+        "fine": [
+          "do.provincia",
+          "do.municipio",
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 124 (elected every four years by direct vote), Artículo 125 (vice president on the same ticket), Artículo 209.1 (runoff on the last Sunday of June when no ticket has more than half the valid votes)",
+      "first_held": "1924-03-15",
+      "earliest_record": "1962-12-20",
+      "finest_note": "2000-2024: by electoral college in the JCE's xlsx and xls files. 1994-1998: by municipality for each level. 1962-1986: by municipality, one column of party votes for the presidency and one for all other candidacies. 1990: ballots per province and level only.",
+      "note": "Joint ticket elected by national direct vote. The JCE, created by Ley 35 of 8 March 1923, ran its first presidential election on 15 March 1924; presidents chosen before 1924 under the constitutions of 1844-1908 are not yet researched. The 1994 crisis cut the term elected that year to two years, so presidential elections moved to 1996 and every four years after, apart from the congressional and municipal ones, until 2016. The two-round majority rule dates from the 1994 reform; the only runoff so far was 30 June 1996. The 2020 election, proclaimed for 17 May, was held on 5 July. Votes abroad count since 2004.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "DO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1966-01-01",
+          "source": "anteriores",
+          "locator": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores (boletines históricos for 1966, 1970, 1974, 1978, 1982, 1986, 1990, and 1994)",
+          "valid_to": "1995-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Second round between the two leading tickets on the last Sunday of June",
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1996-01-01",
+          "valid_to": "2012-01-01",
+          "source": "historia",
+          "locator": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral (Pacto por la Democracia: term cut to 1996 and a second round established; first runoff in 1996)"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2012-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years",
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Second round between the two leading tickets on the last Sunday of June (Artículo 209.1)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2000-05-16",
+          "last_date": "2024-05-19",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Results by electoral college for every presidential election 2000-2024 (2016, 2020, and 2024 xlsx; earlier xls)"
+        },
+        {
+          "platform": "Boletines históricos de la JCE",
+          "url": "http://resultadoselectorales.jce.gob.do/boletines/{year}/nivel{year}.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "1962-12-20",
+          "last_date": "1996-06-30",
+          "finest": "do.municipio",
+          "source": "boletines",
+          "evidence": "Municipal tables for 1962-1986 and 1994-1996 (both 1996 rounds on resultadomunicipal1996*vuelta.htm); 1990 prints only votes per province"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1924-03-15",
+          "note": "First presidential election run by the JCE (Horacio Vásquez elected)."
+        },
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "General elections of the Trujillo era (1930-1957), run by the JCE; the Board publishes no results for them online."
+        },
+        {
+          "date": "1962-12-20",
+          "note": "First elections after the Trujillo dictatorship."
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1996-05-16"
+        },
+        {
+          "date": "1996-06-30",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2000-05-16"
+        },
+        {
+          "date": "2004-05-16"
+        },
+        {
+          "date": "2008-05-16"
+        },
+        {
+          "date": "2012-05-20"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 1,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel PRESIDENCIAL: Presidente 1, Vicepresidente 1"
+        },
+        {
+          "date": "2020-07-05",
+          "note": "Proclaimed for 17 May 2020 and held on 5 July 2020."
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 1,
+          "source": "ganadores-2024",
+          "quote": "Sheet PRESIDENTE: PRESIDENTE and VICEPRESIDENTE, PRM Y ALIADOS"
+        }
+      ],
+      "est_votes": 55000000,
+      "effort": 2
+    },
+    {
+      "key": "senado",
+      "tier": "nacion",
+      "name": "Elección de Senadores",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "do.provincia"
+        ],
+        "fine": [
+          "do.municipio",
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 78: one senator for each province and one for the Distrito Nacional, for four years; Ley 20-23 Artículo 293.4: plurality",
+      "earliest_record": "1962-12-20",
+      "finest_note": "2000-2024: by electoral college in the JCE's xlsx and xls files. 1994-1998: by municipality for each level. 1962-1986: by municipality, one column of party votes for the presidency and one for all other candidacies. 1990: ballots per province and level only.",
+      "note": "One senator per province and the Distrito Nacional (32 in 2010, 2016, and 2024), by plurality. Until 2016 the senator and the province's deputies were elected on one congressional ballot. Congressional elections fell with the presidential ones through 1994, two years apart from them in 1998-2010 (the 2010 Congress sat six years), and with them again from 2016. Elections before 1962 are not yet listed from official sources.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "DO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1966-01-01",
+          "source": "anteriores",
+          "locator": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores (boletines históricos for 1966, 1970, 1974, 1978, 1982, 1986, 1990, and 1994)",
+          "valid_to": "2011-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2002-05-16",
+          "last_date": "2020-07-05",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Congressional ballot by electoral college for 2002, 2006, 2010, 2016, and 2020"
+        },
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30617",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2024-05-19",
+          "last_date": "2024-05-19",
+          "finest": "do.provincia",
+          "source": "repositorio",
+          "evidence": "Senadores, relación general definitiva by province"
+        },
+        {
+          "platform": "Boletines históricos de la JCE",
+          "url": "http://resultadoselectorales.jce.gob.do/boletines/{year}/nivel{year}.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "1962-12-20",
+          "last_date": "1998-05-16",
+          "finest": "do.municipio",
+          "source": "boletines",
+          "evidence": "Municipal tables for 1962-1986, 1994, and the 1998 congressional level by province"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "General elections of the Trujillo era (1930-1957), run by the JCE; the Board publishes no results for them online."
+        },
+        {
+          "date": "1962-12-20"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2002-05-16"
+        },
+        {
+          "date": "2006-05-16"
+        },
+        {
+          "date": "2010-05-16",
+          "contests": 32,
+          "seats": 32,
+          "source": "res-073-2010",
+          "quote": "treinta y dos (32) Senadores(as): uno(a) por el Distrito Nacional y uno(a) por cada provincia"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 32,
+          "seats": 32,
+          "source": "ganadores-2016",
+          "quote": "Sheet1: 32 SENADOR rows"
+        },
+        {
+          "date": "2020-07-05"
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 32,
+          "seats": 32,
+          "source": "ganadores-2024",
+          "quote": "Sheet SENADO: 32 rows, one per province and the Distrito Nacional"
+        }
+      ],
+      "est_votes": 45000000,
+      "effort": 2
+    },
+    {
+      "key": "diputados",
+      "tier": "nacion",
+      "name": "Elección de Diputados por circunscripción territorial",
+      "name_en": "Chamber of Deputies, territorial seats",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "do.provincia",
+          "do.circunscripcion"
+        ],
+        "fine": [
+          "do.municipio",
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 81.1: territorial deputies for the Distrito Nacional and the provinces, in proportion to the registered electorate and at least two per province (158 from 2028; 178 under the 2010 and 2015 texts); Ley 20-23 Artículo 295: D'Hondt with preferential votes (Ley 157-13)",
+      "earliest_record": "1962-12-20",
+      "finest_note": "2000-2024: by electoral college in the JCE's xlsx and xls files. 1994-1998: by municipality for each level. 1962-1986: by municipality, one column of party votes for the presidency and one for all other candidacies. 1990: ballots per province and level only.",
+      "note": "List PR by province until 1998; Ley 275-97 split the most populous provinces into circumscriptions, first used in 2002. Preferential votes order candidates within each list. 178 seats in 45 provinces and circumscriptions in 2024; the 2024 Constitution cuts the territorial seats to 158 from 2028 (transitional provision Primera). Elections before 1962 are not yet listed from official sources.",
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house"
+          ],
+          "schemes": [
+            "do.provincia",
+            "do.circunscripcion"
+          ],
+          "except_codes": [
+            "exterior"
+          ],
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1966-01-01",
+          "source": "anteriores",
+          "locator": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores (boletines históricos for 1966, 1970, 1974, 1978, 1982, 1986, 1990, and 1994)",
+          "valid_to": "2011-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2002-05-16",
+          "last_date": "2020-07-05",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Congressional ballot by electoral college for 2002, 2006, 2010, 2016, and 2020"
+        },
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30613",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2024-05-19",
+          "last_date": "2024-05-19",
+          "finest": "do.circunscripcion",
+          "source": "repositorio",
+          "evidence": "Diputados, relación general definitiva by province and circumscription, with the D'Hondt quotients"
+        },
+        {
+          "platform": "Boletines históricos de la JCE",
+          "url": "http://resultadoselectorales.jce.gob.do/boletines/{year}/nivel{year}.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "1962-12-20",
+          "last_date": "1998-05-16",
+          "finest": "do.municipio",
+          "source": "boletines",
+          "evidence": "Municipal tables for 1962-1986, 1994, and the 1998 congressional level by province"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "General elections of the Trujillo era (1930-1957), run by the JCE; the Board publishes no results for them online."
+        },
+        {
+          "date": "1962-12-20"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2002-05-16"
+        },
+        {
+          "date": "2006-05-16"
+        },
+        {
+          "date": "2010-05-16",
+          "seats": 178,
+          "source": "res-073-2010",
+          "quote": "ciento setenta y ocho (178) Diputados(as) elegidos(as) por circunscripción territorial"
+        },
+        {
+          "date": "2016-05-15",
+          "seats": 178,
+          "source": "ganadores-2016",
+          "quote": "Sheet1: 178 DIPUTADO rows"
+        },
+        {
+          "date": "2020-07-05"
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 45,
+          "seats": 178,
+          "source": "escanos-2024",
+          "quote": "DIPUTADOS: 45 tables by province and circumscription whose Total de Escaños sum to 178"
+        }
+      ],
+      "est_votes": 45000000,
+      "effort": 3
+    },
+    {
+      "key": "diputados_nacionales",
+      "tier": "nacion",
+      "name": "Diputados nacionales por acumulación de votos",
+      "name_en": "Chamber of Deputies, national seats by accumulated votes",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 81.2: five deputies elected nationally by accumulated votes, preferably for parties with at least 1% of the valid votes and no seat; Ley 20-23 Artículo 296",
+      "valid_from": "2010-01-26",
+      "first_held": "2010-05-16",
+      "earliest_record": "2010-05-16",
+      "note": "Five seats allotted from each party's national total on the deputies' ballot to closed lists, preferring parties with at least 1% and no territorial seat (Ley 37-10 of 11 February 2010, now Ley 20-23 Artículo 296). No separate vote.",
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house"
+          ],
+          "schemes": [
+            "world.country"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30611",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2010-05-16",
+          "last_date": "2024-05-19",
+          "finest": "world.country",
+          "source": "repositorio",
+          "evidence": "Winners by sheet (DIPUTADO NACIONAL) for 2024; 2016 winners file and Resolución 073-2010 for earlier years"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-05-16",
+          "contests": 1,
+          "seats": 5,
+          "source": "res-073-2010",
+          "quote": "cinco (5) Diputados(as) elegidos a nivel nacional por acumulación de votos"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 1,
+          "seats": 5,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel CONGRESUAL: Diputado Nacional 5"
+        },
+        {
+          "date": "2020-07-05"
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 1,
+          "seats": 5,
+          "source": "ganadores-2024",
+          "quote": "Sheet DIPUTADO NACIONAL: 5 rows"
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 3
+    },
+    {
+      "key": "diputados_exterior",
+      "tier": "exterior",
+      "name": "Diputados representantes de la comunidad dominicana en el exterior",
+      "name_en": "Chamber of Deputies, seats for Dominicans abroad",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "do.circunscripcion"
+        ],
+        "fine": [
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 81.3: seven deputies for the Dominican community abroad, elected as the law provides",
+      "valid_from": "2010-01-26",
+      "first_held": "2012-05-20",
+      "earliest_record": "2012-05-20",
+      "note": "Seven seats in three circumscriptions abroad (3, 2, and 2 seats), list PR. First elected on 20 May 2012 with the presidential election, then with the general elections from 2016.",
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house"
+          ],
+          "schemes": [
+            "do.circunscripcion"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2012-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2012-05-20",
+          "last_date": "2020-07-05",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Ultramar results by electoral college for 2012, 2016, and 2020"
+        },
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30614",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2024-05-19",
+          "last_date": "2024-05-19",
+          "finest": "do.circunscripcion",
+          "source": "repositorio",
+          "evidence": "Diputados exterior, relación general definitiva by circumscription"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2012-05-20",
+          "note": "First election of deputies abroad (JCE history)."
+        },
+        {
+          "date": "2016-05-15",
+          "seats": 7,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel CONGRESUAL: Diputado De Ultramar 7"
+        },
+        {
+          "date": "2020-07-05"
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 3,
+          "seats": 7,
+          "source": "escanos-2024",
+          "quote": "DIPUTADOS DE ULTRAMAR: three circumscriptions with Total de Escaños 3, 2, and 2"
+        }
+      ],
+      "est_votes": 700000,
+      "effort": 1
+    },
+    {
+      "key": "parlacen",
+      "tier": "nacion",
+      "name": "Diputados al Parlamento Centroamericano (PARLACEN)",
+      "name_en": "Central American Parliament",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ]
+      },
+      "source": "ley20-23",
+      "locator": "Artículo 96, párrafo: representatives to international parliaments elected by D'Hondt on closed lists from each party's valid votes at the senatorial level",
+      "first_held": "2010-05-16",
+      "earliest_record": "2010-05-16",
+      "note": "Twenty deputies and their alternates, allotted nationally by D'Hondt from the votes on the Senate ballot; there is no separate vote. 2010 is the earliest allotment found in JCE documents (Resolución 073-2010 and the JCE's PARLACEN regulation of 22 February 2010); whether the Republic chose deputies by vote before 2010 is not established here.",
+      "match": [
+        {
+          "name_pattern": "Parlamento Centroamericano|PARLACEN|Central American Parliament"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio/Vista-Escritorio?Command=Core_Download&Method=attachment&EntryId=30615",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2024-05-19",
+          "last_date": "2024-05-19",
+          "finest": "world.country",
+          "source": "repositorio",
+          "evidence": "DIPUTADOS PARLACEN: national D'Hondt table, 20 seats"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-05-16",
+          "contests": 1,
+          "seats": 20,
+          "source": "res-073-2010",
+          "quote": "veinte (20) Diputados(as) y sus suplentes al Parlamento Centroamericano (PARLACEN)"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 1,
+          "seats": 20,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel CONGRESUAL: Diputado Parlacen 20, Suplente Diputado Parlacen 20"
+        },
+        {
+          "date": "2020-07-05"
+        },
+        {
+          "date": "2024-05-19",
+          "contests": 1,
+          "seats": 20,
+          "source": "escanos-2024",
+          "quote": "DIPUTADOS PARLACEN, REPUBLICA DOMINICANA, Total de Escaños : 20"
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 2
+    },
+    {
+      "key": "alcalde",
+      "tier": "municipio",
+      "name": "Elección de Alcaldes y Vicealcaldes (Síndicos hasta 2007)",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "do.municipio"
+        ],
+        "fine": [
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 201: the Alcaldía, headed by an alcalde whose substitute is the vicealcalde; Ley 20-23 Artículo 293.4: plurality",
+      "earliest_record": "1962-12-20",
+      "finest_note": "2000-2024: by electoral college in the JCE's xlsx and xls files. 1994-1998: by municipality for each level. 1962-1986: by municipality, one column of party votes for the presidency and one for all other candidacies. 1990: ballots per province and level only.",
+      "note": "Mayor (síndico until Ley 176-07 of 2007) and deputy mayor on one ticket, by plurality, in the Distrito Nacional and each municipality. Until 2016 one municipal ballot elected the mayor and the council together, and the archive holds it as the council contest (class regidores); separate mayoral ballots began with the 2020 municipal elections. The 16 February 2020 election was suspended and held on 15 March 2020.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "schemes": [
+            "do.municipio"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1966-01-01",
+          "source": "anteriores",
+          "locator": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores (boletines históricos for 1966, 1970, 1974, 1978, 1982, 1986, 1990, and 1994)",
+          "valid_to": "2011-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "historia",
+          "locator": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral (15 May 2016: first elections since 1994 in which every authority was elected at once)",
+          "valid_to": "2017-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 2,
+          "day_rule": "feb_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2020-01-01",
+          "valid_to": "2029-01-01",
+          "source": "proclama-feb-2024",
+          "locator": "Primero: el tercer domingo del mes de febrero del año 2024 (18 February); the 2024 Constitution's transitional provision Quinta keeps February for 2028"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2032-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2002-05-16",
+          "last_date": "2024-02-18",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Municipal ballot by electoral college for 2002-2016 and the 2024 municipal file by office; the 2020 municipal results are relaciones generales definitivas (EntryId 16969)"
+        },
+        {
+          "platform": "Boletines históricos de la JCE",
+          "url": "http://resultadoselectorales.jce.gob.do/boletines/{year}/nivel{year}.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "1962-12-20",
+          "last_date": "1998-05-16",
+          "finest": "do.municipio",
+          "source": "boletines",
+          "evidence": "Municipal tables for 1962-1986, 1994, and the 1998 municipal level"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "General elections of the Trujillo era (1930-1957), run by the JCE; the Board publishes no results for them online."
+        },
+        {
+          "date": "1962-12-20"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "note": "Municipal-only election."
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2002-05-16"
+        },
+        {
+          "date": "2006-05-16"
+        },
+        {
+          "date": "2010-05-16"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 158,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel MUNICIPAL: Alcalde 158, Vicealcalde 158"
+        },
+        {
+          "date": "2020-03-15",
+          "contests": 158,
+          "source": "municipal-2020",
+          "quote": "ALCADES ALCANZADOS ... Total 158"
+        },
+        {
+          "date": "2024-02-18",
+          "contests": 158,
+          "source": "proclama-feb-2024",
+          "quote": "TOTAL NACIONAL 158 y 158"
+        }
+      ],
+      "est_votes": 40000000,
+      "effort": 2
+    },
+    {
+      "key": "regidores",
+      "tier": "municipio",
+      "name": "Elección de Regidores y sus suplentes",
+      "name_en": "Municipal councils (regidores)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "do.municipio",
+          "do.circunscripcion_municipal"
+        ],
+        "fine": [
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 201: the Concejo de Regidores, whose number and substitutes the law sets by population; Ley 20-23 Artículo 295: D'Hondt with preferential votes",
+      "earliest_record": "1962-12-20",
+      "finest_note": "2000-2024: by electoral college in the JCE's xlsx and xls files. 1994-1998: by municipality for each level. 1962-1986: by municipality, one column of party votes for the presidency and one for all other candidacies. 1990: ballots per province and level only.",
+      "note": "Council members and their substitutes by list PR with preferential votes, in each municipality and the Distrito Nacional (some, such as the Distrito Nacional, in several municipal circumscriptions). 1,164 seats in 2016, 2020, and 2024. Until 2016 the same municipal ballot also elected the mayor.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "do.municipio",
+            "do.circunscripcion_municipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "1966-01-01",
+          "source": "anteriores",
+          "locator": "https://jce.gob.do/Dependencias/Elecciones/Elecciones-Anteriores (boletines históricos for 1966, 1970, 1974, 1978, 1982, 1986, 1990, and 1994)",
+          "valid_to": "2011-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "historia",
+          "locator": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral (15 May 2016: first elections since 1994 in which every authority was elected at once)",
+          "valid_to": "2017-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 2,
+          "day_rule": "feb_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2020-01-01",
+          "valid_to": "2029-01-01",
+          "source": "proclama-feb-2024",
+          "locator": "Primero: el tercer domingo del mes de febrero del año 2024 (18 February); the 2024 Constitution's transitional provision Quinta keeps February for 2028"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2032-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2002-05-16",
+          "last_date": "2024-02-18",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Municipal ballot by electoral college for 2002-2016 and the 2024 municipal file by office; the 2020 municipal results are relaciones generales definitivas (EntryId 16969)"
+        },
+        {
+          "platform": "Boletines históricos de la JCE",
+          "url": "http://resultadoselectorales.jce.gob.do/boletines/{year}/nivel{year}.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "1962-12-20",
+          "last_date": "1998-05-16",
+          "finest": "do.municipio",
+          "source": "boletines",
+          "evidence": "Municipal tables for 1962-1986, 1994, and the 1998 municipal level"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "General elections of the Trujillo era (1930-1957), run by the JCE; the Board publishes no results for them online."
+        },
+        {
+          "date": "1962-12-20"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "note": "Municipal-only election."
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2002-05-16"
+        },
+        {
+          "date": "2006-05-16"
+        },
+        {
+          "date": "2010-05-16"
+        },
+        {
+          "date": "2016-05-15",
+          "seats": 1164,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel MUNICIPAL: Regidor 1164, Suplente Regidor 1164"
+        },
+        {
+          "date": "2020-03-15",
+          "seats": 1164,
+          "source": "municipal-2020",
+          "quote": "REGIDORES ... Grand Total 1164"
+        },
+        {
+          "date": "2024-02-18",
+          "seats": 1164,
+          "source": "proclama-feb-2024",
+          "quote": "TOTAL NACIONAL ... 1,164 y 1,164"
+        }
+      ],
+      "est_votes": 40000000,
+      "effort": 2
+    },
+    {
+      "key": "director_dm",
+      "tier": "distrito_municipal",
+      "name": "Elección de Directores y Subdirectores de Distritos Municipales",
+      "name_en": "Municipal district directors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "do.distrito_municipal"
+        ],
+        "fine": [
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 201, párrafo I: the Junta de Distrito, with a director as its executive and a substitute",
+      "earliest_record": "2010-05-16",
+      "note": "Director and deputy director (subdirector, created by Ley 341-09) on one ticket by plurality. The JCE's results files first code municipal districts in 2010; when district directors were first elected is not established here. Until 2016 one ballot elected the director and the vocales together, held in the archive as the vocales contest.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "schemes": [
+            "do.distrito_municipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "historia",
+          "locator": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral (15 May 2016: first elections since 1994 in which every authority was elected at once)",
+          "valid_to": "2017-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 2,
+          "day_rule": "feb_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2020-01-01",
+          "valid_to": "2029-01-01",
+          "source": "proclama-feb-2024",
+          "locator": "Primero: el tercer domingo del mes de febrero del año 2024 (18 February); the 2024 Constitution's transitional provision Quinta keeps February for 2028"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2032-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2010-05-16",
+          "last_date": "2024-02-18",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Municipal-district ballot by electoral college for 2010 and 2016, and the 2024 municipal file by office"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-05-16"
+        },
+        {
+          "date": "2016-05-15",
+          "contests": 234,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel MUNICIPAL: Director 234, Subdirector 234"
+        },
+        {
+          "date": "2020-03-15",
+          "contests": 235,
+          "source": "municipal-2020",
+          "quote": "DIRECTORES ALCANZADOS ... Total 235"
+        },
+        {
+          "date": "2024-02-18",
+          "contests": 235,
+          "source": "proclama-feb-2024",
+          "quote": "TOTAL NACIONAL ... 235 y 235"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 2
+    },
+    {
+      "key": "vocales",
+      "tier": "distrito_municipal",
+      "name": "Elección de Vocales de Distritos Municipales",
+      "name_en": "Municipal district boards (vocales)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "do.distrito_municipal"
+        ],
+        "fine": [
+          "do.colegio"
+        ]
+      },
+      "source": "const2024",
+      "locator": "Artículo 201, párrafo I: the Junta de Vocales, with normative and oversight functions",
+      "earliest_record": "2010-05-16",
+      "note": "Board members by list PR with preferential votes: three in most districts, more in districts of over 15,000 inhabitants (Ley 341-09). 730 seats in 2016, 735 in 2020 and 2024.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "do.distrito_municipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2016-01-01",
+          "source": "historia",
+          "locator": "https://jce.gob.do/Institucional/Quienes-Somos/Historia-de-la-Junta-Central-Electoral (15 May 2016: first elections since 1994 in which every authority was elected at once)",
+          "valid_to": "2017-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 2,
+          "day_rule": "feb_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2020-01-01",
+          "valid_to": "2029-01-01",
+          "source": "proclama-feb-2024",
+          "locator": "Primero: el tercer domingo del mes de febrero del año 2024 (18 February); the 2024 Constitution's transitional provision Quinta keeps February for 2028"
+        },
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2032-01-01",
+          "source": "const2024",
+          "locator": "Artículo 209: los colegios electorales se abrirán cada cuatro años ... el tercer domingo del mes de mayo; Artículo 274: the elected term ends on 16 August every four years"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=1860",
+          "format": "xlsx, xls",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2010-05-16",
+          "last_date": "2024-02-18",
+          "finest": "do.colegio",
+          "source": "repositorio",
+          "evidence": "Municipal-district ballot by electoral college for 2010 and 2016, and the 2024 municipal file by office"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-05-16"
+        },
+        {
+          "date": "2016-05-15",
+          "seats": 730,
+          "source": "ganadores-2016",
+          "quote": "Sheet2, nivel MUNICIPAL: Vocal 730"
+        },
+        {
+          "date": "2020-03-15",
+          "contests": 235,
+          "seats": 735,
+          "source": "municipal-2020",
+          "quote": "VOCALES ... Grand Total 735 (with DIRECTORES ALCANZADOS Total 235)"
+        },
+        {
+          "date": "2024-02-18",
+          "contests": 235,
+          "seats": 735,
+          "source": "proclama-feb-2024",
+          "quote": "TOTAL NACIONAL ... 235 y 235 | 735"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 2
+    },
+    {
+      "key": "primarias",
+      "tier": "nacion",
+      "name": "Elecciones primarias simultáneas",
+      "name_en": "Simultaneous party primaries",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "do.municipio",
+          "do.distrito_municipal"
+        ]
+      },
+      "source": "calendario-2020",
+      "locator": "Plazos legales, primarias de partidos políticos: Art. 46, párr. II, Ley 33-18 (candidates chosen by primaries no later than the first Sunday of October of the pre-electoral year); Art. 51, párr. I (final results within five days)",
+      "first_held": "2019-10-06",
+      "earliest_record": "2023-10-01",
+      "note": "Party primaries run by the JCE on one day under Ley 33-18 (2018), for the parties that choose them, open or closed. Held 6 October 2019 and 1 October 2023; in 2023 only the PRM went to primaries, for president, mayors, councils, directors, and vocales (1,026,047 ballots cast). The JCE publishes the 2023 results by demarcation and polling table; no 2019 results file was found on the portal. Ley 286-04 had provided primaries by universal vote in 2004.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "DO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "called": false,
+          "administered_by": "Junta Central Electoral",
+          "valid_from": "2019-01-01",
+          "source": "calendario-2020",
+          "locator": "Art. 46, párr. II, Ley 33-18: a más tardar el 1er. domingo de octubre del año pre-electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal de Transparencia de la JCE",
+          "url": "https://jce.gob.do/portaltransparencia/Repositorio?EntryId=27563",
+          "format": "xlsx, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information of the Junta Central Electoral, published in its transparency portal under the Ley General de Libre Acceso a la Información Pública (Ley 200-04); reuse with the source acknowledged",
+          "first_date": "2023-10-01",
+          "last_date": "2023-10-01",
+          "finest": "do.colegio",
+          "source": "primarias-2023-mesas",
+          "evidence": "Resultados detalle por mesas (EntryId 27569) and resumen por demarcación y cargo (27571): PRM, 543 demarcation and office rows"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2019-10-06",
+          "note": "First simultaneous primaries (JCE precampaign finance reports page)."
+        },
+        {
+          "date": "2023-10-01",
+          "contests": 543,
+          "source": "primarias-2023",
+          "quote": "PRM rows by demarcation and office: PRESIDENTE(A) 1, ALCALDE(SA) 2, REGIDOR(A) 164, DIRECTOR(A) 143, VOCAL 233"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 2
+    },
+    {
+      "key": "voto_femenino_1934",
+      "tier": "nacion",
+      "name": "Concurrencia de las mujeres a manera de ensayo",
+      "name_en": "Women's trial votes on the constitutional reform",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "historia",
+      "valid_from": "1933-12-22",
+      "valid_to": "1942-01-10",
+      "first_held": "1934-05-16",
+      "note": "Decree 858 of 22 December 1933 let women vote, as a trial, with the 1934 general elections to express support for reforming the articles of the Constitution that disadvantaged them; 96,247 women voted on 16 May 1934, and they did so again in 1938. The 1942 constitutional reform gave women the vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DO",
+          "valid_to": "1942-01-10"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1934-05-16"
+        },
+        {
+          "date": "1938-01-01",
+          "precision": "year"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The JCE publishes only the national 1934 turnout (96,247 women) in its history; no count by unit is on its portal.",
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "key": "referendo",
+      "tier": "nacion",
+      "name": "Referendo",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const2024",
+      "locator": "Artículo 210 (referendums by law, approved by two thirds of each chamber, never on a mandate) and Artículo 272 (referendo aprobatorio of reforms to rights, territory, nationality, currency, or the reform procedure)",
+      "valid_from": "2010-01-26",
+      "note": "The 2010 Constitution introduced national referendums and the referendo aprobatorio; transitional provision Sexta exempted the 2024 reform from it.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DO",
+          "valid_from": "2010-01-26"
+        }
+      ],
+      "disposition": "out_of_scope",
+      "disposition_reason": "No national referendum has been held: the JCE lists none among its elections, and the only constitutional reform since 2010 subject to the rule (2024) was exempted by transitional provision Sexta."
+    },
+    {
+      "key": "referendo_municipal",
+      "tier": "municipio",
+      "name": "Referendo, plebiscito e iniciativa normativa municipales",
+      "name_en": "Municipal referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const2024",
+      "locator": "Artículo 203: the organic law of local administration sets the scope, requirements, and conditions of municipal referendums, plebiscites, and normative initiatives",
+      "valid_from": "2010-01-26",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The JCE publishes no municipal referendum or plebiscite results, and whether any has been held is not established from official sources.",
+      "est_votes": 0,
+      "effort": 5
+    },
+    {
+      "key": "eleccion_senado",
+      "tier": "nacion",
+      "name": "Elecciones de segundo grado del Senado",
+      "name_en": "Officers chosen by the Senate",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const2024",
+      "locator": "Artículo 80.3-5: the Senate elects the Cámara de Cuentas, the members of the Junta Central Electoral, and the Defensor del Pueblo by two thirds; Artículo 77.1: chambers fill their own vacancies from a party's terna",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "DO"
+        }
+      ],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointments voted in the Senate (and vacancy fills in each chamber), recorded only in legislative journals; no electorate votes."
+    }
+  ]
+}
