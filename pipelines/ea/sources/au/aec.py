@@ -79,12 +79,13 @@ EVENTS = [
     Event(31633, date(2026, 5, 9), "by_election", "2026 Farrer by-election", "NSW", "Farrer"),
 ]
 HEADER = re.compile(r'^"?(StateAb|DivisionI[dD]|PartyAb|QuestionNo|State)"?,')
-# Published only as HTML pages without polling-place files; see the report.
+# Published as HTML pages only, without CSV downloads; election_html builds them.
 HTML_ONLY = {10822, 12426}
 
 
 def base(event: Event) -> str:
-    return f"{ROOT}/{event.id}/{'results' if event.id == 12246 else 'Website'}"
+    folder = {12246: "results", 12426: ""}.get(event.id, "Website")
+    return f"{ROOT}/{event.id}/{folder}".rstrip("/")
 
 
 def download(event: Event, name: str) -> str:
@@ -191,6 +192,7 @@ def _suffix(url: str) -> str:
 
 
 def fetch() -> None:
+    fetch_html()
     for event in EVENTS:
         if event.id in HTML_ONLY:
             continue
@@ -292,6 +294,7 @@ DECLARATION_NAMES = {
     "POSTAL": "postal votes",
     "PRE_POLL": "declaration pre-poll votes",
     "PROVISIONAL": "provisional votes",
+    "ORDINARY_OTHER": "ordinary votes the polling place pages do not show",
 }
 SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
     (
@@ -379,6 +382,7 @@ def _int(text: str) -> int:
 # Geography ------------------------------------------------------------------------------------------------------
 
 
+@functools.cache
 def _divisions() -> dict[str, tuple[str, list[tuple[date, str]]]]:
     """Division id -> (state, [(day, name)]) from every enrolment and candidate file."""
     seen: dict[str, tuple[str, list[tuple[date, str]]]] = {}
@@ -399,6 +403,11 @@ def _divisions() -> dict[str, tuple[str, list[tuple[date, str]]]]:
                 if entry[0] != state:
                     raise ValueError(f"division {id} is in {entry[0]} and {state}")
                 entry[1].append((event.day, name))
+    named = {(state, name.lower()): id for id, (state, names) in seen.items() for _, name in names}
+    for url in pages_2001()[0]:
+        state, name = _heading_2001(url)
+        id = named.get((state, name.lower()), f"{state}-{name}")
+        seen.setdefault(id, (state, []))[1].append((V2001.day, name))
     return seen
 
 
@@ -417,13 +426,14 @@ def _source_row(p: Package) -> None:
 
 
 def _geo_files() -> list[str]:
-    return [
+    files = [
         download(
             event, "HouseCandidatesDownload" if event.kind == "by_election" else "GeneralEnrolmentByDivisionDownload"
         )
         for event in EVENTS
         if event.id not in HTML_ONLY
     ]
+    return [*files, *pages_2001()[0]]
 
 
 def geo() -> Package:
@@ -432,7 +442,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         f"Australia's 8 states and territories and the {len(divisions)} federal electoral divisions that have "
-        "returned results to the Australian Electoral Commission's Tally Room since 2004",
+        "returned results to the Australian Electoral Commission's Tally Room since 2001",
     )
     p.external |= {AUSTRALIA, COUNTRY}
     _source_row(p)
@@ -451,7 +461,7 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, STATE_NAMES[state], "en", "official")
         p.name(id, state, "en", "abbreviation", False)
-    for code, (state, names) in sorted(divisions.items(), key=lambda item: int(item[0])):
+    for code, (state, names) in sorted(divisions.items(), key=lambda item: (not item[0].isdigit(), item[0].zfill(6))):
         id = area("au.division", code)
         p.add("area", id=id, scheme_code="au.division")
         p.add("area_code", area_id=id, code=code)
@@ -485,6 +495,9 @@ def _party_names() -> dict[str, str]:
                 ab, name = field(row, "PartyAb"), field(row, "PartyNm")
                 if ab not in NO_PARTY and name:
                     names[ab] = name
+    for row in cells(page(PARTY_CODES)):
+        if len(row) == 2 and re.fullmatch(r"[A-Z0-9]{2,4}", row[0]) and row[0] not in NO_PARTY:
+            names.setdefault(row[0], row[1])
     return names
 
 
@@ -494,18 +507,20 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         f"Australia's House of Representatives and Senate, their electoral systems, and the {len(names)} party "
-        "abbreviations on the Australian Electoral Commission's candidate files since 2004, with the source files "
+        "abbreviations on the Australian Electoral Commission's results since 2001, with the source files "
         "every election package cites",
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {AUSTRALIA}
     staged = set(_geo_files())
+    files = [PARTY_CODES, *html_cited(V2001), *html_cited(WERRIWA)]
     for event in EVENTS:
         if event.id not in HTML_ONLY:
-            for url in dict.fromkeys([*_candidate_files(event), *_cited(event)]):
-                if url not in staged:
-                    staged.add(url)
-                    p.artifact(raw.cached(SOURCE, url), AEC)
+            files += [*_candidate_files(event), *_cited(event)]
+    for url in dict.fromkeys(files):
+        if url not in staged:
+            staged.add(url)
+            p.artifact(raw.cached(SOURCE, url), AEC)
     p.add("body", id=HOUSE, polity_id=AUSTRALIA, kind="lower_house")
     p.name(HOUSE, "House of Representatives", "en", "official")
     p.add("body", id=SENATE, polity_id=AUSTRALIA, kind="upper_house")
@@ -1084,7 +1099,7 @@ def referendum(p: Package, event: Event, election: str, path: str, units: Units,
 
 
 def days() -> list[date]:
-    return sorted({event.day for event in EVENTS if event.id not in HTML_ONLY})
+    return sorted({V2001.day, *(event.day for event in EVENTS)})
 
 
 def packages() -> list[str]:
@@ -1160,12 +1175,620 @@ def election(day: date) -> Package:
     return p
 
 
+def build(day: date) -> Package:
+    if day == V2001.day:
+        return election_html(V2001)
+    if day == WERRIWA.day:
+        return election_html(WERRIWA)
+    return election(day)
+
+
 def parse() -> None:
     geo().write()
     registry().write()
     for day in days():
-        election(day).write()
+        build(day).write()
 
 
 def emit() -> None:
     package.run("load", packages())
+
+
+# The 2001 election and the 2005 Werriwa by-election: HTML pages only ------------------------------------------------
+
+V2001 = Event(10822, date(2001, 11, 10), "general", "2001 Australian federal election")
+WERRIWA = next(event for event in EVENTS if event.id == 12426)
+PARTY_CODES = f"{ROOT}/10822/Website/party_codes.htm"
+LINK = re.compile(r'href="?([^"\s>#]+\.htm)', re.IGNORECASE)
+
+
+def page(url: str) -> str:
+    return _text(raw.cached(SOURCE, url).path.read_bytes())
+
+
+def _links(url: str, pattern: str) -> list[str]:
+    folder = url.rsplit("/", 1)[0]
+    found = [f"{folder}/{href}" for href in LINK.findall(page(url)) if re.fullmatch(pattern, href)]
+    return list(dict.fromkeys(found))
+
+
+def pages_2001() -> tuple[list[str], list[str], list[str]]:
+    """Division pages, polling place pages, and Senate pages of the 2001 election."""
+    folder = base(V2001)
+    divisions = [
+        url for state in STATES for url in _links(f"{folder}/div_{state.lower()}.htm", r"[A-Z]{2,3}[A-Z]{4}\.htm")
+    ]
+    places = [url for division in divisions for url in _links(division, r"\d+\.htm")[:1]]
+    senate = [f"{folder}/SEN_{state}.htm" for state in STATES]
+    return divisions, places, senate
+
+
+def pages_werriwa() -> list[str]:
+    folder = base(WERRIWA)
+    return [
+        f"{folder}/HouseDivisionFirstPrefsByVoteType-12426-153.htm",
+        f"{folder}/HouseDivisionPollingPlaces-12426-153.htm",
+        f"{folder}/HouseDivisionTcpByPollingPlace-12426-153.htm",
+        f"{folder}/HouseDivisionFirstPrefs-12426-153.htm",
+    ]
+
+
+def fetch_html() -> None:
+    folder = base(V2001)
+    for state in STATES:
+        raw.fetch(SOURCE, f"{folder}/div_{state.lower()}.htm", suffix=".htm")
+    divisions = [
+        url for state in STATES for url in _links(f"{folder}/div_{state.lower()}.htm", r"[A-Z]{2,3}[A-Z]{4}\.htm")
+    ]
+    for url in divisions:
+        raw.fetch(SOURCE, url, suffix=".htm")
+    _, places, senate = pages_2001()
+    for url in [*places, *senate, f"{folder}/party_codes.htm"]:
+        raw.fetch(SOURCE, url, suffix=".htm")
+    for url in pages_werriwa():
+        raw.fetch(SOURCE, url, suffix=".htm")
+    for url in werriwa_places():
+        raw.fetch(SOURCE, url, suffix=".htm")
+
+
+def werriwa_places() -> list[str]:
+    return _links(pages_werriwa()[1], r"HousePollingPlaceFirstPrefs-12426-\d+\.htm")
+
+
+ROW = re.compile(r"<tr[^>]*>(.*?)(?=<tr[\s>]|</table|$)", re.IGNORECASE | re.DOTALL)
+CELL = re.compile(r"<t[dh][^>]*>(.*?)(?=<t[dh][\s>]|</tr|$)", re.IGNORECASE | re.DOTALL)
+
+
+def cells(html: str) -> list[list[str]]:
+    """Every table row of a page as its cells' text, for the pre-2006 pages whose markup leaves tags unclosed."""
+    return [
+        [" ".join(unescape(re.sub(r"<[^>]+>", " ", cell)).replace("\xa0", " ").split()) for cell in CELL.findall(row)]
+        for row in ROW.findall(html)
+    ]
+
+
+TYPES_2001 = {
+    "Absent": "ABSENT",
+    "Postal": "POSTAL",
+    "Pre-poll": "PRE_POLL",
+    "Pre-Poll": "PRE_POLL",
+    "Provisional": "PROVISIONAL",
+}
+LABEL = re.compile(r"^(.*?)(?: \(([A-Z0-9]+)\))?$")
+HTML_METHOD = (
+    "First preferences per polling place from the Australian Electoral Commission's {pages}; absent, postal, "
+    "pre-poll, and provisional votes per division from its first preferences by vote type table, stored as one unit "
+    "each. The distribution of preferences is not stored. Enrolment is stored on a separate unit per division."
+)
+
+
+def _heading_2001(url: str) -> tuple[str, str]:
+    heading = next(row[0] for row in cells(page(url)) if row and " : " in row[0] and "(" in row[0])
+    state, name = heading.split(" : ", 1)
+    return state, name.split(" (")[0]
+
+
+def division_ids() -> dict[tuple[str, str], str]:
+    return {(state, name.lower()): id for id, (state, names) in _divisions().items() for _, name in names}
+
+
+def _number(text: str) -> int | None:
+    text = text.replace(",", "").strip()
+    return int(text) if text.isdigit() else None
+
+
+def _enrolled(rows: list[list[str]]) -> int | None:
+    for row in rows:
+        for cell in row:
+            match = re.search(r"Enrol(?:led|ment) ?: ?([\d,]+)", cell)
+            if match:
+                return _int(match.group(1))
+    return None
+
+
+def _candidate(
+    p: Package, event: Event, contest: str, tag: str, label: str, position: int, ab: str, known: set[str]
+) -> str:
+    option = key("option", event.id, "house", tag)
+    p.add(
+        "contest_option",
+        id=option,
+        contest_id=contest,
+        kind="candidate",
+        party_id=_party_of(ab, known),
+        ballot_position=position,
+        ballot_label=label,
+    )
+    surname, _, given = label.partition(", ")
+    person = key("person", event.id, tag)
+    p.add("person", id=person)
+    p.name(person, person_name(given, surname), "en", "official")
+    p.add(
+        "candidacy",
+        id=key("candidacy", event.id, tag),
+        person_id=person,
+        option_id=option,
+        role="head",
+        ballot_name=label,
+        member_of_party_id=_party_of(ab, known),
+        is_independent=ab in NO_PARTY,
+    )
+    return option
+
+
+def _house_contest(
+    p: Package, event: Event, election: str, path: str, division: str, name: str, state: str, method: str
+) -> tuple[str, str]:
+    contest = key("contest", event.id, "house", division)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="body_seats",
+        body_id=HOUSE,
+        district_area_id=area("au.division", division),
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=HOUSE_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{name} ({state})", "en", "official")
+    p.add("slug", path=f"{path}/house-{changeset.slug(name)}", entity_id=contest, is_current=True)
+    return contest, _result_set(p, election, contest, method)
+
+
+def _accounts(values: Values, result_set: str, unit: str, valid: int, invalid: int | None) -> None:
+    values.add(result_set, unit, None, 4, valid)
+    if invalid is not None:
+        values.add(result_set, unit, None, 5, invalid)
+        values.add(result_set, unit, None, 3, valid + invalid)
+
+
+GAPS: dict[str, int] = {}
+OVER: dict[str, dict[str, int]] = {}
+
+
+def _remainder(
+    p: Package,
+    values: Values,
+    units: Units,
+    result_set: str,
+    division: str,
+    options: dict[str, str],
+    ordinary: dict[str, int],
+    summed: Counter[str],
+    valid: Counter[str],
+    bad: dict[str, int],
+    pages: str,
+) -> None:
+    """Ordinary votes the division prints but its polling place pages do not show go on one unit, so totals hold."""
+    gaps = {
+        label: n - summed[label]
+        for label, n in ordinary.items()
+        if label not in ("FORMAL", "TOTAL") and summed[label] != n
+    }
+    if not gaps:
+        return
+    over = {label: -gap for label, gap in gaps.items() if gap < 0}
+    if over:
+        OVER[f"{units.day}:{division}"] = over
+        gaps = {label: gap for label, gap in gaps.items() if gap > 0}
+        listed = ", ".join(f"{label} {n}" for label, n in over.items())
+        p.add(
+            "note",
+            id=key("note", result_set, "over"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=f"The Australian Electoral Commission's {pages} give more ordinary votes than its first "
+            f"preferences by vote type table for this division ({listed} more). The polling place figures are "
+            "stored as printed, so these totals exceed the table's by those votes.",
+            lang="en",
+        )
+    unit = units.declaration(division, "ORDINARY_OTHER")
+    for label, gap in gaps.items():
+        if label == "INFORMAL":
+            bad[unit] = gap
+        else:
+            values.add(result_set, unit, options[label], 1, gap)
+            valid[unit] += gap
+    GAPS[f"{units.day}:{division}"] = sum(gaps.values())
+    p.add(
+        "note",
+        id=key("note", result_set, "remainder"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md=f"The Australian Electoral Commission's {pages} show {sum(gaps.values()):,} fewer ordinary votes "
+        "than its first preferences by vote type table for this division, because some rows of the pages are "
+        "truncated or the votes were counted outside a listed polling place. The difference is stored on one unit "
+        "for the division, so the division's totals match the table.",
+        lang="en",
+    )
+
+
+def house_2001(p: Package, election: str, path: str, units: Units, values: Values, known: set[str]) -> int:
+    event = V2001
+    divisions, places, _ = pages_2001()
+    ids = division_ids()
+    for url, place_url in zip(divisions, places, strict=True):
+        rows = cells(page(url))
+        state, name = _heading_2001(url)
+        division = ids[(state, name.lower())]
+        contest, result_set = _house_contest(
+            p, event, election, path, division, name, state, HTML_METHOD.format(pages="division results pages")
+        )
+        start = next(i for i, row in enumerate(rows) if row[:2] == ["Candidate", "Party Code"])
+        options: dict[str, str] = {}
+        printed: dict[str, int] = {}
+        for row in rows[start + 1 :]:
+            if row[0] in ("FORMAL", "INFORMAL", "TOTAL"):
+                printed[row[0]] = _int(row[2])
+                if row[0] == "TOTAL":
+                    break
+                continue
+            if row[0].startswith("....."):
+                continue
+            options[row[0]] = _candidate(
+                p, event, contest, f"{division}:{row[0]}", row[0], len(options) + 1, row[1], known
+            )
+            p.add("declared", result_set_id=result_set, option_id=options[row[0]], measure=1, value=_int(row[2]))
+        p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=printed["FORMAL"])
+        p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=printed["INFORMAL"])
+        tcp = next(i for i, row in enumerate(rows) if row and row[0] == "Two Candidate Preferred")
+        pair = {row[0]: float(row[2].rstrip("%")) for row in rows[tcp + 1 : tcp + 3] if row[0] in options}
+        if len(pair) != 2:
+            votes: dict[str, int] = {}
+            for row in rows[start + 1 :]:
+                if row[0] == "TOTAL":
+                    break
+                if row[0] in options:
+                    votes[row[0]] = _int(row[2])
+            leader = max(votes, key=lambda c: votes[c])
+            if 2 * votes[leader] <= printed["FORMAL"]:
+                raise ValueError(f"2001 {name}: no two-candidate count and no first-preference majority")
+            pair = {leader: 1.0}
+        winner = max(pair, key=lambda c: pair[c])
+        for label, option in options.items():
+            kind = "elected" if label == winner else "lost" if label in pair else "eliminated"
+            p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+        table = next(
+            i
+            for i, row in enumerate(rows)
+            if i > start and len(row) == 6 and row[0] in options and _number(row[1]) is not None
+        )
+        kinds = ["Ordinary", "Absent", "Postal", "Pre-poll", "Provisional"]
+        ordinary: dict[str, int] = {}
+        valid: Counter[str] = Counter()
+        bad: dict[str, int] = {}
+        for row in rows[table:]:
+            if row[0] == "TOTAL":
+                break
+            for column, number in zip(kinds, row[1:6], strict=True):
+                if column == "Ordinary":
+                    ordinary[row[0]] = _int(number)
+                    continue
+                unit = units.declaration(division, TYPES_2001[column])
+                if row[0] == "INFORMAL":
+                    bad[unit] = _int(number)
+                elif row[0] != "FORMAL":
+                    values.add(result_set, unit, options[row[0]], 1, _int(number))
+                    valid[unit] += _int(number)
+        summed: Counter[str] = Counter()
+        html = page(place_url)
+        first = place_url.rsplit("/", 1)[1].removesuffix(".htm")
+        parts = re.split(r'n?ame="(\d+)"', html)
+        blocks = [(first, parts[0]), *zip(parts[1::2], parts[2::2], strict=True)]
+        links = re.findall(r'href="?(\d+\.htm(?:#\d+)?)"?>([^<]*)', page(url))
+        named = {href.split("#")[1]: unescape(text).strip() for href, text in links if "#" in href}
+        if links:
+            named.setdefault(first, unescape(links[0][1]).strip())
+        by_name = {text.lower(): id for id, text in named.items()}
+        used: set[str] = set()
+        for place, block in blocks:
+            unit_rows = [row for row in cells(block) if row and row[0]]
+            headers = [i for i, row in enumerate(unit_rows) if row[:2] == ["Candidate", "Votes"]]
+            for index, header in enumerate(headers):
+                above = unit_rows[header - 1] if header else []
+                heading = above[0] if len(above) == 1 and " : " not in above[0] and "Results" not in above[0] else None
+                if index == 0:
+                    here, label = place, named.get(place) or heading or f"Polling place {place}"
+                else:
+                    if heading is None:
+                        continue  # the page lost both the anchor and the name; the remainder unit holds these votes
+                    here, label = by_name.get(heading.lower(), f"{division}:{heading}"), heading
+                    if here in used:
+                        here = f"{division}:{heading}"
+                used.add(here)
+                unit = units.place(division, here, label)
+                stop = headers[index + 1] if index + 1 < len(headers) else len(unit_rows)
+                for row in unit_rows[header + 1 : stop]:
+                    if len(row) < 2 or _number(row[1]) is None:
+                        continue
+                    match = LABEL.match(row[0])
+                    assert match is not None
+                    text = match.group(1)
+                    if text == "INFORMAL":
+                        bad[unit] = _int(row[1])
+                        summed["INFORMAL"] += _int(row[1])
+                    elif text in options:
+                        values.add(result_set, unit, options[text], 1, _int(row[1]))
+                        valid[unit] += _int(row[1])
+                        summed[text] += _int(row[1])
+        _remainder(p, values, units, result_set, division, options, ordinary, summed, valid, bad, "polling place pages")
+        for unit in {*valid, *bad}:
+            _accounts(values, result_set, unit, valid[unit], bad.get(unit))
+        enrolled = _enrolled(rows)
+        if enrolled is not None:
+            values.add(result_set, units.roll(division), None, 2, enrolled)
+    return len(divisions)
+
+
+def senate_2001(p: Package, election: str, path: str, values: Values, known: set[str]) -> int:
+    event = V2001
+    for url in pages_2001()[2]:
+        state = url.rsplit("_", 1)[1].removesuffix(".htm")
+        rows = cells(page(url))
+        contest = key("contest", event.id, "senate", state)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=SENATE,
+            district_area_id=area("au.state", state),
+            magnitude=2 if state in ("ACT", "NT") else 6,
+            round_number=1,
+            electoral_system_id=SENATE_GVT,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"Senate, {STATE_NAMES[state]}", "en", "official")
+        p.add("slug", path=f"{path}/senate-{state.lower()}", entity_id=contest, is_current=True)
+        result_set = _result_set(
+            p,
+            election,
+            contest,
+            "First preferences for the whole state or territory, the finest unit the Australian Electoral Commission "
+            "publishes for the 2001 Senate election. Votes above the line are stored on one option per group and "
+            "votes below the line on each candidate. The source does not mark the senators elected, so no outcomes "
+            "are stored.",
+        )
+        unit = key("unit", f"{event.day}:{state}:SENATE")
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=AUSTRALIA,
+            scheme_code="au.polling_place",
+            code=f"{event.day}:{state}:SENATE",
+            area_relation="within",
+            area_id=area("au.state", state),
+            kind="aggregate",
+        )
+        p.name(unit, f"{STATE_NAMES[state]}: all Senate votes", "en", "official")
+        start = next(i for i, row in enumerate(rows) if row[:2] == ["Ticket", "Candidates"])
+        group = ""
+        valid = 0
+        printed: dict[str, int] = {}
+        for row in rows[start + 1 :]:
+            total = row[0].removeprefix("STATE ")
+            if total in ("FORMAL", "INFORMAL", "TOTAL"):
+                printed[total] = _int(row[1])
+                if total == "TOTAL":
+                    break
+                continue
+            if len(row) < 5 or "Group Total" in row[:2] or "Ungrouped Total" in row[:2]:
+                continue
+            if len(row) == 6:
+                group, row = row[0], row[1:]
+            label, code, votes = row[0], row[1], _int(row[2])
+            tag = f"{state}:{group}:{label}"
+            if label == "TICKET VOTES":
+                option = key("option", event.id, "senate", tag)
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="legend",
+                    party_id=_party_of(code, known),
+                    ballot_label=f"Group {group} (above the line)",
+                )
+            else:
+                option = _candidate_senate(p, event, contest, tag, label, code, known)
+            values.add(result_set, unit, option, 1, votes)
+            valid += votes
+        if valid != printed["FORMAL"]:
+            raise ValueError(f"2001 Senate {state}: options sum to {valid}, the page prints {printed['FORMAL']}")
+        _accounts(values, result_set, unit, valid, printed["INFORMAL"])
+        enrolled = _enrolled(rows)
+        if enrolled is not None:
+            values.add(result_set, unit, None, 2, enrolled)
+    return 8
+
+
+def _candidate_senate(p: Package, event: Event, contest: str, tag: str, label: str, code: str, known: set[str]) -> str:
+    option = key("option", event.id, "senate", tag)
+    p.add(
+        "contest_option",
+        id=option,
+        contest_id=contest,
+        kind="candidate",
+        party_id=_party_of(code, known),
+        ballot_label=label,
+    )
+    surname, _, given = label.partition(", ")
+    person = key("person", event.id, "senate", tag)
+    p.add("person", id=person)
+    p.name(person, person_name(given, surname), "en", "official")
+    p.add(
+        "candidacy",
+        id=key("candidacy", event.id, "senate", tag),
+        person_id=person,
+        option_id=option,
+        role="head",
+        ballot_name=label,
+        member_of_party_id=_party_of(code, known),
+        is_independent=code in NO_PARTY,
+    )
+    return option
+
+
+def house_werriwa(p: Package, election: str, path: str, units: Units, values: Values, known: set[str]) -> int:
+    event = WERRIWA
+    division = "153"
+    by_type, _, _, summary = pages_werriwa()
+    contest, result_set = _house_contest(
+        p, event, election, path, division, "Werriwa", "NSW", HTML_METHOD.format(pages="polling place results pages")
+    )
+    rows = cells(page(by_type))
+    start = next(i for i, row in enumerate(rows) if row[:2] == ["Candidate", "Party"])
+    by_name = {name: ab for ab, name in _party_names().items()}
+    options: dict[str, str] = {}
+    ordinary: dict[str, int] = {}
+    valid: Counter[str] = Counter()
+    bad: dict[str, int] = {}
+    for row in rows[start + 1 :]:
+        numbers = [_int(cell) for cell in row[2::2]] if len(row) >= 13 else []
+        if len(row) < 13 or row[0].startswith("....."):
+            continue
+        label = row[0]
+        if label == "TOTAL":
+            break
+        if label == "FORMAL":
+            continue
+        ordinary[label] = numbers[0]
+        for kind, value in zip(("ABSENT", "PROVISIONAL", "PRE_POLL", "POSTAL"), numbers[1:5], strict=True):
+            unit = units.declaration(division, kind)
+            if label == "INFORMAL":
+                bad[unit] = value
+            else:
+                if label not in options:
+                    options[label] = _candidate(
+                        p,
+                        event,
+                        contest,
+                        f"{division}:{label}",
+                        label,
+                        len(options) + 1,
+                        by_name.get(row[1], ""),
+                        known,
+                    )
+                values.add(result_set, unit, options[label], 1, value)
+                valid[unit] += value
+        if label != "INFORMAL":
+            p.add("declared", result_set_id=result_set, option_id=options[label], measure=1, value=numbers[5])
+        else:
+            p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=numbers[5])
+    summed: Counter[str] = Counter()
+    for url in werriwa_places():
+        place = url.rsplit("-", 1)[1].removesuffix(".htm")
+        place_rows = cells(page(url))
+        heading = next(cell for row in place_rows for cell in row if cell.startswith("POLLING PLACE - "))
+        name = next(
+            (
+                r[0]
+                for r in cells(page(pages_werriwa()[1]))
+                if r and r[0].upper() == heading.removeprefix("POLLING PLACE - ").split(" Division")[0].strip()
+            ),
+            heading.removeprefix("POLLING PLACE - ").split(" Division")[0].title(),
+        )
+        unit = units.place(division, place, name)
+        begin = next(i for i, row in enumerate(place_rows) if row[:3] == ["Candidate", "Party", "Votes"])
+        for row in place_rows[begin + 1 :]:
+            if row[0] == "TOTAL":
+                break
+            if row[0].startswith(".....") or row[0] == "FORMAL":
+                continue
+            value = _int(row[2])
+            if row[0] == "INFORMAL":
+                bad[unit] = value
+                summed["INFORMAL"] += value
+            else:
+                values.add(result_set, unit, options[row[0]], 1, value)
+                valid[unit] += value
+                summed[row[0]] += value
+    _remainder(p, values, units, result_set, division, options, ordinary, summed, valid, bad, "polling place pages")
+    for unit in {*valid, *bad}:
+        _accounts(values, result_set, unit, valid[unit], bad.get(unit))
+    first = cells(page(summary))
+    tcp = next(i for i, row in enumerate(first) if "This Election (%)" in row)
+    pair = {row[0]: _int(row[2]) for row in first[tcp + 1 :] if row and row[0] in options}
+    winner = max(pair, key=lambda c: pair[c])
+    for label, option in options.items():
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=option,
+            kind="elected" if label == winner else "lost" if label in pair else "eliminated",
+        )
+    enrolled = _enrolled(first)
+    if enrolled is not None:
+        values.add(result_set, units.roll(division), None, 2, enrolled)
+    return 1
+
+
+def election_html(event: Event) -> Package:
+    p = Package(
+        f"{SOURCE}/{event.day}",
+        SOURCE,
+        f"The {event.title}, by polling place, from the Australian Electoral Commission's results pages",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRALIA, COUNTRY}
+    for url in html_cited(event):
+        p.uses(raw.cached(SOURCE, url))
+    election_id = key("election", event.day)
+    path = f"au/{event.day}-{'general' if event is V2001 else 'by-election'}"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=AUSTRALIA,
+        kind=event.kind,
+        date_from=event.day,
+        date_to=event.day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, event.title, "en", "official")
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units = Units(p, event.day)
+    values = Values()
+    known = _parties()
+    if event is V2001:
+        house_2001(p, election_id, path, units, values, known)
+        senate_2001(p, election_id, path, values, known)
+    else:
+        house_werriwa(p, election_id, path, units, values, known)
+    p.frame("result_value", values.frame())
+    over = {k: v for k, v in OVER.items() if k.startswith(str(event.day))}
+    if over:
+        p.accept(
+            "accounting.declared",
+            f"in {len(over)} divisions the AEC's 2001 polling place pages give 1 to 8 more ordinary votes for a "
+            "candidate than its own first preferences by vote type table; stored as printed, with a caveat note",
+        )
+    return p
+
+
+def html_cited(event: Event) -> list[str]:
+    if event is V2001:
+        divisions, places, senate = pages_2001()
+        return [*divisions, *places, *senate]
+    return [*pages_werriwa(), *werriwa_places()]
