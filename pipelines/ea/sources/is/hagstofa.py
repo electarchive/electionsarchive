@@ -229,6 +229,8 @@ REGIONS = {
     "Northeast",
     "East",
     "South",
+    "Soutwest",
+    "Suðurland",
 }
 ALIASES = {
     "Akraneskaupstaður": "Akranes",
@@ -256,6 +258,12 @@ ALIASES = {
     "Stykkishólmsbær": "Stykkishólmur",
     "Vestmannaeyjabær": "Vestmannaeyjar",
     "Ólafsfjörður": "Ólafsfjarðarbær",
+    "Akrahreppur og Sveitarfélagið Skagafjörður": "Skagafjörður",
+    "Kjósahreppur": "Kjósarhreppur",
+    "Blönduós": "Blönduóssbær",
+    "Seyðiafjarðarkaupstaður": "Seyðisfjörður",
+    "Fjarðabyggð (Breiðdalshreppur meðtalinn)": "Fjarðabyggð",
+    "Sandgerðisbær og Garður": "Sandgerði og Garður",
 }
 CONSTITUENCIES = {
     # code: (name, native name, valid from, valid to)
@@ -644,6 +652,7 @@ class Build:
         self.counts: Counter[str] = Counter()
         self.sets: list[str] = []
         self.cited: set[str] = set()
+        self.valued: Counter[str] = Counter()
         kind, english, native = KINDS[event.kind]
         day = event.day
         english_date = (
@@ -778,6 +787,7 @@ class Build:
         if value is None:
             return
         self.counts["values"] += 1
+        self.valued[result_set] += 1
         self.p.add(
             "result_value",
             result_set_id=result_set,
@@ -801,12 +811,31 @@ class Build:
     def note(self, entity: str, kind: str, text: str, suffix: str = "") -> None:
         self.p.add("note", id=key("note", entity, kind, suffix), entity_id=entity, kind=kind, body_md=text, lang="en")
 
+    def finish(self) -> Package:
+        for row in self.p.rows.get("result_set", []):
+            if not self.valued[str(row["id"])]:
+                row["completeness"] = None
+        return self.p
+
     def caveat(self, text: str) -> None:
-        self.note(self.election, "caveat", text, text[:40])
+        self.note(self.election, "caveat", text, text)
 
 
 # Where two of Statistics Iceland's own tables disagree, the pair of figures and what the package does about it.
 KNOWN: dict[str, tuple[int, int]] = {
+    "2002 registered voters (municipalities, national total)": (203141, 204945),
+    "2006 registered voters (municipalities, national total)": (215932, 216163),
+    "2010 registered voters (municipalities, national total)": (224828, 225855),
+    "2014 registered voters (municipalities, national total)": (238654, 239734),
+    "2018 registered voters (municipalities, national total)": (247890, 247943),
+    "2006 Kópavogur valid votes": (14592, 14591),
+    "2006 Sveitarfélagið Garður valid votes": (802, 803),
+    "2006 Blönduóssbær valid votes": (589, 588),
+    "2006 Langanesbyggð valid votes": (304, 303),
+    "2006 Skeiða- og Gnúpverjahreppur valid votes": (315, 314),
+    "2022 Seltjarnarnes valid votes": (2470, 2469),
+    "2022 Langanesbyggð valid votes": (347, 345),
+    "2022 Reykjanesbær valid votes": (6783, 6782),
     "2012 votes cast nationwide (participation table, results table)": (163294, 163251),
     "2016 votes cast nationwide (participation table, results table)": (185430, 185390),
     "2020 votes cast nationwide (participation table, results table)": (168790, 168821),
@@ -815,7 +844,7 @@ KNOWN: dict[str, tuple[int, int]] = {
 
 
 def mismatch(b: Build, what: str, ours: int | None, theirs: int | None) -> None:
-    if ours == theirs:
+    if (ours or 0) == (theirs or 0):
         return
     if KNOWN.get(what) == (ours, theirs):
         b.caveat(
@@ -1007,7 +1036,7 @@ def turnout_only(event: Event) -> Package:
         b.value(result_set, unit, None, measure, value)
         b.declare(result_set, None, measure, value)
     dated(b, event)
-    return b.p
+    return b.finish()
 
 
 def dated(b: Build, event: Event) -> None:
@@ -1107,7 +1136,7 @@ def althing_national(
     if None not in (cast, blank, void):
         mismatch(b, f"{year} ballots", whole, (cast or 0) - (blank or 0) - (void or 0))
     dated(b, event)
-    return b.p
+    return b.finish()
 
 
 def national_seats(year: int, pid: str) -> int | None:
@@ -1242,7 +1271,7 @@ def althing_constituencies(b: Build, event: Event, registered: int | None, cast:
         if published is not None:
             mismatch(b, f"{year} {name} nationwide", totals[party_id_of(name)], published)
     dated(b, event)
-    return b.p
+    return b.finish()
 
 
 # ---------------------------------------------------------------- presidency
@@ -1396,7 +1425,7 @@ def president(event: Event) -> Package:
     b.declare(result_set, None, 6, totals.get(Year=ys, Votes="Blank ballots", Unit="Number"))
     b.declare(result_set, None, 5, totals.get(Year=ys, Votes="Void ballots", Unit="Number"))
     dated(b, event)
-    return b.p
+    return b.finish()
 
 
 PERSONS: set[tuple[str, str]] = set()
@@ -1498,7 +1527,7 @@ def referendum(event: Event) -> Package:
         b.outcome(result_set, no, None, "won" if (n or 0) > (y or 0) else "lost")
         if year == 1944 and not any(q for q in [None]):
             pass
-    return b.p
+    return b.finish()
 
 
 def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str, str]]) -> Package:
@@ -1620,7 +1649,280 @@ def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str,
     if ballot_set is not None:
         for measure, value in ((2, registered), (3, cast), (4, valid_total), (6, blank_total), (5, void_total)):
             b.declare(ballot_set, None, measure, value)
-    return b.p
+    return b.finish()
+
+
+# ---------------------------------------------------------------- local government
+
+LOCAL_TABLES = {
+    2002: ("KOS03201", None, "KOS03210", "KOS03302"),
+    2006: ("KOS03202", "KOS03205", "KOS03211", "KOS03304"),
+    2010: ("KOS03203", "KOS03206", "KOS03212", "KOS03305"),
+    2014: ("KOS03204", "KOS03207", "KOS03213", "KOS03306"),
+    2018: ("KOS03204a", "KOS03208", "KOS03214", "KOS03307"),
+    2022: ("KOS03204b", "KOS03208a", "KOS03214a", "KOS03308"),
+}
+LETTER = re.compile(r"^([A-ZÞÆÖÐÁÉÍÓÚÝ]{1,2})(?=[\s\-–:.]|$)")
+TACIT = re.compile(r"^(?P<m>.+?)[,\s]+(?:sjálfkjörið|one list)(?P<rest>.*)$", re.IGNORECASE)
+MARKER = re.compile(r"^[\s,]*(?:elected|without voting|no voting|not voting|,)\s*", re.IGNORECASE)
+
+
+@dataclass
+class Block:
+    name: str
+    tacit: bool
+    head: list[int | None]
+    lists: list[tuple[str, list[int | None]]]
+
+
+def blocks(g: Grid, rows: dict[str, list[int | None]]) -> list[Block]:
+    """The municipalities of a results or candidates table: a header row, then one row for each candidate list."""
+    out: list[Block] = []
+    labels = [clean(label) for label in g.labels[g.dims[0]]]
+    originals = g.labels[g.dims[0]]
+    dashed = all(" - " in label for label in labels)
+    for i, label in enumerate(labels):
+        values = rows[originals[i]]
+        following = labels[i + 1] if i + 1 < len(labels) else ""
+        tacit = TACIT.match(label)
+        if tacit:
+            rest = tacit.group("rest")
+            while True:
+                shorter = MARKER.sub("", rest)
+                if shorter == rest:
+                    break
+                rest = shorter
+            name = canon(tacit.group("m").strip(" ,"))
+            if not out or out[-1].name != name or not out[-1].tacit:
+                out.append(Block(name, True, values, []))
+            if rest.strip():
+                out[-1].lists.append((rest.strip(), values))
+            continue
+        if dashed and " - " in label:
+            name, rest = label.split(" - ", 1)
+            name = canon(name)
+            if not out or out[-1].name != name:
+                out.append(Block(name, False, [None] * len(values), []))
+            out[-1].lists.append((rest, values))
+            continue
+        if not out or following.startswith(label + " ") or (i == 0):
+            out.append(Block(canon(label), False, values, []))
+            continue
+        head = out[-1]
+        if head.tacit and re.match(re.escape(head.name) + r"[,\s]", label):
+            head.lists.append((label[len(head.name) :].strip(" ,"), values))
+            continue
+        prefix = next((p for p in (labels[j] for j in range(i, -1, -1)) if label.startswith(p + " ")), None)
+        if prefix is None:
+            out.append(Block(canon(label), False, values, [(label, values)]))
+        else:
+            head.lists.append((label[len(prefix) :].strip(), values))
+    return out
+
+
+def letter(text: str) -> str:
+    match = LETTER.match(text) or re.search(r"listabókstafur\s+([A-ZÞÆÖÐÁÉÍÓÚÝ]{1,2})", text)
+    return match.group(1) if match else text.lower()
+
+
+def seats_for(lists: list[tuple[str, list[int | None]]], share: Block | None) -> list[int | None]:
+    """The representatives each list elected, from the candidates table: by ballot letter, else by position."""
+    if share is None:
+        return [None] * len(lists)
+    total = share.head[0] or sum(values[0] or 0 for _, values in share.lists)
+    by_letter = {letter(text): values[0] for text, values in share.lists}
+    got = [by_letter.get(letter(text)) for text, _ in lists]
+    if sum(g or 0 for g in got) == total and len({letter(text) for text, _ in lists}) == len(lists):
+        return got
+    if len(lists) == len(share.lists):
+        position = [values[0] for _, values in share.lists]
+        if sum(x or 0 for x in position) == total:
+            return position
+    return [None] * len(lists)
+
+
+def local(event: Event) -> Package:
+    year = event.day.first.year
+    if year not in LOCAL_TABLES:
+        return local_reykjavik(event)
+    turnout_table, votes_table, results_table, seats_table = LOCAL_TABLES[year]
+    b = Build(event, f"The {year} Icelandic local government elections by municipality from Statistics Iceland")
+    b.cite(turnout_table, results_table, seats_table, "KOS02005")
+    if votes_table:
+        b.cite(votes_table)
+    registered_all, cast_all = turnout("KOS02005", event.label)
+    t = grid(turnout_table)
+    results = grid(results_table)
+    seats = grid(seats_table)
+    result_rows = {
+        label: [results.cells[(label, unit)] for unit in results.labels[results.dims[1]]]
+        for label in results.labels[results.dims[0]]
+    }
+    seat_unit = seats.labels["Unit"][-1]
+    seat_rows = {
+        label: [seats.cells[(label, seat_unit, "Total")]] for label in seats.labels[seats.dims[0]]
+    }
+    r_blocks = {x.name: x for x in blocks(results, result_rows)}
+    s_blocks = {x.name: x for x in blocks(seats, seat_rows)}
+    v = grid(votes_table) if votes_table else None
+    v_labels = {canon(label): label for label in v.labels["Municipality"]} if v is not None else {}
+    note = SOURCE_NOTE + (
+        "Each municipal council is elected by proportional representation from candidate lists. Voters on the "
+        "electoral roll, votes cast, and blank and void ballots are the municipality's, and each list's votes are "
+        "its valid votes. Seats are the representatives each list elected."
+    )
+    reg_sum = cast_sum = 0
+    gaps: list[str] = []
+    list_gaps: list[str] = []
+    used: set[str] = set()
+    for label in t.labels["Municipality"]:
+        if is_region(label):
+            continue
+        name = canon(label)
+        registered = t.get(Municipality=label, Unit="Voters on the electoral roll", Sex="Total")
+        cast = t.get(Municipality=label, Unit="Votes cast", Sex="Total")
+        valid = blank = void = None
+        if v is not None:
+            vl = v_labels[name]
+            valid = v.get(Municipality=vl, Unit="Valid votes")
+            blank = v.get(Municipality=vl, Unit="Blank ballots")
+            void = v.get(Municipality=vl, Unit="Void ballots")
+            counted = v.get(Municipality=vl, Unit="Votes cast, total")
+            if cast is None:
+                cast = counted
+            elif counted is not None:
+                mismatch(b, f"{year} {name} votes cast", counted, cast)
+        block = r_blocks.get(name)
+        if block is None and valid is not None:
+            block = next(
+                (x for x in r_blocks.values() if x.head[0] == valid and x.name not in used and not x.tacit), None
+            )
+        title = (f"{year} {name} municipal election", None)
+        if block is not None:
+            used.add(block.name)
+        area_id = area("is.sveitarfelag", name)
+        if block is not None and block.tacit:
+            contest = b.contest(
+                f"local:{name}",
+                title,
+                kind="list_allocation",
+                where=area_id,
+                system=SYSTEM_LOCAL,
+                body_id=COUNCIL_BODY,
+            )
+            tacit_set = b.result_set(
+                f"local:{name}",
+                contest,
+                SOURCE_NOTE + "Only one candidate list stood in this municipality, so no vote was held and the "
+                "list was elected without one.",
+            )
+            b.p.rows["result_set"][-1]["kind"] = "tacit"
+            share = s_blocks.get(name)
+            seated = seats_for(block.lists, share)
+            if share is not None and share.head[0] is not None:
+                b.p.rows["contest"][-1]["magnitude"] = share.head[0]
+            for position, (text, _) in enumerate(block.lists, 1):
+                option = b.option(
+                    contest, letter(text), text, position, "list", party(local_party(text)) if local_party(text) else None
+                )
+                if seated[position - 1]:
+                    b.outcome(tacit_set, option, seated[position - 1], "elected")
+            continue
+        if block is None:
+            contest = b.contest(
+                f"local:{name}", title, kind="body_seats", where=area_id, system=SYSTEM_LOCAL, body_id=COUNCIL_BODY
+            )
+            result_set = b.result_set(
+                f"local:{name}",
+                contest,
+                SOURCE_NOTE + "This municipality's council was elected by direct personal voting, without candidate "
+                "lists. Statistics Iceland publishes the municipality's turnout and ballots, and not the votes "
+                "for each person.",
+            )
+            unit = b.municipality(name)
+            for measure, value in ((2, registered), (3, cast), (4, valid), (6, blank), (5, void)):
+                b.value(result_set, unit, None, measure, value)
+            reg_sum += registered or 0
+            cast_sum += cast or 0
+            gap(b, result_set, gaps, name, cast, valid, blank, void)
+            continue
+        contest = b.contest(
+            f"local:{name}", title, kind="list_allocation", where=area_id, system=SYSTEM_LOCAL, body_id=COUNCIL_BODY
+        )
+        share = s_blocks.get(name)
+        magnitude = share.head[0] if share is not None and share.head[0] is not None else None
+        if magnitude is None and share is not None:
+            magnitude = sum(vals[0] or 0 for _, vals in share.lists) or None
+        b.p.rows["contest"][-1]["magnitude"] = magnitude
+        result_set = b.result_set(f"local:{name}", contest, note)
+        unit = b.municipality(name)
+        for measure, value in ((2, registered), (3, cast), (4, valid), (6, blank), (5, void)):
+            b.value(result_set, unit, None, measure, value)
+            b.declare(result_set, None, measure, value)
+        listed = 0
+        seated = seats_for(block.lists, share)
+        for position, (text, vals) in enumerate(block.lists, 1):
+            pid = local_party(text)
+            option = b.option(contest, letter(text), text, position, "list", party(pid) if pid else None)
+            b.value(result_set, unit, option, 1, vals[0])
+            b.declare(result_set, option, 1, vals[0])
+            listed += vals[0] or 0
+            if seated[position - 1]:
+                b.outcome(result_set, option, seated[position - 1])
+        mismatch(b, f"{year} {name} list votes", listed, block.head[0])
+        if valid is not None:
+            mismatch(b, f"{year} {name} valid votes", listed, valid)
+            if listed != valid:
+                list_gaps.append(name)
+                b.note(
+                    result_set,
+                    "caveat",
+                    f"The list votes add up to {listed:,}, and Statistics Iceland prints {valid:,} valid votes. Each "
+                    "figure is stored as printed.",
+                    "valid",
+                )
+        gap(b, result_set, gaps, name, cast, valid, blank, void)
+        reg_sum += registered or 0
+        cast_sum += cast or 0
+    mismatch(b, f"{year} registered voters (municipalities, national total)", reg_sum, registered_all)
+    mismatch(b, f"{year} votes cast", cast_sum, cast_all)
+    if gaps:
+        b.p.accept(
+            "accounting.ballots_sum",
+            f"Statistics Iceland's votes cast differ from the sum of its valid, blank, and void ballots in "
+            f"{len(gaps)} municipalities ({', '.join(gaps)}); stored as printed",
+        )
+    if list_gaps:
+        b.p.accept(
+            "accounting.votes_valid",
+            f"in {len(list_gaps)} municipalities ({', '.join(list_gaps)}) the list votes differ by a vote or two "
+            "from the valid votes in Statistics Iceland's table of votes cast; each is stored as printed",
+        )
+    unmatched = sorted(set(r_blocks) - used - {x.name for x in r_blocks.values() if x.tacit})
+    if unmatched:
+        raise LookupError(f"{year}: results of {unmatched} match no municipality of the turnout table")
+    return b.finish()
+
+
+def gap(
+    b: Build, result_set: str, gaps: list[str], name: str, cast: int | None, valid: int | None, blank: int | None,
+    void: int | None,
+) -> None:
+    if cast is None or valid is None or valid + (blank or 0) + (void or 0) == cast:
+        return
+    gaps.append(name)
+    b.note(
+        result_set,
+        "caveat",
+        f"Statistics Iceland prints {cast:,} votes cast, and {valid:,} valid, {blank or 0:,} blank, and "
+        f"{void or 0:,} void ballots, which add up to {valid + (blank or 0) + (void or 0):,}. Each figure is stored as "
+        "printed.",
+        "ballots",
+    )
+
+
+def local_reykjavik(event: Event) -> Package:
+    raise NotImplementedError(event.ekey)
 
 
 # ---------------------------------------------------------------- run
@@ -1633,6 +1935,8 @@ def build(event: Event) -> Package:
         return president(event)
     if event.kind == "referendum":
         return referendum(event)
+    if event.kind == "local":
+        return local(event)
     raise NotImplementedError(event.ekey)
 
 
