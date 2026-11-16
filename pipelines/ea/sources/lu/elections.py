@@ -1035,16 +1035,16 @@ def _race(p: Package, name: str, first: date, election: str, path: str, race: Ra
                 kind="won" if entry.seats else "lost",
                 seats=entry.seats,
             )
-    plain: dict[str, str] = {}
-    elected: dict[str, bool] = {c.name: c.elected for c in race.candidates}
+    plain: dict[int, str] = {}
+    elected: dict[int, tuple[str, bool]] = {c.number: (c.name, c.elected) for c in race.candidates}
     for place in race.places:
         for c in place.candidates:
-            elected.setdefault(c.name, c.elected)
-    for position, (who, won) in enumerate(elected.items(), 1):
-        person = key("person", name, tag, "plain", who)
+            elected.setdefault(c.number, (c.name, c.elected))
+    for position, (ballot, (who, won)) in enumerate(elected.items(), 1):
+        person = key("person", name, tag, "plain", ballot)
         p.add("person", id=person)
         p.name(person, who, "fr", "official")
-        option = plain[who] = key("option", name, tag, "candidate", who)
+        option = plain[ballot] = key("option", name, tag, "candidate", ballot)
         p.add(
             "contest_option",
             id=option,
@@ -1055,7 +1055,7 @@ def _race(p: Package, name: str, first: date, election: str, path: str, race: Ra
         )
         p.add(
             "candidacy",
-            id=key("candidacy", name, tag, who),
+            id=key("candidacy", name, tag, "plain", ballot),
             person_id=person,
             option_id=option,
             role="head",
@@ -1076,7 +1076,7 @@ def _race(p: Package, name: str, first: date, election: str, path: str, race: Ra
                     result_set, unit, candidate_option[(entry.number, candidate.name)], CANDIDATE_VOTES, candidate.votes
                 )
         for candidate in place.candidates:
-            values.add(result_set, unit, plain[candidate.name], VOTES, candidate.votes)
+            values.add(result_set, unit, plain[candidate.number], VOTES, candidate.votes)
     p.frame("result_value", values.frame())
     if race.printed:
         _declared(p, result_set, race, list_option, candidate_option, plain)
@@ -1100,7 +1100,7 @@ def _declared(
     race: Race,
     list_option: dict[int, str],
     candidate_option: dict[tuple[int, str], str],
-    plain: dict[str, str],
+    plain: dict[int, str],
 ) -> None:
     for measure, value in (
         (REGISTERED, race.stats.registered),
@@ -1134,7 +1134,7 @@ def _declared(
             p.add(
                 "declared",
                 result_set_id=result_set,
-                option_id=plain[candidate.name],
+                option_id=plain[candidate.number],
                 measure=VOTES,
                 value=candidate.votes,
             )
