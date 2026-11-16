@@ -854,6 +854,7 @@ def registry(year: int) -> Package:
             id=key("page", year, page),
             artifact_id=artifact_id,
             page_number=page,
+            image_key=f"pages/{SOURCE}/{artifact.path.stem}/{page}.png",
             width=width,
             height=height,
         )
