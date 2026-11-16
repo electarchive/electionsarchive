@@ -1,0 +1,1816 @@
+{
+  "polity": "GT",
+  "name": "Guatemala",
+  "sources": {
+    "constitucion": {
+      "title": "Constitución Política de la República de Guatemala (1985, reformada por Acuerdo Legislativo 18-93)",
+      "publisher": "Corte de Constitucionalidad",
+      "url": "https://cc.gob.gt/index.php/constitucion-politica/",
+      "kind": "official_body",
+      "note": "Arts. 157 (Congress: district deputies plus a national list of a quarter of them, four-year term), 184 (President and Vice President, four years, absolute majority or a second round), 224 (departments and municipalities), 254 (municipal councils elected directly every four years), 173 and 280 (consulta popular), 278 (Asamblea Nacional Constituyente), 215 and 217 (judges chosen by Congress from postulation-commission lists), and 269 (Constitutional Court)."
+    },
+    "lepp": {
+      "title": "Ley Electoral y de Partidos Políticos, Decreto 1-85 de la Asamblea Nacional Constituyente, y sus reformas (edición 2026)",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/LEPP2026.pdf",
+      "kind": "official_body",
+      "note": "Arts. 196 (convocation in January, elections on a Sunday in June since Decreto 26-2016), 199 (classes of elections: general, Asamblea Nacional Constituyente, Central American Parliament, consulta popular), 201-203 (absolute majority, plurality for mayors and síndicos, D'Hondt), 205 (23 electoral districts and 128 district deputies), 206 (municipal corporations by population), 26 (party national assemblies choose candidates), and 123 (TSE magistrates elected by Congress)."
+    },
+    "historia": {
+      "title": "Historia del Tribunal Supremo Electoral",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/homepage/historia",
+      "kind": "official_body",
+      "note": "Timeline of every process the TSE has run: the 1984 Constituent Assembly, the general elections and second rounds from 1985 to 2023, the mid-term municipal elections of 1988, 1993, and 1998, and the consultas populares of 1999 and 2018. It dates the 1994 consulta \"25 de mayo\", the day of the 1993 self-coup, which the 1993-1994 memoria contradicts."
+    },
+    "memorias": {
+      "title": "Memorias electorales",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+      "kind": "official_body",
+      "note": "Index of the 17 memorias, 1984 to 2023, each a PDF; the 2003 memoria is split into one PDF per municipality."
+    },
+    "m1984": {
+      "title": "Memoria de las Elecciones para Diputados a la Asamblea Nacional Constituyente, 1 de julio de 1984",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1984_Memoria_Elecciones-AsambleaNacionalConstituyente.pdf",
+      "kind": "official_body",
+      "note": "409 scanned pages, no text layer. Register by department and municipality, then results by district and municipality."
+    },
+    "m1985": {
+      "title": "Memoria de las Elecciones Generales 1985",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1985_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "486 scanned pages, no text layer. Page 6: \"El Congreso de la República, compuesto actualmente por cien diputados\"; the national list of 25 was voted with the presidential ticket; results by municipality."
+    },
+    "m1988": {
+      "title": "Memoria de las Elecciones Municipales 1988",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1988_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "381 scanned pages, no text layer. Mid-term election of the corporations elected for two and a half years in 1985, and of 30 others elected for five years."
+    },
+    "m1990": {
+      "title": "Memoria de las Elecciones Generales 1990-1991",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1990-1991_Elecciones_Generales.pdf",
+      "kind": "official_body",
+      "note": "479 scanned pages, no text layer. Decreto 1-90 (pages 28-31): 87 district deputies, 29 by national list, 20 to the Central American Parliament, and every municipal corporation except the 30 elected for five years in 1988."
+    },
+    "m1993": {
+      "title": "Memoria de las Elecciones de Corporaciones Municipales 1993",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1993_Memoria_de_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "369 scanned pages, no text layer. 276 corporations elected on 9 May 1993."
+    },
+    "m1994": {
+      "title": "Memoria de las Consultas Populares (1993-1994) y Elección de Diputados (1994)",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1993-1994_Consulta_Popular_-_%20Eleccion_de_Diputados.pdf",
+      "kind": "official_body",
+      "note": "409 scanned pages, no text layer. The 1994 consulta popular on the constitutional reforms and the extraordinary election of a new Congress that followed it."
+    },
+    "m1995": {
+      "title": "Memoria de las Elecciones Generales 1995-1996",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1995-1996_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "797 scanned pages, no text layer."
+    },
+    "m1998": {
+      "title": "Memoria de las Elecciones Municipales 1998",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1998_Elecciones_Municipales.pdf",
+      "kind": "official_body",
+      "note": "221 scanned pages, no text layer. The 30 corporations elected for five years in 1993, elected again for 18 months so that every municipality votes with the general election from 1999."
+    },
+    "m1999cp": {
+      "title": "Memoria de la Consulta Popular 1999",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1999_Consulta_Popular.pdf",
+      "kind": "official_body",
+      "note": "387 scanned pages, no text layer. Results by department and municipality."
+    },
+    "m1999": {
+      "title": "Memoria de las Elecciones Generales 1999",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/1999_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "866 scanned pages, no text layer."
+    },
+    "m2003": {
+      "title": "Memoria Electoral 2003",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales/memoria-electoral-2003",
+      "kind": "official_body",
+      "note": "One PDF per municipality under /images/memoriaselec/memoria_electoral_2003/<department>/<municipality>.pdf, 269 files linked from the page."
+    },
+    "m2007": {
+      "title": "Memoria Elecciones Generales 2007",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "892 pages with a text layer. Decreto 1-2007: 158 deputies (127 by district, 31 by national list); elections in the 23 districts and the 332 municipalities on 9 September 2007, second round 4 November."
+    },
+    "m2011": {
+      "title": "Memoria Elecciones Generales 2011",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2011_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "694 pages with a text layer, 686 MB. The convocation set 127 district and 31 national-list deputies; \"los 333 municipios que conforman la división político-administrativa del país\"."
+    },
+    "m2015": {
+      "title": "Memoria de Elecciones Generales y al Parlamento Centroamericano 2015",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2015_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "578 pages with a text layer. Results by department and municipality for every ballot."
+    },
+    "m2018": {
+      "title": "Memoria de la Consulta Popular 2018",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2018_Memoria_Consulta_Popular.pdf",
+      "kind": "official_body",
+      "note": "288 pages with a text layer. The consulta on submitting Guatemala's claim against Belize to the International Court of Justice."
+    },
+    "m2019": {
+      "title": "Memoria de Elecciones Generales y al Parlamento Centroamericano 2019",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2019_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "906 pages with a text layer. Results and adjudications for each of the 340 municipalities, each district, the national list, the Central American Parliament, and both presidential rounds."
+    },
+    "m2023": {
+      "title": "Memoria de Elecciones Generales y de Diputados al Parlamento Centroamericano 2023",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.tse.org.gt/images/memoriaselec/me/2023_Memoria_Elecciones.pdf",
+      "kind": "official_body",
+      "note": "810 pages with a text layer. Register of 9,361,068; 24,585 polling tables; national results for the presidency, the national list, and the Central American Parliament, results by district, and results and adjudications by municipality; Decreto 3-2023 repeated five municipal elections on 20 August 2023."
+    },
+    "trep2023": {
+      "title": "Transmisión de Resultados Electorales Preliminares (TREP), Elecciones Generales 2023: archivos por mesa",
+      "publisher": "Tribunal Supremo Electoral (TSE)",
+      "url": "https://www.trep.gt",
+      "kind": "official_body",
+      "note": "Per-table CSV files in a zip for each election day (primeraeleccion.trep.gt, segundaeleccion.trep.gt)."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República de Guatemala",
+      "name_en": "Republic of Guatemala",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "constitucion"
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos",
+      "name_en": "Departments",
+      "parent": "national",
+      "scheme": "gt.departamento",
+      "elects": false,
+      "source": "constitucion",
+      "counts": [
+        {
+          "date": "2016-05-25",
+          "value": 22,
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 205: \"cada departamento de la República constituye un distrito electoral, con excepción del departamento de Guatemala\"; the list a) to w) names 22 departments, Guatemala as two districts)"
+        }
+      ]
+    },
+    {
+      "key": "distrito",
+      "name": "Distritos electorales",
+      "name_en": "Electoral districts for Congress",
+      "parent": "national",
+      "scheme": "gt.distrito",
+      "source": "lepp",
+      "counts": [
+        {
+          "date": "2016-05-25",
+          "value": 23,
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 205: districts a) Distrito Central to w) Jutiapa)"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "value": 23,
+          "source": "m2007",
+          "locator": "Decreto 1-2007: \"los veintitrés distritos electorales incluido el distrito central\""
+        }
+      ]
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios",
+      "name_en": "Municipalities",
+      "parent": "departamento",
+      "polity_kind": "municipality",
+      "scheme": "gt.municipio",
+      "source": "constitucion",
+      "counts": [
+        {
+          "date": "1985-11-03",
+          "value": 330,
+          "source": "m1985",
+          "locator": "p. 53: \"las cabeceras de los 330 municipios existentes en la República\""
+        },
+        {
+          "date": "1999-11-07",
+          "value": 330,
+          "source": "m1999",
+          "locator": "p. 25: \"los 330 municipios de la República\""
+        },
+        {
+          "date": "2007-09-09",
+          "value": 332,
+          "source": "m2007",
+          "locator": "Decreto 1-2007: \"los trescientos treinta y dos municipios de la República\""
+        },
+        {
+          "date": "2011-09-11",
+          "value": 333,
+          "source": "m2011",
+          "locator": "\"los 333 municipios que conforman la división político-administrativa del país\""
+        },
+        {
+          "date": "2018-04-15",
+          "value": 340,
+          "source": "m2018",
+          "locator": "\"a las 340 Corporaciones Municipales del país\""
+        },
+        {
+          "date": "2019-06-16",
+          "value": 340,
+          "source": "m2019",
+          "locator": "\"Juntas de los 340 municipios\""
+        }
+      ]
+    },
+    {
+      "key": "comunidad",
+      "name": "Comunidades (aldeas, caseríos, cantones, barrios, colonias)",
+      "name_en": "Communities within municipalities",
+      "parent": "municipio",
+      "polity_kind": "submunicipal",
+      "source": "constitucion"
+    },
+    {
+      "key": "functional",
+      "name": "Ámbitos funcionales y no territoriales",
+      "name_en": "Functional and non-territorial electorates",
+      "parent": "national",
+      "elects": false,
+      "source": "constitucion"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Elección de Presidente y Vicepresidente de la República",
+      "name_en": "President and Vice President",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1985-05-31",
+      "first_held": "1985-11-03",
+      "earliest_record": "1985-11-03",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "gt.municipio"
+        ],
+        "fine": [
+          "gt.centro",
+          "gt.mesa"
+        ]
+      },
+      "note": "President and Vice President elected together on one ticket (planilla) by absolute majority of valid votes, else a second election between the two leading tickets 45 to 60 days later (Constitution art. 184; LEPP art. 201). Five-year term under the 1985 text; four years since the reforms ratified on 30 January 1994; no re-election. Citizens abroad vote for President since Decreto 26-2016 (first in 2019). The archive holds 2015 and 2019 by municipality from the memorias and 2023 by polling table from the TREP.",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 184)",
+      "est_votes": 59000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GT",
+          "valid_from": "1985-05-31"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1985",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1985_Memoria_Elecciones.pdf (p. 15: President, Vice President, and deputies \"serán electos por cinco años, conforme a la Constitución\")",
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a second election between the two leading tickets.",
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1985-05-31",
+          "valid_to": "1994-01-30"
+        },
+        {
+          "source": "constitucion",
+          "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 184 as reformed by Acuerdo Legislativo 18-93, ratified 30 January 1994: \"período improrrogable de cuatro años\")",
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a second election between the two leading tickets within 45 to 60 days.",
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1994-01-30",
+          "valid_to": "2004-05-26"
+        },
+        {
+          "source": "m2007",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf (Decreto 1-2007: the election \"se deberá realizar el primero o segundo domingo del mes de septiembre\")",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a second election between the two leading tickets within 45 to 60 days.",
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-26",
+          "valid_to": "2016-05-25"
+        },
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 196 as reformed by Decreto 26-2016: \"se efectuarán un domingo del mes de junio\"; art. 201)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "term_years": 4,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a second election between the two leading tickets within 45 to 60 days (LEPP art. 201).",
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2016-05-25",
+          "vacancy_rule": "The Vice President succeeds; if both offices fall vacant, Congress elects the replacement for the rest of the term (Constitution art. 189)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1985-1999, text from 2007)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1985-11-03",
+          "last_date": "2023-08-20",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "First and second rounds by department and municipality in each memoria; 2023 gives national totals only"
+        },
+        {
+          "platform": "TSE TREP per-table files",
+          "url": "https://www.trep.gt",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "2023-06-25",
+          "last_date": "2023-08-20",
+          "finest": "gt.mesa",
+          "source": "trep2023",
+          "evidence": "Preliminary count of each polling table for both 2023 rounds"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-11-03",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "3 de noviembre Se realizan las Elecciones Generales"
+        },
+        {
+          "date": "1985-12-08",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "8 de diciembre Segunda Elección Presidencial"
+        },
+        {
+          "date": "1990-11-11",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "11 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "1991-01-06",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "6 de enero Segunda Elección Presidencial"
+        },
+        {
+          "date": "1995-11-12",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "12 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano."
+        },
+        {
+          "date": "1996-01-07",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "7 de enero Segunda Elección Presidencial"
+        },
+        {
+          "date": "1999-11-07",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "7 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "1999-12-26",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "26 de diciembre Segunda elección Presidencial"
+        },
+        {
+          "date": "2003-11-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "9 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2003-12-28",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "28 de diciembre Segunda Elección Presidencial"
+        },
+        {
+          "date": "2007-09-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "9 de septiembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2007-11-04",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "4 de noviembre Segunda Elección Presidencial"
+        },
+        {
+          "date": "2011-09-11",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "11 de septiembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2011-11-06",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "6 de noviembre Segunda Elección Presidencial"
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "6 de septiembre Se realizan las Elecciones Generales y de Diputados al Parlamento Centroamericano."
+        },
+        {
+          "date": "2015-10-25",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "25 de octubre Segunda Elección Presidencial"
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "16 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2019-08-11",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "11 de agosto Segunda Elección Presidencial"
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "25 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2023-08-20",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "historia",
+          "quote": "20 de agosto Segunda Elección Presidencial"
+        }
+      ]
+    },
+    {
+      "key": "congreso_lista_nacional",
+      "tier": "national",
+      "name": "Diputados al Congreso de la República por lista nacional",
+      "name_en": "Congress, national-list deputies",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1985-05-31",
+      "first_held": "1985-11-03",
+      "earliest_record": "1985-11-03",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ],
+        "grain": [
+          "gt.municipio"
+        ],
+        "fine": [
+          "gt.centro",
+          "gt.mesa"
+        ]
+      },
+      "note": "The Congreso de la República is unicameral. Deputies are elected by closed lists and D'Hondt, part by electoral district (each department, with Guatemala City's municipality as the Distrito Central and the rest of its department as the Distrito de Guatemala) and part by a national list equal to a quarter of the district seats (Constitution art. 157; LEPP arts. 203 and 205). Seats per district follow population (one per 80,000 inhabitants in 2007), capped at 128 district seats since 2016. In 1985 the national list was voted with the presidential ticket; from 1990 on a separate ballot. The extraordinary election of 14 August 1994, after the consulta of 30 January 1994, renewed the whole Congress for the rest of the term.",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 205: \"Los 32 diputados electos por el sistema de lista nacional constituyen el veinticinco por ciento del número total de diputados distritales\")",
+      "est_votes": 30000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "(Congress|Congreso)",
+          "schemes": [
+            "world.country"
+          ],
+          "iso_pattern": "GT",
+          "valid_from": "1985-05-31"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1985",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1985_Memoria_Elecciones.pdf (p. 15: deputies \"serán electos por cinco años\")",
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1985-05-31",
+          "valid_to": "1994-01-30"
+        },
+        {
+          "source": "constitucion",
+          "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 157 as reformed in 1993: four-year term)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1994-01-30",
+          "valid_to": "2004-05-26"
+        },
+        {
+          "source": "m2007",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf (Decreto 1-2007)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-26",
+          "valid_to": "2016-05-25"
+        },
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (arts. 196 and 205)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2016-05-25",
+          "vacancy_rule": "The next candidate on the party's list takes the seat (LEPP art. 204)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1985-1999, text from 2007)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1985-11-03",
+          "last_date": "2023-06-25",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "National-list votes by department and municipality, and the adjudications"
+        },
+        {
+          "platform": "TSE TREP per-table files",
+          "url": "https://www.trep.gt",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "2023-06-25",
+          "last_date": "2023-06-25",
+          "finest": "gt.mesa",
+          "source": "trep2023",
+          "evidence": "gtm2023_e2 files, one per department"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-11-03",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 25,
+          "source": "m1985",
+          "quote": "p. 6: \"El Congreso de la República, compuesto actualmente por cien diputados\"; \"en la lista nacional que en la última elección fué de veinticinco diputados\""
+        },
+        {
+          "date": "1990-11-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 29,
+          "source": "m1990",
+          "quote": "p. 356: \"116 diputados titulares al Congreso de la República\"; p. 30, Decreto 1-90 art. 3: \"b) veintinueve por medio de lista nacional\""
+        },
+        {
+          "date": "1995-11-12",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 16,
+          "source": "m1995",
+          "quote": "p. 11, convocation decree: Congress \"será de OCHENTA (80)\" deputies for \"CUATRO AÑOS\", \"a) SESENTA Y CUATRO (64) POR EL SISTEMA DE DISTRITOS ELECTORALES\""
+        },
+        {
+          "date": "1999-11-07",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 22,
+          "source": "m1999",
+          "quote": "p. 13, convocation decree art. 4: the next Congress \"será de CIENTO TRECE (113)\" deputies, \"NOVENTA Y UNO (91) POR EL SISTEMA DE DISTRITOS ELECTORALES\""
+        },
+        {
+          "date": "2003-11-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "9 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2007-09-09",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31,
+          "source": "m2007",
+          "quote": "Decreto 1-2007: \"ciento cincuenta y ocho\" deputies, \"a) CIENTO VEINTISIETE POR EL SISTEMA DE DISTRITOS ELECTORALES\"; \"en los veintitrés distritos electorales incluido el distrito central\""
+        },
+        {
+          "date": "2011-09-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31,
+          "source": "m2011",
+          "quote": "\"el Decreto estableció la elección de ciento veintisiete (127) diputados por el sistema de distritos electorales y de treinta y uno (31) más\" by national list"
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "6 de septiembre Se realizan las Elecciones Generales y de Diputados al Parlamento Centroamericano."
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "16 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 32,
+          "source": "m2023",
+          "quote": "Acuerdo No. 1361-2023 adjudicates 32 rows \"Diputado por Lista Nacional\"; Acuerdos No. 1362-2023 to 1384-2023, one per district from the Distrito Central to Jutiapa, adjudicate 128 rows \"Diputado Distrito\""
+        },
+        {
+          "date": "1994-08-14",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 16,
+          "note": "Extraordinary election of a new Congress for the rest of the 1991-1996 term, after the 1993 reforms ratified on 30 January 1994.",
+          "source": "m1994",
+          "quote": "p. 227, convocation decree art. 2: \"EL DOMINGO CATORCE DE AGOSTO DE MIL NOVECIENTOS NOVENTA Y CUATRO\"; art. 3: Congress \"sera de OCHENTA (80)\", \"a) SESENTA Y CUATRO (64) POR EL SISTEMA DE DISTRITOS ELECTORALES\"; p. 238: \"dieciséis que equivalen al veinticinco por ciento de diputados por lista nacional\""
+        }
+      ]
+    },
+    {
+      "key": "congreso_distrital",
+      "tier": "distrito",
+      "name": "Diputados al Congreso de la República por distrito electoral",
+      "name_en": "Congress, district deputies",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1985-05-31",
+      "first_held": "1985-11-03",
+      "earliest_record": "1985-11-03",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "gt.departamento",
+          "gt.distrito",
+          "gt.municipio"
+        ],
+        "grain": [
+          "gt.municipio"
+        ],
+        "fine": [
+          "gt.centro",
+          "gt.mesa"
+        ]
+      },
+      "note": "The Congreso de la República is unicameral. Deputies are elected by closed lists and D'Hondt, part by electoral district (each department, with Guatemala City's municipality as the Distrito Central and the rest of its department as the Distrito de Guatemala) and part by a national list equal to a quarter of the district seats (Constitution art. 157; LEPP arts. 203 and 205). Seats per district follow population (one per 80,000 inhabitants in 2007), capped at 128 district seats since 2016. In 1985 the national list was voted with the presidential ticket; from 1990 on a separate ballot.",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 205: \"El número de diputados distritales no excederá de 128\")",
+      "est_votes": 30000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "(Congress|Congreso)",
+          "schemes": [
+            "gt.departamento",
+            "gt.distrito",
+            "gt.municipio"
+          ],
+          "iso_pattern": "GT",
+          "valid_from": "1985-05-31"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1985",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1985_Memoria_Elecciones.pdf (p. 15: deputies \"serán electos por cinco años\")",
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1985-05-31",
+          "valid_to": "1994-01-30"
+        },
+        {
+          "source": "constitucion",
+          "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 157 as reformed in 1993)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1994-01-30",
+          "valid_to": "2004-05-26"
+        },
+        {
+          "source": "m2007",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf (Decreto 1-2007)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-26",
+          "valid_to": "2016-05-25"
+        },
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (arts. 196 and 205)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2016-05-25",
+          "vacancy_rule": "The next candidate on the party's district list takes the seat, else the party's national list (LEPP art. 204)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1985-1999, text from 2007)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1985-11-03",
+          "last_date": "2023-06-25",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "District votes by municipality and the adjudications of each district"
+        },
+        {
+          "platform": "TSE TREP per-table files",
+          "url": "https://www.trep.gt",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "2023-06-25",
+          "last_date": "2023-06-25",
+          "finest": "gt.mesa",
+          "source": "trep2023",
+          "evidence": "gtm2023_e3 files, one per district"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-11-03",
+          "election_kind": "general",
+          "seats": 75,
+          "source": "m1985",
+          "quote": "p. 6: \"El Congreso de la República, compuesto actualmente por cien diputados\"; \"en la lista nacional que en la última elección fué de veinticinco diputados\""
+        },
+        {
+          "date": "1990-11-11",
+          "election_kind": "general",
+          "seats": 87,
+          "source": "m1990",
+          "quote": "p. 356: \"116 diputados titulares al Congreso de la República\"; p. 30, Decreto 1-90 art. 3: \"b) veintinueve por medio de lista nacional\""
+        },
+        {
+          "date": "1995-11-12",
+          "election_kind": "general",
+          "seats": 64,
+          "source": "m1995",
+          "quote": "p. 11, convocation decree: Congress \"será de OCHENTA (80)\" deputies for \"CUATRO AÑOS\", \"a) SESENTA Y CUATRO (64) POR EL SISTEMA DE DISTRITOS ELECTORALES\""
+        },
+        {
+          "date": "1999-11-07",
+          "election_kind": "general",
+          "seats": 91,
+          "source": "m1999",
+          "quote": "p. 13, convocation decree art. 4: the next Congress \"será de CIENTO TRECE (113)\" deputies, \"NOVENTA Y UNO (91) POR EL SISTEMA DE DISTRITOS ELECTORALES\""
+        },
+        {
+          "date": "2003-11-09",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "9 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2007-09-09",
+          "election_kind": "general",
+          "contests": 23,
+          "seats": 127,
+          "source": "m2007",
+          "quote": "Decreto 1-2007: \"ciento cincuenta y ocho\" deputies, \"a) CIENTO VEINTISIETE POR EL SISTEMA DE DISTRITOS ELECTORALES\"; \"en los veintitrés distritos electorales incluido el distrito central\""
+        },
+        {
+          "date": "2011-09-11",
+          "election_kind": "general",
+          "seats": 127,
+          "source": "m2011",
+          "quote": "\"el Decreto estableció la elección de ciento veintisiete (127) diputados por el sistema de distritos electorales y de treinta y uno (31) más\" by national list"
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "6 de septiembre Se realizan las Elecciones Generales y de Diputados al Parlamento Centroamericano."
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "16 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "general",
+          "contests": 23,
+          "seats": 128,
+          "source": "m2023",
+          "quote": "Acuerdo No. 1361-2023 adjudicates 32 rows \"Diputado por Lista Nacional\"; Acuerdos No. 1362-2023 to 1384-2023, one per district from the Distrito Central to Jutiapa, adjudicate 128 rows \"Diputado Distrito\""
+        },
+        {
+          "date": "1994-08-14",
+          "election_kind": "special",
+          "seats": 64,
+          "note": "Extraordinary election of a new Congress for the rest of the 1991-1996 term, after the 1993 reforms ratified on 30 January 1994.",
+          "source": "m1994",
+          "quote": "p. 227, convocation decree art. 2: \"EL DOMINGO CATORCE DE AGOSTO DE MIL NOVECIENTOS NOVENTA Y CUATRO\"; art. 3: Congress \"sera de OCHENTA (80)\", \"a) SESENTA Y CUATRO (64) POR EL SISTEMA DE DISTRITOS ELECTORALES\"; p. 238: \"dieciséis que equivalen al veinticinco por ciento de diputados por lista nacional\""
+        }
+      ]
+    },
+    {
+      "key": "parlacen",
+      "tier": "national",
+      "name": "Diputados al Parlamento Centroamericano",
+      "name_en": "Central American Parliament, Guatemala's deputies",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1990-11-11",
+      "earliest_record": "1990-11-11",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ],
+        "grain": [
+          "gt.municipio"
+        ],
+        "fine": [
+          "gt.centro",
+          "gt.mesa"
+        ]
+      },
+      "note": "Twenty deputies, each with a substitute, elected from closed national lists by D'Hondt on the general-election day (LEPP arts. 199 c and 203), first with the general election of 11 November 1990. The treaty sets a five-year term; Guatemala elects its deputies with every general election.",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 199 c: \"Elección de diputados al Parlamento Centroamericano\"; art. 203)",
+      "est_votes": 30000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "(Central American Parliament|Parlamento Centroamericano|PARLACEN)",
+          "iso_pattern": "GT",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1990",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1990-1991_Elecciones_Generales.pdf (pp. 28-30, Decreto 1-90 art. 4)",
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1990-01-01",
+          "valid_to": "1994-01-30"
+        },
+        {
+          "source": "m1999",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1999_Memoria_Elecciones.pdf (p. 13, convocation decree art. 1: \"diputados titulares y suplentes al Parlamento Centroamericano\" with the general election)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1994-01-30",
+          "valid_to": "2004-05-26"
+        },
+        {
+          "source": "m2007",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf (Decreto 1-2007: the Parliament \"se integrará por veinte diputados titulares por cada Estado miembro\", elected with the general election)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-26",
+          "valid_to": "2016-05-25"
+        },
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 196: \"Las elecciones generales y diputados al Parlamento Centroamericano se efectuarán un domingo del mes de junio\")",
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2016-05-25",
+          "vacancy_rule": "The substitute, else the next on the list (LEPP art. 204)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1990-1999, text from 2007)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1990-11-11",
+          "last_date": "2023-06-25",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "Votes by department and municipality, and the 20 adjudications"
+        },
+        {
+          "platform": "TSE TREP per-table files",
+          "url": "https://www.trep.gt",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "2023-06-25",
+          "last_date": "2023-06-25",
+          "finest": "gt.mesa",
+          "source": "trep2023",
+          "evidence": "gtm2023_e5 files"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-11-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 20,
+          "source": "m1990",
+          "quote": "p. 356: \"20 diputados titulares e igual número de suplentes para el Parlamento Centroamericano\""
+        },
+        {
+          "date": "1995-11-12",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "12 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano."
+        },
+        {
+          "date": "1999-11-07",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "7 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2003-11-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "9 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2007-09-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "9 de septiembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2011-09-11",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "11 de septiembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "6 de septiembre Se realizan las Elecciones Generales y de Diputados al Parlamento Centroamericano."
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "16 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "historia",
+          "quote": "25 de junio Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        }
+      ]
+    },
+    {
+      "key": "consulta_popular",
+      "tier": "national",
+      "name": "Consulta popular",
+      "name_en": "National referendums (consultas populares)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1985-05-31",
+      "first_held": "1994-01-30",
+      "earliest_record": "1994-01-30",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "gt.municipio"
+        ]
+      },
+      "note": "Called by Congress on decisions of special importance (Constitution art. 173) and required to ratify constitutional reforms that Congress passes by two thirds (art. 280); the 2018 consulta on the dispute with Belize was held under transitory art. 19. Three held: 30 January 1994 (the 1993 reforms, approved), 16 May 1999 (the reforms after the peace accords, four questions, all rejected), and 15 April 2018 (the Belize dispute to the International Court of Justice, approved). Two requests in 1993, after the self-coup of 25 May, were withdrawn or rejected before a vote.",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (arts. 173 and 280)",
+      "est_votes": 3500000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "GT"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 196: the decree calling a consulta popular comes at least 90 days before the vote)",
+          "called": true,
+          "administered_by": "Tribunal Supremo Electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1994 and 1999, text 2018)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1994-01-30",
+          "last_date": "2018-04-15",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "Results by department and municipality for each consulta"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-30",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "m1994",
+          "quote": "p. 50, art. 2: \"La Consulta Popular a que se refiere el artículo anterior, se practicará en un solo día, el domingo 30 de enero de 1994\""
+        },
+        {
+          "date": "1999-05-16",
+          "election_kind": "referendum",
+          "contests": 4,
+          "note": "Four questions: the nation and social rights, the Legislative branch, the Executive branch, and the Judiciary.",
+          "source": "m1999cp",
+          "quote": "p. 8: \"la consulta popular realizada el día 16 de mayo de 1999\"; p. 5: \"Acuerdo 15-99 emitido por el Congreso de la República el 13 de febrero de 1999 (con las 4 preguntas)\""
+        },
+        {
+          "date": "2018-04-15",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "historia",
+          "quote": "15 de abril Consulta Popular sobre el Diferendo Territorial, Insular y Marítimo con Belice."
+        }
+      ]
+    },
+    {
+      "key": "asamblea_constituyente",
+      "tier": "national",
+      "name": "Diputados a la Asamblea Nacional Constituyente",
+      "name_en": "National Constituent Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1984-07-01",
+      "earliest_record": "1984-07-01",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country",
+          "gt.departamento",
+          "gt.distrito",
+          "gt.municipio"
+        ],
+        "grain": [
+          "gt.municipio"
+        ]
+      },
+      "note": "Elected on 1 July 1984, 88 deputies, 23 by national list and 65 by district, the TSE's first election; it wrote the 1985 Constitution and the LEPP. The Constitution lets Congress call a new one by two thirds to amend its protected articles (art. 278; LEPP art. 199 b). The assemblies that wrote the 1945, 1956, and 1965 constitutions were elected before the TSE existed and fall under legislativa_previa.",
+      "source": "m1984",
+      "est_votes": 1700000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "GT",
+          "valid_from": "1983-03-23"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitucion",
+          "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 278)",
+          "called": true,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memoria electoral 1984",
+          "url": "https://www.tse.org.gt/images/memoriaselec/me/1984_Memoria_Elecciones-AsambleaNacionalConstituyente.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1984-07-01",
+          "last_date": "1984-07-01",
+          "finest": "gt.municipio",
+          "source": "m1984",
+          "evidence": "Register by municipality and results by district and municipality"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1984-07-01",
+          "election_kind": "general",
+          "seats": 88,
+          "source": "m1984",
+          "quote": "p. 28: \"un total de 1,174 candidatos para las ochenta y ocho curules de la Asamblea\"; p. 29: \"LISTA NACIONAL DE 23 DIPUTADOS PARA LA ASAMBLEA NACIONAL CONSTITUYENTE\""
+        }
+      ]
+    },
+    {
+      "key": "corporacion_municipal",
+      "tier": "municipio",
+      "name": "Elección de Alcaldes y Corporaciones Municipales",
+      "name_en": "Municipal corporations (mayor, síndicos, and councillors)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1985-05-31",
+      "first_held": "1985-11-03",
+      "earliest_record": "1985-11-03",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "gt.municipio"
+        ],
+        "fine": [
+          "gt.centro",
+          "gt.mesa"
+        ]
+      },
+      "finest_note": "One list per organization; the leading list takes the mayoralty and the síndicos by plurality, councillors by D'Hondt",
+      "note": "Each of the 340 municipalities elects its concejo: the mayor and síndicos by plurality of the list and the councillors by D'Hondt, with 2 or 3 síndicos and 4 to 10 councillors by population (Constitution art. 254; LEPP arts. 202, 203, and 206). Civic electoral committees (comités cívicos) may stand alongside parties. Until the 1993 reforms terms were two and a half or five years by size, so mid-term elections fell in 1988, 1993, and 1998 (corporacion_medio_periodo); since 1999 every municipality votes with the general election for four years. Where null votes exceed half, the election is repeated (LEPP art. 203 bis), as in five municipalities on 20 August 2023.",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (arts. 202, 203, and 206)",
+      "est_votes": 35000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "GT"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1988",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1988_Memoria_Elecciones.pdf (Decreto 1-87: corporations of municipalities under 20,000 inhabitants elected \"por un período de dos años y seis meses\", those of 20,000 to 50,000 for five years)",
+          "month": 11,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1985-05-31",
+          "valid_to": "1994-01-30"
+        },
+        {
+          "source": "constitucion",
+          "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 254 as reformed in 1993: four years; transitory art. 27 aligned the terms by 2000)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1994-01-30",
+          "valid_to": "2004-05-26"
+        },
+        {
+          "source": "m2007",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/2007_Memoria_Elecciones.pdf (Decreto 1-2007)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2004-05-26",
+          "valid_to": "2016-05-25"
+        },
+        {
+          "source": "lepp",
+          "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (arts. 196 and 206)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "term_years": 4,
+          "partisan": true,
+          "administered_by": "Tribunal Supremo Electoral through the departmental and municipal electoral boards",
+          "valid_from": "2016-05-25",
+          "vacancy_rule": "Councillors replace the mayor in their order, and substitutes fill the councillors' seats (LEPP art. 206)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned 1985-1999, one PDF per municipality in 2003, text from 2007)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1985-11-03",
+          "last_date": "2023-08-20",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "Votes per organization and the adjudicated mayor, síndicos, and councillors for each municipality"
+        },
+        {
+          "platform": "TSE TREP per-table files",
+          "url": "https://www.trep.gt",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "2023-06-25",
+          "last_date": "2023-08-20",
+          "finest": "gt.mesa",
+          "source": "trep2023",
+          "evidence": "gtm2023_e4 files, one per municipality, and the five repeated elections of 20 August"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-11-03",
+          "election_kind": "general",
+          "contests": 330,
+          "source": "m1985",
+          "quote": "p. 129: \"la lista de postulaciones en 330 municipios\"; p. 53: \"las cabeceras de los 330 municipios existentes en la República\""
+        },
+        {
+          "date": "1990-11-11",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "11 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "1995-11-12",
+          "election_kind": "general",
+          "contests": 300,
+          "source": "m1995",
+          "quote": "p. 50: in the elections of 12 November 1995 and 7 January 1996 citizens elected \"Corporaciones Municipales en 300 municipios del país\" (the 30 elected for five years in 1993 voted again in 1998)"
+        },
+        {
+          "date": "1999-11-07",
+          "election_kind": "general",
+          "contests": 330,
+          "source": "m1999",
+          "quote": "p. 13, convocation decree art. 1: \"de todas las corporaciones municipales del país\"; p. 25: \"los 330 municipios de la República\""
+        },
+        {
+          "date": "2003-11-09",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "9 de noviembre Se realizan las Elecciones Generales y al Parlamento Centroamericano"
+        },
+        {
+          "date": "2007-09-09",
+          "election_kind": "general",
+          "contests": 332,
+          "source": "m2007",
+          "quote": "Decreto 1-2007: elections \"en los veintitrés distritos electorales incluido el distrito central, los trescientos treinta y dos municipios de la República\""
+        },
+        {
+          "date": "2011-09-11",
+          "election_kind": "general",
+          "contests": 333,
+          "source": "m2011",
+          "quote": "\"los 333 municipios que conforman la división político-administrativa del país\""
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "general",
+          "source": "historia",
+          "quote": "6 de septiembre Se realizan las Elecciones Generales y de Diputados al Parlamento Centroamericano."
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "general",
+          "contests": 340,
+          "source": "m2019",
+          "quote": "340 mayors adjudicated, one Acuerdo of a Junta Electoral Departamental per municipality; \"los 340 municipios del país\""
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "general",
+          "contests": 340,
+          "source": "m2023",
+          "quote": "Section 13, \"Resultados y Adjudicaciones, Elección de Alcaldes y Corporaciones Municipales\", one table per municipality"
+        },
+        {
+          "date": "2023-08-20",
+          "election_kind": "local",
+          "contests": 5,
+          "note": "Repeated after the 25 June results were annulled; held with the presidential second round.",
+          "source": "m2023",
+          "quote": "Decreto 3-2023: \"Convocatoria ciudadanos de Guatemala, Retalhuleu, Chimaltenango, Suchitepéquez, Quiché a nueva elección de Corporación Municipal para el 20 de agosto de 2023\""
+        }
+      ]
+    },
+    {
+      "key": "corporacion_medio_periodo",
+      "tier": "municipio",
+      "name": "Elecciones de Corporaciones Municipales de medio período",
+      "name_en": "Mid-term municipal elections (1988-1998)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1985-05-31",
+      "valid_to": "1999-01-01",
+      "first_held": "1988-04-24",
+      "earliest_record": "1988-04-24",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "gt.municipio"
+        ]
+      },
+      "note": "Under the 1985 text, corporations of municipalities under 20,000 inhabitants served two and a half years and the rest five, so mid-term elections fell between general elections: 272 municipalities on 24 April 1988, 276 on 9 May 1993, and on 7 June 1998 the 30 elected for five years in 1993, for 18 months so that all municipal terms end together from 2000 (transitory art. 27 of the 1993 reforms).",
+      "source": "historia",
+      "est_votes": 2000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "GT",
+          "valid_from": "1986-01-14",
+          "valid_to": "1999-01-01",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "source": "m1988",
+          "locator": "https://www.tse.org.gt/images/memoriaselec/me/1988_Memoria_Elecciones.pdf (Decreto 1-87: corporations \"por un período de dos años y seis meses\")",
+          "partisan": true,
+          "called": false,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "1985-05-31",
+          "valid_to": "1999-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE memorias electorales",
+          "url": "https://www.tse.org.gt/comunicacion/publicaciones/memorias/memorias-electorales-2",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "public information under the Ley de Acceso a la Información Pública (Decreto 57-2008); no reuse terms stated",
+          "first_date": "1988-04-24",
+          "last_date": "1998-06-07",
+          "finest": "gt.municipio",
+          "source": "memorias",
+          "evidence": "The 1988, 1993, and 1998 municipal memorias, results and adjudications by municipality"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-04-24",
+          "election_kind": "local",
+          "contests": 272,
+          "source": "m1988",
+          "quote": "p. 14: \"se convoca elecciones municipales que tendrán lugar en 272 municipios de la República, el día domingo 24 de abril de 1988\""
+        },
+        {
+          "date": "1993-05-09",
+          "election_kind": "local",
+          "contests": 276,
+          "note": "The TSE's history page dates it 8 May; the convocation decree in the memoria says Sunday 9 May.",
+          "source": "m1993",
+          "quote": "p. 13: \"el domingo nueve de mayo de mil novecientos noventa y tres\"; \"deberían elegirse 276 corporaciones municipales en toda la República\""
+        },
+        {
+          "date": "1998-06-07",
+          "election_kind": "local",
+          "contests": 30,
+          "note": "The 30 corporations elected for five years in 1993, elected for 18 months to January 2000.",
+          "source": "m1998",
+          "quote": "p. 6: \"la memoria de las elecciones municipales celebradas los días 7 de junio y 20 de septiembre de 1998, para escoger, mediante el voto popular, Alcaldes, Síndicos y Concejales en treinta municipios de dieciséis departamentos de la República\""
+        },
+        {
+          "date": "1998-09-20",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "m1998",
+          "quote": "p. 81: Decreto 1-98 closed the process in 29 municipalities, \"con excepción del de Chinautla, en el que se celebraron nuevas elecciones el día veinte de septiembre\""
+        }
+      ]
+    },
+    {
+      "key": "presidencial_previa",
+      "tier": "national",
+      "name": "Elecciones presidenciales anteriores a 1984",
+      "name_en": "Presidential elections before the 1985 Constitution",
+      "category": "executive",
+      "goal": "national",
+      "valid_to": "1982-03-23",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Presidents were chosen by direct vote under the constitutions of 1879, 1945, 1956, and 1965, and under the last two by Congress between the two leading candidates when none had an absolute majority. The coup of 23 March 1982 ended the 1965 order and annulled that month's election.",
+      "source": "historia",
+      "disposition": "blocked",
+      "disposition_reason": "Before the Tribunal Supremo Electoral (Decreto Ley 30-83), elections were run by the Registro Electoral and earlier bodies under the Executive; the TSE's memorias begin with 1984 and no official compilation of earlier results is published.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "indirect",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GT",
+          "valid_to": "1982-03-24",
+          "precedence": 1
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "legislativa_previa",
+      "tier": "national",
+      "name": "Elecciones legislativas y constituyentes anteriores a 1984",
+      "name_en": "Legislative and constituent elections before 1984",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1982-03-23",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The Asamblea Legislativa and, from 1945, the Congreso de la República, and the constituent assemblies of 1945, 1956, and 1965.",
+      "source": "historia",
+      "disposition": "blocked",
+      "disposition_reason": "Before the Tribunal Supremo Electoral (Decreto Ley 30-83), elections were run by the Registro Electoral and earlier bodies under the Executive; the TSE's memorias begin with 1984 and no official compilation of earlier results is published.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "GT",
+          "valid_to": "1982-03-24",
+          "precedence": 1
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "municipal_previa",
+      "tier": "municipio",
+      "name": "Elecciones municipales anteriores a 1984",
+      "name_en": "Municipal elections before 1984",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1982-03-23",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elected municipal corporations under the 1945, 1956, and 1965 constitutions; under Ubico (1931-1944) mayors were appointed intendentes.",
+      "source": "historia",
+      "disposition": "blocked",
+      "disposition_reason": "Before the Tribunal Supremo Electoral (Decreto Ley 30-83), elections were run by the Registro Electoral and earlier bodies under the Executive; the TSE's memorias begin with 1984 and no official compilation of earlier results is published.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "GT",
+          "valid_to": "1982-03-24",
+          "precedence": 2
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "plebiscito_previo",
+      "tier": "national",
+      "name": "Plebiscitos anteriores a 1984",
+      "name_en": "Plebiscites before 1984",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_to": "1982-03-23",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Plebiscites such as those extending Ubico's term (1935) and confirming Castillo Armas (1954).",
+      "source": "historia",
+      "disposition": "blocked",
+      "disposition_reason": "Before the Tribunal Supremo Electoral (Decreto Ley 30-83), elections were run by the Registro Electoral and earlier bodies under the Executive; the TSE's memorias begin with 1984 and no official compilation of earlier results is published.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GT",
+          "valid_to": "1982-03-24",
+          "precedence": 1
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "asambleas_partidos",
+      "tier": "functional",
+      "name": "Asambleas de partidos políticos y comités cívicos",
+      "name_en": "Party and civic-committee nominating assemblies",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Each party's Asamblea Nacional elects and proclaims its candidates for President, Vice President, the national list, and the Central American Parliament, and departmental and municipal assemblies those for districts and corporations (LEPP arts. 24-27); a TSE delegate attends and the acta is filed with the Registro de Ciudadanos.",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 26 e: \"Elegir y proclamar a los candidatos del partido, a la Presidencia\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes of party delegates in assemblies, not a primary open to voters; the TSE certifies the actas but runs no nominating election and publishes no counts.",
+      "dates": []
+    },
+    {
+      "key": "magistraturas",
+      "tier": "functional",
+      "name": "Elección de magistrados y funcionarios por el Congreso",
+      "name_en": "Judges and officers chosen by Congress",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Congress elects the Supreme Court and Court of Appeals magistrates from postulation-commission lists (Constitution arts. 215 and 217), the five TSE magistrates from a list of 40 (LEPP art. 123), and the Comptroller and Human Rights Ombudsman; the Constitutional Court's members are designated by the Supreme Court, Congress, the President, the University of San Carlos, and the bar association (art. 269).",
+      "source": "lepp",
+      "locator": "https://www.tse.org.gt/images/LEPP2026.pdf (art. 123: elected by Congress \"de una nómina de cuarenta candidatos propuesta por la Comisión de Postulación\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by Congress or by institutions, with no popular vote.",
+      "dates": []
+    },
+    {
+      "key": "colegios_profesionales",
+      "tier": "functional",
+      "name": "Elecciones de colegios profesionales y de la Universidad de San Carlos",
+      "name_en": "Professional-association and university elections for public posts",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Members of the colegios profesionales elect delegates to the postulation commissions and the bar association's magistrates of the Constitutional Court (Constitution art. 269); the University of San Carlos's council designates another.",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 269)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by each colegio's own electoral tribunal for its members, not by the TSE, and not general elections.",
+      "dates": []
+    },
+    {
+      "key": "consulta_vecinal",
+      "tier": "municipio",
+      "name": "Consultas a los vecinos",
+      "name_en": "Municipal consultations of residents",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "A municipal council may consult its residents, and must when 10 percent of them ask; communities have also held consultations under ILO Convention 169, notably on mining since 2005 (Código Municipal, Decreto 12-2002, arts. 63-66).",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 253, municipal autonomy)",
+      "disposition": "blocked",
+      "disposition_reason": "Run by the municipality, not the TSE; results stay in each council's actas and no register of them is published.",
+      "dates": []
+    },
+    {
+      "key": "alcaldia_comunitaria",
+      "tier": "comunidad",
+      "name": "Alcaldías comunitarias o auxiliares",
+      "name_en": "Community and auxiliary mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each community's assembly chooses its alcalde comunitario or auxiliar by its own customs, and the municipal mayor appoints the one chosen (Código Municipal, Decreto 12-2002, arts. 56-58).",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 253)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by community assemblies by custom, not by ballot under the LEPP; no electoral authority runs or records them.",
+      "dates": []
+    },
+    {
+      "key": "cocode",
+      "tier": "comunidad",
+      "name": "Consejos Comunitarios de Desarrollo (COCODE)",
+      "name_en": "Community development councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each community's general assembly elects its COCODE's coordinating body (Ley de los Consejos de Desarrollo Urbano y Rural, Decreto 11-2002, art. 13).",
+      "source": "constitucion",
+      "locator": "https://cc.gob.gt/index.php/constitucion-politica/ (art. 225, development councils)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by show of hands in community assemblies, not by ballot under the LEPP; no electoral authority runs or records them.",
+      "dates": []
+    }
+  ]
+}
