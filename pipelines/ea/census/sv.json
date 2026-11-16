@@ -1,0 +1,914 @@
+{
+  "polity": "SV",
+  "name": "El Salvador",
+  "sources": {
+    "cn2026": {
+      "title": "Constitución de la República de El Salvador (1983), texto vigente con reformas hasta el D.L. N° 570 de 7 de mayo de 2026",
+      "publisher": "Asamblea Legislativa de El Salvador",
+      "url": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf",
+      "kind": "official_body"
+    },
+    "cn2014": {
+      "title": "Constitución de la República de El Salvador (1983), texto con reformas hasta 2014",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/constitucion2014.pdf",
+      "kind": "official_body"
+    },
+    "ce": {
+      "title": "Código Electoral (D.L. N° 413 de 3 de julio de 2013), texto actualizado al 6 de octubre de 2023",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/codigo-electoral/Codigo-Electoral-06-10-2023.pdf",
+      "kind": "official_body"
+    },
+    "lpp": {
+      "title": "Ley de Partidos Políticos (D.L. N° 307 de 2013), texto actualizado al 15 de octubre de 2017",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/ley-de-partidos-15-10-2017.pdf",
+      "kind": "official_body"
+    },
+    "escrutinios": {
+      "title": "Portal de Transparencia (LAIP): Resultados de los Escrutinios, actualizado al 30/09/2024",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/component/content/article/2-uncategorised/57-resultados-de-los-escrutinios",
+      "kind": "official_body"
+    },
+    "historia": {
+      "title": "Portal de Transparencia (LAIP): Historia del Tribunal Supremo Electoral",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/home-2/historia",
+      "kind": "official_body"
+    },
+    "plagel2027": {
+      "title": "Plan General de Elecciones 2027 para Sufragio en Territorio Nacional (PLAGEL 2027, versión modificada)",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://tse.gob.sv/docs/plagel/PLAGEL-2027-STN-02.pdf",
+      "kind": "official_body"
+    },
+    "plagel2027_se": {
+      "title": "Plan General de Elecciones 2027 para Sufragio en el Extranjero (PLAGEL 2027 SE, versión modificada)",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://tse.gob.sv/docs/plagel/PLAGEL-SE-02.pdf",
+      "kind": "official_body"
+    },
+    "alcaldias2015": {
+      "title": "Elecciones 2015: alcaldías por partido político o coalición",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/estadisticos/2015/NumeroAlcaldiasganadas2015.pdf",
+      "kind": "official_body"
+    },
+    "acta_parlacen1994": {
+      "title": "Acta número tres: escrutinio final de la elección de Diputados al Parlamento Centroamericano del 20 de marzo de 1994",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/Actas_de_Escrutinio/Acta%20de%20Escrutinio%20Final%20de%20Eleccion%20de%20Diputados%20al%20PARLACEN%20de%201994.pdf",
+      "kind": "official_body"
+    },
+    "acta_al1997": {
+      "title": "Acta de escrutinio final de la elección de Diputados a la Asamblea Legislativa de 1997",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/Actas_de_Escrutinio/Acta%20de%20Escrutinio%20Final%20de%20Eleccion%20de%20Diputados%20a%20la%20Asamblea%20Legislativa%201997.pdf",
+      "kind": "official_body"
+    },
+    "acta_al2003": {
+      "title": "Actas de escrutinio final de las elecciones de Diputados a la Asamblea Legislativa y Concejos Municipales de 2003",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/Actas_de_Escrutinio/Actas%20de%20Escrutinio%20Final%20de%20Elecciones%20a%20Diputados%20a%20la%20A.L.%20y%20de%20C.%20M.%20de%202003.pdf",
+      "kind": "official_body"
+    },
+    "acta_al2006": {
+      "title": "Actas de escrutinio final de las elecciones de Diputados a la Asamblea Legislativa y Concejos Municipales de 2006",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/Actas_de_Escrutinio/Actas%20de%20Escrutinio%20Final%20de%20Elecciones%20de%20Diputados%20a%20la%20A.L.%20y%20de%20C.M.%20de%202006.pdf",
+      "kind": "official_body"
+    },
+    "acta_al2009": {
+      "title": "Actas de escrutinio final de Diputados a la Asamblea Legislativa y al PARLACEN de 2009",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/Actas_de_Escrutinio/Actas%20de%20Escrutinio%20Final%20de%20%20Diputados%20a%20la%20A.%20Legislativa%20y%20PALACEN%20de%202009.pdf",
+      "kind": "official_body"
+    },
+    "dip1994": {
+      "title": "Reporte de votación para diputados por departamento, elección 20 de marzo de 1994, escrutinio final",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/estadisticos/1994/consolidadodip1994.pdf",
+      "kind": "official_body"
+    },
+    "alc1994": {
+      "title": "Escrutinio final para Concejos Municipales, elecciones 20 de marzo de 1994, distribución de votos válidos",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/laip_tse/documentos/estadisticos/1994/consolidadoalc1994.pdf",
+      "kind": "official_body"
+    },
+    "pres2014": {
+      "title": "Escrutinio final de la elección presidencial 2014, primera y segunda vuelta, por junta receptora de votos",
+      "publisher": "Tribunal Supremo Electoral",
+      "url": "https://transparencia.tse.gob.sv/2014/escrutiniofinal_1ray2davuelta/pres1/pais.html",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República de El Salvador",
+      "name_en": "El Salvador",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "cn2026"
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos",
+      "name_en": "Departments (appointed governors; each is an Assembly constituency)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "sv.departamento",
+      "elects": false,
+      "source": "ce",
+      "counts": [
+        {
+          "date": "2023-10-06",
+          "value": 14,
+          "source": "ce",
+          "locator": "Art. 13: tantas circunscripciones electorales como departamentos, literals a to n (San Salvador to Cabañas): 14"
+        },
+        {
+          "date": "2027-02-28",
+          "value": 14,
+          "source": "plagel2027",
+          "locator": "Programa de conformación de OET, productos esperados: a) 14 JED conformadas"
+        }
+      ]
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios",
+      "name_en": "Municipalities",
+      "parent": "departamento",
+      "polity_kind": "municipality",
+      "scheme": "sv.municipio",
+      "source": "cn2026",
+      "counts": [
+        {
+          "date": "2015-03-01",
+          "value": 262,
+          "source": "alcaldias2015",
+          "locator": "Alcaldías por partido político o coalición, TOTAL .... 262"
+        },
+        {
+          "date": "2027-02-28",
+          "value": 44,
+          "source": "plagel2027",
+          "locator": "Programa de conformación de OET, productos esperados: b) 44 JEM conformadas (one Junta Electoral Municipal per municipality)"
+        }
+      ]
+    },
+    {
+      "key": "distrito",
+      "name": "Distritos municipales",
+      "name_en": "Municipal districts (the 262 municipalities before 2024, no elected body)",
+      "parent": "municipio",
+      "polity_kind": "submunicipal",
+      "elects": false,
+      "valid_from": "2024-05-01",
+      "source": "ce"
+    },
+    {
+      "key": "functional",
+      "name": "Ámbitos funcionales y no territoriales",
+      "name_en": "Functional and non-territorial electorates",
+      "parent": "national",
+      "elects": false,
+      "source": "cn2026"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Elección de Presidente y Vicepresidente de la República",
+      "name_en": "President and vice president",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sv.departamento",
+          "sv.municipio",
+          "sv.centro",
+          "sv.jrv"
+        ]
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (arts. 80 and 154)",
+      "earliest_record": "1994-03-20",
+      "finest_note": "junta receptora de votos (JRV) for 2014 (HTML); department in the 1994-2009 PDF consolidados",
+      "note": "A joint ticket elected by direct vote in one national constituency, voters abroad counted since 2014. Under the 1983 text an absolute majority of valid votes elected, otherwise a second election between the top two within 30 days (1984, 1994, and 2014 went to one). D.L. N° 371 of 31 July 2025 (D.O. N° 144, 1 August 2025) amended arts. 80, 133, 152, and 154: a plurality elects, the term is six years, and the transitional article ends the 2024 term on 1 June 2027 so that president, Assembly, and councils are elected together on 28 February 2027. The Consejo Central de Elecciones ran elections until the 1991 constitutional reform created the TSE.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "SV"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of valid votes; otherwise a second election between the two leading parties or coalitions within 30 days (Cn. art. 80, Código Electoral art. 216).",
+          "administered_by": "Tribunal Supremo Electoral (Consejo Central de Elecciones until 1992)",
+          "valid_to": "2025-08-01",
+          "source": "cn2014",
+          "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/constitucion2014.pdf (art. 80: segunda elección; art. 154: el período presidencial será de cinco años)"
+        },
+        {
+          "period_years": 6,
+          "phase": 5,
+          "term_years": 6,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_from": "2025-08-01",
+          "source": "cn2026",
+          "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 80: los candidatos que hayan obtenido el mayor número de votos válidos; art. 154: seis años; D.L. N° 371 transitional article)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE Portal de Transparencia (LAIP): Resultados de los Escrutinios",
+          "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/component/content/article/2-uncategorised/57-resultados-de-los-escrutinios",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "escrutinios",
+          "format": "pdf, html",
+          "first_date": "1994-03-20",
+          "last_date": "2014-03-09",
+          "finest": "sv.departamento",
+          "evidence": "Department consolidados for 1994, 1999, 2004, and 2009 (text-layer PDF for 1994, scans for 1999 to 2009) and the final scrutiny actas; the 2019 spreadsheet link returned 404 on the check date."
+        },
+        {
+          "platform": "TSE: escrutinio final 2014 por JRV",
+          "url": "https://transparencia.tse.gob.sv/2014/escrutiniofinal_1ray2davuelta/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2014-02-02",
+          "last_date": "2014-03-09",
+          "finest": "sv.jrv",
+          "source": "pres2014",
+          "evidence": "Pages for the country, 14 departments, 262 municipalities, voting centers, and each JRV, for both rounds"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1824-01-01",
+          "through": "1983-12-19",
+          "note": "Elections of the head of state and president under the constitutions of 1824 to 1962, including the Consejo Central de Elecciones era from 1950 (1950, 1956, 1962, 1967, 1972, and 1977), are not yet enumerated from official sources."
+        },
+        {
+          "date": "1984-03-25",
+          "note": "Organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1984-05-06",
+          "election_kind": "runoff",
+          "note": "Second election between the two leading parties."
+        },
+        {
+          "date": "1989-03-19",
+          "note": "Organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1994-03-20",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Presidente y Vicepresidente de la República, Diputados al Parlamento Centroamericano, Diputados a la Asamblea Legislativa y Concejos Municipales ... Consolidado departamental final de actas-elección de Presidente y Vicepresidente de la República"
+        },
+        {
+          "date": "1994-04-24",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Consolidado departamental final de actas-elección de Presidente y Vicepresidente de la República (segunda vuelta)"
+        },
+        {
+          "date": "1999-03-07",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Presidente y Vicepresidente de la República 7 de marzo de 1999"
+        },
+        {
+          "date": "2004-03-21",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Presidente y Vicepresidente de la República 21 de marzo 2004"
+        },
+        {
+          "date": "2009-03-15",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Presidente y Vicepresidente de la República ... 18 de enero y 15 de marzo de 2009; Acta de Escrutinio Final de Elección Presidencial de 2009"
+        },
+        {
+          "date": "2014-02-02",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Presidente y Vicepresidente de la República, 2 de febrero de 2014 y 9 de marzo de 2014: Acta de Escrutinio Final de Elección Presidencial primera vuelta 2014"
+        },
+        {
+          "date": "2014-03-09",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Acta de Escrutinio Final de Elección Presidencial segunda vuelta 2014"
+        },
+        {
+          "date": "2019-02-03",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de presidente y vicepresidente de la República, 3 de febrero de 2019"
+        },
+        {
+          "date": "2024-02-04",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elecciones de presidencia de la República y diputaciones a la Asamblea Legislativa, del 4 de febrero de 2024"
+        },
+        {
+          "date": "2027-02-28",
+          "note": "Scheduled (PLAGEL 2027): the 2024-2029 term ends on 1 June 2027 under the transitional article of D.L. N° 371 of 31 July 2025, and the 2027 winner serves six years."
+        }
+      ],
+      "est_votes": 32000000,
+      "effort": 3
+    },
+    {
+      "key": "asamblea_legislativa",
+      "tier": "national",
+      "name": "Elección de Diputados a la Asamblea Legislativa",
+      "name_en": "Legislative Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "sv.departamento"
+        ],
+        "fine": [
+          "sv.municipio",
+          "sv.centro",
+          "sv.jrv"
+        ]
+      },
+      "source": "ce",
+      "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/codigo-electoral/Codigo-Electoral-06-10-2023.pdf (arts. 13 and 217)",
+      "earliest_record": "1994-03-20",
+      "finest_note": "department in the TSE consolidados and actas; voting center and JRV spreadsheets for 2018 and 2021 were listed but returned 404 on the check date",
+      "note": "Unicameral, renewed every three years (Cn. art. 124), by list proportional representation (Cn. art. 79). 60 seats in 1985 and 1988; 84 seats from 1991 to 2021, 64 in the 14 departmental constituencies plus 20 on a national list until 2003, then all 84 in the departments; 60 seats in 14 departmental constituencies from 2024 (D.L. N° 755 of 7 June 2023 amending Código Electoral art. 13), allocated by D'Hondt (art. 217) instead of quotient and largest remainder. Open lists with preference marks and cross-voting since 2012 and 2015 (Sala de lo Constitucional rulings). The 2026 reform of Cn. art. 79 allows electoral constituencies abroad as the law determines; for 2027 the votes cast abroad are still added to the departmental constituencies (PLAGEL 2027 SE).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "SV"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "called": false,
+          "administered_by": "Tribunal Supremo Electoral (Consejo Central de Elecciones until 1992)",
+          "source": "cn2026",
+          "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 124: los miembros de la Asamblea se renovarán cada tres años; el período comenzará el primero de mayo)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE Portal de Transparencia (LAIP): Resultados de los Escrutinios",
+          "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/component/content/article/2-uncategorised/57-resultados-de-los-escrutinios",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "escrutinios",
+          "format": "pdf",
+          "first_date": "1994-03-20",
+          "last_date": "2015-03-01",
+          "finest": "sv.municipio",
+          "evidence": "Department reports and actas from 1994 (text-layer PDF for 1994, scans from 1997 to 2009), municipal consolidado by party for 2015; the 2018 and 2021 JRV spreadsheets and actas returned 404 on the check date."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1824-01-01",
+          "through": "1981-12-31",
+          "note": "Legislative elections from the Congreso of 1824 to the Asamblea Legislativa of 1978, including the Consejo Central de Elecciones era from 1950, are not yet enumerated from official sources."
+        },
+        {
+          "date": "1985-03-31",
+          "note": "60 seats; organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1988-03-20",
+          "note": "60 seats; organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1991-03-10",
+          "note": "84 seats from 1991, 64 in the 14 departments and 20 on a national list; organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1994-03-20",
+          "source": "dip1994",
+          "quote": "REPORTE DE VOTACION PARA DIPUTADOS POR DEPARTAMENTO, ELECCION 20 DE MARZO DE 1994, ESCRUTINIO FINAL (rows 1 SAN SALVADOR to 14 CABANAS)",
+          "note": "14 departmental lists and the national list of 20."
+        },
+        {
+          "date": "1997-03-16",
+          "contests": 15,
+          "seats": 84,
+          "source": "acta_al1997",
+          "quote": "en lo que corresponde a las Circunscripciones Nacional y Departamentales de la República de El Salvador"
+        },
+        {
+          "date": "2000-03-12",
+          "contests": 15,
+          "seats": 84,
+          "source": "escrutinios",
+          "quote": "Resultados Elección por Circunscripción Nacional de diputados a la Asamblea Legislativa y Diputados al Parlamento Centroamericano; Consolidado departamental de Diputados a la Asamblea Legislativa"
+        },
+        {
+          "date": "2003-03-16",
+          "contests": 15,
+          "seats": 84,
+          "source": "acta_al2003",
+          "quote": "en lo que corresponde a las Circunscripciones Nacional y Departamentales de la República de El Salvador"
+        },
+        {
+          "date": "2006-03-12",
+          "contests": 14,
+          "seats": 84,
+          "source": "acta_al2006",
+          "quote": "en lo que corresponde a las Circunscripciones Departamentales de la República de El Salvador",
+          "note": "The national list was no longer used."
+        },
+        {
+          "date": "2009-01-18",
+          "source": "acta_al2009",
+          "quote": "habiéndose instalado las mesas de trabajo por cada una de las circunscripciones electorales ... divididos entre veinticinco que es el número de Diputados Propietarios correspondientes al Departamento (San Salvador)",
+          "note": "84 seats in the 14 departments."
+        },
+        {
+          "date": "2012-03-11",
+          "note": "84 seats in the 14 departments; first election with open lists and cross-voting by preference marks."
+        },
+        {
+          "date": "2015-03-01",
+          "note": "84 seats in the 14 departments."
+        },
+        {
+          "date": "2018-03-04",
+          "note": "84 seats in the 14 departments."
+        },
+        {
+          "date": "2021-02-28",
+          "note": "84 seats in the 14 departments."
+        },
+        {
+          "date": "2024-02-04",
+          "contests": 14,
+          "seats": 60,
+          "source": "ce",
+          "quote": "Art. 13.- LA ASAMBLEA LEGISLATIVA ESTARÁ COMPUESTA POR 60 DIPUTADOS O DIPUTADAS ... HABRÁ TANTAS CIRCUNSCRIPCIONES ELECTORALES, CÓMO DEPARTAMENTOS (San Salvador 16 to Cabañas 2)"
+        },
+        {
+          "date": "2027-02-28",
+          "note": "Scheduled (PLAGEL 2027), for the 2027-2030 term."
+        }
+      ],
+      "est_votes": 33000000,
+      "effort": 3
+    },
+    {
+      "key": "asamblea_constituyente",
+      "tier": "national",
+      "name": "Elección de Diputados a la Asamblea Constituyente",
+      "name_en": "Constituent Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "sv.departamento"
+        ]
+      },
+      "source": "cn2014",
+      "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/constitucion2014.pdf (art. 249: Constitución de 1962 adoptada por Decreto Constituyente N° 3 de 26 de abril de 1982)",
+      "valid_to": "1983-12-20",
+      "note": "The Constituent Assembly of 60 deputies elected on 28 March 1982 adopted the 1962 constitution provisionally (Decreto Constituyente N° 3, 26 April 1982), chose a provisional president, wrote the 1983 constitution, and sat as the Legislative Assembly until 1985. Earlier constituent assemblies (among them those of 1950 and 1961-1962) are not yet enumerated.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "SV"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1982-03-28",
+          "note": "Organized by the Consejo Central de Elecciones."
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 4
+    },
+    {
+      "key": "parlacen",
+      "tier": "national",
+      "name": "Elección de Diputados al Parlamento Centroamericano",
+      "name_en": "Central American Parliament (PARLACEN) deputies",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sv.departamento",
+          "sv.municipio",
+          "sv.centro",
+          "sv.jrv"
+        ]
+      },
+      "source": "ce",
+      "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/codigo-electoral/Codigo-Electoral-06-10-2023.pdf (art. 11: veinte Diputados y Diputadas propietarios ... durarán en sus funciones cinco años; art. 197: circunscripción nacional)",
+      "valid_to": "2025-08-01",
+      "earliest_record": "1994-03-20",
+      "finest_note": "municipality in the 2015 consolidado; JRV spreadsheet for 2021 listed but returned 404 on the check date",
+      "note": "Twenty deputies and their alternates elected by list proportional representation in one national constituency, usually on the day of the legislative and municipal elections. D.L. N° 370 of 31 July 2025 (D.O. N° 144, 1 August 2025) removed the PARLACEN deputies from the officials of popular election in Cn. art. 80, and PLAGEL 2027 schedules no PARLACEN vote, so the class is closed.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "name_pattern": "(Parlamento Centroamericano|Central American Parliament|PARLACEN)",
+          "within": null,
+          "precedence": 5
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Tribunal Supremo Electoral",
+          "valid_to": "2025-08-01",
+          "source": "ce",
+          "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/codigo-electoral/Codigo-Electoral-06-10-2023.pdf (art. 11)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE Portal de Transparencia (LAIP): Resultados de los Escrutinios",
+          "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/component/content/article/2-uncategorised/57-resultados-de-los-escrutinios",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "escrutinios",
+          "format": "pdf",
+          "first_date": "1994-03-20",
+          "last_date": "2015-03-01",
+          "finest": "sv.municipio",
+          "evidence": "1994 acta with the 20 elected, 2000 national-constituency results, 2006 and 2009 distribution and national consolidados, 2015 votes by municipality and preference marks; the 2021 JRV spreadsheet returned 404 on the check date."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-01",
+          "through": "1993-12-31",
+          "note": "Any election of the Salvadoran deputies to the Central American Parliament before 1994 is not yet enumerated from official sources."
+        },
+        {
+          "date": "1994-03-20",
+          "contests": 1,
+          "seats": 20,
+          "source": "acta_parlacen1994",
+          "quote": "Escrutinio Final de las Elecciones para Diputados al Parlamento Centroamericano, celebradas el día veinte de marzo del presente año ... se declaran electos Diputados Propietarios y Suplentes (1 to 20)"
+        },
+        {
+          "date": "2000-03-12",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Diputados al Parlamento Centroamericano, Asamblea Legislativa y Concejos Municipales, 12 de marzo de 2000"
+        },
+        {
+          "date": "2006-03-12",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Elección de Diputados al Parlamento Centroamericano, Asamblea Legislativa y Concejos Municipales, 12 de marzo de 2006: Distribución de los diputados electos para el Parlamento Centroamericano"
+        },
+        {
+          "date": "2009-01-18",
+          "contests": 1,
+          "source": "escrutinios",
+          "quote": "Diputados al Parlamento Centroamericano, Diputados a la Asamblea Legislativa y Concejos Municipales 18 de enero ... de 2009: Consolidado nacional final de actas-elecciones Parlacen"
+        },
+        {
+          "date": "2015-03-01",
+          "contests": 1,
+          "seats": 20,
+          "source": "escrutinios",
+          "quote": "Elección de Diputados al Parlamento Centroamericano, Asamblea Legislativa y Concejos Municipales, 1 de marzo de 2015"
+        },
+        {
+          "date": "2021-02-28",
+          "contests": 1,
+          "seats": 20,
+          "source": "escrutinios",
+          "quote": "Elección de diputaciones a la Asamblea Legislativa, Parlamento Centroamericano y Concejos Municipales, 28 de febrero de 2021"
+        },
+        {
+          "date": "2024-03-03",
+          "contests": 1,
+          "seats": 20,
+          "source": "escrutinios",
+          "quote": "elecciones de diputaciones al Parlamento Centroamericano y Concejos Municipales, del 3 de marzo de 2024"
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 3
+    },
+    {
+      "key": "consulta_popular",
+      "tier": "national",
+      "name": "Consulta popular sobre el proyecto y bases de la unión centroamericana",
+      "name_en": "Referendum on a Central American union",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 89: El proyecto y bases de la unión se someterán a consulta popular)",
+      "note": "The only national popular vote on a question that the 1983 constitution provides for; none has been held. Constitutional amendments pass by two successive Assemblies (art. 248) with no referendum.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "SV"
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "eleccion_segundo_grado",
+      "tier": "national",
+      "name": "Elecciones de segundo grado por la Asamblea Legislativa",
+      "name_en": "Officials chosen by the Legislative Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 131 ords. 17 and 19: elegir por votación nominal y pública)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointments by roll-call vote of the Assembly (Supreme Court and TSE magistrates, Fiscal General, Procuradores, Corte de Cuentas, Consejo Nacional de la Judicatura, and presidential designados), recorded as legislative decrees rather than contested popular elections; the 1982 choice of a provisional president by the Constituent Assembly is one such vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "SV"
+        }
+      ]
+    },
+    {
+      "key": "elecciones_internas",
+      "tier": "functional",
+      "name": "Elecciones internas de los partidos políticos",
+      "name_en": "Party internal elections and candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lpp",
+      "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/ley-de-partidos-15-10-2017.pdf (arts. 37 to 37-K)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each party's own electoral commission organizes, runs, and declares its internal elections (Ley de Partidos Políticos arts. 37-A and 37-K); the TSE does not run or certify them, and no official body publishes their results.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "SV*"
+        }
+      ]
+    },
+    {
+      "key": "eleccion_abogados",
+      "tier": "functional",
+      "name": "Elección de candidatos a Magistrados de la Corte Suprema por las entidades representativas de los abogados",
+      "name_en": "Lawyers' vote for Supreme Court candidates",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 186: la mitad de la cual provendrá de los aportes de las entidades representativas de los abogados)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A vote of registered lawyers that supplies half the Consejo Nacional de la Judicatura's list of Supreme Court candidates; a professional vote outside the TSE that elects no one to office."
+    },
+    {
+      "key": "concejo_municipal",
+      "tier": "municipio",
+      "name": "Elección de Concejos Municipales",
+      "name_en": "Municipal councils (mayor, síndico, and regidores)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "sv.municipio"
+        ],
+        "fine": [
+          "sv.centro",
+          "sv.jrv"
+        ]
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (art. 202: Concejos formados de un Alcalde, un Síndico y dos o más Regidores ... elegidos para un período de tres años)",
+      "earliest_record": "1994-03-20",
+      "finest_note": "municipality in the TSE consolidados; JRV spreadsheets for 2018 and 2021 listed but returned 404 on the check date",
+      "note": "Each municipality elects its whole council on one party ballot. Until 2012 the winning slate took every seat; since 2015 the party with the most votes takes the mayor and síndico and enough regidores for a majority, and the other regidores go by municipal quotient and largest remainder (Código Electoral arts. 12 and 219). 262 municipalities until 2021; from the 2024 election, 44 municipalities under the Ley Especial para la Reestructuración Municipal (D.L. N° 762 of 13 June 2023), whose 262 former municipalities became districts without elected bodies. Contests count councils.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "name_pattern": "(Concejo Municipal|Municipal council|Alcald)",
+          "within": null,
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "called": false,
+          "administered_by": "Tribunal Supremo Electoral (Consejo Central de Elecciones until 1992)",
+          "source": "ce",
+          "locator": "https://transparencia.tse.gob.sv/laip_tse/documentos/leyes/codigo-electoral/Codigo-Electoral-06-10-2023.pdf (art. 168: durarán en su gestión tres años, y tomarán posesión el día primero de mayo del año de su elección)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSE Portal de Transparencia (LAIP): Resultados de los Escrutinios",
+          "url": "https://transparencia.tse.gob.sv/laip_tse/index.php/component/content/article/2-uncategorised/57-resultados-de-los-escrutinios",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "escrutinios",
+          "format": "pdf",
+          "first_date": "1994-03-20",
+          "last_date": "2015-03-01",
+          "finest": "sv.municipio",
+          "evidence": "Votes by party for each municipality: 1994 (text-layer PDF), 1997, 2000, 2003, 2006, 2009, and 2012 consolidados and actas (mostly scans), 2015 detail by municipality; the 2018 and 2021 JRV spreadsheets and the 2021 acta returned 404 on the check date."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1824-01-01",
+          "through": "1984-12-31",
+          "note": "Municipal elections before 1985, including the Consejo Central de Elecciones era from 1950, are not yet enumerated from official sources."
+        },
+        {
+          "date": "1985-03-31",
+          "note": "Organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1988-03-20",
+          "note": "Organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1991-03-10",
+          "note": "Organized by the Consejo Central de Elecciones."
+        },
+        {
+          "date": "1994-03-20",
+          "source": "alc1994",
+          "quote": "ESCRUTINIO FINAL PARA CONCEJOS MUNICIPALES, ELECCIONES 20 DE MARZO DE 1994, DISTRIBUCION DE VOTOS VALIDOS"
+        },
+        {
+          "date": "1997-03-16"
+        },
+        {
+          "date": "2000-03-12"
+        },
+        {
+          "date": "2003-03-16"
+        },
+        {
+          "date": "2006-03-12"
+        },
+        {
+          "date": "2009-01-18",
+          "note": "San Agustín (Usulután) voted a second time (TSE: Detalle municipal de actas en elección de Concejos municipales en San Agustín, segunda vuelta)."
+        },
+        {
+          "date": "2012-03-11"
+        },
+        {
+          "date": "2015-03-01",
+          "contests": 262,
+          "source": "alcaldias2015",
+          "quote": "ELECCIONES 2015, ALCALDIAS POR PARTIDO POLITICO O COALICION ... TOTAL .... 262",
+          "note": "First election of plural councils, with regidores shared by quotient and remainder."
+        },
+        {
+          "date": "2018-03-04",
+          "note": "The TSE published a separate acta and JRV results for San Francisco Gotera."
+        },
+        {
+          "date": "2021-02-28"
+        },
+        {
+          "date": "2024-03-03",
+          "note": "First election in the 44 municipalities of the Ley Especial para la Reestructuración Municipal (D.L. N° 762 of 13 June 2023)."
+        },
+        {
+          "date": "2027-02-28",
+          "note": "Scheduled (PLAGEL 2027), for the 2027-2030 term."
+        }
+      ],
+      "est_votes": 35000000,
+      "effort": 4
+    },
+    {
+      "key": "consulta_municipal",
+      "tier": "municipio",
+      "name": "Consulta popular municipal",
+      "name_en": "Municipal consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "cn2026",
+      "locator": "https://www.asamblea.gob.sv/sites/default/files/2026-05/1.%20CONSTITUCI%C3%93N%20DE%20LA%20REP%C3%9ABLICA.pdf (arts. 203 and 204: municipal autonomy)",
+      "disposition": "blocked",
+      "disposition_reason": "Called and counted by the municipal council itself under the Código Municipal (consulta popular, arts. 115 to 117); the TSE takes no part, and no official body compiles the questions or the counts.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ]
+    }
+  ]
+}
