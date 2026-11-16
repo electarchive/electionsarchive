@@ -1,0 +1,1021 @@
+{
+  "polity": "CI",
+  "name": "Côte d'Ivoire",
+  "sources": {
+    "code2020": {
+      "title": "Ordonnance n° 2020-356 du 8 avril 2020 portant révision du Code électoral",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf",
+      "kind": "official_body",
+      "note": "Text layer. Title II sets each election: the president (Art. 43-64), deputies (Art. 65-103), senators (Art. 104-144), regional councillors (Art. 145-173), and municipal councillors (Art. 174-202). Art. 205 lists the laws it amends, starting with Law 2000-514 of 1 August 2000, the electoral code of 2000."
+    },
+    "constitution": {
+      "title": "Constitution de la République de Côte d'Ivoire du 8 novembre 2016, révisée par la loi constitutionnelle du 19 mars 2020 (Journal officiel)",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/04/JO-Constitution-19-Mars-2020.pdf",
+      "kind": "official_body",
+      "note": "Scanned Journal officiel issue without a text layer."
+    },
+    "senat": {
+      "title": "Connaître le Sénat",
+      "publisher": "Sénat de Côte d'Ivoire",
+      "url": "https://www.senat.ci/connaitre-le-senat",
+      "kind": "official_body",
+      "note": "Quotes Art. 85 and Art. 87 of the Constitution: two thirds of senators elected by indirect universal suffrage and one third appointed by the President; five-year term; first legislature 12 April 2018 to 16 September 2023."
+    },
+    "collectivites2012": {
+      "title": "Loi n° 2012-1128 du 13 décembre 2012 portant organisation des collectivités territoriales",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2023/06/Loi-de-2012-portant-organisation-des-collectivites-territoriales.pdf",
+      "kind": "official_body",
+      "note": "Scanned; the region and the commune are the two levels of local government."
+    },
+    "edan2025-repertoire": {
+      "title": "EDAN 2025: répertoire des lieux et bureaux de vote et de la population électorale par circonscription",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2025/11/EDAN_2025_REPERTOIRE_STAT_LV_BV_POP-1011.xlsx",
+      "kind": "official_body",
+      "note": "Sheet BASE_CIR lists 11,835 polling places in 31 regions (codes 01-31) and 2 autonomous districts (A1 Abidjan, A2 Yamoussoukro), 205 circumscriptions, and 25,370 polling stations; sheet STAT REG-CIR totals 205 circumscriptions and 255 seats."
+    },
+    "pop2020-departement": {
+      "title": "Population électorale 2020, répartition par genre et par département",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/10/Population-Electorale-2020_par-Departement.pdf",
+      "kind": "official_body",
+      "note": "108 departments under 31 regions and 2 autonomous districts, plus the diaspora."
+    },
+    "results": {
+      "title": "Résultats des élections",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/resultats-recents/",
+      "kind": "official_body",
+      "note": "Results tables as PDF: presidential 2010, 2020, 2025; legislative 2011, 2013, 2016, 2021, 2025, 2026; regional and municipal 2013 and 2023; senatorial 2023."
+    },
+    "edan2011": {
+      "title": "Election des députés à l'Assemblée nationale, scrutins du 11 décembre 2011 et du 26 février 2012: résultats",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/03/Resultats-definitifs-2.pdf",
+      "kind": "official_body"
+    },
+    "epr2015": {
+      "title": "Proclamation des résultats provisoires de l'élection du Président de la République du 25/10/2015",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/05/50-Proclammation-des-resultats-provisoires-de-lelection-du-president-de-la-republique-du-25-10-2015.pdf",
+      "kind": "official_body",
+      "note": "Speech of the CEI president, 28 October 2015, with national totals and each candidate's votes; per-department tables for 24 regions and Abidjan communes are files 26-49 in the same upload folder."
+    },
+    "ref2016": {
+      "title": "Proclamation des résultats du scrutin référendaire du 30 octobre 2016: allocution du Président",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/05/5-Proclamation-des-resultats-du-scrutin-referendaire-du-30-octobre-2016-allocution-du-president.pdf",
+      "kind": "official_body",
+      "note": "National provisional totals: 6,313,758 registered, 2,678,601 voters, 2,655,001 valid, Yes 2,480,287, No 174,714."
+    },
+    "er2013": {
+      "title": "Election des conseillers régionaux, scrutin du 21 avril 2013: résultats du scrutin",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2025/09/RESULTAT_REGIONALE-2013-FINAL.pdf",
+      "kind": "official_body"
+    },
+    "er2013-juillet": {
+      "title": "Election des conseillers régionaux, scrutins des 21 avril et 21 juillet 2013: résultats des scrutins",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/04/ELECTION-DES-CONSEILLERS-REGIONAUX-2013.pdf",
+      "kind": "official_body"
+    },
+    "em2013": {
+      "title": "Election des conseillers municipaux, scrutin du 21 avril 2013: résultats des scrutins",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2025/09/RESULTAT_MUNICIPALE-2013-FINAL.pdf",
+      "kind": "official_body",
+      "note": "Communes numbered 001 to 197."
+    },
+    "er2018": {
+      "title": "Election des conseillers régionaux, scrutins du 13 octobre et du 16 décembre 2018",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/04/1-ELECTION-DES-CONSEILLERS-REGIONAUX-1.pdf",
+      "kind": "official_body"
+    },
+    "em2018": {
+      "title": "Election des conseillers municipaux, scrutins du 13 octobre et du 16 décembre 2018",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2020/04/2-ELECTION-DES-CONSEILLERS-MUNICIPAUX.pdf",
+      "kind": "official_body"
+    },
+    "er2023": {
+      "title": "Election des conseillers régionaux, scrutin du 02 septembre 2023: résultats du scrutin",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2023/09/Regionales_2023.pdf",
+      "kind": "official_body"
+    },
+    "em2023": {
+      "title": "Election des conseillers municipaux, scrutin du 02 septembre 2023: résultats du scrutin",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2023/09/Municipales_2023.pdf",
+      "kind": "official_body"
+    },
+    "erem2023-partiels": {
+      "title": "Elections des conseillers régionaux et municipaux, scrutin partiel du 02 décembre 2023: résultats",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2023/12/RESULTATS-EM-PARTIELS-2023_VF.pdf",
+      "kind": "official_body",
+      "note": "Municipal reruns; the regional rerun is RESULTATS-ER-PARTIELS-2023.pdf in the same folder."
+    },
+    "esen2023": {
+      "title": "Election des sénateurs, scrutins du 16 septembre et du 23 décembre 2023: résultats des scrutins",
+      "publisher": "Commission Électorale Indépendante (CEI)",
+      "url": "https://www.cei.ci/wp-content/uploads/2023/12/RESULTATS_ESEN_SEPT_ET_DEC_2023.pdf",
+      "kind": "official_body"
+    },
+    "cc-decisions": {
+      "title": "Avis et décisions",
+      "publisher": "Conseil constitutionnel de Côte d'Ivoire",
+      "url": "https://www.conseil-constitutionnel.ci/decisions",
+      "kind": "official_body",
+      "note": "Online decisions start in 2020; the earliest results proclamation listed is CI-2020-EP-010 of 9 November 2020."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "République de Côte d'Ivoire",
+      "name_en": "Côte d'Ivoire",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "constitution"
+    },
+    {
+      "key": "region",
+      "name": "Régions",
+      "name_en": "Regions",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "collectivites2012",
+      "counts": [
+        {
+          "date": "2018-10-13",
+          "value": 31,
+          "source": "er2018",
+          "locator": "Récapitulatif: 31 circumscriptions won (one per region), 13 October and 16 December 2018"
+        },
+        {
+          "date": "2025-11-10",
+          "value": 31,
+          "source": "edan2025-repertoire",
+          "locator": "Sheet BASE_CIR: region codes 01 to 31"
+        }
+      ]
+    },
+    {
+      "key": "district_autonome",
+      "name": "Districts autonomes",
+      "name_en": "Autonomous districts (Abidjan and Yamoussoukro)",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "source": "code2020",
+      "counts": [
+        {
+          "date": "2025-11-10",
+          "value": 2,
+          "source": "edan2025-repertoire",
+          "locator": "Sheet BASE_CIR: codes A1 (District autonome d'Abidjan) and A2 (District autonome de Yamoussoukro)"
+        }
+      ]
+    },
+    {
+      "key": "departement",
+      "name": "Départements",
+      "name_en": "Departments (prefectures)",
+      "parent": "region",
+      "elects": false,
+      "scheme": "ci.departement",
+      "source": "pop2020-departement",
+      "counts": [
+        {
+          "date": "2020-10-01",
+          "precision": "month",
+          "value": 108,
+          "source": "pop2020-departement",
+          "locator": "108 department rows under 31 regions and 2 autonomous districts, excluding the diaspora row"
+        }
+      ]
+    },
+    {
+      "key": "departement_collectivite",
+      "name": "Départements (collectivités territoriales)",
+      "name_en": "Departments as local governments, with elected general councils",
+      "parent": "region",
+      "polity_kind": "county",
+      "valid_from": "2002-01-01",
+      "valid_to": "2012-12-13",
+      "source": "collectivites2012"
+    },
+    {
+      "key": "commune",
+      "name": "Communes",
+      "name_en": "Communes (municipalities)",
+      "parent": "departement",
+      "polity_kind": "municipality",
+      "source": "collectivites2012",
+      "counts": [
+        {
+          "date": "2013-04-21",
+          "value": 197,
+          "source": "em2013",
+          "locator": "Communes numbered 001 to 197"
+        },
+        {
+          "date": "2018-10-13",
+          "value": 201,
+          "source": "em2018",
+          "locator": "Récapitulatif: TOTAL 201 circumscriptions won, one per commune"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election du Président de la République",
+      "name_en": "President, direct",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ci.departement"
+        ]
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 43-45: five-year term, absolute majority or a runoff between the top two, first round on the last Saturday of October)",
+      "first_held": "1960-11-27",
+      "earliest_record": "2010-10-31",
+      "note": "Elected directly since independence: single candidates in 1960-1985, contested since 1990. The 2010 election went to a runoff. The 2016 Constitution created a vice president, appointed rather than elected since the 2020 revision; no vice president has been elected on a ticket. The CEI's site holds results from 2010; 1960-2000 results sit in Supreme Court and Constitutional Council decisions that are not online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CI"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 10,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "administered_by": "Commission Électorale Indépendante",
+          "source": "code2020",
+          "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 43-45)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2025/10/EPR_2025_RESULTAT_NATIONAL.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2010-10-31",
+          "last_date": "2025-10-25",
+          "finest": "ci.departement",
+          "source": "results",
+          "evidence": "2010 rounds, 2020, and 2025 by department (Abidjan communes and foreign countries apart), text layer"
+        },
+        {
+          "platform": "CEI media library",
+          "url": "https://www.cei.ci/wp-content/uploads/2020/05/50-Proclammation-des-resultats-provisoires-de-lelection-du-president-de-la-republique-du-25-10-2015.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2015-10-25",
+          "last_date": "2015-10-25",
+          "finest": "ci.departement",
+          "source": "epr2015",
+          "evidence": "National provisional totals in the proclamation speech; per-department tables in files 26-49 (Resultats-<region>.pdf)"
+        },
+        {
+          "platform": "Conseil constitutionnel decisions",
+          "url": "https://www.conseil-constitutionnel.ci/decisions",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "role": "publishes",
+          "first_date": "2020-10-31",
+          "last_date": "2025-10-25",
+          "source": "cc-decisions",
+          "evidence": "Final national results (decisions CI-2020-EP-010 and CI-2025-EP-007); no decision before 2020 is online"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2010-10-31"
+        },
+        {
+          "date": "2010-11-28",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2015-10-25",
+          "source": "epr2015",
+          "quote": "Le 25 octobre 2015, six millions trois cent mille cent quarante-deux (6.300.142) de nos compatriotes étaient appelés"
+        },
+        {
+          "date": "2020-10-31"
+        },
+        {
+          "date": "2025-10-25"
+        }
+      ],
+      "est_votes": 40000000,
+      "effort": 2
+    },
+    {
+      "key": "assemblee_nationale",
+      "tier": "national",
+      "name": "Election des députés à l'Assemblée nationale",
+      "name_en": "National Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "ci.circonscription"
+        ]
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 67-69: five-year term; one-round plurality, single-member seats by candidate and multi-member seats by closed winner-take-all list; circumscriptions set by decree)",
+      "first_held": "1960-11-27",
+      "earliest_record": "2011-12-11",
+      "note": "Unicameral until the Senate first sat in 2018. A single national list until 1975, competing single-party candidates in 1980 and 1985, and multiparty contests since 1990. 255 seats in 205 circumscriptions since 2011. The 1959 Legislative Assembly of the autonomous republic preceded it. The CEI's site holds results from 2011; earlier ones are not online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "CI"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission Électorale Indépendante",
+          "source": "code2020",
+          "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 66-68)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2025/12/EDAN_2025_RESULTAT_NATIONAL_DETAILS.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2011-12-11",
+          "last_date": "2026-02-21",
+          "finest": "ci.circonscription",
+          "source": "results",
+          "evidence": "Candidate and list votes per circumscription for 2011, 2013, 2016, 2021, 2025, and the 2026 rerun; no polling-station results"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "2011-12-11"
+        },
+        {
+          "date": "2016-12-18"
+        },
+        {
+          "date": "2021-03-06"
+        },
+        {
+          "date": "2025-12-27",
+          "contests": 205,
+          "seats": 255,
+          "source": "edan2025-repertoire",
+          "quote": "STAT REG-CIR: TOTAL 205 circonscriptions, 255 sièges"
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 3
+    },
+    {
+      "key": "assemblee_partielle",
+      "tier": "national",
+      "name": "Elections partielles des députés",
+      "name_en": "National Assembly by-elections and reruns",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 68: a new poll after a tie; Art. 103: by-elections within six months of a vacancy)",
+      "first_held": "2012-02-26",
+      "earliest_record": "2012-02-26",
+      "note": "Reruns of annulled or postponed circumscriptions and by-elections for vacant seats, each a separate polling day.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "CI"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2026/02/REPRISE_EDAN_2025.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2012-02-26",
+          "last_date": "2026-02-21",
+          "finest": "ci.circonscription",
+          "source": "results",
+          "evidence": "Partial polls are printed in the general election's table or in their own file"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2012-02-26",
+          "election_kind": "by_election",
+          "source": "edan2011",
+          "quote": "SCRUTINS DU 11 DECEMBRE 2011 ET DU 26 FEVRIER 2012"
+        },
+        {
+          "date": "2013-02-03",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2016-12-29",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2017-01-28",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2021-04-24",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2021-06-12",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2026-02-21",
+          "election_kind": "by_election"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 2
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Election des sénateurs",
+      "name_en": "Senate (elected two thirds)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2016-11-08",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 106-109: indirect suffrage for five years in each autonomous district and region, closed winner-take-all lists, college of district, regional, and municipal councillors)",
+      "first_held": "2018-03-24",
+      "earliest_record": "2023-09-16",
+      "note": "Two senators per region and autonomous district (66 elected seats in 33 circumscriptions); the President appoints the other third (Art. 87 of the Constitution, quoted by the Senate). The CEI's site holds the 2023 results but not those of 24 March 2018.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CI"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission Électorale Indépendante",
+          "source": "senat",
+          "locator": "https://www.senat.ci/connaitre-le-senat (Art. 87: two thirds elected by indirect universal suffrage; five-year term)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2023/12/RESULTATS_ESEN_SEPT_ET_DEC_2023.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2023-09-16",
+          "last_date": "2023-12-23",
+          "source": "esen2023",
+          "evidence": "Electors, voters, and list votes per region and autonomous district; 2018 results are not on the site"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2018-03-24"
+        },
+        {
+          "date": "2023-09-16",
+          "contests": 33,
+          "seats": 66,
+          "deferred": [
+            "2023-12-23"
+          ],
+          "source": "esen2023",
+          "quote": "SCRUTINS DU 16 SEPTEMBRE ET DU 23 DECEMBRE 2023: 33 lists marked ELU, one per region and autonomous district, two seats each"
+        }
+      ],
+      "est_votes": 18000,
+      "effort": 2
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Référendum",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "constitution",
+      "first_held": "2000-07-23",
+      "earliest_record": "2016-10-30",
+      "note": "Constitutional referendums of 23 July 2000 and 30 October 2016. The CEI published only national provisional totals for 2016 in its proclamation speech; no 2000 result is online from an official body. The 1958 referendum on the French Constitution was a French vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CI"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI media library",
+          "url": "https://www.cei.ci/wp-content/uploads/2020/05/5-Proclamation-des-resultats-du-scrutin-referendaire-du-30-octobre-2016-allocution-du-president.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2016-10-30",
+          "last_date": "2016-10-30",
+          "source": "ref2016",
+          "evidence": "National provisional totals only, in the proclamation speech"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-07-23"
+        },
+        {
+          "date": "2016-10-30",
+          "contests": 1,
+          "source": "ref2016",
+          "quote": "Pour le OUI : 2.480.287 voix, soit 93,42%; Pour le NON : 174.714 voix, soit 6,58%."
+        }
+      ],
+      "est_votes": 5500000,
+      "effort": 1
+    },
+    {
+      "key": "conseil_regional",
+      "tier": "region",
+      "name": "Election des conseillers régionaux",
+      "name_en": "Regional councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "contests_per_unit": 1,
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 146-148: the region is one circumscription; five-year term; the leading list takes half the seats and the rest go by proportional representation, largest remainders)",
+      "first_held": "2013-04-21",
+      "earliest_record": "2013-04-21",
+      "finest_note": "Region; the CEI tables print no polling-station results",
+      "note": "Regions became local governments under the 2011-2012 reform. Partial polls rerun annulled regions.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission Électorale Indépendante",
+          "source": "code2020",
+          "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 147: renewed on a date set by decree, at least two months ahead)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2023/09/Regionales_2023.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2013-04-21",
+          "last_date": "2023-12-02",
+          "source": "results",
+          "evidence": "List votes per region for 2013 (RESULTAT_REGIONALE-2013-FINAL.pdf), 2018 (1-ELECTION-DES-CONSEILLERS-REGIONAUX-1.pdf), and 2023 with the December rerun"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-04-21",
+          "contests": 31,
+          "deferred": [
+            "2013-07-21"
+          ],
+          "source": "er2013-juillet",
+          "quote": "ELECTION DES CONSEILLERS REGIONAUX, SCRUTINS DES 21 AVRIL & 21 JUILLET 2013"
+        },
+        {
+          "date": "2018-10-13",
+          "contests": 31,
+          "deferred": [
+            "2018-12-16"
+          ],
+          "source": "er2018",
+          "quote": "Scrutins du 13 Octobre et du 16 Décembre 2018 ... TOTAL 31"
+        },
+        {
+          "date": "2023-09-02",
+          "contests": 31,
+          "deferred": [
+            "2023-12-02"
+          ],
+          "source": "er2023",
+          "quote": "SCRUTIN DU 02 SEPTEMBRE 2023: 30 lists marked VAINQUEUR; one region rerun on 2 December 2023"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 2
+    },
+    {
+      "key": "conseil_municipal",
+      "tier": "commune",
+      "name": "Election des conseillers municipaux",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "contests_per_unit": 1,
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 175-176: five-year term; the leading list takes half the seats and the rest go by proportional representation, largest remainders)",
+      "earliest_record": "2013-04-21",
+      "finest_note": "Commune; the CEI tables print no polling-station results",
+      "note": "Councils of every commune, elected by list; the mayor is not on a separate ballot. Municipal elections were held from 1980 to 2001 under earlier laws (Law 2000-514 for 2001), but the CEI's site holds results only from 2013. Partial polls rerun annulled communes.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission Électorale Indépendante",
+          "source": "code2020",
+          "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 175: renewed on a date set by decree, at least two months ahead)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEI results tables",
+          "url": "https://www.cei.ci/wp-content/uploads/2023/09/Municipales_2023.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2013-04-21",
+          "last_date": "2023-12-02",
+          "source": "results",
+          "evidence": "List votes per commune for 2013 (RESULTAT_MUNICIPALE-2013-FINAL.pdf), 2018 (2-ELECTION-DES-CONSEILLERS-MUNICIPAUX.pdf), and 2023 with the December reruns"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "through": "2001-12-31",
+          "note": "Communal elections under the laws before 2013; not counted from an official list"
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 197,
+          "source": "em2013",
+          "quote": "ELECTION DES CONSEILLERS MUNICIPAUX, SCRUTIN DU 21 AVRIL 2013: communes 001 to 197"
+        },
+        {
+          "date": "2018-10-13",
+          "contests": 201,
+          "deferred": [
+            "2018-12-16"
+          ],
+          "source": "em2018",
+          "quote": "Scrutins du 13 Octobre et du 16 décembre 2018 ... TOTAL 201"
+        },
+        {
+          "date": "2023-09-02",
+          "contests": 201,
+          "deferred": [
+            "2023-12-02"
+          ],
+          "source": "em2023",
+          "quote": "SCRUTIN DU 02 SEPTEMBRE 2023: 199 lists marked VAINQUEUR; the other communes rerun on 2 December 2023"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 2
+    },
+    {
+      "key": "conseil_general",
+      "tier": "departement_collectivite",
+      "name": "Election des conseillers généraux",
+      "name_en": "Departmental general councils (abolished)",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "2002-01-01",
+      "valid_to": "2012-12-13",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "collectivites2012",
+      "note": "Departments were local governments with elected general councils from 2002, elected once in July 2002; the 2011-2012 reform kept only regions and communes.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the July 2002 general-council results online: the CEI's site and media library start with 2010, and the Constitutional Council's online decisions start in 2020.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_to": "2012-12-13"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2002-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 5
+    },
+    {
+      "key": "district",
+      "tier": "district_autonome",
+      "name": "Gouverneur et conseil de district autonome",
+      "name_en": "Autonomous district governors and councils",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 109: elected district councillors sit in the senatorial college)",
+      "note": "Abidjan and Yamoussoukro are run by governors appointed by decree; the electoral code provides no popular vote for the district council or governor (Art. 1 lists only the presidential, legislative, senatorial, regional, and municipal elections).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular election: governors are appointed and the electoral code (Art. 1) holds no district ballot.",
+      "match": [],
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "assemblee_territoriale",
+      "tier": "national",
+      "name": "Conseil général et Assemblée territoriale de la Côte d'Ivoire",
+      "name_en": "Territorial assembly of the colony (abolished)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1946-01-01",
+      "valid_to": "1958-12-04",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "note": "The colony's General Council (1946) and Territorial Assembly (1952, 1957), elected under French law; the 1957 assembly became the constituent and then legislative assembly of the autonomous republic in December 1958.",
+      "disposition": "blocked",
+      "disposition_reason": "Results appear only in the colonial Journal officiel, which no Ivorian official body publishes online.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "CI",
+          "valid_to": "1958-12-04"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1952-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1957-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5
+    },
+    {
+      "key": "parlement_francais",
+      "tier": "national",
+      "name": "Députés et sénateurs de la Côte d'Ivoire au Parlement français",
+      "name_en": "Members of the French Parliament for Côte d'Ivoire (1945-1958)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1945-10-21",
+      "valid_to": "1958-12-04",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections to the French National Assembly and Council of the Republic belong to the France census, as does the 1958 referendum.",
+      "match": [],
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "primaires",
+      "tier": "national",
+      "name": "Primaires",
+      "name_en": "Nominating contests",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "code2020",
+      "locator": "https://www.cei.ci/wp-content/uploads/2020/07/Ordonnance-N%C2%B0-2020-356-portant-Nouveau-Code-%C3%A9lectoral-du-08-Avr.2020.pdf (Art. 51-53: presidential candidates file with the CEI and need citizen sponsorship (parrainage), not a primary)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The state runs no nominating contest: parties pick their candidates, and the presidential sponsorship of Art. 51 is a signature requirement, not a vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "CI*"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    }
+  ]
+}
