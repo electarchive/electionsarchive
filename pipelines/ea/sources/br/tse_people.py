@@ -12,7 +12,7 @@ from ea.sources.br import municipais, tse_history
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_people"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ROSTERS = [
     *((municipais.SOURCE, year, municipais.FILES[(year, "roster")]) for year in municipais.YEARS),
@@ -136,7 +136,13 @@ def emit() -> Path:
             joined.join(merging.select("title"), on="title")
             .filter(~pl.col("person").is_in(split["person"].implode()))
             .group_by("title", "person")
-            .agg(pl.col("misread").all(), pl.col("rank").min(), pl.col("birth").first(), first=pl.col("year").min())
+            .agg(
+                pl.col("misread").all(),
+                pl.col("rank").min(),
+                pl.col("birth").first(),
+                first=pl.col("year").min(),
+                years=pl.col("year").n_unique(),
+            )
             .sort("title", "misread", "rank", "first", "person")
         )
         births = (
@@ -147,6 +153,23 @@ def emit() -> Path:
         )
         print(f"merged titles whose persons' birth dates differ {births.height}")
         births.write_parquet(PARSED / "births.parquet")
+        # A merged number's persons disagree on a birth date when a roster mistyped it. The date that more of the
+        # number's election years carry wins; an even split keeps the survivor's own date.
+        support = (
+            groups.filter(~pl.col("misread") & pl.col("birth").is_not_null())
+            .group_by("title", "birth")
+            .agg(pl.col("years").sum())
+            .sort("title", "years", descending=[False, True])
+            .group_by("title", maintain_order=True)
+            .agg(
+                birth=pl.col("birth").first(),
+                lead=pl.col("years").first(),
+                next=pl.col("years").get(1, null_on_oob=True),
+            )
+            .filter(pl.col("next").is_not_null() & (pl.col("lead") > pl.col("next")))
+        )
+        majority = dict(zip(support["title"], support["birth"], strict=True))
+        corrected = 0
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -156,6 +179,11 @@ def emit() -> Path:
         )
         for group in groups.partition_by("title", maintain_order=True):
             survivor, *duplicates = [UUID(person) for person in group["person"]]
+            date = majority.get(group["title"][0])
+            if date is not None and group["birth"][0] != date:
+                cs.add("person", id=survivor, birth_date=date, birth_precision="day")
+                corrected += 1
             for duplicate in duplicates:
                 cs.merge(duplicate, survivor)
+        print(f"survivors taking the birth date most years agree on {corrected}")
         return cs.write()
