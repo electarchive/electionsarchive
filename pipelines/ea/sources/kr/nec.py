@@ -368,6 +368,44 @@ def fetch_people() -> None:
         raw.fetch(SOURCE, _sparql(query), suffix=".json")
 
 
+# Ballot labels that Wikidata's Korean labels and dates leave open, matched by hand to the item that is the same party:
+# a name Wikidata keeps as an alias, or a party that was renamed and kept its legal identity.
+PARTY_ITEMS = {
+    ("한나라당", "19971218"): "Q20916",
+    ("한나라당", "20021219"): "Q20916",
+    ("새누리당", "20121219"): "Q20916",
+    ("민주통합당", "20121219"): "Q22794",
+    ("새천년민주당", "20021219"): "Q488952",
+    ("평화민주당", "19871216"): "Q23994817",
+}
+# Candidates that no election's P726 lists, matched to the item whose Korean label, dates of life, and office fit.
+PERSON_ITEMS = {
+    "조봉암": "Q626718",
+    "이시영": "Q494787",
+    "신흥우": "Q12604774",
+    "변영태": "Q482965",
+    "김준연": "Q6682161",
+    "전진한": "Q11269676",
+    "정근모": "Q16091601",
+}
+
+
+def _party_items(text: str, day: str, items: list[tuple[str, str | None, str | None, str | None]]) -> list[str]:
+    held = f"{day[:4]}-{day[4:6]}-{day[6:]}"
+    if (text, day) in PARTY_ITEMS:
+        return [PARTY_ITEMS[text, day]]
+    found = [
+        item
+        for item, _, start, end in items
+        if (start is None or start[:10] <= held) and (end is None or end[:10] >= held)
+    ]
+    if len(set(found)) > 1:
+        dated = {item for item, _, start, _ in items if item in found and start is not None}
+        if len(dated) == 1:
+            return list(dated)
+    return found
+
+
 PUBLISHER = "중앙선거관리위원회 (National Election Commission)"
 TITLE = "선거통계시스템: 역대선거 대통령선거 개표현황"
 WINNERS_TITLE = "선거통계시스템: 역대선거 대통령선거 당선인 명부"
@@ -602,19 +640,24 @@ def emit() -> Path:
         name(system, "Presidential election, plurality of the valid votes", "en", "english")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
 
+        def existing(scheme: str, value: str) -> UUID | None:
+            row = conn.execute(
+                "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+            ).fetchone()
+            return None if row is None else row[0]
+
         parties: dict[tuple[str, str], UUID] = {}
         minted_parties: set[UUID] = set()
 
         def party(text: str, day: str) -> UUID:
             if (text, day) not in parties:
-                held = f"{day[:4]}-{day[4:6]}-{day[6:]}"
-                found = [
-                    item
-                    for item, _, start, end in party_items.get(text, [])
-                    if (start is None or start[:10] <= held) and (end is None or end[:10] >= held)
-                ]
-                key = ("wikidata", found[0]) if len(set(found)) == 1 else (f"{SOURCE}.party", f"{text}:{day}")
+                found = _party_items(text, day, party_items.get(text, []))
+                legacy = (f"{SOURCE}.party", f"{text}:{day}")
+                key = ("wikidata", found[0]) if len(set(found)) == 1 else legacy
                 entity = parties[text, day] = cs.key(*key)
+                old = existing(*legacy) if key != legacy else None
+                if old is not None:
+                    cs.merge(old, entity)
                 if entity in cs.minted and entity not in minted_parties:
                     minted_parties.add(entity)
                     cs.add("party", id=entity, kind="party", polity_id=korea)
@@ -699,14 +742,17 @@ def emit() -> Path:
                     ballot_position=None,
                     ballot_label=person_name,
                 )
-                item = people.get((day, person_name)) or unique.get(person_name)
-                person = persons.get(("wikidata", item) if item else (day, person_name))
+                item = people.get((day, person_name)) or unique.get(person_name) or PERSON_ITEMS.get(person_name)
+                at = ("wikidata", item) if item else ("name", person_name)
+                person = persons.get(at)
                 if person is None:
                     person = cs.key("wikidata", item) if item else cs.key(f"{SOURCE}.person", f"{day}:{person_name}")
-                    persons[("wikidata", item) if item else (day, person_name)] = person
+                    persons[at] = person
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, person_name)
+                if (old := existing(f"{SOURCE}.person", f"{day}:{person_name}")) is not None:
+                    cs.merge(old, person)
                 cs.add(
                     "candidacy",
                     id=cs.key(f"{SOURCE}.candidacy", f"{day}:{number}"),
