@@ -1,0 +1,942 @@
+{
+  "polity": "BZ",
+  "name": "Belize",
+  "sources": {
+    "ebc-commission": {
+      "title": "The Commission: Electoral Management Bodies",
+      "publisher": "Elections and Boundaries Commission, Belize",
+      "url": "https://elections.gov.bz/the-commission/",
+      "kind": "official_body"
+    },
+    "ebd-general": {
+      "title": "General Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/general-election-results/",
+      "kind": "official_body"
+    },
+    "ebd-1993": {
+      "title": "Election Results 1993",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/1993-General-Election-Results.pdf",
+      "kind": "official_body",
+      "note": "Scanned tables reprinted from the Belize Gazette of 10 July 1993, with the Freetown by-election of 1993 on page 4; no text layer."
+    },
+    "ebd-1998": {
+      "title": "Results of General Elections 1998",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/1998-General-Elections-Results.pdf",
+      "kind": "official_body",
+      "note": "Scanned returns, divisions numbered 1 to 29; no text layer."
+    },
+    "ebd-1979": {
+      "title": "General Elections 1979",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/GENERAL-ELECTIONS-1979.pdf",
+      "kind": "official_body"
+    },
+    "ebd-1984-1989": {
+      "title": "Belize General Elections Results 1984 and 1989",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2025/03/Belize-General-Elections-Results-1984-and-1989.docx.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2003": {
+      "title": "2003 General Elections Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2003-General-Elections-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2008": {
+      "title": "2008 General Elections Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2008-General-Elections-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2012": {
+      "title": "2012 General Elections Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2012-General-Elections-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2015": {
+      "title": "2015 General Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2015-General-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2020": {
+      "title": "2020 General Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2020-General-Election-Results-1.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2025": {
+      "title": "General Election 12th March 2025",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2025/03/GENERAL-ELECTION-12TH-MARCH-2025.pdf",
+      "kind": "official_body"
+    },
+    "ebd-by": {
+      "title": "By-Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/bi-election-results/",
+      "kind": "official_body"
+    },
+    "ebd-2003-cayo-south": {
+      "title": "Cayo South Electoral Division: Result of By-election 2003",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2003-Cayo-South-By-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2015-dangriga": {
+      "title": "2015 Dangriga Official By-Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2015-Dangriga-Official-By-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2021-corozal-bay": {
+      "title": "Corozal Bay By-Election Official Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2021-Corozal-Official-By-Election-Results-1.pdf",
+      "kind": "official_body"
+    },
+    "ebd-2024-toledo-east": {
+      "title": "Toledo East By-Election Results 2024",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2024/07/FINAL-Toledo-East-By-Election-Results-2024-1-2.pdf",
+      "kind": "official_body"
+    },
+    "ebd-referendum": {
+      "title": "Referendum",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/referendum/",
+      "kind": "official_body"
+    },
+    "ebd-ref-2008": {
+      "title": "Referendum Results 2008",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2008-Referendum-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-ref-2019": {
+      "title": "Certificate of Results of Referendum in the Entire Country, 8th May 2019",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2019-Referendum-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-ref-caye-caulker": {
+      "title": "Certificate of Result of Referendum in Caye Caulker Village, 8th October 2025",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2025/10/Caye-Caulker-Referendum-Results-final.pdf",
+      "kind": "official_body"
+    },
+    "ebd-municipal": {
+      "title": "Municipal Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/municipal-election-results/",
+      "kind": "official_body"
+    },
+    "ebd-mun-2003": {
+      "title": "Results of the Municipal Elections of 5 March 2003",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2003-Municipal-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-mun-2006": {
+      "title": "2006 Municipal Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2006-Municipal-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-mun-2009": {
+      "title": "2009 Municipal Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2009-Municipal-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-mun-2012": {
+      "title": "Municipal Elections 2012",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2012-Municipal-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-mun-2021": {
+      "title": "2021 Municipal Election Results",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2021-Municipal-Election-Resuls-Final.pdf",
+      "kind": "official_body"
+    },
+    "ebd-mun-2024": {
+      "title": "Belize City Municipal Results 2024",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2024/03/BELIZE-CITY-MUNICIPAL-RESULTS-2024-3.pdf",
+      "kind": "official_body",
+      "note": "One sheet per municipality on the Municipal Election Results page, nine in all for 2024."
+    },
+    "ebd-town-board-2002": {
+      "title": "Benque Viejo Town: Town Board By-Elections, March 6, 2002",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/2002-Benque-Viejo-By-Results.pdf",
+      "kind": "official_body"
+    },
+    "ebd-village": {
+      "title": "Village Council Elections",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/village-council-elections/",
+      "kind": "official_body"
+    },
+    "ebd-village-2025": {
+      "title": "2025 Village Councils Elections",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/2025-village-council-elections/",
+      "kind": "official_body"
+    },
+    "ebd-polling-areas": {
+      "title": "Polling Areas",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/polling-areas/",
+      "kind": "official_body"
+    },
+    "ropa": {
+      "title": "Representation of the People Act, Chapter 9 of the Substantive Laws of Belize, Revised Edition 2020",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-9-Representation-of-the-People-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap85": {
+      "title": "Belize City Council Act, Chapter 85 of the Substantive Laws of Belize, Revised Edition 2000",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-85-Belize-City-Council-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap86": {
+      "title": "Belmopan City Council Act, Chapter 86 of the Substantive Laws of Belize, Revised Edition 2000",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-86-Belmopan-City-Council-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap87": {
+      "title": "Town Councils Act, Chapter 87 of the Substantive Laws of Belize, Revised Edition 2000",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-87-Town-Councils-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap88": {
+      "title": "Village Councils Act, Chapter 88 of the Substantive Laws of Belize, Revised Edition 2020",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-88-Village-Councils-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap10": {
+      "title": "Referendum Act, Chapter 10 of the Substantive Laws of Belize, Revised Edition 2020",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-10-Referendum-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap10-01": {
+      "title": "Belize Territorial Dispute Referendum Act, Chapter 10:01",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/CAP-10.01-Belize-Territorial-Dispute-Referendum-Act.pdf",
+      "kind": "official_body"
+    },
+    "cap9-01": {
+      "title": "Recall of Elected Representatives Act, Chapter 9:01",
+      "publisher": "Government of Belize (Law Revision Commissioner)",
+      "url": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-9.01-Recall-of-Elected-Representatives-Act.pdf",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Belize",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "ebc-commission",
+      "counts": [
+        {
+          "date": "2025-03-12",
+          "value": 1,
+          "source": "ebd-2025",
+          "locator": "One national return for all 31 electoral divisions"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Districts",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "source": "ebd-polling-areas",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 6,
+          "source": "ebd-polling-areas",
+          "locator": "Polling areas listed for Belize (as Belize City and Belize Rural), Cayo, Corozal, Orange Walk, Stann Creek, and Toledo"
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Cities and towns",
+      "name_en": "Municipalities",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "source": "cap87",
+      "counts": [
+        {
+          "date": "2024-03-06",
+          "value": 9,
+          "source": "ebd-municipal",
+          "locator": "2024 results sheets for Belize City, Belmopan, Benque Viejo del Carmen, Corozal, Dangriga, Orange Walk, Punta Gorda, San Ignacio and Santa Elena, and San Pedro (two city councils under Cap. 85 and 86, seven town councils in the Schedule to Cap. 87)"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "Villages and communities",
+      "name_en": "Villages",
+      "parent": "district",
+      "polity_kind": "submunicipal",
+      "source": "cap88",
+      "counts": [
+        {
+          "date": "2025-07-06",
+          "value": 190,
+          "source": "ebd-village-2025",
+          "locator": "190 chairpersons returned as Elected across the 13 official result sheets of the 2025 village council elections, 18 May to 6 July 2025"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "House of Representatives general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "bz.division"
+        ]
+      },
+      "source": "ropa",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-9-Representation-of-the-People-Act.pdf (s. 17: Belize divided into the electoral divisions of the First Schedule; each represented by one elected member)",
+      "earliest_record": "1979-11-21",
+      "valid_from": "1964-01-01",
+      "note": "One member per electoral division by first past the post (Representation of the People Act s. 17 (3)): 18 divisions in 1979, 28 in 1984 and 1989, 29 from 1993 to 2003, and 31 since 2008 (Act No. 11 of 2005). The House first sat after the election of 1965 under the self-government constitution of 1964; the Department publishes returns from 1979, and its 1993 and 1998 files are scans without a text layer. Parliament runs five years from its first sitting unless dissolved earlier, so the date is called.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BZ"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Elections and Boundaries Department",
+          "source": "ropa",
+          "vacancy_rule": "by-election",
+          "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-9-Representation-of-the-People-Act.pdf (s. 19: writs for holding elections; s. 17 (3): one member per division)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/general-election-results/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1979-11-21",
+          "last_date": "2025-03-12",
+          "finest": "bz.division",
+          "role": "administers",
+          "source": "ebd-general",
+          "evidence": "One PDF per general election with each division's candidates, votes, registered electors, and rejected ballots; 1993 and 1998 are scans"
+        }
+      ],
+      "finest_note": "electoral division; no polling-station returns published",
+      "dates": [
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "note": "First House election under the 1964 constitution; no official return online."
+        },
+        {
+          "date": "1969-01-01",
+          "precision": "year",
+          "note": "No official return online."
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "note": "No official return online."
+        },
+        {
+          "date": "1979-11-21",
+          "contests": 18,
+          "seats": 18,
+          "source": "ebd-1979",
+          "quote": "18 divisions with candidates and votes; page headed 24th November 1979"
+        },
+        {
+          "date": "1984-12-14",
+          "contests": 28,
+          "seats": 28,
+          "source": "ebd-1984-1989",
+          "quote": "1984 table: 28 divisions"
+        },
+        {
+          "date": "1989-09-04",
+          "contests": 28,
+          "seats": 28,
+          "source": "ebd-1984-1989",
+          "quote": "1989 table: 28 divisions"
+        },
+        {
+          "date": "1993-06-30",
+          "contests": 29,
+          "seats": 29,
+          "source": "ebd-1993",
+          "quote": "ELECTION RESULTS 1993: 29 divisions on pages 1 to 3, Source: Belize Gazette, July 10, 1993"
+        },
+        {
+          "date": "1998-08-27",
+          "contests": 29,
+          "seats": 29,
+          "source": "ebd-1998",
+          "quote": "General Elections of Members of the House of Representatives, held on Thursday, 27 August, 1998: divisions numbered 1 to 29"
+        },
+        {
+          "date": "2003-03-05",
+          "contests": 29,
+          "seats": 29,
+          "source": "ebd-2003",
+          "quote": "29 divisions with candidates and votes"
+        },
+        {
+          "date": "2008-02-07",
+          "contests": 31,
+          "seats": 31,
+          "source": "ebd-2008",
+          "quote": "31 divisions with candidates and votes"
+        },
+        {
+          "date": "2012-03-07",
+          "contests": 31,
+          "seats": 31,
+          "source": "ebd-2012",
+          "quote": "March 7, 2012: 31 divisions"
+        },
+        {
+          "date": "2015-11-04",
+          "contests": 31,
+          "seats": 31,
+          "source": "ebd-2015",
+          "quote": "31 divisions with candidates and votes"
+        },
+        {
+          "date": "2020-11-11",
+          "contests": 31,
+          "seats": 31,
+          "source": "ebd-2020",
+          "quote": "31 divisions with candidates and votes"
+        },
+        {
+          "date": "2025-03-12",
+          "contests": 31,
+          "seats": 31,
+          "source": "ebd-2025",
+          "quote": "General Election 12th March 2025: 31 divisions"
+        }
+      ],
+      "est_votes": 1300000,
+      "effort": 2
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "House of Representatives by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ebd-by",
+      "note": "A vacant division seat is filled by by-election. The Department's By-Election Results page mixes House by-elections with village council and town board by-elections; only the House ones count here. The 1993 Freetown by-election is printed on page 4 of the 1993 general election file.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BZ"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/bi-election-results/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1993-01-01",
+          "last_date": "2024-07-17",
+          "finest": "bz.division",
+          "role": "administers",
+          "source": "ebd-by",
+          "evidence": "Division totals per candidate for the 2003 Cayo South, 2015 Dangriga, 2021 Corozal Bay, and 2024 Toledo East by-elections"
+        }
+      ],
+      "finest_note": "electoral division",
+      "dates": [
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "ebd-1993",
+          "quote": "BY-ELECTION RESULTS 1993: Freetown (Source: The Gazette # 5, January 30, 1993)"
+        },
+        {
+          "date": "2003-10-29",
+          "contests": 1,
+          "source": "ebd-2003-cayo-south",
+          "quote": "Cayo South Electoral Division, Result of By-election 2003, October 29, 2003"
+        },
+        {
+          "date": "2015-07-08",
+          "contests": 1,
+          "source": "ebd-2015-dangriga",
+          "quote": "Dangriga official by-election results"
+        },
+        {
+          "date": "2021-03-03",
+          "contests": 1,
+          "source": "ebd-2021-corozal-bay",
+          "quote": "COROZAL BAY BY-ELECTION OFFICIAL RESULTS, 3rd March 2021"
+        },
+        {
+          "date": "2024-07-17",
+          "contests": 1,
+          "source": "ebd-2024-toledo-east",
+          "quote": "Toledo East by-election results"
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 1
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap10",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-10-Referendum-Act.pdf (s. 2 (1): a referendum on a resolution of the National Assembly, a petition of ten percent of electors, a law that provides for one, or a settlement of the dispute with Guatemala)",
+      "valid_from": "1999-03-06",
+      "first_held": "2008-02-07",
+      "earliest_record": "2008-02-07",
+      "note": "Referendum Act No. 2 of 1999. The 2008 referendum was held with the general election; the 2019 one, under the Belize Territorial Dispute Referendum Act (Cap. 10:01), was whether to submit Guatemala's claim to the International Court of Justice. Results are published by electoral division.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BZ"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/referendum/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2008-02-07",
+          "last_date": "2019-05-08",
+          "finest": "bz.division",
+          "role": "administers",
+          "source": "ebd-referendum",
+          "evidence": "Yes, No, and rejected by division with registered electors"
+        }
+      ],
+      "finest_note": "electoral division",
+      "dates": [
+        {
+          "date": "2008-02-07",
+          "contests": 1,
+          "source": "ebd-ref-2008",
+          "quote": "Referendum Results 2008: Total Votes Cast 73,213"
+        },
+        {
+          "date": "2019-05-08",
+          "contests": 1,
+          "source": "ebd-ref-2019",
+          "quote": "Certificate of Results of Referendum in the Entire Country, 8th May 2019"
+        }
+      ],
+      "est_votes": 190000,
+      "effort": 1
+    },
+    {
+      "key": "recall",
+      "tier": "national",
+      "name": "Recall referendums on members of the House",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap9-01",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-9.01-Recall-of-Elected-Representatives-Act.pdf (s. 3 (2): petition of at least 30% of the division's registered voters; ss. 6-7: writ and result of the recall referendum)",
+      "valid_from": "2010-12-01",
+      "note": "Recall of Elected Representatives Act No. 20 of 2010, in force 1 December 2010. The Department lists no recall referendum on its referendum or by-election pages.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "iso_pattern": "BZ"
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "municipal",
+      "tier": "municipality",
+      "name": "City and town council elections (mayors and councillors)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cap87",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-87-Town-Councils-Act.pdf (s. 3 (3): a Mayor and six other members; s. 4: office until the last day of February after two years in office; s. 10: Mayor directly elected)",
+      "valid_from": "1999-02-17",
+      "first_held": "1999-03-01",
+      "earliest_record": "2003-03-05",
+      "note": "Every city and town council is elected at once: the mayor directly and the other members (ten in Belize City, six elsewhere) at large, each elector voting for up to that many candidates. The Acts of 1999 replaced the Belize City Council Act (Cap. 66) and the Local Government (District Boards) Act (Cap. 67); the first councils under them were elected in March 1999 (Belize City) and March 2000 (Belmopan and the seven towns), all holding office to February 2003, and every council since in the March after two years in office. The Department publishes no 2015 or 2018 results. By-elections fill vacancies within ninety days and count here.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1999-02-17"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1999-02-17"
+        }
+      ],
+      "cadence": [
+        {
+          "government_kind": "municipality",
+          "source": "cap85",
+          "period_years": 3,
+          "phase": 2,
+          "month": 3,
+          "day_rule": "mar_first_wednesday",
+          "term_years": 3,
+          "called": false,
+          "valid_from": "2003-01-01",
+          "administered_by": "Elections and Boundaries Department",
+          "vacancy_rule": "by-election within ninety days unless within a year of the term's end",
+          "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-85-Belize-City-Council-Act.pdf (s. 4 (1): office until the last day of February after two years in office, the 1999 council to February 2003; s. 4 (2): by-election within ninety days; s. 5: general election on the first Wednesday after the term expires)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/municipal-election-results/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2003-03-05",
+          "last_date": "2024-03-06",
+          "role": "administers",
+          "source": "ebd-municipal",
+          "evidence": "Candidate votes per municipality for 2003, 2006, 2009, 2012, 2021, and 2024 (Belize City 2009 also by polling station); 2015 and 2018 missing"
+        }
+      ],
+      "finest_note": "municipality; Belize City 2009 also by polling area",
+      "dates": [
+        {
+          "date": "1999-03-01",
+          "precision": "month",
+          "contests": 1,
+          "source": "cap85",
+          "quote": "the Council elected to office in the general election held in the month of March, 1999, shall hold office until the last day of February, 2003"
+        },
+        {
+          "date": "2000-03-01",
+          "contests": 8,
+          "source": "cap87",
+          "quote": "the Council elected to office in the general election held in the month of March, 2000 (seven towns in the Schedule); Belmopan: the first Council on the first Wednesday in the month of March, 2000 (Cap. 86 s. 4)"
+        },
+        {
+          "date": "2003-03-05",
+          "contests": 9,
+          "source": "ebd-mun-2003",
+          "quote": "Belize City, Belmopan City, Orange Walk Town, Corozal Town, San Ignacio/Santa Elena, Benque Viejo, Dangriga, Punta Gorda, San Pedro; held on Wednesday, 5th March 2003"
+        },
+        {
+          "date": "2006-03-01",
+          "contests": 9,
+          "source": "ebd-mun-2006",
+          "quote": "nine RESULTS OF THE ... COUNCIL ELECTION sheets, held on Wednesday, 1st March, 2006"
+        },
+        {
+          "date": "2009-03-04",
+          "contests": 9,
+          "source": "ebd-mun-2009",
+          "quote": "held on Wednesday, 4th March, 2009"
+        },
+        {
+          "date": "2012-03-07",
+          "contests": 9,
+          "source": "ebd-mun-2012",
+          "quote": "Municipal Elections 2012, Belize City, March 7, 2012"
+        },
+        {
+          "date": "2015-03-04",
+          "note": "Due under Cap. 85 s. 5; the Department publishes no 2015 results."
+        },
+        {
+          "date": "2018-03-07",
+          "note": "Due under Cap. 85 s. 5; the Department publishes no 2018 results."
+        },
+        {
+          "date": "2021-03-03",
+          "contests": 9,
+          "source": "ebd-mun-2021",
+          "quote": "held on Wednesday, 3rd March 2021"
+        },
+        {
+          "date": "2024-03-06",
+          "contests": 9,
+          "source": "ebd-municipal",
+          "quote": "nine 2024 result sheets, one per city and town council; Belize City Council Election held on Wednesday, 6th March 2024"
+        }
+      ],
+      "est_votes": 650000,
+      "effort": 3
+    },
+    {
+      "key": "village_council",
+      "tier": "village",
+      "name": "Village and community council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cap88",
+      "contests_per_unit": 1,
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-88-Village-Councils-Act.pdf (s. 5: a council holds office for three years; s. 6: seven members elected; s. 3: community councils under the same Parts; s. 35: election regulations by the Elections and Boundaries Commission)",
+      "valid_from": "1999-01-01",
+      "earliest_record": "2016-06-05",
+      "note": "Village Councils Act No. 30 of 1999. Each village (and each recognized community) elects a chairperson and six members at large for three years; the Department runs the polls in waves on Sundays from May to July of each cycle year, and declares uncontested councils on nomination day. Its pages list cycles from 2010; the 2010 and 2013 pages hold no files, and per-village sheets start in 2016. By-elections count here.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(Village|Community) Council"
+        }
+      ],
+      "cadence": [
+        {
+          "government_kind": "village",
+          "source": "cap88",
+          "period_years": 3,
+          "phase": 0,
+          "term_years": 3,
+          "called": false,
+          "valid_from": "2010-01-01",
+          "month": 5,
+          "administered_by": "Elections and Boundaries Department",
+          "vacancy_rule": "by-election",
+          "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-88-Village-Councils-Act.pdf (s. 5 (e): hold office for three years; s. 9: vacation of seat and by-election; s. 10: dissolution by the Elections and Boundaries Commission)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/village-council-elections/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2016-06-05",
+          "last_date": "2025-07-06",
+          "role": "administers",
+          "source": "ebd-village",
+          "evidence": "One PDF per village and polling day in 2016 (170), 2019 (183), and 2022 (192); 13 district or day sheets in 2025; 2010 and 2013 pages empty"
+        }
+      ],
+      "finest_note": "village",
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "local_referendums",
+      "tier": "village",
+      "name": "District and area referendums",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap10",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Cap-10-Referendum-Act.pdf (s. 2 (1) (b): a referendum in any specific district or area on a petition of twenty-five percent of its registered electors)",
+      "valid_from": "2008-01-01",
+      "first_held": "2025-10-08",
+      "earliest_record": "2025-10-08",
+      "note": "The area referendum came with the 2008 amendment (Act No. 1 of 2008). The only one the Department lists is Caye Caulker village's of 8 October 2025.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum",
+            "local"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal",
+            "region"
+          ]
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Department",
+          "url": "https://elections.gov.bz/referendum/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2025-10-08",
+          "last_date": "2025-10-08",
+          "role": "administers",
+          "source": "ebd-referendum",
+          "evidence": "Caye Caulker certificate of result"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2025-10-08",
+          "contests": 1,
+          "source": "ebd-ref-caye-caulker",
+          "quote": "CERTIFICATE OF RESULT OF REFERENDUM IN CAYE CAULKER VILLAGE, BELIZE RURAL SOUTH ELECTORAL DIVISION, 8TH OCTOBER 2025: 1454 registered, 857 cast"
+        }
+      ],
+      "est_votes": 900,
+      "effort": 1
+    },
+    {
+      "key": "councils_before_1999",
+      "tier": "municipality",
+      "name": "Belize City Council and district town board elections before 1999",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cap87",
+      "locator": "https://elections.gov.bz/wp-content/uploads/2023/12/Chapter-87-Town-Councils-Act.pdf (s. 63: the Local Government (District Boards) Act, Cap. 67, repealed); Cap. 85 s. 63 repeals the Belize City Council Act, Cap. 66",
+      "valid_to": "1999-02-17",
+      "note": "Councils elected under the Belize City Council Act (Cap. 66) and the town boards under the Local Government (District Boards) Act (Cap. 67) until the 1999 Acts. The one result the Department posts is the Benque Viejo town board by-election of 6 March 2002, held under the old name.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_to": "1999-02-17"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Department publishes no results before 2003, and no official list of the council and town board elections under Cap. 66 and Cap. 67 is online; the returns sit in the Government Gazette.",
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "legislative_assembly",
+      "tier": "national",
+      "name": "Legislative Assembly and elected Legislative Council seats before 1965",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ebc-commission",
+      "valid_to": "1964-01-01",
+      "note": "Elected seats in the colonial legislatures (the Legislative Council and the Legislative Assembly) before the House of Representatives first sat in 1965.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BZ"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Elections and Boundaries Commission dates from 1978 and the Department publishes nothing before 1979; colonial returns are only in the Government Gazette, not online.",
+      "est_votes": 150000,
+      "effort": 5
+    }
+  ]
+}
