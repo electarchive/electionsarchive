@@ -265,6 +265,70 @@ def fetch(
     return _artifact(source, key, entry)
 
 
+def fetch_many(
+    source: str,
+    urls: list[str],
+    *,
+    suffix: str,
+    workers: int = 16,
+    batch: int = 2000,
+    attempts: int = 4,
+) -> dict[str, Artifact]:
+    """Fetch many GET URLs into the cache concurrently, writing the index once per batch instead of once per file,
+    so a source of tens of thousands of small API responses does not rewrite its index for each one. Cached URLs are
+    reused, and a URL that still fails after its attempts is left out of the result."""
+    from concurrent.futures import ThreadPoolExecutor
+    from time import sleep
+
+    folder = DATA / "raw" / source
+    folder.mkdir(parents=True, exist_ok=True)
+    index = _read(source)
+    out = {url: _artifact(source, url, index[url]) for url in urls if url in index}
+    pending = [url for url in dict.fromkeys(urls) if url not in index]
+    client = httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120)
+
+    def one(url: str) -> tuple[str, dict[str, str | int | None]] | None:
+        for attempt in range(attempts):
+            try:
+                response = client.get(url)
+                response.raise_for_status()
+            except httpx.HTTPStatusError as failure:
+                if failure.response.status_code < 500:
+                    break
+                sleep(2**attempt)
+                continue
+            except httpx.HTTPError:
+                sleep(2**attempt)
+                continue
+            content = response.content
+            digest = hashlib.sha256(content).hexdigest()
+            name = f"{digest}{suffix}"
+            if not (folder / name).exists():
+                partial = folder / f".{uuid4()}.part"
+                partial.write_bytes(content)
+                partial.replace(folder / name)
+            return url, {
+                "sha256": digest,
+                "file": name,
+                "retrieved_at": datetime.now(UTC).isoformat(),
+                "media_type": response.headers.get("content-type"),
+                "bytes": len(content),
+            }
+        print(f"{source}: {url} could not be fetched", file=sys.stderr, flush=True)
+        return None
+
+    with client, ThreadPoolExecutor(workers) as pool:
+        for start in range(0, len(pending), batch):
+            done = [hit for hit in pool.map(one, pending[start : start + batch]) if hit is not None]
+            with locked(source) as current:
+                for url, entry in done:
+                    current[url] = entry
+            for url, entry in done:
+                _push(source, url, entry)
+                out[url] = _artifact(source, url, entry)
+    return out
+
+
 def atomic_parquet() -> None:
     """Make every path-targeted DataFrame.write_parquet in this process replace its file only once fully written."""
     import polars as pl
