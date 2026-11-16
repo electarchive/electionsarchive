@@ -599,6 +599,15 @@ class National:
     counted: int
     quota: int
     lists: list[tuple[str, int, int]]  # party label, votes, seats
+    members: list[list[str]]  # per list, the names declared elected in column 8, in printed order
+
+
+def _wrap(named: list[str], entry: str) -> None:
+    """Add a column 8 entry: a new name when it has a comma, else the rest of a name that wrapped."""
+    if "," in entry:
+        named.append(entry)
+    elif named:
+        named[-1] = f"{named[-1]} {entry}"
 
 
 def read_2024() -> National:
@@ -618,11 +627,21 @@ def read_2024() -> National:
             if row[-1][0] >= 120 and not winner:
                 winner = row[-1][1]
     lists: list[tuple[str, int, int]] = []
+    members: list[list[str]] = []
     cast = counted = quota = 0
     for page in pages[3:]:
-        for line in page.splitlines():
-            row = [(p, t) for p, t in segments(line) if not t.startswith("Government Gazette")]
+        raw_lines = [
+            line for line in page.splitlines() if "Government Gazette" not in line and not line.strip().isdigit()
+        ]
+        # Column 8 holds "Surname, Given names" entries, all starting at one offset on a page.
+        offsets = [p for line in raw_lines for p, t in segments(line) if "," in t and not re.fullmatch(r"[\d,]+", t)]
+        names_at = max(set(offsets), key=offsets.count) if offsets else len(max(raw_lines, key=len, default=""))
+        for line in raw_lines:
+            tail = "" if len(line[names_at - 1 : names_at + 1].strip()) == 2 else line[names_at:].strip()
+            row = segments(line[:names_at] if tail else line)
             if not row:
+                if tail and members:
+                    _wrap(members[-1], tail)
                 continue
             at = next(
                 (
@@ -633,6 +652,8 @@ def read_2024() -> National:
                 None,
             )
             if at is None:
+                if tail and members:
+                    _wrap(members[-1], tail)
                 if lists and not lists[-1][0].endswith(")") and row[0][1].endswith(")"):
                     lists[-1] = (clean(f"{lists[-1][0]} {row[0][1]}"), lists[-1][1], lists[-1][2])
                 continue
@@ -641,6 +662,12 @@ def read_2024() -> National:
                 cast, counted, quota = number(head[0][1]), number(head[1][1]), number(head[2][1])
                 head = head[3:]
             lists.append((clean(" ".join(t for _, t in head)), number(row[at][1]), int(row[at + 1][1])))
+            members.append([])
+            if tail:
+                _wrap(members[-1], tail)
+    for (label, _, won), named in zip(lists, members, strict=True):
+        if len(named) != won:
+            raise ValueError(f"{label}: {won} seats but {len(named)} elected names")
     return National(
         president_counted,
         president,
@@ -649,6 +676,7 @@ def read_2024() -> National:
         counted,
         quota,
         lists,
+        members,
     )
 
 
@@ -1268,7 +1296,7 @@ def _national_2024(p: Package, day: str, first: date) -> None:
     for measure, value in ((CAST, data.cast), (VALID, data.counted)):
         _put(p, result_set, unit, None, measure, value)
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-    for position, (label, votes, won) in enumerate(data.lists, 1):
+    for position, ((label, votes, won), named) in enumerate(zip(data.lists, data.members, strict=True), 1):
         party = party_of(label)
         option = key("option", f"{tag}:assembly", position)
         p.add(
@@ -1290,3 +1318,29 @@ def _national_2024(p: Package, day: str, first: date) -> None:
             kind="won" if won else "lost",
             seats=won,
         )
+        for place, ballot_name in enumerate(named, 1):
+            surname, _, given = ballot_name.partition(", ")
+            tag_member = f"{tag}:assembly:{position}:{place}"
+            person = key("person", tag_member)
+            p.add("person", id=person)
+            p.name(person, clean(f"{given} {surname}"), "en", "official")
+            candidacy = key("candidacy", tag_member)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role="list_member",
+                list_position=place,
+                ballot_name=ballot_name,
+                member_of_party_id=party_id(party) if party else None,
+                is_independent=False,
+            )
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=candidacy,
+                kind="elected",
+                seats=None,
+            )
