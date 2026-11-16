@@ -6,18 +6,29 @@ For the database schema and vocabulary, read [data-model.md](data-model.md). For
 
 ## What a pipeline is
 
-A pipeline turns one official source into facts the archive can publish. Every pipeline has four steps:
+A pipeline turns one official source into facts the archive can publish. Each source is a Python module named by its registry name, `{iso}.{publisher}`. The name has two parts: the ISO code of the polity, such as `us`, `tr`, or `ch`, and the publisher, such as `medsl` or `bfs`. The module lives at `pipelines/ea/sources/{iso}/{publisher}.py` and defines `fetch()`, `parse()`, and `emit()`. The CLI imports `ea.sources.{name}` and calls the function named after the step.
 
 - **Fetch** downloads the source files into the raw cache.
-- **Parse** reads the raw files and writes typed Parquet tables under `data/parsed/{source}/`.
-- **Emit** builds a changeset, a folder that describes every row the source adds or changes.
-- **Apply** loads the changeset, runs checks, and publishes it, or holds it for review.
+- **Parse** reads the raw files and writes what the pipeline will load: its packages, or, for an older pipeline, typed Parquet tables under `data/parsed/{source}/`.
+- **Emit** writes to the archive. A package pipeline loads its packages, and an older pipeline builds a changeset for `apply`.
 
-Each source is a Python module named by its registry name, `{iso}.{publisher}`. The name has two parts: the ISO code of the polity, such as `us`, `tr`, or `ch`, and the publisher, such as `medsl` or `bfs`. The module lives at `pipelines/ea/sources/{iso}/{publisher}.py` and defines `fetch()`, `parse()`, and `emit()`. The CLI imports `ea.sources.{name}` and calls the function named after the step. The Canadian federal elections module, `ca.elections`, is the reference pattern for the others.
+Pipelines never write to the core tables directly. Every write is recorded as a changeset, so each row has a pipeline and a source, each write is checked before it lands, and each one can be replaced or reverted later. There are two ways to write.
 
-Pipelines never write to the core tables directly. Each one writes a changeset, and only `apply` publishes changesets. A changeset is a folder with a `manifest.json` file and one Parquet file per target table. The manifest records the author, the pipeline name and version, the kind of change, the declared scope, the order in which the tables publish, and the git commit, branch, and checkout path that ran the emit. Each apply and publish appends a line to `data/logs/provenance.tsv` with the time, the step, the changeset, its status, and the commit, branch, and checkout path it ran from. This design gives every write three properties. Each row has a pipeline and a source, each changeset can be reviewed before it lands, and each one can be reverted later.
+**Packages** are the path for every new source. A pipeline builds one package per election, plus a `geo` package for its places and a `registry` package for its parties, bodies, and offices. Each package is a folder of Parquet files, one per table, with a `package.json` manifest. It is checked without a database and then loaded in bulk, and the load records a published changeset for it. The Czech module, `cz.volby`, is the reference pattern. See [Packages](#packages).
+
+**Changesets** carry everything else: the pipelines written before packages existed, curated records such as the list of countries, entity matching and merges, corrections, and live results. Canada's federal elections module, `ca.elections`, is the reference pattern. A changeset is a folder with a `manifest.json` file and one Parquet file per target table. The manifest records the author, the pipeline name and version, the kind of change, the declared scope, the order in which the tables publish, and the git commit, branch, and checkout path that ran the emit. Each apply and publish appends a line to `data/logs/provenance.tsv` with the time, the step, the changeset, its status, and the commit, branch, and checkout path it ran from. `ea emit` refuses an import changeset from a pipeline that has no changeset from before November 15, 2026, when packages became the path for new sources. A development database that holds no changesets from before that date is exempt, so a fresh checkout can still load the older pipelines.
 
 `apply` loads a changeset into a staging schema, runs every applicable check, and computes the difference from the current data. It then publishes the changeset in one transaction. A changeset publishes automatically when every check passes, if it comes from an official body and every source is a registered official source. Any other changeset is set to `pending_review`, including every changeset from a person or an agent. A reviewer then publishes it with `ea publish`, or reverts it with `ea revert`.
+
+## Packages
+
+A package's key is `{pipeline}/{name}`, such as `cz.volby/ps-2021`, and `p.write()` puts it in `data/packages/{key}/build/`. Its manifest records the pipeline, a summary, the packages it depends on, the ids it references outside itself (`external`), the git commit that built it, the raw files it cites, the check findings it accepts and why, a row count for each table, and a digest of its table data.
+
+- **Ids** come from `p.id(kind, *parts)`, a UUIDv5 of the pipeline, the kind, and the source's own key, so a rebuild gives the same ids and parsing never needs the database. A row that points outside the package and its dependencies lists that id in `p.external`. Countries are referenced this way, by `uuid5(NAMESPACE, "polity\x1f{ISO}")`. A package cannot create a country, so a country the archive lacks is first added to the curated `world.countries` changeset.
+- **`ea package check`** runs in DuckDB, with no database. It checks that keys are unique, that every reference resolves inside the package, its dependencies, or its external ids, that electoral rules match the engine's schema, and that the accounting and outcome checks hold. A finding blocks the load unless the pipeline accepts its code with `p.accept(code, reason)`, and the reason is stored with the load.
+- **`ea package ready`** asks the database what `check` cannot see: that every external id exists, that every dependency is loaded or in the same batch, that every required column without a default has a value, that every enum column holds only values the database allows, and that every column exists. It writes nothing, so run it before a load.
+- **`ea package load`** runs the checks again and loads the batch in dependency order, in one transaction. Each package records a published changeset of kind `import`, whose scope names the package, its version, and its digest. A package whose digest matches its last load is skipped. A new version replaces the rows that the package's earlier versions wrote. An empty required column with a fixed default, such as a date's precision, takes the default. Before committing, the load compares the rows, values, and seats in the database with the package, and rolls back on any difference. It keeps a copy of each loaded version in `data/packages/{key}/v{n}/`, so `{key}@v{n}` reloads it.
+- **`ea package export <pipeline>`** turns the published rows of a changeset-path pipeline into the package `{pipeline}/all`, ids included. Loading that package adopts the old changesets and rewrites nothing.
 
 ## The raw cache
 
@@ -53,6 +64,7 @@ The main steps take a registry name, except `apply`, `publish`, and `revert`, wh
 - `uv run ea apply <changeset-folder>` loads a changeset, runs its checks, and publishes it or sets it to `pending_review`.
 - `uv run ea publish <changeset-id> [--reviewer <user-id>]` publishes a changeset that is in `pending_review`.
 - `uv run ea revert <changeset-id> "<reason>" [--reviewer <user-id>]` rejects an unpublished changeset, or undoes a published one that no later changeset builds on.
+- `uv run ea package {check,ready,load} <key>...` checks, readies, or loads packages by key (`{pipeline}/{name}`). `uv run ea package export <pipeline>...` exports a changeset-path pipeline as a package. [Packages](#packages) describes each one.
 - `uv run ea raw {verify,license,pin,retire}` maintains the raw cache, as described above.
 - `uv run ea fixtures` exports the engine's golden-test fixtures from the database.
 - `uv run ea rollup <set>...` recomputes the area rollups of the named result sets. `--affected` rebuilds every set whose rollups are missing at its district. `--scope <sets>` lists the places with at least that many rolled-up result sets in `area_day_scope` and rebuilds their rows in `area_day_set`.
@@ -202,35 +214,51 @@ The North Carolina feed, `us.ballots.nc`, counts accepted and returned ballots f
 
 ## Adding a source
 
-Follow these steps to add a source. The example uses a hypothetical source, `xx.example`.
+Follow these steps to add a source. The example uses a hypothetical source, `xx.example`, on the package path. The `cz.volby` module shows each step in full.
 
 1. **Check the archive first.** Search the existing modules in `pipelines/ea/sources/{iso}/` and `docs/data-model.md`, so that you do not duplicate a publisher or a naming scheme. Note the source's license or its absence. The `licenses` correction pipeline records licenses for sources that publish none.
 
-2. **Create the module.** Add `pipelines/ea/sources/xx/example.py`. Define `SOURCE = "xx.example"`, a `VERSION` string, and `PARSED = DATA / "parsed" / SOURCE`. The version is written into every manifest, so bump it when the output of the module changes.
+2. **Make sure the country exists.** A package references its country by `uuid5(NAMESPACE, "polity\x1f{ISO}")` and lists that id in `p.external`. If the archive has no record for the country, add it to `pipelines/ea/sources/world/countries.py` with its Wikidata item and native names, and apply that changeset first.
 
-3. **Write `fetch()`.** Call `raw.fetch(SOURCE, url, suffix=".csv")` for each file the source publishes. Use the source's stable URLs. If the source needs a POST, pass `body=`. If the source is a crawl you ran yourself, store it with `raw.store`.
+3. **Create the module.** Add `pipelines/ea/sources/xx/example.py` and define `SOURCE = "xx.example"`.
 
-4. **Write `parse()`.** Read each cached file with `raw.cached(SOURCE, url)`, and write typed Parquet tables under `PARSED`. Compare the parsed rows with the totals the source prints, and raise an error on any mismatch. Corrections to the source's own cells are curated constants in the module, each proven by the printed totals and disclosed in a `note` on the result set.
+4. **Write `fetch()`.** Call `raw.fetch(SOURCE, url, suffix=".csv")` for each file the source publishes. Use the source's stable URLs. If the source needs a POST, pass `body=`. If the source is a crawl you ran yourself, store it with `raw.store`.
 
-5. **Write `emit()`.** Open a connection with `connect()`, create a `Changeset` with the pipeline name, version, a one-line summary, and the polity's ISO code, and stage the rows. Use `cs.source(publisher, title)` for each source, and `cs.artifact(raw.cached(SOURCE, url), source)` to cite each cached file. Resolve existing entities with `cs.key`, `cs.unit`, and `cs.area`, and end with `return cs.write()`. Canada's `ca.elections` module shows the pattern at each step.
+5. **Write `parse()`.** Read each cached file with `raw.cached(SOURCE, url)` and build the packages: a `geo` package for the places and their shapes, a `registry` package for the parties, bodies, offices, and electoral systems, and one package for each election that depends on both. Make every id with `p.id(kind, *parts)` from the source's own codes, cite each cached file with `p.artifact`, and end each package with `p.write()`. Compare the parsed rows with the totals the source prints, and raise an error on any mismatch. Corrections to the source's own cells are curated constants in the module, each proven by the printed totals and disclosed in a `note` on the result set. `emit()` loads the packages.
 
-   A sketch of `emit()`, where `PUBLISHER`, `TITLE`, and `URL` are module constants:
+   A sketch, where `COUNTRY`, `DAYS`, `packages()`, `results_url()`, `geo()`, and `registry()` come from the module:
 
 ```python
-def emit() -> Path:
-    with connect() as conn:
-        cs = Changeset(conn, pipeline=SOURCE, version=VERSION, summary="One sentence on the scope.", polity="XX")
-        source = cs.source(PUBLISHER, TITLE)
-        cs.artifact(raw.cached(SOURCE, URL), source)
-        return cs.write()
+def parse() -> None:
+    geo().write()
+    registry().write()
+    for day in DAYS:
+        election(day).write()
+
+
+def election(day: str) -> Package:
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"The {day} general election by polling station",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external.add(COUNTRY)
+    p.artifact(raw.cached(SOURCE, results_url(day)), p.id("source", "results"))
+    ...
+    return p
+
+
+def emit() -> None:
+    package.run("load", packages())
 ```
 
-6. **Run the steps in order.** Run `uv run ea fetch xx.example`, then `uv run ea parse xx.example`, then `uv run ea apply "$(uv run ea emit xx.example)"`. Start with a single contest or a single year if the source is large. A re-run reuses the cache, so a later step does not repeat the earlier downloads.
+6. **Check the packages.** Run `uv run ea fetch xx.example` and `uv run ea parse xx.example`. Then run `uv run ea package check` on every key until each one is clean, or until each remaining finding is accepted with `p.accept(code, reason)` and a specific reason. Compare each election's national totals with the totals the authority publishes.
 
-7. **Read the changeset before publishing.** A changeset from a person, or from a source that is not an official body, waits in `pending_review`. Read its `checks` summary and its flags. Publish it with `uv run ea publish <changeset-id>`, or reject it with `uv run ea revert`. Check the new entities in the changeset for anything unexpected, because a pipeline that publishes automatically can mint an entity that should not exist.
+7. **Load them.** Run `uv run ea package ready` on every key, then `uv run ea emit xx.example`. Load the `geo` and `registry` packages with the elections or before them.
 
-8. **Record the source and its citations.** Every fact must trace to a source and a changeset. Cite each cached file through `cs.artifact`. If the source publishes a Wikipedia page, fetch the page with its revision pinned.
+8. **Record the source and its citations.** Every fact must trace to a source. Cite each cached file through `p.artifact`. If the source publishes a Wikipedia page, fetch the page with its revision pinned.
 
 9. **Check the cache.** Run `uv run ea raw verify xx.example` to confirm that every indexed file matches its hash, and `uv run ea raw license xx.example` to stamp the license on each entry.
 
-Keep each pipeline small. A source that needs entity matching, such as a people or party matcher, belongs in its own module, which runs after the source publishes.
+Keep each pipeline small. A source that needs entity matching, such as a people or party matcher, belongs in its own module on the changeset path, which runs after the source loads.

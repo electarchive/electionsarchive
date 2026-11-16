@@ -8,13 +8,13 @@ Read the matching file before working in its area:
 
 - `docs/architecture.md`: flows, repository layout, stack, API surfaces, access, and hosting. Read it before adding a package, service, route family, or dependency.
 - `docs/data-model.md`: vocabulary, conventions, and tables. Read it before touching the database, changeset formats, or anything about results, geography, parties, people, offices, or provenance.
-- `docs/pipelines.md`: the `ea` CLI, the raw cache, apply and checks, digitization, entity resolution, and live ingestion. Read it before writing or running a pipeline.
+- `docs/pipelines.md`: the `ea` CLI, the raw cache, packages, apply and checks, digitization, entity resolution, and live ingestion. Read it before writing or running a pipeline.
 - `docs/performance.md`: the procedure cache, warm-up, database settings, query patterns, and coarse geometry. Read it before writing an RPC query or changing the cache.
 - `CONTRIBUTING.md`: setup, the checks CI runs, and conventions.
 
 ## Invariants
 
-- Every write to core tables is a changeset through the apply path (`uv run ea apply`). Never write to core tables with ad hoc SQL.
+- Every write to core tables is recorded as a changeset: a package load (`uv run ea package load`) for a new source, or the apply path (`uv run ea apply`) for older pipelines and curated edits. Never write to core tables with ad hoc SQL.
 - Until launch, a re-emit replaces the facts of a result set its own pipeline last wrote, so a pipeline's own bugs are fixed in place; a disagreeing or finer source publishes a superseding result set. After launch, a published result set is immutable.
 - Every number traces to a source and a changeset; digitized numbers also trace to a page and bounding box.
 - Official outcomes and seats are stored as declared; engine output is derived and only ever compared against them.

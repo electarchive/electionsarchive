@@ -101,7 +101,7 @@ Reading needs no key. A key from [your settings](https://electionsarchive.com/se
 ```mermaid
 flowchart LR
   S["Official results, books, and scans"] --> P["Pipelines<br>fetch, parse, emit"]
-  P --> C["Changesets"]
+  P --> C["Packages and changesets"]
   C --> A{"Checks and review"}
   A --> D[("Postgres + PostGIS")]
   D --> W["Website"]
@@ -110,7 +110,7 @@ flowchart LR
   D --> B["Bulk releases"]
 ```
 
-One database is the source of truth, and the only way to write to it is a changeset. Each source has a pipeline that fetches the official files into a raw cache, parses them, and emits a changeset. Every changeset passes the same checks before it is published. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through the whole workflow with Canada's federal elections as the example, and [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
+One database is the source of truth, and every write to it is recorded as a changeset. Each source has a pipeline that fetches the official files into a raw cache and parses them. A new source builds packages, one Parquet folder per election. The packages are checked without a database and then loaded in bulk. Older pipelines and curated edits emit changesets, which pass the same checks before they publish. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through both paths, using Canada's federal elections as the example you can run. [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
 
 ## Run it locally
 
@@ -144,7 +144,7 @@ uv run ea apply "$(uv run ea emit ca.elections)"
 | `packages/engine`    | Seat allocation and referendum outcomes, tested against real elections |
 | `packages/analytics` | Comparisons between elections, change metrics, and indices             |
 | `packages/view-spec` | The JSON view spec schema                                              |
-| `pipelines`          | Python pipelines that fetch, parse, and publish results as changesets  |
+| `pipelines`          | Python pipelines that fetch, parse, check, and load results            |
 | `infra`              | Docker Compose for local Postgres and Redis                            |
 | `spike`              | The schema spike: proven DDL and benchmarks                            |
 | `docs`               | Guides for contributors                                                |

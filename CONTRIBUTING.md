@@ -59,7 +59,7 @@ Keep each pull request to one change, and say how you checked it: the page you l
 
 ## Conventions
 
-- **Every write goes through a changeset.** Nothing writes to the core tables directly: pipelines emit changesets, and `ea apply` publishes them after the checks pass. See [docs/data-model.md](docs/data-model.md).
+- **Every write is a changeset.** Nothing writes to the core tables directly. A new source builds packages, which `ea package check` and `ea package load` check and load. Older pipelines and curated edits emit changesets, which `ea apply` publishes after the checks pass. Each load is also recorded as a changeset. See [docs/pipelines.md](docs/pipelines.md) and [docs/data-model.md](docs/data-model.md).
 - **Every number has a source.** A result set names its source, and numbers read from scans also record the page and the bounding box they came from.
 - **Declared results stay as declared.** Official outcomes and seat counts are stored as the authority published them. The engine in `packages/engine` recomputes seats only to compare against them.
 - **Svelte 5 with runes, strict TypeScript.** No `any`; use `unknown` and narrow it.

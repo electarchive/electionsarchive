@@ -1,10 +1,10 @@
 # Architecture
 
-One Postgres + PostGIS database is the source of truth. Python pipelines write to it only through changesets. One SvelteKit app reads it and serves every surface for people and agents: pages, the REST API, the MCP server, and Markdown and JSON twins. Static artifacts such as map tiles, bulk releases, and live snapshots are files served from object storage behind a CDN.
+The source of truth is one Postgres + PostGIS database. Python pipelines write to it only through packages and changesets, and every write is recorded as a changeset. One SvelteKit app reads the database and serves every surface for people and agents: pages, the REST API, the MCP server, and Markdown and JSON twins. Static artifacts (map tiles, bulk releases, and live snapshots) are files served from object storage behind a CDN.
 
 ## Flows
 
-**Writes.** A pipeline fetches raw files, which are cached and checksummed, parses and validates them, and emits a changeset: Parquet tables plus a manifest. The apply step loads the changeset into staging tables, runs the checks, and either publishes it in one transaction or queues it for review. See [pipelines.md](pipelines.md) and [data-model.md](data-model.md).
+**Writes.** A pipeline fetches raw files, caches them with checksums, and parses them. A new source builds packages: one folder of Parquet tables plus a manifest for each election, its places, and its parties. The packages are checked without a database, then checked again against the database, and loaded in bulk in one transaction that records a published changeset for each. Older pipelines and curated edits emit a changeset instead. The apply step loads it into staging tables and checks it, then either publishes it in one transaction or queues it for review. See [pipelines.md](pipelines.md) and [data-model.md](data-model.md).
 
 **Reads.** Server code in SvelteKit queries Postgres through Drizzle, and pages render on the server. The same oRPC procedures back the app's typed client, the public REST API, and the MCP tools, so all three return the same data.
 
