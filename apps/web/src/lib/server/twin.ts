@@ -1965,20 +1965,42 @@ function overviewMarkdown(
         m.coverage_overview_column_tiers(),
         m.coverage_overview_column_span(),
       ],
-      data.polities.map((polity) => [
-        link(polity.name, `coverage/${polity.polity}`),
-        polity.tiers
-          .map(
-            (tier) =>
-              `${TIER_LABELS[tier.key as Tier]()}: ${tier.cell == null || tier.cell.total === 0 ? m.coverage_cell_none() : `${percent(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes") / tier.cell.total, 1)} (${m.coverage_cell_of({ complete: count(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes")), total: count(tier.cell.total) })})`}`,
-          )
-          .join("; "),
-        polity.first == null || polity.last == null
-          ? ""
-          : `${polity.first}–${polity.last}`,
-      ]),
+      data.polities
+        .filter((polity) => polity.surveyed)
+        .map((polity) => [
+          link(polity.name, `coverage/${polity.polity}`),
+          polity.tiers
+            .map(
+              (tier) =>
+                `${TIER_LABELS[tier.key as Tier]()}: ${tier.cell == null || tier.cell.total === 0 ? m.coverage_cell_none() : `${percent(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes") / tier.cell.total, 1)} (${m.coverage_cell_of({ complete: count(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes")), total: count(tier.cell.total) })})`}`,
+            )
+            .join("; "),
+          polity.first == null || polity.last == null
+            ? ""
+            : `${polity.first}–${polity.last}`,
+        ]),
     ),
     m.coverage_overview_note(),
+    ...(data.polities.some((polity) => !polity.surveyed)
+      ? [
+          `## ${m.coverage_unsurveyed()}`,
+          m.coverage_unsurveyed_hint(),
+          table(
+            [m.coverage_overview_column_country(), m.coverage_unsurveyed()],
+            data.polities
+              .filter((polity) => !polity.surveyed)
+              .toSorted((a, b) => a.name.localeCompare(b.name))
+              .map((polity) => [
+                polity.name,
+                polity.elections > 0
+                  ? m.coverage_unsurveyed_held({
+                      elections: count(polity.elections),
+                    })
+                  : "",
+              ]),
+          ),
+        ]
+      : []),
     ...(data.polities.some((polity) => polity.classes.length > 0)
       ? [
           `## ${m.coverage_classes()}`,

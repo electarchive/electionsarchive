@@ -103,6 +103,7 @@ const Note = v.object({
 const Summary = v.object({
   polity: v.string(),
   name: v.string(),
+  surveyed: v.boolean(),
   first: v.nullable(v.number()),
   last: v.nullable(v.number()),
   elections: v.number(),
@@ -300,13 +301,15 @@ async function build() {
 async function summaries(polity: string | null) {
   const found = await db.execute<Polity>(sql`
     select c.polity, coalesce((select n.text from polity p join name n on n.entity_id = p.id and n.is_preferred
-        where p.iso_code = upper(c.polity) order by n.lang <> 'en', n.recorded_from desc, n.id limit 1), upper(c.polity)) as name,
+        where p.iso_code = upper(c.polity) order by n.lang <> 'en', n.recorded_from desc, n.id limit 1),
+        (select n ->> 'name' from jsonb_array_elements(c.notes) n where n ->> 'census' = 'none' limit 1), upper(c.polity)) as name,
+      not c.notes @> '[{"census": "none"}]' as surveyed,
       c.first, c.last, c.elections, c.contests, c.finest, c.finest_noun as "finestNoun", c.regions, c.levels,
       (select coalesce(jsonb_agg(n - 'contests' - 'elections' order by i), '[]') from jsonb_array_elements(c.notes) with ordinality as t (n, i)) as notes,
       c.sources
     from coverage_polity c
     where ${polity}::text is null or c.polity = ${polity}
-    order by c.polity = 'us' desc, c.contests desc
+    order by c.polity = 'us' desc, c.contests desc, c.polity
   `);
   return found.rows;
 }
@@ -471,6 +474,7 @@ export const coverage = {
         polities: polities.map((polity) => ({
           polity: polity.polity,
           name: polity.name,
+          surveyed: polity.surveyed,
           first: polity.first,
           last: polity.last,
           elections: polity.elections,
@@ -482,6 +486,7 @@ export const coverage = {
           ),
           uncounted: polity.notes.filter(
             (note) =>
+              note.goal !== "census" &&
               note.category == null &&
               note.canvass == null &&
               note.readiness == null,

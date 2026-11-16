@@ -37,6 +37,12 @@
   const censused = $derived(
     data.polities.filter((polity) => polity.classes.length > 0),
   );
+  const surveyed = $derived(data.polities.filter((polity) => polity.surveyed));
+  const waiting = $derived(
+    data.polities
+      .filter((polity) => !polity.surveyed)
+      .toSorted((a, b) => a.name.localeCompare(b.name, getLocale())),
+  );
 
   const built = $derived(
     data.builtAt == null
@@ -106,7 +112,7 @@
         <span>{m.coverage_overview_column_span()}</span>
       </div>
       <ul class="grid">
-        {#each data.polities as polity (polity.polity)}
+        {#each surveyed as polity (polity.polity)}
           <li
             class="relative grid gap-x-5 gap-y-2 border-be px-3.5 py-3 hover:bg-muted/60 lg:grid-cols-[minmax(0,11rem)_repeat(5,minmax(0,1fr))_6.5rem] lg:items-start"
           >
@@ -183,6 +189,38 @@
         {m.coverage_overview_note()}
       </p>
     </section>
+    {#if waiting.length > 0}
+      <section
+        aria-labelledby="coverage-unsurveyed"
+        class="grid gap-2 bg-card px-3.5 pbs-4 pbe-4"
+      >
+        <h2 id="coverage-unsurveyed" class="text-lg font-bold">
+          {m.coverage_unsurveyed()}
+          <span class="text-sm font-normal text-muted-foreground tabular-nums"
+            >{count(waiting.length)}</span
+          >
+        </h2>
+        <p class="text-sm text-muted-foreground max-inline-[72ch]">
+          {m.coverage_unsurveyed_hint()}
+        </p>
+        <ul
+          class="grid gap-x-5 gap-y-1.5 text-sm sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {#each waiting as polity (polity.polity)}
+            <li class="flex flex-wrap items-baseline gap-x-2">
+              <span class="font-semibold">{polity.name}</span>
+              {#if polity.elections > 0}
+                <span class="text-xs text-muted-foreground tabular-nums"
+                  >{m.coverage_unsurveyed_held({
+                    elections: count(polity.elections),
+                  })}</span
+                >
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
     {#if censused.length > 0}
       <section
         aria-labelledby="coverage-classes"

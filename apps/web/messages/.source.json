@@ -4080,7 +4080,10 @@
     "downloads_question_tie_break": "2509aaad4bbb87cd8149af9c586004c7",
     "settings_account_title": "08bd40c7543007ad06e4fce31618f6ec",
     "settings_account_lede": "4978f32ee83056adcbb4af40ac5a769c",
-    "settings_cancel": "ea4788705e6873b424c65e91c2846b19"
+    "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
+    "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
+    "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
   },
   "fr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -8163,7 +8166,10 @@
     "downloads_question_tie_break": "2509aaad4bbb87cd8149af9c586004c7",
     "settings_account_title": "08bd40c7543007ad06e4fce31618f6ec",
     "settings_account_lede": "4978f32ee83056adcbb4af40ac5a769c",
-    "settings_cancel": "ea4788705e6873b424c65e91c2846b19"
+    "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
+    "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
+    "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
   },
   "kmr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -12246,7 +12252,10 @@
     "downloads_question_tie_break": "2509aaad4bbb87cd8149af9c586004c7",
     "settings_account_title": "08bd40c7543007ad06e4fce31618f6ec",
     "settings_account_lede": "4978f32ee83056adcbb4af40ac5a769c",
-    "settings_cancel": "ea4788705e6873b424c65e91c2846b19"
+    "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
+    "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
+    "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
   },
   "pt-BR": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -16329,7 +16338,10 @@
     "downloads_question_tie_break": "2509aaad4bbb87cd8149af9c586004c7",
     "settings_account_title": "08bd40c7543007ad06e4fce31618f6ec",
     "settings_account_lede": "4978f32ee83056adcbb4af40ac5a769c",
-    "settings_cancel": "ea4788705e6873b424c65e91c2846b19"
+    "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
+    "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
+    "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
   },
   "tr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -20412,6 +20424,9 @@
     "downloads_question_tie_break": "2509aaad4bbb87cd8149af9c586004c7",
     "settings_account_title": "08bd40c7543007ad06e4fce31618f6ec",
     "settings_account_lede": "4978f32ee83056adcbb4af40ac5a769c",
-    "settings_cancel": "ea4788705e6873b424c65e91c2846b19"
+    "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
+    "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
+    "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
   }
 }
