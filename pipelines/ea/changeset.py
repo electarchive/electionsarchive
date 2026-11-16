@@ -658,7 +658,7 @@ class Changeset:
         return tables
 
     def write(self) -> Path:
-        pipeline = self.manifest["pipeline"]
+        pipeline = str(self.manifest["pipeline"])
         if (
             self.manifest["kind"] == "import"
             and not str(pipeline).startswith("census.")
