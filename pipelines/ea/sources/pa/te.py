@@ -5,7 +5,7 @@ import json
 import re
 import subprocess
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -87,7 +87,7 @@ def number(cell: object) -> int | None:
     if isinstance(cell, bool):
         return None
     if isinstance(cell, int | float):
-        return int(round(cell)) if float(cell).is_integer() else None
+        return round(cell) if float(cell).is_integer() else None
     text = str(cell).strip().replace(",", "")
     if re.fullmatch(r"-?\d+", text):
         return int(text)
@@ -156,18 +156,21 @@ def layout(grid: list[list[object]], first_row: int = 0) -> tuple[Layout, int]:
     if start is None:
         raise LookupError("no PRD column")
     r0, j0 = start
-    cols = (
-        lambda word: [  # noqa: E731
+
+    def cols(word: str) -> list[int]:
+        return [
             j
             for j in range(width)
             if any(j < len(row) and word in text(row[j]).upper() for row in header[max(0, r0 - 4) :])
         ]
-    )
+
     blank_cols = [j for j in cols("BLANCO") if j > j0]
     null_cols = [j for j in cols("NULOS") if j > j0]
     blank = min(blank_cols) if blank_cols else None
     null = min(c for c in null_cols if blank is None or c > blank) if null_cols else None
     end = blank if blank is not None else null
+    if end is None:
+        raise LookupError("no blank or null column")
     parties = {}
     for j in range(j0, end):
         label = _party_label(header, j, r0)
@@ -252,14 +255,17 @@ def pdf_party_rows(grid: list[list[object]], labels: list[str], reg: int | None 
     cells = [number(c) for c in grid[total][1:]]
     np = len(labels)
     for jv in range(1, 9):
+        valid = cells[jv]
+        if valid is None:
+            continue
         for gap in (2, 1):
             end = jv + gap + np
-            if end > len(cells) or cells[jv] is None or sum(c or 0 for c in cells[jv + gap : end]) != cells[jv]:
+            if end > len(cells) or sum(c or 0 for c in cells[jv + gap : end]) != valid:
                 continue
             for blank, null in ((None, 0), (0, 2), (0, 1)):
                 nulls = cells[end + null] if end + null < len(cells) else None
-                blanks = (cells[end + blank] if blank is not None else 0) if end + (blank or 0) < len(cells) else None
-                if nulls is not None and blanks is not None and cells[jv - 1] == cells[jv] + blanks + nulls:
+                blanks = 0 if blank is None else cells[end + blank] if end + blank < len(cells) else None
+                if nulls is not None and blanks is not None and cells[jv - 1] == valid + blanks + nulls:
                     return rows_from(
                         grid, total, labels, jv, gap, end + blank if blank is not None else None, end + null, reg
                     )
@@ -343,13 +349,13 @@ def circuits(rows: list[Row]) -> list[Unit]:
     return units
 
 
-def districts(rows: list[Row], depth: int, issues: list[str], top: Callable[[Row], bool] = is_top) -> list[Unit]:
+def districts(rows: list[Row], depth: int, issues: list[str], is_block: Callable[[Row], bool] = is_top) -> list[Unit]:
     """Units of a table by district (depth 2) or by corregimiento (depth 3), found by indentation and checked by sums."""
     blocks: list[tuple[Row, list[Row]]] = []
     for row in rows:
         if norm(row.label) == "total":
             continue
-        if top(row) or not blocks:
+        if is_block(row) or not blocks:
             blocks.append((row, []))
         else:
             blocks[-1][1].append(row)
@@ -384,19 +390,22 @@ def whole(parent: Row, children: list[Row]) -> bool:
         return False
     for name in FIELDS:
         total = getattr(parent, name)
-        if total is not None and all(getattr(c, name) is not None for c in children):
-            if total != sum(getattr(c, name) for c in children):
-                return False
+        if (
+            total is not None
+            and all(getattr(c, name) is not None for c in children)
+            and total != sum(getattr(c, name) for c in children)
+        ):
+            return False
     return all(votes == sum(c.votes.get(party, 0) for c in children) for party, votes in parent.votes.items())
 
 
 def nest(top: Row, members: list[Row], issues: list[str]) -> list[tuple[Row, Row]]:
     """The leaf rows under a province or comarca, each with its district, by finding the rows that add up to a parent."""
-    nodes: dict[int, tuple[list[tuple[int, int]], int]] = {}
+    nodes: dict[int, tuple[list[int], int]] = {}
 
     def build(i: int) -> tuple[list[int], int]:
         if i in nodes:
-            return nodes[i][0], nodes[i][1]  # type: ignore[return-value]
+            return nodes[i]
         row, kids, j, total = members[i], [], i + 1, 0
         while j < len(members) and total < (row.valid or 0):
             _, after = build(j)
@@ -405,7 +414,7 @@ def nest(top: Row, members: list[Row], issues: list[str]) -> list[tuple[Row, Row
             j = after
         if not whole(row, [members[k] for k in kids]):
             kids, j = [], i + 1
-        nodes[i] = (kids, j)  # type: ignore[assignment]
+        nodes[i] = (kids, j)
         return kids, j
 
     out: list[tuple[Row, Row]] = []
@@ -417,7 +426,7 @@ def nest(top: Row, members: list[Row], issues: list[str]) -> list[tuple[Row, Row
     index = 0
     found: list[Row] = []
     while index < len(members):
-        kids, after = build(index)
+        _, after = build(index)
         found.append(members[index])
         out.extend((members[index], leaf) for leaf in leaves(index))
         index = after
@@ -557,7 +566,7 @@ def president_table(
 
 
 def party_table(grid: list[list[object]], kind: str, e: Election, depth: int | str, office: str) -> None:
-    lay, rows = party_rows(grid)
+    _, rows = party_rows(grid)
     units = circuits(rows) if depth == "c" else districts(rows, int(depth), e.issues)
     getattr(e, office).extend(units)
     e.printed[office] = rows[0]
@@ -617,22 +626,32 @@ SYSTEM_PLURALITY = key("electoral_system", "plurality")
 PARTIES: dict[str, tuple[str, str]] = {
     "prd": ("PRD", "Partido Revolucionario Democrático"),
     "popular": ("PP", "Partido Popular"),
-    "p popular": ("PP", "Partido Popular"),
+    "p. popular": ("PP", "Partido Popular"),
     "molirena": ("MOLIRENA", "Movimiento Liberal Republicano Nacionalista"),
     "pan": ("PAN", "Partido Panameñista"),
-    "p panamenista": ("PAN", "Partido Panameñista"),
+    "p. panamenista": ("PAN", "Partido Panameñista"),
     "cam dem": ("CD", "Cambio Democrático"),
     "cd": ("CD", "Cambio Democrático"),
     "lib": ("LIB", "Partido Liberal"),
     "liberal": ("LIB", "Partido Liberal"),
+    "lib nal": ("LIBNAL", "Partido Liberal Nacional"),
     "union patriotica": ("UP", "Unión Patriótica"),
     "vmp": ("VMP", "Vanguardia Moral de la Patria"),
-    "p alianza": ("ALIANZA", "Partido Alianza"),
+    "p. alianza": ("ALIANZA", "Partido Alianza"),
     "rm": ("RM", "Realizando Metas"),
     "pais": ("PAIS", "PAIS"),
     "moca": ("MOCA", "Movimiento Otro Camino"),
+    "arn": ("ARN", "Partido Arnulfista"),
+    "pdc": ("PDC", "Partido Demócrata Cristiano"),
+    "mpe": ("MPE", "Movimiento Papa Egoró"),
+    "morena": ("MORENA", "Movimiento de Renovación Nacional"),
+    "pla": ("PLA", "Partido Liberal Auténtico"),
+    "sol": ("SOL", "Partido Solidaridad"),
+    "ren civ": ("RENCIV", "Partido Renovación Civilista"),
+    "pnp": ("PNP", "Partido Nacionalista Popular"),
+    "fad": ("FAD", "Frente Amplio por la Democracia"),
 }  # fmt: skip
-INDEPENDENTS = ("libre postulacion", "celeste", "verde", "chocolate")
+INDEPENDENTS = ("libre postulacion", "celeste", "verde", "chocolate", "azul oscuro", "gris oscuro")
 
 
 def independent(label: str) -> bool:
@@ -661,7 +680,11 @@ PROVINCE_ALIASES = {
     "comarca ngobe bugle": "ngabe bugle", "ngobe bugle": "ngabe bugle", "ngabe buble": "ngabe bugle",
     "comarca ngabe bugle": "ngabe bugle", "comarca kuna yala": "kuna yala", "guna yala": "kuna yala",
     "comarca guna yala": "kuna yala", "comarca embera": "embera", "comarca embera wounaan": "embera",
-    "embera wounaan": "embera", "comarca naso tjer di": "naso tjer di",
+    "embera wounaan": "embera", "comarca naso tjer di": "naso tjer di", "san blas": "kuna yala",
+    "kanquintu": "kankintu", "nole duina": "nole duima", "renacimientos": "renacimiento",
+    "sta catalina o calovebora": "santa catalina o calovebora",
+    "santa catalina o calovebora (bledeshia)": "santa catalina o calovebora",
+    "comarca de san blas": "kuna yala", "com. de kuna yala": "kuna yala", "comarca de kuna yala": "kuna yala",
 }  # fmt: skip
 
 
@@ -681,7 +704,26 @@ def pretty(label: str) -> str:
     return " ".join(w if w in SMALL and i else w.capitalize() for i, w in enumerate(words))
 
 
+COMARCAS = {
+    "kuna yala",
+    "ngabe bugle",
+    "embera",
+    "naso tjer di",
+    "comarca kuna de madungandi",
+    "comarca kuna de wargandi",
+}
+DISPLAY = {
+    "kuna yala": "Comarca Kuna Yala",
+    "ngabe bugle": "Comarca Ngäbe Buglé",
+    "embera": "Comarca Emberá",
+    "naso tjer di": "Comarca Naso Tjër Di",
+}
+
+
 def best(labels: list[tuple[int, str]]) -> str:
+    key_ = place_key(labels[0][1])
+    if key_ in DISPLAY:
+        return DISPLAY[key_]
     mixed = [(year, label) for year, label in labels if not label.isupper()]
     return pretty(max(mixed or labels)[1])
 
@@ -691,8 +733,8 @@ def colliding() -> set[str]:
     """District names that two provinces share in one election, so that their keys carry the province."""
     found: set[str] = set()
     for e in elections().values():
-        seen: dict[str, str] = {}
         for office in ("mayor", "rep", "council"):
+            seen: dict[str, str] = {}
             for unit in getattr(e, office):
                 if unit.scheme in ("distrito", "corregimiento"):
                     district, province = place_key(unit.path[1]), place_key(unit.path[0])
@@ -753,7 +795,11 @@ def places() -> Places:
 def spans(history: list[tuple[date, str]]) -> list[tuple[str, date | None, date | None]]:
     """Parents over time: each distinct parent from the first election that shows it until the next one's."""
     ordered: list[tuple[date, str]] = []
-    for day, parent in sorted(set(history)):
+    by_day: dict[date, list[str]] = {}
+    for day, parent in history:
+        by_day.setdefault(day, []).append(parent)
+    for day, parents in sorted(by_day.items()):
+        parent = min(set(parents), key=lambda k: (k not in COMARCAS, k))
         if not ordered or ordered[-1][1] != parent:
             ordered.append((day, parent))
     return [
@@ -900,7 +946,59 @@ def packages() -> list[str]:
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.day}" for e in elections().values())]
 
 
+# Where the rows of a table do not add up to its printed Total, and why. The figures are stored as the rows print them.
+EXPLAINED = {
+    (
+        1994,
+        "rep",
+        "reg",
+    ): "the rows add up to 3,854 fewer registered voters than the printed Total, and the Yaviza row prints 2 registered voters against 2,517 votes cast",
+    (
+        2024,
+        "rep",
+        "reg",
+    ): "the rows add up to 1,173 fewer registered voters than the printed Total, and the Paraíso row prints 668 registered voters against 952 votes cast",
+    (2024, "council", "valid"): "the printed Total leaves out the Comarca Naso Tjër Di, whose row is in the table",
+}
+
+
+def compare(e: Election) -> list[str]:
+    """Check each office's units against the national Total row the Tribunal prints, and say what was compared."""
+    lines: list[str] = []
+    for office in ("president", "deputy", "mayor", "rep", "council"):
+        units = getattr(e, office)
+        printed = e.printed.get(office)
+        if not units or printed is None:
+            continue
+        found: dict[str, tuple[int, int]] = {}
+        for name in ("valid", "cast", "reg", "blank", "null"):
+            want = getattr(printed, name)
+            got = sum(getattr(u.row, name) or 0 for u in units)
+            if want is not None and got != want:
+                found[name] = (got, want)
+        for party, want in printed.votes.items():
+            got = sum(u.row.votes.get(party, 0) for u in units)
+            if got != want:
+                found[party] = (got, want)
+        if not found:
+            lines.append(f"{e.year} {office}: {len(units)} units, every printed total matches")
+            continue
+        reasons = [EXPLAINED.get((e.year, office, name)) for name in ("valid", "reg") if name in found]
+        if not all(reasons) or (e.year, office) == (2024, "council") and "valid" not in found:
+            raise ValueError(f"{e.year} {office}: the rows differ from the printed totals {found}")
+        lines.append(
+            f"{e.year} {office}: {len(units)} units, differs from the printed total in {sorted(found)}: "
+            + "; ".join(str(r) for r in reasons)
+        )
+    return lines
+
+
 def parse() -> None:
+    for e in elections().values():
+        if e.issues:
+            raise ValueError(f"{e.year}: {e.issues}")
+        for line in compare(e):
+            print(line, flush=True)
     geo().write()
     registry().write()
     for e in elections().values():
@@ -955,7 +1053,7 @@ def election(e: Election) -> Package:
     p.name(id, f"Elecciones generales de {e.year}", "es", "native", False)
     path = f"pa/{e.day}-general"
     p.add("slug", path=path, entity_id=id, is_current=True)
-    units: dict[tuple[str, str], str] = {}
+    units: dict[str, str] = {}
 
     def unit(u: Unit) -> str:
         found = area_of(u)
@@ -976,7 +1074,7 @@ def election(e: Election) -> Package:
         )
         return uid
 
-    def contest(office: str, parts: list[object], label: str, area_id: str, **fields: object) -> tuple[str, str]:
+    def contest(office: str, parts: Sequence[object], label: str, area_id: str, **fields: object) -> tuple[str, str]:
         cid = key("contest", e.day, office, *parts)
         en, es = OFFICES[office]
         p.add(
@@ -1041,7 +1139,7 @@ def election(e: Election) -> Package:
     for position, t in enumerate(e.tickets, 1):
         oid = options[t.label] = key("option", cid, norm(t.label))
         member = None
-        if len(t.parties) > 1 and "libre" not in norm(t.label):
+        if len(t.parties) > 1 and not independent(t.label) and "libre" not in norm(t.label):
             member = alliance_id(t.label)
         elif len(t.parties) == 1 and not independent(t.parties[0]):
             member = party_id(t.parties[0])
@@ -1060,7 +1158,7 @@ def election(e: Election) -> Package:
                 p.add("person", id=person)
                 p.name(person, name, "es", "official")
                 p.add("candidacy", id=key("candidacy", e.day, norm(t.label), role, name), person_id=person, option_id=oid, role=role,
-                      ballot_name=name, is_independent="libre" in norm(t.label))  # fmt: skip
+                      ballot_name=name, is_independent=any(independent(label) for label in (t.label, *t.parties)))  # fmt: skip
     for u in e.president:
         values(rid, unit(u), u.row, options)
     total, votes = e.printed["president"], e.printed["president_votes"]
