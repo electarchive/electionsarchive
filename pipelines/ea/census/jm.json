@@ -1,0 +1,847 @@
+{
+  "polity": "JM",
+  "name": "Jamaica",
+  "sources": {
+    "const-1962": {
+      "kind": "official_body",
+      "publisher": "Ministry of Justice, Jamaica",
+      "title": "The Constitution of Jamaica (Second Schedule to The Jamaica (Constitution) Order in Council 1962)",
+      "url": "https://laws.moj.gov.jm/",
+      "note": "laws.moj.gov.jm failed TLS verification on 2026-11-16 (incomplete certificate chain); cited from the library's index."
+    },
+    "rpa": {
+      "kind": "official_body",
+      "publisher": "Ministry of Justice, Jamaica",
+      "title": "The Representation of the People Act",
+      "url": "https://laws.moj.gov.jm/",
+      "note": "laws.moj.gov.jm failed TLS verification on 2026-11-16 (incomplete certificate chain); cited from the library's index."
+    },
+    "lga-2016": {
+      "kind": "official_body",
+      "publisher": "Ministry of Justice, Jamaica",
+      "title": "The Local Governance Act, 2016",
+      "url": "https://laws.moj.gov.jm/",
+      "note": "laws.moj.gov.jm failed TLS verification on 2026-11-16 (incomplete certificate chain); cited from the library's index."
+    },
+    "jp-history": {
+      "kind": "official_body",
+      "publisher": "Houses of Parliament of Jamaica",
+      "title": "History of the Parliament of Jamaica",
+      "url": "https://japarliament.gov.jm/",
+      "note": "The history page served a bot interstitial to automated requests on 2026-11-16."
+    },
+    "jis-legislature": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "The Legislature",
+      "url": "https://jis.gov.jm/government/the-legislature/"
+    },
+    "jis-ge2025": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "September 3 is General Election",
+      "url": "https://jis.gov.jm/september-3-is-general-election/"
+    },
+    "jis-ge2025-result": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "Jamaica Labour Party Wins Historic Third Consecutive General Election",
+      "url": "https://jis.gov.jm/jamaica-labour-party-wins-historic-third-consecutive-general-election/"
+    },
+    "jis-eac-2004": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "EAC Says Increase Number of Constituencies, House Unanimously Assents",
+      "url": "https://jis.gov.jm/eac-says-increase-number-of-constituencies-house-unanimously-assents/"
+    },
+    "jis-constituencies-2008": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "Debate on Bill to Increase the Number of Constituencies Begins in House",
+      "url": "https://jis.gov.jm/debate-on-bill-to-increase-the-number-of-constituencies-begins-in-house/"
+    },
+    "jis-lge2007": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "Governing Party Wins Local Polls",
+      "url": "https://jis.gov.jm/governing-party-wins-local-polls/"
+    },
+    "jis-lge2012": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "All Systems Go for Local Government Elections",
+      "url": "https://jis.gov.jm/all-systems-go-for-local-government-elections/"
+    },
+    "jis-portmore-2012": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "Portmore Gets New Mayor",
+      "url": "https://jis.gov.jm/portmore-gets-new-mayor/"
+    },
+    "jis-lge2016": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "Value of Local Representation",
+      "url": "https://jis.gov.jm/value-local-representation/"
+    },
+    "jis-lge2024": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "February 26 is Local Government Elections",
+      "url": "https://jis.gov.jm/february-26-is-local-government-elections/"
+    },
+    "jis-lge2024-nomination": {
+      "kind": "official_body",
+      "publisher": "Jamaica Information Service",
+      "title": "February 8 is Nomination Day for Local Government Elections",
+      "url": "https://jis.gov.jm/february-8-is-nomination-day-for-local-government-elections/"
+    },
+    "mlgcd-about": {
+      "kind": "official_body",
+      "publisher": "Ministry of Local Government and Community Development",
+      "title": "About Us",
+      "url": "https://www.localgovjamaica.gov.jm/about-us/"
+    },
+    "ecj-parliamentary": {
+      "kind": "official_body",
+      "publisher": "Electoral Commission of Jamaica",
+      "title": "Election results: parliamentary elections",
+      "url": "https://www.ecj.com.jm/elections/election-results/parliamentary-elections/",
+      "note": "The ECJ site answered automated requests with a challenge page; the files themselves are listed in the jm.ecj pipeline."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Jamaica",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const-1962"
+    },
+    {
+      "key": "constituency",
+      "name": "Constituencies",
+      "parent": "national",
+      "source": "jis-legislature",
+      "counts": [
+        {
+          "date": "2025-09-03",
+          "value": 63,
+          "source": "jis-ge2025",
+          "locator": "\"Members of Parliament (MPs) will be elected in 63 constituencies\""
+        },
+        {
+          "date": "2004-03-18",
+          "value": 60,
+          "source": "jis-eac-2004",
+          "locator": "\"as a first movement, the constituencies would be moved from 60 to 63\" (18 March 2004)"
+        }
+      ]
+    },
+    {
+      "key": "local",
+      "name": "Local authorities: 13 municipal corporations and the Municipality of Portmore",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "mlgcd-about",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 14,
+          "source": "mlgcd-about",
+          "locator": "\"our fourteen (14) local authorities\""
+        }
+      ]
+    },
+    {
+      "key": "division",
+      "name": "Electoral divisions",
+      "parent": "local",
+      "source": "jis-lge2024",
+      "counts": [
+        {
+          "date": "2012-03-26",
+          "value": 228,
+          "source": "jis-lge2012",
+          "locator": "\"228 divisions in the 63 constituencies island-wide\""
+        },
+        {
+          "date": "2024-02-26",
+          "value": 228,
+          "source": "jis-lge2024",
+          "locator": "\"to be contested in 228 electoral divisions\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "General elections to the House of Representatives",
+      "name_en": "House of Representatives general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "jm.ps"
+        ]
+      },
+      "finest_note": "The ECJ publishes box-by-box reports by polling station (polling division) for each constituency; elections before 2002 are not yet confirmed at that grain.",
+      "valid_from": "1944-11-20",
+      "first_held": "1944-12-12",
+      "earliest_record": "1944-12-12",
+      "source": "jis-legislature",
+      "note": "First past the post in single-member constituencies (63 since 2011). Parliament lasts five years from its first sitting unless dissolved sooner, and a general election follows each dissolution (Constitution s.64). The 2025 election was the 19th under universal adult suffrage, introduced in 1944.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "JM",
+          "valid_from": "1944-11-20"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "jis-legislature",
+          "locator": "https://jis.gov.jm/government/the-legislature/ (\"The Governor-General ... to dissolve Parliament at any time within the five years and name a date for a general election\")",
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica, through the Electoral Office of Jamaica and constituency returning officers"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Jamaica, election results (box-by-box and summary PDFs)",
+          "url": "https://www.ecj.com.jm/elections/election-results/parliamentary-elections/",
+          "format": "pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "finest": "jm.ps",
+          "source": "ecj-parliamentary",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2002-10-16",
+          "last_date": "2025-09-03",
+          "evidence": "Box-by-box polling-station reports with constituency summaries for the 2002, 2007, 2011, and 2016 general elections; 2020 and 2025 and the years before 2002 not yet confirmed. The ECJ site answered automated requests with a challenge page; the files themselves are listed in the jm.ecj pipeline."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1944-12-12",
+          "contests": 32,
+          "seats": 32,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1949-12-20",
+          "contests": 32,
+          "seats": 32,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1955-01-12",
+          "contests": 32,
+          "seats": 32,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1959-07-28",
+          "contests": 45,
+          "seats": 45,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1962-04-10",
+          "contests": 45,
+          "seats": 45,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1967-02-21",
+          "contests": 53,
+          "seats": 53,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1972-02-29",
+          "contests": 53,
+          "seats": 53,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1976-12-15",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1980-10-30",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1983-12-15",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1989-02-09",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1993-03-30",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "1997-12-18",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "2002-10-16",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "Constituencies as listed in the ECJ's constituency summary (https://www.ecj.com.jm/wp-content/uploads/2017/12/2002GeneralElectionSummary.pdf); the count is not quoted from a file fetched for this census."
+        },
+        {
+          "date": "2007-09-03",
+          "contests": 60,
+          "seats": 60,
+          "source": "ecj-parliamentary",
+          "note": "Constituencies as listed in the ECJ's constituency summary (https://www.ecj.com.jm/wp-content/uploads/2017/12/2007GeneralElectionSummary.pdf); the count is not quoted from a file fetched for this census."
+        },
+        {
+          "date": "2011-12-29",
+          "contests": 63,
+          "seats": 63,
+          "source": "jis-lge2012",
+          "quote": "228 divisions in the 63 constituencies island-wide, take place just under three months after the December 29, 2011 General Elections."
+        },
+        {
+          "date": "2016-02-25",
+          "contests": 63,
+          "seats": 63,
+          "source": "ecj-parliamentary",
+          "note": "Constituencies as listed in the ECJ's constituency summary (https://www.ecj.com.jm/wp-content/uploads/2017/12/2016GeneralElectionSummary.pdf); the count is not quoted from a file fetched for this census."
+        },
+        {
+          "date": "2020-09-03",
+          "contests": 63,
+          "seats": 63,
+          "source": "ecj-parliamentary",
+          "note": "One member per constituency. The constituency count and polling date are not quoted from a file fetched for this census: the ECJ site refused it and the Constitution's schedule of constituencies was unreachable."
+        },
+        {
+          "date": "2025-09-03",
+          "contests": 63,
+          "seats": 63,
+          "source": "jis-ge2025",
+          "quote": "Members of Parliament (MPs) will be elected in 63 constituencies to serve a five-year parliamentary term."
+        }
+      ],
+      "est_votes": 14000000,
+      "effort": 2
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "By-elections to the House of Representatives",
+      "name_en": "House of Representatives by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "jm.ps"
+        ]
+      },
+      "valid_from": "1944-11-20",
+      "source": "rpa",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "JM",
+          "valid_from": "1944-11-20"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "rpa",
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica, through the Electoral Office of Jamaica and constituency returning officers",
+          "vacancy_rule": "A vacant seat is filled at a by-election in its constituency on a writ issued by the Governor-General."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Jamaica, election results (box-by-box and summary PDFs)",
+          "url": "https://www.ecj.com.jm/elections/election-results/parliamentary-elections/",
+          "format": "pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "finest": "jm.ps",
+          "source": "ecj-parliamentary",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2001-03-08",
+          "last_date": "2020-03-02",
+          "evidence": "Box-by-box reports for 11 by-elections from 2001 to 2020. The ECJ site answered automated requests with a challenge page; the files themselves are listed in the jm.ecj pipeline."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of by-elections has been reached yet; the ECJ lists those since 2001."
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 2
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const-1962",
+      "first_held": "1961-09-19",
+      "note": "The only referendum so far is that of 19 September 1961 on staying in the Federation of the West Indies, held under the colonial government. The Constitution requires a referendum for a bill altering its deeply entrenched provisions (s.49); none has been held since independence.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "JM"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const-1962",
+          "locator": "https://laws.moj.gov.jm/ (Constitution s.49)",
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1961-09-19",
+          "note": "Federation referendum; the date is not quoted from a fetched official source."
+        }
+      ],
+      "est_votes": 470000,
+      "effort": 4
+    },
+    {
+      "key": "federal_house",
+      "tier": "national",
+      "name": "Elections in Jamaica to the House of Representatives of the West Indies Federation",
+      "name_en": "West Indies Federation House of Representatives (Jamaica seats)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1958-01-01",
+      "valid_to": "1962-05-31",
+      "first_held": "1958-03-25",
+      "source": "jp-history",
+      "note": "Jamaica returned 17 of the 45 members of the federal House at the only federal election, 25 March 1958; the Federation was dissolved on 31 May 1962. Not quoted from a fetched official source.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "name_pattern": "(West Indies|Federal|Federation)",
+          "precedence": 5,
+          "valid_from": "1958-01-01",
+          "valid_to": "1962-05-31"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1958-03-25",
+          "note": "The only federal general election; the date is not quoted from a fetched official source."
+        }
+      ],
+      "est_votes": 550000,
+      "effort": 4
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Elections of members of the Legislative Council",
+      "name_en": "Legislative Council (elected members, 1884-1944)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1884-01-01",
+      "valid_to": "1944-11-20",
+      "source": "jis-lge2016",
+      "note": "Under crown colony government an elected minority of the Legislative Council was chosen by a property and tax franchise, one member per parish from 1895; replaced by the House of Representatives under the 1944 Constitution.",
+      "disposition": "blocked",
+      "disposition_reason": "Returns were printed only in the Jamaica Gazette and colonial blue books; no official publication of them is online, and the ECJ's listings start in 1944.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "JM",
+          "valid_to": "1944-11-20"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "house_of_assembly",
+      "tier": "national",
+      "name": "Elections to the House of Assembly of Jamaica",
+      "name_en": "Colonial House of Assembly (1664-1866)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1664-01-01",
+      "valid_to": "1866-01-01",
+      "source": "jp-history",
+      "note": "The elected assembly of the colony, chosen by freeholders under a property franchise, surrendered its powers after the Morant Bay rebellion and was abolished, and crown colony government began in 1866.",
+      "disposition": "blocked",
+      "disposition_reason": "Polls survive only in the Assembly's journals and parish records; no official body publishes results.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "JM",
+          "valid_to": "1866-01-01"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "The Senate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "jis-legislature",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Senate is appointed, not elected: 13 senators on the advice of the Prime Minister and 8 on the advice of the Leader of the Opposition (Constitution s.35).",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "head_of_state",
+      "tier": "national",
+      "name": "Governor-General and Prime Minister",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-1962",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor-General is appointed by the monarch, and the Prime Minister is appointed from the House as the member best able to command its majority (Constitution ss.27 and 70); neither is chosen by a public vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "judiciary",
+      "tier": "national",
+      "name": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-1962",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges and resident magistrates are appointed by the Governor-General, on the advice of the Prime Minister or the Judicial Service Commission (Constitution Chapter VII); none is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Party candidate selections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "rpa",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their candidates by their own delegates' conferences; the state neither runs nor publishes them, and candidates enter the official process only at nomination day.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "JM"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "local_councils",
+      "tier": "division",
+      "name": "Local government elections of councillors",
+      "name_en": "Municipal corporation councillors (parish councils and KSAC before 2016)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "jm.ps"
+        ]
+      },
+      "source": "jis-lge2024",
+      "finest_note": "Councillors are elected in single-member electoral divisions; the ECJ counts each division by polling station, but division results files have not been reached for this census.",
+      "note": "First past the post in single-member electoral divisions (228 since at least 2012) for the 13 municipal corporations (the parish councils and the Kingston and St. Andrew Corporation before the Local Governance Act 2016) and the Portmore municipality. Elections have repeatedly been postponed by Act of Parliament.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "jis-lge2024",
+          "locator": "https://jis.gov.jm/february-26-is-local-government-elections/ (\"Local government elections were last held in 2016\")",
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica, through the Electoral Office of Jamaica"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Jamaica, election results",
+          "url": "https://www.ecj.com.jm/",
+          "format": "pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "jis-lge2007",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Local government results are released by the Electoral Office of Jamaica; which years the ECJ site holds is not yet confirmed. The ECJ site answered automated requests with a challenge page; the files themselves are listed in the jm.ecj pipeline."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-01-01",
+          "precision": "year",
+          "through": "2003-12-31",
+          "note": "Parish council and KSAC elections under adult suffrage; no official list of their dates has been reached yet (2003 is confirmed by the 2007 JIS report)."
+        },
+        {
+          "date": "2007-12-05",
+          "note": "Divisions not yet counted from an official source.",
+          "source": "jis-lge2007",
+          "quote": "The governing Jamaica Labour Party (JLP) has won the Wednesday, December 5 Local Government Elections taking control of nine of the country's 13 parish councils."
+        },
+        {
+          "date": "2012-03-26",
+          "contests": 228,
+          "seats": 228,
+          "source": "jis-lge2012",
+          "quote": "all is in place for the March 26 Local Government Elections. The upcoming elections, to allow for political representation in 228 divisions in the 63 constituencies island-wide"
+        },
+        {
+          "date": "2016-11-28",
+          "contests": 228,
+          "seats": 228,
+          "source": "jis-lge2016",
+          "quote": "individuals vying for the position of councillor are selected by political parties or run as independents in the 228 divisions."
+        },
+        {
+          "date": "2024-02-26",
+          "contests": 228,
+          "seats": 228,
+          "source": "jis-lge2024-nomination",
+          "quote": "the 2024 local government elections on February 26. They will vie for seats as Councillors in the 228 electoral divisions across the island and for Mayor of the Municipality of Portmore."
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 3
+    },
+    {
+      "key": "local_by",
+      "tier": "division",
+      "name": "Local government by-elections",
+      "name_en": "Division by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "jis-ge2025",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "jis-ge2025",
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica, through the Electoral Office of Jamaica",
+          "vacancy_rule": "A vacant division is filled at a by-election; by-elections in four Kingston and St. Andrew divisions were held with the 2025 general election."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of division by-elections has been reached yet."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "portmore_mayor",
+      "tier": "local",
+      "name": "Mayor of the Municipality of Portmore",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "2003-01-01",
+      "first_held": "2003-06-19",
+      "source": "jis-portmore-2012",
+      "note": "Portmore's mayor is the only one in Jamaica elected by direct vote, by first past the post across the municipality, at each local government election; every other mayor is chosen by the councillors.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "name_pattern": "Portmore"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "jis-lge2024",
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Electoral Commission of Jamaica, through the Electoral Office of Jamaica"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2003-06-19",
+          "note": "The first direct mayoral poll; the date is not quoted from a fetched official source."
+        },
+        {
+          "date": "2007-12-05",
+          "contests": 1,
+          "seats": 1,
+          "source": "jis-lge2007",
+          "quote": "lost the Portmore Municipal Council in St. Catherine where the PNP's former Mayor George Lee lost to the JLP's Keith Hinds. Portmore is Jamaica's only municipality where the mayor is elected by direct vote."
+        },
+        {
+          "date": "2012-03-26",
+          "contests": 1,
+          "seats": 1,
+          "source": "jis-portmore-2012",
+          "quote": "he polled 15,011 votes in the recent Local Government elections, defeating former Mayor, Keith Hinds who got 8,287 votes and independent candidate, Alrick Davis, who garnered 216 votes."
+        },
+        {
+          "date": "2016-11-28",
+          "note": "Held with the local government elections; not quoted from a fetched official source."
+        },
+        {
+          "date": "2024-02-26",
+          "contests": 1,
+          "seats": 1,
+          "source": "jis-lge2024-nomination",
+          "quote": "They will vie for seats as Councillors in the 228 electoral divisions across the island and for Mayor of the Municipality of Portmore."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 2
+    },
+    {
+      "key": "council_mayors",
+      "tier": "local",
+      "name": "Mayors and chairmen chosen by councillors",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lga-2016",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each municipal corporation except Portmore elects its mayor from among its councillors (Local Governance Act 2016); these are council votes recorded in minutes, not public elections.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}
