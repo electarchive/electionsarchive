@@ -432,25 +432,41 @@ def same_name(name: str) -> str:
     return re.sub(r"[^A-ZÁÉÍÓÖŐÚÜŰ]", "", TITLES.sub("", re.sub(r"\s+", " ", name).strip()).upper())
 
 
+CITED: set[str] = set()
+
+
+def cited() -> set[str]:
+    """Every raw file an election package cites, so the registry cites each as an artifact of the office."""
+    return CITED
+
+
 CAVEATS = {
     "accounting.votes_valid": (
-        ("In {n} polling station{s} the votes for the options do not add up to the valid ballots in the office's file. "
-        "The figures are stored as printed."),
+        (
+            "In {n} polling station{s} the votes for the options do not add up to the valid ballots in the office's file. "
+            "The figures are stored as printed."
+        ),
         "the office's polling-station lines do not add up to the valid ballots it prints; stored as printed",
     ),
     "accounting.ballots_sum": (
-        ("In {n} polling station{s} the valid and invalid ballots do not add up to the ballots in the box in the "
-        "office's file. The figures are stored as printed."),
+        (
+            "In {n} polling station{s} the valid and invalid ballots do not add up to the ballots in the box in the "
+            "office's file. The figures are stored as printed."
+        ),
         "the valid and invalid ballots the office prints do not add up to the ballots in the box; stored as printed",
     ),
     "accounting.turnout": (
-        ("In {n} polling station{s} more ballots were in the box than voters were on the roll at its close, because "
-        "voters with a certificate or a transfer voted there. The figures are stored as printed."),
+        (
+            "In {n} polling station{s} more ballots were in the box than voters were on the roll at its close, because "
+            "voters with a certificate or a transfer voted there. The figures are stored as printed."
+        ),
         "more ballots than voters on the station's roll, from voters who voted there with a certificate or transfer",
     ),
     "accounting.declared": (
-        ("{n} of the office's declared totals for this contest differ from the sum of its own polling-station lines. "
-        "Both are stored as published."),
+        (
+            "{n} of the office's declared totals for this contest differ from the sum of its own polling-station lines. "
+            "Both are stored as published."
+        ),
         "",
     ),
 }
@@ -478,6 +494,7 @@ class Day:
         self.seen: set[tuple[str, str]] = set()
         self.inherited: set[str] = set()
         self.reasons: dict[str, str] = {}
+        self.cited: set[str] = set()
         for depend in depends:
             built = package.folder(depend) / "build" / "person.parquet"
             if built.exists():
@@ -491,7 +508,10 @@ class Day:
         return True
 
     def cite(self, name: str) -> None:
-        self.p.uses(raw.cached(SOURCE, name))
+        if name not in self.cited:
+            self.cited.add(name)
+            CITED.add(name)
+            self.p.uses(raw.cached(SOURCE, name))
 
     def election(
         self,
@@ -745,7 +765,7 @@ class Day:
         for (result_set, _, option, measure), amount in self.values.items():
             sums[(result_set, option, measure)] += amount
         gaps = {index: amount - sums[index] for index, amount in self.declared.items() if sums[index] != amount}
-        for (result_set, _, _) in gaps:
+        for result_set, _, _ in gaps:
             found["accounting.declared"][result_set] += 1
         for code, counts in found.items():
             if not counts:
@@ -821,10 +841,12 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
         date(1989, 10, 23),
         date(2011, 12, 30),
         {"formula": "two_round", "majority": 0.5, "advance": 3},
-        ("176 single-member districts. In the first round a candidate needed more than half of the valid votes, with "
-        "a turnout above half of the electorate. Otherwise every candidate with at least 15% of the votes, and at "
-        "least the top three, could run in the second round, where the most votes won if a quarter of the electorate "
-        "turned out."),
+        (
+            "176 single-member districts. In the first round a candidate needed more than half of the valid votes, with "
+            "a turnout above half of the electorate. Otherwise every candidate with at least 15% of the votes, and at "
+            "least the top three, could run in the second round, where the most votes won if a quarter of the electorate "
+            "turned out."
+        ),
     ),
     (
         LIST_1990,
@@ -834,9 +856,11 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
             "formula": "hagenbach_bischoff_quota",
             "threshold": {"level": "list", "scope": "national", "percent": 4},
         },
-        ("152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
-        "among the lists that won 4% of the regional list votes nationwide; the remaining seats went to national "
-        "compensation lists from the votes that won no seat."),
+        (
+            "152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
+            "among the lists that won 4% of the regional list votes nationwide; the remaining seats went to national "
+            "compensation lists from the votes that won no seat."
+        ),
     ),
     (
         LIST_1994,
@@ -846,9 +870,11 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
             "formula": "hagenbach_bischoff_quota",
             "threshold": {"level": "list", "scope": "national", "percent": 5},
         },
-        ("152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
-        "among the lists that won 5% of the regional list votes nationwide (10% for a joint list of two parties, 15% "
-        "for three or more); the remaining seats went to national compensation lists."),
+        (
+            "152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
+            "among the lists that won 5% of the regional list votes nationwide (10% for a joint list of two parties, 15% "
+            "for three or more); the remaining seats went to national compensation lists."
+        ),
     ),
     (
         SMD_FPTP,
@@ -862,17 +888,21 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
         date(2011, 12, 30),
         None,
         {"formula": "dhondt", "threshold": {"level": "list", "scope": "national", "percent": 5}},
-        ("93 seats from national lists, allocated by D'Hondt among the lists that won 5% of the list votes (10% for a "
-        "joint list of two parties, 15% for three or more), counting the votes that won no district seat and the "
-        "winners' surplus votes. National minority lists win a seat at a reduced quota."),
+        (
+            "93 seats from national lists, allocated by D'Hondt among the lists that won 5% of the list votes (10% for a "
+            "joint list of two parties, 15% for three or more), counting the votes that won no district seat and the "
+            "winners' surplus votes. National minority lists win a seat at a reduced quota."
+        ),
     ),
     (
         EP_SYSTEM,
         date(2004, 1, 1),
         None,
         {"formula": "dhondt", "threshold": {"level": "list", "scope": "national", "percent": 5}},
-        ("Hungary's members of the European Parliament, elected from closed national lists by D'Hondt among the lists "
-        "that won 5% of the valid votes."),
+        (
+            "Hungary's members of the European Parliament, elected from closed national lists by D'Hondt among the lists "
+            "that won 5% of the valid votes."
+        ),
     ),
 ]
 PRECINCT_METHOD = (
@@ -1420,7 +1450,7 @@ def vtr_parliament(d: Day, year: int) -> None:
             tag, label, "candidate", nominator=party_name, position=_int(row.get("szavlap_sorsz")), ident=f"ej{ej_id}"
         )
         if d.first(tag, f"ej{ej_id}"):
-            d.candidate(tag, option, f"ogy:{year}:kpn:{row.get('kpn_id') or ej_id}", label, nominator=party_name)
+            d.candidate(tag, option, f"kpn:{row.get('kpn_id') or ej_id}", label, nominator=party_name)
         return tag, option
 
     def list_option(tl_id: int) -> str:
@@ -1437,7 +1467,7 @@ def vtr_parliament(d: Day, year: int) -> None:
                 d.candidate(
                     list_tag,
                     option,
-                    f"ogy:{year}:kpn:{member_row.get('kpn_id') or member_row['tj_id']}",
+                    f"kpn:{member_row.get('kpn_id') or member_row['tj_id']}",
                     printed,
                     role="list_member",
                     position=_int(member_row.get("sorsz")),
@@ -1542,13 +1572,12 @@ def registry() -> Package:
         license_url="https://www.valasztas.hu/impresszum",
         attribution="Nemzeti Választási Iroda, valasztas.hu",
     )
-    p.artifact(raw.cached(SOURCE, ARCHIVE), NVI)
-    for election, (catalogs, results) in VTR_CATALOGS.items():
-        for name in catalogs:
-            p.artifact(raw.cached(SOURCE, vtr_url(election, "ver", name)), NVI)
-        for name in results:
-            p.artifact(raw.cached(SOURCE, vtr_url(election, "szavossz", name)), NVI)
-        p.artifact(raw.cached(SOURCE, _crawl_key(election)), NVI)
+    stored: set[str] = set()
+    for url in sorted(cited()):
+        artifact = raw.cached(SOURCE, url)
+        if artifact.storage_key not in stored:
+            stored.add(artifact.storage_key)
+            p.artifact(artifact, NVI)
     p.add("body", id=PARLIAMENT, polity_id=HUNGARY, kind="unicameral")
     p.name(PARLIAMENT, "National Assembly", "en", "official")
     p.name(PARLIAMENT, "Országgyűlés", "hu", "native", False)
@@ -1557,6 +1586,23 @@ def registry() -> Package:
             "electoral_system", id=id, polity_id=HUNGARY, valid_from=since, valid_to=until, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text, lang="en")
+    found = places()
+    for id, (table, kind, code) in sorted(LOCAL_BODIES.items()):
+        name = found.names.get(code) or found.historic.get(code, ("", code))[1]
+        name = person_text(name) if name.isupper() else name
+        if table == "office":
+            p.add("office", id=id, polity_id=HUNGARY, kind="mayor")
+            english = "Lord Mayor of Budapest" if code == "01" else f"Mayor of {name}"
+            native = "Budapest főpolgármestere" if code == "01" else f"{name} polgármestere"
+        elif kind == "county-assembly":
+            p.add("body", id=id, polity_id=HUNGARY, kind="council")
+            english = "Budapest Assembly" if code == "01" else f"{COUNTIES[code]} County Assembly"
+            native = "Fővárosi Közgyűlés" if code == "01" else f"{COUNTIES[code]} Vármegyei Közgyűlés"
+        else:
+            p.add("body", id=id, polity_id=HUNGARY, kind="council")
+            english, native = f"{name} council", f"{name} képviselő-testülete"
+        p.name(id, english, "en", "official")
+        p.name(id, native, "hu", "native", False)
     for folded, label in sorted(PARTIES.items()):
         id = key("party", folded)
         p.add("party", id=id, kind="bloc" if re.search(r",|-KDNP|\bÉS\b", label) else "party", polity_id=HUNGARY)
@@ -2096,7 +2142,7 @@ def vtr_european(d: Day, tag: str) -> None:
             candidacy = d.candidate(
                 tag,
                 option,
-                f"ep:2024:kpn:{member['kpn_id']}",
+                f"kpn:{member['kpn_id']}",
                 printed,
                 role="list_member",
                 position=_int(member.get("sorsz")),
@@ -2140,9 +2186,249 @@ def vtr_european(d: Day, tag: str) -> None:
                 d.outcome(tag, option, "won", seats)
 
 
+VTR_CATALOGS["onk2024"] = (
+    ["Telepulesek.json", "onkJlcs.json", "onkSzervezetek.json", "NemzVal.json", "onkTelepulesiMandatumok.json"],
+    [],
+)
 VTR_CATALOGS["ep2024"] = (
     ["Telepulesek.json", "euListakEsJeloltek.json", "euSzervezetek.json"],
     ["ListasJkv.json", "LevelJkv.json", "KuviJkv.json", "epGyoztesek.json"],
 )
 for _day in EP_DAYS:
     OTHER.append((_day, f"{_day.year} European Parliament election", european))
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Local elections
+
+LOCAL_MAYOR = key("electoral_system", "local-mayor", 1990)
+LOCAL_BLOCK = key("electoral_system", "local-block", 1990)
+LOCAL_SMD = key("electoral_system", "local-smd", 1990)
+LOCAL_LIST = key("electoral_system", "local-list", 1990)
+SYSTEMS += [
+    (
+        LOCAL_MAYOR,
+        date(1990, 1, 1),
+        None,
+        {"formula": "fptp"},
+        ("Mayors, and the Lord Mayor of Budapest, are elected directly in a single round; the candidate with the most "
+        "votes wins."),
+    ),
+    (
+        LOCAL_BLOCK,
+        date(1990, 1, 1),
+        None,
+        {"formula": "block"},
+        ("In settlements of up to 10,000 inhabitants the council is elected on one ballot from individual candidates: "
+        "each voter may vote for as many candidates as there are seats, and the candidates with the most votes win."),
+    ),
+    (
+        LOCAL_SMD,
+        date(1990, 1, 1),
+        None,
+        {"formula": "fptp"},
+        ("In settlements of more than 10,000 inhabitants and in Budapest's districts, part of the council is elected in "
+        "single-member wards by the most votes; the rest come from compensation lists of the votes that won no seat."),
+    ),
+    (
+        LOCAL_LIST,
+        date(1990, 1, 1),
+        None,
+        {"formula": "dhondt", "threshold": {"level": "list", "scope": "contest", "percent": 5}},
+        ("County assemblies (from the voters of settlements of up to 10,000 inhabitants) and, from 2024, the Budapest "
+        "Assembly are elected from closed lists by D'Hondt among the lists that won 5% of the votes."),
+    ),
+]
+
+LOCAL_BODIES: dict[str, tuple[str, str, str]] = {}
+
+
+def council(area_code: str) -> str:
+    id = key("body", "council", area_code)
+    LOCAL_BODIES[id] = ("body", "council", area_code)
+    return id
+
+
+def mayoralty(area_code: str) -> str:
+    id = key("office", "mayor", area_code)
+    LOCAL_BODIES[id] = ("office", "mayor", area_code)
+    return id
+
+
+def county_assembly(maz: str) -> str:
+    id = key("body", "county-assembly", maz)
+    LOCAL_BODIES[id] = ("body", "county-assembly", maz)
+    return id
+
+
+def local_election(d: Day, year: int) -> tuple[str, str]:
+    path = f"hu/{d.day}-local"
+    election = d.election(
+        f"onk:{year}",
+        "local",
+        f"{year} Hungarian local elections",
+        f"{year}. évi helyi önkormányzati választások",
+        path,
+    )
+    return election, path
+
+
+class Local:
+    """Contests of one local election, named after the place they elect for."""
+
+    def __init__(self, d: Day, year: int) -> None:
+        self.d = d
+        self.year = year
+        self.election, self.path = local_election(d, year)
+
+    def place_name(self, area_code: str) -> str:
+        found = places()
+        name = found.names.get(area_code) or found.historic.get(area_code, ("", area_code))[1]
+        return person_text(name) if name.isupper() else name
+
+    def contest(self, kind: str, area_code: str, ward: str | None = None, magnitude: int | None = 1) -> str:
+        """kind: mayor, lord-mayor, council (block vote), ward, county-list, budapest-list."""
+        tag = f"onk:{self.year}:{kind}:{area_code}" + (f":{ward}" if ward else "")
+        if tag in self.d.sets:
+            return tag
+        name = self.place_name(area_code) if kind not in ("county-list", "lord-mayor", "budapest-list") else ""
+        maz = area_code[:2]
+        if kind == "mayor":
+            title, english = f"{name} polgármester", f"Mayor of {name}"
+            fields = {"office": mayoralty(area_code), "district_area": settlement(area_code), "system": LOCAL_MAYOR}
+            contest_kind = "office"
+        elif kind == "lord-mayor":
+            title, english = "Budapest főpolgármester", "Lord Mayor of Budapest"
+            fields = {"office": mayoralty("01"), "district_area": county("01"), "system": LOCAL_MAYOR}
+            contest_kind = "office"
+        elif kind == "council":
+            title, english = f"{name} képviselő-testület", f"{name} council"
+            fields = {"body": council(area_code), "district_area": settlement(area_code), "system": LOCAL_BLOCK}
+            contest_kind = "body_seats"
+        elif kind == "ward":
+            title, english = (
+                f"{name} {int(cast(str, ward))}. egyéni választókerület",
+                f"{name} ward {int(cast(str, ward))}",
+            )
+            fields = {"body": council(area_code), "district_area": settlement(area_code), "system": LOCAL_SMD}
+            contest_kind = "body_seats"
+        elif kind == "county-list":
+            title, english = f"{COUNTIES[maz]} vármegyei közgyűlés", f"{COUNTIES[maz]} County Assembly"
+            fields = {"body": county_assembly(maz), "district_area": county(maz), "system": LOCAL_LIST}
+            contest_kind = "list_allocation"
+        else:
+            title, english = "Fővárosi közgyűlés", "Budapest Assembly"
+            fields = {"body": county_assembly("01"), "district_area": county("01"), "system": LOCAL_LIST}
+            contest_kind = "list_allocation"
+        self.d.contest(
+            tag,
+            self.election,
+            contest_kind,
+            title,
+            f"{self.path}/{changeset.slug(tag.split(':', 2)[2])}",
+            magnitude=magnitude,
+            method=method(),
+            english=english,
+            **fields,  # type: ignore[arg-type]
+        )
+        return tag
+
+
+VTR_LOCAL_KINDS = {
+    "1": "mayor",
+    "2": "lord-mayor",
+    "3": "council",
+    "4": "ward",
+    "6": "county-list",
+    "F": "budapest-list",
+}
+
+
+def vtr_local(d: Day) -> None:
+    election_name = "onk2024"
+    for name in VTR_CATALOGS[election_name][0]:
+        d.cite(vtr_url(election_name, "ver", name))
+    d.cite(_crawl_key(election_name))
+    local = Local(d, 2024)
+    found = places()
+    groups = {
+        int(cast(int, row["kod"])): str(row["nev"])
+        for row in _items(vtr_json(election_name, "ver", "onkJlcs.json")["list"])
+    }
+    for code, payload in sorted(vtr_precincts(election_name).items()):
+        data = cast(dict[str, object], payload["data"])
+        area = found.resolve(code[:2], code[2:], found.names.get(code, ""), trust_code=True)
+        ballots: dict[tuple[str, str | None], list[dict[str, object]]] = {}
+        for ballot in _items(data.get("szavazolapok")):
+            kind = str(ballot["valaltip"])
+            if "tevk_csoport" in ballot:
+                for ward in _items(ballot["tevk_csoport"]):
+                    ballots[(kind, str(ward["tevk"]))] = _items(ward.get("jeloltek"))
+            else:
+                ballots[(kind, None)] = _items(ballot.get("jeloltek"))
+        options: dict[tuple[str, str | None, int], str] = {}
+        tags: dict[tuple[str, str | None], str] = {}
+        for (kind, ward), entries in ballots.items():
+            role = VTR_LOCAL_KINDS.get(kind)
+            if role is None:
+                continue
+            elected = sum(1 for entry in entries if entry.get("mandatum") == 1)
+            place = {"county-list": code[:2], "lord-mayor": "01", "budapest-list": "01"}.get(role, area)
+            tag = tags[(kind, ward)] = local.contest(
+                role,
+                place,
+                ward,
+                magnitude=None if role.endswith("list") else max(elected, 1) if role == "council" else 1,
+            )
+            for entry in entries:
+                position = int(cast(int, entry["szavlap_sorsz"]))
+                nominator = groups.get(int(cast(int, entry.get("jlcs_id") or 0)), "Független")
+                if entry.get("tl_id"):
+                    option = d.option(
+                        tag, nominator, "list", nominator=nominator, position=position, ident=f"tl{entry['tl_id']}"
+                    )
+                    seats = _int(entry.get("mandatum"))
+                    if seats:
+                        d.outcome(tag, option, "won", seats)
+                else:
+                    printed = str(entry["jelolt_neve"])
+                    if entry.get("dr_jelzo"):
+                        printed = f"{entry['dr_jelzo']} {printed}"
+                    ident = f"ej{entry['ej_id']}"
+                    option = d.option(tag, printed, "candidate", nominator=nominator, position=position, ident=ident)
+                    if d.first(tag, ident):
+                        d.candidate(
+                            tag, option, f"kpn:{entry.get('kpn_id') or entry['ej_id']}", printed, nominator=nominator
+                        )
+                    if entry.get("mandatum") == 1:
+                        d.outcome(tag, option, "elected")
+                options[(kind, ward, position)] = option
+        protocols = [(None, protocol) for protocol in _items(data.get("jegyzokonyvek"))]
+        protocols += [
+            (str(group["tevk"]), protocol)
+            for group in _items(data.get("tevk_csoport"))
+            for protocol in _items(group.get("jegyzokonyvek"))
+        ]
+        for ward, protocol in protocols:
+            kind = str(protocol["valaltip"])
+            index = (kind, ward if kind == "4" else None)
+            if index not in tags:
+                continue
+            tag = tags[index]
+            unit = d.unit(area, str(protocol["sorsz"]))
+            for item in _items(protocol.get("tetelek")):
+                d.value(
+                    tag, unit, options[(*index, int(cast(int, item["szavlap_sorsz"])))], 1, _int(item.get("szavazat"))
+                )
+            d.accounting(
+                tag,
+                unit,
+                _int(protocol.get("vp_osszes")),
+                _int(protocol.get("szk_megjelent")),
+                _int(protocol.get("szl_belyegzett_urna")),
+                _int(protocol.get("szl_ervenytelen")),
+                _int(protocol.get("szl_ervenyes")),
+            )
+
+
+OTHER.append((date(2024, 6, 9), "2024 local elections", vtr_local))
