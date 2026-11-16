@@ -1,4 +1,5 @@
-"""Costa Rica's Tribunal Supremo de Elecciones: the "cómputo de votos" workbooks of every national election."""
+"""Costa Rica's Tribunal Supremo de Elecciones: the "cómputo de votos" workbooks of every national election, and the
+polling-table counts of its 2026 interactive report."""
 
 import functools
 import json
@@ -7,10 +8,11 @@ import unicodedata
 import zipfile
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import UTC, date, datetime
 from uuid import uuid5
 
 import fastexcel
+import httpx
 import polars as pl
 
 from ea import changeset, package, raw
@@ -58,6 +60,20 @@ ARCHIVES = (
 
 
 MUNICIPAL_ARCHIVES = ("computovotos_febrero2016", "computovotos_febrero2020", "computovotos_febrero2024")
+REPORT_PAGE = f"{BASE}/computodevotos2026.html"
+REPORT_QUERY = "https://wabi-south-central-us-api.analysis.windows.net/public/reports/querydata?synchronous=true"
+REPORT_KEY = "1df703ba-e3f0-4af4-aa93-e4684214e524"
+REPORT_MODEL = 12883096
+REPORT_TABLES = {
+    "juntas": ("JUNTAS-CODIGOE", ("JUNTA", "CODIGOE", "CODIGO_CENTRO")),
+    "centros": ("CENTROS DE VOTACION", ("COD_CENTRO", "NOMBRE", "TIPO")),
+    "distritos": ("DISTRITO ELECTORAL", ("PCE", "PCD", "NOMBRE")),
+    "territorial": ("COD_TERRITORIAL", ("PCD", "provincia", "canton", "distrito")),
+    "partidos": ("PARTIDOS", ("CodPartido", "descPartido", "Orden")),
+}
+"""The tables of the Tribunal's 2026 vote-count report, by the name each is cached under, with the columns read."""
+REPORT_VOTES = ("COMPUTO FEB 2026", ("TIPOE", "Junta", "CodPartido", "votos"))
+REPORT_PAGE_ROWS = 30000
 
 
 def fetch() -> None:
@@ -65,9 +81,130 @@ def fetch() -> None:
     for name in (*ARCHIVES, *MUNICIPAL_ARCHIVES):
         raw.fetch(SOURCE, zip_url(name), suffix=".zip")
     declared.fetch()
+    fetch_report()
 
 
-CENTROS, NESTED_LEVEL = "centro", "nested"
+def report_query(entity: str, columns: tuple[str, ...], restart: list[list[str]] | None = None) -> dict[str, object]:
+    """A query of one table of the report's data model, every row at the grain of the columns, one page at a time."""
+    window: dict[str, object] = {"Count": REPORT_PAGE_ROWS}
+    if restart is not None:
+        window["RestartTokens"] = restart
+    select = [
+        {"Column": {"Expression": {"SourceRef": {"Source": "t"}}, "Property": column}, "Name": f"t.{column}"}
+        for column in columns
+    ]
+    command = {
+        "Query": {"Version": 2, "From": [{"Name": "t", "Entity": entity, "Type": 0}], "Select": select},
+        "Binding": {
+            "Primary": {"Groupings": [{"Projections": list(range(len(columns)))}]},
+            "DataReduction": {"DataVolume": 4, "Primary": {"Window": window}},
+            "Version": 1,
+        },
+    }
+    return {
+        "version": "1.0.0",
+        "queries": [{"Query": {"Commands": [{"SemanticQueryDataShapeCommand": command}]}}],
+        "cancelQueries": [],
+        "modelId": REPORT_MODEL,
+    }
+
+
+def report_url(name: str) -> str:
+    return f"{REPORT_QUERY}#{name}"
+
+
+def report_store(name: str, body: dict[str, object]) -> raw.Artifact:
+    try:
+        return raw.cached(SOURCE, report_url(name))
+    except LookupError:
+        response = httpx.post(
+            REPORT_QUERY,
+            json=body,
+            headers={"X-PowerBI-ResourceKey": REPORT_KEY, "User-Agent": raw.USER_AGENT},
+            timeout=300,
+        )
+        response.raise_for_status()
+        return raw.store(
+            SOURCE,
+            report_url(name),
+            response.content,
+            suffix=".json",
+            retrieved_at=datetime.now(UTC),
+            media_type="application/json",
+        )
+
+
+def report_names() -> list[str]:
+    """The cached pages of the report, in order: its tables, then the pages of the votes by polling table."""
+    names = list(REPORT_TABLES)
+    page = 0
+    while True:
+        names.append(f"computo-{page}")
+        _, more = dsr(raw.cached(SOURCE, report_url(names[-1])).path.read_bytes())
+        if more is None:
+            return names
+        page += 1
+
+
+def fetch_report() -> None:
+    raw.fetch(SOURCE, REPORT_PAGE, suffix=".html")
+    for name, (entity, columns) in REPORT_TABLES.items():
+        _, more = dsr(report_store(name, report_query(entity, columns)).path.read_bytes())
+        if more is not None:
+            raise ValueError(f"the report's {entity} table has more than one page")
+    restart = None
+    page = 0
+    while True:
+        content = report_store(f"computo-{page}", report_query(*REPORT_VOTES, restart)).path.read_bytes()
+        _, restart = dsr(content)
+        if restart is None:
+            return
+        page += 1
+
+
+def dsr(content: bytes) -> tuple[list[list[object]], list[list[str]] | None]:
+    """The rows of one page of a report query's answer, and the token that continues it, or None on the last page.
+    The answer compresses each row against the one before it: a bit of R repeats a column's value, a bit of Ø
+    leaves it empty, and a column with a dictionary holds the index of its value."""
+    answer = json.loads(content)
+    data = answer["results"][0]["result"]["data"]
+    shape = data["dsr"]["DS"][0]
+    dictionaries = shape.get("ValueDicts", {})
+    out: list[list[object]] = []
+    columns: list[dict[str, object]] = []
+    previous: list[object] = []
+    for group in shape["PH"]:
+        for members in group.values():
+            for member in members:
+                if "S" in member:
+                    columns = member["S"]
+                    previous = [None] * len(columns)
+                given = list(member.get("C", []))
+                repeat, empty = member.get("R", 0), member.get("Ø", 0)
+                row: list[object] = []
+                for index, column in enumerate(columns):
+                    if repeat >> index & 1:
+                        value = previous[index]
+                    elif empty >> index & 1:
+                        value = None
+                    else:
+                        value = given.pop(0)
+                        if "DN" in column and isinstance(value, int):
+                            value = dictionaries[column["DN"]][value]
+                    row.append(value)
+                if given:
+                    raise ValueError(f"a row of the report holds {len(given)} more values than its columns")
+                previous = row
+                out.append(row)
+    return out, None if shape.get("IC", True) else shape.get("RT")
+
+
+def report_table(name: str) -> list[list[object]]:
+    return dsr(raw.cached(SOURCE, report_url(name)).path.read_bytes())[0]
+
+
+CENTROS, NESTED_LEVEL, JUNTAS = "centro", "nested", "junta"
+UNIT_NOUN = {CENTROS: "voting center", NESTED_LEVEL: "electoral district", JUNTAS: "polling table"}
 
 
 def zip_url(name: str) -> str:
@@ -506,7 +643,7 @@ HELD = (
         {3: ("president", 2)},
         CENTROS,
     ),
-    Held(date(2026, 2, 1), (NESTED[2],), {1: ("president", 1), 2: ("assembly", 1)}, NESTED_LEVEL),
+    Held(date(2026, 2, 1), (NESTED[2],), {1: ("president", 1), 2: ("assembly", 1)}, JUNTAS),
 )
 SEATS = {1: 19, 2: 11, 3: 7, 4: 6, 5: 4, 6: 5, 7: 5}
 PROVINCE_NAMES = ("San José", "Alajuela", "Cartago", "Heredia", "Guanacaste", "Puntarenas", "Limón")
@@ -542,6 +679,16 @@ CENTER_METHOD = (
     "centers, such as long-stay homes, institutional care centers, and mental health centers, are rows of the same "
     "tables."
 )
+JUNTA_METHOD = (
+    "Counted by the Tribunal Supremo de Elecciones, as published in its interactive report of the 2026 vote count "
+    "(cómputo de votos), linked from its page for the count. The report's data model holds the count of every "
+    "polling table (junta receptora de votos): the registered electorate (electorado), the votes received (ballots "
+    "cast), the valid votes by party, the null votes (nulos), and the blank votes (blancos), stored for each table as "
+    "the report gives them, read through the report's public query service. Valid votes exclude the blank votes. Each "
+    "polling table sits under its voting center (centro de votación); tables abroad sit under their consulate. The "
+    "national and provincial totals are those printed in the Tribunal's workbook of the same count, and every one of "
+    "them equals the sum of the tables."
+)
 DISTRICT_METHOD = (
     " The units are the electoral districts (distritos electorales) the Tribunal prints under each administrative "
     "district, the finest level it publishes for this election. Votes cast abroad are reported by country."
@@ -574,6 +721,10 @@ def places() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
                         districts[district] = title(leaf.district[1])
                     cantons.setdefault(canton, f"Cantón {leaf.canton[0]}")
                     districts.setdefault(district, f"Distrito {leaf.district[0]}")
+    for code, (_, canton, district) in report().districts.items():
+        if code[0] in "1234567":
+            cantons.setdefault(code[:3], title(canton))
+            districts.setdefault(code, title(district))
     return provinces, cantons, districts
 
 
@@ -588,10 +739,17 @@ def council_cantons() -> dict[str, str]:
     return found
 
 
-def sources(p: Package) -> None:
+def sources(p: Package, *, with_report: bool = False) -> None:
     for name in ARCHIVES:
         p.uses(raw.cached(SOURCE, zip_url(name)))
     p.uses(raw.cached(SOURCE, LIST_URL))
+    if with_report:
+        for artifact in report_artifacts():
+            p.uses(artifact)
+
+
+def report_artifacts() -> list[raw.Artifact]:
+    return [raw.cached(SOURCE, REPORT_PAGE), *(raw.cached(SOURCE, report_url(name)) for name in report_names())]
 
 
 def geo() -> Package:
@@ -599,10 +757,10 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Costa Rica's 7 provinces, cantons, and administrative districts by the Tribunal Supremo de Elecciones' codes, "
-        "and the schemes of its voting centers",
+        "and the schemes of its voting centers and polling tables",
     )
     p.external |= {COSTA_RICA, COUNTRY}
-    sources(p)
+    sources(p, with_report=True)
     for code, rank, kind, noun in (
         ("cr.provincia", 1, "administrative", "province"),
         ("cr.canton", 2, "administrative", "canton"),
@@ -610,6 +768,7 @@ def geo() -> Package:
         ("cr.distrito_electoral", 4, "precinct", "electoral district"),
         ("cr.centro", 4, "precinct", "voting center"),
         ("cr.pais", 4, "precinct", "country abroad"),
+        ("cr.junta", 5, "precinct", "polling table"),
     ):
         p.add("scheme", code=code, polity_id=COSTA_RICA, kind=kind, rank=rank, noun=noun, code_system="tse")
     provinces, cantons, districts = places()
@@ -700,6 +859,8 @@ def registry() -> Package:
     p.artifact(raw.cached(SOURCE, declared.INDEX_URL), DECLARATORIAS)
     for resolution in declared.available():
         p.artifact(raw.cached(SOURCE, declared.url(resolution)), DECLARATORIAS)
+    for artifact in report_artifacts():
+        p.artifact(artifact, TSE_SOURCE)
     p.add("body", id=ASSEMBLY, polity_id=COSTA_RICA, kind="unicameral")
     p.name(ASSEMBLY, "Legislative Assembly of Costa Rica", "en", "official")
     p.name(ASSEMBLY, "Asamblea Legislativa", "es", "native", False)
@@ -1088,6 +1249,160 @@ def compare_provinces(
     return gaps
 
 
+@dataclass(frozen=True)
+class Center:
+    code: int
+    name: str
+    kind: str
+    district: str  # the TSE code of its administrative district, or "" abroad
+
+
+@dataclass
+class Report:
+    """The 2026 vote-count report: each polling table's voting center, and the votes of each table."""
+
+    juntas: dict[int, Center] = field(default_factory=dict)
+    provinces: dict[int, int] = field(default_factory=dict)  # polling table -> province, 0 abroad
+    parties: dict[int, tuple[str, int]] = field(default_factory=dict)  # code -> (name, order on the report)
+    votes: dict[tuple[int, int, int], int] = field(default_factory=dict)  # (contest family, table, code) -> count
+    districts: dict[str, tuple[str, str, str]] = field(default_factory=dict)  # TSE code -> province, canton, district
+
+
+REPORT_FAMILY = {"president": 1, "assembly": 2}
+REPORT_MEASURES = {501: REGISTERED, 502: CAST, 503: VALID, 504: INVALID, 505: BLANK}
+"""The report's codes for the accounting rows, by measure; 500 counts the tables and 506 the abstentions."""
+REPORT_SKIP = {500, 506}
+PRISON = 9  # the report's type of center for an institutional care center (centro de atención institucional)
+
+
+@functools.cache
+def report() -> Report:
+    out = Report()
+    districts = {int(str(pce)): str(pcd) for pce, pcd, _ in report_table("distritos")}
+    for pcd, province, canton, district in report_table("territorial"):
+        out.districts[str(pcd)] = (str(province), str(canton), str(district))
+    centers: dict[int, tuple[str, int]] = {
+        int(str(code)): (" ".join(str(name).split()), int(str(kind))) for code, name, kind in report_table("centros")
+    }
+    for number, codigo, center in report_table("juntas"):
+        number, codigo, center = int(str(number)), int(str(codigo)), int(str(center))
+        name, kind = centers[center]
+        province = codigo // 100000
+        if province == 8:
+            country = out.districts[districts[codigo]][1]
+            out.juntas[number] = Center(center, f"{title(country)}: {title(name)}", "abroad_mission", "")
+            out.provinces[number] = 0
+        else:
+            out.juntas[number] = Center(
+                center, title(name), "prison" if kind == PRISON else "standard", districts[codigo]
+            )
+            out.provinces[number] = province
+    for code, name, order in report_table("partidos"):
+        out.parties[int(str(code))] = (str(name), int(str(order)))
+    for name in report_names():
+        if not name.startswith("computo-"):
+            continue
+        for family, number, code, count in dsr(raw.cached(SOURCE, report_url(name)).path.read_bytes())[0]:
+            at = (int(str(family)), int(str(number)), int(str(code)))
+            if out.votes.setdefault(at, int(str(count))) != int(str(count)):
+                raise ValueError(f"the report gives two counts for {at}")
+    return out
+
+
+def tally(
+    p: Package,
+    contest: tuple[date, str, int, str, str],
+    chapter: int,
+    tables: Chosen,
+    options: dict[str, str],
+    units: dict[str, str],
+    unit_rows: list[dict[str, object]],
+) -> None:
+    """The options of one contest, from the parties the workbook's totals print for it, in the report's order, and
+    the voting centers and polling tables the report counts it in."""
+    day, family, province, contest_id, _ = contest
+    data = report()
+    scope = "COSTA RICA" if family == "president" else fold(PROVINCE_NAMES[province - 1])
+    running = {column for column in tables.declared[chapter][scope] if measure_of(column) is None}
+    by_name = {fold(name): (code, name, order) for code, (name, order) in data.parties.items() if code < 500}
+    if running - set(by_name):
+        raise LookupError(f"{day} {family} {province}: {sorted(running - set(by_name))} are not on the report")
+    for column in sorted(running, key=lambda column: by_name[column][2]):
+        option = options[column] = key("option", day, family, province, column)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest_id,
+            kind="ticket" if family == "president" else "list",
+            party_id=party(column),
+            ballot_position=len(options),
+            ballot_label=by_name[column][1],
+        )
+    for number, center in sorted(data.juntas.items()):
+        if family == "assembly" and data.provinces[number] != province:
+            continue
+        abroad_unit = not center.district
+        place = {
+            "polity_id": COSTA_RICA,
+            "area_relation": "unlocated" if abroad_unit else "within",
+            "area_id": None if abroad_unit else area("cr.distrito", center.district),
+            "kind": center.kind,
+        }
+        parent = f"{day}:{center.code}"
+        if parent not in units:
+            units[parent] = key("unit", parent)
+            unit_rows.append(
+                {"id": units[parent], "scheme_code": "cr.centro", "code": parent, "parent_id": None}
+                | place
+                | {"name": center.name}
+            )
+        code = f"{day}:junta:{number}"
+        if code not in units:
+            units[code] = key("unit", code)
+            unit_rows.append(
+                {"id": units[code], "scheme_code": "cr.junta", "code": code, "parent_id": units[parent]}
+                | place
+                | {"name": f"Junta {number}"}
+            )
+
+
+def tallied(
+    day: date,
+    result_set: str,
+    family: str,
+    province: int,
+    options: dict[str, str],
+    sums: Counter[tuple[str | None, int]],
+) -> list[dict[str, object]]:
+    """The values of one contest from the report, one row per polling table and party or accounting measure."""
+    data = report()
+    wanted = REPORT_FAMILY[family]
+    codes = {code: fold(name) for code, (name, _) in data.parties.items()}
+    out: list[dict[str, object]] = []
+    for (kind, number, code), count in sorted(data.votes.items()):
+        if kind != wanted or code in REPORT_SKIP or (family == "assembly" and data.provinces[number] != province):
+            continue
+        if code in REPORT_MEASURES:
+            option_id, measure = None, REPORT_MEASURES[code]
+        elif codes[code] in options:
+            option_id, measure = options[codes[code]], 1
+        elif count:
+            raise ValueError(f"{family} {province}: {count} votes for {codes[code]}, which the totals do not print")
+        else:
+            continue
+        sums[(option_id, measure)] += count
+        out.append(
+            {
+                "result_set_id": result_set,
+                "unit_id": key("unit", f"{day}:junta:{number}"),
+                "option_id": option_id,
+                "measure": measure,
+                "value": count,
+            }
+        )
+    return out
+
+
 def election(day: date) -> Package:
     helds = [held for held in HELD if held.day == day]
     held = helds[0]
@@ -1099,18 +1414,19 @@ def election(day: date) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"Costa Rica's {'presidential runoff' if runoff else 'national election'} of {day:%-d %B %Y} by "
-        f"{'voting center' if held.level == CENTROS else 'electoral district'} from the Tribunal Supremo de "
-        "Elecciones' vote count",
+        f"{UNIT_NOUN[held.level]} from the Tribunal Supremo de Elecciones' vote count",
         depends,
     )
     p.external |= {COSTA_RICA, COUNTRY}
-    sources(p)
+    sources(p, with_report=held.level == JUNTAS)
     for resolution in declared.available():
         if resolution.day.year == day.year:
             p.uses(raw.cached(SOURCE, declared.url(resolution)))
     p.uses(raw.cached(SOURCE, declared.INDEX_URL))
     chosen_tables = chosen(held)
-    method = METHOD + (CENTER_METHOD if held.level == CENTROS else DISTRICT_METHOD)
+    method = (
+        JUNTA_METHOD if held.level == JUNTAS else METHOD + (CENTER_METHOD if held.level == CENTROS else DISTRICT_METHOD)
+    )
     election_id = key("election", day)
     p.add(
         "election",
@@ -1216,62 +1532,72 @@ def election(day: date) -> Package:
                 "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en"
             )
             options: dict[str, str] = {}
-            ran = {col for _, leaves, _ in groups for leaf in leaves for col, v in leaf.values.items() if v > 0}
-            for table, _, _ in groups:
-                for column, text in zip(table.columns, table.shown, strict=True):
-                    if measure_of(column) is None and column not in options and (family != "council" or column in ran):
-                        option = options[column] = key("option", day, family, ident, column)
-                        p.add(
-                            "contest_option",
-                            id=option,
-                            contest_id=contest,
-                            kind="ticket" if family == "president" else "list",
-                            party_id=party(column),
-                            ballot_position=len(options),
-                            ballot_label=text,
-                        )
             sums: Counter[tuple[str | None, int]] = Counter()
-            for table, leaves, scheme in groups:
-                counts: Counter[str] = Counter()
-                for leaf in leaves:
-                    base = f"{day}:{code_of(leaf)}:{fold(' '.join((*leaf.above, leaf.name)))}"
-                    counts[base] += 1
-                    code = base if counts[base] == 1 else f"{base}#{counts[base]}"
-                    if code not in units:
-                        unit = units[code] = key("unit", code)
-                        abroad_unit = leaf.province == 0
-                        unit_rows.append(
-                            {
-                                "id": unit,
-                                "polity_id": COSTA_RICA,
-                                "scheme_code": scheme,
-                                "code": code,
-                                "area_relation": "unlocated" if abroad_unit else "within",
-                                "area_id": None if abroad_unit else area("cr.distrito", code_of(leaf)),
-                                "kind": "abroad_mission" if abroad_unit else "standard",
-                                "name": title(" ".join((*leaf.above[-1:], leaf.name)))
-                                if abroad_unit
-                                else title(leaf.name),
-                            }
-                        )
-                    unit = units[code]
-                    for column, value in leaf.values.items():
-                        measure = measure_of(column)
-                        if measure == 0 or (measure is None and column not in options):
-                            continue
-                        number_ = whole(value)
-                        sums[(options[column] if measure is None else None, 1 if measure is None else measure)] += (
-                            number_
-                        )
-                        values.append(
-                            {
-                                "result_set_id": result_set,
-                                "unit_id": unit,
-                                "option_id": options[column] if measure is None else None,
-                                "measure": 1 if measure is None else measure,
-                                "value": number_,
-                            }
-                        )
+            if held.level == JUNTAS:
+                tally(
+                    p, (day, family, province, contest, result_set), chapter, chosen_tables, options, units, unit_rows
+                )
+                values += tallied(day, result_set, family, province, options, sums)
+            else:
+                ran = {col for _, leaves, _ in groups for leaf in leaves for col, v in leaf.values.items() if v > 0}
+                for table, _, _ in groups:
+                    for column, text in zip(table.columns, table.shown, strict=True):
+                        if (
+                            measure_of(column) is None
+                            and column not in options
+                            and (family != "council" or column in ran)
+                        ):
+                            option = options[column] = key("option", day, family, ident, column)
+                            p.add(
+                                "contest_option",
+                                id=option,
+                                contest_id=contest,
+                                kind="ticket" if family == "president" else "list",
+                                party_id=party(column),
+                                ballot_position=len(options),
+                                ballot_label=text,
+                            )
+                for table, leaves, scheme in groups:
+                    counts: Counter[str] = Counter()
+                    for leaf in leaves:
+                        base = f"{day}:{code_of(leaf)}:{fold(' '.join((*leaf.above, leaf.name)))}"
+                        counts[base] += 1
+                        code = base if counts[base] == 1 else f"{base}#{counts[base]}"
+                        if code not in units:
+                            unit = units[code] = key("unit", code)
+                            abroad_unit = leaf.province == 0
+                            unit_rows.append(
+                                {
+                                    "id": unit,
+                                    "polity_id": COSTA_RICA,
+                                    "scheme_code": scheme,
+                                    "code": code,
+                                    "area_relation": "unlocated" if abroad_unit else "within",
+                                    "area_id": None if abroad_unit else area("cr.distrito", code_of(leaf)),
+                                    "kind": "abroad_mission" if abroad_unit else "standard",
+                                    "name": title(" ".join((*leaf.above[-1:], leaf.name)))
+                                    if abroad_unit
+                                    else title(leaf.name),
+                                }
+                            )
+                        unit = units[code]
+                        for column, value in leaf.values.items():
+                            measure = measure_of(column)
+                            if measure == 0 or (measure is None and column not in options):
+                                continue
+                            number_ = whole(value)
+                            sums[(options[column] if measure is None else None, 1 if measure is None else measure)] += (
+                                number_
+                            )
+                            values.append(
+                                {
+                                    "result_set_id": result_set,
+                                    "unit_id": unit,
+                                    "option_id": options[column] if measure is None else None,
+                                    "measure": 1 if measure is None else measure,
+                                    "value": number_,
+                                }
+                            )
             printed = chosen_tables.declared.get(chapter, {})
             if family == "council":
                 printed_rows = [chosen_tables.cantons.get((chapter, province, canton), {})]
