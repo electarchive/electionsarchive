@@ -192,7 +192,8 @@ METHOD = (
     "Totals as published by the Jurado Nacional de Elecciones in Infogob, its election archive, for each contest's "
     "constituency. Registered voters are the electoral roll, ballots cast are the votes cast (votos emitidos), and "
     "blank and null votes are stored as blank and invalid ballots. Infogob does not publish these elections below "
-    "the constituency; the polling-station counts of the Oficina Nacional de Procesos Electorales are not stored here."
+    "the constituency; where the Oficina Nacional de Procesos Electorales publishes its counts by polling table or "
+    "district, they are stored as a second, finer result set of the same contest."
 )
 ELECTED_ONLY = (
     "Infogob publishes only the members elected in this constituency, with the votes each received, and not the "
