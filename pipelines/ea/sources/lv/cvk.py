@@ -5,6 +5,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
 from html.parser import HTMLParser
+from typing import Any
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -135,8 +136,29 @@ def path(name: str) -> raw.Artifact:
     return raw.cached(SOURCE, URLS[name])
 
 
-def loaded(name: str) -> object:
+def loaded(name: str) -> Any:
     return json.loads(path(name).path.read_text(encoding="utf-8-sig"))
+
+
+def _attr(element: ET.Element, name: str) -> str:
+    found = element.get(name)
+    if found is None:
+        raise LookupError(f"{element.tag} has no {name}")
+    return found
+
+
+def _child(element: ET.Element, tag: str) -> ET.Element:
+    found = element.find(tag)
+    if found is None:
+        raise LookupError(f"{element.tag} has no {tag}")
+    return found
+
+
+def _text(element: ET.Element, tag: str) -> str:
+    found = element.findtext(tag)
+    if found is None:
+        raise LookupError(f"{element.tag} has no {tag}")
+    return found
 
 
 def _count(value: object) -> int | None:
@@ -247,10 +269,10 @@ def _tree() -> tuple[dict[str, Node], dict[int, str]]:
     nodes: dict[str, Node] = {}
     names: dict[int, str] = {}
 
-    def walk(item: dict[str, object], parent: str | None) -> None:
+    def walk(item: Any, parent: str | None) -> None:
         stats = item["departmentStats"]
         id = str(item["alias"])
-        lists = {}
+        lists: dict[int, int] = {}
         for entry in stats["partiesStats"]:
             lists[int(entry["npk"])] = int(entry["paperGood"])
             names[int(entry["npk"])] = clean(entry["name"])
@@ -275,14 +297,14 @@ def _tree() -> tuple[dict[str, Node], dict[int, str]]:
 
 def _xml2014() -> Reading:
     root = ET.parse(path("sv2014/rezultsxml").path).getroot()
-    base = root.find("PamatTabulas")
+    base = _child(root, "PamatTabulas")
     nodes: dict[str, Node] = {}
     names: dict[int, str] = {}
     ballot: dict[str, int] = {}
-    for entry in base.find("Saraksti"):
-        ballot[entry.get("SarID")] = int(entry.get("Loze"))
-        names[int(entry.get("Loze"))] = clean(entry.get("Nosaukums"))
-    total = root.find("Valsts")
+    for entry in _child(base, "Saraksti"):
+        ballot[_attr(entry, "SarID")] = int(_attr(entry, "Loze"))
+        names[int(_attr(entry, "Loze"))] = clean(_attr(entry, "Nosaukums"))
+    total = _child(root, "Valsts")
     nodes["0"] = Node(
         "0",
         None,
@@ -290,45 +312,47 @@ def _xml2014() -> Reading:
         "0",
         "Latvija",
         "",
-        int(total.get("Balsstiesigie")),
-        int(total.get("Nobalsojusie")),
-        int(total.get("DerVelZimes")),
-        lists={ballot[e.get("SarID")]: int(e.get("Zimes")) for e in total},
+        int(_attr(total, "Balsstiesigie")),
+        int(_attr(total, "Nobalsojusie")),
+        int(_attr(total, "DerVelZimes")),
+        lists={ballot[_attr(e, "SarID")]: int(_attr(e, "Zimes")) for e in total},
     )
-    national = {ballot[e.get("SarID")]: int(e.get("Vietas")) for e in total}
-    for e in base.find("Regioni"):
-        code = str(int(e.get("RegID")) - 1)
-        nodes[f"r{e.get('RegID')}"] = Node(
-            f"r{e.get('RegID')}", "0", 1, code, clean(e.get("Nosaukums")), "", None, None, None
+    national = {ballot[_attr(e, "SarID")]: int(_attr(e, "Vietas")) for e in total}
+    for e in _child(base, "Regioni"):
+        region = _attr(e, "RegID")
+        nodes[f"r{region}"] = Node(
+            f"r{region}", "0", 1, str(int(region) - 1), clean(_attr(e, "Nosaukums")), "", None, None, None
         )
-    for e in base.find("PilsetasUnNovadi"):
-        nodes[f"c{e.get('PilsNovID')}"] = Node(
-            f"c{e.get('PilsNovID')}",
-            f"r{e.get('RegID')}",
+    for e in _child(base, "PilsetasUnNovadi"):
+        town = _attr(e, "PilsNovID")
+        nodes[f"c{town}"] = Node(
+            f"c{town}",
+            f"r{_attr(e, 'RegID')}",
             2,
-            e.get("PilsNovID"),
-            clean(e.get("Nosaukums")),
+            town,
+            clean(_attr(e, "Nosaukums")),
             "",
             None,
             None,
             None,
         )
-    for e in base.find("Iecirkni"):
-        nodes[f"s{e.get('IecID')}"] = Node(
-            f"s{e.get('IecID')}",
-            f"c{e.get('PilsNovID')}",
+    for e in _child(base, "Iecirkni"):
+        station = _attr(e, "IecID")
+        nodes[f"s{station}"] = Node(
+            f"s{station}",
+            f"c{_attr(e, 'PilsNovID')}",
             3,
-            e.get("IecID"),
-            clean(e.get("Nosaukums")),
-            clean(e.get("Adrese")),
+            station,
+            clean(_attr(e, "Nosaukums")),
+            clean(_attr(e, "Adrese")),
             None,
             None,
             None,
         )
-    for e in root.find("PartijasRegionos"):
-        nodes[f"r{e.get('RegID')}"].lists[ballot[e.get("SarID")]] = int(e.get("DerVelZimes"))
-    for e in root.find("PartijasIecirknos"):
-        nodes[f"s{e.get('IecID')}"].lists[ballot[e.get("SarID")]] = int(e.get("DerVelZimes"))
+    for e in _child(root, "PartijasRegionos"):
+        nodes[f"r{_attr(e, 'RegID')}"].lists[ballot[_attr(e, "SarID")]] = int(_attr(e, "DerVelZimes"))
+    for e in _child(root, "PartijasIecirknos"):
+        nodes[f"s{_attr(e, 'IecID')}"].lists[ballot[_attr(e, "SarID")]] = int(_attr(e, "DerVelZimes"))
     return Reading(nodes, names, None, [], national)
 
 
@@ -354,7 +378,7 @@ def fetch() -> None:
     for code in DATI.values():
         root = dati_url(code)
         raw.fetch(SOURCE, root, suffix=".html")
-        for url in (*dati_pages(code)[1:][0], *dati_pages(code)[2]):
+        for url in (*dati_pages(code)[1], *dati_pages(code)[2]):
             raw.fetch(SOURCE, url, suffix=".html")
         raw.fetch(SOURCE, f"{HOST}/{code}/ieveletie-deputati/", suffix=".html")
     for day in LEGACY:
@@ -697,7 +721,7 @@ def build(day: str) -> Package:
 
 def _rs_of(p: Package, option: str) -> str:
     contest = next(o["contest_id"] for o in p.rows["contest_option"] if o["id"] == option)
-    return next(r["id"] for r in p.rows["result_set"] if r["contest_id"] == contest)
+    return str(next(r["id"] for r in p.rows["result_set"] if r["contest_id"] == contest))
 
 
 REFERENDUM_TITLES = {
@@ -726,7 +750,7 @@ def _referendum(day: str) -> tuple[list[dict[str, str]], list[dict[str, int]], d
     ).getroot()
 
     def values(e: ET.Element) -> dict[str, int]:
-        return {v.get("id"): int(v.text) for v in e.findall("value")}
+        return {_attr(v, "id"): int(v.text or 0) for v in e.findall("value")}
 
     stations = [dict(e.attrib) for e in root.findall("district")]
     figures = [values(e) for e in root.findall("district")]
@@ -734,7 +758,7 @@ def _referendum(day: str) -> tuple[list[dict[str, str]], list[dict[str, int]], d
         names = [values(e) for e in root.findall("area")]
         total = {k: sum(a[k] for a in names) for k in names[0]}
     else:
-        total = values(root.find("area"))
+        total = values(_child(root, "area"))
     return stations, figures, total
 
 
@@ -933,11 +957,11 @@ def _members(prefix: str) -> list[dict[str, str]]:
     root = ET.parse(path(f"{prefix}/electedcandidates636363813214220000.xml").path).getroot()
     return [
         {
-            "council": m.findtext("DepartmentId"),
-            "list": m.findtext("CandidateListId"),
-            "id": m.findtext("CandidateId"),
-            "name": clean(f"{m.findtext('Forename')} {m.findtext('Lastname')}"),
-            "number": m.findtext("NumberInList"),
+            "council": _text(m, "DepartmentId"),
+            "list": _text(m, "CandidateListId"),
+            "id": _text(m, "CandidateId"),
+            "name": clean(f"{_text(m, 'Forename')} {_text(m, 'Lastname')}"),
+            "number": _text(m, "NumberInList"),
         }
         for m in root.iter("ElectedCandidateModel")
     ]
@@ -1144,7 +1168,7 @@ def dati_url(code: str, *parts: str) -> str:
     return f"{HOST}/{code}/velesanu-rezultati/" + "".join(f"{part}/" for part in parts)
 
 
-def dati_pages(code: str) -> tuple[list[str], list[str], list[tuple[str, str]]]:
+def dati_pages(code: str) -> tuple[list[str], list[str], list[str]]:
     """The commission's results pages for an election: the root, the region pages, and the municipality pages."""
     root = tables(dati_url(code))
     seen: dict[tuple[str, ...], None] = {}
@@ -1231,12 +1255,13 @@ def read_dati(code: str) -> Dati:
             if row[0].order and row[0].order.isdigit()
         }
         for row in stats:
+            order = row[0].order or ""
             votes = {
                 int(number): _n(cell)
-                for number, cell in zip(header[2:], matrix[row[0].order][2:], strict=False)
+                for number, cell in zip(header[2:], matrix[order][2:], strict=False)
                 if number.isdigit()
             }
-            place.stations.append((int(row[0].order), row[1].text, _n(row[2]), _n(row[4]), votes))
+            place.stations.append((int(order), row[1].text, _n(row[2]), _n(row[4]), votes))
     elected = []
     for row in tables(f"{HOST}/{code}/ieveletie-deputati/").tables["elected-total-table"][1:]:
         elected.append(
