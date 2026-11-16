@@ -1,0 +1,2408 @@
+{
+ "polity": "HU",
+ "name": "Hungary",
+ "sources": {
+  "alaptorveny": {
+   "title": "Magyarország Alaptörvénye (2011. április 25.)",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2011-4301-02-00",
+   "kind": "official_body",
+   "note": "Text read from the consolidated version in force from 1 October 2026."
+  },
+  "alkotmany1949": {
+   "title": "1949. évi XX. törvény a Magyar Népköztársaság Alkotmánya",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/1949-20-00-00",
+   "kind": "official_body"
+  },
+  "vjt2011": {
+   "title": "2011. évi CCIII. törvény az országgyűlési képviselők választásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2011-203-00-00",
+   "kind": "official_body"
+  },
+  "vjt1989": {
+   "title": "1989. évi XXXIV. törvény az országgyűlési képviselők választásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/1989-34-00-00",
+   "kind": "official_body"
+  },
+  "ve2013": {
+   "title": "2013. évi XXXVI. törvény a választási eljárásról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2013-36-00-00",
+   "kind": "official_body"
+  },
+  "ovjt2010": {
+   "title": "2010. évi L. törvény a helyi önkormányzati képviselők és polgármesterek választásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2010-50-00-00",
+   "kind": "official_body"
+  },
+  "ovjt1990": {
+   "title": "1990. évi LXIV. törvény a helyi önkormányzati képviselők és polgármesterek választásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/1990-64-00-00",
+   "kind": "official_body"
+  },
+  "motv2011": {
+   "title": "2011. évi CLXXXIX. törvény Magyarország helyi önkormányzatairól",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2011-189-00-00",
+   "kind": "official_body"
+  },
+  "nek2011": {
+   "title": "2011. évi CLXXIX. törvény a nemzetiségek jogairól",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2011-179-00-00",
+   "kind": "official_body"
+  },
+  "nektv1993": {
+   "title": "1993. évi LXXVII. törvény a nemzeti és etnikai kisebbségek jogairól",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/1993-77-00-00",
+   "kind": "official_body"
+  },
+  "nsztv2013": {
+   "title": "2013. évi CCXXXVIII. törvény a népszavazás kezdeményezéséről, az európai polgári kezdeményezésről, valamint a népszavazási eljárásról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2013-238-00-00",
+   "kind": "official_body"
+  },
+  "ep2003": {
+   "title": "2003. évi CXIII. törvény az Európai Parlament tagjainak választásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/2003-113-00-00",
+   "kind": "official_body"
+  },
+  "tb1991": {
+   "title": "1991. évi LXXXIV. törvény a társadalombiztosítási önkormányzati testületek megválasztásáról",
+   "publisher": "Nemzeti Jogszabálytár (Igazságügyi Minisztérium)",
+   "url": "https://njt.hu/jogszabaly/1991-84-00-00",
+   "kind": "official_body"
+  },
+  "nvi_archive": {
+   "title": "Korábbi választások feldolgozható adatai (1990–2024)",
+   "publisher": "Nemzeti Választási Iroda",
+   "url": "https://www.valasztas.hu/korabbi-valasztasok-feldolgozhato-adatai",
+   "kind": "official_body",
+   "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+   "note": "One zip of 32 per-election bundles: parliamentary 1990–2022, local 1990–2024, national referendums 1997–2022, EP 2004–2024, and nationality 2019 and 2024."
+  },
+  "nvi_onk2024": {
+   "title": "Helyi önkormányzati és nemzetiségi önkormányzati választások 2024: települések, mandátumok és nemzetiségi választások (VTR adatállományok)",
+   "publisher": "Nemzeti Választási Iroda",
+   "url": "https://vtr.valasztas.hu/onk2024",
+   "kind": "official_body",
+   "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+   "note": "Telepulesek.json, onkTelepulesiMandatumok.json, and NemzVal.json under https://vtr.valasztas.hu/onk2024/data/06091753/ver/."
+  },
+  "nvi_idokozi": {
+   "title": "Időközi választások",
+   "publisher": "Nemzeti Választási Iroda",
+   "url": "https://www.valasztas.hu/idokozi-valasztasok",
+   "kind": "official_body",
+   "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)"
+  },
+  "nvi_helyi_nepszavazas": {
+   "title": "Helyi népszavazások",
+   "publisher": "Nemzeti Választási Iroda",
+   "url": "https://www.valasztas.hu/teruleti-es-helyi-nepszavazasok",
+   "kind": "official_body",
+   "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)"
+  },
+  "ksh_stadat": {
+   "title": "8.1.2.2. A települések száma és népessége jogállás szerint, 2026. január 1.",
+   "publisher": "Központi Statisztikai Hivatal",
+   "url": "https://www.ksh.hu/stadat_files/fol/hu/fol0007.html",
+   "kind": "official_body"
+  },
+  "ksh_hnt": {
+   "title": "Magyarország helységnévtára: Tájékoztató (2026. január 1-jei közigazgatási állapot)",
+   "publisher": "Központi Statisztikai Hivatal",
+   "url": "https://www.ksh.hu/apps/hntr.egyeb?p_lang=HU&p_sablon=TAJEKOZTATO",
+   "kind": "official_body"
+  },
+  "parlament": {
+   "title": "Az Országgyűlés története és a korábbi országgyűlési választások",
+   "publisher": "Országgyűlés Hivatala",
+   "url": "https://www.parlament.hu/",
+   "kind": "official_body",
+   "note": "The Parliament's own history pages and almanacs; dates before 1990 are listed from them and the laws that called each election, not quoted."
+  },
+  "ksh_valasztas_hist": {
+   "title": "Választási statisztikai kiadványok (1920–1990)",
+   "publisher": "Központi Statisztikai Hivatal",
+   "url": "https://library.hungaricana.hu/hu/collection/KSH/",
+   "kind": "official_body",
+   "note": "KSH's election statistics volumes, scanned in the KSH Library collection."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Magyarország",
+   "name_en": "Hungary",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "alaptorveny"
+  },
+  {
+   "key": "varmegye",
+   "name": "Vármegyék",
+   "name_en": "Counties (vármegyék)",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "hu.megye",
+   "source": "motv2011",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 19,
+     "source": "ksh_stadat",
+     "locator": "https://www.ksh.hu/stadat_files/fol/hu/fol0007.html"
+    }
+   ]
+  },
+  {
+   "key": "fovaros",
+   "name": "Főváros (Budapest)",
+   "name_en": "Capital (Budapest)",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "scheme": "hu.megye",
+   "source": "motv2011",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 1,
+     "source": "ksh_stadat",
+     "locator": "https://www.ksh.hu/stadat_files/fol/hu/fol0007.html"
+    }
+   ]
+  },
+  {
+   "key": "telepules",
+   "name": "Települések",
+   "name_en": "Settlements (towns, large villages, and villages)",
+   "parent": "varmegye",
+   "polity_kind": "municipality",
+   "scheme": "hu.telepules",
+   "source": "motv2011",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 3155,
+     "source": "ksh_stadat",
+     "locator": "https://www.ksh.hu/stadat_files/fol/hu/fol0007.html"
+    }
+   ]
+  },
+  {
+   "key": "kerulet",
+   "name": "Fővárosi kerületek",
+   "name_en": "Districts of Budapest",
+   "parent": "fovaros",
+   "polity_kind": "submunicipal",
+   "scheme": "hu.telepules",
+   "source": "motv2011",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 23,
+     "source": "ksh_hnt",
+     "locator": "https://www.ksh.hu/apps/hntr.egyeb?p_lang=HU&p_sablon=TAJEKOZTATO"
+    }
+   ]
+  },
+  {
+   "key": "nemzetiseg",
+   "name": "Nemzetiségek",
+   "name_en": "Recognized nationalities (non-territorial)",
+   "parent": "national",
+   "source": "nek2011",
+   "counts": [
+    {
+     "date": "2024-06-09",
+     "value": 13,
+     "source": "nvi_onk2024",
+     "locator": "https://vtr.valasztas.hu/onk2024/data/06091753/ver/NemzVal.json"
+    }
+   ]
+  },
+  {
+   "key": "kiralysag",
+   "name": "Magyar Királyság (népképviseleti országgyűlések)",
+   "name_en": "Kingdom of Hungary (representative diets, 1848–1944)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1848-04-11",
+   "valid_to": "1944-12-21",
+   "source": "parlament"
+  },
+  {
+   "key": "atmenet",
+   "name": "Ideiglenes Nemzetgyűlés és Magyar Köztársaság (1944–1949)",
+   "name_en": "Provisional National Assembly and the Republic of 1946–1949",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1944-12-21",
+   "valid_to": "1949-08-20",
+   "source": "parlament"
+  },
+  {
+   "key": "nepkoztarsasag",
+   "name": "Magyar Népköztársaság",
+   "name_en": "Hungarian People's Republic (1949–1989)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1949-08-20",
+   "valid_to": "1989-10-23",
+   "source": "alkotmany1949"
+  }
+ ],
+ "classes": [
+  {
+   "key": "ogy",
+   "tier": "national",
+   "name": "Országgyűlési képviselők választása",
+   "name_en": "National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "hu.oevk"
+    ],
+    "fine": [
+     "hu.telepules",
+     "hu.szavazokor"
+    ]
+   },
+   "finest_note": "Votes are published by polling station (szavazókör); postal and foreign-mission votes as separate units.",
+   "note": "1990–2010: 386 seats (176 two-round single-member constituencies, up to 152 seats on 20 territorial lists, and at least 58 national compensation seats; Act XXXIV of 1989). Since 2014: 199 seats (106 first-past-the-post constituencies and 93 national-list seats, with preferential nationality lists; Act CCIII of 2011). Parliamentary by-elections are held in the single-member constituencies.",
+   "source": "alaptorveny",
+   "valid_from": "1990-01-01",
+   "first_held": "1990-03-25",
+   "earliest_record": "1990-03-25",
+   "contests_per_unit": 1,
+   "est_votes": 110000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 4,
+     "day_rule": "a Sunday in April or May of the fourth year after the previous election",
+     "term_years": 4,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "Single-member constituencies: an absolute majority on a valid first round (turnout over half) elects; otherwise a second round two weeks later (Act XXXIV of 1989, § 7).",
+     "administered_by": "Országos Választási Bizottság",
+     "valid_to": "2014-01-01",
+     "source": "vjt1989",
+     "locator": "https://njt.hu/jogszabaly/1989-34-00-00"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 4,
+     "day_rule": "a Sunday in April or May of the fourth year after the previous election",
+     "term_years": 4,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "vacancy_rule": "A vacant single-member seat is filled by a by-election (időközi választás) unless the term ends within the year; a vacant list seat passes to the next candidate on the list.",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1990-03-25",
+     "last_date": "2022-04-03",
+     "finest": "hu.szavazokor",
+     "evidence": "One bundle per parliamentary election from 1990 to 2022, with polling-station returns."
+    },
+    {
+     "platform": "Választási eredmények (VTR, NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "url": "https://vtr.valasztas.hu/ogy2026",
+     "first_date": "2022-04-03",
+     "finest": "hu.szavazokor",
+     "evidence": "Per-settlement polling-station protocols as json for 2022 and 2026."
+    },
+    {
+     "platform": "Időközi választások (NVI)",
+     "format": "html and json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://www.valasztas.hu/orszaggyulesi-valasztasok1",
+     "first_date": "2015-01-01",
+     "finest": "hu.szavazokor",
+     "evidence": "Parliamentary by-elections called since 1 January 2015."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-25",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "1990-04-08",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "1994-05-08",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "1994-05-29",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "1998-05-10",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "1998-05-24",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2002-04-07",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2002-04-21",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2006-04-09",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2006-04-23",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2010-04-11",
+     "contests": 197,
+     "seats": 386,
+     "note": "Counted as 176 single-member constituencies, 20 territorial lists, and the national list.",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2010-04-25",
+     "election_kind": "runoff",
+     "source": "vjt1989"
+    },
+    {
+     "date": "2014-04-06",
+     "contests": 107,
+     "seats": 199,
+     "note": "Counted as 106 single-member constituencies and the national list.",
+     "source": "vjt2011"
+    },
+    {
+     "date": "2018-04-08",
+     "contests": 107,
+     "seats": 199,
+     "note": "Counted as 106 single-member constituencies and the national list.",
+     "source": "vjt2011"
+    },
+    {
+     "date": "2022-04-03",
+     "contests": 107,
+     "seats": 199,
+     "note": "Counted as 106 single-member constituencies and the national list.",
+     "source": "vjt2011"
+    },
+    {
+     "date": "2026-04-12",
+     "contests": 107,
+     "seats": 199,
+     "note": "Counted as 106 single-member constituencies and the national list.",
+     "source": "vjt2011"
+    }
+   ]
+  },
+  {
+   "key": "koztarsasagi_elnok",
+   "tier": "national",
+   "name": "A köztársasági elnök megválasztása",
+   "name_en": "Presidential elections by the National Assembly",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The National Assembly elects the President by secret ballot: two thirds in the first round, then a majority in a run-off between the top two. The 1990 referendum rejected direct election.",
+   "source": "alaptorveny",
+   "valid_from": "1989-10-23",
+   "first_held": "1990-08-03",
+   "est_votes": 4000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "selection": "elected",
+     "administered_by": "Országgyűlés",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-08-03",
+     "election_kind": "indirect",
+     "note": "Árpád Göncz.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "1995-06-19",
+     "election_kind": "indirect",
+     "note": "Árpád Göncz re-elected.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2000-06-06",
+     "election_kind": "indirect",
+     "note": "Ferenc Mádl.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2005-06-07",
+     "election_kind": "indirect",
+     "note": "László Sólyom.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2010-06-29",
+     "election_kind": "indirect",
+     "note": "Pál Schmitt.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2012-05-02",
+     "election_kind": "indirect",
+     "note": "János Áder.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2017-03-13",
+     "election_kind": "indirect",
+     "note": "János Áder re-elected.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2022-03-10",
+     "election_kind": "indirect",
+     "note": "Katalin Novák.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    },
+    {
+     "date": "2024-02-26",
+     "election_kind": "indirect",
+     "note": "Tamás Sulyok.",
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 10. cikk (1): A köztársasági elnököt az Országgyűlés öt évre választja."
+    }
+   ]
+  },
+  {
+   "key": "nepszavazas",
+   "tier": "national",
+   "name": "Országos népszavazás",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Ordered by the National Assembly on the initiative of 200,000 voters (mandatory) or of the President, the Government, or 100,000 voters (optional); valid only when more than half of the voters cast a valid vote (Alaptörvény Art. 8).",
+   "source": "nsztv2013",
+   "first_held": "1989-11-26",
+   "earliest_record": "1997-11-16",
+   "est_votes": 55000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1997-11-16",
+     "last_date": "2022-04-03",
+     "finest": "hu.szavazokor",
+     "evidence": "Bundles for 1997, 2003, 2004, 2008, 2016, and 2022; the 1989 and 1990 referendums are absent."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-11-26",
+     "election_kind": "referendum",
+     "contests": 4,
+     "note": "Four questions, including whether the President is elected after the parliamentary election.",
+     "source": "parlament"
+    },
+    {
+     "date": "1990-07-29",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Direct election of the President; invalid for low turnout.",
+     "source": "parlament"
+    },
+    {
+     "date": "1997-11-16",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "NATO membership.",
+     "source": "nvi_archive"
+    },
+    {
+     "date": "2003-04-12",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "EU accession.",
+     "source": "nvi_archive"
+    },
+    {
+     "date": "2004-12-05",
+     "election_kind": "referendum",
+     "contests": 2,
+     "note": "Hospital privatization and preferential naturalization.",
+     "source": "nvi_archive"
+    },
+    {
+     "date": "2008-03-09",
+     "election_kind": "referendum",
+     "contests": 3,
+     "note": "Visit fees, daily hospital fees, and tuition fees.",
+     "source": "nvi_archive"
+    },
+    {
+     "date": "2016-10-02",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "EU migrant relocation quotas; invalid for low turnout.",
+     "source": "nvi_archive"
+    },
+    {
+     "date": "2022-04-03",
+     "election_kind": "referendum",
+     "contests": 4,
+     "note": "Four child-protection questions, held with the parliamentary election; invalid.",
+     "source": "nvi_archive"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Európai parlamenti képviselők választása",
+   "name_en": "European Parliament elections in Hungary",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "One national constituency with closed lists, D'Hondt, and a 5% threshold (Act CXIII of 2003).",
+   "source": "ep2003",
+   "valid_from": "2004-05-01",
+   "first_held": "2004-06-13",
+   "earliest_record": "2004-06-13",
+   "est_votes": 15000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "administered_by": "Nemzeti Választási Iroda",
+     "source": "ep2003",
+     "locator": "https://njt.hu/jogszabaly/2003-113-00-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "2004-06-13",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Bundles for 2004, 2009, 2014, 2019, and 2024 with polling-station returns."
+    },
+    {
+     "platform": "Választási eredmények (VTR, NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "url": "https://vtr.valasztas.hu/ep2024",
+     "first_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Polling-station protocols as json."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-13",
+     "contests": 1,
+     "seats": 24,
+     "source": "ep2003"
+    },
+    {
+     "date": "2009-06-07",
+     "contests": 1,
+     "seats": 22,
+     "source": "ep2003"
+    },
+    {
+     "date": "2014-05-25",
+     "contests": 1,
+     "seats": 21,
+     "source": "ep2003"
+    },
+    {
+     "date": "2019-05-26",
+     "contests": 1,
+     "seats": 21,
+     "source": "ep2003"
+    },
+    {
+     "date": "2024-06-09",
+     "contests": 1,
+     "seats": 21,
+     "source": "ep2003"
+    }
+   ]
+  },
+  {
+   "key": "tb_onkormanyzat",
+   "tier": "national",
+   "name": "Társadalombiztosítási önkormányzati választás",
+   "name_en": "Social security self-government elections",
+   "category": "special_purpose",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Insured persons elected the employee side of the Health Insurance and Pension Insurance self-governments from union lists in one nationwide vote; Parliament abolished the self-governments in 1998.",
+   "source": "tb1991",
+   "valid_from": "1991-12-20",
+   "valid_to": "1998-07-01",
+   "first_held": "1993-05-21",
+   "est_votes": 4000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "The National Election Office's archive does not hold the 1993 vote, and no official machine-readable or tabulated return by area has been found; only the national result was announced.",
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "special"
+     ],
+     "valid_from": "1993-01-01",
+     "valid_to": "1999-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-05-21",
+     "election_kind": "special",
+     "source": "tb1991"
+    }
+   ]
+  },
+  {
+   "key": "kozvetett",
+   "tier": "national",
+   "name": "Testületek által választott tisztségek",
+   "name_en": "Offices filled by assemblies and councils",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "alaptorveny",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by an assembly, not by voters: the Prime Minister, the Speaker, Constitutional Court judges, and the Kúria president (by the National Assembly), county assembly presidents and deputy mayors (by the councils), and lay judges (by local councils).",
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_government",
+      "speaker",
+      "other",
+      "deputy_mayor"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "birak",
+   "tier": "national",
+   "name": "Bírák",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "alaptorveny",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judicial office is filled by popular vote: professional judges are appointed by the President, and lay judges are elected by local councils (see kozvetett)."
+  },
+  {
+   "key": "elovalasztas",
+   "tier": "national",
+   "name": "Előválasztás",
+   "name_en": "Nominating contests",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "ve2013",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The electoral procedure act (Ve. § 1) covers no nominating contest; parties pick candidates themselves, and the 2021 opposition primary was run by the parties, not the election office.",
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "primary"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "kamarak",
+   "tier": "national",
+   "name": "Köztestületi és kamarai választások",
+   "name_en": "Chamber and professional-body elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "ve2013",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the chambers themselves among their members (economic, agrarian, and professional chambers), not by the election office under the electoral procedure act."
+  },
+  {
+   "key": "megyei_kozgyules",
+   "tier": "varmegye",
+   "name": "Vármegyei közgyűlés választása",
+   "name_en": "County assembly elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.megye"
+    ],
+    "fine": [
+     "hu.telepules",
+     "hu.szavazokor"
+    ]
+   },
+   "finest_note": "Voters outside the county-rank towns vote for county lists; published by polling station.",
+   "note": "In 1990 the county assemblies were elected indirectly by electors of the municipal councils; directly from county lists since 1994 (1994–2006 in two sections, settlements up to and over 10,000).",
+   "source": "ovjt2010",
+   "valid_from": "1990-09-01",
+   "first_held": "1994-12-11",
+   "earliest_record": "1994-12-11",
+   "est_votes": 24000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 10,
+     "term_years": 4,
+     "administered_by": "Országos Választási Bizottság",
+     "valid_to": "2014-01-01",
+     "source": "ovjt1990",
+     "locator": "https://njt.hu/jogszabaly/1990-64-00-00"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1994-12-11",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "County list results in each local-election bundle from 1994."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": " County Assembly",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 19,
+     "source": "alaptorveny",
+     "quote": "Alaptörvény 35. cikk (2): követő ötödik év április, május, június vagy július hónapjában, az európai parlamenti képviselők választásával egyidejűleg"
+    }
+   ]
+  },
+  {
+   "key": "fovarosi_kozgyules",
+   "tier": "fovaros",
+   "name": "Fővárosi közgyűlés választása",
+   "name_en": "Budapest Assembly elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.megye"
+    ],
+    "fine": [
+     "hu.telepules",
+     "hu.szavazokor"
+    ]
+   },
+   "note": "1990–2010 and since 2024 elected from city-wide lists; in 2014 and 2019 composed of the Lord Mayor, the 23 district mayors, and 9 compensation-list members.",
+   "source": "ovjt2010",
+   "valid_from": "1990-09-01",
+   "first_held": "1990-09-30",
+   "earliest_record": "1990-09-30",
+   "est_votes": 7000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 10,
+     "term_years": 4,
+     "administered_by": "Országos Választási Bizottság",
+     "valid_to": "2014-01-01",
+     "source": "ovjt1990",
+     "locator": "https://njt.hu/jogszabaly/1990-64-00-00"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "administered_by": "Nemzeti Választási Iroda",
+     "day_rule": "with the general local elections",
+     "valid_from": "2014-01-01",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1990-09-30",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Budapest list results in each local-election bundle."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "^Budapest Assembly",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-09-30",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "ovjt2010"
+    }
+   ]
+  },
+  {
+   "key": "fopolgarmester",
+   "tier": "fovaros",
+   "name": "Főpolgármester választása",
+   "name_en": "Lord Mayor of Budapest elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Elected by the Budapest Assembly in 1990; directly by plurality since 1994.",
+   "source": "ovjt2010",
+   "valid_from": "1994-01-01",
+   "first_held": "1994-12-11",
+   "earliest_record": "1994-12-11",
+   "contests_per_unit": 1,
+   "est_votes": 6500000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "runoff": "none",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1994-12-11",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Lord Mayor results in each local-election bundle from 1994."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "^Lord Mayor of Budapest",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "ovjt2010"
+    }
+   ]
+  },
+  {
+   "key": "polgarmester",
+   "tier": "telepules",
+   "name": "Polgármester választása",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Includes the mayors of Budapest's 23 districts. In 1990 voters elected the mayor directly only in settlements up to 10,000 inhabitants; elsewhere the council chose. Direct plurality election everywhere since 1994.",
+   "source": "ovjt2010",
+   "valid_from": "1990-09-01",
+   "first_held": "1990-09-30",
+   "earliest_record": "1990-09-30",
+   "contests_per_unit": 1,
+   "est_votes": 40000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 10,
+     "term_years": 4,
+     "runoff": "none",
+     "administered_by": "Országos Választási Bizottság",
+     "valid_to": "2014-01-01",
+     "source": "ovjt1990",
+     "locator": "https://njt.hu/jogszabaly/1990-64-00-00"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "runoff": "none",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "alaptorveny",
+     "vacancy_rule": "A vacancy, or a council's dissolution of itself, leads to a by-election (időközi választás) called by the local election commission.",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1990-09-30",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Mayoral results in each local-election bundle from 1990."
+    },
+    {
+     "platform": "Időközi választások (NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://vtr.valasztas.hu/ionk",
+     "first_date": "2015-01-01",
+     "finest": "hu.szavazokor",
+     "evidence": "By-elections called since 1 January 2015; current ones on the VTR service."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "^Mayor of ",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-09-30",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 3177,
+     "seats": 3177,
+     "source": "nvi_onk2024",
+     "quote": "onkTelepulesiMandatumok.json: 3,177 settlements and Budapest districts"
+    }
+   ]
+  },
+  {
+   "key": "kepviselo_testulet",
+   "tier": "telepules",
+   "name": "Települési önkormányzati képviselők választása",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "finest_note": "Settlements up to 10,000 inhabitants vote on one block-vote list of individual candidates; larger ones and Budapest's districts elect single-member wards plus compensation lists.",
+   "note": "Includes the councils of Budapest's 23 districts.",
+   "source": "ovjt2010",
+   "valid_from": "1990-09-01",
+   "first_held": "1990-09-30",
+   "earliest_record": "1990-09-30",
+   "est_votes": 40000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 10,
+     "term_years": 4,
+     "administered_by": "Országos Választási Bizottság",
+     "valid_to": "2014-01-01",
+     "source": "ovjt1990",
+     "locator": "https://njt.hu/jogszabaly/1990-64-00-00"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "alaptorveny",
+     "locator": "https://njt.hu/jogszabaly/2011-4301-02-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "1990-09-30",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Council results in each local-election bundle from 1990."
+    },
+    {
+     "platform": "Időközi választások (NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://vtr.valasztas.hu/ionk",
+     "first_date": "2015-01-01",
+     "finest": "hu.szavazokor",
+     "evidence": "By-elections called since 1 January 2015; current ones on the VTR service."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": " council$",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-09-30",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "source": "ovjt1990"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "source": "ovjt2010"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 3177,
+     "seats": 16735,
+     "note": "Counted as one council per unit; seats exclude the mayors.",
+     "source": "nvi_onk2024",
+     "quote": "onkTelepulesiMandatumok.json: 3,177 settlements and Budapest districts; testLetszam sums to 16,735 (1,586 ward and 621 compensation seats in the 166 units over 10,000)"
+    }
+   ]
+  },
+  {
+   "key": "helyi_nepszavazas",
+   "tier": "telepules",
+   "name": "Helyi népszavazás",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Ordered by a municipal or county council, on its own motion or on a citizens' initiative (Nsztv. Part III); includes the rare county referendums.",
+   "source": "nsztv2013",
+   "first_held": "1990-09-01",
+   "earliest_record": "1999-01-01",
+   "est_votes": 2000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Helyi népszavazások (NVI)",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_helyi_nepszavazas",
+     "url": "https://www.valasztas.hu/teruleti-es-helyi-nepszavazasok",
+     "first_date": "1999-01-01",
+     "finest": "hu.telepules",
+     "evidence": "One page per year from 1999 to 2024 listing each local referendum and its result."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "schemes": [
+      "hu.telepules",
+      "hu.megye"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "note": "Span start: the office lists local referendums by year from 1999; not yet counted.",
+     "source": "nvi_helyi_nepszavazas",
+     "through": "2026-11-16"
+    }
+   ]
+  },
+  {
+   "key": "nemz_telepulesi",
+   "tier": "nemzetiseg",
+   "name": "Települési nemzetiségi önkormányzati képviselők választása",
+   "name_en": "Settlement nationality self-government elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Voters on the nationality register of a settlement elect its nationality self-government by block vote; held only where enough voters register (minority self-governments 1994–2010 under Act LXXVII of 1993, nationality self-governments since 2014 under Act CLXXIX of 2011).",
+   "source": "nek2011",
+   "valid_from": "1994-01-01",
+   "first_held": "1994-12-11",
+   "earliest_record": "1994-12-11",
+   "est_votes": 2000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "nek2011",
+     "locator": "https://njt.hu/jogszabaly/2011-179-00-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "2019-10-13",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Separate nationality bundles for 2019 and 2024; earlier nationality results are inside the local-election bundles."
+    },
+    {
+     "platform": "Időközi nemzetiségi választások (NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://vtr.valasztas.hu/inemz",
+     "first_date": "2015-01-01",
+     "finest": "hu.telepules",
+     "evidence": "Nationality by-elections called since 1 January 2015."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "name_pattern": " self-government of ",
+     "valid_from": "1994-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-11",
+     "election_kind": "local",
+     "source": "nektv1993"
+    },
+    {
+     "date": "1998-10-18",
+     "election_kind": "local",
+     "source": "nektv1993"
+    },
+    {
+     "date": "2002-10-20",
+     "election_kind": "local",
+     "source": "nektv1993"
+    },
+    {
+     "date": "2006-10-01",
+     "election_kind": "local",
+     "source": "nektv1993"
+    },
+    {
+     "date": "2010-10-03",
+     "election_kind": "local",
+     "source": "nektv1993"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "source": "nek2011"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "source": "nek2011"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 2147,
+     "note": "2,722 called, 2,147 held.",
+     "source": "nvi_onk2024",
+     "quote": "NemzVal.json, Összesen: kituzott_tel_db 2722, megtarthato_tel_db 2147"
+    }
+   ]
+  },
+  {
+   "key": "nemz_teruleti",
+   "tier": "nemzetiseg",
+   "name": "Területi nemzetiségi önkormányzati képviselők választása",
+   "name_en": "Territorial (county) nationality self-government elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hu.megye"
+    ],
+    "fine": [
+     "hu.telepules",
+     "hu.szavazokor"
+    ]
+   },
+   "note": "Elected by the settlement representatives as electors in 2007 and 2011; directly from county lists of registered voters since 2014.",
+   "source": "nek2011",
+   "valid_from": "2014-01-01",
+   "first_held": "2014-10-12",
+   "earliest_record": "2019-10-13",
+   "est_votes": 1000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "nek2011",
+     "locator": "https://njt.hu/jogszabaly/2011-179-00-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "2019-10-13",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Separate nationality bundles for 2019 and 2024; earlier nationality results are inside the local-election bundles."
+    },
+    {
+     "platform": "Időközi nemzetiségi választások (NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://vtr.valasztas.hu/inemz",
+     "first_date": "2015-01-01",
+     "finest": "hu.telepules",
+     "evidence": "Nationality by-elections called since 1 January 2015."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "name_pattern": " self-government of ",
+     "valid_from": "2014-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "source": "nek2011"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "source": "nek2011"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 64,
+     "note": "68 called, 64 held.",
+     "source": "nvi_onk2024",
+     "quote": "NemzVal.json, Összesen: kituzott_ter_db 68, megtarthato_ter_db 64"
+    }
+   ]
+  },
+  {
+   "key": "nemz_orszagos",
+   "tier": "nemzetiseg",
+   "name": "Országos nemzetiségi önkormányzati képviselők választása",
+   "name_en": "National nationality self-government elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "hu.telepules"
+    ],
+    "fine": [
+     "hu.szavazokor"
+    ]
+   },
+   "note": "One national list contest per nationality (13). Elected by electors 1995–2011; directly since 2014.",
+   "source": "nek2011",
+   "valid_from": "2014-01-01",
+   "first_held": "2014-10-12",
+   "earliest_record": "2019-10-13",
+   "est_votes": 1000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "day_rule": "October 2014 and 2019; since 2024 on the day of the European Parliament election, in April to July (Alaptörvény Art. 35(2))",
+     "administered_by": "Nemzeti Választási Iroda",
+     "valid_from": "2014-01-01",
+     "source": "nek2011",
+     "locator": "https://njt.hu/jogszabaly/2011-179-00-00"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Korábbi választások feldolgozható adatai (NVI)",
+     "url": "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip",
+     "format": "zip of pipe-separated text, csv, xls, and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_archive",
+     "first_date": "2019-10-13",
+     "last_date": "2024-06-09",
+     "finest": "hu.szavazokor",
+     "evidence": "Separate nationality bundles for 2019 and 2024; earlier nationality results are inside the local-election bundles."
+    },
+    {
+     "platform": "Időközi nemzetiségi választások (NVI)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "Free reuse without alteration, with the source named (valasztas.hu impresszum)",
+     "source": "nvi_idokozi",
+     "url": "https://vtr.valasztas.hu/inemz",
+     "first_date": "2015-01-01",
+     "finest": "hu.telepules",
+     "evidence": "Nationality by-elections called since 1 January 2015."
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "^National .* self-government$",
+     "valid_from": "2014-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2014-10-12",
+     "election_kind": "local",
+     "contests": 13,
+     "source": "nek2011"
+    },
+    {
+     "date": "2019-10-13",
+     "election_kind": "local",
+     "contests": 13,
+     "source": "nek2011"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 13,
+     "seats": 299,
+     "source": "nvi_onk2024",
+     "quote": "NemzVal.json, Összesen: kituzott_orsz_db 13, megtarthato_orsz_db 13, mandatum 299"
+    }
+   ]
+  },
+  {
+   "key": "orszaggyules_kiralysag",
+   "tier": "kiralysag",
+   "name": "Országgyűlési (képviselőházi és nemzetgyűlési) választások 1848–1939",
+   "name_en": "Diet, House of Representatives, and National Assembly elections, 1848–1939",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Census-suffrage elections to the lower house of the diet from 1848 (413 constituencies from 1875), then the National Assembly of 1920 and 1922 and the House of Representatives of 1926–1939, partly by open ballot. Elections ran over several days; dates are the month the voting began. Constituency returns are in the Parliament's almanacs and, from 1920, KSH's election statistics volumes.",
+   "source": "parlament",
+   "valid_from": "1848-04-11",
+   "valid_to": "1944-12-21",
+   "first_held": "1848-06-01",
+   "est_votes": 25000000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "KSH Könyvtár (Hungaricana)",
+     "url": "https://library.hungaricana.hu/hu/collection/KSH/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1920-01-25",
+     "evidence": "Scanned KSH election statistics volumes with constituency returns; no machine-readable file.",
+     "source": "ksh_valasztas_hist"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "valid_to": "1944-12-21"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1848-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1861-03-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1865-11-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1869-03-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1872-07-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1875-07-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1878-07-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1881-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1884-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1887-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1892-01-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1896-10-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1901-10-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1905-01-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1906-04-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1910-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1920-01-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1922-05-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1926-12-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1931-06-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1935-03-01",
+     "precision": "month",
+     "source": "parlament"
+    },
+    {
+     "date": "1939-05-01",
+     "precision": "month",
+     "source": "parlament"
+    }
+   ]
+  },
+  {
+   "key": "felsohaz",
+   "tier": "kiralysag",
+   "name": "Felsőház",
+   "name_en": "Upper House",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "parlament",
+   "valid_from": "1927-01-01",
+   "valid_to": "1945-01-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Members sat by birth, office, or appointment, or were chosen by county and municipal assemblies and professional bodies; no popular vote.",
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "body_kinds": [
+      "upper_house"
+     ],
+     "valid_to": "1945-01-01"
+    }
+   ]
+  },
+  {
+   "key": "torvenyhatosag",
+   "tier": "kiralysag",
+   "name": "Törvényhatósági és községi választások",
+   "name_en": "County, municipal, and village assembly elections before 1950",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Half of each county and municipal committee (törvényhatósági bizottság) sat by virtue of paying the most tax (virilisták); the other half was elected by constituency.",
+   "source": "parlament",
+   "valid_from": "1870-01-01",
+   "valid_to": "1950-10-22",
+   "disposition": "blocked",
+   "disposition_reason": "Each county and town ran its own elections and no national compilation of returns by an official body is known; returns survive only in county archives.",
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "valid_to": "1950-01-01"
+    }
+   ]
+  },
+  {
+   "key": "nemzetgyules_1945",
+   "tier": "atmenet",
+   "name": "Nemzetgyűlési és országgyűlési választás 1945, 1947",
+   "name_en": "National Assembly elections of 1945 and 1947",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "List PR in county constituencies plus a national list; 409 seats in 1945 and 411 in 1947.",
+   "source": "parlament",
+   "valid_from": "1944-12-21",
+   "valid_to": "1949-05-01",
+   "first_held": "1945-11-04",
+   "est_votes": 9500000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "KSH Könyvtár (Hungaricana)",
+     "url": "https://library.hungaricana.hu/hu/collection/KSH/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1945-11-04",
+     "evidence": "Scanned KSH election statistics with settlement returns.",
+     "source": "ksh_valasztas_hist"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "valid_from": "1944-12-21",
+     "valid_to": "1949-05-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1945-11-04",
+     "seats": 409,
+     "source": "parlament"
+    },
+    {
+     "date": "1947-08-31",
+     "seats": 411,
+     "source": "parlament"
+    }
+   ]
+  },
+  {
+   "key": "ogy_nepkoztarsasag",
+   "tier": "nepkoztarsasag",
+   "name": "Országgyűlési választások a Népköztársaságban",
+   "name_en": "National Assembly elections of the People's Republic",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single Patriotic People's Front list in 1949 and 1953 (county lists), single-member constituencies from 1967 with one nominee in most, and compulsory multiple nomination in 1985 with second rounds.",
+   "source": "alkotmany1949",
+   "valid_from": "1949-05-01",
+   "valid_to": "1990-01-01",
+   "first_held": "1949-05-15",
+   "est_votes": 63000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "KSH Könyvtár (Hungaricana)",
+     "url": "https://library.hungaricana.hu/hu/collection/KSH/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1949-05-15",
+     "evidence": "National and county totals in KSH yearbooks; constituency returns from 1967 in scans.",
+     "source": "ksh_valasztas_hist"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "valid_from": "1949-05-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1949-05-15",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1953-05-17",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1958-11-16",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1963-02-24",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1967-03-19",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1971-04-25",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1975-06-15",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1980-06-08",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1985-06-08",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1985-06-22",
+     "election_kind": "runoff",
+     "note": "Second round where no candidate won a majority on 8 June.",
+     "source": "alkotmany1949"
+    }
+   ]
+  },
+  {
+   "key": "tanacs",
+   "tier": "nepkoztarsasag",
+   "name": "Tanácsválasztások",
+   "name_en": "Council elections of the People's Republic",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "County, town, district, and village councils elected on Patriotic People's Front nominations, usually on the same day as the parliamentary election from 1958.",
+   "source": "alkotmany1949",
+   "valid_from": "1950-01-01",
+   "valid_to": "1990-01-01",
+   "first_held": "1950-10-22",
+   "est_votes": 60000000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "KSH Könyvtár (Hungaricana)",
+     "url": "https://library.hungaricana.hu/hu/collection/KSH/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1950-10-22",
+     "evidence": "National and county totals only.",
+     "source": "ksh_valasztas_hist"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "HU",
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "valid_from": "1950-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1950-10-22",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1953-11-22",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1958-11-16",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1963-02-24",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1967-03-19",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1971-04-25",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1975-06-15",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1980-06-08",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    },
+    {
+     "date": "1985-06-08",
+     "election_kind": "local",
+     "source": "alkotmany1949"
+    }
+   ]
+  }
+ ]
+}
