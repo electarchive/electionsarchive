@@ -556,6 +556,8 @@ CHECKS = {
                               join all_contest_option o on o.id = v.option_id
                               where o.contest_id <> r.contest_id""",
     "fact.party_color": "select party_id, color from party_color where not regexp_full_match(color, '#[0-9a-f]{6}')",
+    "fact.note_kind": """select id, kind from note
+                         where kind not in ('context', 'caveat', 'methodology', 'editorial', 'retired')""",
     "accounting.votes_valid": """with v as (
                                    select v.result_set_id, v.unit_id,
                                           sum(value) filter (where measure = 1 and option_id is not null) as votes,
