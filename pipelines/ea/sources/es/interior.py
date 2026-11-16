@@ -1744,8 +1744,8 @@ REASONS = {
         "stored as printed."
     ),
     "accounting.declared": (
-        "{n} of the ministry's constituency totals differ from the sums of its own unit-level files, which count the "
-        "census and late corrections differently; both are stored as printed."
+        "{n} of the ministry's constituency totals differ from the sums of its own unit-level figures in the same "
+        "files; both are stored as printed."
     ),
     "outcomes.seats_magnitude": (
         "In {n} contests the seats the ministry declares for the lists do not add up to the seats of the body in the "
