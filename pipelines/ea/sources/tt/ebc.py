@@ -1,0 +1,864 @@
+import csv
+import functools
+import re
+import subprocess
+import time
+from collections import Counter
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from datetime import date
+from typing import NamedTuple
+from uuid import uuid5
+
+import fastexcel
+import httpx
+
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Package
+
+SOURCE = "tt.ebc"
+SITE = "https://ebctt.com"
+UPLOADS = f"{SITE}/wp-content/uploads"
+TRINIDAD = str(uuid5(package.NAMESPACE, "polity\x1fTT"))
+PUBLISHER = "Elections and Boundaries Commission of Trinidad and Tobago"
+REGISTERED, BALLOTS, VALID, INVALID, VOTES = 2, 3, 4, 5, 1
+
+HISTORY = f"{SITE}/wp-content/plugins/charts/data/parliamentary-results.tsv"
+RESULTS_2015 = f"{UPLOADS}/2015-Parliamentary-Elections-Final-Results-and-CandiatesVote-Count.pdf"
+PARTY_2015 = f"{UPLOADS}/Results-of-the-Parliamentary-Election-Held-on-Monday-7th-September-2015-Political-Party.xlsx"
+SUMMARY_2020 = f"{UPLOADS}/The-Preliminary-Results-for-the-2020-Parliamentary-Elections.pdf"
+REPORT_2025 = f"{UPLOADS}/Parliamentary_Elections_Report_2025_20260713_secured.pdf"
+FILES = {
+    HISTORY: ".tsv",
+    RESULTS_2015: ".pdf",
+    PARTY_2015: ".xlsx",
+    SUMMARY_2020: ".pdf",
+    REPORT_2025: ".pdf",
+}
+DAYS = {
+    1946: date(1946, 7, 1),
+    1956: date(1956, 9, 24),
+    1961: date(1961, 12, 4),
+    1966: date(1966, 11, 7),
+    1971: date(1971, 5, 24),
+    1976: date(1976, 9, 13),
+    1981: date(1981, 11, 9),
+    1986: date(1986, 12, 15),
+    1991: date(1991, 12, 16),
+    1995: date(1995, 11, 6),
+    2000: date(2000, 12, 11),
+    2001: date(2001, 12, 10),
+    2002: date(2002, 10, 7),
+    2007: date(2007, 11, 5),
+    2010: date(2010, 5, 24),
+    2015: date(2015, 9, 7),
+    2020: date(2020, 8, 10),
+    2025: date(2025, 4, 28),
+}
+COUNCIL = {1946, 1956}
+FULL = {2015, 2020, 2025}
+# Party abbreviations that mean a different party in different decades.
+SPLIT = {("P.D.P.", 1956): "PDP56"}
+PARTIES = {
+    "A.P.P.": "All People's Party",
+    "C.A.R.M.": "Class Action Reform Movement",
+    "C.O.P.": "Congress of the People",
+    "D.P.T.": "Democratic Party of Trinidad and Tobago",
+    "I.D.A.": "Innovative Democratic Alliance",
+    "I.L.P.": "Independent Liberal Party",
+    "M.N.D.": "Movement for National Development",
+    "M.S.J.": "Movement for Social Justice",
+    "N.C.T.": "National Coalition for Transformation",
+    "N.N.V.": "New National Vision",
+    "N.O.W.": "National Organisation of We The People",
+    "N.T.A.": "National Transformation Alliance",
+    "O.T.V.": "One Tobago Voice",
+    "P.D.P.": "Progressive Democratic Patriots",
+    "P.E.P.": "Progressive Empowerment Party",
+    "P.F.": "Patriotic Front",
+    "P.N.M.": "People's National Movement",
+    "P.P.": "Progressive Party",
+    "T.D.F.": "Trinidad and Tobago Democratic Front",
+    "T.H.C.": "Trinidad Humanity Campaign",
+    "T.H.M.": "The Hyarima Movement",
+    "T.N.P.": "The National Party",
+    "T.P.P.": "Tobago People's Party",
+    "U.N.C.": "United National Congress",
+    "U.P.P.": "Unrepresented Peoples Party",
+    "U.T.P.": "Unity of The People",
+}
+
+
+def fetch() -> None:
+    for url, suffix in FILES.items():
+        for attempt in range(6):
+            try:
+                raw.fetch(SOURCE, url, suffix=suffix)
+                break
+            except httpx.HTTPError:
+                if attempt == 5:
+                    raise
+                time.sleep(3 * (attempt + 1))
+
+
+def key(kind: str, *parts: object) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+def area(code: str) -> str:
+    return key("area", "tt.constituency", code)
+
+
+def norm(text: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", text.upper())
+
+
+def title(text: str) -> str:
+    words = re.sub(r"\s+", " ", text.strip()).title()
+    for small in ("Of", "And"):
+        words = words.replace(f"-{small}-", f"-{small.lower()}-")
+    return re.sub(r"\bMc ([A-Z])", r"Mc\1", words.replace("'S", "'s"))
+
+
+def party_code(code: str, year: int) -> str:
+    return SPLIT.get((code, year), re.sub(r"[^A-Z0-9]", "", code.upper()))
+
+
+def number(text: str) -> int:
+    return int(text.replace(",", ""))
+
+
+@dataclass
+class Candidate:
+    name: str | None
+    party: str | None
+    votes: int | None
+    independent: bool = False
+    label: str | None = None
+
+
+@dataclass
+class Station:
+    code: str
+    special: bool
+    venue: str
+    votes: list[int]
+    valid: int
+    rejected: int
+    registered: int
+
+
+@dataclass
+class District:
+    name: str
+    registered: int | None
+    valid: int | None
+    rejected: int | None
+    ballots: int | None
+    candidates: list[Candidate]
+    winner: int
+    stations: list[Station] = field(default_factory=list)
+    declared: dict[str, int] = field(default_factory=dict)
+
+
+class Event(NamedTuple):
+    kind: str
+    name: str = ""
+    names: tuple[tuple[str, str], ...] = ()
+    code: str = ""
+    special: bool = False
+    venue: str = ""
+    numbers: tuple[int, ...] = ()
+
+
+@dataclass
+class Work:
+    """A district's polling station tables while the report is being read."""
+
+    name: str
+    names: list[tuple[str, str]]
+    stations: list[Event]
+    total: list[int]
+
+
+@dataclass
+class Election:
+    year: int
+    districts: list[District]
+    totals: dict[str, int] = field(default_factory=dict)
+    sources: list[str] = field(default_factory=list)
+    stage: str = "official"
+
+
+def _text(url: str) -> str:
+    path = raw.cached(SOURCE, url).path
+    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def _winner(candidates: list[Candidate]) -> int:
+    votes = [c.votes or 0 for c in candidates]
+    top = max(votes)
+    if votes.count(top) != 1:
+        raise ValueError(f"no single leader in {votes}")
+    return votes.index(top)
+
+
+def history() -> dict[int, Election]:
+    """Winners and turnout figures per constituency, 1946 to 2010, from the commission's historical district data."""
+    elections: dict[int, Election] = {}
+    path = raw.cached(SOURCE, HISTORY).path
+    with path.open(encoding="utf-8") as file:
+        for row in csv.DictReader(file, delimiter="\t"):
+            year = int(row["year"])
+            if year in FULL:
+                continue
+            party = row["party"].strip()
+            elected = Candidate(
+                re.sub(r"\s+", " ", row["candidate"]).strip(),
+                None if party in {"n.a.", "IND", "IND."} else party,
+                None,
+                independent=party in {"IND", "IND."},
+            )
+            elections.setdefault(year, Election(year, [], sources=[HISTORY])).districts.append(
+                District(
+                    title(row["district"].replace(" / ", "/")),
+                    number(row["electors"]),
+                    number(row["accepted"]),
+                    number(row["rejected"]),
+                    None,
+                    [elected],
+                    0,
+                )
+            )
+    return elections
+
+
+def _station_rows(lines: list[str]) -> Iterator[Event]:
+    parties = re.compile(r"^(?:[A-Z]+\.)+$")
+    digits = r"\d[\d,]*"
+    row = re.compile(r"^\s*(\*?)(\d{3,4}(?:-\d+)?)\s{2,}(\S.*?)\s{2,}((?:" + digits + r"\s+)*" + digits + r")\s*$")
+    total = re.compile(r"^TOTAL\s+((?:" + digits + r"\s+)*" + digits + r")\s*$")
+    start = next(
+        i
+        for i, line in enumerate(lines)
+        if re.search(r"Elections?\b.*House.*APPENDIX II\s*$", line)
+        and "Electoral District of" in "".join(lines[i : i + 3])
+    )
+    current: str | None = None
+    names: list[tuple[str, str]] = []
+    segment: list[str] = []
+    heading = False
+    for index in range(start, len(lines)):
+        line = lines[index]
+        if re.search(r"APPENDIX III\b", line) and "Elections" in line:
+            break
+        if re.search(r"^\s*Elections?\b.*House.*APPENDIX II\s*$", line):
+            following = next(text for text in lines[index + 1 :] if text.strip())
+            found = re.search(r"Electoral District of (.+?)\s*$", following)
+            if found is None:
+                break
+            current = found.group(1).strip()
+            names, segment, heading = [], [], True
+            yield Event("district", name=current)
+            continue
+        if current is None:
+            continue
+        if heading:
+            text = line.strip()
+            if row.match(line):
+                heading = False
+                yield Event("candidates", names=tuple(names))
+            elif (
+                not text
+                or text.startswith(("NO. OF VOTES", "POLLING", "STATION", "NUMBER", "TOTAL", "Electoral District of"))
+                or "POLLING STATION ADDRESS" in text
+            ):
+                continue
+            elif parties.match(text):
+                names.append((" ".join(segment), text))
+                segment = []
+                continue
+            else:
+                segment.append(text)
+                continue
+        found_row = row.match(line)
+        if found_row:
+            special, code, venue, figures = found_row.groups()
+            yield Event(
+                "station",
+                code=code,
+                special=special == "*",
+                venue=venue,
+                numbers=tuple(number(figure) for figure in figures.split()),
+            )
+            continue
+        found_total = total.match(line)
+        if found_total:
+            yield Event("total", numbers=tuple(number(figure) for figure in found_total.group(1).split()))
+
+
+def election_2025() -> Election:
+    lines = _text(REPORT_2025).splitlines()
+    summary: dict[str, tuple[int, int, int, int, str, str]] = {}
+    head = next(i for i, line in enumerate(lines) if "APPENDIX I" in line and "Elections to the House" in line)
+    for line in lines[head : head + 150]:
+        found = re.match(
+            r"^([A-Z][A-Z'./\- ]+?)\s{2,}([\d,]+)\s+([\d,]+)\s+(\d+)\s+([\d,]+)\s{2,}(.+?)\s{2,}((?:[A-Z]+\.)+)\s*$",
+            line,
+        )
+        if found:
+            name, registered, valid, rejected, cast, winner, party = found.groups()
+            summary[norm(name)] = (number(registered), number(valid), number(rejected), number(cast), winner, party)
+    totals_line = re.compile(r"^\s*TOTAL\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$")
+    grand = next(found for line in lines[head : head + 200] if (found := totals_line.match(line)))
+    districts: list[District] = []
+    work = Work("", [], [], [])
+    done = True
+    for event in _station_rows(lines):
+        if event.kind == "district":
+            if done or work.name != event.name:
+                work = Work(event.name, [], [], [])
+                done = False
+        elif event.kind == "candidates":
+            if not work.names:
+                work.names = list(event.names)
+        elif event.kind == "station":
+            work.stations.append(event)
+        else:
+            work.total = list(event.numbers)
+            districts.append(_district_2025(work, summary))
+            done = True
+    if len(districts) != len(summary):
+        raise ValueError(f"{len(districts)} districts in the polling station tables, {len(summary)} in the summary")
+    return Election(
+        2025,
+        districts,
+        {
+            "registered": number(grand.group(1)),
+            "valid": number(grand.group(2)),
+            "rejected": number(grand.group(3)),
+            "ballots": number(grand.group(4)),
+        },
+        [REPORT_2025],
+    )
+
+
+def _district_2025(work: Work, summary: dict[str, tuple[int, int, int, int, str, str]]) -> District:
+    name, names, total = work.name, work.names, work.total
+    stations: list[Station] = []
+    width = len(names) + 3
+    for data in work.stations:
+        figures = list(data.numbers)
+        if len(figures) != width:
+            raise ValueError(f"{name} station {data.code}: {len(figures)} figures for {len(names)} candidates")
+        stations.append(
+            Station(
+                data.code,
+                data.special,
+                data.venue,
+                figures[: len(names)],
+                figures[-3],
+                figures[-2],
+                figures[-1],
+            )
+        )
+    for column in range(width):
+        if sum(s_figures(s, len(names))[column] for s in stations) != total[column]:
+            raise ValueError(f"{name}: column {column} of the polling stations disagrees with the printed total")
+    registered, valid, rejected, ballots, winner, party = summary[norm(name)]
+    if [total[-1], total[-3], total[-2], total[-3] + total[-2]] != [registered, valid, rejected, ballots]:
+        raise ValueError(f"{name}: printed district total disagrees with the summary")
+    candidates = []
+    for label, code in names:
+        surname, _, given = label.partition(",")
+        candidates.append(
+            Candidate(
+                f"{given.strip()} {surname.strip()}".strip(),
+                None if code == "IND." else code,
+                None,
+                independent=code == "IND.",
+                label=label,
+            )
+        )
+    for index, candidate in enumerate(candidates):
+        candidate.votes = total[index]
+    leader = _winner(candidates)
+    if norm(candidates[leader].name or "") != norm(winner) or (candidates[leader].party or "IND.") != party:
+        raise ValueError(f"{name}: declared winner {winner} is not the leader {candidates[leader].name}")
+    return District(
+        title(name), registered, valid, rejected, ballots, candidates, leader, stations, {"ballots": ballots}
+    )
+
+
+def s_figures(station: Station, width: int) -> list[int]:
+    return [*station.votes, station.valid, station.rejected, station.registered]
+
+
+def election_2020() -> Election:
+    lines = _text(SUMMARY_2020).splitlines()
+    header: list[tuple[str, float]] | None = None
+    districts: list[District] = []
+    columns: Counter[str] = Counter()
+    grand: tuple[dict[str, int], int, int] | None = None
+    for line in lines:
+        if "DISTRICT WITH ELECTORATE" in line:
+            header = None
+            continue
+        if header is None and re.search(r"\bCOP\b.*\bGrand Total\b", line):
+            squeezed = line.replace("Grand Total", "Grand_Total")
+            header = [(found.group(), (found.start() + found.end()) / 2) for found in re.finditer(r"\S+", squeezed)]
+            continue
+        if header is None:
+            continue
+        found = re.match(r"^(\S.*?) - (\d+)\s{2,}(.*)$", line) or re.match(r"^(Grand Total)()\s{2,}(.*)$", line)
+        if not found:
+            continue
+        name, registered, rest = found.groups()
+        offset = len(line) - len(rest)
+        figures = [(t.group(), offset + (t.start() + t.end()) / 2) for t in re.finditer(r"[\d,]+", rest)]
+        cells: dict[str, int] = {}
+        for text, center in figures[:-2]:
+            column = min(header[:-2], key=lambda item: abs(item[1] - center))[0]
+            if column in cells:
+                raise ValueError(f"{name}: two figures under {column}")
+            cells[column] = number(text)
+        rejected, ballots = number(figures[-2][0]), number(figures[-1][0])
+        if sum(cells.values()) + rejected != ballots:
+            raise ValueError(f"{name}: parties and rejected ballots do not add up to the grand total")
+        if name == "Grand Total":
+            grand = (cells, rejected, ballots)
+            continue
+        candidates = [
+            Candidate(
+                None,
+                None if column.startswith("IN") else column,
+                votes,
+                independent=column.startswith("IN"),
+                label=f"Independent {column[2:]}" if column.startswith("IN") else None,
+            )
+            for column, votes in cells.items()
+        ]
+        columns.update(cells)
+        districts.append(
+            District(
+                title(name),
+                int(registered),
+                sum(cells.values()),
+                rejected,
+                ballots,
+                candidates,
+                _winner(candidates),
+            )
+        )
+    if grand is None or dict(columns) != grand[0] or sum(d.rejected or 0 for d in districts) != grand[1]:
+        raise ValueError("2020 districts disagree with the printed grand total")
+    return Election(
+        2020,
+        districts,
+        {
+            "valid": grand[2] - grand[1],
+            "rejected": grand[1],
+            "ballots": grand[2],
+            "registered": sum(d.registered or 0 for d in districts),
+        },
+        [SUMMARY_2020],
+        "preliminary",
+    )
+
+
+def election_2015() -> Election:
+    reader = fastexcel.read_excel(str(raw.cached(SOURCE, PARTY_2015).path))
+    rows = reader.load_sheet(0, header_row=None).to_polars().rows()
+    heading = rows[3]
+    columns = {c: str(heading[c]).strip() for c in range(6, len(heading)) if heading[c] and str(heading[c]).strip()}
+    declared: dict[int, tuple[str, int, int, int, int, dict[str, int]]] = {}
+    totals: dict[str, int] = {}
+    for row in rows[6:]:
+        if not row[0]:
+            continue
+        found = re.match(r"^\s*(\d+)\s*\.\s*(.+)$", str(row[0]))
+        if found:
+            declared[int(found.group(1))] = (
+                found.group(2).strip(),
+                int(row[1]),
+                int(row[2]),
+                int(row[4]),
+                int(row[5]),
+                {columns[c]: int(row[c]) for c in columns if row[c] not in (None, "")},
+            )
+        elif str(row[0]).strip() == "TOTAL":
+            totals = {"registered": int(row[1]), "ballots": int(row[2]), "rejected": int(row[4]), "valid": int(row[5])}
+    named: dict[int, list[Candidate]] = {}
+    current = 0
+    line_pattern = re.compile(r"^(.*?)\s{2,}([A-Z][A-Z.]*\.)\s+([\d,]+)\s+([\d.]+)%")
+    for line in _text(RESULTS_2015).splitlines():
+        start = re.match(r"^\s{0,12}(\d{1,2})\s*\.\s*[A-Z]", line)
+        if start:
+            current = int(start.group(1))
+            named.setdefault(current, [])
+        found = line_pattern.match(line)
+        if found and current:
+            who = re.split(r"\s{2,}", found.group(1).strip())[-1].strip()
+            named[current].append(Candidate(who, found.group(2), number(found.group(3))))
+    districts: list[District] = []
+    for index, (name, registered, ballots, rejected, valid, votes) in sorted(declared.items()):
+        candidates = named.get(index, [])
+        have = Counter()
+        for candidate in candidates:
+            have[candidate.party or ""] += candidate.votes or 0
+        for party, count in votes.items():
+            if have[party] == 0 and count:
+                # Y.O.U.R. Party's label wraps onto two lines in the commission's PDF, so the line is missed.
+                missing = Candidate(MISSING.get((index, party)), party, count)
+                candidates.append(missing)
+                have[party] += count
+        if dict(have) != votes or sum(votes.values()) != valid:
+            raise ValueError(f"2015 district {index} {name}: candidate lines disagree with the party sheet")
+        for candidate in candidates:
+            if candidate.party == "IND.":
+                candidate.independent, candidate.party = True, None
+        districts.append(District(title(name), registered, valid, rejected, ballots, candidates, _winner(candidates)))
+    return Election(2015, districts, totals, [RESULTS_2015, PARTY_2015])
+
+
+MISSING = {(29, "Y.O.U.R."): "Judith De Verteuil"}
+
+
+@functools.cache
+def elections() -> dict[int, Election]:
+    found = history()
+    found[2015] = election_2015()
+    found[2020] = election_2020()
+    found[2025] = election_2025()
+    for election in found.values():
+        keys = [norm(d.name) for d in election.districts]
+        if len(keys) != len(set(keys)):
+            raise ValueError(f"{election.year} repeats a district name")
+    return dict(sorted(found.items()))
+
+
+def packages() -> list[str]:
+    return [
+        "tt.ebc/geo",
+        "tt.ebc/registry",
+        *(f"tt.ebc/{day}" for day in DAYS.values()),
+    ]
+
+
+def parse() -> None:
+    geo().write()
+    registry().write()
+    for year in elections():
+        general(year).write()
+
+
+def emit() -> None:
+    package.run("load", packages())
+
+
+METHODS = {
+    "history": (
+        "From the commission's historical district profile data, which gives each constituency's electors, accepted "
+        "(valid) votes, rejected ballots, and the elected candidate with their party. Candidates who lost and the "
+        "votes of the winner are not in that file, so the result set holds the registered, valid, and invalid "
+        "counts and the winner only. The file's turnout column mixes two formulas between years, so it is not stored."
+    ),
+    2015: (
+        "From the commission's final results of the 7 September 2015 election: a sheet of votes by party for each "
+        "electoral district, and a table of each candidate's votes. The two agree in every district. Registered "
+        "voters are the electorate, ballots cast are valid plus rejected ballots, and the winner is the candidate "
+        "with most votes."
+    ),
+    2020: (
+        "From the commission's published preliminary results summary of the 10 August 2020 election, which gives "
+        "each electoral district's votes for each party, with independent candidates as IN1 to IN4, and rejected "
+        "ballots. It does not name the candidates, so options are labelled by party, and the winner is the "
+        "option with most votes. Its district electorate and rejected ballots are stored; ballots cast is the "
+        "summary's grand total. The commission's final report for the election is a scanned document that is not "
+        "yet digitized."
+    ),
+    2025: (
+        "From the commission's report on the 28 April 2025 election, Appendix II, which gives each candidate's votes "
+        "at each polling station (division) with its valid votes, rejected ballots, and electorate. The station "
+        "figures sum to the district totals the report prints and to the district summary in Appendix I, which "
+        "also names the declared winner. Stations marked with an asterisk held the ballots of special electors."
+    ),
+}
+
+
+def _label(year: int) -> str:
+    return f"{year} Trinidad and Tobago {'Legislative Council' if year in COUNCIL else 'parliamentary'} election"
+
+
+def geo() -> Package:
+    p = Package(
+        "tt.ebc/geo",
+        SOURCE,
+        "Trinidad and Tobago's electoral districts (constituencies) by name, with the polling stations of each "
+        "election as reporting units, from the Elections and Boundaries Commission",
+    )
+    p.external.add(TRINIDAD)
+    p.add("scheme", code="tt.constituency", polity_id=TRINIDAD, kind="electoral_district", rank=1, noun="constituency")
+    p.add("scheme", code="tt.polling_station", polity_id=TRINIDAD, kind="precinct", rank=2, noun="polling station")
+    seen: dict[str, str] = {}
+    for election in elections().values():
+        for district in election.districts:
+            seen[norm(district.name)] = district.name
+    for code, name in sorted(seen.items()):
+        id = area(code)
+        p.add("area", id=id, scheme_code="tt.constituency")
+        p.add("area_code", area_id=id, code=code)
+        p.name(id, name, "en", "official")
+    return p
+
+
+BODY = key("body", "house")
+COUNCIL_BODY = key("body", "council")
+SOURCE_ID = key("source", SOURCE)
+SYSTEM = key("electoral_system", "fptp")
+
+
+def registry() -> Package:
+    p = Package(
+        "tt.ebc/registry",
+        SOURCE,
+        "Trinidad and Tobago's House of Representatives and Legislative Council, the plurality system, the "
+        "commission as a source, and the parties that contested parliamentary elections",
+        depends=["tt.ebc/geo"],
+    )
+    p.external.add(TRINIDAD)
+    p.add(
+        "source",
+        id=SOURCE_ID,
+        kind="official_body",
+        publisher=PUBLISHER,
+        title="Parliamentary election results",
+        url=SITE,
+        license="Official public record, no license stated",
+        attribution=PUBLISHER,
+    )
+    for file in FILES:
+        p.artifact(raw.cached(SOURCE, file), SOURCE_ID)
+    p.add("body", id=BODY, polity_id=TRINIDAD, kind="lower_house")
+    p.name(BODY, "House of Representatives", "en", "official")
+    p.add("body", id=COUNCIL_BODY, polity_id=TRINIDAD, kind="unicameral")
+    p.name(COUNCIL_BODY, "Legislative Council", "en", "official")
+    p.add(
+        "electoral_system",
+        id=SYSTEM,
+        polity_id=TRINIDAD,
+        valid_from=None,
+        valid_to=None,
+        rules={"formula": "fptp"},
+        rules_version=1,
+    )
+    p.name(SYSTEM, "Single-member plurality", "en", "official")
+    codes: dict[str, str] = {}
+    for year, election in elections().items():
+        for district in election.districts:
+            for candidate in district.candidates:
+                if candidate.party:
+                    codes[party_code(candidate.party, year)] = candidate.party
+    for code, text in sorted(codes.items()):
+        id = party(code)
+        p.add("party", id=id, kind="party", polity_id=TRINIDAD)
+        full = PARTIES.get(text)
+        p.name(id, full or text, "en", "official")
+        if full:
+            p.name(id, text, "en", "abbreviation", False)
+    return p
+
+
+def party(code: str) -> str:
+    return key("party", code)
+
+
+def general(year: int) -> Package:
+    election = elections()[year]
+    day = DAYS[year]
+    p = Package(
+        f"tt.ebc/{day}",
+        SOURCE,
+        f"The {year} Trinidad and Tobago "
+        f"{'Legislative Council' if year in COUNCIL else 'parliamentary'} election by "
+        f"{'polling station' if year == 2025 else 'constituency'}, from the Elections and Boundaries Commission",
+        depends=["tt.ebc/geo", "tt.ebc/registry"],
+    )
+    p.external.add(TRINIDAD)
+    for url in election.sources:
+        p.uses(raw.cached(SOURCE, url))
+    body = COUNCIL_BODY if year in COUNCIL else BODY
+    method = METHODS[year] if year in METHODS else METHODS["history"]
+    if year not in FULL:
+        p.accept(
+            "accounting.votes_valid",
+            "The commission's historical district data gives each constituency's valid votes and only the elected "
+            "candidate, without the votes of any candidate, so the options' votes cannot sum to the valid votes.",
+        )
+    first = key("election", day)
+    p.add("election", id=first, polity_id=TRINIDAD, kind="general", date_from=day, date_to=day, status="held")
+    p.name(first, _label(year), "en", "official")
+    path = f"tt/{day}-general"
+    p.add("slug", path=path, entity_id=first, is_current=True)
+    p.add("citation", id=key("citation", first), entity_id=first, source_id=SOURCE_ID, locator=None)
+    for district in election.districts:
+        code = norm(district.name)
+        contest = key("contest", day, code)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=first,
+            kind="body_seats",
+            body_id=body,
+            district_area_id=area(code),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, district.name, "en", "official")
+        p.add("slug", path=f"{path}/{slug(district.name)}", entity_id=contest, is_current=True)
+        result_set = key("result_set", day, code)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=first,
+            contest_id=contest,
+            stage=election.stage,
+            kind="counted",
+            source_id=SOURCE_ID,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        unit = key("unit", day, code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=TRINIDAD,
+            scheme_code="tt.constituency",
+            code=f"{day}:{code}",
+            parent_id=None,
+            area_relation="equals",
+            area_id=area(code),
+            kind="standard",
+        )
+        p.name(unit, district.name, "en", "official")
+        options: list[str] = []
+        for index, candidate in enumerate(district.candidates):
+            tag = f"{index}:{norm(candidate.name or candidate.label or candidate.party or '')}"
+            option = key("option", day, code, tag)
+            options.append(option)
+            label = candidate.label if candidate.name is None else (candidate.name)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party(party_code(candidate.party, year)) if candidate.party else None,
+                ballot_position=None,
+                ballot_label=label or candidate.party,
+            )
+            if candidate.name:
+                person = key("person", day, code, norm(candidate.name))
+                p.add("person", id=person)
+                p.name(person, title(candidate.name) if candidate.name.isupper() else candidate.name, "en", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", day, code, tag),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    list_position=None,
+                    ballot_name=candidate.label or candidate.name,
+                    member_of_party_id=party(party_code(candidate.party, year)) if candidate.party else None,
+                    is_independent=candidate.independent,
+                )
+        winner = district.winner
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=options[winner],
+            kind="elected",
+        )
+        stations = district.stations
+        units = [unit]
+        if stations:
+            units = []
+            for station in stations:
+                child = key("unit", day, code, station.code)
+                p.add(
+                    "reporting_unit",
+                    id=child,
+                    polity_id=TRINIDAD,
+                    scheme_code="tt.polling_station",
+                    code=f"{day}:{code}:{station.code}",
+                    parent_id=unit,
+                    area_relation="within",
+                    area_id=area(code),
+                    kind="standard",
+                )
+                p.name(child, f"{station.code} {station.venue}", "en", "official")
+                units.append(child)
+        _values(p, result_set, units, options, district)
+    return p
+
+
+def _value(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
+    if value is None:
+        return
+    p.add(
+        "result_value",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        flags=0,
+        value=value,
+    )
+
+
+def _values(p: Package, result_set: str, units: list[str], options: list[str], district: District) -> None:
+    if district.stations:
+        for unit, station in zip(units, district.stations, strict=True):
+            for option, votes in zip(options, station.votes, strict=True):
+                _value(p, result_set, unit, option, VOTES, votes)
+            _value(p, result_set, unit, None, REGISTERED, station.registered)
+            _value(p, result_set, unit, None, VALID, station.valid)
+            _value(p, result_set, unit, None, INVALID, station.rejected)
+        for measure, value in (
+            (REGISTERED, district.registered),
+            (VALID, district.valid),
+            (INVALID, district.rejected),
+        ):
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for option, candidate in zip(options, district.candidates, strict=True):
+            if candidate.votes is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=candidate.votes)
+        return
+    unit = units[0]
+    for option, candidate in zip(options, district.candidates, strict=True):
+        _value(p, result_set, unit, option, VOTES, candidate.votes)
+    _value(p, result_set, unit, None, REGISTERED, district.registered)
+    _value(p, result_set, unit, None, BALLOTS, district.ballots)
+    _value(p, result_set, unit, None, VALID, district.valid)
+    _value(p, result_set, unit, None, INVALID, district.rejected)
+
+
+def totals() -> dict[int, dict[str, tuple[int, int | None]]]:
+    """Each election's national figures: what the units add up to, and what the commission prints."""
+    found: dict[int, dict[str, tuple[int, int | None]]] = {}
+    for year, election in elections().items():
+        mine = {
+            "registered": sum(d.registered or 0 for d in election.districts),
+            "valid": sum(d.valid or 0 for d in election.districts),
+            "rejected": sum(d.rejected or 0 for d in election.districts),
+            "ballots": sum(d.ballots or 0 for d in election.districts),
+        }
+        found[year] = {measure: (value, election.totals.get(measure)) for measure, value in mine.items()}
+    return found
