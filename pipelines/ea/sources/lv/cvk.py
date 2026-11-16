@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
 
-from ea import package, raw
+from ea import changeset, package, raw
 from ea.package import Package
 
 SOURCE = "lv.cvk"
@@ -340,7 +340,7 @@ def read(day: str) -> Reading:
 
 
 def packages() -> list[str]:
-    return ["lv.cvk/geo", "lv.cvk/registry", *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS]))]
+    return ["lv.cvk/geo", "lv.cvk/registry", *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL]))]
 
 
 def fetch() -> None:
@@ -355,6 +355,8 @@ def parse() -> None:
         build(day).write()
     for day in REFERENDUMS:
         referendum(day).write()
+    for day in MUNICIPAL:
+        municipal(day).write()
 
 
 def emit() -> None:
@@ -416,6 +418,10 @@ def registry() -> Package:
     for day in DAYS:
         for label in read(day).names.values():
             labels.setdefault(party(label), label)
+    for prefix in MUNICIPAL.values():
+        for council in _municipal(prefix)[0].values():
+            for label, _, _ in council.lists.values():
+                labels.setdefault(party(label), label)
     for id, label in sorted(labels.items(), key=lambda item: item[1]):
         p.add("party", id=id, kind="bloc" if "apvienot" in label.casefold() else "party", polity_id=LATVIA)
         p.name(id, label, "lv", "official")
@@ -790,5 +796,232 @@ def referendum(day: str) -> Package:
             body_md=f"At {over} polling stations, more voters took part than the voters attached to the station in "
             "the commission's file. The figures are stored as printed.",
             lang="en",
+        )
+    return p
+
+
+MUNICIPAL = {"2017-06-03": "pv2017"}
+MUNICIPAL_METHOD = (
+    "Counted per polling station and published by the Central Election Commission of Latvia as open data. "
+    "Registered voters are the voters attached to the polling station in the commission's file, ballots cast are "
+    "the voters who took part, and valid votes are the valid marks for lists. Each council is elected in its own "
+    "constituency; its seats are allocated to lists, and the commission's elected-candidate file names the "
+    "members. The file also holds each candidate's plus and minus marks and valid-envelope counts; they are not "
+    "stored here yet."
+)
+
+
+@dataclass
+class Council:
+    id: str
+    name: str
+    voters: int | None
+    cast: int | None
+    valid: int | None
+    seats: int | None
+    lists: dict[str, tuple[str, int, int]] = field(default_factory=dict)
+
+
+@dataclass
+class Booth:
+    id: str
+    number: str
+    name: str
+    address: str
+    voters: int | None
+    cast: int | None
+    valid: int | None
+    lists: dict[str, int] = field(default_factory=dict)
+
+
+def _int(e: ET.Element, tag: str) -> int | None:
+    found = e.find(f"{tag}/Count")
+    if found is None:
+        found = e.find(tag)
+    return int(found.text) if found is not None and found.text else None
+
+
+def _municipal(prefix: str) -> tuple[dict[str, Council], list[Booth], dict[str, str]]:
+    councils: dict[str, Council] = {}
+    booths: list[Booth] = []
+    for _, e in ET.iterparse(path(f"{prefix}/electionresults636363813214220000.xml").path, events=("end",)):
+        if e.tag != "DepartmentResultModel":
+            continue
+        kind = e.findtext("Type")
+        if kind == "2":
+            council = Council(
+                e.findtext("Id"),
+                clean(e.findtext("Name")),
+                _int(e, "VoterCount"),
+                _int(e, "VotedCount"),
+                _int(e, "ValidMarkCount"),
+                _int(e, "MaxElectedCandidateCount"),
+            )
+            for item in e.iter("CandidateListResultModel"):
+                council.lists[item.findtext("CandidateListId")] = (
+                    clean(item.findtext("CandidateListName")),
+                    _int(item, "ValidMarkCount") or 0,
+                    _int(item, "ElectedCandidateCount") or 0,
+                )
+            councils[council.id] = council
+        elif kind == "3":
+            booth = Booth(
+                e.findtext("Id"),
+                e.findtext("Number") or "",
+                clean(e.findtext("Name")),
+                clean(e.findtext("Address")),
+                _int(e, "VoterCount"),
+                _int(e, "VotedCount"),
+                _int(e, "ValidMarkCount"),
+            )
+            for item in e.iter("CandidateListResultModel"):
+                booth.lists[item.findtext("CandidateListId")] = _int(item, "ValidMarkCount") or 0
+            booths.append(booth)
+        e.clear()
+    owner = {list_id: council.id for council in councils.values() for list_id in council.lists}
+    return councils, booths, owner
+
+
+def _members(prefix: str) -> list[dict[str, str]]:
+    root = ET.parse(path(f"{prefix}/electedcandidates636363813214220000.xml").path).getroot()
+    return [
+        {
+            "council": m.findtext("DepartmentId"),
+            "list": m.findtext("CandidateListId"),
+            "id": m.findtext("CandidateId"),
+            "name": clean(f"{m.findtext('Forename')} {m.findtext('Lastname')}"),
+            "number": m.findtext("NumberInList"),
+        }
+        for m in root.iter("ElectedCandidateModel")
+    ]
+
+
+def municipal(day: str) -> Package:
+    prefix = MUNICIPAL[day]
+    first = date.fromisoformat(day)
+    year = first.year
+    english, native = f"{year} Latvian municipal elections", f"{year}. gada pašvaldību vēlēšanas"
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by polling station from the Central Election Commission",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    for name in files(prefix):
+        p.uses(path(name))
+    councils, booths, owner = _municipal(prefix)
+    election = key("election", day)
+    where = f"lv/{day}-local"
+    p.add("election", id=election, polity_id=LATVIA, kind="local", date_from=first, date_to=first, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    sets: dict[str, str] = {}
+    options: dict[tuple[str, str], str] = {}
+    used: Counter[str] = Counter()
+    for council in sorted(councils.values(), key=lambda c: c.name):
+        contest = key("contest", day, council.id)
+        slug = changeset.slug(council.name)
+        used[slug] += 1
+        slug = slug if used[slug] == 1 else f"{slug}-{used[slug]}"
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            magnitude=council.seats,
+            round_number=1,
+            electoral_system_id=SYSTEM_MUNICIPAL,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{year} {council.name} council election", "en", "official")
+        p.name(contest, f"{council.name} domes vēlēšanas {year}", "lv", "native", False)
+        p.add("slug", path=f"{where}/{slug}", entity_id=contest, is_current=True)
+        result_set = sets[council.id] = key("result_set", day, council.id)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=MUNICIPAL_METHOD,
+            lang="en",
+        )
+        for position, (list_id, (label, marks, won)) in enumerate(
+            sorted(council.lists.items(), key=lambda item: item[1][0]), 1
+        ):
+            option = options[(council.id, list_id)] = key("option", day, council.id, list_id)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(label),
+                ballot_position=None,
+                ballot_label=label,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=marks)
+            if won:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won)
+        for measure, value in ((REGISTERED, council.voters), (CAST, council.cast), (VALID, council.valid)):
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    over = 0
+    for booth in booths:
+        council = owner[next(iter(booth.lists))]
+        result_set = sets[council]
+        code = f"{day}:{booth.number}:{booth.id}"
+        unit = key("unit", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=LATVIA,
+            scheme_code="lv.iecirknis",
+            code=code,
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        text = ", ".join(part for part in (booth.name, booth.address) if part)
+        if text:
+            p.name(unit, text, "lv", "official")
+        _put(p, result_set, unit, None, REGISTERED, booth.voters)
+        _put(p, result_set, unit, None, CAST, booth.cast)
+        _put(p, result_set, unit, None, VALID, booth.valid)
+        for list_id, marks in booth.lists.items():
+            _put(p, result_set, unit, options[(council, list_id)], VOTES, marks)
+        over += (booth.cast or 0) > (booth.voters or 0)
+    for m in _members(prefix):
+        option = options[(m["council"], m["list"])]
+        person = key("person", day, m["council"], m["id"])
+        p.add("person", id=person)
+        p.name(person, m["name"], "lv", "official")
+        candidacy = key("candidacy", day, m["council"], m["id"])
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=option,
+            role="list_member",
+            list_position=int(m["number"]),
+            ballot_name=m["name"],
+        )
+        p.add("outcome", result_set_id=sets[m["council"]], option_id=option, candidacy_id=candidacy, kind="elected")
+    if over:
+        p.accept(
+            "accounting.turnout",
+            f"{over} polling stations print more voters than the voters attached to them; stored as printed",
         )
     return p
