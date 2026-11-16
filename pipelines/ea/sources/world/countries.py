@@ -5,8 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "world.countries"
-VERSION = "1"
-NAMED_BY_PACKAGES = {"AR", "CL", "PE", "ZA"}
+VERSION = "2"
 COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "AL": ("Q222", [("sq", "Shqipëria")]),
     "AM": ("Q399", [("hy", "Հայաստան")]),
@@ -104,14 +103,11 @@ def emit() -> Path:
         }
         for iso, (wikidata, natives) in COUNTRIES.items():
             polity = cs.polity(iso)
-            if polity not in cs.minted:
-                continue
             area, label = areas[iso]
             cs.add("polity", id=polity, kind="sovereign_state", iso_code=iso)
-            if iso not in NAMED_BY_PACKAGES:
-                cs.add("name", entity_id=polity, text=label, lang="en", kind="official", is_preferred=True)
-                for lang, text in natives:
-                    cs.add("name", entity_id=polity, text=text, lang=lang, kind="native", is_preferred=False)
+            cs.add("name", entity_id=polity, text=label, lang="en", kind="official", is_preferred=True)
+            for lang, text in natives:
+                cs.add("name", entity_id=polity, text=text, lang=lang, kind="native", is_preferred=False)
             cs.add("slug", path=iso.lower(), entity_id=polity)
             cs.add("external_id", entity_id=polity, scheme="wikidata", value=wikidata)
             cs.add("polity_territory", polity_id=polity, area_id=area)
