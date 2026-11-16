@@ -26,6 +26,7 @@ dependencies = [
   "regex==2026.9.29",
   "scipy>=1.18.1",
   "shapely>=2.2.0",
+  "xlrd>=2.0.1",
 ]
 
 [project.scripts]
