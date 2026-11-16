@@ -15,13 +15,9 @@ VERSION = "4"
 NEAR = 12 * 366
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 STRONG = ("bioguide", "wikidata", "fec.candidate")
-# Local tails, plus state legislative and statewide tails (the seat key without its date). President is left out:
-# a father and son can share a ballot name there (George Bush, George W. Bush) within the window.
-LOCAL = (
-    r"^[0-9-]+:(alged:|[A-Z]{2}:[0-9]{4,}:"
-    r"|[A-Z]{2}:(house|senate|assembly|governor|lieutenant-governor|attorney-general|secretary-of-state"
-    r"|treasurer|auditor|comptroller|controller)(:|$))"
-)
+# Local tails, plus every state legislative, congressional, and statewide tail (the seat key without its date). President
+# is left out: a father and son can share a ballot name there (George Bush, George W. Bush) within the window.
+LOCAL = r"^[0-9-]+:(alged:|[A-Z]{2}:[0-9]{4,}:|[A-Z]{2}:(?!(president|question)(:|$))[a-z])"
 PLACEHOLDERS = re.compile(
     r"write|scatter|blank|\bover|\bunder|vacan|none of|no candidate|total|^yes$|^no$|uncommitted|^other"
 )
