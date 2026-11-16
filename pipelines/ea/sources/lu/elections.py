@@ -91,42 +91,56 @@ NAMES = {
     "referendum": ("referendum", "Référendum", "Referendum"),
 }
 QUESTIONS = (
-    "Approuvez-vous l'idée que les Luxembourgeois âgés entre seize et dix-huit ans aient le droit de s'inscrire de "
-    "manière facultative sur les listes électorales en vue de participer comme électeurs aux élections pour la "
-    "Chambre des Députés, aux élections européennes et communales ainsi qu'aux référendums?",
-    "Approuvez-vous l'idée que les résidents non luxembourgeois aient le droit de s'inscrire de manière facultative "
-    "sur les listes électorales en vue de participer comme électeurs aux élections pour la Chambre des Députés, à la "
-    "double condition particulière d'avoir résidé pendant au moins dix ans au Luxembourg et d'avoir préalablement "
-    "participé aux élections communales ou européennes au Luxembourg?",
-    "Approuvez-vous l'idée de limiter à dix ans la durée maximale pendant laquelle, de façon continue, une personne "
-    "peut être membre du Gouvernement?",
+    (
+        "Approuvez-vous l'idée que les Luxembourgeois âgés entre seize et dix-huit ans aient le droit de s'inscrire de "
+        "manière facultative sur les listes électorales en vue de participer comme électeurs aux élections pour la "
+        "Chambre des Députés, aux élections européennes et communales ainsi qu'aux référendums?"
+    ),
+    (
+        "Approuvez-vous l'idée que les résidents non luxembourgeois aient le droit de s'inscrire de manière facultative "
+        "sur les listes électorales en vue de participer comme électeurs aux élections pour la Chambre des Députés, à la "
+        "double condition particulière d'avoir résidé pendant au moins dix ans au Luxembourg et d'avoir préalablement "
+        "participé aux élections communales ou européennes au Luxembourg?"
+    ),
+    (
+        "Approuvez-vous l'idée de limiter à dix ans la durée maximale pendant laquelle, de façon continue, une personne "
+        "peut être membre du Gouvernement?"
+    ),
 )
 ACCEPTED: dict[str, list[tuple[str, str]]] = {
     "1994-06-12": [
         (
             "accounting.ballots_sum",
-            "the 1994 European Parliament pages print ballot figures that do not add up in three communes: Bastendorf "
-            "(379 ballots cast, 36 invalid, 0 valid), Grosbous (397 cast, 368 valid, 0 invalid), and Mertert (1,717 "
-            "cast, 1,547 valid, 0 invalid); they are stored as printed",
+            (
+                "the 1994 European Parliament pages print ballot figures that do not add up in three communes: Bastendorf "
+                "(379 ballots cast, 36 invalid, 0 valid), Grosbous (397 cast, 368 valid, 0 invalid), and Mertert (1,717 "
+                "cast, 1,547 valid, 0 invalid); they are stored as printed"
+            ),
         ),
         (
             "accounting.turnout",
-            "the 1994 European Parliament page for Flaxweiler prints 735 ballots in the box for 713 registered voters; "
-            "stored as printed",
+            (
+                "the 1994 European Parliament page for Flaxweiler prints 735 ballots in the box for 713 registered voters; "
+                "stored as printed"
+            ),
         ),
     ],
     "2005-10-09": [
         (
             "accounting.turnout",
-            "the 2005 communal page for Reisdorf prints 478 ballots in the box for 463 registered voters; stored as "
-            "printed",
+            (
+                "the 2005 communal page for Reisdorf prints 478 ballots in the box for 463 registered voters; stored as "
+                "printed"
+            ),
         )
     ],
     "2013-10-20": [
         (
             "accounting.declared",
-            "the Est constituency's printed totals include the commune of Waldbredimus, whose ballots the file "
-            "gives but whose list and candidate votes it omits; the commune's votes are missing here",
+            (
+                "the Est constituency's printed totals include the commune of Waldbredimus, whose ballots the file "
+                "gives but whose list and candidate votes it omits; the commune's votes are missing here"
+            ),
         )
     ],
 }
@@ -401,7 +415,9 @@ def read_v2(name: str) -> list[Race]:
         for child in entity.findall("entites/entite"):
             visit(child, clean(child.findtext("nom")) if child.get("type") == "CANTON" else canton)
 
-    visit(root.find("entite"), None)  # type: ignore[arg-type]
+    top = root.find("entite")
+    assert top is not None
+    visit(top, None)
     return races
 
 
@@ -557,13 +573,24 @@ def _sum(places: list[Place]) -> Stats:
 
 def _communal_race(place: Place, view: pages.Legacy) -> Race:
     seats = pages.figure(view.details.get("Conseillers", ""))
-    mode = "PROPORTIONNEL" if "proportionnelle" in view.details.get("Système électoral", "").casefold() else "MAJORITAIRE"
+    mode = (
+        "PROPORTIONNEL" if "proportionnelle" in view.details.get("Système électoral", "").casefold() else "MAJORITAIRE"
+    )
     candidates: list[Candidate] = []
     if mode != "PROPORTIONNEL":
         candidates = [c for entry in place.entries for c in entry.candidates]
         place.candidates = candidates
         place.entries = []
-    return Race(place.name, seats, mode, place.stats, place.entries, candidates if mode != "PROPORTIONNEL" else [], [place], printed=False)
+    return Race(
+        place.name,
+        seats,
+        mode,
+        place.stats,
+        place.entries,
+        candidates if mode != "PROPORTIONNEL" else [],
+        [place],
+        printed=False,
+    )
 
 
 def _communal_2023(links: list[str]) -> list[Race]:
@@ -574,7 +601,18 @@ def _communal_2023(links: list[str]) -> list[Race]:
                 continue  # the commune's election was postponed; the page holds no results
             place = Place(commune, canton or None, Stats(registered=registered), entries, plain)
             label = f"{commune} ({section})" if section else commune
-            made.append(Race(label, seats, "PROPORTIONNEL" if entries else "MAJORITAIRE", place.stats, entries, plain, [place], printed=False))
+            made.append(
+                Race(
+                    label,
+                    seats,
+                    "PROPORTIONNEL" if entries else "MAJORITAIRE",
+                    place.stats,
+                    entries,
+                    plain,
+                    [place],
+                    printed=False,
+                )
+            )
     return made
 
 
@@ -615,8 +653,10 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Luxembourg's four legislative constituencies, its cantons, and the communes named in the elections site's "
-        "result files",
+        (
+            "Luxembourg's four legislative constituencies, its cantons, and the communes named in the elections site's "
+            "result files"
+        ),
     )
     p.external |= {LUXEMBOURG, COUNTRY}
     _source(p)
@@ -682,8 +722,10 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Luxembourg's national parties, the Chamber of Deputies, the communal councils, and the electoral systems of "
-        "the legislative, European, and communal elections",
+        (
+            "Luxembourg's national parties, the Chamber of Deputies, the communal councils, and the electoral systems of "
+            "the legislative, European, and communal elections"
+        ),
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(LUXEMBOURG)
@@ -707,9 +749,7 @@ def registry() -> Package:
     p.name(CHAMBER, "Chamber of Deputies", "en", "official")
     p.name(CHAMBER, "Chambre des Députés", "fr", "native", False)
     p.name(CHAMBER, "Chamber vun den Deputéierten", "lb", "native", False)
-    communes = {
-        slug(c): c for name in reversed(NAMES_ALL) if family_of(name) == "communal" for c in places_of(name)
-    }
+    communes = {slug(c): c for name in reversed(NAMES_ALL) if family_of(name) == "communal" for c in places_of(name)}
     for commune in sorted(communes.values(), key=slug):
         id = council(commune)
         p.add("body", id=id, polity_id=LUXEMBOURG, kind="council")
@@ -719,30 +759,42 @@ def registry() -> Package:
         (
             SYSTEM_LEGISLATIVE,
             {"formula": "hagenbach_bischoff", "lists": {"order": "open", "vacancy": "next_by_votes"}},
-            "Sixty deputies are elected in four constituencies (Sud 23, Centre 21, Nord 9, Est 7) by list "
-            "proportional representation with the Hagenbach-Bischoff method. Each voter has as many votes as the "
-            "constituency has seats and may vote for a whole list or distribute votes across lists, giving a "
-            "candidate at most two.",
+            (
+                "Sixty deputies are elected in four constituencies (Sud 23, Centre 21, Nord 9, Est 7) by list "
+                "proportional representation with the Hagenbach-Bischoff method. Each voter has as many votes as the "
+                "constituency has seats and may vote for a whole list or distribute votes across lists, giving a "
+                "candidate at most two."
+            ),
         ),
         (
             SYSTEM_EUROPEAN,
             {"formula": "hagenbach_bischoff", "lists": {"order": "open", "vacancy": "next_by_votes"}},
-            "Luxembourg's six members of the European Parliament are elected in one national constituency by list "
-            "proportional representation with the Hagenbach-Bischoff method. Each voter has six votes and may "
-            "distribute them across lists, giving a candidate at most two.",
+            (
+                "Luxembourg's six members of the European Parliament are elected in one national constituency by list "
+                "proportional representation with the Hagenbach-Bischoff method. Each voter has six votes and may "
+                "distribute them across lists, giving a candidate at most two."
+            ),
         ),
         (
             SYSTEM_LIST_COMMUNE,
             {"formula": "hagenbach_bischoff", "lists": {"order": "open", "vacancy": "next_by_votes"}},
-            "Councils of communes with 3,000 or more inhabitants are elected by list proportional representation "
-            "with the Hagenbach-Bischoff method; voters have as many votes as there are seats.",
+            (
+                "Councils of communes with 3,000 or more inhabitants are elected by list proportional representation "
+                "with the Hagenbach-Bischoff method; voters have as many votes as there are seats."
+            ),
         ),
-        (SYSTEM_REFERENDUM, {"formula": "referendum"}, "A question put to all voters; the answer with the most votes carries."),
+        (
+            SYSTEM_REFERENDUM,
+            {"formula": "referendum"},
+            "A question put to all voters; the answer with the most votes carries.",
+        ),
         (
             SYSTEM_BLOCK_COMMUNE,
             {"formula": "block"},
-            "Councils of communes with fewer than 3,000 inhabitants are elected by majority vote: voters have as "
-            "many votes as there are seats, and the candidates with the most votes are elected.",
+            (
+                "Councils of communes with fewer than 3,000 inhabitants are elected by majority vote: voters have as "
+                "many votes as there are seats, and the candidates with the most votes are elected."
+            ),
         ),
     )
     for id, rules, text in systems:
@@ -823,8 +875,10 @@ def _accept(p: Package, day: str) -> None:
     if any(family_of(name) != "referendum" for name in DAYS[day]):
         p.accept(
             "accounting.votes_valid",
-            "each voter has as many votes as the contest has seats, so the votes for lists add up to more than the "
-            "valid ballots; both are stored as the authority prints them",
+            (
+                "each voter has as many votes as the contest has seats, so the votes for lists add up to more than the "
+                "valid ballots; both are stored as the authority prints them"
+            ),
         )
     for reason in ACCEPTED.get(day, []):
         p.accept(*reason)
@@ -869,7 +923,8 @@ def _election(p: Package, name: str, first: date, units: dict[str, str]) -> None
     path = f"lu/{day}-{family}"
     p.add("slug", path=path, entity_id=election, is_current=True)
     for race in races(name):
-        _race(p, name, first, election, path, race, units)
+        if race.entries or race.candidates or any(pl.entries or pl.candidates for pl in race.places):
+            _race(p, name, first, election, path, race, units)
 
 
 def _result_set(p: Package, name: str, election: str, contest: str, tag: str) -> str:
@@ -904,9 +959,9 @@ def _race(p: Package, name: str, first: date, election: str, path: str, race: Ra
     else:
         label = f"{first.year} {race.name} communal election"
         district = area("lu.commune", race.places[0].name)
-        system = SYSTEM_LIST_COMMUNE if race.mode == "PROPORTIONNEL" else SYSTEM_BLOCK_COMMUNE
+        system = SYSTEM_LIST_COMMUNE if race.mode == "PROPORTIONNEL" or race.entries else SYSTEM_BLOCK_COMMUNE
         body, where = council(race.places[0].name), tag
-    proportional = race.mode == "PROPORTIONNEL"
+    proportional = race.mode == "PROPORTIONNEL" or bool(race.entries)
     p.add(
         "contest",
         id=contest,
@@ -1063,7 +1118,11 @@ def _declared(
     for entry in race.entries:
         if entry.total is not None:
             p.add(
-                "declared", result_set_id=result_set, option_id=list_option[entry.number], measure=VOTES, value=entry.total
+                "declared",
+                result_set_id=result_set,
+                option_id=list_option[entry.number],
+                measure=VOTES,
+                value=entry.total,
             )
         for candidate in entry.candidates:
             if candidate.votes is not None:
@@ -1077,7 +1136,11 @@ def _declared(
     for candidate in race.candidates:
         if candidate.votes is not None:
             p.add(
-                "declared", result_set_id=result_set, option_id=plain[candidate.name], measure=VOTES, value=candidate.votes
+                "declared",
+                result_set_id=result_set,
+                option_id=plain[candidate.name],
+                measure=VOTES,
+                value=candidate.votes,
             )
 
 

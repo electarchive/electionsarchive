@@ -8,10 +8,9 @@ layouts.
 
 import re
 from collections.abc import Iterator
-from html import unescape
 from html.parser import HTMLParser
 
-from ea.sources.lu.model import Candidate, Entry, Place, Stats, clean, number
+from ea.sources.lu.model import Candidate, Entry, Place, Stats, clean
 
 VOID = {"br", "img", "input", "meta", "link", "hr", "area", "base", "col", "source", "wbr", "path", "use"}
 
@@ -25,22 +24,22 @@ class Node:
     def text(self) -> str:
         return clean("".join(k if isinstance(k, str) else k.text() for k in self.kids))
 
-    def walk(self) -> Iterator["Node"]:
+    def walk(self) -> Iterator[Node]:
         for kid in self.kids:
             if isinstance(kid, Node):
                 yield kid
                 yield from kid.walk()
 
-    def find(self, tag: str) -> "Node | None":
+    def find(self, tag: str) -> Node | None:
         return next((n for n in self.walk() if n.tag == tag), None)
 
-    def all(self, tag: str) -> list["Node"]:
+    def all(self, tag: str) -> list[Node]:
         return [n for n in self.walk() if n.tag == tag]
 
     def classes(self) -> set[str]:
         return set((self.attrs.get("class") or "").split())
 
-    def rows(self) -> list["Node"]:
+    def rows(self) -> list[Node]:
         """This table's own rows, leaving out the rows of tables nested in it."""
         found: list[Node] = []
 
@@ -55,7 +54,7 @@ class Node:
         visit(self)
         return found
 
-    def cells(self) -> list["Node"]:
+    def cells(self) -> list[Node]:
         return [k for k in self.kids if isinstance(k, Node) and k.tag in ("td", "th")]
 
 
@@ -240,7 +239,12 @@ def candidates_of(table: Node, start: int = 1) -> list[Candidate]:
     found: list[Candidate] = []
     for row in table.rows():
         cells = row.cells()
-        if len(cells) == 2 and cells[0].tag == "th" and "candidate" in row.classes() and "candidate-votes" in cells[1].classes():
+        if (
+            len(cells) == 2
+            and cells[0].tag == "th"
+            and "candidate" in row.classes()
+            and "candidate-votes" in cells[1].classes()
+        ):
             who, votes, elected = person(row)
             found.append(Candidate(start + len(found), who, votes, elected))
     return found
@@ -268,7 +272,9 @@ def communal_2023(html: str) -> list[tuple[str, int | None, str, str | None, int
     blocks = with_class(main, "div", "suffrages-section") or [main]
     found = []
     for block in blocks:
-        kicker = next(iter(with_class(block, "div", "kicker")), None) or next(iter(with_class(main, "div", "kicker")), None)
+        kicker = next(iter(with_class(block, "div", "kicker")), None) or next(
+            iter(with_class(main, "div", "kicker")), None
+        )
         text = kicker.text() if kicker else ""
         seats = re.search(r"Conseillers\s*:\s*(\d+)", text)
         section = re.search(r"section\s+(.*?)\s+Conseillers", text)
@@ -279,9 +285,10 @@ def communal_2023(html: str) -> list[tuple[str, int | None, str, str | None, int
                 continue
             name = next(iter(with_class(head, "span", "suffrages-parti-name")), None)
             label = name.text() if name else head.cells()[0].text()
-            values = {c: figure(next(iter(with_class(head, "td", c)), Node("td", {})).text()) for c in (
-                "suffrages-list", "suffrages-nameList", "suffrages-total", "suffrages-mandats"
-            )}
+            values = {
+                c: figure(next(iter(with_class(head, "td", c)), Node("td", {})).text())
+                for c in ("suffrages-list", "suffrages-nameList", "suffrages-total", "suffrages-mandats")
+            }
             inner = next(iter(body.all("table")), None)
             entry = Entry(
                 len(entries) + 1,
