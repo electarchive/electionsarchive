@@ -19,7 +19,7 @@ from ea.sources.it.storico import EXISTING, NEW, cased
 from ea.store import DATA, connect
 
 SOURCE = "it.regionali"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/regionali"
 DAYS = [
@@ -293,6 +293,7 @@ class Regional:
     parties: dict[str, str]
     counted: str
     allocated: str
+    unaccounted: int = 0
 
 
 REGIONAL = {
@@ -329,6 +330,48 @@ REGIONAL = {
             "to Maurizio Mangialardi, the runner-up for president, and the president, Francesco Acquaroli, also sits "
             "on the council."
         ),
+    ),
+    ("11", date(2025, 9, 28)): Regional(
+        publisher="Regione Marche",
+        title="Elezioni regionali 2025: risultati (regione.marche.it)",
+        url="https://www.regione.marche.it/elezioni2025/",
+        candidates="https://www.regione.marche.it/elezioni2025/static_json/raggrup_0.json",
+        lists="https://www.regione.marche.it/elezioni2025/static_json/liste_0.json",
+        allocation="https://www.regione.marche.it/elezioni2025/static_json/provvisorio_seggi.pdf",
+        size=30,
+        seats={
+            "LEGA SALVINI MARCHE": 3,
+            "GIORGIA MELONI PER ACQUAROLI - FRATELLI D'ITALIA": 10,
+            "FORZA ITALIA BERLUSCONI": 3,
+            "CIVICI MARCHE PER ACQUAROLI PRESIDENTE": 1,
+            "I MARCHIGIANI PER ACQUAROLI PRESIDENTE": 1,
+            "LISTE CIVICHE LIBERTAS UNIONE DI CENTRO": 1,
+            "PD - PARTITO DEMOCRATICO": 6,
+            "ALLEANZA VERDI E SINISTRA": 1,
+            "LISTA CIVICA MATTEO RICCI PRESIDENTE": 2,
+            "MOVIMENTO 5 STELLE 2050": 1,
+            "PROGETTO MARCHE VIVE MATTEO RICCI PRESIDENTE": 1,
+        },
+        parties={
+            "LEGA SALVINI MARCHE": "LEGA",
+            "GIORGIA MELONI PER ACQUAROLI - FRATELLI D'ITALIA": "FRATELLI D'ITALIA",
+            "FORZA ITALIA BERLUSCONI": "FORZA ITALIA",
+            "PD - PARTITO DEMOCRATICO": "PARTITO DEMOCRATICO",
+            "NOI MODERATI PER ACQUAROLI": "NOI MODERATI",
+            "DEMOCRAZIA SOVRANA POPOLARE DSP CON MARCO RIZZO": "DEMOCRAZIA SOVRANA POPOLARE",
+            "PCI - PARTITO COMUNISTA ITALIANO": "PARTITO COMUNISTA ITALIANO",
+        },
+        counted=(
+            "Results are the Marche Region's count of all 1,572 polling sections, from the results files on its 2025 "
+            "election site. The region gives 662,883 voters, one more than the 662,882 valid, blank, null, and "
+            "contested ballots it counts."
+        ),
+        allocated=(
+            "The 30 council seats are those of the region's provisional seat allocation by list, which the region "
+            "labels unofficial. The seat it marks as due to a candidate for president, Matteo Ricci, the runner-up, is "
+            "counted on his own list, Progetto Marche Vive Matteo Ricci Presidente."
+        ),
+        unaccounted=1,
     ),
 }
 PLACES = ("REGIONE", "CIRCOSCRIZIONE", "PROVINCIA", "COMUNE", "SEZIONE")
@@ -439,7 +482,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, held.allocation, suffix=".pdf")
 
 
-def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
     groups = json.loads(raw.cached(SOURCE, held.candidates).path.read_bytes())
     lists = json.loads(raw.cached(SOURCE, held.lists).path.read_bytes())
     totals = groups["votiRaggrup"]
@@ -447,7 +490,10 @@ def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.Dat
         totals["tot_sezio"]
     ):
         raise ValueError(f"{code} {day}: the count is not final")
-    if totals["tvotival"] + totals["tbianche"] + totals["tnulle"] + totals["sk_contestate"] != totals["tvotanti"]:
+    if (
+        totals["tvotival"] + totals["tbianche"] + totals["tnulle"] + totals["sk_contestate"]
+        != totals["tvotanti"] - held.unaccounted
+    ):
         raise ValueError(f"{code} {day}: ballots do not add up to voters")
     accounting = pl.DataFrame(
         {
@@ -461,7 +507,9 @@ def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.Dat
             "places": [int(totals["tot_sezio"])],
         }
     )
-    named = {entry["nlistamacro"]: entry["nome"].strip() for entry in lists["anagrListe"]}
+    named = {
+        entry["nlistamacro"]: entry["nome"].strip() for group in groups["anagrRaggrup"] for entry in group["arrListe"]
+    }
     list_rows = pl.DataFrame(
         [
             {"day": day, "region": code, "list": named[int(number)], "list_votes": votes["voti"], "places": 1}
@@ -486,7 +534,20 @@ def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.Dat
         raise ValueError(f"{code} {day}: list votes do not add up to valid list votes")
     if sum(held.seats.values()) != held.size or not set(held.seats) <= set(named.values()):
         raise ValueError(f"{code} {day}: seats do not match the lists")
-    return accounting, list_rows, candidates
+    pairs = pl.DataFrame(
+        [
+            {
+                "day": day,
+                "region": code,
+                "list": named[entry["nlistamacro"]],
+                "surname": group["cognome_cand"].strip().upper(),
+                "forename": group["nome_cand"].strip().upper(),
+            }
+            for group in groups["anagrRaggrup"]
+            for entry in group["arrListe"]
+        ]
+    )
+    return accounting, list_rows, candidates, pairs
 
 
 def read(archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
@@ -526,6 +587,7 @@ def parse() -> None:
     lists: list[pl.DataFrame] = []
     candidates: list[pl.DataFrame] = []
     seats: list[pl.DataFrame] = []
+    links: list[pl.DataFrame] = []
     PARSED.mkdir(parents=True, exist_ok=True)
     for day in DAYS:
         archive = zipfile.ZipFile(raw.cached(SOURCE, url(day)).path)
@@ -563,6 +625,9 @@ def parse() -> None:
                         pl.col("candidate_votes").sum()
                     )
                 )
+                links.append(
+                    frame.filter(pl.col("list") != "").select("day", "region", "list", "surname", "forename").unique()
+                )
         for member in archive.namelist():
             if PREFERENCES.match(member):
                 text = archive.read(member).decode("cp1252")
@@ -583,10 +648,17 @@ def parse() -> None:
                     .agg(seats=pl.len())
                 )
     for (code, day), held in REGIONAL.items():
-        counts, by_list, running = regional(code, day, held)
+        counts, by_list, running, pairs = regional(code, day, held)
         accounting.append(counts)
         lists.append(by_list)
         candidates.append(running)
+        links.append(pairs)
+    linked = pl.concat(links).unique()
+    clashes = linked.filter(pl.len().over("day", "region", "list") > 1)
+    if clashes.height:
+        raise ValueError(
+            f"lists linked to more than one presidential candidate: {clashes.sort('day', 'region').rows()}"
+        )
     resolve, extinct, transferred = municipalities()
     labels = pl.concat(
         [
@@ -623,6 +695,7 @@ def parse() -> None:
         PARSED / "candidates.parquet"
     )
     pl.concat(seats).write_parquet(PARSED / "seats.parquet")
+    linked.write_parquet(PARSED / "links.parquet")
 
 
 def emit() -> Path:
@@ -632,6 +705,13 @@ def emit() -> Path:
     seats = pl.read_parquet(PARSED / "seats.parquet")
     extinct = pl.read_parquet(PARSED / "extinct.parquet")
     transferred = pl.read_parquet(PARSED / "transferred.parquet")
+    nominated = {
+        (day, region, surname, forename): lists
+        for day, region, surname, forename, lists in pl.read_parquet(PARSED / "links.parquet")
+        .group_by("day", "region", "surname", "forename")
+        .agg(pl.col("list"))
+        .iter_rows()
+    }
     totals = accounting.group_by("day", "region").agg(pl.all().exclude("day", "region", "code").sum())
     list_totals = lists.group_by("day", "region", "list").agg(pl.col("list_votes").sum())
     candidate_totals = candidates.group_by("day", "region", "surname", "forename", "given", "family").agg(
@@ -799,6 +879,7 @@ def emit() -> Path:
                 path = f"it/{slug_}/{day}-general"
                 cs.add("slug", path=path, entity_id=election)
                 own = REGIONAL.get((code, day))
+                aliases = {} if own is None else own.parties
                 source = ministry if own is None else regional_sources[code, day]
                 accounting_set = result_set(f"{code}:{day}:election", election, None, source)
                 links.append((day, code, "election", "", str(accounting_set), None))
@@ -857,7 +938,7 @@ def emit() -> Path:
                         id=option,
                         contest_id=contest,
                         kind="list",
-                        party_id=party_of(label_, day, {} if own is None else own.parties),
+                        party_id=party_of(label_, day, aliases),
                         ballot_label=label_,
                     )
                     links.append((day, code, "list", label_, str(list_set), str(option)))
@@ -900,14 +981,20 @@ def emit() -> Path:
                     ballot = f"{row['surname']} {row['forename']}".strip()
                     option = cs.key(f"{SOURCE}.option", f"{code}:{day}:president:{ballot}")
                     cs.add("contest_option", id=option, contest_id=race, kind="candidate", ballot_label=ballot)
+                    candidacy = cs.key(f"{SOURCE}.candidacy", f"{code}:{day}:president:{ballot}")
                     cs.add(
                         "candidacy",
-                        id=cs.key(f"{SOURCE}.candidacy", f"{code}:{day}:president:{ballot}"),
+                        id=candidacy,
                         person_id=person_of(row["given"], row["family"], day, code),
                         option_id=option,
                         role="head",
                         ballot_name=ballot,
                     )
+                    for party in dict.fromkeys(
+                        party_of(label_, day, aliases)
+                        for label_ in nominated.get((day, code, row["surname"], row["forename"]), [])
+                    ):
+                        cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party, kind="nominated")
                     links.append((day, code, "president", ballot, str(race_set), str(option)))
                     if day.year >= 2000 and row["candidate_votes"] == top:
                         cs.add("outcome", result_set_id=race_set, option_id=option, kind="elected")
