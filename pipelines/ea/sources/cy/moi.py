@@ -541,8 +541,8 @@ def _overcount(p: Package, result_sets: Sequence[str], boxes: Sequence[tuple[dic
         return
     extra = sum(result["voted"] - result["reg"] for result in over)
     text = (
-        f"The Ministry's own ballot box figures show more voters who voted than registered voters in {len(over)} "
-        f"ballot box{'es' if len(over) > 1 else ''} ({extra} more in all). They are stored as printed."
+        f"Across the election, the Ministry's own ballot box figures show more voters who voted than registered voters "
+        f"in {len(over)} ballot box{'es' if len(over) > 1 else ''} ({extra} more in all). They are stored as printed."
     )
     p.accept("accounting.turnout", text)
     for result_set in result_sets:
