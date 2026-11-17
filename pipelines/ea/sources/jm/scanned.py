@@ -114,3 +114,63 @@ def read(day: str) -> Report:
         ],
         raw["notes"],
     )
+
+
+# The box-by-box reports, whose polling-station tables `boxes/` holds for the constituencies whose reading passed every
+# check, by election day.
+BOXFILES: dict[str, str] = {
+    "1976-12-15": f"{BASE}/1976GeneralElectionBoxbyBox.pdf",
+    "1980-10-30": f"{BASE}/1980GeneralElectionBoxbyBox.pdf",
+    "1983-12-15": f"{BASE}/1983GeneralElectionBoxbyBox.pdf",
+    "1989-02-09": f"{BASE}/1989GeneralElectionBoxbyBox.pdf",
+    "1993-03-30": f"{BASE}/1993GeneralElectionBoxbyBox.pdf",
+    "1997-12-18": f"{BASE}/1997GeneralElectionBoxbyBox.pdf",
+}
+BOXES = Path(__file__).parent / "boxes"
+
+
+@dataclass
+class Station:
+    code: str
+    page: int
+    votes: list[int]
+    rejected: int
+    total: int
+    electors: int | None
+    boxes: list[list[float] | None]
+    inferred: bool
+
+
+@functools.cache
+def stations(day: str) -> dict[int, list[Station]]:
+    """The polling stations of each constituency whose box-by-box table was read and checked, by its number."""
+    path = BOXES / f"{day}.json"
+    if day not in BOXFILES or not path.exists():
+        return {}
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        c["number"]: [
+            Station(
+                s["code"],
+                s["page"],
+                s["votes"],
+                s["rejected"],
+                s["total"],
+                s["electors"],
+                s["boxes"],
+                bool(s.get("inferred")),
+            )
+            for s in c["stations"]
+        ]
+        for c in raw["constituencies"]
+    }
+
+
+@functools.cache
+def own_totals(day: str) -> frozenset[int]:
+    """The constituencies whose stations add up to the box-by-box report's own totals line, not to the summary's."""
+    path = BOXES / f"{day}.json"
+    if day not in BOXFILES or not path.exists():
+        return frozenset()
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    return frozenset(c["number"] for c in raw["constituencies"] if c.get("own_totals"))

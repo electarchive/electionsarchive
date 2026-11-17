@@ -641,12 +641,37 @@ def build_scanned(day: str) -> Package:
     p = Package(
         f"jm.ecj/{day}",
         SOURCE,
-        f"The Jamaican general election of {first} by constituency, from the Director of Elections' report",
+        f"The Jamaican general election of {first} "
+        + (
+            "by polling station where the box-by-box report was read, otherwise by constituency"
+            if scanned.stations(day)
+            else "by constituency"
+        )
+        + ", from the Director of Elections' report",
         depends=depends,
     )
     p.external.add(JAMAICA)
     for url in scanned.FILES[day]:
         p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
+    boxed = scanned.stations(day)
+    pages: dict[int, str] = {}
+    if boxed:
+        url = scanned.BOXFILES[day]
+        stored = raw.cached(SOURCE, url)
+        artifact = p.artifact(stored, ECJ_SOURCE) if url not in scanned.FILES[day] else _artifact_id(stored)
+        sizes = _sizes(stored.path)
+        for number in sorted({s.page for rows in boxed.values() for s in rows}):
+            width, height = sizes[number]
+            pages[number] = key("page", stored.sha256, number)
+            p.add(
+                "source_page",
+                id=pages[number],
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
+                width=round(width * 100 / 72),
+                height=round(height * 100 / 72),
+            )
     unknown = tags - known_parties()
     if unknown:
         raise ValueError(f"{day}: parties {sorted(unknown)} are not in a registry package")
@@ -656,6 +681,7 @@ def build_scanned(day: str) -> Package:
     p.add("slug", path=path, entity_id=election, is_current=True)
     p.name(election, f"{first.year} Jamaican general election", "en", "official")
     flagged: dict[str, list[str]] = {}
+    own: list[str] = []
     for k in report.constituencies:
         name = k.name
         contest = key("contest", day, k.number)
@@ -685,16 +711,33 @@ def build_scanned(day: str) -> Package:
             is_default=True,
             completeness=1.0,
         )
-        pages = f"page {k.page}" if k.page == k.stats_page else f"pages {k.stats_page} and {k.page}"
+        where = f"page {k.page}" if k.page == k.stats_page else f"pages {k.stats_page} and {k.page}"
+        rows = boxed.get(k.number)
         p.add(
             "note",
             id=key("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md="Digitized from the constituency tables of the Director of Elections' printed report, "
-            f"{pages} of the scanned file. Electors are those on the lists, ballots cast include rejected ballots, "
-            "and the report prints no result by polling station in these tables. Figures are stored as printed. The "
-            "winner of a constituency is the candidate with the most votes.",
+            body_md=(
+                "Digitized by polling station from the Director of Elections' box-by-box report, read by optical "
+                "character recognition from the scanned pages. Every station's candidates' votes and rejected ballots "
+                "add up to its printed total votes, and the stations add up to the constituency totals of the "
+                f"summary tables ({where} of the summary file), which are declared."
+                + (
+                    " Electors are stored for each station."
+                    if rows[0].electors is not None
+                    else f" The summary prints {k.electors:,} electors; the stations' electors as read did not add "
+                    "up to that, so electors are stored neither by station nor for the constituency."
+                    if k.electors is not None
+                    else ""
+                )
+                + " The winner of a constituency is the candidate with the most votes."
+                if rows
+                else "Digitized from the constituency tables of the Director of Elections' printed report, "
+                f"{where} of the scanned file. Electors are those on the lists, ballots cast include rejected "
+                "ballots, and the report prints no result by polling station in these tables. Figures are stored as "
+                "printed. The winner of a constituency is the candidate with the most votes."
+            ),
             lang="en",
         )
         options: list[str] = []
@@ -725,6 +768,38 @@ def build_scanned(day: str) -> Package:
                 else party_id(candidate.party),
                 is_independent=independent(candidate.party),
             )
+        valid = (
+            k.accepted
+            if k.accepted is not None
+            else (k.cast - k.rejected if k.cast and k.rejected is not None else None)
+        )
+        if rows:
+            _stations(p, day, k, name, result_set, options, rows, pages)
+            if k.number in scanned.own_totals(day):
+                own.append(name)
+                p.add(
+                    "note",
+                    id=key("note", result_set, "own-totals"),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The polling stations add up to the totals line the box-by-box report prints for this "
+                    "constituency, which differs from the constituency totals of the report's summary tables. The "
+                    "summary's totals are declared; the stations are stored as the box-by-box report prints them.",
+                    lang="en",
+                )
+            electors = k.electors if rows[0].electors is not None else None
+            measures = [(REGISTERED, electors), (CAST, k.cast), (INVALID, k.rejected), (VALID, valid)]
+            for measure, value in measures:
+                if value is not None:
+                    p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+            for option, candidate in zip(options, k.candidates, strict=True):
+                if candidate.votes is not None:
+                    p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=candidate.votes)
+            top = max(c.votes or 0 for c in k.candidates)
+            winners = [o for o, c in zip(options, k.candidates, strict=True) if c.votes == top]
+            if len(winners) == 1:
+                p.add("outcome", result_set_id=result_set, option_id=winners[0], kind="won")
+            continue
         unit = key("unit", day, k.number)
         p.add(
             "reporting_unit",
@@ -737,11 +812,6 @@ def build_scanned(day: str) -> Package:
             kind="standard",
         )
         p.name(unit, f"{name} constituency", "en", "official")
-        valid = (
-            k.accepted
-            if k.accepted is not None
-            else (k.cast - k.rejected if k.cast and k.rejected is not None else None)
-        )
         measures = [(REGISTERED, k.electors), (CAST, k.cast), (INVALID, k.rejected), (VALID, valid)]
         for measure, value in measures:
             _put(p, result_set, unit, None, measure, value)
@@ -774,7 +844,97 @@ def build_scanned(day: str) -> Package:
     }
     for code, names in flagged.items():
         p.accept(code, f"In {', '.join(names)}, {reasons[code]}; the figures are stored as printed")
+    over = sum(1 for rows in boxed.values() for s in rows if s.electors is not None and s.total > s.electors)
+    if over:
+        p.accept(
+            "accounting.turnout",
+            f"{over} polling stations print more ballots cast than electors on the list, mostly stations for "
+            "election-day workers, police, and the military; stored as printed",
+        )
+    if own:
+        p.accept(
+            "accounting.declared",
+            f"In {', '.join(own)}, the polling stations add up to the box-by-box report's own totals line, which "
+            "differs from the summary tables' constituency totals that are declared; both are stored as printed",
+        )
     return p
+
+
+DIGITIZED = 8
+
+
+def _artifact_id(stored: raw.Artifact) -> str:
+    return str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ECJ_SOURCE}\x1f{stored.storage_key}"))
+
+
+def _sizes(path: object) -> dict[int, tuple[float, float]]:
+    out = subprocess.run(["pdfinfo", "-f", "1", "-l", "999", str(path)], capture_output=True, text=True, check=True)
+    found = (re.match(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)", line) for line in out.stdout.splitlines())
+    return {int(m[1]): (float(m[2]), float(m[3])) for m in found if m}
+
+
+def _stations(
+    p: Package,
+    day: str,
+    k: scanned.Constituency,
+    name: str,
+    result_set: str,
+    options: list[str],
+    rows: list[scanned.Station],
+    pages: dict[int, str],
+) -> None:
+    """The polling stations of one constituency from the box-by-box report, each value with its page and box."""
+    for s in rows:
+        unit = key("unit", day, k.number, s.code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=JAMAICA,
+            scheme_code="jm.ps",
+            code=f"{day}:{k.number}:{s.code}",
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        p.name(unit, f"{name}, polling station {s.code}", "en", "official")
+        cells: list[tuple[str | None, int, int | None]] = [
+            *((option, VOTES, v) for option, v in zip(options, s.votes, strict=True)),
+            (None, INVALID, s.rejected),
+            (None, CAST, s.total),
+        ]
+        if s.electors is not None:
+            cells.append((None, REGISTERED, s.electors))
+        for (option, measure, v), box in zip(cells, s.boxes, strict=False):
+            if v is None:
+                continue
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=DIGITIZED,
+                value=v,
+            )
+            if box is not None:
+                p.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    page_id=pages[s.page],
+                    source_id=None,
+                    x0=box[0],
+                    y0=box[1],
+                    x1=box[2],
+                    y1=box[3],
+                )
+        _put(p, result_set, unit, None, VALID, s.total - s.rejected)
 
 
 def votes_of(k: scanned.Constituency) -> list[int]:
