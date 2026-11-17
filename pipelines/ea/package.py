@@ -557,6 +557,8 @@ CHECKS = {
                                 and not exists (select 1 from all_result_set r
                                                 where r.id = v.result_set_id and r.contest_id = o.contest_id)""",
     "fact.party_color": "select party_id, color from party_color where not regexp_full_match(color, '#[0-9a-f]{6}')",
+    "fact.scheme_code": """select code from scheme
+                           where not regexp_full_match(code, '([a-z]{2,3}(-[a-z0-9]+)?|world)\\.[a-z0-9_]+')""",
     "fact.note_kind": """select id, kind from note
                          where kind not in ('context', 'caveat', 'methodology', 'editorial', 'retired')""",
     "fact.scheme_code": """select code from scheme
