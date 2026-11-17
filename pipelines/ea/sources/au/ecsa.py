@@ -2,6 +2,7 @@
 
 import csv
 import functools
+import html
 import io
 import re
 import zipfile
@@ -104,7 +105,11 @@ def person_name(raw_name: str) -> str:
     if "," in raw_name:
         surname, _, given = raw_name.partition(",")
         return f"{given.strip()} {surname.strip().title()}".strip()
-    return raw_name.strip()
+    words = raw_name.split()
+    split = next((i for i, w in enumerate(words) if not w.replace("'", "").replace("-", "").isupper()), len(words))
+    split = max(split, 1)
+    surname = " ".join(w.title() if w.isupper() else w for w in words[:split])
+    return f"{' '.join(words[split:])} {surname}".strip()
 
 
 def number(text: str) -> int | None:
@@ -216,7 +221,103 @@ def event_2022() -> Event:
     return event
 
 
-EVENTS = {"2022-03-19": event_2022}
+# 2018 state election: one page per district and a second page per district for its polling places.
+
+INDEX_2018 = f"{HOST}/elections/past-state-election-results?view=article&id=124:2018-state-election-results-breakdown&catid=12:elections"
+NOT_DISTRICTS = {"House_of_Assembly", "Legislative_Council"}
+
+
+def district_pages(index: str) -> list[str]:
+    found = set(re.findall(r"/html/results/2018/([A-Za-z_]+)2?\.html", index)) - NOT_DISTRICTS
+    return sorted(found)
+
+
+def cells(row: str) -> list[str]:
+    return [
+        html.unescape(re.sub(r"<[^>]+>", " ", c)).strip() for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.S)
+    ]
+
+
+def tables(text: str) -> list[list[list[str]]]:
+    out = []
+    for table in re.findall(r"<table class=\"table table-striped\">(.*?)</table>", text, re.S):
+        out.append([cells(r) for r in re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.S)])
+    return out
+
+
+def html_candidate(cell: str) -> Candidate:
+    parts = cell.split()
+    return Candidate(" ".join(parts[:-1]), parts[-1])
+
+
+def parse_html(name: str, main: str, booths: str) -> District:
+    enrolled = number(re.search(r'electorsEnrolledNumber">([\d,]+)<', main).group(1))  # type: ignore[union-attr]
+    first, runoff = tables(booths)
+    head = first[0]
+    stop = next(i for i, c in enumerate(head) if c.startswith("Frml") or c.startswith("Formal"))
+    candidates = [html_candidate(c) for c in head[1:stop]]
+    width = len(candidates)
+    places: list[Place] = []
+    declared: Place | None = None
+    for r in first[1:]:
+        label = r[0]
+        if not label or len(r) < width + 5 or label.startswith("District Total %"):
+            continue
+        place = Place(
+            label,
+            [number(c) for c in r[1 : 1 + width]],
+            number(r[1 + width]),
+            number(r[2 + width]),
+            number(r[4 + width]),
+        )
+        if label == "District Total":
+            declared = place
+        elif label == "Polling Place Totals":
+            continue
+        elif label.startswith("Declaration"):
+            place.name = "Declaration Votes"
+            place.kind = "aggregate"
+            places.append(place)
+        else:
+            places.append(place)
+    assert declared is not None
+    district = District(name, candidates, enrolled, places, declared)
+    rhead = runoff[0]
+    pair = [html_candidate(c.removesuffix("Number")) for c in rhead[1:] if c.endswith("Number")]
+    names = [c.name for c in candidates]
+    district.finalists = (names.index(pair[0].name), names.index(pair[1].name))
+    by_name = {p.name: p for p in places}
+    for r in runoff[1:]:
+        label = r[0]
+        if len(r) < 5 or not label:
+            continue
+        counts = [number(r[1]), number(r[3])]
+        label = "Declaration Votes" if label.startswith("Declaration") else label
+        if label == "District Total":
+            declared.runoff = counts
+        elif label in by_name:
+            by_name[label].runoff = counts
+    return district
+
+
+def event_2018() -> Event:
+    index = raw.cached(SOURCE, INDEX_2018).path.read_text()
+    pages = district_pages(index)
+    event = Event("2018-03-17", "general", [INDEX_2018])
+    for page in pages:
+        main, booths = (f"{HOST}/html/results/2018/{page}{n}.html" for n in ("", "2"))
+        event.files += [main, booths]
+        event.districts.append(
+            parse_html(
+                page.replace("_", " "),
+                raw.cached(SOURCE, main).path.read_text(),
+                raw.cached(SOURCE, booths).path.read_text(),
+            )
+        )
+    return event
+
+
+EVENTS = {"2018-03-17": event_2018, "2022-03-19": event_2022}
 
 
 def packages() -> list[str]:
@@ -226,6 +327,10 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in (ELECTION_2022, TCP_2022):
         raw.fetch(SOURCE, url, suffix=".zip")
+    index = raw.fetch(SOURCE, INDEX_2018, suffix=".html")
+    for page in district_pages(index.path.read_text()):
+        for n in ("", "2"):
+            raw.fetch(SOURCE, f"{HOST}/html/results/2018/{page}{n}.html", suffix=".html")
 
 
 def parse() -> None:
