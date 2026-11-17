@@ -580,10 +580,10 @@ TARGET_KEY = {"scheme": "code", "polity": "id"}
 
 CHECKS = {
     "unique.fact": """with repeated as (
-                        select hash(result_set_id, unit_id, option_id, measure) as h from result_value
+                        select hash(result_set_id, unit_id, option_id, channel, measure, count_round) as h from result_value
                         group by h having count(*) > 1)
-                      select result_set_id, unit_id, option_id, measure, count(*) as n from result_value
-                      where hash(result_set_id, unit_id, option_id, measure) in (select h from repeated)
+                      select result_set_id, unit_id, option_id, channel, measure, count_round, count(*) as n from result_value
+                      where hash(result_set_id, unit_id, option_id, channel, measure, count_round) in (select h from repeated)
                       group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
