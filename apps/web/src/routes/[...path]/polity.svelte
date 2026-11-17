@@ -14,6 +14,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import { compactPlaces } from "#lib/compare.js";
   import Name from "#lib/components/name.svelte";
+  import NativeName from "#lib/components/native-name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import {
     capitalize,
@@ -431,7 +432,7 @@
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
   <div class="flex items-start justify-between gap-3">
     <h1 class="title">
-      {polity.name}
+      <NativeName name={polity.name} native={polity.native} />
     </h1>
     <a
       class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"

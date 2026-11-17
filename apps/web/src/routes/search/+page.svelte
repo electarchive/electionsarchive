@@ -10,6 +10,7 @@
   import Logo from "#lib/components/logo.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import { date } from "#lib/format.js";
+  import { ordered } from "#lib/native.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
@@ -111,7 +112,14 @@
           height="36"
         />
       {/if}
-      <span class="line-clamp-2 font-semibold text-pretty">{hit.name}</span>
+      {const shown = $derived(ordered(hit.name, hit.native))}
+      <span class="line-clamp-2 font-semibold text-pretty"
+        ><span lang={shown.primary.lang}>{shown.primary.text}</span
+        >{#if shown.secondary != null}{" "}<span
+            class="font-normal text-muted-foreground"
+            lang={shown.secondary.lang}>{shown.secondary.text}</span
+          >{/if}</span
+      >
       {#if hit.ballot != null}
         <span
           class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"

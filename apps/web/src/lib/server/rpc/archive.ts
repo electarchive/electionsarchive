@@ -637,6 +637,8 @@ const sisters = async (roots: Array<string>, day: string) =>
 
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
 
+const Native = v.nullable(v.object({ text: v.string(), lang: v.string() }));
+
 const PartyRef = v.object({
   id: v.string(),
   label: v.string(),
@@ -1060,6 +1062,7 @@ export async function names(
   );
   const full = new Map<string, string>();
   const short = new Map<string, string>();
+  const native = new Map<string, { text: string; lang: string }>();
   for (const id of ids) {
     const named = found(id, on);
     if (named.label !== "") {
@@ -1068,19 +1071,29 @@ export async function names(
     if (named.short != null) {
       short.set(id, named.short);
     }
+    if (named.native != null) {
+      native.set(id, named.native);
+    }
   }
-  return { full, short };
+  return { full, short, native };
 }
 
-const datedMemo = {
-  version: "",
-  entries: new Map<string, { label: string; short: string | null }>(),
+const LATIN = /^[\p{Script=Latin}\p{Script=Common}\p{Script=Inherited}]*$/u;
+
+const LATIN_TEXT = (text: SQL) =>
+  sql`(${text} !~ '[^\\u0001-\\u024F\\u0300-\\u036F\\u1E00-\\u1EFF\\u2000-\\u206F\\u20A0-\\u20CF]')`;
+
+type Named = {
+  label: string;
+  short: string | null;
+  native: { text: string; lang: string } | null;
 };
 
-const datedRunning = new Map<
-  string,
-  Promise<{ label: string; short: string | null }>
->();
+const NAMELESS: Named = { label: "", short: null, native: null };
+
+const datedMemo = { version: "", entries: new Map<string, Named>() };
+
+const datedRunning = new Map<string, Promise<Named>>();
 
 const DATED_CHUNKS = 4;
 const DATED_CHUNK_MIN = 300;
@@ -1100,12 +1113,9 @@ const datedTogether = together(
       datedMemo.entries.clear();
     }
     const scope = `${common.join(",")}|`;
-    const found = new Map<string, { label: string; short: string | null }>();
+    const found = new Map<string, Named>();
     const lookup = (historical: boolean) => (id: string, on: string | null) =>
-      found.get(`${historical}|${id}|${on ?? ""}`) ?? {
-        label: "",
-        short: null,
-      };
+      found.get(`${historical}|${id}|${on ?? ""}`) ?? NAMELESS;
     const unique: Array<{ id: string; on: string | null; h: boolean }> = [];
     const waits: Array<Promise<void>> = [];
     for (const pair of asks.flatMap((ask) =>
@@ -1118,7 +1128,7 @@ const datedTogether = together(
       const hit =
         version === "" ? undefined : datedMemo.entries.get(scope + key);
       if (hit == null) {
-        found.set(key, { label: "", short: null });
+        found.set(key, { ...NAMELESS });
         const running = datedRunning.get(scope + key);
         if (running == null) {
           unique.push(pair);
@@ -1148,9 +1158,7 @@ const datedTogether = together(
       }
     };
     for (const { slot, key } of keys) {
-      const settled = finished.promise.then(
-        () => found.get(key) ?? { label: "", short: null },
-      );
+      const settled = finished.promise.then(() => found.get(key) ?? NAMELESS);
       settled.catch(() => {});
       datedRunning.set(slot, settled);
     }
@@ -1163,6 +1171,7 @@ const datedTogether = together(
         on: string | null;
         kind: string;
         text: string;
+        lang: string | null;
       }>(sql`
         with p as (
           select * from unnest(${sql.param(chunk.map((pair) => pair.id))}::uuid[], ${sql.param(chunk.map((pair) => pair.on))}::date[], ${sql.param(chunk.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
@@ -1171,7 +1180,7 @@ const datedTogether = together(
           select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
           from name
           where entity_id = any(${sql.param(ids)}::uuid[])
-            and (kind in ('official', 'english', 'short', 'abbreviation') or (${withHistory} and kind = 'historical'))
+            and (kind in ('official', 'english', 'transliteration', 'short', 'abbreviation') or (${withHistory} and kind = 'historical'))
         ),
         l as (
           select distinct on (entity_id) entity_id, lang from c
@@ -1182,19 +1191,34 @@ const datedTogether = together(
           select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.kind::text as kind, c.text
           from p
           join c on c.entity_id = p.entity_id
-            and c.kind in ('official', 'english', 'historical')
+            and c.kind in ('official', 'english', 'transliteration', 'historical')
             and (c.kind <> 'historical' or p.h)
-            and (c.kind in ('official', 'english')
+            and (c.kind in ('official', 'english', 'transliteration')
               or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
           left join l on l.entity_id = p.entity_id
           order by p.entity_id, p.on_date, p.h, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
             coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
             ${nearest(sql`c`, sql`p.on_date`)} nulls first,
+            ${LATIN_TEXT(sql`c.text`)} desc,
             coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
             c.lang = l.lang desc nulls last,
             (c.lang = 'en') desc, (c.kind = 'official') desc, c.recorded_from desc, c.id
+        ),
+        v as (
+          select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.text, c.lang
+          from p
+          join c on c.entity_id = p.entity_id
+            and c.kind in ('official', 'historical')
+            and (c.kind <> 'historical' or p.h)
+            and not ${LATIN_TEXT(sql`c.text`)}
+            and (c.kind = 'official'
+              or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
+          order by p.entity_id, p.on_date, p.h, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
+            coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
+            ${nearest(sql`c`, sql`p.on_date`)} nulls first,
+            (c.text <> upper(c.text)) desc, c.is_preferred desc, c.recorded_from desc, c.id
         )
-        (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+        (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text, null as lang
         from n
         left join lateral (
           select o.id, o.date_from, o.polity_id from election o
@@ -1215,7 +1239,10 @@ const datedTogether = together(
           )
         ) d on true)
         union all
-        select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text
+        select v.entity_id, v.h, v.on_date::text, 'native', v.text, v.lang
+        from v
+        union all
+        select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text, null
         from p
         cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
         where p.entity_id = any(array(select entity_id from c where kind in ('short', 'abbreviation')))
@@ -1243,13 +1270,24 @@ const datedTogether = together(
     );
     for (const row of results.flatMap((result) => result.rows)) {
       const key = `${row.historical}|${row.entity_id}|${row.on ?? ""}`;
-      const entry = found.get(key) ?? { label: "", short: null };
+      const entry = found.get(key) ?? { ...NAMELESS };
       if (row.kind === "abbreviation") {
         entry.short = row.text;
+      } else if (row.kind === "native") {
+        entry.native = { text: row.text, lang: row.lang ?? "und" };
       } else {
         entry.label = row.text;
       }
       found.set(key, entry);
+    }
+    for (const pair of unique) {
+      const entry = found.get(`${pair.h}|${pair.id}|${pair.on ?? ""}`);
+      if (
+        entry?.native != null &&
+        (!LATIN.test(entry.label) || entry.label.endsWith(entry.native.text))
+      ) {
+        entry.native = null;
+      }
     }
     if (version !== "" && version === datedMemo.version) {
       for (const pair of unique) {
@@ -2777,6 +2815,7 @@ async function contestFrame({
     : null;
   return {
     name: labels.full.get(contest.id) ?? "",
+    native: labels.native.get(contest.id) ?? null,
     kind: contest.kind,
     path,
     breadcrumbs: crumbs,
@@ -7055,6 +7094,7 @@ const Population = v.nullable(
 
 const Frame = {
   name: v.string(),
+  native: Native,
   kind: v.string(),
   path: v.nullable(v.string()),
   breadcrumbs: v.array(Link),
@@ -9252,6 +9292,7 @@ export const contests = {
           v.object({
             key: v.string(),
             label: v.string(),
+            native: v.optional(Native),
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
             lean: v.nullable(v.number()),
@@ -11728,6 +11769,12 @@ export const contests = {
         [...new Set(backers.rows.map((row) => row.party))],
         contest.date,
       );
+      const holder = (row: (typeof rows)[number]) =>
+        row.current?.person ?? row.current?.party ?? null;
+      const natives = await names(
+        [...new Set(rows.map(holder).filter((id) => id != null))],
+        contest.date,
+      );
       return withLogos(
         {
           ...page,
@@ -11860,6 +11907,7 @@ export const contests = {
             const nominated = own.filter((entry) => entry.kind === "nominated");
             return {
               ...row,
+              native: natives.native.get(holder(row) ?? "") ?? null,
               color:
                 grid?.legend.find((item) => item.key === row.key)?.color ??
                 row.color,
@@ -17167,6 +17215,7 @@ export async function races(
               ) ??
               lead?.label ??
               "",
+            native: null as { text: string; lang: string } | null,
             short:
               (single == null ? parties.short.get(party ?? "") : null) ??
               lead?.short ??
@@ -17246,6 +17295,7 @@ export async function races(
                   party == null
                     ? m.seats_independents()
                     : (declaredNames?.full.get(party) ?? ""),
+                native: null,
                 short:
                   party == null
                     ? null
@@ -17264,6 +17314,17 @@ export async function races(
                 ballots: 0,
               };
             });
+      const natives = await names(
+        results.flatMap((row) => {
+          const id = row.person ?? row.party;
+          return id == null ? [] : [id];
+        }),
+        date,
+      );
+      for (const row of results) {
+        const found = natives.native.get(row.person ?? row.party ?? "");
+        row.native = found != null && LATIN.test(row.label) ? found : null;
+      }
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);
       let tacit = 0;
       for (const row of unopposed) {
@@ -18153,6 +18214,7 @@ function electionHeader({
             name: labels.full.get(id) ?? "",
             place: labels.full.get(within) ?? "",
           }),
+    native: within == null ? (labels.native.get(id) ?? null) : null,
     date: election.date,
     status: election.status,
     isIndirect: election.isIndirect,
@@ -18210,6 +18272,7 @@ export const elections = {
     .output(
       v.object({
         name: v.string(),
+        native: Native,
         date: v.nullable(v.string()),
         status: v.string(),
         kind: v.string(),
@@ -18260,6 +18323,7 @@ export const elections = {
     .output(
       v.object({
         name: v.string(),
+        native: Native,
         date: v.nullable(v.string()),
         status: v.string(),
         isIndirect: v.boolean(),
@@ -18441,6 +18505,7 @@ export const elections = {
               v.object({
                 key: v.string(),
                 label: v.string(),
+                native: v.optional(Native),
                 short: v.nullable(v.string()),
                 color: v.nullable(v.string()),
                 lean: v.nullable(v.number()),
@@ -24235,6 +24300,7 @@ export const polities = {
     .output(
       v.object({
         name: v.string(),
+        native: Native,
         kind: v.string(),
         parent: v.nullable(v.string()),
         breadcrumbs: v.array(Link),
@@ -24854,6 +24920,7 @@ export const polities = {
       `);
       return {
         name: labels.full.get(input.id) ?? "",
+        native: labels.native.get(input.id) ?? null,
         kind: polity.kind,
         parent: polity.parent,
         breadcrumbs: crumbs.slice(0, -1),
@@ -26330,7 +26397,7 @@ async function namesakes(
   }
   const known = await db.execute<{ entity_id: string; text: string }>(sql`
     select entity_id, text from name
-    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
+    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english', 'transliteration')
   `);
   const matched = new Set(
     known.rows
@@ -27561,8 +27628,8 @@ export const entities = {
       const known =
         entity.type === "person"
           ? await db.execute<{ text: string }>(sql`
-            select text from name where entity_id = ${entity.id}::uuid and kind in ('official', 'english')
-            order by kind = 'english' and lang = 'en' and script = 'Latn' desc, is_preferred desc, text
+            select text from name where entity_id = ${entity.id}::uuid and kind in ('official', 'english', 'transliteration')
+            order by kind = 'english' and lang = 'en' and script = 'Latn' desc, kind = 'transliteration' desc, is_preferred desc, text
           `)
           : null;
       const owner =
@@ -27632,6 +27699,7 @@ export const people = {
     .output(
       v.object({
         name: v.string(),
+        native: Native,
         born: v.nullable(v.string()),
         precision: v.nullable(v.string()),
         died: v.nullable(v.string()),
@@ -28527,6 +28595,7 @@ export const people = {
         ].toSorted((a, b) => a.localeCompare(b))[0] ?? "9999";
       return {
         name: labels.full.get(person.id) ?? "",
+        native: labels.native.get(person.id) ?? null,
         born: person.born,
         precision: person.precision,
         died: person.died,
@@ -29650,6 +29719,7 @@ export const parties = {
     .output(
       v.object({
         name: v.string(),
+        native: Native,
         short: v.nullable(v.string()),
         color: v.nullable(v.string()),
         kind: v.string(),
@@ -29830,6 +29900,7 @@ export const parties = {
       const ranges = new Map(spans.rows.map((row) => [row.party, row]));
       return {
         name: self?.label ?? "",
+        native: own.native.get(party.id) ?? null,
         short: self?.short ?? null,
         color: self?.color ?? null,
         kind: party.kind,
@@ -29983,6 +30054,7 @@ export const search = {
           id: v.string(),
           type: v.string(),
           name: v.string(),
+          native: Native,
           path: v.nullable(v.string()),
           context: v.nullable(v.string()),
           date: v.nullable(v.string()),
@@ -30457,6 +30529,7 @@ export const search = {
             id: row.id,
             type: row.type,
             name: labels.full.get(row.id) ?? "",
+            native: labels.native.get(row.id) ?? null,
             path:
               row.type === "body" &&
               slugs.get(row.context ?? "") != null &&
@@ -30513,6 +30586,7 @@ export const search = {
         id: row.id,
         type: row.type,
         name: row.name,
+        native: row.native,
         path: located.get(row.id) ?? row.path,
         context: row.context,
         date: row.date,

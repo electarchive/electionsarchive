@@ -1617,6 +1617,7 @@
         rows: race.results.map((row) => ({
           key: row.key,
           label: row.label,
+          native: row.native,
           short: row.short,
           color: row.color,
           lean: row.lean,

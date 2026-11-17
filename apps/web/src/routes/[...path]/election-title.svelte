@@ -1,10 +1,14 @@
 <script lang="ts">
+  import type { Native } from "#lib/native.js";
+  import NativeName from "#lib/components/native-name.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const {
     head,
-  }: { head: { name: string; date: string | null; status: string } } = $props();
+  }: {
+    head: { name: string; native: Native; date: string | null; status: string };
+  } = $props();
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,
@@ -16,7 +20,7 @@
 
 <div class="grid content-start gap-1.5 min-inline-0">
   <h1 class="title">
-    {head.name}
+    <NativeName name={head.name} native={head.native} />
   </h1>
   <p
     class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"

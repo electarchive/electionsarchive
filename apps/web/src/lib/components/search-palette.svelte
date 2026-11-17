@@ -31,6 +31,7 @@
   import Logo from "#lib/components/logo.svelte";
   import * as Dialog from "#lib/components/ui/dialog/index.js";
   import { date } from "#lib/format.js";
+  import { ordered } from "#lib/native.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -644,6 +645,15 @@
   {/each}
 {/snippet}
 
+{#snippet named(hit: Hit)}
+  {const shown = $derived(ordered(hit.name, hit.native ?? null))}
+  <span lang={shown.primary.lang}>{@render name(shown.primary.text)}</span
+  >{#if shown.secondary != null}{" "}<span
+      class="font-normal text-muted-foreground"
+      lang={shown.secondary.lang}>{@render name(shown.secondary.text)}</span
+    >{/if}
+{/snippet}
+
 <Dialog.Root
   bind:open={finder.isOpen}
   onOpenChangeComplete={(open) => {
@@ -811,7 +821,7 @@
                     {@render glyph(item.hit, 56)}
                     <span class="grid gap-0.5 min-inline-0">
                       <span class="heading text-pretty"
-                        >{@render name(item.hit.name)}</span
+                        >{@render named(item.hit)}</span
                       >
                       {#if item.hit.office != null}
                         <span class="font-medium">{item.hit.office}</span>
@@ -859,7 +869,7 @@
                     {@render glyph(item.hit, 28)}
                     <span class="grid flex-1 min-inline-0">
                       <span class="truncate font-medium"
-                        >{@render name(item.hit.name)}</span
+                        >{@render named(item.hit)}</span
                       >
                       {#if item.hit.context != null}
                         <span

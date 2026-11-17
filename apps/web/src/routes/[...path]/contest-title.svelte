@@ -1,4 +1,5 @@
 <script lang="ts">
+  import NativeName from "#lib/components/native-name.svelte";
   import Term from "#lib/components/term.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -28,7 +29,11 @@
   >
 {/if}
 <h1 class="title" data-scope-title>
-  {(drilled ? heading : head.name).replaceAll("\u2014", "\u2060—")}
+  <NativeName
+    name={drilled ? heading : head.name}
+    native={drilled ? null : head.native}
+    format={(text: string) => text.replaceAll("\u2014", "\u2060—")}
+  />
 </h1>
 <p
   class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"

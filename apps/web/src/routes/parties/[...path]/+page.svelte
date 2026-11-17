@@ -6,8 +6,10 @@
   import { SvelteSet } from "svelte/reactivity";
   import Logo from "#lib/components/logo.svelte";
   import Name from "#lib/components/name.svelte";
+  import NativeName from "#lib/components/native-name.svelte";
   import ShareImage from "#lib/components/share-image.svelte";
   import { count, date } from "#lib/format.js";
+  import { titled } from "#lib/native.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -118,7 +120,9 @@
 </script>
 
 <svelte:head>
-  <title>{heading} | {m.wordmark()}</title>
+  <title
+    >{party.scope == null ? titled(heading, party.native) : heading} | {m.wordmark()}</title
+  >
   <meta name="description" content={description} />
   <link
     rel="canonical"
@@ -165,10 +169,14 @@
             />
           {/if}
           <h1 class="title">
-            {heading}{#if party.scope == null && party.short != null && !party.name.includes(party.short)}&nbsp;<span
-                class="font-sans text-[0.5em] font-semibold tracking-normal whitespace-nowrap text-muted-foreground"
-                >{party.short}</span
-              >{/if}
+            <NativeName
+              name={heading}
+              native={party.scope == null ? party.native : null}
+              >{#if party.scope == null && party.short != null && !party.name.includes(party.short)}&nbsp;<span
+                  class="font-sans text-[0.5em] font-semibold tracking-normal whitespace-nowrap text-muted-foreground"
+                  >{party.short}</span
+                >{/if}</NativeName
+            >
           </h1>
         </div>
         <div class="flex shrink-0 gap-2">

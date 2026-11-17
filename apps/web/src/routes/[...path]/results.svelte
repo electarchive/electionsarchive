@@ -17,6 +17,7 @@
     points,
     precision,
   } from "#lib/format.js";
+  import { ordered } from "#lib/native.js";
   import { explain, LOST, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -500,6 +501,7 @@
   {const row = $derived(line.row)}
   {const page = $derived(row.current)}
   {const other = $derived(row.earlier)}
+  {const shown = $derived(ordered(row.label, row.native ?? null))}
   <tr
     class={cn(
       "border-border/60",
@@ -564,7 +566,7 @@
             <span class="shrink! min-inline-0 min-md:truncate"
               ><Name
                 class="font-semibold text-foreground min-md:inline-block min-md:truncate min-md:align-bottom min-md:max-inline-full"
-                label={row.label}
+                label={shown.primary.text}
                 color={swatch(row.color, row.key)}
                 hasSwatch={false}
                 person={(page ?? other)?.person}
@@ -634,6 +636,12 @@
               {/if}
             </span>
           </span>
+          {#if shown.secondary != null}
+            <span
+              class="block text-[0.8125rem] text-muted-foreground"
+              lang={shown.secondary.lang}>{shown.secondary.text}</span
+            >
+          {/if}
           {#if line.subtitle != null && !line.isAbbreviated}
             <span class="mbs-2 block text-[0.8125rem] text-pretty">
               <Name

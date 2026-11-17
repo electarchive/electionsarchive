@@ -7,10 +7,12 @@
   import { ending } from "#lib/caucus.js";
   import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
+  import NativeName from "#lib/components/native-name.svelte";
   import ShareImage from "#lib/components/share-image.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, credit, date, percent } from "#lib/format.js";
+  import { titled } from "#lib/native.js";
   import { explain, LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -377,7 +379,7 @@
 {/snippet}
 
 <svelte:head>
-  <title>{person.name} | {m.wordmark()}</title>
+  <title>{titled(person.name, person.native)} | {m.wordmark()}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
   <meta property="og:type" content="profile" />
@@ -413,7 +415,7 @@
       {/if}
       <div class="flex items-start justify-between gap-3">
         <h1 class="title">
-          {person.name}
+          <NativeName name={person.name} native={person.native} />
         </h1>
         <div class="flex shrink-0 gap-2">
           <a

@@ -3,6 +3,7 @@
   import { setContext } from "svelte";
   import ShareImage from "#lib/components/share-image.svelte";
   import { date } from "#lib/format.js";
+  import { titled } from "#lib/native.js";
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
   import { Settled } from "#lib/settled.svelte.js";
@@ -75,13 +76,13 @@
     if (data.kind !== "contest") {
       return data.kind === "election"
         ? chosen == null
-          ? data.head.name
+          ? titled(data.head.name, data.head.native)
           : m.election_race_title({ race: chosen, election: data.head.name })
-        : data.polity.name;
+        : titled(data.polity.name, data.polity.native);
     }
     const name =
       data.head.scope.noun == null
-        ? data.head.name
+        ? titled(data.head.name, data.head.native)
         : `${data.head.scope.abroad == null ? data.head.scope.name : m.scope_abroad_title({ place: data.head.scope.name })}, ${data.head.name}`;
     const tail = /, [^,]+$/u.exec(data.head.election.name)?.[0];
     return /\b\d{4}\b/u.test(name)
