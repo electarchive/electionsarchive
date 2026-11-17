@@ -1,4 +1,5 @@
 import base64
+import html
 import io
 import json
 import re
@@ -8,17 +9,19 @@ import unicodedata
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 
+import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
 from ea import batch, raw
 from ea.sources.jp import mic, mic_hoc
+from ea.sources.jp.mlit import PREFECTURES
 from ea.store import DATA
 
 SOURCE = "jp.mic_hoc"
@@ -28,8 +31,11 @@ VERSION = "1"
 RAW = mic.SOURCE
 BASE = f"{mic.DATA_ROOT}/sangiin21"
 MODEL = "claude-haiku-5-5"
+CHECKER = "claude-sonnet-5-5"
+RECHECK = "sangiin21-sonnet"
 PROMPT = "1"
 READS = 2
+READERS = [(MODEL, 1), (MODEL, 2), (CHECKER, 1)]
 LONGEST = 1568
 DPI = 200
 TILES = {
@@ -143,21 +149,21 @@ def tiles(url: str, page: int) -> dict[str, tuple[tuple[int, int, int, int], Ima
     return found
 
 
-def read_key(url: str, page: int, tile: str, read: int) -> str:
-    return f"anthropic-batch:{MODEL}/{PROMPT}/sangiin21/{stem(url)}/{page}/{tile}/{read}"
+def read_key(url: str, page: int, tile: str, read: int, model: str = MODEL) -> str:
+    return f"anthropic-batch:{model}/{PROMPT}/sangiin21/{stem(url)}/{page}/{tile}/{read}"
 
 
-def read(url: str, page: int, tile: str, number: int) -> dict[str, Any]:
-    message = json.loads(raw.cached(SOURCE, read_key(url, page, tile, number)).path.read_text())
+def read(url: str, page: int, tile: str, number: int, model: str = MODEL) -> dict[str, Any]:
+    message = json.loads(raw.cached(SOURCE, read_key(url, page, tile, number, model)).path.read_text())
     return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
 
 
-def request(crop: Image.Image, read: int) -> batch.Want:
+def request(crop: Image.Image, read: int, model: str = MODEL) -> batch.Want:
     buffer = io.BytesIO()
     crop.quantize(4).save(buffer, "PNG", optimize=True)
-    price_in, price_out = batch.PRICES[MODEL]
+    price_in, price_out = batch.PRICES[model]
     params = MessageCreateParamsNonStreaming(
-        model=MODEL,
+        model=model,
         max_tokens=16000,
         system=SYSTEM,
         messages=[
@@ -226,465 +232,991 @@ def ocr() -> None:
     print(batch.ensure(SOURCE, JOB, wanted)[1])
 
 
-# ---------------------------------------------------------------------------------------------------------------
-# Parsing: two reads of every band become one table per PDF, checked against its own subtotals and tied to the
-# 結果調 totals.
+def rechecks(crops: str) -> dict[str, batch.Want]:
+    """One read with a stronger model of each band a list in the parsed folder names."""
+    urls = {stem(document.url): document.url for document in documents()}
+    wanted_tiles: dict[tuple[str, int], set[str]] = {}
+    for name, page, tile in json.loads((PARSED / crops).read_text()):
+        wanted_tiles.setdefault((urls[name], page), set()).add(tile)
+
+    def build(item: tuple[tuple[str, int], set[str]]) -> dict[str, batch.Want]:
+        (url, page), chosen = item
+        return {
+            read_key(url, page, tile, 1, CHECKER): request(crop, 1, CHECKER)
+            for tile, (_, crop) in tiles(url, page).items()
+            if tile in chosen
+        }
+
+    wanted: dict[str, batch.Want] = {}
+    with ThreadPoolExecutor(4) as pool:
+        for part in pool.map(build, wanted_tiles.items()):
+            wanted.update(part)
+    return wanted
 
 
-SUBTOTAL = re.compile(r"計$")
-TOP = re.compile(r"(合計|[都道府県]計)$")
-SKIP_COLUMN = re.compile(r"率|時刻|確定|残票")
-CANDIDATE = re.compile(r"^\s*\d+\s*(?:/|$)")
-MAX_OVERLAP = 30
-MAX_TRIES = 3
+def recheck(crops: str = f"recheck-v{VERSION}.json") -> None:
+    """Send the stronger reads through their own batch, by default of every band whose figures the last parse
+    could not reconcile. It stops before sending until the approval line has run."""
+    wanted = rechecks(crops)
+    total, dollars = estimate(wanted)
+    print(
+        f"ea batch approve {SOURCE}/{RECHECK} {max(1.0, round(dollars * 1.5)):.0f}   # {total} requests, ${dollars:.2f}"
+    )
+    print(batch.ensure(SOURCE, RECHECK, wanted)[1])
+
+
+PARTIES = [
+    "維新政党・新風",
+    "社会民主党",
+    "公明党",
+    "9条ネット",
+    "共生新党",
+    "日本共産党",
+    "国民新党",
+    "自由民主党",
+    "民主党",
+    "新党日本",
+    "女性党",
+]
+SHORT = {
+    "共産党": "日本共産党",
+    "共産": "日本共産党",
+    "自民党": "自由民主党",
+    "自民": "自由民主党",
+    "社民党": "社会民主党",
+    "社民": "社会民主党",
+    "国民": "国民新党",
+    "新風": "維新政党・新風",
+    "共生": "共生新党",
+    "公明": "公明党",
+    "民主": "民主党",
+    "9条": "9条ネット",
+    "女党": "女性党",
+    "女性": "女性党",
+    "日本": "新党日本",
+}
+XLS = f"{BASE}/xls/sangiin21_{{}}.xls"
+BOOK = f"{BASE}/pdf/sangiin21_3_13.pdf"
+NAMES = [native for native, _ in PREFECTURES]
+MARKS = re.compile(r"[\s☆★※◎○●◇◆□■*＊]+")
+AGGREGATE = re.compile(r"(計|郡)(\(.*\))?$")
+ROSTER = re.compile(r"^\d")
+NOISE = re.compile(r"表記|率|順位|番号|名簿|候補者|得票総数|その他の|unreadable|^[.…・]+$")
+TIME = re.compile(r"\d\s*[時:]\s*\d|確定|未")
+CLOCK = "!clock"
+STAMP = re.compile(r"\d{1,2}:\d{2}(今回)?確定$")
+MISREAD = re.compile(r"(?<![市区郡])[都部]$")
+WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="[\d.]+">(.*?)</word>')
+SKIP = ("率", "時刻", "確定", "残", "不受理", "持", "その他", "番号", "法定", "没収")
+SMD_KEYS = (
+    ("投票者", "s:voters"),
+    ("無効", "s:invalid"),
+    ("投票総数", "s:ballots"),
+    ("有効", "s:valid"),
+    ("按分", "s:frac"),
+    ("あん分", "s:frac"),
+    ("端数", "s:frac"),
+    ("属", "s:none"),
+    ("得票", "s:sum"),
+    ("合計", "s:sum"),
+    ("小計", "s:sum"),
+)
+PR_BALLOTS = (
+    ("投票者", "r:voters"),
+    ("無効", "r:invalid"),
+    ("投票総数", "r:ballots"),
+    ("有効", "r:valid"),
+    ("按分", "r:frac"),
+    ("端数", "r:frac"),
+    ("属さない", "r:none"),
+)
+REPAIRS = 4
+TRIES = 3
+MAX_OVERLAP = 40
 
 
 def norm(text: str) -> str:
-    text = unicodedata.normalize("NFKC", text)
-    return re.sub(r"[\s☆★※◎○●*＊]+", "", text).replace("ケ", "ヶ")
+    return MARKS.sub("", unicodedata.normalize("NFKC", text)).replace("ケ", "ヶ")
+
+
+def place_label(text: str) -> str:
+    label = STAMP.sub("", norm(text)).rstrip("・")
+    return "" if NOISE.search(label) else MISREAD.sub("郡", label) if len(label) >= 3 else label
+
+
+def flat(text: str) -> str:
+    return re.sub(r"[\s・]", "", unicodedata.normalize("NFKC", text))
 
 
 def figure(text: str) -> Decimal | None:
-    """A printed cell as a number; None for a blank, 0 for a dash."""
-    text = unicodedata.normalize("NFKC", text).replace(",", "").replace(" ", "")
-    if text in {"", "\u3000"}:
-        return None
+    """A printed cell as a number, or None for a blank or unreadable cell; a dash is 0."""
+    text = re.sub(r"\(\s*\d+\.\d+\s*\)$", "", unicodedata.normalize("NFKC", text)).replace(",", "").replace(" ", "")
     if text in {"-", "－", "―", "ー", "|"}:
         return Decimal(0)
-    try:
-        return Decimal(text)
-    except InvalidOperation:
+    if not re.fullmatch(r"\d+(?:\.\d{1,3})?", text):
         return None
+    return Decimal(text)
+
+
+def ratio(left: str, right: str) -> float:
+    return SequenceMatcher(None, left, right, autojunk=False).ratio() if left and right else 0.0
+
+
+@dataclass(frozen=True)
+class Candidate:
+    order: int
+    name: str
+    party: str
+    votes: Decimal
+    elected: bool
+
+
+def prefecture_of(label: str) -> int | None:
+    label = re.sub(r"\s", "", label)
+    return NAMES.index(label) + 1 if label in NAMES else None
+
+
+def book() -> dict[int, list[Candidate]]:
+    """The prefectural district candidates in ballot order, from the 結果調 book's two-column pages."""
+    path = raw.cached(RAW, BOOK).path
+    text = subprocess.run(["pdftotext", "-bbox", path, "-"], capture_output=True, text=True, check=True).stdout
+    found: dict[int, list[Candidate]] = {}
+    prefecture: int | None = None
+    for page in text.split("<page")[1:]:
+        words = [
+            (float(left), float(top), float(right), unicodedata.normalize("NFKC", html.unescape(word)))
+            for left, top, right, word in WORD.findall(page)
+        ]
+        for half in (0, 1):
+            lines: dict[int, list[tuple[float, float, float, str]]] = {}
+            for left, top, right, word in words:
+                if (left >= 412) == bool(half):
+                    lines.setdefault(round(top), []).append((left - 373 * half, top, right - 373 * half, word))
+            for _, line in sorted(lines.items()):
+                line.sort()
+                heads = [word for left, _, _, word in line if left < 60 and prefecture_of(word)]
+                if heads:
+                    prefecture = prefecture_of(heads[0])
+                    found[prefecture or 0] = []
+                    continue
+                if prefecture is None or line[0][3] not in ("当", "落") or line[0][0] > 55:
+                    continue
+                name = [word for word in line if 55 <= word[0] < 160]
+                if not name:
+                    continue
+                gaps = [(name[i + 1][0] - name[i][2], i) for i in range(len(name) - 1)]
+                cut = max(gaps)[1] + 1 if gaps and max(gaps)[0] > 9 else len(name)
+                display = " ".join(
+                    part for part in ("".join(w[3] for w in name[:cut]), "".join(w[3] for w in name[cut:])) if part
+                )
+                party = "".join(word for left, _, _, word in line if 190 <= left < 280)
+                votes = "".join(word for left, _, _, word in line if 340 <= left < 412)
+                found[prefecture].append(
+                    Candidate(len(found[prefecture]) + 1, display, party, mic.amount(votes), line[0][3] == "当")
+                )
+    return found
+
+
+def sheet(name: str, last: bool = False) -> list[list[str]]:
+    path = raw.cached(RAW, XLS.format(name)).path
+    names = mic.sheets(path)
+    return [row for title in (names[-1:] if last else names) for row in mic.grid(path, title)]
+
+
+def party_name(text: str) -> str | None:
+    text = flat(text)
+    for name in sorted(PARTIES, key=len, reverse=True):
+        if flat(name) in text:
+            return name
+    for token in re.split(r"[/:()]", text):
+        if token in SHORT:
+            return SHORT[token]
+        best = max(PARTIES, key=lambda name: ratio(token, flat(name)))
+        if len(token) >= 3 and ratio(token, flat(best)) >= 0.75:
+            return best
+    return None
 
 
 @dataclass
-class Row:
-    label: str
-    seen: list[list[str]]
+class Official:
+    """What the ministry's tables print for each prefecture: the district candidates and every column's total."""
+
+    smd: dict[int, list[Candidate]]
+    lists: dict[str, list[str]]
+    totals: dict[int, dict[str, Decimal]]
+
+
+def official() -> Official:
+    smd = book()
+    totals: dict[int, dict[str, Decimal]] = {number: {} for number in range(1, 48)}
+    for number, candidates in smd.items():
+        for candidate in candidates:
+            totals[number][f"s{candidate.order}"] = candidate.votes
+    for name, prefix in (("3_8", "s"), ("3_7", "r")):
+        for row in sheet(name):
+            if (number := prefecture_of(row[0] or row[1])) is not None:
+                cells = [cell for cell in row if cell]
+                for part, cell in zip(("ballots", "valid", "invalid"), cells[1:4], strict=True):
+                    totals[number][f"{prefix}:{part}"] = mic.amount(cell)
+    starts: list[tuple[int, str | None]] = []
+    for row in sheet("3_5"):
+        if not row[0] and any(cell and party_name(cell) for cell in row):
+            starts = [(i, party_name(cell)) for i, cell in enumerate(row) if cell]
+        if (number := prefecture_of(row[0])) is None:
+            continue
+        for i, party in starts:
+            for part, offset in (("t", 0), ("p", 2), ("l", 3)):
+                totals[number][f"{part}:{party}"] = mic.amount(row[i + offset])
+    for found in totals.values():
+        for part in ("t", "p", "l"):
+            found[f"{part}:all"] = sum((found[f"{part}:{party}"] for party in PARTIES), Decimal(0))
+    lists: dict[str, list[str]] = {}
+    for index in range(1, 12):
+        rows = sheet(f"3_11_{index}", last=True)
+        party = party_name(next(cell for row in rows for cell in row if cell.startswith("政党等の名称")))
+        if party is None:
+            raise ValueError(f"3_11_{index}: no party")
+        people = lists.setdefault(party, [])
+        columns: dict[int, str] = {}
+        for row in rows:
+            if row[0].startswith("名簿登載者名"):
+                columns = {i: mic.person_name(cell) for i, cell in enumerate(row) if i and cell}
+                people += [name for name in columns.values() if name not in people]
+            elif (number := prefecture_of(row[0])) is not None:
+                for i, name in columns.items():
+                    totals[number][f"c:{party}:{name}"] = mic.amount(row[i])
+    return Official(smd, lists, totals)
+
+
+def smd_key(text: str, candidates: list[Candidate]) -> str | None:
+    plain = flat(text)
+    if not plain or any(word in plain for word in SKIP):
+        return None
+    match = re.match(r"^\(?0*(\d{1,2})\)?[/:.]?", plain)
+    rest = plain[match.end() :] if match else plain
+    rest = re.sub(r"\(.*?\)|（.*?）", "", rest)
+    for party in sorted({c.party for c in candidates} | set(PARTIES), key=len, reverse=True):
+        rest = rest.replace(flat(party), "")
+    rest = rest.replace("/", "")
+    scores = sorted(((ratio(rest, flat(c.name)), c.order) for c in candidates), reverse=True)
+    if match and 1 <= int(match[1]) <= len(candidates):
+        number = int(match[1])
+        named = ratio(rest, flat(candidates[number - 1].name))
+        if scores and scores[0][0] >= 0.75 and scores[0][1] != number and named < 0.5:
+            return f"s{scores[0][1]}"
+        if not rest or named >= 0.3 or not scores or scores[0][0] < 0.6:
+            return f"s{number}"
+    if scores and scores[0][0] >= 0.6 and (len(scores) == 1 or scores[0][0] - scores[1][0] >= 0.15):
+        return f"s{scores[0][1]}"
+    for word, key in SMD_KEYS:
+        if word in plain:
+            return key
+    return None
+
+
+def part_of(text: str) -> str | None:
+    if any(word in text for word in ("率", "時刻", "確定", "残")):
+        return None
+    if "政党等" in text or "政党得票" in text or "政党名" in text or re.search(r"(^|/)政党(/|$)", text):
+        return "p"
+    if "名簿登載者" in text or "候補者" in text:
+        return "l"
+    if "得票" in text or "合計" in text or text.endswith("計"):
+        return "t"
+    return None
+
+
+def party_keys(header: list[str]) -> list[str | None]:
+    """Keys for a party table's columns: each party's total, party-name votes, and list votes, or the ballots."""
+    cells = [flat(text) for text in header]
+    found: list[tuple[str | None, str | None]] = []
+    for text in cells:
+        ballot = next((key for word, key in PR_BALLOTS if word in text), None)
+        if ballot is not None and party_name(text) is None and "名簿" not in text and "政党" not in text:
+            found.append(("ballot", ballot))
+            continue
+        number = re.match(r"^0*(\d{1,2})[/:]", text)
+        party = "all" if "全党派" in text or text.startswith("合計/") else party_name(text)
+        if party is None and number and 1 <= int(number[1]) <= len(PARTIES):
+            party = PARTIES[int(number[1]) - 1]
+        part = part_of(text)
+        if party is not None and part is None and "率" not in text:
+            part = "t"
+        found.append((party, part))
+    order = {"t": 0, "p": 1, "l": 2}
+    named = [party for party, _ in found if party not in (None, "ballot")]
+    for i, (party, part) in enumerate(found):
+        if party is not None or part is None:
+            continue
+        before = next(((p, q) for p, q in reversed(found[:i]) if q is not None), None)
+        after = next(((p, q) for p, q in found[i + 1 :] if q is not None), None)
+        if before and before[0] not in (None, "ballot") and order.get(before[1] or "", 9) < order[part]:
+            found[i] = (before[0], part)
+        elif after and after[0] not in (None, "ballot") and order.get(after[1] or "", -1) > order[part]:
+            found[i] = (after[0], part)
+        elif not named:
+            found[i] = ("all", part)
+    return [
+        part if party == "ballot" else f"{part}:{party}" if party is not None and part is not None else None
+        for party, part in found
+    ]
+
+
+def candidate_text(text: str) -> tuple[int | None, str]:
+    plain = flat(text)
+    number = re.match(r"^\(?0*(\d{1,2})\)?[/:.]?", plain)
+    rest = plain[number.end() :] if number else plain
+    for name in sorted({*PARTIES, *SHORT}, key=len, reverse=True):
+        rest = rest.replace(flat(name), "")
+    return (int(number[1]) if number else None), rest.replace("/", "")
+
+
+def named(text: str, people: list[str], least: float) -> str | None:
+    scores = sorted(((ratio(text, flat(name)), name) for name in people), reverse=True)
+    if scores and scores[0][0] >= least and (len(scores) == 1 or scores[0][0] - scores[1][0] >= 0.1):
+        return scores[0][1]
+    return None
+
+
+def list_key(text: str, party: str, people: list[str]) -> str | None:
+    """A list table column: a candidate by list number (or by name when no number is printed), or a party total."""
+    plain = flat(text)
+    if not plain or any(word in plain for word in ("率", "時刻", "確定")):
+        return None
+    number, rest = candidate_text(text)
+    if number is None or rest.startswith(("計", "合計")):
+        part = part_of(plain)
+        if part == "t" and ("計" in plain and "合計得票" not in plain and "得票総数" not in plain):
+            part = "l"
+        if part is not None:
+            return f"{part}:{party_name(plain) or party}"
+    name = named(rest, people, 0.75 if number is not None else 0.6)
+    if name is not None:
+        return f"c:{party}:{name}"
+    return f"#:{party}:{number}" if number is not None else None
 
 
 @dataclass
-class Strip:
-    columns: list[str]
-    rows: list[Row]
-    alt: list[str] = field(default_factory=list)
-    notes: list[str] = field(default_factory=list)
+class Fragment:
+    document: Document
+    page: int
+    tile: str
+    read: int
+    keys: list[str | None]
+    labels: list[str]
+    cells: list[list[str]]
 
 
-def strip_of(table: dict[str, Any]) -> Strip:
-    return Strip(
-        [str(column) for column in table["columns"]],
-        [Row(norm(row["label"]), [list(row["cells"])]) for row in table["rows"] if norm(row["label"])],
-    )
-
-
-def labels(rows: list[Row]) -> list[str]:
-    return [row.label for row in rows]
-
-
-def overlap(top: Strip, bottom: Strip) -> tuple[int, int, int] | None:
-    """Where the tail of the upper band and the head of the lower band show the same row labels."""
-    above = labels(top.rows)[-MAX_OVERLAP:]
-    below = labels(bottom.rows)[:MAX_OVERLAP]
-    hit = SequenceMatcher(None, above, below, autojunk=False).find_longest_match(0, len(above), 0, len(below))
-    if hit.size == 0 or hit.a + hit.size < len(above) - 1 or hit.b > 1:
-        return None
-    return len(top.rows) - len(above) + hit.a, hit.b, hit.size
-
-
-def join(top: Strip, bottom: Strip) -> bool:
-    """Append the lower band's table to the upper band's when it continues it; the shared rows keep both reads."""
-    found = overlap(top, bottom)
-    if found is None:
-        if bottom.columns:
-            return False
-        top.notes.append("bands share no row label")
-        top.rows += bottom.rows
-        return True
-    start, head, size = found
-    for offset in range(size):
-        top.rows[start + offset].seen += bottom.rows[head + offset].seen
-    top.rows += bottom.rows[head + size :]
-    if not top.columns:
-        top.columns = bottom.columns
-    return True
-
-
-def stitch(bands: list[list[Strip]]) -> list[Strip]:
-    """The bands of one page, top to bottom, as that page's tables."""
-    out: list[Strip] = []
-    for band in bands:
-        for index, table in enumerate(band):
-            if index == 0 and out and join(out[-1], table):
-                continue
-            out.append(table)
-    return out
-
-
-def similar(left: list[str], right: list[str]) -> bool:
-    if not left or not right:
-        return True
-    return len(left) == len(right) and SequenceMatcher(None, "/".join(left), "/".join(right)).ratio() > 0.6
-
-
-def combine(first: list[Strip], second: list[Strip]) -> list[Strip]:
-    """Pair the tables of the two reads of a page and pool each row's observations by row label."""
-    if len(first) != len(second):
-        pairs = []
-        left, right = list(first), list(second)
-        for table in left:
-            match = next((other for other in right if similar(table.columns, other.columns)), None)
-            if match is not None:
-                right.remove(match)
-            pairs.append((table, match))
-        pairs += [(other, None) for other in right]
+def header_keys(document: Document, header: list[str], facts: Official) -> list[str | None]:
+    if document.kind == "district":
+        keys = [smd_key(text, facts.smd[document.prefecture]) for text in header]
+    elif document.kind == "party":
+        keys = party_keys(header)
     else:
-        pairs = list(zip(first, second, strict=True))
-    out = []
-    for one, two in pairs:
-        if two is None:
-            out.append(one)
-            continue
-        if one.columns != two.columns:
-            one.alt = two.columns
-        blocks = SequenceMatcher(None, labels(one.rows), labels(two.rows), autojunk=False).get_opcodes()
-        rows: list[Row] = []
-        for tag, a0, a1, b0, b1 in blocks:
-            if tag == "equal" or (tag == "replace" and a1 - a0 == b1 - b0):
-                for x, y in zip(one.rows[a0:a1], two.rows[b0:b1], strict=True):
-                    x.seen += y.seen
-                    rows.append(x)
-                if tag == "replace":
-                    one.notes.append(f"row labels differ: {labels(one.rows[a0:a1])} against {labels(two.rows[b0:b1])}")
-            else:
-                rows += one.rows[a0:a1] + two.rows[b0:b1]
-                one.notes.append(f"reads disagree on rows {labels(one.rows[a0:a1])} {labels(two.rows[b0:b1])}")
-        one.rows = rows
-        out.append(one)
+        party = party_name(document.party) or document.party
+        keys = [list_key(text, party, facts.lists.get(party, [])) for text in header]
+    return [CLOCK if re.search(r"時刻|確定", text) else key for text, key in zip(header, keys, strict=True)]
+
+
+def real(header: list[str], keys: list[str | None]) -> bool:
+    printed = [key for text, key in zip(header, keys, strict=True) if flat(text) and not flat(text).isdigit()]
+    return bool(printed) and sum(key is not None for key in printed) * 2 >= len(printed)
+
+
+def renumbered(found: list[Fragment], seen: dict[str, list[tuple[int, str]]]) -> None:
+    """Name the list columns printed with a number only. Most prefectures number each party's candidates from 1,
+    some number all lists in one run, so each document's offset comes from the columns whose names do match."""
+    numbers: dict[str, Counter[int]] = {}
+    for pairs in seen.values():
+        for at, key in pairs:
+            numbers.setdefault(key, Counter())[at] += 1
+    position = {key: counts.most_common(1)[0][0] for key, counts in numbers.items()}
+    by_number = {(key.split(":")[1], at): key for key, at in position.items()}
+    shift = {
+        name: Counter(at - position[key] for at, key in pairs).most_common(1)[0][0] if pairs else 0
+        for name, pairs in seen.items()
+    }
+    for fragment in found:
+        offset = shift.get(stem(fragment.document.url), 0)
+        fragment.keys = [
+            by_number.get((key.split(":")[1], int(key.split(":")[2]) - offset))
+            if key is not None and key.startswith("#:")
+            else key
+            for key in fragment.keys
+        ]
+
+
+def fragments(held: set[str], facts: Official) -> list[Fragment]:
+    """Every table of every band read, with the column keys of the header its page prints."""
+    out: list[Fragment] = []
+    seen: dict[str, list[tuple[int, str]]] = {}
+    for document in documents():
+        previous: dict[int, list[str | None]] = {}
+        for page in range(1, pages(document) + 1):
+            found: dict[int, list[tuple[str, list[str | None] | None, dict[str, Any]]]] = {}
+            for number, (model, attempt) in enumerate(READERS, 1):
+                for tile in ("top", "middle", "bottom"):
+                    if read_key(document.url, page, tile, attempt, model) not in held:
+                        continue
+                    try:
+                        tables = read(document.url, page, tile, attempt, model)["tables"]
+                    except json.JSONDecodeError:
+                        continue
+                    for table in tables:
+                        header = [str(text) for text in table["columns"]]
+                        keys = header_keys(document, header, facts)
+                        for text, key in zip(header, keys, strict=True):
+                            at, _ = candidate_text(text)
+                            if document.kind == "list" and at is not None and key is not None and key.startswith("c:"):
+                                seen.setdefault(stem(document.url), []).append((at, key))
+                        found.setdefault(number, []).append((tile, keys if real(header, keys) else None, table))
+            first = {n: next((keys for _, keys, _ in tables if keys), None) for n, tables in found.items()}
+            for number, tables in found.items():
+                current = first[number] or next((keys for keys in first.values() if keys), None)
+                current = current or previous.get(number)
+                for tile, keys, table in tables:
+                    current = keys or current
+                    rows = [
+                        (place_label(str(row["label"])), [str(cell) for cell in row["cells"]]) for row in table["rows"]
+                    ]
+                    rows = [(label, cells) for label, cells in rows if label]
+                    if (
+                        current is None
+                        or not rows
+                        or 2 * sum(bool(ROSTER.match(label)) for label, _ in rows) > len(rows)
+                    ):
+                        continue
+                    out.append(
+                        Fragment(
+                            document,
+                            page,
+                            tile,
+                            number,
+                            current,
+                            [label for label, _ in rows],
+                            [cells for _, cells in rows],
+                        )
+                    )
+                if current is not None:
+                    previous[number] = current
+    renumbered(out, seen)
     return out
 
 
-def tables_of(held: set[str], url: str, page: int, number: int) -> list[Strip] | None:
-    bands: list[list[Strip]] = []
-    found = [tile for tile in ("top", "middle", "bottom") if read_key(url, page, tile, number) in held]
-    if not found:
-        return None
-    for tile in found:
-        bands.append([strip_of(table) for table in read(url, page, tile, number)["tables"]])
-    return stitch(bands)
+def place(labels: list[str], canon: list[str]) -> list[int | None]:
+    """Where each row of a band falls among the prefecture's rows: by printed order, or by a label printed once
+    when a document orders its rows differently."""
+    at: list[int | None] = [None] * len(labels)
+    for tag, i0, i1, j0, j1 in SequenceMatcher(None, labels, canon, autojunk=False).get_opcodes():
+        if tag == "equal":
+            for offset in range(i1 - i0):
+                at[i0 + offset] = j0 + offset
+        elif tag == "replace" and (i1 - i0 == j1 - j0 or i0 == 0 or i1 == len(labels)):
+            size = min(i1 - i0, j1 - j0)
+            pairs = (
+                [(i1 - k, j1 - k) for k in range(1, size + 1)]
+                if i0 == 0 and i1 - i0 != j1 - j0
+                else [(i0 + k, j0 + k) for k in range(size)]
+            )
+            for i, j in pairs:
+                if ratio(labels[i], canon[j]) >= 0.34:
+                    at[i] = j
+        elif tag == "replace":
+            j = j0
+            for i in range(i0, i1):
+                best = max(range(j, j1), key=lambda k: ratio(labels[i], canon[k]), default=None)
+                if best is not None and ratio(labels[i], canon[best]) >= 0.5:
+                    at[i] = best
+                    j = best + 1
+    once = {label: j for j, label in enumerate(canon) if canon.count(label) == 1}
+    taken = {j for j in at if j is not None}
+    for i, label in enumerate(labels):
+        if at[i] is None and once.get(label) is not None and once[label] not in taken:
+            at[i] = once[label]
+            taken.add(once[label])
+    return at
+
+
+def canonical(sequences: list[list[str]]) -> list[str]:
+    """The prefecture's rows in printed order, assembled from overlapping bands by majority."""
+    order = sorted(
+        (labels for labels in sequences if len(labels) >= 2),
+        key=lambda labels: (len(set(labels)) - len(labels), len(labels)),
+        reverse=True,
+    )
+    if not order:
+        return []
+    canon = list(order[0])
+    for _ in range(60):
+        heads: Counter[tuple[str, ...]] = Counter()
+        tails: Counter[tuple[str, ...]] = Counter()
+        inserts: Counter[tuple[int, tuple[str, ...]]] = Counter()
+        cover = [0] * (len(canon) + 1)
+        for labels in order:
+            ops = SequenceMatcher(None, labels, canon, autojunk=False).get_opcodes()
+            equal = [op for op in ops if op[0] == "equal"]
+            if not equal or sum(op[2] - op[1] for op in equal) < min(3, len(labels)):
+                continue
+            lo, hi = equal[0][3] - equal[0][1], equal[-1][4] + (len(labels) - equal[-1][2])
+            for j in range(max(lo, 0) + 1, min(hi, len(canon))):
+                cover[j] += 1
+            for tag, i0, i1, j0, j1 in ops:
+                if tag != "delete":
+                    continue
+                if j0 == 0 and i0 == 0:
+                    heads[tuple(labels[i0:i1])] += 1
+                elif j0 == len(canon) and i1 == len(labels):
+                    tails[tuple(labels[i0:i1])] += 1
+                elif 0 < j0 < len(canon):
+                    inserts[j0, tuple(labels[i0:i1])] += 1
+        grown = False
+        known = set(canon)
+        added = sorted(
+            (
+                (j, rows)
+                for (j, rows), count in inserts.items()
+                if count >= max(2, cover[j] * 0.3) and not known.issuperset(rows)
+            ),
+            reverse=True,
+        )
+        taken: set[int] = set()
+        for j, rows in added:
+            if j not in taken:
+                canon[j:j] = list(rows)
+                taken.add(j)
+                grown = True
+        for counter, front in ((heads, True), (tails, False)):
+            counter = Counter({rows: count for rows, count in counter.items() if not known.issuperset(rows)})
+            if not counter:
+                continue
+            longest = max(len(rows) for rows in counter)
+            for size in range(longest, 0, -1):
+                votes = Counter(rows[-size:] if front else rows[:size] for rows in counter if len(rows) >= size)
+                rows, count = votes.most_common(1)[0]
+                if count >= 2 or (count >= 1 and len(counter) == 1):
+                    canon = [*rows, *canon] if front else [*canon, *rows]
+                    grown = True
+                    break
+        if not grown:
+            break
+    votes = [Counter[str]() for _ in canon]
+    for labels in order:
+        for label, j in zip(labels, place(labels, canon), strict=True):
+            if j is not None:
+                votes[j][label] += 1
+    return [vote.most_common(1)[0][0] if vote else label for vote, label in zip(votes, canon, strict=True)]
+
+
+Source = tuple[str, int, str, int]
+Cell = tuple[str, int]
 
 
 @dataclass
-class Grid:
-    """One PDF: every column strip of every page joined on the row labels."""
+class Prefecture:
+    number: int
+    rows: list[str]
+    observed: dict[Cell, list[tuple[Decimal | None, Source]]]
+    dropped: int = 0
+    alternates: dict[Cell, set[Decimal]] = field(default_factory=dict)
+    leaves: list[int] = field(default_factory=list)
+    members: dict[int, list[int]] = field(default_factory=dict)
+    values: dict[Cell, Decimal | None] = field(default_factory=dict)
+    how: dict[Cell, str] = field(default_factory=dict)
+    review: list[dict[str, Any]] = field(default_factory=list)
 
-    columns: list[str] = field(default_factory=list)
-    alt: dict[str, str] = field(default_factory=dict)
-    labels: list[str] = field(default_factory=list)
-    cells: list[dict[int, list[list[str]]]] = field(default_factory=list)
-    notes: list[str] = field(default_factory=list)
+
+def alike(left: list[str | None], right: list[str | None]) -> bool:
+    return len(left) == len(right) and 2 * sum(
+        a == b and a is not None for a, b in zip(left, right, strict=True)
+    ) >= len(left)
 
 
-def assemble(found: list[Strip]) -> Grid:
-    """Tables with the same header continue each other downward. Tables with other headers over the same rows are
-    further columns of the same rows."""
-    groups: list[list[Strip]] = []
-    for table in found:
-        match = next((g for g in groups if similar(g[0].columns, table.columns)), None)
+def joined(head: list[str], tail: list[str]) -> list[str]:
+    """One band's rows after the band above, without the rows both show."""
+    for size in range(min(len(head), len(tail), MAX_OVERLAP), 0, -1):
+        same = sum(ratio(a, b) >= 0.6 for a, b in zip(head[-size:], tail[:size], strict=True))
+        if same >= 0.7 * size and (size >= 2 or head[-1] == tail[0]):
+            return head + tail[size:]
+    return head + tail
+
+
+def repeats(labels: list[str], added: list[str]) -> bool:
+    seen = set(labels)
+    return 2 * sum(label in seen for label in added) > len(added)
+
+
+def sequences(found: list[Fragment]) -> list[list[str]]:
+    """The rows each read of each document shows for one header, page after page."""
+    groups: dict[tuple[str, int], list[tuple[list[str | None], list[str]]]] = {}
+    for fragment in found:
+        sections = groups.setdefault((stem(fragment.document.url), fragment.read), [])
+        match = next(
+            (
+                labels
+                for keys, labels in sections
+                if alike(keys, fragment.keys) and not repeats(labels, joined(labels, fragment.labels)[len(labels) :])
+            ),
+            None,
+        )
         if match is None:
-            groups.append([table])
+            sections.append((fragment.keys, list(fragment.labels)))
         else:
-            match.append(table)
-    grid = Grid()
-    keys: dict[tuple[str, int], int] = {}
-    for group in sorted(groups, key=lambda g: -sum(len(t.rows) for t in g)):
-        seen: Counter[str] = Counter()
-        base = len(grid.columns)
-        head = group[0]
-        for index, name in enumerate(head.columns or [f"#{len(grid.columns)}"]):
-            name = name if name not in grid.columns else f"{name}#{base + index}"
-            grid.columns.append(name)
-            if head.alt:
-                grid.alt[name] = head.alt[index] if index < len(head.alt) else ""
-        for table in group:
-            grid.notes += table.notes
-            for row in table.rows:
-                seen[row.label] += 1
-                key = (row.label, seen[row.label])
-                if key not in keys:
-                    keys[key] = len(grid.labels)
-                    grid.labels.append(row.label)
-                    grid.cells.append({})
-                grid.cells[keys[key]][base] = row.seen
-    return grid
+            match[:] = joined(match, fragment.labels)
+    return [labels for sections in groups.values() for _, labels in sections]
 
 
-def observations(grid: Grid, row: int, column: int) -> list[str]:
-    """Every read of one cell, from whichever strip holds its column."""
-    start = max(base for base in grid.cells[row] if base <= column)
-    out = []
-    for cells in grid.cells[row][start]:
-        if column - start < len(cells):
-            out.append(cells[column - start])
+def fitted(keys: list[str | None], cells: list[str]) -> list[tuple[str, str]]:
+    """A row's cells by key when a band read without its header gives the row more or fewer cells: blank cells the
+    header has no column for are dropped, and unkeyed columns at either end may be missing."""
+    if any(TIME.search(cell) for cell in cells):
+        cells = [cell for cell in cells if not TIME.search(cell)]
+        keys = [key for key in keys if key != CLOCK]
+    width = len(keys)
+    if len(cells) > width:
+        cells = [cell for cell in cells if cell.strip()]
+    gap = width - len(cells)
+    if gap > 0 and not any(keys[len(cells) :]):
+        keys = keys[: len(cells)]
+    elif gap > 0 and not any(keys[:gap]):
+        keys = keys[gap:]
+    if len(keys) != len(cells):
+        keyed = [key for key in keys if key is not None and key != CLOCK]
+        filled = [cell for cell in cells if cell.strip()]
+        if len(keyed) == len(filled):
+            return list(zip(keyed, filled, strict=True))
+        if 0 < len(keys) - len(cells) <= 2:
+            keys = keys[: len(cells)]
+        else:
+            return []
+    return [(key, cell) for key, cell in zip(keys, cells, strict=True) if key is not None and key != CLOCK]
+
+
+def observe(number: int, found: list[Fragment]) -> Prefecture:
+    rows = canonical(sequences(found))
+    out = Prefecture(number, rows, {})
+    for fragment in found:
+        source = (stem(fragment.document.url), fragment.page, fragment.tile, fragment.read)
+        for j, cells in zip(place(fragment.labels, rows), fragment.cells, strict=True):
+            pairs = fitted(fragment.keys, cells) if j is not None else []
+            if j is None or not pairs:
+                out.dropped += 1
+                continue
+            for key, cell in pairs:
+                out.observed.setdefault((key, j), []).append((figure(cell), source))
+                comma = re.fullmatch(r"(\d{1,3}(?:,\d{3})*),(\d{3})", re.sub(r"\s|\(.*\)$", "", cell))
+                if comma:
+                    out.alternates.setdefault((key, j), set()).add(Decimal(f"{comma[1].replace(',', '')}.{comma[2]}"))
     return out
 
 
-def is_subtotal(label: str) -> bool:
-    return bool(SUBTOTAL.search(label))
+def tally(seen: list[tuple[Decimal | None, Source]]) -> list[tuple[Decimal | None, int]]:
+    ranked: list[tuple[Decimal | None, int]] = Counter(value for value, _ in seen).most_common()
+    numeric: list[tuple[Decimal | None, int]] = [(value, count) for value, count in ranked if value is not None]
+    return numeric or ranked
 
 
-def tolerance(values: list[Decimal | None], size: int) -> Decimal:
-    return Decimal("0.001") * size if any(v is not None and v != v.to_integral() for v in values) else Decimal(0)
+def structure(prefecture: Prefecture) -> None:
+    """Which rows are counting districts and which add others up, judged by the labels and by the sums."""
+    keys = sorted({key for key, _ in prefecture.observed})
+    best = {cell: tally(seen)[0][0] for cell, seen in prefecture.observed.items()}
+    size = len(prefecture.rows)
+    aggregate = {r for r, label in enumerate(prefecture.rows) if AGGREGATE.search(label)}
+    busy = sorted(keys, key=lambda key: -sum((key, r) in best for r in range(size)))[:60]
 
+    def windows(r: int, leaves: list[int], longest: int) -> list[list[int]]:
+        before = [leaf for leaf in leaves if leaf < r]
+        after = [leaf for leaf in leaves if leaf > r]
+        found = [before[-k:] for k in range(2, min(len(before), longest) + 1)]
+        found += [after[:k] for k in range(2, min(len(after), longest) + 1)]
+        return found
 
-def window(values: list[Decimal | None], order: list[int], target: Decimal, step: Decimal) -> bool:
-    total = Decimal(0)
-    for size, index in enumerate(order, 1):
-        total += values[index] or Decimal(0)
-        if abs(total - target) <= step * size:
-            return True
-    return False
-
-
-def column_failures(names: list[str], values: list[Decimal | None]) -> list[int]:
-    """Rows whose subtotal differs from the leaf rows it should add up from."""
-    subtotal = [is_subtotal(name) for name in names]
-    leaves = [i for i, flag in enumerate(subtotal) if not flag]
-    step = tolerance(values, 1)
-    failed = []
-    for index, flag in enumerate(subtotal):
-        target = values[index]
-        if not flag or target is None or not leaves:
-            continue
-        if TOP.search(names[index]):
-            total = sum((values[i] or Decimal(0) for i in leaves), Decimal(0))
-            if abs(total - target) <= step * len(leaves):
+    def score(r: int, window: list[int]) -> tuple[int, int]:
+        hit = tried = 0
+        for key in busy:
+            total = best.get((key, r))
+            if not total:
                 continue
-        after = [i for i in leaves if i > index]
-        before = [i for i in reversed(leaves) if i < index]
-        if not (window(values, after, target, step) or window(values, before, target, step)):
-            failed.append(index)
-    return failed
+            parts = [part for leaf in window if (part := best.get((key, leaf))) is not None]
+            if len(parts) < len(window):
+                continue
+            tried += 1
+            hit += sum(parts, Decimal(0)) == total
+        return hit, tried
 
-
-def row_rules(columns: list[str]) -> list[tuple[int, list[int], str]]:
-    """Identities a printed row must satisfy: a total column and the columns that add up to it."""
-    rules: list[tuple[int, list[int], str]] = []
-    found = {
-        key: i for i, name in enumerate(columns) for key in ("有効投票数", "無効投票数", "投票総数") if key in name
-    }
-    if len(found) == 3:
-        rules.append((found["投票総数"], [found["有効投票数"], found["無効投票数"]], "ballots"))
-    candidates = [i for i, name in enumerate(columns) if CANDIDATE.match(name)]
-    totals = [i for i, name in enumerate(columns) if norm(name).endswith("合計") and i not in candidates]
-    if candidates and totals:
-        rules.append((totals[0], candidates, "candidates"))
-    heads: dict[str, dict[str, int]] = {}
-    for i, name in enumerate(columns):
-        head, _, tail = name.rpartition(" / ")
-        if not head:
-            continue
-        part = (
-            "list" if "名簿登載者" in tail else "party" if "政党等の" in tail else "total" if "得票総数" in tail else ""
-        )
-        if part:
-            heads.setdefault(head, {})[part] = i
-    for parts in heads.values():
-        if len(parts) == 3:
-            rules.append((parts["total"], [parts["party"], parts["list"]], "party"))
-    return rules
-
-
-def row_failed(values: list[Decimal | None], rule: tuple[int, list[int], str]) -> bool:
-    target, parts, _ = rule
-    printed = values[target]
-    if printed is None:
-        return False
-    total = sum((values[i] or Decimal(0) for i in parts), Decimal(0))
-    return abs(total - printed) > tolerance([*values], len(parts) + 1)
-
-
-def reconcile(grid: Grid) -> tuple[list[list[Decimal | None]], list[dict[str, Any]]]:
-    """Resolve every cell: take the value most reads agree on, then let the printed subtotals and row identities
-    overrule it where the reads disagree. Cells the checks cannot settle go to review."""
-    rows, width = len(grid.labels), len(grid.columns)
-    options: dict[tuple[int, int], list[tuple[Decimal | None, int]]] = {}
-    values: list[list[Decimal | None]] = [[None] * width for _ in range(rows)]
-    for r in range(rows):
-        for c in range(width):
-            tally = Counter(figure(text) for text in observations(grid, r, c))
-            ranked = tally.most_common()
-            if ranked:
-                values[r][c] = ranked[0][0]
-            if len(ranked) > 1:
-                options[r, c] = [(value, count) for value, count in ranked]
-    rules = row_rules(grid.columns)
-    skip = [bool(SKIP_COLUMN.search(name)) for name in grid.columns]
-
-    def bad(r: int, c: int) -> int:
-        count = sum(row_failed(values[r], rule) for rule in rules if c == rule[0] or c in rule[1])
-        if not skip[c]:
-            count += len(column_failures(grid.labels, [row[c] for row in values]))
-        return count
-
-    for _ in range(MAX_TRIES):
+    for _ in range(5):
+        leaves = [r for r in range(size) if r not in aggregate]
         moved = False
-        for (r, c), choices in options.items():
-            if skip[c]:
-                continue
-            scored = []
-            for value, count in choices:
-                values[r][c] = value
-                scored.append((bad(r, c), -count, value))
-            scored.sort(key=lambda item: item[:2])
-            best = scored[0]
-            if values[r][c] != best[2]:
-                moved = True
-            values[r][c] = best[2]
+        for r in leaves:
+            others = [leaf for leaf in leaves if leaf != r and leaf not in aggregate]
+            for window in windows(r, others, 30):
+                hit, tried = score(r, window)
+                if tried >= 3 and hit >= 0.8 * tried:
+                    aggregate.add(r)
+                    moved = True
+                    break
         if not moved:
             break
-    review: list[dict[str, Any]] = []
-    for r, name in enumerate(grid.labels):
-        for rule in rules:
-            if row_failed(values[r], rule):
-                review.append({"row": name, "check": f"row {rule[2]}", "column": grid.columns[rule[0]]})
-    for c, column in enumerate(grid.columns):
-        if skip[c]:
-            continue
-        for r in column_failures(grid.labels, [row[c] for row in values]):
-            review.append({"row": grid.labels[r], "check": "subtotal", "column": column})
-        for (r, cc), choices in options.items():
-            if cc == c and len({value for value, _ in choices}) > 1 and values[r][c] is None:
-                review.append({"row": grid.labels[r], "check": "unread", "column": column})
-    return values, review
-
-
-def read_pdf(
-    held: set[str], document: Document
-) -> tuple[Grid, list[list[Decimal | None]], list[dict[str, Any]]] | None:
-    """One PDF as a checked grid, or None when none of its pages has been read."""
-    found: list[Strip] = []
-    for page in range(1, pages(document) + 1):
-        reads = [tables_of(held, document.url, page, number) for number in range(1, READS + 1)]
-        have = [r for r in reads if r is not None]
-        if not have:
-            return None
-        pair = have[0]
-        for other in have[1:]:
-            pair = combine(pair, other)
-        found += pair
-    grid = assemble(found)
-    values, review = reconcile(grid)
-    return grid, values, review
-
-
-def totals_row(grid: Grid) -> int | None:
-    return next((i for i, name in enumerate(grid.labels) if TOP.search(name)), None)
-
-
-def person(text: str) -> str:
-    head = text.split(" / ")
-    return norm(head[1] if len(head) > 2 else head[-1])
-
-
-def printed(book: str, names: set[str], votes: Decimal) -> str:
-    """Whether the 結果調 prints these votes, and next to the candidate's name."""
-    text = mic.plain(unicodedata.normalize("NFKC", book))
-    found = False
-    for form in mic.printed(votes):
-        for hit in re.finditer(re.escape(form) + r"(?![\d.,])", text):
-            found = True
-            if any(name in text[max(0, hit.start() - 120) : hit.start()] for name in names):
-                return "tied"
-    return "votes_only" if found else "miss"
-
-
-def tie(results: dict[str, tuple[Document, Grid, list[list[Decimal | None]]]]) -> dict[str, Any]:
-    """Compare the prefecture totals of the scans with the national figures of the 結果調."""
-    found = mic_hoc.listing(21)
-    held = mic_hoc.ELECTIONS[21][0]
-    parties, people = mic_hoc.national_lists(raw.cached(RAW, found.lists).path, held)
-    book = mic_hoc.book_for(21)
-    report: dict[str, Any] = {
-        "candidates": {"tied": [], "votes_only": [], "miss": []},
-        "parties": {},
-        "people": {"tied": 0, "miss": []},
-    }
-    sums: dict[str, dict[str, Decimal]] = {}
-    for key, (document, grid, values) in results.items():
-        top = totals_row(grid)
-        if top is None:
-            continue
-        for c, name in enumerate(grid.columns):
-            value = values[top][c]
-            if value is None:
-                continue
-            if document.kind == "district" and CANDIDATE.match(name):
-                names = {person(name), person(grid.alt.get(name, ""))} - {""}
-                report["candidates"][printed(book, names, value)].append([key, name, str(value)])
-            elif document.kind == "party" and CANDIDATE.match(name):
-                head, _, tail = name.rpartition(" / ")
-                part = "candidate_votes" if "名簿登載者" in tail else "party_votes" if "政党等の" in tail else "total"
-                sums.setdefault(mic_hoc.party_name(norm(head.split(" / ")[-1])), {}).setdefault(part, Decimal(0))
-                sums[mic_hoc.party_name(norm(head.split(" / ")[-1]))][part] += value
-            elif document.kind == "list" and CANDIDATE.match(name):
-                sums.setdefault(f"{document.party}\x1f{person(name)}", {}).setdefault("votes", Decimal(0))
-                sums[f"{document.party}\x1f{person(name)}"]["votes"] += value
-    for record in parties:
-        got = sums.get(record["party"], {})
-        diff = {
-            part: [str(got.get(part)), record[part]]
-            for part in ("total", "party_votes", "candidate_votes")
-            if part in record and got.get(part) != Decimal(record[part])
-        }
-        report["parties"][record["party"]] = diff or "tied"
-    for row in people:
-        got = sums.get(f"{mic_hoc.party_name(row['party'])}\x1f{norm(row['name'])}")
-        if got is not None and got["votes"] == Decimal(row["votes"]):
-            report["people"]["tied"] += 1
+    prefecture.leaves = [r for r in range(size) if r not in aggregate]
+    for r in sorted(aggregate):
+        options = [*windows(r, prefecture.leaves, size), prefecture.leaves]
+        scored = sorted(((score(r, window), -len(window), window) for window in options), reverse=True)
+        if scored and scored[0][0][1] and scored[0][0][0] >= 0.6 * scored[0][0][1]:
+            prefecture.members[r] = scored[0][2]
         else:
-            report["people"]["miss"].append([row["party"], row["name"], row["votes"], str(got and got["votes"])])
-    return report
+            prefecture.review.append({"row": prefecture.rows[r], "check": "subtotal without members"})
+
+
+Equation = tuple[list[tuple[Cell, int]], Decimal, str]
+
+
+def equations(prefecture: Prefecture, facts: Official) -> list[Equation]:
+    have = {key for key, _ in prefecture.observed}
+    anchors = facts.totals[prefecture.number]
+    out: list[Equation] = []
+    for key in sorted(have):
+        if key in anchors:
+            out.append(([((key, leaf), 1) for leaf in prefecture.leaves], anchors[key], f"total {key}"))
+        for r, members in prefecture.members.items():
+            if (key, r) in prefecture.observed:
+                terms = [((key, r), 1)] + [((key, leaf), -1) for leaf in members]
+                out.append((terms, Decimal(0), f"subtotal {key} {prefecture.rows[r]}"))
+    rules: list[tuple[str, list[str], str]] = []
+    for party in PARTIES:
+        rules.append((f"t:{party}", [f"p:{party}", f"l:{party}"], f"party {party}"))
+        rules.append((f"l:{party}", [f"c:{party}:{name}" for name in facts.lists.get(party, [])], f"list {party}"))
+    candidates = [f"s{c.order}" for c in facts.smd.get(prefecture.number, [])]
+    rules.append(("s:sum", candidates, "candidates"))
+    rules.append(("s:valid", ["s:sum", *(key for key in ("s:frac", "s:none") if key in have)], "valid"))
+    rules.append(("s:ballots", ["s:valid", "s:invalid"], "ballots"))
+    rules.append(("r:ballots", ["r:valid", "r:invalid"], "pr ballots"))
+    for total, parts, name in rules:
+        if total not in have or not all(part in have for part in parts):
+            continue
+        for r in range(len(prefecture.rows)):
+            out.append(([((total, r), 1)] + [((part, r), -1) for part in parts], Decimal(0), f"row {name}"))
+    return out
+
+
+def solve(prefecture: Prefecture, facts: Official) -> None:
+    """Pick each cell's value: the reading most reads agree on, overruled where printed totals and row identities
+    settle a disagreement; a cell no read can give is solved from an identity it alone leaves open."""
+    options = {cell: tally(seen) for cell, seen in prefecture.observed.items()}
+    for cell, alternates in prefecture.alternates.items():
+        options[cell] += [(value, 0) for value in sorted(alternates) if value not in dict(options[cell])]
+    values: dict[Cell, Decimal | None] = {cell: ranked[0][0] for cell, ranked in options.items()}
+    how = {cell: "agreed" if len(ranked) == 1 else "voted" for cell, ranked in options.items()}
+    system = equations(prefecture, facts)
+    involved: dict[Cell, list[int]] = {}
+    for index, (terms, _, _) in enumerate(system):
+        for cell, _ in terms:
+            involved.setdefault(cell, []).append(index)
+
+    def residual(index: int) -> Decimal | None:
+        terms, constant, _ = system[index]
+        total = Decimal(0)
+        for cell, sign in terms:
+            value = values.get(cell)
+            if value is None:
+                return None
+            total += sign * value
+        return constant - total
+
+    def broken(cell: Cell) -> int:
+        return sum(1 for index in involved.get(cell, []) if residual(index) not in (None, Decimal(0)))
+
+    for _ in range(TRIES):
+        moved = False
+        for cell, ranked in options.items():
+            if len(ranked) < 2:
+                continue
+            scored = []
+            for value, count in ranked:
+                values[cell] = value
+                scored.append((broken(cell), -count, value))
+            scored.sort(key=lambda item: item[:2])
+            if values[cell] != scored[0][2] or scored[0][2] != ranked[0][0]:
+                moved = moved or scored[0][2] != ranked[0][0]
+            values[cell] = scored[0][2]
+            how[cell] = "settled" if scored[0][2] != ranked[0][0] else how[cell]
+        if not moved:
+            break
+    groups: dict[tuple[int, str], list[Cell]] = {}
+    for cell in prefecture.alternates:
+        key, r = cell
+        groups.setdefault((r, ""), []).append(cell)
+        groups.setdefault((r, key.split(":")[1] if key[:2] in ("t:", "p:", "l:", "c:") else key), []).append(cell)
+    for cells in groups.values():
+        before = {cell: values.get(cell) for cell in cells}
+        after = {cell: max(prefecture.alternates[cell]) for cell in cells}
+        if any(before[cell] is None or before[cell] in prefecture.alternates[cell] for cell in cells):
+            continue
+        indexes = {index for cell in cells for index in involved.get(cell, [])}
+        old = sum(residual(index) not in (None, Decimal(0)) for index in indexes)
+        values.update(after)
+        if sum(residual(index) not in (None, Decimal(0)) for index in indexes) < old:
+            how.update(dict.fromkeys(cells, "decimal"))
+        else:
+            values.update(before)
+    for _ in range(REPAIRS):
+        moved = False
+        for index, (terms, _, _) in enumerate(system):
+            unknown = [(cell, sign) for cell, sign in terms if values.get(cell) is None]
+            if len(unknown) != 1:
+                continue
+            cell, sign = unknown[0]
+            values[cell] = Decimal(0)
+            left = residual(index)
+            if left is None or sign * left < 0:
+                values[cell] = None
+                continue
+            values[cell] = sign * left
+            how[cell] = "solved"
+            moved = True
+        for cell, indexes in involved.items():
+            if values.get(cell) is None or len(indexes) < 2:
+                continue
+            gaps = [gap for index in indexes if (gap := residual(index))]
+            if len(gaps) < len(indexes):
+                continue
+            shifts = {gap * dict(system[index][0])[cell] for gap, index in zip(gaps, indexes, strict=True)}
+            if len(shifts) != 1:
+                continue
+            shift = shifts.pop()
+            value = values[cell]
+            if value is None or value + shift < 0:
+                continue
+            values[cell] = value + shift
+            how[cell] = "repaired"
+            moved = True
+        if not moved:
+            break
+    prefecture.values = values
+    prefecture.how = how
+    for index, (terms, constant, name) in enumerate(system):
+        gap = residual(index)
+        if gap not in (None, Decimal(0)):
+            prefecture.review.append({"check": name, "residual": str(gap), "expected": str(constant)})
+    for cell, kind in how.items():
+        if kind in ("repaired", "solved"):
+            key, r = cell
+            seen = sorted({str(value) for value, _ in prefecture.observed.get(cell, [])})
+            prefecture.review.append(
+                {"check": kind, "column": key, "row": prefecture.rows[r], "value": str(values[cell]), "reads": seen}
+            )
+
+
+def doubtful(prefecture: Prefecture, facts: Official) -> set[tuple[str, int, str]]:
+    """The bands behind every cell of an unmet identity or subtotal, and behind every disputed cell of a column
+    whose counting districts miss the printed total."""
+    cells: set[Cell] = set()
+    for terms, constant, name in equations(prefecture, facts):
+        if name.startswith("total"):
+            continue
+        values = [(value, sign) for cell, sign in terms if (value := prefecture.values.get(cell)) is not None]
+        if len(values) == len(terms) and sum((sign * value for value, sign in values), Decimal(0)) != constant:
+            cells.update(cell for cell, _ in terms)
+    for key, total in facts.totals[prefecture.number].items():
+        leaves = [(key, leaf) for leaf in prefecture.leaves]
+        if not any(cell in prefecture.observed for cell in leaves):
+            continue
+        if sum((prefecture.values.get(cell) or Decimal(0) for cell in leaves), Decimal(0)) != total:
+            cells.update(cell for cell in leaves if len({value for value, _ in prefecture.observed.get(cell, [])}) != 1)
+    return {source[:3] for cell in cells for _, source in prefecture.observed.get(cell, [])}
 
 
 def parse() -> Path:
-    """Parse every cached read into per-unit tables and write the review list and the ties."""
-    held = raw.keys(SOURCE)
-    results: dict[str, tuple[Document, Grid, list[list[Decimal | None]]]] = {}
+    """Parse every cached read into counting-district values and write the review list and the ties."""
+    facts = official()
+    found = fragments(raw.keys(SOURCE), facts)
+    by: dict[int, list[Fragment]] = {}
+    for fragment in found:
+        by.setdefault(fragment.document.prefecture, []).append(fragment)
     rows: list[dict[str, str]] = []
     review: list[dict[str, Any]] = []
-    unread = 0
-    for document in documents():
-        done = read_pdf(held, document)
-        if done is None:
-            unread += 1
+    ties: dict[str, Any] = {
+        "prefectures": {},
+        "parties": {},
+        "people": {"tied": 0, "miss": []},
+        "smd": {"tied": 0, "miss": []},
+    }
+    sums: dict[str, Decimal] = {}
+    doubted: set[tuple[str, int, str]] = set()
+    for number in sorted(by):
+        prefecture = observe(number, by[number])
+        structure(prefecture)
+        solve(prefecture, facts)
+        doubted |= doubtful(prefecture, facts)
+        review += [{"prefecture": number, **item} for item in prefecture.review]
+        anchors = facts.totals[number]
+        missing = sorted(key for key in anchors if not any((key, r) in prefecture.observed for r in prefecture.leaves))
+        if missing:
+            review.append({"prefecture": number, "check": "columns not found", "columns": missing})
+        leaves = set(prefecture.leaves)
+        for (key, r), value in sorted(prefecture.values.items(), key=lambda item: (item[0][1], item[0][0])):
+            if value is None:
+                continue
+            first = prefecture.observed.get((key, r), [(None, ("", 0, "", 0))])
+            source = next((s for v, s in first if v == value), first[0][1])
+            rows.append(
+                {
+                    "prefecture": str(number),
+                    "row": str(r),
+                    "unit": prefecture.rows[r],
+                    "level": "leaf" if r in leaves else "aggregate",
+                    "column": key,
+                    "votes": str(value),
+                    "how": prefecture.how.get((key, r), ""),
+                    "pdf": source[0],
+                    "page": str(source[1]),
+                    "tile": source[2],
+                }
+            )
+            if r in leaves and not key.startswith("s"):
+                sums[key] = sums.get(key, Decimal(0)) + value
+        off = {
+            key: [
+                str(sum((prefecture.values.get((key, leaf)) or Decimal(0) for leaf in prefecture.leaves), Decimal(0))),
+                str(total),
+            ]
+            for key, total in anchors.items()
+            if sum((prefecture.values.get((key, leaf)) or Decimal(0) for leaf in prefecture.leaves), Decimal(0))
+            != total
+        }
+        ties["prefectures"][NAMES[number - 1]] = {
+            "rows": len(prefecture.rows),
+            "leaves": len(prefecture.leaves),
+            "dropped": prefecture.dropped,
+            "off": off,
+        }
+    found_lists = mic_hoc.listing(21)
+    parties, people = mic_hoc.national_lists(raw.cached(RAW, found_lists.lists).path, mic_hoc.ELECTIONS[21][0])
+    for record in parties:
+        party = party_name(record["party"])
+        if party is None:
             continue
-        grid, values, flags = done
-        name = stem(document.url)
-        results[name] = (document, grid, values)
-        review += [{"pdf": name, **flag} for flag in flags]
-        review += [{"pdf": name, "check": "note", "row": note} for note in dict.fromkeys(grid.notes)]
-        for r, label in enumerate(grid.labels):
-            for c, column in enumerate(grid.columns):
-                if values[r][c] is not None and not SKIP_COLUMN.search(column):
-                    level = "total" if TOP.search(label) else "subtotal" if is_subtotal(label) else "leaf"
-                    rows.append(
-                        {
-                            "prefecture": str(document.prefecture),
-                            "kind": document.kind,
-                            "party": document.party,
-                            "unit": label,
-                            "level": level,
-                            "column": column,
-                            "votes": str(values[r][c]),
-                        }
-                    )
+        diff = {
+            part: [str(sums.get(f"{letter}:{party}")), record[part]]
+            for part, letter in (("total", "t"), ("party_votes", "p"), ("candidate_votes", "l"))
+            if sums.get(f"{letter}:{party}") != Decimal(record[part])
+        }
+        ties["parties"][party] = diff or "tied"
+    for person in people:
+        party = party_name(person["party"]) or person["party"]
+        got = sums.get(f"c:{party}:{person['name']}")
+        if got == Decimal(person["votes"]):
+            ties["people"]["tied"] += 1
+        else:
+            ties["people"]["miss"].append([party, person["name"], person["votes"], str(got)])
+    for number, candidates in facts.smd.items():
+        off = ties["prefectures"].get(NAMES[number - 1], {}).get("off", {})
+        for candidate in candidates:
+            if f"s{candidate.order}" in off:
+                ties["smd"]["miss"].append([NAMES[number - 1], candidate.name, *off[f"s{candidate.order}"]])
+            else:
+                ties["smd"]["tied"] += 1
     PARSED.mkdir(parents=True, exist_ok=True)
-    import polars as pl
-
     pl.DataFrame(rows).write_parquet(PARSED / f"counting-v{VERSION}.parquet")
-    ties = tie(results) if results else {}
-    ties["unread_pdfs"] = unread
     (PARSED / f"review-v{VERSION}.json").write_text(json.dumps(review, ensure_ascii=False, indent=1))
     (PARSED / f"ties-v{VERSION}.json").write_text(json.dumps(ties, ensure_ascii=False, indent=1))
+    (PARSED / f"recheck-v{VERSION}.json").write_text(json.dumps(sorted(doubted), ensure_ascii=False))
     return PARSED
