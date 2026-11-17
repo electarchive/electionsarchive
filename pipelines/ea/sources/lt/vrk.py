@@ -380,6 +380,10 @@ def fetch() -> None:
                 for url in summaries(config, item).values():
                     get(url, ".html")
         fetch_summaries(config)
+        for item in config.parts:
+            if item.kind in PREFERENCES:
+                for _, url in preference_urls(config, item):
+                    get(url, ".csv")
 
 
 # The summary pages a home page links, by what each one declares.
@@ -448,6 +452,31 @@ PAGES = {
     "president": "rezultataiPreLietuvoje",
     "referendum": "rezultataiRefSavivaldybese",
 }
+
+
+# The kinds of contest whose lists carry candidates, and the summary page that links each list's preference votes.
+PREFERENCES = ("list", "ep", "council")
+PREFERENCE_FILE = re.compile(r'data-direct-href="(/rinkimai/\d+/(\d)/\d+/rezultatai/PB_\d+_\d_\d+_\d+\.csv)"')
+
+
+def preference_urls(config: Config, item: Part) -> list[tuple[int, str]]:
+    """The preference-vote files (`PB`) of a list contest as (round, url), read from the pages that link them.
+
+    The Seimas and European Parliament lists link one file per list from the page of the national result. A council
+    contest links them from the page of each municipality.
+    """
+    pages: list[str] = []
+    if item.kind == "council":
+        for listing_path in linked(config, "municipalities"):
+            pages += [path for _, path in places(listing_path)]
+    else:
+        pages = [url.removeprefix(BASE) for url in summaries(config, item).values()]
+    found: list[tuple[int, str]] = []
+    for path in pages:
+        html = summary.cached(path)
+        if html is not None:
+            found += [(int(round_), f"{BASE}{link}") for link, round_ in PREFERENCE_FILE.findall(html)]
+    return list(dict.fromkeys(found))
 
 
 def selected(config: Config, item: Part) -> list[tuple[int, int, str]]:
@@ -784,6 +813,10 @@ class State:
         self.held: list[tuple[int, int, str]] = []
         self.cited: set[str] = set()
         self.differ: list[tuple[str, str | None, int, int, int]] = []
+        # a list's candidates by (result set, list option, lowercased name), as (person, candidacy); none for a name
+        # that two candidates of the list share
+        self.candidates: dict[tuple[str, str, str], tuple[str, str] | None] = {}
+        self.preferences = 0
 
 
 def build(config: Config) -> Package:
@@ -817,6 +850,10 @@ def build(config: Config) -> Package:
             if page_url is not None and page_url in raw.keys(SOURCE):
                 page = raw.cached(SOURCE, page_url)
                 p.artifact(page, VRK_SOURCE)
+            if item.kind in PREFERENCES:
+                for number_round, url in preference_urls(config, item):
+                    if number_round == round_ and url in raw.keys(SOURCE):
+                        p.artifact(raw.cached(SOURCE, url), VRK_SOURCE)
             facts = collect(config, item, round_)
             for address in dict.fromkeys(facts.urls):
                 if address not in state.cited:
@@ -838,6 +875,7 @@ def build(config: Config) -> Package:
                 as_of,
                 page.path.read_text() if page else None,
                 facts,
+                round_,
             )
     if state.gaps:
         p.accept(
@@ -909,6 +947,7 @@ def contests(
     as_of: datetime | None,
     page: str | None,
     facts: Facts,
+    source_round: int,
 ) -> None:
     path = state.paths[election]
     district = item.kind in ("smd", "mayor", "council")
@@ -982,6 +1021,8 @@ def contests(
         options = options_for(p, state, config, item, contest, here)
         ids = unit_rows(p, state, day, f"{config.scope}:" if config.scope else "", result_set, here)
         value_rows(p, result_set, here, options, ids)
+        if item.kind in PREFERENCES:
+            preference_rows(p, state, config, item, source_round, code, contest, result_set, options, ids)
         if page is not None:
             declared, seats = declare(item, here, page)
             reconcile(p, state, result_set, here, options, declared, seats, item.kind)
@@ -1105,6 +1146,10 @@ def seat_members(
         option = labels.get(normal(member.party if item.kind == "list" else member.area))
         if option is None:
             raise ValueError(f"lt.vrk {item.kind}: {member.name!r} is elected from an unknown list {member.party!r}")
+        found = state.candidates.get((result_set, options[option], summary.named(member.name)))
+        if found is not None:
+            p.add("outcome", result_set_id=result_set, option_id=options[option], candidacy_id=found[1], kind="elected")
+            continue
         person = key("person", config.first, item.kind, "member", summary.named(member.name))
         if person not in state.people:
             state.people.add(person)
@@ -1309,6 +1354,140 @@ def value_rows(p: Package, result_set: str, here: pl.DataFrame, options: dict[st
             count_round=pl.lit(0, pl.Int16),
             flags=pl.lit(0, pl.Int16),
             value=pl.sum_horizontal("box", "post"),
+        ),
+    )
+
+
+PREFERRED: dict[tuple[date, Part, int], pl.DataFrame] = {}
+
+
+def preferences(config: Config, item: Part, round_: int) -> pl.DataFrame:
+    """The preference votes of one round's list contest: one row per polling district protocol and candidate."""
+    if (config.first, item, round_) not in PREFERRED:
+        cached = raw.keys(SOURCE)
+        found = []
+        for number_round, url in preference_urls(config, item):
+            if number_round != round_ or url not in cached:
+                continue
+            frame = read(url)
+            ap = frame["APYGARDOS_NR"].str.strip_chars()
+            number = frame["APYLINKES_NR"].str.strip_chars()
+            name = frame["APYLINKES_PAVADINIMAS"].str.strip_chars()
+            found.append(
+                pl.DataFrame(
+                    {
+                        "ap": ap,
+                        "unit": ap + ":" + number + ":" + name,
+                        "list": frame["PARTIJOS_SARASO_NUMERIS"].str.strip_chars(),
+                        "candidate": frame["RKND_ID"].str.strip_chars(),
+                        "first": frame["VARDAS"].str.strip_chars(),
+                        "last": frame["PAVARDE"].str.strip_chars(),
+                        "position": count(frame["PARTIJOS_EILES_NR"]),
+                        "votes": count(frame["PIRMUMO_BALAI"]),
+                    }
+                )
+            )
+        PREFERRED[(config.first, item, round_)] = pl.concat(found) if found else pl.DataFrame(schema={"ap": pl.String})
+    return PREFERRED[(config.first, item, round_)]
+
+
+def preference_rows(
+    p: Package,
+    state: State,
+    config: Config,
+    item: Part,
+    round_: int,
+    code: str,
+    contest: str,
+    result_set: str,
+    options: dict[str, str],
+    ids: dict[str, str],
+) -> None:
+    """Add each list's candidates as options under the list, with their preference votes (measure 7) per district."""
+    rows = preferences(config, item, round_)
+    if item.kind == "council" and not rows.is_empty():
+        rows = rows.filter(pl.col("ap") == code)
+    if rows.is_empty():
+        return
+    # The preference files file the polling stations abroad of a European Parliament vote under another district
+    # number than the vote files do; the station's number and name tell them apart.
+    inside = {unit.split(":", 1)[1]: unit for unit in ids}
+    renamed = {
+        unit: inside[unit.split(":", 1)[1]] for unit in set(rows["unit"]) - set(ids) if unit.split(":", 1)[1] in inside
+    }
+    if renamed:
+        rows = rows.with_columns(pl.col("unit").replace(renamed))
+    missing = set(rows["list"]) - set(options)
+    if missing or not set(rows["unit"]) <= set(ids):
+        raise ValueError(
+            f"lt.vrk {item.kind} {code}: preference votes for lists {missing} or districts not in the vote"
+        )
+    known: dict[tuple[str, str], str] = {}
+    people: dict[tuple[str, str], tuple[str, str]] = {}
+    names: dict[tuple[str, str, str], list[str]] = {}
+    for row in rows.unique(subset=["list", "candidate"], maintain_order=True).iter_rows(named=True):
+        name = title(f"{row['first']} {row['last']}")
+        option = known[(row["list"], row["candidate"])] = key(
+            "option", contest, "candidate", row["list"], row["candidate"]
+        )
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            parent_option_id=options[row["list"]],
+            ballot_position=row["position"],
+            ballot_label=name,
+        )
+        person = key("person", config.first, item.kind, "candidate", row["candidate"])
+        if person not in state.people:
+            state.people.add(person)
+            p.add("person", id=person)
+            p.name(person, name, "lt", "official")
+        candidacy = key("candidacy", result_set, "candidate", row["candidate"])
+        people[(row["list"], row["candidate"])] = (person, candidacy)
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[row["list"]],
+            role="list_member",
+            list_position=row["position"],
+            ballot_name=name,
+            is_independent=False,
+        )
+        names.setdefault((result_set, row["list"], summary.named(f"{row['first']} {row['last']}")), []).append(
+            row["candidate"]
+        )
+    for (_, list_number, name), candidates in names.items():
+        state.candidates[(result_set, options[list_number], name)] = (
+            people[(list_number, candidates[0])] if len(candidates) == 1 else None
+        )
+    mapping = pl.DataFrame(
+        {
+            "list": [a for a, _ in known],
+            "candidate": [b for _, b in known],
+            "option_id": list(known.values()),
+        }
+    )
+    votes = (
+        rows.group_by("unit", "list", "candidate")
+        .agg(pl.col("votes").sum())
+        .join(mapping, on=["list", "candidate"], how="left")
+    )
+    votes = votes.drop_nulls("votes")
+    state.preferences += int(votes["votes"].sum())
+    p.frame(
+        "result_value",
+        votes.select(
+            result_set_id=pl.lit(result_set),
+            unit_id=pl.col("unit").replace_strict(ids),
+            option_id="option_id",
+            channel=pl.lit(0, pl.Int16),
+            measure=pl.lit(7, pl.Int16),
+            count_round=pl.lit(0, pl.Int16),
+            flags=pl.lit(0, pl.Int16),
+            value="votes",
         ),
     )
 
