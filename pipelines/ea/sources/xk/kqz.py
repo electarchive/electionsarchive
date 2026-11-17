@@ -7,8 +7,8 @@ polling center, with each municipality's and the country's totals. Companion fil
 polling centers, the political entities, and their candidates with their gender. The mayoral runoff of 9 November
 2025 has its own files with the suffix "part-2".
 
-The Commission's main site, kqz-ks.org, serves its result archive for earlier elections behind a browser challenge,
-so those elections are not built here.
+The Commission's main site, kqz-ks.org, serves its result archive behind a browser challenge. Its Assembly elections
+are built from files saved in a browser, by the module `kuvendi`, into the same geo and registry packages.
 """
 
 import functools
@@ -106,7 +106,15 @@ LIST_METHOD = (
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{FIRST}", f"{SOURCE}/{RUNOFF}"]
+    from ea.sources.xk import kuvendi
+
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        f"{SOURCE}/{FIRST}",
+        f"{SOURCE}/{RUNOFF}",
+        *(f"{SOURCE}/{day}" for day in kuvendi.DAYS),
+    ]
 
 
 def _data(path: Path) -> None:
@@ -115,15 +123,22 @@ def _data(path: Path) -> None:
 
 
 def fetch() -> None:
+    from ea.sources.xk import kuvendi
+
     for url in URLS:
         raw.fetch(SOURCE, url, suffix=".json", check=_data)
+    kuvendi.fetch_all()
 
 
 def parse() -> None:
+    from ea.sources.xk import kuvendi
+
     geo().write()
     registry().write()
     first().write()
     runoff().write()
+    for day in kuvendi.DAYS:
+        kuvendi.election_package(day).write()
 
 
 def emit() -> None:
@@ -280,7 +295,8 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Kosovo's 38 municipalities as the Central Election Commission names them, and its polling station scheme",
+        "Kosovo's 38 municipalities as the Central Election Commission names them, their outlines, and its polling "
+        "station scheme",
     )
     p.external |= {KOSOVO}
     p.add(
@@ -312,6 +328,9 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=code)
         p.name(id, sq, "sq", "official")
         p.name(id, sr, "sr", "official", False)
+    from ea.sources.xk import kuvendi
+
+    kuvendi.extend_geo(p)
     return p
 
 
@@ -370,8 +389,8 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Kosovo's municipal mayors and assemblies, their electoral systems, and the political entities on the Central "
-        "Election Commission's 2025 local ballots",
+        "Kosovo's municipal mayors and assemblies, the Assembly, their electoral systems, and the political entities on "
+        "the Central Election Commission's ballots",
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {KOSOVO}
@@ -403,6 +422,9 @@ def registry() -> Package:
         made.add(id)
         p.add("party", id=id, kind=party_kind(entity.name), polity_id=KOSOVO)
         p.name(id, entity.name, "sq", "official")
+    from ea.sources.xk import kuvendi
+
+    kuvendi.extend_registry(p)
     return p
 
 
