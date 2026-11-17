@@ -208,6 +208,26 @@ PLEBISCITES = {
         ("SIART67", "Plebiscite on social security (Article 67)", "Plebiscito sobre seguridad social (art. 67)"),
     ]
 }
+SITE = "https://www.gub.uy/corte-electoral/sites/corte-electoral/files/"
+# The Corte's "resultados y cargos" workbook of an election: the party totals and the seats each party won.
+SUMMARY = {"2014-10-26": f"{SITE}2024-04/Nacionales%202014.xlsx"}
+# The Corte's "integración de hojas" of the primaries: the precandidate and the members of every ballot sheet.
+INTEGRATION = {
+    "2019-06-30": "e749ad5e-ef5a-4f56-9b16-96868cbfa460/resource/edfdec16-cf84-4b34-a59f-31615228d3c6/download/"
+    "integracin-de-las-hojas-de-votacin-.csv",
+    "2024-06-30": "48a4e7f5-6909-41a0-aa8a-95dc42cc201f/resource/68123598-1699-4049-a510-d3aafbb112d3/download/"
+    "integracion-hojas-de-votacion.xlsx",
+}
+# The party abbreviations of the summary workbook, by lema key.
+ABBREVIATIONS = {
+    "F.A.": "FRENTE AMPLIO",
+    "P.N.": "NACIONAL",
+    "P.C.": "COLORADO",
+    "P.I.": "INDEPENDIENTE",
+    "A.P.": "ASAMBLEA POPULAR",
+    "P.T.": "DE LOS TRABAJADORES",
+    "P.E.R.I.": "ECOLOGISTA RADICAL INTRANSIGENTE",
+}
 LOWER = {"de", "la", "los", "las", "del", "y", "el"}
 BREAKDOWN_METHOD = (
     "Counted by the Corte Electoral per circuit (comisión receptora de votos), as published in the national open-data "
@@ -239,6 +259,16 @@ def files(day: str) -> dict[str, str]:
     return {name: url(path) for name, path in FILES[day].items() if name != "dataset"}
 
 
+def documents(day: str) -> dict[str, str]:
+    """Every file an election's package cites: its data files, its seats workbook, and its sheet integration."""
+    found = files(day)
+    if day in SUMMARY:
+        found["summary"] = url(SUMMARY[day])
+    if day in INTEGRATION:
+        found["integration"] = url(INTEGRATION[day])
+    return found
+
+
 def packages() -> list[str]:
     return ["uy.corte/geo", "uy.corte/registry", *(f"uy.corte/{day}" for day in ALL)]
 
@@ -246,8 +276,8 @@ def packages() -> list[str]:
 def fetch() -> None:
     for day in DAYS:
         raw.fetch(SOURCE, f"{CATALOG}{FILES[day]['dataset']}", suffix=".html")
-        for link in files(day).values():
-            raw.fetch(SOURCE, link, suffix=".csv")
+        for link in documents(day).values():
+            raw.fetch(SOURCE, link, suffix=".xlsx" if link.endswith(".xlsx") else ".csv")
     for day, link in PLEBISCITE_FILES.items():
         raw.fetch(SOURCE, link, suffix=PLEBISCITE_SUFFIX[day])
     for day in XDAYS:
@@ -422,6 +452,67 @@ def party(lema: str) -> str:
     return key("party", lema)
 
 
+def summary(day: str) -> list[list[str]]:
+    """The cells of the Corte's results-and-seats workbook, row by row, without the empty ones."""
+    path = raw.cached(SOURCE, url(SUMMARY[day])).path
+    sheet = fastexcel.read_excel(str(path)).load_sheet(0, header_row=None, dtypes="string").to_polars()
+    rows = ([cell.strip() for cell in row if cell is not None and cell.strip()] for row in sheet.iter_rows())
+    return [row for row in rows if row]
+
+
+def section(rows: list[list[str]], number: int) -> list[list[str]]:
+    """The rows of one numbered section, after its heading and before the next one."""
+    start = next(i for i, row in enumerate(rows) if row and row[0].startswith(f"{number})"))
+    end = next((i for i in range(start + 1, len(rows)) if rows[i] and re.match(r"\d+\)", rows[i][0])), len(rows))
+    return rows[start + 1 : end]
+
+
+def seat_row(parties: list[str], cells: list[str]) -> dict[str, int]:
+    """The seats of one row: a count per party and a final total that must match their sum."""
+    seats = [int(cell) for cell in cells]
+    if len(seats) != len(parties) + 1 or sum(seats[:-1]) != seats[-1]:
+        raise ValueError(f"the seats {cells} do not add up across {parties}")
+    return {ABBREVIATIONS[party]: n for party, n in zip(parties, seats, strict=False)}
+
+
+def declared_votes(day: str) -> tuple[dict[str, int], int, int]:
+    """The votes of each lema, and the blank and annulled ballots, that the Corte declares for the whole country."""
+    rows = section(summary(day), 4)
+    header = next(row for row in rows if row[0] == "DEPARTAMENTO")
+    total = next(row for row in rows if row[0] == "TOTALES")
+    parties = [cell if cell.endswith(".") else f"{cell}." for cell in header[1:8]]
+    if header[9] != "En Blanco" or header[10] != "Sobres con":
+        raise ValueError(f"{day}: the declared totals have another layout: {header}")
+    votes = {ABBREVIATIONS[party]: int(cell) for party, cell in zip(parties, total[1:8], strict=True)}
+    return votes, int(total[9]), int(total[10])
+
+
+def declared_seats(day: str) -> tuple[dict[str, int], dict[str, dict[str, int]]]:
+    """The Senate seats by lema key, and the Chamber seats by department code and lema key, as the Corte declares."""
+    rows = summary(day)
+    senate = section(rows, 7)
+    header = next(row for row in senate if row[0] in ABBREVIATIONS)
+    total = next(row for row in senate if row[0] == "TOTALES")
+    seats = seat_row(header[:-1], total[1:])
+    chamber = section(rows, 8)
+    header = next(row for row in chamber if row[0] == "DEPARTAMENTO")
+    parties = header[1:-1]
+    by_name = {norm(text): code for code, text in DEPARTMENTS.items()}
+    districts: dict[str, dict[str, int]] = {}
+    nation = None
+    for row in chamber:
+        if row[0] == "TOTALES":
+            nation = seat_row(parties, row[1:])
+        elif norm(row[0]) in by_name:
+            districts[by_name[norm(row[0])]] = seat_row(parties, row[1:])
+    if nation is None or set(districts) != set(DEPARTMENTS):
+        raise ValueError(f"{day}: the Chamber seats miss a department or the total")
+    for lema in nation:
+        if sum(found.get(lema, 0) for found in districts.values()) != nation[lema]:
+            raise ValueError(f"{day}: the Chamber seats of {lema} do not add up to the declared total")
+    return seats, districts
+
+
 @functools.cache
 def municipalities() -> dict[tuple[str, str], str]:
     found: dict[tuple[str, str], str] = {}
@@ -498,7 +589,7 @@ def registry() -> Package:
     source_row(p)
     for day in DAYS:
         p.artifact(raw.cached(SOURCE, f"{CATALOG}{FILES[day]['dataset']}"), UY_SOURCE)
-        for link in files(day).values():
+        for link in documents(day).values():
             p.artifact(raw.cached(SOURCE, link), UY_SOURCE)
         if day in PLEBISCITE_FILES:
             p.artifact(raw.cached(SOURCE, PLEBISCITE_FILES[day]), UY_SOURCE)
@@ -566,7 +657,7 @@ class Builder:
         self.day = day
         self.p = Package(f"uy.corte/{day}", SOURCE, summary, depends=["uy.corte/geo", "uy.corte/registry"])
         self.p.external.add(URUGUAY)
-        for link in xlsx_links(day) if day in XLSX else files(day).values():
+        for link in xlsx_links(day) if day in XLSX else documents(day).values():
             self.p.uses(raw.cached(SOURCE, link))
         if day in PLEBISCITE_FILES:
             self.p.uses(raw.cached(SOURCE, PLEBISCITE_FILES[day]))
@@ -817,6 +908,27 @@ class Builder:
             )
         return lemas
 
+    def declared(
+        self, result_set: str, options: dict[str, str], votes: dict[str, int], blank: int, annulled: int
+    ) -> None:
+        """The country totals the Corte declares, for the counts to be checked against: each lema's votes, and the
+        blank and annulled ballots."""
+        for lema, n in sorted(votes.items()):
+            if lema not in options:
+                raise ValueError(f"{self.day}: the Corte declares votes for {lema}, which has no option")
+            self.p.add("declared", result_set_id=result_set, option_id=options[lema], measure=1, value=n)
+        self.p.add("declared", result_set_id=result_set, option_id=None, measure=6, value=blank)
+        self.p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=annulled)
+
+    def seats(self, result_set: str, options: dict[str, str], won: dict[str, int]) -> None:
+        """The seats the Corte declares for each lema, on the lema's option; a lema that won none has no outcome."""
+        for lema, n in sorted(won.items()):
+            if n == 0:
+                continue
+            if lema not in options:
+                raise ValueError(f"{self.day}: {lema} won seats but has no option in the contest")
+            self.p.add("outcome", result_set_id=result_set, option_id=options[lema], kind="won", seats=n)
+
     def lema_totals(
         self,
         contest: str,
@@ -942,6 +1054,7 @@ def national(day: str) -> Package:
     )
     frame = breakdown(day)
     b.add_units(b.totals)
+    seats = declared_seats(day) if day in SUMMARY else None
     votes = sheets(frame, "HOJA_EN", "VOTO_LEMA")
     lema_votes = votes.group_by("DEPARTAMENTO", "CRV", "LEMAKEY").agg(pl.col("VOTES").sum())
     contest, result_set = b.contest(
@@ -956,6 +1069,8 @@ def national(day: str) -> Package:
     )
     options = b.lema_totals(contest, result_set, lema_votes, "ticket")
     b.accounting_values(result_set)
+    if day in SUMMARY:
+        b.declared(result_set, options, *declared_votes(day))
     tickets, _ = RUNOFF_TICKETS[next(d for d in RUNOFF if d[:4] == year)]
     ahead = {lema for _, _, lema in tickets}
     for lema, option in options.items():
@@ -968,10 +1083,15 @@ def national(day: str) -> Package:
         f"{year} Uruguayan Senate election",
         "senate",
         body=SENATE_BODY,
+        magnitude=None if seats is None else sum(seats[0].values()),
         es=f"Elección de Senadores {year}",
     )
-    b.lema_totals(contest, result_set, lema_votes, "list")
+    lists = b.lema_totals(contest, result_set, lema_votes, "list")
     b.accounting_values(result_set)
+    if day in SUMMARY:
+        b.declared(result_set, lists, *declared_votes(day))
+    if seats is not None:
+        b.seats(result_set, lists, seats[0])
     for dept, text in DEPARTMENTS.items():
         here = votes.filter(pl.col("DEPARTAMENTO") == dept)
         contest, result_set = b.contest(
@@ -981,10 +1101,13 @@ def national(day: str) -> Package:
             f"chamber-{text}",
             body=CHAMBER_BODY,
             district=key("area", "uy.departamento", dept),
+            magnitude=None if seats is None else sum(seats[1][dept].values()),
             es=f"Elección de Representantes {year}, {text}",
         )
-        b.tree(contest, result_set, here, parts=(dept,))
+        lemas = b.tree(contest, result_set, here, parts=(dept,))
         b.accounting_values(result_set, {dept})
+        if seats is not None:
+            b.seats(result_set, lemas, seats[1][dept])
     for column, en, es in PLEBISCITES.get(day, []):
         contest, result_set = b.contest(
             f"plebiscite:{column}", "ballot_question", f"{year} {en}", en.split(" (")[0], es=es
@@ -1005,7 +1128,8 @@ def national(day: str) -> Package:
         body_md="The Senate and the Chamber of Representatives are elected with the same ballot sheets as the "
         "President, so each lema's votes are the same in every contest; the Chamber contests split them by sheet, "
         "the department's list. Votes counted for a lema alone, where a voter marked several sheets of one lema, "
-        "are stored as legend votes on the lema option. Seats and the electoral system are not stored here.",
+        "are stored as legend votes on the lema option. The seats of the Senate and of each department's delegation "
+        "are the Corte's declared distribution, where its results workbook is published.",
         lang="en",
     )
     return b.p
@@ -1114,6 +1238,12 @@ def runoff(day: str) -> Package:
     leader = max(tickets, key=lambda t: sums[t[0]])[2]
     if leader != elected:
         raise ValueError(f"{day}: the totals put {leader} ahead, not {elected}")
+    if first in SUMMARY:
+        b.p.uses(raw.cached(SOURCE, url(SUMMARY[first])))
+        declared = norm(" ".join(cell for row in section(summary(first), 6) for cell in row))
+        winner = next(label for _, label, lema in tickets if lema == elected)
+        if norm(winner.split("–")[0]) not in declared:
+            raise ValueError(f"{day}: the Corte declares another ticket than {winner}")
     unit = b.unit_frame()
     for position, (column, label, lema) in enumerate(tickets, 1):
         option = b.option(contest, "ticket", label, lema, lema=lema, position=position)
@@ -1170,6 +1300,7 @@ def primary(day: str) -> Package:
                 )
                 b.tree(contest, result_set, pl.concat([sheet, residual]), parts=(tag,))
                 b.accounting_values(result_set, None if dept is None else {dept}, found)
+    precandidates(b, frame, day)
     b.p.add(
         "note",
         id=key("note", b.election_id, "primaries"),
@@ -1178,8 +1309,9 @@ def primary(day: str) -> Package:
         body_md="Each party's primary elects its deliberative bodies, and each ballot sheet names a presidential "
         "precandidate. Votes are stored per ballot sheet. Votes the Corte counts for a sublema, for a precandidate, "
         "or for several sheets without a single sheet are stored as legend votes on the party's option. The ballots "
-        "in the unit accounting are the circuit's, shared by every party's primary. Presidential precandidate totals "
-        "are not stored here.",
+        "in the unit accounting are the circuit's, shared by every party's primary. Each party's presidential "
+        "precandidate totals are derived from the same counts, by precandidate; the Corte's proclamation of the "
+        "nominees is not stored here.",
         lang="en",
     )
     return b.p
@@ -1403,6 +1535,105 @@ def declare(
             raise ValueError(
                 f"{b.day}: the Corte declares {value} votes for {lema} in {what}, which has no such option"
             )
+
+
+PRECANDIDATE_RECORDS = {"HOJA_ODN", "VOTOS_PREC", "PREC_ODN", "SUBLEMA_ODN"}
+PRECANDIDATE_METHOD = (
+    "Derived from the Corte Electoral's breakdown by circuit. Each National Deliberative Body ballot sheet names the "
+    "precandidate it supports, and a precandidate's votes in a circuit are the votes of their ballot sheets there, plus "
+    "the votes the Corte counts for the precandidate directly or through a sublema without a single sheet. Every "
+    "sheet and precandidate pair was checked against the Corte's integration of the ballot sheets. A sheet number "
+    "can be shared by several precandidates of one party, so the precandidate is read from the count itself. Votes for "
+    "a party's sheets that the Corte does not attribute to a precandidate are not counted here."
+)
+
+
+def person_name(text: str) -> str:
+    """The name of a person the Corte lists as `SURNAME, Given names`, in reading order."""
+    surname, _, given = text.partition(",")
+    return f"{given.strip()} {' '.join(w.capitalize() for w in surname.split())}".strip()
+
+
+def integration(day: str) -> set[tuple[str, str, str]]:
+    """The (lema key, sheet number, precandidate key) triples of the Corte's integration of the National sheets."""
+    path = raw.cached(SOURCE, url(INTEGRATION[day])).path
+    if path.suffix == ".xlsx":
+        found = fastexcel.read_excel(str(path)).load_sheet_by_name("Datos", header_row=0, dtypes="string").to_polars()
+    else:
+        found = pl.read_csv(io.StringIO(path.read_bytes().decode("cp1252")), infer_schema_length=0)
+    found = found.filter(pl.col("TipoHoja") == "ODN").select("Numero", "PartidoPolitico", "Precandidato").unique()
+    return {
+        (lema_key(party), number.strip(), norm(prec))
+        for number, party, prec in found.iter_rows()
+        if prec is not None and number is not None and party is not None
+    }
+
+
+def precandidates(b: Builder, frame: pl.DataFrame, day: str) -> None:
+    """One presidential contest per party: its precandidates, with their votes by circuit."""
+    year = day[:4]
+    known = integration(day)
+    rows = frame.filter(pl.col("TIPOREGISTRO").is_in(sorted(PRECANDIDATE_RECORDS)))
+    pairs = rows.filter(pl.col("TIPOREGISTRO") == "HOJA_ODN").select("LEMAKEY", "DESCRIPCION1", "DESCRIPCION2").unique()
+    missing = [
+        (lema, number, prec) for lema, prec, number in pairs.iter_rows() if (lema, number, norm(prec)) not in known
+    ]
+    if missing:
+        raise ValueError(f"{day}: sheets whose precandidate the integration does not list: {missing[:5]}")
+    labels = names()
+    for lema in sorted(rows["LEMAKEY"].unique().to_list()):
+        found = rows.filter(pl.col("LEMAKEY") == lema)
+        if (found["DESCRIPCION1"].str.to_lowercase() == "no aplica").any():
+            raise ValueError(f"{day}: votes of {lema} without a precandidate")
+        contest, result_set = b.contest(
+            f"president:{lema}",
+            "office",
+            f"{year} {labels[lema]} primary, presidential precandidates",
+            f"president-{labels[lema]}",
+            office=PRESIDENCY,
+            es=f"Elecciones internas {year}, {labels[lema]}, precandidatos a la Presidencia",
+        )
+        b.p.add(
+            "note",
+            id=key("note", result_set, "precandidates"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=PRECANDIDATE_METHOD,
+            lang="en",
+        )
+        names_by_key = {norm(text): text for text in found["DESCRIPCION1"].unique().to_list()}
+        options: dict[str, str] = {}
+        for position, tag in enumerate(sorted(names_by_key), 1):
+            text = person_name(names_by_key[tag])
+            option = options[tag] = b.option(
+                contest, "candidate", text, "precandidate", lema, tag, lema=lema, position=position
+            )
+            person = key("person", day, lema, tag)
+            b.p.add("person", id=person, birth_precision=None)
+            b.p.name(person, text, "es", "official")
+            b.p.add(
+                "candidacy",
+                id=key("candidacy", day, lema, tag),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=text,
+                member_of_party_id=party(lema),
+            )
+        option_ids = pl.DataFrame(
+            [(tag, option) for tag, option in options.items()],
+            schema={"TAG": pl.String, "OPTION": pl.String},
+            orient="row",
+        )
+        votes = (
+            found.with_columns(TAG=pl.col("DESCRIPCION1").map_elements(norm, return_dtype=pl.String))
+            .join(option_ids, on="TAG", how="left")
+            .join(b.unit_frame(), on=["DEPARTAMENTO", "CRV"], how="left")
+        )
+        if votes["UNIT"].null_count():
+            raise ValueError(f"{day}: precandidate rows for circuits missing from the totals")
+        b.values(result_set, votes.select("UNIT", "OPTION", MEASURE=pl.lit(1), VALUE="CANTIDADVOTOS"))
+        b.accounting_values(result_set, None, found)
 
 
 def letter(text: str) -> str | None:
