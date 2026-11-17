@@ -26,13 +26,126 @@ URLS = {
     "ref2019-1": "http://a.cec.md/storage/ckfinder/files/Procese%20verbale/Ref%202/Rezultate_Referendum_%C3%8Entrebarea_1.xlsx",
     "ref2019-2": "http://a.cec.md/storage/ckfinder/files/Procese%20verbale/Procese%20verbale%20uninominal/Rezultate_Referendum_%C3%8Entrebarea_2.xlsx",
     "ps2025": f"{BASE}/68e657b72b3ec/115495/attached_files",
+    "pres2020-1": "https://a.cec.md/storage/ckfinder/files/Alegeri%20Preziden%C8%9Biale_1%20noiembrie%202020/"
+    "Alegeri_Prezidentiale_2020_Tur_I.xlsx",
+    "pres2020-2": "https://a.cec.md/storage/ckfinder/files/Alegeri_Prezidentiale_2020_Tur_II.xlsx",
+    "ps2019-totals": f"{BASE}/5caef9fc3c7ab/92794/attached_files",
 }
-SUFFIX = {"ps2014": ".xls", "ps2014-districts": ".xls", "ps2014-totals": ".xls"}
+FILES = "http://a.cec.md/storage/ckfinder/files"
+PS2019_LIST = {
+    1: f"{FILES}/1_Briceni.xlsx",
+    2: f"{FILES}/2_Ocnita(1).xlsx",
+    3: f"{FILES}/3_Edinet(1).xlsx",
+    4: f"{FILES}/4_Riscani(1).xlsx",
+    5: f"{FILES}/5_Glodeni(1).xlsx",
+    6: f"{FILES}/6_Drochia(1).xlsx",
+    7: f"{FILES}/7_Soroca(1).xlsx",
+    8: f"{FILES}/Totalizator_proportional/8_Floresti.xlsx",
+    9: f"{FILES}/Totalizator_proportional/9_Balti.xlsx",
+    10: f"{FILES}/Totalizator_proportional/10_Balti.xlsx",
+    11: f"{FILES}/Totalizator_proportional/11_Falesti.xlsx",
+    12: f"{FILES}/Totalizator_proportional/12_Singerei.xlsx",
+    13: f"{FILES}/Totalizator_proportional/13_Rezina.xlsx",
+    14: f"{FILES}/Totalizator_proportional/14_Telenesti.xlsx",
+    15: f"{FILES}/Totalizator_proportional/15_Calarasi.xlsx",
+    16: f"{FILES}/Totalizator_proportional/16_Ungheni.xlsx",
+    17: f"{FILES}/Totalizator_proportional/17_Nisporeni.xlsx",
+    18: f"{FILES}/Totalizator_proportional/18_Orhei.xlsx",
+    19: f"{FILES}/Totalizator_proportional/19_Ivancea.xlsx",
+    20: f"{FILES}/Totalizator_proportional/20_Straseni.xlsx",
+    21: f"{FILES}/Totalizator_proportional/21_Criuleni.xlsx",
+    22: f"{FILES}/Totalizator_proportional/22_Ialoveni.xlsx",
+    23: f"{FILES}/Totalizator_proportional/23_Chisinau.xlsx",
+    24: f"{FILES}/Totalizator_proportional/24_Chisinau.xlsx",
+    25: f"{FILES}/Totalizator_proportional/25_Chisinau.xlsx",
+    26: f"{FILES}/Totalizator_proportional/26_Chisinau.xlsx",
+    27: f"{FILES}/Totalizator_proportional/27_Chisinau.xlsx",
+    28: f"{FILES}/Totalizator_proportional/28_Chisinau.xlsx",
+    29: f"{FILES}/Totalizator_proportional/29_Chisinau.xlsx",
+    30: f"{FILES}/Totalizator_proportional/30_Chisinau.xlsx",
+    31: f"{FILES}/Totalizator_proportional/31_Chisinau.xlsx",
+    32: f"{FILES}/Totalizator_proportional/32_Chisinau.xlsx",
+    33: f"{FILES}/Totalizator_proportional/33_Chisinau.xlsx",
+    34: f"{FILES}/Totalizator_proportional/34_Anenii%20Noi.xlsx",
+    35: f"{FILES}/Totalizator_proportional/35_Causeni.xlsx",
+    36: f"{FILES}/Totalizator_proportional/36_Stefan%20Voda.xlsx",
+    37: f"{FILES}/Totalizator_proportional/37_Razeni.xlsx",
+    38: f"{FILES}/Totalizator_proportional/38_Hincesti.xlsx",
+    39: f"{FILES}/Totalizator_proportional/39_Sarata%20Galbena.xlsx",
+    40: f"{FILES}/Totalizator_proportional/40_Cimislia.xlsx",
+    41: f"{FILES}/Totalizator_proportional/41_Leova.xlsx",
+    42: f"{FILES}/Totalizator_proportional/42_Cantemir.xlsx",
+    43: f"{FILES}/Totalizator_proportional/43_Cahul.xlsx",
+    44: f"{FILES}/Totalizator_proportional/44_Taraclia.xlsx",
+    45: f"{FILES}/Totalizator_proportional/45_Comrat.xlsx",
+    46: f"{FILES}/Totalizator_proportional/46_Ceadir-Lunga.xlsx",
+    47: f"{FILES}/Totalizator_proportional/47_Camenca%2C%20R%C3%AEbni%C8%9Ba%2C%20Dub%C4%83sari%20%C8%99i%20Grigoriopol.xlsx",
+    48: f"{FILES}/Totalizator_proportional/48_Slobozia%2C%20mun_%20Tiraspol%20%C8%99i%20Bender.xlsx",
+    49: f"{FILES}/Totalizator_proportional/49_est%20de%20Republica%20Moldova.xlsx",
+    50: f"{FILES}/Totalizator_proportional/50_vest%20de%20Republica%20Moldova.xlsx",
+    51: f"{FILES}/Totalizator_proportional/51_SUA%2C%20Canada.xlsx",
+}
+PS2019_DISTRICT = {
+    1: f"{FILES}/Totalizator_uninominal/1_Briceni.xlsx",
+    2: f"{FILES}/Totalizator_uninominal/2_Ocnita.xlsx",
+    3: f"{FILES}/Totalizator_uninominal/3_Edinet.xlsx",
+    4: f"{FILES}/Totalizator_uninominal/4_Riscani.xlsx",
+    5: f"{FILES}/Totalizator_uninominal/5_Glodeni.xlsx",
+    6: f"{FILES}/Totalizator_uninominal/6_Drochia.xlsx",
+    7: f"{FILES}/Totalizator_uninominal/7_Soroca.xlsx",
+    8: f"{FILES}/Totalizator_uninominal/8_Floresti.xlsx",
+    9: f"{FILES}/Totalizator_uninominal/9_Balti.xlsx",
+    10: f"{FILES}/Totalizator_uninominal/10_Balti.xlsx",
+    11: f"{FILES}/Totalizator_uninominal/11_Falesti.xlsx",
+    12: f"{FILES}/Totalizator_uninominal/12_Singerei.xlsx",
+    13: f"{FILES}/Totalizator_uninominal/13_Rezina.xlsx",
+    14: f"{FILES}/Totalizator_uninominal/14_Telenesti.xlsx",
+    15: f"{FILES}/Totalizator_uninominal/15_Calarasi.xlsx",
+    16: f"{FILES}/Totalizator_uninominal/16_Ungheni.xlsx",
+    17: f"{FILES}/Totalizator_uninominal/17_Nisporeni.xlsx",
+    18: f"{FILES}/Totalizator_uninominal/18_Orhei.xlsx",
+    19: f"{FILES}/Totalizator_uninominal/19_Ivancea.xlsx",
+    20: f"{FILES}/Totalizator_uninominal/20_Straseni.xlsx",
+    21: f"{FILES}/Totalizator_uninominal/21_Criuleni.xlsx",
+    22: f"{FILES}/Totalizator_uninominal/22_Ialoveni.xlsx",
+    23: f"{FILES}/23_Chisinau.xlsx",
+    24: f"{FILES}/24_Chisinau.xlsx",
+    25: f"{FILES}/25_Chisinau.xlsx",
+    26: f"{FILES}/26_Chisinau.xlsx",
+    27: f"{FILES}/27_Chisinau.xlsx",
+    28: f"{FILES}/Totalizator_uninominal/28_Chisinau.xlsx",
+    29: f"{FILES}/29_Chisinau.xlsx",
+    30: f"{FILES}/30_Chisinau.xlsx",
+    31: f"{FILES}/31_Chisinau.xlsx",
+    32: f"{FILES}/32_Chisinau.xlsx",
+    33: f"{FILES}/33_Chisinau.xlsx",
+    34: f"{FILES}/Totalizator_uninominal/34_Anenii%20Noi.xlsx",
+    35: f"{FILES}/Totalizator_uninominal/35_Causeni.xlsx",
+    36: f"{FILES}/Totalizator_uninominal/36_Stefan%20Voda.xlsx",
+    37: f"{FILES}/Totalizator_uninominal/37_Razeni.xlsx",
+    38: f"{FILES}/Totalizator_uninominal/38_Hincesti.xlsx",
+    39: f"{FILES}/Totalizator_uninominal/39_Sarata%20Galbena.xlsx",
+    40: f"{FILES}/Totalizator_uninominal/40_Cimislia.xlsx",
+    41: f"{FILES}/Totalizator_uninominal/41_Leova.xlsx",
+    42: f"{FILES}/Totalizator_uninominal/42_Cantemir.xlsx",
+    43: f"{FILES}/Totalizator_uninominal/43_Cahul.xlsx",
+    44: f"{FILES}/Totalizator_uninominal/44_Taraclia.xlsx",
+    45: f"{FILES}/Totalizator_uninominal/45_Comrat.xlsx",
+    46: f"{FILES}/Totalizator_uninominal/46_Ceadir-Lunga.xlsx",
+    47: f"{FILES}/Totalizator_uninominal/47_Camenca%2C%20R%C3%AEbni%C8%9Ba%2C%20Dub%C4%83sari%20%C8%99i%20Grigoriopol.xlsx",
+    48: f"{FILES}/Totalizator_uninominal/48_Slobozia%2C%20Tiraspol%20%C8%99i%20Bender.xlsx",
+    49: f"{FILES}/Totalizator_uninominal/49_la%20est%20de%20Republica%20Moldova.xlsx",
+    50: f"{FILES}/Totalizator_uninominal/50_la%20vest%20de%20Republica%20Moldova.xlsx",
+    51: f"{FILES}/Totalizator_uninominal/51_SUA%2C%20Canada.xlsx",
+}
+SUFFIX = {"ps2014": ".xls", "ps2014-districts": ".xls", "ps2014-totals": ".xls", "ps2019-totals": ".pdf"}
 DAYS = {
     "2014-11-30": date(2014, 11, 30),
     "2016-10-30": date(2016, 10, 30),
     "2016-11-13": date(2016, 11, 13),
     "2019-02-24": date(2019, 2, 24),
+    "2020-11-01": date(2020, 11, 1),
+    "2020-11-15": date(2020, 11, 15),
     "2021-07-11": date(2021, 7, 11),
     "2024-10-20": date(2024, 10, 20),
     "2024-11-03": date(2024, 11, 3),
@@ -40,7 +153,11 @@ DAYS = {
 }
 
 
-EARLIER = {"2016-11-13": ["md.cec/2016-10-30"], "2024-11-03": ["md.cec/2024-10-20"]}
+EARLIER = {
+    "2016-11-13": ["md.cec/2016-10-30"],
+    "2020-11-15": ["md.cec/2020-11-01"],
+    "2024-11-03": ["md.cec/2024-10-20"],
+}
 
 
 def key(kind: str, *parts: object) -> str:
@@ -51,6 +168,8 @@ CEC_SOURCE = key("source", "cec")
 PARLIAMENT = key("body", "parliament")
 PRESIDENCY = key("office", "president")
 SYSTEM_LIST = key("electoral_system", "parliament", "list")
+SYSTEM_LIST_MIXED = key("electoral_system", "parliament", "list", "mixed")
+SYSTEM_DISTRICT = key("electoral_system", "parliament", "single_member")
 SYSTEM_PRESIDENT = key("electoral_system", "president", "two_round")
 SYSTEM_REFERENDUM = key("electoral_system", "referendum")
 
@@ -232,16 +351,97 @@ def read_2019(url: str) -> Table:
         for row in sheet(url, name)[4:]:
             if re.fullmatch(r"\d+", clean(row[0])):
                 district = int(name)
-                stations.append(
-                    Station(district, f"{district}/{int(clean(row[0]))}", names[district], "", _row(row, 1, 12))
-                )
+                # Constituency 51 numbers its referendum stations apart from its parliamentary ones.
+                number_ = f"{'r' if district == 51 else ''}{int(clean(row[0]))}"
+                stations.append(Station(district, f"{district}/{number_}", names[district], "", _row(row, 1, 12)))
     rows = sheet(url, "TOTAL")
     total = _row(next(row for row in rows if clean(row[0]) == "Total"), 2, 13)
     labels = [clean(cell) for cell in rows[2][13:] if cell] or [clean(cell) for cell in sheet(url, "1")[2][10:12]]
     return Table(stations, total, labels, [""] * len(labels), (0, 1, 2, 3, 5, 6), 9, 11)
 
 
+def read_2020(url: str) -> Table:
+    """A presidential round of 2020: one sheet with a national row, circumscription rows, and polling stations, and a
+    header that prints each candidate's name over the party that nominated them."""
+    rows = sheet(url)
+    width = len(rows[0])
+    stations: list[Station] = []
+    district = 0
+    for row in rows[1:]:
+        text = clean(row[0])
+        if "Circumscrip" in text and row[2] is None:
+            district = _district(text) or 0
+        elif row[2] is not None and re.fullmatch(r"\d+", clean(row[1])):
+            stations.append(
+                Station(district, f"{district}/{int(clean(row[1]))}", text, clean(row[2]), _row(row, 3, width))
+            )
+    names, tags = [], []
+    for cell in rows[0][9 : width - 3]:
+        name, party = [clean(part) for part in str(cell).strip().split("\n") if clean(part)]
+        names.append(name)
+        tags.append("" if party.lower().startswith("candidat independent") else party)
+    total = _row(next(row for row in rows if clean(row[0]).startswith("Alegeri")), 3, width)
+    count = width - 3 - 9
+    return Table(stations, total, names, tags, (0, 1, 2, 3, 5, 6 + count), 6, 6 + count, named=True)
+
+
+def _numbered(text: str) -> bool:
+    return re.fullmatch(r"\d+", clean(text)) is not None
+
+
+def _station_2019(district: int, row: list[str | None], values: list[int | None]) -> Station:
+    place, _, name = str(row[1] or "").strip().partition("\n")
+    return Station(district, f"{district}/{int(clean(row[0]))}", clean(place), clean(name), values)
+
+
+def read_2019_list() -> Table:
+    """The national list contest of 2019, from one workbook per single-member constituency. Each prints its own
+    total row, and the national row is their sum."""
+    stations: list[Station] = []
+    total: list[int | None] = []
+    labels: list[str] = []
+    for district, url in PS2019_LIST.items():
+        rows = sheet(url)
+        header = next(i for i, row in enumerate(rows) if clean(row[0]).startswith("Nr. Sec"))
+        width = len(rows[header]) - 2
+        found = [clean(cell).replace("~", " ") for cell in rows[header][9:width]]
+        if labels and found != labels:
+            raise ValueError(f"constituency {district} lists other parties: {found}")
+        labels = found
+        printed = _row(rows[header + 1], 2, width)
+        total = printed if not total else [(a or 0) + (b or 0) for a, b in zip(total, printed, strict=True)]
+        for row in rows[header + 2 :]:
+            if _numbered(str(row[0] or "")):
+                stations.append(_station_2019(district, row, _row(row, 2, width)))
+    return Table(stations, total, labels, [""] * len(labels), (0, 1, 2, 3, 5, 6), 7, 7 + len(labels))
+
+
+def read_2019_district(district: int) -> Table:
+    """One single-member constituency of 2019. The header prints each candidate as the nominating party (or
+    "Candidat independent") over the candidate's name; two empty columns sit between the candidates."""
+    rows = sheet(PS2019_DISTRICT[district])
+    header = next(i for i, row in enumerate(rows) if clean(row[0]).startswith("Nr. Sec"))
+    head = rows[header]
+    valid = next(i for i, cell in enumerate(head) if cell and "total de voturi valabil" in cell)
+    columns = [i for i in range(8, valid) if head[i]]
+    labels, tags = [], []
+    for i in columns:
+        party, name = [clean(part) for part in str(head[i]).strip().split("\n") if clean(part)]
+        labels.append(name)
+        tags.append("" if party.lower().startswith("candidat independent") else party.replace("~", " "))
+    keep = [*range(2, 8), *columns, valid]
+
+    def pick(row: list[str | None]) -> list[int | None]:
+        return [number(row[i]) for i in keep]
+
+    stations = [_station_2019(district, row, pick(row)) for row in rows[header + 2 :] if _numbered(str(row[0] or ""))]
+    count = len(columns)
+    return Table(stations, pick(rows[header + 1]), labels, tags, (0, 1, 2, 3, 5, 6 + count), 6, 6 + count, True)
+
+
 def table(day: str, which: str = "") -> Table:
+    if which.startswith("pres2020"):
+        return read_2020(URLS[which])
     if which.startswith("ref2019"):
         return read_2019(URLS[which])
     if which.startswith("pres2016"):
@@ -262,6 +462,8 @@ def packages() -> list[str]:
 def fetch() -> None:
     for name, url in URLS.items():
         raw.fetch(SOURCE, url, suffix=SUFFIX.get(name, ".xlsx"))
+    for url in [*PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
+        raw.fetch(SOURCE, url, suffix=".xlsx")
 
 
 def parse() -> None:
@@ -274,8 +476,11 @@ def emit() -> None:
     package.run("load", packages())
 
 
+CEDILLA = str.maketrans("şţŞŢ", "șțȘȚ")
+
+
 def party_key(label: str) -> str:
-    text = re.sub(r"[„”“\"']", "", label).strip()
+    text = re.sub(r"[„”“\"'~]", " ", label.translate(CEDILLA)).strip()
     text = re.sub(r"^(partidul politic|partid politic|partidul)\s+", "", text, flags=re.IGNORECASE)
     return clean(text).casefold()
 
@@ -291,10 +496,12 @@ def tag_party(tag: str) -> str:
 def list_labels() -> dict[str, str]:
     """Every list's printed name across the parliamentary elections, by party id."""
     found: dict[str, str] = {}
-    for day in ("2014-11-30", "2021-07-11", "2025-09-28"):
-        for label in table(day).labels:
-            if "Candidat independent" not in label:
-                found.setdefault(party_id(label), re.sub(r"\s+", " ", label.strip()))
+    labels = [label for day in ("2014-11-30", "2021-07-11", "2025-09-28") for label in table(day).labels]
+    labels += read_2019_list().labels
+    labels += [tag for district in PS2019_DISTRICT for tag in read_2019_district(district).tags if tag]
+    for label in labels:
+        if "Candidat independent" not in label:
+            found.setdefault(party_id(label), re.sub(r"\s+", " ", label.strip()))
     return found
 
 
@@ -307,8 +514,8 @@ def candidate_tags() -> set[str]:
 
 def candidate_parties() -> dict[str, str]:
     found: dict[str, str] = {}
-    for which in ("pres2016-1", "pres2016-2"):
-        for tag in table("2016-10-30", which).tags:
+    for which in ("pres2016-1", "pres2016-2", "pres2020-1", "pres2020-2"):
+        for tag in table("", which).tags:
             if tag:
                 found.setdefault(party_id(tag), tag)
     return found
@@ -332,7 +539,7 @@ def registry() -> Package:
         license="Official publication; reuse terms are not stated",
         attribution="Comisia Electorală Centrală a Republicii Moldova",
     )
-    for url in URLS.values():
+    for url in [*URLS.values(), *PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
         p.artifact(raw.cached(SOURCE, url), CEC_SOURCE)
     p.add(
         "scheme",
@@ -364,6 +571,22 @@ def registry() -> Package:
             (
                 "A candidate with a majority of valid votes in the first round is elected; otherwise the two leading "
                 "candidates go to a second round."
+            ),
+        ),
+        (
+            SYSTEM_LIST_MIXED,
+            {"formula": "dhondt"},
+            (
+                "Under the mixed system used in 2019, a single national constituency elects 50 of the 101 deputies by "
+                "party-list proportional representation. The electoral thresholds are not stored here."
+            ),
+        ),
+        (
+            SYSTEM_DISTRICT,
+            {"formula": "fptp"},
+            (
+                "Under the mixed system used in 2019, each of 51 single-member constituencies elects one deputy, the "
+                "candidate with the most valid votes."
             ),
         ),
         (SYSTEM_REFERENDUM, {"formula": "referendum"}, "A yes or no question put to all voters."),
@@ -498,6 +721,7 @@ def build(day: str) -> Package:
     if day in ("2014-11-30", "2021-07-11", "2025-09-28"):
         _parliament(p, day, first)
     elif day == "2019-02-24":
+        _parliament_2019(p, day, first)
         _referendum(p, day, first)
     elif day == "2024-10-20":
         _presidential(p, day, first, 1)
@@ -571,6 +795,89 @@ def _parliament(p: Package, day: str, first: date) -> None:
         )
 
 
+def _parliament_2019(p: Package, day: str, first: date) -> None:
+    """The mixed-system election of 2019: 50 deputies from a national list contest and 51 from single-member
+    constituencies, every ballot counted at the same polling stations."""
+    p.uses(raw.cached(SOURCE, URLS["ps2019-totals"]))
+    for url in [*PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
+        p.uses(raw.cached(SOURCE, url))
+    election = _election(
+        p,
+        f"ps{day}",
+        first,
+        "general",
+        "2019 Moldovan parliamentary election",
+        "Alegeri parlamentare din 24.02.2019",
+        f"md/{day}-general",
+    )
+    contest = _contest(
+        p,
+        f"ps{day}",
+        election,
+        "list_allocation",
+        "2019 Moldovan parliamentary election, national constituency",
+        "Alegeri parlamentare 2019, circumscripția națională",
+        f"md/{day}-general/parliament",
+        body_id=PARLIAMENT,
+        magnitude=50,
+        electoral_system_id=SYSTEM_LIST_MIXED,
+    )
+    t = read_2019_list()
+    result_set = _result_set(p, election, contest, f"ps{day}")
+    options: list[str] = []
+    for position, label in enumerate(t.labels, 1):
+        option = key("option", f"ps{day}", position)
+        options.append(option)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=party_id(label),
+            ballot_position=position,
+            ballot_label=label,
+        )
+    units = _units(p, day, [t])
+    _votes(p, result_set, units, options, t)
+    p.add(
+        "note",
+        id=key("note", result_set, "national"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md="The Commission published this contest in one workbook per single-member constituency, each with "
+        "its polling stations and a printed constituency total. The national totals stored as declared are the sum "
+        "of those 51 totals, which equals the Commission's protocol on the national totalization of 3 March 2019.",
+        lang="en",
+    )
+    for district in PS2019_DISTRICT:
+        name = f"ps{day}-{district}"
+        seat = _contest(
+            p,
+            name,
+            election,
+            "body_seats",
+            f"2019 Moldovan parliamentary election, single-member constituency {district}",
+            f"Alegeri parlamentare 2019, circumscripția uninominală nr. {district}",
+            f"md/{day}-general/constituency-{district}",
+            body_id=PARLIAMENT,
+            magnitude=1,
+            electoral_system_id=SYSTEM_DISTRICT,
+        )
+        t = read_2019_district(district)
+        result_set = _result_set(p, election, seat, name)
+        options = _candidates(p, name, 2019, 1, seat, t, True, f"ps2019:{district}")
+        _votes(p, result_set, _units(p, day, [t]), options, t)
+
+
+def _votes(p: Package, result_set: str, units: dict[str, str], options: list[str], t: Table) -> None:
+    _accounting(p, result_set, units, t)
+    for station in t.stations:
+        for option, value in zip(options, station.row[t.first : t.end], strict=True):
+            _put(p, result_set, units[station.code], option, VOTES, value)
+    _declared(p, result_set, options, t)
+    _caveats(p, result_set, t)
+
+
 def _caveats(p: Package, result_set: str, t: Table) -> None:
     over = 0
     for station in t.stations:
@@ -578,9 +885,12 @@ def _caveats(p: Package, result_set: str, t: Table) -> None:
         if a is not None and b is not None and d is not None and d > a + b:
             over += 1
     if over:
+        earlier = p.accepted.get("accounting.turnout")
+        counted = over + (int(str(earlier).split()[0].replace(",", "")) if earlier else 0)
         p.accept(
             "accounting.turnout",
-            f"{over} polling stations print more ballots cast than voters on both rolls; stored as printed",
+            f"{counted:,} polling-station rows print more ballots cast than voters on the basic and supplementary "
+            "rolls together; the Commission's own figures, stored as printed",
         )
         p.add(
             "note",
@@ -594,11 +904,18 @@ def _caveats(p: Package, result_set: str, t: Table) -> None:
 
 
 def _candidates(
-    p: Package, name: str, year: int, round_number: int, contest: str, t: Table, build_people: bool
+    p: Package,
+    name: str,
+    year: int,
+    round_number: int,
+    contest: str,
+    t: Table,
+    build_people: bool,
+    scope: str = "",
 ) -> list[str]:
     options: list[str] = []
     for position, (label, tag) in enumerate(zip(t.labels, t.tags, strict=True), 1):
-        person = key("person", f"pres{year}", label)
+        person = key("person", scope or f"pres{year}", label)
         if build_people:
             p.add("person", id=person)
             p.name(person, label, "ro", "official")
