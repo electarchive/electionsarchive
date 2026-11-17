@@ -14,13 +14,14 @@ from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import Connection, connect
 
 SOURCE = "crosswalk"
-VERSION = "1"
+VERSION = "2"
 NEAR = 12 * 366
 RIVAL = 60
 MOST = 200_000
 LONG_GAP = 24 * 365
 LONG_SPAN = 50 * 365
 MATCHED = ("tr", "br")
+COUNTRIES = ("FR", "ES", "FI", "IT", "PL", "CA", "LU", "IE")
 IDENTITIES = (
     "bioguide",
     "wikidata",
@@ -42,11 +43,20 @@ CANON = {"rudy": "rudolph", "rudi": "rudolph"} | {
     if form not in {"kathleen", "jon", "bert"}
 }
 CODED = ("person", "polity", "area", "office", "body", "party", "pipeline")
-COLUMNS = ("person", "name", "day", "wide", "polity", "area", "office", "body", "party", "pipeline")
+COLUMNS = ("person", "name", "day", "wide", "inside", "polity", "area", "office", "body", "party", "pipeline")
 ROWS = """copy (
+  with recursive up(id, at, depth) as (
+    select id, id, 0 from polity
+    union all
+    select up.id, pp.parent_id, up.depth + 1 from up join polity_parent pp on pp.polity_id = up.at where up.depth < 8
+  ), country as (
+    select distinct on (up.id) up.id, split_part(p.iso_code, '-', 1) as iso
+    from up join polity p on p.id = up.at where p.kind = 'sovereign_state' and p.iso_code is not null
+    order by up.id, up.depth
+  ), inside as (select id from country where iso = any(%(countries)s))
   select cy.person_id, coalesce(cy.ballot_name, n.text), e.date_from,
-         (p.kind in ('sovereign_state', 'federal_unit', 'region'))::int, e.polity_id, k.district_area_id, k.office_id,
-         k.body_id, o.party_id, c.pipeline
+         (p.kind in ('sovereign_state', 'federal_unit', 'region'))::int, (e.polity_id in (select id from inside))::int,
+         e.polity_id, k.district_area_id, k.office_id, k.body_id, o.party_id, c.pipeline
   from candidacy cy
   join contest_option o on o.id = cy.option_id
   join contest k on k.id = o.contest_id
@@ -54,7 +64,13 @@ ROWS = """copy (
   join polity p on p.id = e.polity_id
   join changeset c on c.id = cy.changeset_id
   left join lateral (select text from name where entity_id = cy.person_id and is_preferred limit 1) n on true
-  where e.date_from is not null and split_part(c.pipeline, '.', 1) <> all(%s)
+  where e.date_from is not null and split_part(c.pipeline, '.', 1) <> all(%(matched)s)
+    and cy.person_id in (
+      select y.person_id from candidacy y
+      join contest_option yo on yo.id = y.option_id
+      join contest yk on yk.id = yo.contest_id
+      join election ye on ye.id = yk.election_id
+      where ye.polity_id in (select id from inside))
 ) to stdout with (format csv)"""
 EPOCH = date(1970, 1, 1).toordinal()
 SOLE = """select k.office_id::text from contest k join office f on f.id = k.office_id
@@ -65,7 +81,7 @@ SOLE = """select k.office_id::text from contest k join office f on f.id = k.offi
 
 def _frame(conn: Connection) -> tuple[pl.DataFrame, dict[str, pl.DataFrame]]:
     buffer = io.BytesIO()
-    with conn.cursor() as cursor, cursor.copy(ROWS, [list(MATCHED)]) as copy:
+    with conn.cursor() as cursor, cursor.copy(ROWS, {"countries": list(COUNTRIES), "matched": list(MATCHED)}) as copy:
         for chunk in copy:
             buffer.write(chunk)
     frame = pl.read_csv(
@@ -73,9 +89,10 @@ def _frame(conn: Connection) -> tuple[pl.DataFrame, dict[str, pl.DataFrame]]:
         has_header=False,
         new_columns=list(COLUMNS),
         schema_overrides={
-            column: pl.Date if column == "day" else pl.Int8 if column == "wide" else pl.String for column in COLUMNS
+            column: pl.Date if column == "day" else pl.Int8 if column in ("wide", "inside") else pl.String
+            for column in COLUMNS
         },
-    ).with_columns(pl.col("day").cast(pl.Int32), pl.col("wide").cast(pl.Boolean))
+    ).with_columns(pl.col("day").cast(pl.Int32), pl.col("wide").cast(pl.Boolean), pl.col("inside").cast(pl.Boolean))
     del buffer
     named = pl.DataFrame(
         [
@@ -98,7 +115,11 @@ def _frame(conn: Connection) -> tuple[pl.DataFrame, dict[str, pl.DataFrame]]:
 def _seats(frame: pl.DataFrame, sole: list[int]) -> pl.DataFrame:
     line = ["seat", "office", "body"]
     lined = (
-        frame.filter(pl.col("key").is_not_null() & (pl.col("office").is_not_null() | pl.col("body").is_not_null()))
+        frame.filter(
+            pl.col("inside")
+            & pl.col("key").is_not_null()
+            & (pl.col("office").is_not_null() | pl.col("body").is_not_null())
+        )
         .with_columns(
             seat=pl.when(pl.col("area").is_not_null())
             .then(pl.col("area").cast(pl.Int64))
@@ -131,7 +152,7 @@ def _bodies(frame: pl.DataFrame) -> pl.DataFrame:
     named = frame.filter(pl.col("key").is_not_null())
     bearers = named.group_by(["polity", "key"]).agg(pl.col("person").n_unique().alias("bearers"))
     return (
-        named.filter(pl.col("body").is_not_null() & pl.col("wide"))
+        named.filter(pl.col("body").is_not_null() & pl.col("wide") & pl.col("inside"))
         .group_by(["polity", "body", "key"])
         .agg(pl.col("person").unique())
         .join(bearers, on=["polity", "key"])
@@ -341,7 +362,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "People recorded once per source or per race joined across elections, where the same printed name "
+                "People in France, Spain, Finland, Italy, Poland, Canada, Luxembourg, and Ireland recorded once per "
+                "source or per race joined across elections, where the same printed name "
                 "ran for the same seat within 12 years, or for the same legislature of a country, state, or region under "
                 "the same party within 12 years with no one else of that name there, and nothing tells them apart; "
                 "plus pairs joined by hand with cited evidence"
