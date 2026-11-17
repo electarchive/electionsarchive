@@ -163,7 +163,10 @@ def _district_results(found: Round, unit: int) -> list[Okraj]:
     table = next(t for t in tables if any(row[:2] == ["", "skupaj"] for row in t))
     rows = table[next(i for i, row in enumerate(table) if row[:2] == ["", "skupaj"]) :]
     names = rows[0][2:]
-    seats = [int(re.match(r"VO\s+(\d+)", name).group(1)) for name in names]  # type: ignore[union-attr]
+    labels = [re.match(r"VO\s+(\d+)", name) for name in names]
+    if None in labels:
+        raise LookupError(f"{found.day} unit {unit}: unreadable district names {names}")
+    seats = [int(label.group(1)) for label in labels if label is not None]
     okraji = [
         Okraj(unit, seat, clean(re.sub(r"^VO\s+\d+\s*", "", name))) for seat, name in zip(seats, names, strict=True)
     ]
