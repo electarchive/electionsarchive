@@ -55,8 +55,33 @@ FILES: dict[str, tuple[str, str | None]] = {
         f"{BASE}/2020/03/Clarendon-South-Eastern-By-Election-Results-Detail.pdf",
         f"{BASE}/2020/03/Clarendon-South-Eastern-By-Election-Results-Summary.pdf",
     ),
+    "2019-04-04": (
+        f"{BASE}/2019/04/PortlandEasternByElection2019ResultsDetail.pdf",
+        f"{BASE}/2019/04/PortlandEasternByElection2019ResultsSummary.pdf",
+    ),
+    "2020-09-03": (
+        f"{BASE}/2020/10/General-Election-2020-Final-Detailed-Result.pdf",
+        f"{BASE}/2020/11/2020GeneralElectionSummaryResult.pdf",
+    ),
 }
 FILES = dict(sorted(FILES.items()))
+# The elections whose files the registry package lists. The packages of later additions list their own files.
+LISTED = (
+    "2001-03-08",
+    "2002-10-16",
+    "2005-04-13",
+    "2006-06-07",
+    "2007-09-03",
+    "2009-03-23",
+    "2009-06-16",
+    "2009-09-04",
+    "2010-12-20",
+    "2011-04-04",
+    "2011-12-29",
+    "2016-02-25",
+    "2017-10-30",
+    "2020-03-02",
+)
 PARTIES = {
     "JLP": "Jamaica Labour Party",
     "PNP": "People's National Party",
@@ -127,13 +152,30 @@ def summary(day: str) -> dict[int, tuple[int, int, int]]:
         if not found or "TOTALS" in line:
             continue
         cells = re.findall(r"[\d,]+(?:\.\d+)?%?", line[found.end() :])
-        if len(cells) >= 4 and all(re.fullmatch(r"[\d,]+", cells[i]) for i in (-4, -3, -1)):
-            rows[int(found.group(1))] = (
-                int(cells[-4].replace(",", "")),
-                int(cells[-3].replace(",", "")),
-                int(cells[-1].replace(",", "")),
-            )
+        whole = [bool(re.fullmatch(r"[\d,]+", cell)) for cell in cells]
+        if len(cells) >= 4 and all(whole[i] for i in (-4, -3, -1)):
+            picked = (cells[-4], cells[-3], cells[-1])
+        elif len(cells) >= 5 and whole[-5] and not whole[-4] and whole[-3] and not whole[-2] and whole[-1]:
+            picked = (cells[-5], cells[-3], cells[-1])  # newer summaries print a share after the rejected ballots
+        else:
+            continue
+        rows[int(found.group(1))] = (
+            int(picked[0].replace(",", "")),
+            int(picked[1].replace(",", "")),
+            int(picked[2].replace(",", "")),
+        )
     return rows
+
+
+@functools.cache
+def registered_parties() -> frozenset[str]:
+    return frozenset(
+        party
+        for day in LISTED
+        for constituency in document(day).constituencies
+        for party, _ in constituency.candidates
+        if not independent(party)
+    )
 
 
 def independent(tag: str) -> bool:
@@ -162,8 +204,8 @@ def registry() -> Package:
         license="Official publication; reuse terms are not stated",
         attribution="Electoral Commission of Jamaica",
     )
-    for urls in FILES.values():
-        for url in urls:
+    for day in LISTED:
+        for url in FILES[day]:
             if url:
                 p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
     p.add("scheme", code="jm.ps", polity_id=JAMAICA, kind="precinct", rank=1, noun="polling station")
@@ -181,7 +223,7 @@ def registry() -> Package:
     )
     tags = {
         party
-        for day in FILES
+        for day in LISTED
         for constituency in document(day).constituencies
         for party, _ in constituency.candidates
         if not independent(party)
@@ -233,7 +275,14 @@ def build(day: str) -> Package:
     p.external.add(JAMAICA)
     for url in FILES[day]:
         if url:
-            p.uses(raw.cached(SOURCE, url))
+            if day in LISTED:
+                p.uses(raw.cached(SOURCE, url))
+            else:
+                p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
+    for constituency in doc.constituencies:
+        for party, _ in constituency.candidates:
+            if day not in LISTED and not independent(party) and party not in registered_parties():
+                raise ValueError(f"{day}: party {party} is not in the registry package")
     election = key("election", day, "general")
     path = f"jm/{day}-general"
     if general:
@@ -363,6 +412,8 @@ def build(day: str) -> Package:
         count = len(options)
         if any(declared.votes[count:]):
             raise ValueError(f"{day} {name}: totals for unnamed candidates")
+        if general and day not in LISTED:
+            declared = _final(p, day, constituency, declared, result_set)
         for measure, value in (
             (REGISTERED, declared.electors),
             (CAST, declared.total),
@@ -382,6 +433,72 @@ def build(day: str) -> Package:
     if general:
         _summary(p, day, doc)
     return p
+
+
+@functools.cache
+def summary_votes(day: str) -> dict[int, dict[str, int]]:
+    """The votes of each party column in the authority's summary of a general election, by constituency."""
+    url = FILES[day][1]
+    if url is None:
+        return {}
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    tags: list[str] = []
+    rows: dict[int, dict[str, int]] = {}
+    for line in text.splitlines():
+        if not tags and re.search(r"\bJLP\b", line) and re.search(r"\bPNP\b", line):
+            tags = [t for t in line.split() if t != "TOTAL" and not t.startswith("VOTES")]
+            continue
+        found = re.search(r"^\s*\((\d+)\)", line)
+        if not found or not tags:
+            continue
+        cells = [int(c.replace(",", "")) for c in re.findall(r"[\d,]+(?:\.\d+)?", line[found.end() :]) if "." not in c]
+        if len(cells) != len(tags) + 3:
+            raise ValueError(f"{day}: summary line {line!r} against columns {tags}")
+        rows[int(found.group(1))] = dict(zip(tags, cells[: len(tags)], strict=True))
+    return rows
+
+
+def _final(p: Package, day: str, c: pdf.Constituency, declared: pdf.Totals, result_set: str) -> pdf.Totals:
+    """The constituency totals of the authority's later summary where its party votes differ from the report's.
+
+    The summary was published after the polling-station report, and a recount it reflects changes no station row of the
+    report, so the stations are kept as printed and the summary's totals are declared.
+    """
+    if (declared.rejected, declared.total, declared.electors) != summary(day).get(c.number):
+        raise ValueError(f"{day} {c.name}: summary turnout differs from the report")
+    row = summary_votes(day)[c.number]
+    printed = [row.get(party, 0) if not independent(party) or party in row else None for party, _ in c.candidates]
+    if None in printed or sum(v for v in printed if v is not None) != sum(declared.votes[: len(printed)]):
+        raise ValueError(f"{day} {c.name}: summary candidates {row} against {c.candidates}")
+    final = [v for v in printed if v is not None]
+    if final == declared.votes[: len(final)]:
+        return declared
+    names = ", ".join(
+        f"{label.title()} {old:,} in the report and {new:,} in the summary"
+        for (_, label), old, new in zip(c.candidates, declared.votes, final, strict=False)
+        if old != new
+    )
+    p.add(
+        "note",
+        id=key("note", result_set, "summary"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md=f"The authority's summary of the election, published after its polling-station report, prints "
+        f"different candidate totals for this constituency: {names}. The totals of the summary are declared; the "
+        "polling stations are stored as the report prints them and add up to its totals.",
+        lang="en",
+    )
+    p.accept(
+        "accounting.declared",
+        f"{c.name.title()}: the authority's later summary declares candidate totals that differ from the sum of its "
+        "polling-station report; both are stored as printed",
+    )
+    return pdf.Totals(declared.stations, final, declared.rejected, declared.total, declared.electors)
 
 
 def _summary(p: Package, day: str, doc: pdf.Document) -> None:
