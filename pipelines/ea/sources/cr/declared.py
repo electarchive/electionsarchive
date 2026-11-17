@@ -62,6 +62,10 @@ PARTIES = {
     "PSD": "PROGRESO SOCIAL DEMOCRATICO",
     "NR": "NUEVA REPUBLICA",
     "LP": "LIBERAL PROGRESISTA",
+    "PIN": "INTEGRACION NACIONAL",
+    "PRSC": "REPUBLICANO SOCIAL CRISTIANO",
+    "CAC": "COALICION AGENDA CIUDADANA",
+    "PPSO": "PUEBLO SOBERANO",
 }
 """The initials the declaratorias print after an elected deputy, with the party's name as the workbooks print it."""
 
@@ -179,7 +183,7 @@ ROLES = {
     "SEGUNDA VICEPRESIDENTA": ("running_mate", 2),
 }
 TICKET = re.compile(
-    r"\b(?:a\s+la\s+señora|al\s+señor|a\s+la|al|a)\s+([A-ZÁÉÍÓÚÑ][^,;]+?),\s*portador(?:a)?\s+de\s+la\s+cédula\s+de\s+identidad\s+número\s+[\d-]+,?\s+"
+    r"\b(?:a\s+la\s+señora|al\s+señor|a\s+la|al|a)\s+([A-ZÁÉÍÓÚÑ][^,;]+?)(?:,\s*conocid[oa]\s+como\s+[^,;]+?)?,\s*portador(?:a)?\s+de\s+la\s+cédula\s+de\s+identidad\s+número\s+\d[\d\s-]*?\s*,?\s+"
     r"(PRESIDENT[EA]|PRIM(?:ER|ERA)\s+VICEPRESIDENT[EA]|SEGUND[OA]\s+VICEPRESIDENT[EA])"
 )
 
@@ -232,7 +236,10 @@ def deputies_html(resolution: Resolution) -> list[Elected]:
     page = decode(path.read_bytes())
     found: list[Elected] = []
     province, pending = 0, False
-    for row in re.findall(r"<tr.*?</tr>", page, flags=re.DOTALL | re.IGNORECASE):
+    for match in re.finditer(r"<tr.*?</tr>|Provincia:\s*[^<]+", page, flags=re.DOTALL | re.IGNORECASE):
+        row = match.group(0)
+        if not row.lower().startswith("<tr"):
+            row = f"<td>{row}</td>"  # a heading printed as a paragraph above the province's table
         cells = [
             squash(html.unescape(re.sub(r"<[^>]+>", " ", cell)))
             for cell in re.findall(r"<td.*?</td>", row, flags=re.DOTALL | re.IGNORECASE)
