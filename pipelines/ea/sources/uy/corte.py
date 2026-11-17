@@ -10,9 +10,11 @@ import re
 import subprocess
 import unicodedata
 import zipfile
+from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
 
+import fastexcel
 import polars as pl
 
 from ea import changeset, package, raw
@@ -103,11 +105,52 @@ FILES: dict[str, dict[str, str]] = {
         "breakdown": "2d5eb299-0d95-478b-9271-c62f601e7bc1/resource/92d7ca7b-32f1-4cde-b607-d94aef825c4d/download/desglose-de-votos.csv",
     },
 }
+GUB = "https://www.gub.uy/corte-electoral/"
+
+
+@dataclass(frozen=True)
+class Export:
+    """An election published on the Corte's own site as XLSX exports inside zip downloads.
+
+    The exports hold the votes of each ballot sheet in each circuit. `members` names the files to read as
+    (zip, file name inside it); `official` is the Corte's summary workbook of department and municipality totals.
+    """
+
+    pages: tuple[str, ...]
+    zips: dict[str, str]
+    members: dict[str, tuple[str, str]]
+
+
+XLSX: dict[str, Export] = {
+    "2015-05-10": Export(
+        pages=(),
+        zips={"local": f"{GUB}download/node/field_documento/683"},
+        members={
+            "breakdown": ("local", "RESULTADO DEPTAL 2015.xlsx"),
+            "municipal": ("local", "resultado_por_crv_municipal_todo_el_pais CONVERT XLSX.xlsx"),
+            "official": ("local", "Deptales 2015.xlsx"),
+        },
+    ),
+    "2014-06-01": Export(
+        pages=(
+            f"{GUB}datos-y-estadisticas/estadisticas/resultados-elecciones-internas-del-ano-2014",
+            f"{GUB}comunicacion/publicaciones/resultados-elecciones-internas-organo-deliberativo-nacional-circuito",
+            f"{GUB}comunicacion/publicaciones/resultados-elecciones-internas-organo-deliberativo-departamental",
+        ),
+        zips={
+            "odn": f"{GUB}download/node/field_documento/482",
+            "odd": f"{GUB}download/node/field_documento/493",
+        },
+        members={},
+    ),
+}
 NATIONAL = ["2014-10-26", "2019-10-27", "2024-10-27"]
 RUNOFF = ["2014-11-30", "2019-11-24", "2024-11-24"]
-PRIMARY = ["2019-06-30", "2024-06-30"]
-LOCAL = ["2020-09-27", "2025-05-11"]
+PRIMARY = ["2014-06-01", "2019-06-30", "2024-06-30"]
+LOCAL = ["2015-05-10", "2020-09-27", "2025-05-11"]
 DAYS = sorted(FILES)
+XDAYS = sorted(XLSX)
+ALL = sorted([*DAYS, *XDAYS])
 KIND_PATH = {**dict.fromkeys(NATIONAL, "general"), **dict.fromkeys(RUNOFF, "runoff")}
 KIND_PATH |= {**dict.fromkeys(PRIMARY, "primary"), **dict.fromkeys(LOCAL, "local")}
 
@@ -197,7 +240,7 @@ def files(day: str) -> dict[str, str]:
 
 
 def packages() -> list[str]:
-    return ["uy.corte/geo", "uy.corte/registry", *(f"uy.corte/{day}" for day in DAYS)]
+    return ["uy.corte/geo", "uy.corte/registry", *(f"uy.corte/{day}" for day in ALL)]
 
 
 def fetch() -> None:
@@ -207,13 +250,51 @@ def fetch() -> None:
             raw.fetch(SOURCE, link, suffix=".csv")
     for day, link in PLEBISCITE_FILES.items():
         raw.fetch(SOURCE, link, suffix=PLEBISCITE_SUFFIX[day])
+    for day in XDAYS:
+        fetch_xlsx(day)
 
 
 def parse() -> None:
     geo().write()
     registry().write()
-    for day in DAYS:
+    for day in ALL:
         election(day).write()
+
+
+def xlsx_links(day: str) -> list[str]:
+    """The pages and zip downloads that an XLSX election cites."""
+    export = XLSX[day]
+    return [*export.pages, *export.zips.values()]
+
+
+def fetch_xlsx(day: str) -> None:
+    export = XLSX[day]
+    for link in export.pages:
+        raw.fetch(SOURCE, link, suffix=".html")
+    for link in export.zips.values():
+        raw.fetch(SOURCE, link, suffix=".zip")
+
+
+def zip_files(day: str, name: str) -> dict[str, bytes]:
+    """The XLSX files inside one of an election's zips, by file name."""
+    with zipfile.ZipFile(raw.cached(SOURCE, XLSX[day].zips[name]).path) as archive:
+        return {
+            member: archive.read(member) for member in sorted(archive.namelist()) if member.lower().endswith(".xlsx")
+        }
+
+
+def member(day: str, name: str) -> bytes:
+    zip_name, file = XLSX[day].members[name]
+    return zip_files(day, zip_name)[file]
+
+
+def sheet(data: bytes) -> pl.DataFrame:
+    """The first sheet of a Corte XLSX export below its header block, with every column as text."""
+    book = fastexcel.read_excel(data)
+    head = book.load_sheet_by_idx(0, header_row=None, n_rows=20, dtypes="string").to_polars()
+    start = next(index for index, row in enumerate(head.iter_rows()) if row[0] == "ACTO")
+    frame = book.load_sheet_by_idx(0, header_row=start, dtypes="string").to_polars()
+    return frame.with_columns(pl.col(pl.String).str.strip_chars()).filter(pl.col("CIRCUITO").is_not_null())
 
 
 def emit() -> None:
@@ -266,6 +347,59 @@ def totals(day: str) -> pl.DataFrame:
     return circuit(table(files(day)["totals"]))
 
 
+# The XLSX exports of some elections lost their accented letters ("Paysand", "Tacuaremb"), so a department matches
+# on its name with or without them.
+DEPARTMENT_KEYS = {
+    norm(variant): code for code, text in DEPARTMENTS.items() for variant in (text, re.sub(r"[^\x00-\x7f]", "", text))
+}
+
+
+def department(text: str) -> str:
+    return DEPARTMENT_KEYS[norm(text)]
+
+
+def listing(day: str, name: str = "breakdown") -> pl.DataFrame:
+    """A departmental or municipal breakdown in the shape of the open-data CSVs: DEPARTAMENTO, CRV, TIPOREGISTRO,
+    DESCRIPCION1 (the sheet), DESCRIPCION2 (the municipality), LEMA, LEMAKEY, and CANTIDADVOTOS."""
+    if day not in XLSX:
+        return breakdown(day, name)
+    municipal = name == "municipal"
+    frame = sheet(member(day, name))
+    codes = {text: department(text) for text in frame["DEPTO"].unique().to_list()}
+    return frame.select(
+        DEPARTAMENTO=pl.col("DEPTO").replace_strict(codes),
+        CRV=pl.col("CIRCUITO").cast(pl.Int64).cast(pl.String),
+        TIPOREGISTRO=pl.lit("HOJA_EM" if municipal else "HOJA_ED"),
+        DESCRIPCION1="HOJA",
+        DESCRIPCION2=pl.col("MUNICIPIO") if municipal else pl.lit(None, pl.String),
+        LEMA="LEMA",
+        LEMAKEY=pl.col("LEMA").map_elements(lema_key, return_dtype=pl.String),
+        CANTIDADVOTOS=pl.col("CNT_VOTOS").cast(pl.Int64),
+    )
+
+
+def has(day: str, name: str) -> bool:
+    return name in (XLSX[day].members if day in XLSX else FILES[day])
+
+
+# The 2014 primaries' party of each export, by the Corte's convocatoria with accents and punctuation dropped.
+PRIMARY_LEMAS = {
+    "FRENTEAMPLIO": "FRENTE AMPLIO",
+    "NACIONAL": "NACIONAL",
+    "COLORADO": "COLORADO",
+    "ASAMBLEAPOPULAR": "ASAMBLEA POPULAR",
+    "DELACONCERTACIN": "DE LA CONCERTACION",
+    "DELACONCERTACION": "DE LA CONCERTACION",
+    "INDEPENDIENTE": "INDEPENDIENTE",
+    "DELOSTRABAJADORES": "DE LOS TRABAJADORES",
+    "PERI": "ECOLOGISTA RADICAL INTRANSIGENTE",
+    "UNIDOS": "UNIDOS",
+    "UNIONPARAELCAMBIO": "UNION PARA EL CAMBIO",
+}
+# Parties that run only in the XLSX elections, as the Corte's own page names them.
+XLSX_NAMES = {"UNIDOS": "Unidos", "UNION PARA EL CAMBIO": "Unión para el Cambio"}
+
+
 @functools.cache
 def names() -> dict[str, str]:
     found: dict[str, str] = {}
@@ -279,6 +413,8 @@ def names() -> dict[str, str]:
     for tickets, _ in RUNOFF_TICKETS.values():
         for _, _, lema in tickets:
             found.setdefault(lema, lema_name(lema))
+    for lema, text in XLSX_NAMES.items():
+        found.setdefault(lema, text)
     return found
 
 
@@ -291,9 +427,11 @@ def municipalities() -> dict[tuple[str, str], str]:
     found: dict[tuple[str, str], str] = {}
     for day in LOCAL:
         for name in ("breakdown", "municipal"):
-            if name not in FILES[day]:
+            if not has(day, name):
                 continue
-            frame = table(files(day)[name]).filter(pl.col("TIPOREGISTRO") == "HOJA_EM")
+            frame = (listing(day, name) if day in XLSX else table(files(day)[name])).filter(
+                pl.col("TIPOREGISTRO") == "HOJA_EM"
+            )
             frame = frame.with_columns(pl.col("DESCRIPCION1").str.extract(r"-(\S+)$", 1).alias("LETTER"))
             for dept, letter, text in frame.select("DEPARTAMENTO", "LETTER", "DESCRIPCION2").unique().iter_rows():
                 if letter:
@@ -364,6 +502,9 @@ def registry() -> Package:
             p.artifact(raw.cached(SOURCE, link), UY_SOURCE)
         if day in PLEBISCITE_FILES:
             p.artifact(raw.cached(SOURCE, PLEBISCITE_FILES[day]), UY_SOURCE)
+    for day in XDAYS:
+        for link in xlsx_links(day):
+            p.artifact(raw.cached(SOURCE, link), UY_SOURCE)
     for code, text in (
         (CHAMBER_BODY, "Chamber of Representatives"),
         (SENATE_BODY, "Senate"),
@@ -421,16 +562,24 @@ def registry() -> Package:
 class Builder:
     """One election's package, with its circuits as reporting units and its totals as unit accounting."""
 
-    def __init__(self, day: str, summary: str) -> None:
+    def __init__(self, day: str, summary: str, circuits: pl.DataFrame | None = None) -> None:
         self.day = day
         self.p = Package(f"uy.corte/{day}", SOURCE, summary, depends=["uy.corte/geo", "uy.corte/registry"])
         self.p.external.add(URUGUAY)
-        for link in files(day).values():
+        for link in xlsx_links(day) if day in XLSX else files(day).values():
             self.p.uses(raw.cached(SOURCE, link))
         if day in PLEBISCITE_FILES:
             self.p.uses(raw.cached(SOURCE, PLEBISCITE_FILES[day]))
         self.path = f"uy/{day}-{KIND_PATH[day]}"
-        self.totals = totals(day)
+        # The circuit totals; `measured` is false where the Corte publishes the votes of each sheet and no totals.
+        self.measured = circuits is not None or day not in XLSX
+        self.totals = (
+            circuits
+            if circuits is not None
+            else totals(day)
+            if day not in XLSX
+            else pl.DataFrame(schema={"DEPARTAMENTO": pl.String, "CRV": pl.String})
+        )
         self.units: dict[tuple[str, str], str] = {}
         self.sets: list[str] = []
         self.slugs: set[str] = set()
@@ -505,6 +654,8 @@ class Builder:
         office: str | None = None,
         body: str | None = None,
         district: str = NATION,
+        magnitude: int | None = None,
+        completeness: float = 1.0,
         round_number: int | None = None,
         previous: str | None = None,
         system: str | None = None,
@@ -519,6 +670,7 @@ class Builder:
             office_id=office,
             body_id=body,
             district_area_id=district,
+            magnitude=magnitude,
             round_number=round_number,
             previous_round_id=previous,
             electoral_system_id=system,
@@ -544,7 +696,7 @@ class Builder:
             source_id=UY_SOURCE,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=completeness,
         )
         self.p.add(
             "note",
@@ -600,6 +752,8 @@ class Builder:
     def accounting_values(
         self, result_set: str, depts: set[str] | None = None, crvs: pl.DataFrame | None = None
     ) -> None:
+        if not self.measured:
+            return
         found = self.accounting()
         if depts is not None:
             found = found.filter(pl.col("DEPARTAMENTO").is_in(sorted(depts)))
@@ -685,6 +839,48 @@ class Builder:
         self.values(result_set, joined.select("UNIT", "OPTION", MEASURE=pl.lit(1), VALUE="VOTES"))
         return lemas
 
+    def candidates(
+        self, contest: str, result_set: str, votes: pl.DataFrame, lema: str, *, parts: tuple[object, ...] = ()
+    ) -> None:
+        """Options for each precandidate of one party and each ballot sheet beneath, from a frame with DEPARTAMENTO,
+        CRV, CANDIDATE, SHEET (null for votes for the precandidate alone), and VOTES."""
+        candidates: dict[str, str] = {}
+        for position, name in enumerate(sorted(votes["CANDIDATE"].unique().to_list()), 1):
+            candidates[name] = self.option(
+                contest, "candidate", lema_name(name), *parts, name, lema=lema, position=position
+            )
+        found = votes.filter(pl.col("SHEET").is_not_null()).select("CANDIDATE", "SHEET").unique()
+        sheets_by: dict[tuple[str, str], str] = {}
+        for name, sheet_number in found.sort("CANDIDATE", "SHEET").iter_rows():
+            sheets_by[(name, sheet_number)] = self.option(
+                contest,
+                "list",
+                f"List {sheet_number}",
+                *parts,
+                name,
+                sheet_number,
+                lema=lema,
+                parent=candidates[name],
+            )
+        ids = pl.DataFrame(
+            [(name, number, option) for (name, number), option in sheets_by.items()],
+            schema={"CANDIDATE": pl.String, "SHEET": pl.String, "OPTION": pl.String},
+            orient="row",
+        )
+        candidate_ids = pl.DataFrame(
+            list(candidates.items()), schema={"CANDIDATE": pl.String, "ALONE": pl.String}, orient="row"
+        )
+        joined = votes.join(self.unit_frame(), on=["DEPARTAMENTO", "CRV"], how="left")
+        if joined["UNIT"].null_count():
+            raise ValueError(f"{self.day}: votes for circuits missing from the units")
+        joined = joined.join(ids, on=["CANDIDATE", "SHEET"], how="left", nulls_equal=True).join(
+            candidate_ids, on="CANDIDATE", how="left"
+        )
+        self.values(
+            result_set,
+            joined.select("UNIT", OPTION=pl.coalesce("OPTION", "ALONE"), MEASURE=pl.lit(1), VALUE="VOTES"),
+        )
+
 
 def sheets(frame: pl.DataFrame, record: str, alone: str) -> pl.DataFrame:
     """The votes of one kind of ballot, with the sheet number and null for votes for the lema alone."""
@@ -702,15 +898,31 @@ def election(day: str) -> Package:
         p = national(day)
     elif day in RUNOFF:
         p = runoff(day)
+    elif day in XLSX and day in PRIMARY:
+        p = primary_xlsx(day)
     elif day in PRIMARY:
         p = primary(day)
     else:
         p = local(day)
+    if day in XLSX and day in LOCAL:
+        p.accept(
+            "accounting.declared",
+            "The Corte's declared totals, from its summary workbook, are never below the sum of its circuit export "
+            "and are 2.5% above it overall (1.1% above in the municipal elections). The export gives the votes of each ballot sheet in each circuit and no circuit totals, so "
+            "the declared blank and annulled counts have no circuit values to compare with; both are stored as "
+            "published, and each result set's completeness is its circuit votes over its declared votes",
+        )
+        return p
     reason = (
         "In some circuits the totals file counts more ballots than the circuit's roll lists. In every such circuit "
         "the excess is within the observed ballots (voters registered in another circuit), which the Corte counts "
         "in the circuit's ballots; stored as published"
     )
+    if day == "2014-06-01":
+        reason = (
+            "In 3 circuits (Florida 110 and 147, Lavalleja 111) the ballots cast exceed the circuit's roll; in each "
+            "the excess is within the observed ballots (voters registered in another circuit); stored as published"
+        )
     if day == "2024-06-30":
         reason = (
             "In 82 circuits the Corte publishes a roll of zero with ballots cast, and in 7 more the excess is "
@@ -973,6 +1185,226 @@ def primary(day: str) -> Package:
     return b.p
 
 
+def primary_exports(day: str) -> list[tuple[str, str, pl.DataFrame]]:
+    """The 2014 primaries' exports as (record, lema key, frame): ODN or ODD, the party, and its rows."""
+    found: list[tuple[str, str, pl.DataFrame]] = []
+    for record in ("odn", "odd"):
+        for file, data in zip_files(day, record).items():
+            frame = sheet(data)
+            convocatoria = frame["CONVOCATORIA"].unique().to_list()
+            if len(convocatoria) != 1:
+                raise ValueError(f"{day}: {file} has convocatorias {convocatoria}")
+            lema = PRIMARY_LEMAS[norm(re.sub(r"_-_O\.D\.[ND]\.$", "", convocatoria[0]))]
+            found.append((record.upper(), lema, frame))
+    return found
+
+
+def primary_totals(frames: list[tuple[str, str, pl.DataFrame]]) -> pl.DataFrame:
+    """The circuit totals, which the Corte publishes in the wide export of the Concertación's national body only:
+    every circuit of the country with its roll, ballots cast, observed, blank, and annulled ballots."""
+    wide = [
+        frame
+        for record, lema, frame in frames
+        if record == "ODN" and "T_EMITIDOS" in frame.columns and lema == "DE LA CONCERTACION"
+    ]
+    if len(wide) != 1:
+        raise ValueError("the 2014 primaries' circuit totals are not in one export")
+    frame = wide[0]
+    codes = {text: department(text) for text in frame["DEPTO"].unique().to_list()}
+    return frame.select(
+        DEPARTAMENTO=pl.col("DEPTO").replace_strict(codes),
+        CRV=pl.col("CIRCUITO").cast(pl.Int64).cast(pl.String),
+        TOTALHABILITADOS=pl.col("HABILITADO").cast(pl.Int64),
+        TOTALVOTOSEMITIDOS=pl.col("T_EMITIDOS").cast(pl.Int64),
+        TOTALVOTOSOBSERVADOS=pl.col("OBSERVADOS").cast(pl.Int64),
+        TOTALANULADOS=pl.col("ANULADOS").cast(pl.Int64),
+        TOTALENBLANCO=pl.col("EN_BLANCO").cast(pl.Int64),
+    )
+
+
+def primary_xlsx(day: str) -> Package:
+    year = day[:4]
+    frames = primary_exports(day)
+    b = Builder(
+        day, f"The {year} Uruguayan party primaries by circuit from the Corte Electoral", primary_totals(frames)
+    )
+    b.election("primary", f"{year} Uruguayan party primaries", f"Elecciones internas {year}")
+    b.add_units(b.totals)
+    labels = names()
+    for record, lema, frame in sorted(frames, key=lambda item: (item[0], item[1])):
+        body_en, body_es = {
+            "ODN": ("National Deliberative Body", "Órgano Deliberativo Nacional"),
+            "ODD": ("Departmental Deliberative Body", "Órgano Deliberativo Departamental"),
+        }[record]
+        codes = {text: department(text) for text in frame["DEPTO"].unique().to_list()}
+        sheets_column = "HOJA" if "HOJA" in frame.columns else None
+        if sheets_column is None:
+            # The Concertación's national export has one column for its precandidate and no ballot sheets.
+            candidate = frame.columns[-1]
+            votes = frame.select(
+                DEPARTAMENTO=pl.col("DEPTO").replace_strict(codes),
+                CRV=pl.col("CIRCUITO").cast(pl.Int64).cast(pl.String),
+                CANDIDATE=pl.lit(candidate),
+                SHEET=pl.lit(None, pl.String),
+                VOTES=pl.col(candidate).cast(pl.Int64),
+            )
+        else:
+            votes = frame.select(
+                DEPARTAMENTO=pl.col("DEPTO").replace_strict(codes),
+                CRV=pl.col("CIRCUITO").cast(pl.Int64).cast(pl.String),
+                CANDIDATE=pl.col("PRECANDIDATO") if record == "ODN" else pl.lit(None, pl.String),
+                SHEET="HOJA",
+                VOTES=pl.col("CNT_VOTOS").cast(pl.Int64),
+            )
+        b.add_units(votes)
+        for dept in [None] if record == "ODN" else sorted(DEPARTMENTS):
+            found = votes if dept is None else votes.filter(pl.col("DEPARTAMENTO") == dept)
+            if not found.height:
+                continue
+            place = "" if dept is None else f", {DEPARTMENTS[dept]}"
+            tag = f"{record}:{lema}" + ("" if dept is None else f":{dept}")
+            contest, result_set = b.contest(
+                tag,
+                "delegate_allocation",
+                f"{year} {labels[lema]} primary, {body_en}{place}",
+                f"{record}-{labels[lema]}" + ("" if dept is None else f"-{DEPARTMENTS[dept]}"),
+                district=NATION if dept is None else key("area", "uy.departamento", dept),
+                es=f"Elecciones internas {year}, {labels[lema]}, {body_es}{place}",
+            )
+            if record == "ODN":
+                b.candidates(contest, result_set, found, lema, parts=(tag,))
+            else:
+                b.tree(contest, result_set, found.with_columns(LEMAKEY=pl.lit(lema)), parts=(tag,))
+            b.accounting_values(result_set, None if dept is None else {dept}, found)
+    b.p.add(
+        "note",
+        id=key("note", b.election_id, "primaries"),
+        entity_id=b.election_id,
+        kind="caveat",
+        body_md="Each party's primary elects its deliberative bodies. In the National Deliberative Body each ballot "
+        "sheet names a presidential precandidate, so the sheets are stored beneath the precandidate's option; the "
+        "Partido de la Concertación's export has one precandidate and no ballot sheets. The ballots in the unit "
+        "accounting are the circuit's, shared by every party's primary; the Corte publishes them once, in the "
+        "export of the Partido de la Concertación's national body, which lists every circuit of the country. In "
+        "every department the ballots cast, less the blank and annulled ones, exceed the votes the parties' exports "
+        "give per sheet, by between 8% and 22%; the Corte does not itemize the difference.",
+        lang="en",
+    )
+    return b.p
+
+
+OFFICIAL_PARTIES = {
+    "FA": "FRENTE AMPLIO",
+    "PN": "NACIONAL",
+    "PC": "COLORADO",
+    "PCONC": "DE LA CONCERTACION",
+    "PCONCERT": "DE LA CONCERTACION",
+    "PI": "INDEPENDIENTE",
+    "AP": "ASAMBLEA POPULAR",
+    "PERI": "ECOLOGISTA RADICAL INTRANSIGENTE",
+    "PT": "DE LOS TRABAJADORES",
+}
+BLANK = "BLANK"
+ANNULLED = "ANNULLED"
+# Municipality names the Corte's summary workbook misspells, as the circuit export names them. Florida's lists
+# "Fray Bentos", a city in Río Negro; Florida's third municipality, which the table lacks, is Fray Marcos.
+OFFICIAL_ALIASES = {
+    ("AR", "BLATASARBRUM"): "BALTASARBRUM",
+    ("CA", "EMPLAMEOLMOS"): "EMPALMEOLMOS",
+    ("FD", "FRAYBENTOS"): "FRAYMARCOS",
+    ("SA", "VILLACONTITUCION"): "VILLACONSTITUCION",
+}
+
+
+def mkey(text: str) -> str:
+    """A municipality's name as matched between files: Montevideo's are "Municipio A" in one and "A" in the other."""
+    return norm(text).removeprefix("MUNICIPIO")
+
+
+@dataclass
+class Official:
+    """The Corte's summary of a departmental and municipal election: votes by department and party, seats on each
+    departmental board, the party of each elected intendente, and votes by municipality and party. A figure's column
+    is a lema key, or BLANK or ANNULLED (envelopes whose every ballot was annulled)."""
+
+    votes: dict[str, dict[str, int]] = field(default_factory=dict)
+    seats: dict[str, dict[str, int]] = field(default_factory=dict)
+    elected: dict[str, tuple[str, str]] = field(default_factory=dict)
+    municipal: dict[tuple[str, str], dict[str, int]] = field(default_factory=dict)
+
+
+def column(header: str) -> str | None:
+    if header in OFFICIAL_PARTIES:
+        return OFFICIAL_PARTIES[header]
+    if header.startswith("ENBLANCO"):
+        return BLANK
+    if header.startswith("SOBRESC"):
+        return ANNULLED
+    return None
+
+
+def official(day: str) -> Official:
+    book = fastexcel.read_excel(member(day, "official"))
+    rows = book.load_sheet_by_idx(0, header_row=None, dtypes="string").to_polars().iter_rows()
+    found = Official()
+    section = 0
+    header: list[str] = []
+    dept = ""
+    for row in rows:
+        first = (row[0] or "").strip()
+        heading = re.match(r"(\d)\)", first)
+        if heading:
+            section, header = int(heading[1]), []
+            continue
+        if section not in (4, 5, 6, 7):
+            continue
+        if norm(first) == "DEPARTAMENTO":
+            header = [norm(cell or "") for cell in row]
+            continue
+        if not header or norm(first) in ("TOTAL", "TOTALES", "PORCENTAJES") or (not first and section != 7):
+            continue
+        if section == 6:
+            found.elected[department(first)] = (row[1] or "").strip(), lema_key(row[3] or "")
+            continue
+        if section == 7:
+            if first:
+                dept = department(first)
+            if not (row[1] or "").strip():
+                continue
+            name = mkey(row[1] or "")
+            place = found.municipal.setdefault((dept, OFFICIAL_ALIASES.get((dept, name), name)), {})
+        else:
+            place = (found.votes if section == 4 else found.seats).setdefault(department(first), {})
+        for index in range(1 if section < 7 else 2, len(header)):
+            lema = column(header[index])
+            if lema is not None and row[index] is not None:
+                place[lema] = int(float(row[index] or 0))
+    return found
+
+
+def share(votes: pl.DataFrame, figures: dict[str, int]) -> float:
+    """The circuit votes of a result set over the Corte's declared votes for its lemas."""
+    declared = sum(value for lema, value in figures.items() if lema not in (BLANK, ANNULLED))
+    return min(1.0, round(int(votes["VOTES"].sum()) / declared, 6))
+
+
+def declare(
+    b: Builder, result_set: str, options: dict[str, str], figures: dict[str, int], what: str, blank: bool = True
+) -> None:
+    """The Corte's declared totals of a result set: votes of each lema and the blank and annulled ballots."""
+    for lema, value in figures.items():
+        if lema == BLANK and blank:
+            b.p.add("declared", result_set_id=result_set, option_id=None, measure=6, value=value)
+        elif lema == ANNULLED:
+            b.p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=value)
+        elif lema in options:
+            b.p.add("declared", result_set_id=result_set, option_id=options[lema], measure=1, value=value)
+        elif lema not in (BLANK, ANNULLED) and value:
+            raise ValueError(
+                f"{b.day}: the Corte declares {value} votes for {lema} in {what}, which has no such option"
+            )
+
+
 def letter(text: str) -> str | None:
     found = re.search(r"[^\s;-]+-([^\s;-]+)", text)
     return None if found is None else found.group(1)
@@ -986,9 +1418,11 @@ def local(day: str) -> Package:
         f"{year} Uruguayan departmental and municipal elections",
         f"Elecciones departamentales y municipales {year}",
     )
-    b.add_units(b.totals)
-    frame = breakdown(day)
-    municipal = breakdown(day, "municipal") if "municipal" in FILES[day] else frame
+    frame = listing(day)
+    municipal = listing(day, "municipal") if has(day, "municipal") else frame
+    for found in (b.totals,) if b.measured else (frame, municipal):
+        b.add_units(found)
+    declared = official(day) if day in XLSX else None
     labels = municipalities()
     for dept, text in DEPARTMENTS.items():
         area = key("area", "uy.departamento", dept)
@@ -1000,10 +1434,19 @@ def local(day: str) -> Package:
             f"intendente-{text}",
             office=key("office", "intendente", dept),
             district=area,
+            magnitude=1 if declared else None,
+            completeness=share(here, declared.votes[dept]) if declared else 1.0,
             es=f"Elección de Intendente de {text} {year}",
         )
-        b.tree(contest, result_set, here, parts=(dept,))
+        options = b.tree(contest, result_set, here, parts=(dept,))
         b.accounting_values(result_set, {dept})
+        if declared is not None:
+            declare(b, result_set, options, declared.votes[dept], f"the intendente election of {text}")
+            winner = declared.elected[dept][1]
+            for lema, option in options.items():
+                b.p.add(
+                    "outcome", result_set_id=result_set, option_id=option, kind="elected" if lema == winner else "lost"
+                )
         contest, result_set = b.contest(
             f"junta:{dept}",
             "list_allocation",
@@ -1011,18 +1454,41 @@ def local(day: str) -> Package:
             f"junta-departamental-{text}",
             body=key("body", "junta", dept),
             district=area,
+            magnitude=31 if declared else None,
+            completeness=share(here, declared.votes[dept]) if declared else 1.0,
             es=f"Elección de la Junta Departamental de {text} {year}",
         )
         lemas = here.group_by("DEPARTAMENTO", "CRV", "LEMAKEY").agg(pl.col("VOTES").sum())
-        b.lema_totals(contest, result_set, lemas, "list", parts=(dept,))
+        options = b.lema_totals(contest, result_set, lemas, "list", parts=(dept,))
         b.accounting_values(result_set, {dept})
+        if declared is not None:
+            declare(b, result_set, options, declared.votes[dept], f"the departmental board of {text}")
+            for lema, option in options.items():
+                seats = declared.seats[dept].get(lema, 0)
+                if seats:
+                    b.p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
+                else:
+                    b.p.add("outcome", result_set_id=result_set, option_id=option, kind="lost")
+            unplaced = {lema for lema, seats in declared.seats[dept].items() if seats and lema not in options}
+            if unplaced:
+                raise ValueError(f"{day}: seats for {sorted(unplaced)} in {text} with no votes")
     rows = municipal.filter(pl.col("TIPOREGISTRO").is_in(["HOJA_EM", "VOTO_LEMA_EM"])).with_columns(
         pl.col("DESCRIPCION1").map_elements(lambda s: letter(s) or "", return_dtype=pl.String).alias("LETTER")
     )
     if (rows["LETTER"] == "").any():
         raise ValueError(f"{day}: municipal rows without a municipality letter")
+    matched: set[tuple[str, str]] = set()
     for (dept, mark), found in sorted(rows.group_by("DEPARTAMENTO", "LETTER"), key=lambda item: item[0]):
         text = labels[(dept, mark)]
+        votes = sheets(found, "HOJA_EM", "VOTO_LEMA_EM")
+        figures: dict[str, int] | None = None
+        if declared is not None:
+            names_here = {mkey(name) for name in found["DESCRIPCION2"].unique().to_list()}
+            if len(names_here) != 1:
+                raise ValueError(f"{day}: municipality {dept}-{mark} has names {sorted(names_here)}")
+            place = (dept, names_here.pop())
+            figures = declared.municipal[place]
+            matched.add(place)
         contest, result_set = b.contest(
             f"alcalde:{dept}:{mark}",
             "office",
@@ -1030,18 +1496,39 @@ def local(day: str) -> Package:
             f"alcalde-{DEPARTMENTS[dept]}-{text}",
             office=key("office", "alcalde", dept, mark),
             district=key("area", "uy.municipio", dept, mark),
+            completeness=share(votes, figures) if figures is not None else 1.0,
             es=f"Elección de Alcalde de {text}, {DEPARTMENTS[dept]} {year}",
         )
-        votes = sheets(found, "HOJA_EM", "VOTO_LEMA_EM")
-        b.tree(contest, result_set, votes, parts=(dept, mark))
+        options = b.tree(contest, result_set, votes, parts=(dept, mark))
         b.accounting_values(result_set, {dept}, found)
+        if figures is not None:
+            declare(b, result_set, options, figures, f"the municipality {text}")
+        if b.measured:
+            b.p.add(
+                "note",
+                id=key("note", result_set, "municipal"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md="The ballots, observed, invalid, and blank counts are the circuit's totals for the departmental "
+                "ballot, as the Corte publishes them; the municipal ballot is counted on the same circuit.",
+                lang="en",
+            )
+    if declared is not None:
+        left = sorted(set(declared.municipal) - matched)
+        if left:
+            raise ValueError(f"{day}: official municipalities with no circuits: {left}")
         b.p.add(
             "note",
-            id=key("note", result_set, "municipal"),
-            entity_id=result_set,
+            id=key("note", b.election_id, "circuit-export"),
+            entity_id=b.election_id,
             kind="caveat",
-            body_md="The ballots, observed, invalid, and blank counts are the circuit's totals for the departmental "
-            "ballot, as the Corte publishes them; the municipal ballot is counted on the same circuit.",
+            body_md="The Corte's circuit export gives the votes of each ballot sheet in each circuit and no circuit "
+            "totals, so registered voters, ballots cast, and blank and invalid ballots are not stored per circuit. "
+            "Its votes fall short of the Corte's declared totals, by 2.5% overall in the departmental election, "
+            "which appears to be the observed ballots of voters registered in another circuit; each result set's "
+            "completeness is its circuit votes over its declared votes, and the declared figures are stored beside "
+            "them. The declared outcomes are the party of each elected Intendente and the seats each party won on "
+            "each departmental board.",
             lang="en",
         )
     return b.p
