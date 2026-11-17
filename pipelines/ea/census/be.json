@@ -118,6 +118,60 @@
       "publisher": "Brussels Pouvoirs Locaux, Service public régional de Bruxelles",
       "url": "https://elections.brussels/resultats-elections",
       "kind": "official_body"
+    },
+    "vk-prov-2006": {
+      "title": "Provincieraadsverkiezingen 8 oktober 2006 (xlsx)",
+      "publisher": "Vlaanderen (Agentschap Binnenlands Bestuur)",
+      "url": "https://assets.vlaanderen.be/raw/upload/v1732196587/repositories-prd/Provincieraadsverkiezingen_8_oktober_2006_orvkjt.xlsx",
+      "kind": "official_body"
+    },
+    "vk-prov-2012": {
+      "title": "Provincieraadsverkiezingen 14 oktober 2012 (xlsx)",
+      "publisher": "Vlaanderen (Agentschap Binnenlands Bestuur)",
+      "url": "https://assets.vlaanderen.be/raw/upload/v1718363047/provincie-2012-10-16T11_49_14_peizbf.xlsx",
+      "kind": "official_body"
+    },
+    "vk-prov-2018": {
+      "title": "Resultaten provincieraadsverkiezingen 14 oktober 2018 (xlsx)",
+      "publisher": "Vlaanderen (Agentschap Binnenlands Bestuur)",
+      "url": "https://assets.vlaanderen.be/raw/upload/v1699019528/resultaten_verkiezing_provincieraad_20181014_neq9d8.xlsx",
+      "kind": "official_body"
+    },
+    "vk-prov-2024": {
+      "title": "Resultaten provincieraadsverkiezingen 13 oktober 2024 (xlsx)",
+      "publisher": "Vlaanderen (Agentschap Binnenlands Bestuur)",
+      "url": "https://assets.vlaanderen.be/raw/upload/v1729147811/Resultaten_provincieraadsverkiezingen_13_oktober_2024_2_ybpuzk.xlsx",
+      "kind": "official_body"
+    },
+    "wl-prov-2006": {
+      "title": "Élections provinciales 2006: statistiques des résultats par district",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/resultats/2006/fr/province_wallonia/resultstats/elected.html",
+      "kind": "official_body"
+    },
+    "wl-prov-2012": {
+      "title": "Élections provinciales 2012: résultats des listes par district",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/resultats/2012/fr/pro/results/results_start.html",
+      "kind": "official_body"
+    },
+    "wl-prov-2018": {
+      "title": "Élections provinciales 2018: vue d'ensemble des entités",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/resultats/2018/fr/election%EF%B9%96el=PR.html",
+      "kind": "official_body"
+    },
+    "wl-cpas-2012": {
+      "title": "Élections 2012: résultats des CPAS",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/resultats/2012/fr/cpa/results/results_start.html",
+      "kind": "official_body"
+    },
+    "wl-cpas-2018": {
+      "title": "Élections 2018: conseil de CPAS (Comines-Warneton)",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/resultats/2018/fr/election%EF%B9%96el=CS.html",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -1876,21 +1930,30 @@
         },
         {
           "date": "2006-10-08",
-          "note": "Organized by the regions; districts not yet counted."
+          "contests": 98,
+          "seats": 747,
+          "source": "vk-prov-2006",
+          "quote": "Flanders: 52 districts and 411 elected candidates in the 2006 workbook (Party results and Candidate results sheets). Wallonia: 46 districts and 336 seats on wl-prov-2006 (Nombre Sièges per district). 98 districts, 747 seats."
         },
         {
           "date": "2012-10-14",
-          "note": "Organized by the regions; districts not yet counted."
+          "contests": 69,
+          "source": "vk-prov-2012",
+          "quote": "Flanders: 35 districts (EntiteitResultaten) and 351 elected candidates. Wallonia: 34 districts on wl-prov-2012 (Cantons - District de ...). 69 districts; Walloon seats are not summed, so no seat count."
         },
         {
           "date": "2018-10-14",
-          "note": "Organized by the regions; districts not yet counted."
+          "contests": 48,
+          "source": "vk-prov-2018",
+          "quote": "Flanders: 14 districts and 175 seats (algemeen sheet). Wallonia: 34 districts on wl-prov-2018 (PRD entities). 48 districts; Walloon seats are not summed, so no seat count."
         },
         {
           "date": "2024-10-13",
-          "note": "Organized by the regions; districts not yet counted.",
-          "source": "vk-fijnmazig",
-          "quote": "Fijnmazige_resultaten_provincieraadsverkiezingen_13_oktober_2024_Antwerpen"
+          "contests": 14,
+          "seats": 175,
+          "source": "vk-prov-2024",
+          "note": "Flanders only: 14 districts and 175 seats. The Walloon provincial districts of 2024 are not counted yet.",
+          "quote": "algemeen sheet: 14 kieskringen (PR-districts), mandaten 10+20+9+11+15+20+15+11+16+16+9+7+7+9 = 175"
         }
       ],
       "access": [
@@ -2246,11 +2309,15 @@
       "dates": [
         {
           "date": "1988-10-09",
-          "note": "First direct election under the pacification law; not in the federal 1988 file and not yet counted."
+          "contests": 8,
+          "source": "ibz-xml",
+          "quote": "Eight municipalities elect the social welfare council directly: Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem, Voeren, and Comines-Warneton. Counted by the statutory list, not from a results file for this date: the federal 1988 and 1994 municipal files hold no OCMW level; the 2000 federal file lists the same 8 OCMW levels."
         },
         {
           "date": "1994-10-09",
-          "note": "Not in the federal 1994 file; not yet counted."
+          "contests": 8,
+          "source": "ibz-xml",
+          "quote": "Eight municipalities elect the social welfare council directly: Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem, Voeren, and Comines-Warneton. Counted by the statutory list, not from a results file for this date: the federal 1988 and 1994 municipal files hold no OCMW level; the 2000 federal file lists the same 8 OCMW levels."
         },
         {
           "date": "2000-10-08",
@@ -2261,15 +2328,21 @@
         },
         {
           "date": "2006-10-08",
-          "note": "Published by Flanders and Wallonia; not yet counted."
+          "contests": 8,
+          "source": "ibz-xml",
+          "quote": "Eight municipalities elect the social welfare council directly: Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem, Voeren, and Comines-Warneton. Counted by the statutory list, not from a results file for this date: the 2000 federal file lists 8 OCMW levels and the 2024 Flemish file the same seven Flemish municipalities."
         },
         {
           "date": "2012-10-14",
-          "note": "Published by Flanders and Wallonia; not yet counted."
+          "contests": 8,
+          "source": "wl-cpas-2012",
+          "quote": "Eight municipalities elect the social welfare council directly: Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem, Voeren, and Comines-Warneton. Counted by the statutory list, not from a results file for this date: Comines-Warneton's CPAS is on the 2012 Walloon results page; the Flemish OCMW results of 2012 were not reachable."
         },
         {
           "date": "2018-10-14",
-          "note": "Published by Flanders and Wallonia; not yet counted."
+          "contests": 8,
+          "source": "wl-cpas-2018",
+          "quote": "Eight municipalities elect the social welfare council directly: Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem, Voeren, and Comines-Warneton. Counted by the statutory list, not from a results file for this date: Comines-Warneton's conseil de CPAS is on the 2018 Walloon page; the Flemish OCMW results of 2018 were not reachable."
         },
         {
           "date": "2024-10-13",
