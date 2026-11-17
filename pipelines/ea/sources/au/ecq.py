@@ -63,6 +63,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, f"{DATA}/{event['electorates']}", suffix=".json")
     for name in LAYERS:
         raw.fetch(SOURCE, layer_url(name), suffix=".json")
+    from ea.sources.au import ecq_archive
+
+    ecq_archive.fetch()
 
 
 # The normalized model -------------------------------------------------------------------------------------------
@@ -128,6 +131,7 @@ class Contest:
     distributions: int = 0
     totals: Scope | None = None
     inferred: bool = False
+    question: str = ""
 
 
 @dataclass
@@ -582,6 +586,8 @@ def mayor_office(council: str) -> str:
 
 
 def unit_kind(b: Booth) -> str:
+    if b.type_code == "TOTAL":
+        return "aggregate"
     if b.type_code == "DV1":
         return "postal_district"
     if b.type_code in ("DV2", "AB", "AB1", "AB2"):
@@ -689,6 +695,8 @@ def used(events: list[Event]) -> tuple[set[tuple[str, str]], dict[tuple[str, str
             if c.kind == "assembly":
                 districts.add((vintage(STATE_VINTAGES, e.day), c.name))
                 continue
+            if not c.council:
+                continue
             councils.setdefault(council_key(c.council), c.council)
             if c.council_type != "Council - Undivided":
                 for sc in c.scopes:
@@ -705,6 +713,8 @@ def district_area(day: date, name: str) -> str:
 def scope_area(day: date, c: Contest, scope: Scope) -> str:
     if c.kind == "assembly":
         return district_area(day, scope.name)
+    if c.kind == "question" and not c.council:
+        return QUEENSLAND
     if c.council_type == "Council - Undivided":
         return area("au-qld.lga", council_key(c.council))
     return area(
@@ -745,7 +755,7 @@ def geo(events: list[Event]) -> Package:
                 firsts[("au-qld.district", vintage(STATE_VINTAGES, e.day))] = min(
                     e.day, firsts.get(("au-qld.district", vintage(STATE_VINTAGES, e.day)), e.day)
                 )
-            elif c.council_type != "Council - Undivided":
+            elif c.kind in ("councillor", "mayor") and c.council_type != "Council - Undivided":
                 v = vintage(DIVISION_VINTAGES, e.day)
                 firsts[("au-qld.division", v)] = min(e.day, firsts.get(("au-qld.division", v), e.day))
     for (scheme, vint), day in sorted(firsts.items()):
@@ -932,6 +942,18 @@ INFERRED_METHOD = (
     "results file and no declaration. With no more candidates than places to fill, no poll is held, so the "
     "candidate is recorded as elected unopposed."
 )
+ARCHIVE_METHOD = (
+    "Counted by the Electoral Commission of Queensland for each polling booth and published in its results archive "
+    "as the final count. Each unit is one polling booth, or one kind of declaration, pre-poll, or absent vote, "
+    "within one district. Where a distribution of preferences was held, the candidates left at the end and each "
+    "one's votes for the whole district are stored as the last count round; the earlier steps of the distribution "
+    "are not stored here. Enrolment at the close of the roll is stored on a separate unit per district."
+)
+QUESTION_METHOD = (
+    "The Electoral Commission of Queensland's results archive publishes only the total for the whole of "
+    "Queensland, with no figures for districts or voting centres. The total is stored on one unit, and the "
+    "enrolment on another."
+)
 TACIT_METHOD = (
     "No poll was held for this contest because only as many candidates were nominated as there were places to "
     "fill. The Electoral Commission of Queensland declared them elected without a count."
@@ -944,7 +966,7 @@ def kind_of(event: Event) -> str:
         return "local"
     if "by-election" in k:
         return "by_election"
-    if "referendum" in k:
+    if "referendum" in k or "poll" in k:
         return "referendum"
     return "general"
 
@@ -993,7 +1015,8 @@ def election(event: Event) -> Package:
     declared_valid: dict[str, int] = {}
     labels: dict[str, str] = {}
     for c in event.contests:
-        tag = "mayor" if c.kind == "mayor" else "assembly" if c.kind == "assembly" else "councillor"
+        tag = c.kind
+        question = c.kind == "question"
         ident = (event.stub, tag, c.council_code, c.name)
         contest = key("contest", *ident)
         multi = c.elect > 1
@@ -1003,6 +1026,10 @@ def election(event: Event) -> Package:
         elif c.kind == "mayor":
             label, slug = f"{c.council} mayor", f"mayor-{changeset.slug(c.council)}"
             district = area("au-qld.lga", council_key(c.council))
+        elif question:
+            label = f"{c.council} de-amalgamation question" if c.council else c.name
+            slug = f"question-{changeset.slug(c.council or c.name)}"
+            district = scope_area(day, c, c.scopes[0])
         else:
             label = f"{c.council} councillors" if c.council_type == "Council - Undivided" else f"{c.name} councillor"
             slug = f"council-{changeset.slug(c.name)}"
@@ -1012,17 +1039,25 @@ def election(event: Event) -> Package:
             "contest",
             id=contest,
             election_id=election_id,
-            kind="office" if c.kind == "mayor" else "body_seats",
+            kind="ballot_question" if question else "office" if c.kind == "mayor" else "body_seats",
             office_id=mayor_office(c.council) if c.kind == "mayor" else None,
-            body_id=None if c.kind == "mayor" else ASSEMBLY if c.kind == "assembly" else council_body(c.council),
+            body_id=None
+            if c.kind in ("mayor", "question")
+            else ASSEMBLY
+            if c.kind == "assembly"
+            else council_body(c.council),
             district_area_id=district,
-            magnitude=c.elect,
+            magnitude=None if question else c.elect,
             round_number=1,
-            electoral_system_id=system_for(c, day),
+            electoral_system_id=SYSTEM_REFERENDUM if question else system_for(c, day),
             default_result_kind="counted" if counted else "tacit",
         )
         p.name(contest, label, "en", "official")
         p.add("slug", path=f"{path}/{slug}", entity_id=contest, is_current=True)
+        if question:
+            p.add("ballot_question", contest_id=contest, type="referendum")
+            if c.question:
+                p.add("note", id=key("note", contest), entity_id=contest, kind="context", body_md=c.question, lang="en")
         result_set = key("result_set", contest)
         p.add(
             "result_set",
@@ -1036,8 +1071,10 @@ def election(event: Event) -> Package:
             is_default=True,
             completeness=1.0 if counted else None,
         )
+        archive = any(u.startswith(ARCHIVE) for u in event.urls)
         method = (
-            (MAIN_METHOD + (MULTI_METHOD if multi else ""))
+            (QUESTION_METHOD if question and not c.scopes[0].booths else ARCHIVE_METHOD if archive else MAIN_METHOD)
+            + (MULTI_METHOD if multi else "")
             if counted
             else INFERRED_METHOD
             if c.inferred
@@ -1052,11 +1089,13 @@ def election(event: Event) -> Package:
                 "contest_option",
                 id=id,
                 contest_id=contest,
-                kind="candidate",
+                kind="answer" if question else "candidate",
                 party_id=pid,
                 ballot_position=cand.order,
                 ballot_label=cand.ballot,
             )
+            if question:
+                continue
             person = key("person", *ident, cand.order)
             p.add("person", id=person)
             p.name(person, person_name(cand.ballot), "en", "official")
@@ -1117,7 +1156,10 @@ def election(event: Event) -> Package:
                 )
                 p.name(roll, f"{scope.name}: electoral roll", "en", "official")
             values.add(result_set, roll, None, REGISTERED, scope.enrolment)
-            for b in scope.booths:
+            booths = scope.booths or [
+                Booth("total", "total", "TOTAL", "", scope.total, scope.formal, scope.informal, primary=scope.primary)
+            ]
+            for b in booths:
                 unit = key("unit", event.stub, scope.name, b.id)
                 if unit not in units:
                     units[unit] = unit
@@ -1148,6 +1190,22 @@ def election(event: Event) -> Package:
                 if c.distributions:
                     for order, votes in b.final.items():
                         values.add(result_set, unit, options[order], VOTES, votes, c.distributions)
+            if c.distributions and scope.final and not any(b.final for b in scope.booths):
+                # The archive prints the last count only for the whole district.
+                total_unit = key("unit", event.stub, scope.name, "total")
+                p.add(
+                    "reporting_unit",
+                    id=total_unit,
+                    polity_id=AUSTRALIA,
+                    scheme_code="au-qld.booth",
+                    code=f"{day}:{event.stub}:{scope.name}:TOTAL",
+                    area_relation="within",
+                    area_id=area_id,
+                    kind="aggregate",
+                )
+                p.name(total_unit, f"{scope.name}: district total", "en", "official")
+                for order, votes in scope.final.items():
+                    values.add(result_set, total_unit, options[order], VOTES, votes, c.distributions)
     frame = values.frame()
     p.frame("result_value", frame)
     sums = {
@@ -1177,7 +1235,9 @@ def packages(events: list[Event]) -> list[str]:
 
 
 def all_events() -> list[Event]:
-    return sorted(modern_events(), key=lambda e: (e.day, e.stub))
+    from ea.sources.au import ecq_archive
+
+    return sorted([*ecq_archive.archive_events(), *modern_events()], key=lambda e: (e.day, e.stub))
 
 
 def parse() -> None:
