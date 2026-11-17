@@ -369,6 +369,7 @@ def packages() -> list[str]:
         "lv.cvk/geo",
         "lv.cvk/registry",
         *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05", *LEGACY])),
+        *(f"lv.cvk/tn-{day}" for day in TN),
     ]
 
 
@@ -383,6 +384,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, f"{HOST}/{code}/ieveletie-deputati/", suffix=".html")
     for day in LEGACY:
         raw.fetch(SOURCE, legacy_url(day), suffix=".html")
+    for url in tn_urls():
+        raw.fetch(SOURCE, url, suffix=".html")
     raw.fetch(SOURCE, PV2021, suffix=".html")
     raw.fetch(SOURCE, PV2021_ELECTED, suffix=".html")
     for url in pv2021_pages():
@@ -403,6 +406,8 @@ def parse() -> None:
     build_pv2021().write()
     for day in LEGACY:
         build_legacy(day).write()
+    for day in TN:
+        referendum_archive(day).write()
 
 
 def emit() -> None:
@@ -868,6 +873,344 @@ def referendum(day: str) -> Package:
             "the commission's file. The figures are stored as printed.",
             lang="en",
         )
+    return p
+
+
+# The commission's archive pages for the referendums before 2011. Only the 2003 page prints figures below the
+# national totals, by city, district, and abroad; the others print the national totals in text.
+TN_HOST = "https://arhivs.cvk.lv/lv"
+TN_ROOT = f"{TN_HOST}/notikusas-tautas-nobalsosanas/"
+TN_RESULTS_2003 = f"{TN_HOST}/tn-2003-rezultati/"
+TN_SLUGS = {
+    "1998-10-03": "par-likuma-grozijumi-pilsonibas-likuma-atcelsanu-1998",
+    "1999-11-13": "par-likuma-grozijumi-pensiju-likuma-atcelsanu-1999",
+    "2003-09-20": "par-latvijas-dalibu-eiropas-savieniba-2003",
+    "2007-07-07": "par-grozijumu-nacionalas-drosibas-likuma-un-valsts-drosibas-iestazu-likuma-atcelsanu-2007",
+    "2008-08-02": "par-grozijumiem-satversme-2008",
+    "2008-08-23": "par-grozijumu-likuma-par-valsts-pensijam-2008",
+}
+TN_AGAINST = ("Pret", "Against")
+TN_FOR = ("Par", "For")
+TN_FOR_REPEAL = ("Par atcelšanu", "For repeal")
+TN_AGAINST_REPEAL = ("Pret atcelšanu", "Against repeal")
+
+
+@dataclass
+class Question:
+    slug: str
+    english: str
+    native: str
+    type: str
+    answers: tuple[tuple[str, str], tuple[str, str]]
+    figures: dict[int, int]  # measure -> national total printed in the page's text
+    votes: tuple[int, int] | None = None  # for and against, where printed
+
+
+@dataclass
+class Vote:
+    english: str
+    native: str
+    questions: list[Question]
+
+
+TN: dict[str, Vote] = {
+    "1998-10-03": Vote(
+        "1998 Latvian referendum on the repeal of the amendments to the Citizenship Law",
+        "1998. gada tautas nobalsošana par likuma „Grozījumi Pilsonības likumā” atcelšanu",
+        [
+            Question(
+                "question",
+                "1998 Latvian referendum on the repeal of the amendments to the Citizenship Law",
+                "1998. gada tautas nobalsošana par likuma „Grozījumi Pilsonības likumā” atcelšanu",
+                "optional_referendum",
+                (TN_FOR_REPEAL, TN_AGAINST_REPEAL),
+                {14: 928040},
+                (416584, 487559),
+            )
+        ],
+    ),
+    "1999-11-13": Vote(
+        "1999 Latvian referendum on the repeal of the amendments to the Law on State Pensions",
+        "1999. gada tautas nobalsošana par likuma „Grozījumi likumā „Par valsts pensijām”” atcelšanu",
+        [
+            Question(
+                "question",
+                "1999 Latvian referendum on the repeal of the amendments to the Law on State Pensions",
+                "1999. gada tautas nobalsošana par likuma „Grozījumi likumā „Par valsts pensijām”” atcelšanu",
+                "optional_referendum",
+                (TN_FOR_REPEAL, TN_AGAINST_REPEAL),
+                {14: 339879},
+                (320071, 18160),
+            )
+        ],
+    ),
+    "2003-09-20": Vote(
+        "2003 Latvian referendum on membership of the European Union",
+        "2003. gada tautas nobalsošana par Latvijas dalību Eiropas Savienībā",
+        [
+            Question(
+                "question",
+                "2003 Latvian referendum on membership of the European Union",
+                "2003. gada tautas nobalsošana par Latvijas dalību Eiropas Savienībā",
+                "mandatory_referendum",
+                (TN_FOR, TN_AGAINST),
+                {},
+            )
+        ],
+    ),
+    "2007-07-07": Vote(
+        "2007 Latvian referendum on the repeal of the amendments to the National Security Law and the State "
+        "Security Institutions Law",
+        "2007. gada tautas nobalsošana par grozījumu Nacionālās drošības likumā un Valsts drošības iestāžu "
+        "likumā atcelšanu",
+        [
+            Question(
+                "national-security-law",
+                "2007 Latvian referendum on the repeal of the amendments to the National Security Law",
+                "2007. gada tautas nobalsošana par likuma „Grozījumi Nacionālās drošības likumā” atcelšanu",
+                "optional_referendum",
+                (TN_FOR_REPEAL, TN_AGAINST_REPEAL),
+                {3: 338348},
+            ),
+            Question(
+                "state-security-institutions-law",
+                "2007 Latvian referendum on the repeal of the amendments to the State Security Institutions Law",
+                "2007. gada tautas nobalsošana par likuma „Grozījumi Valsts drošības iestāžu likumā” atcelšanu",
+                "optional_referendum",
+                (TN_FOR_REPEAL, TN_AGAINST_REPEAL),
+                {3: 338342},
+            ),
+        ],
+    ),
+    "2008-08-02": Vote(
+        "2008 Latvian referendum on the Satversme amendments bill on petitions to dissolve the Saeima",
+        "2008. gada tautas nobalsošana par likumprojektu „Grozījumi Latvijas Republikas Satversmē”",
+        [
+            Question(
+                "question",
+                "2008 Latvian referendum on the Satversme amendments bill on petitions to dissolve the Saeima",
+                "2008. gada tautas nobalsošana par likumprojektu „Grozījumi Latvijas Republikas Satversmē”",
+                "initiative",
+                (TN_FOR, TN_AGAINST),
+                {14: 629304, 3: 629119, 5: 1415},
+                (608847, 18857),
+            )
+        ],
+    ),
+    "2008-08-23": Vote(
+        "2008 Latvian referendum on the state pensions bill",
+        "2008. gada tautas nobalsošana par likumprojektu „Grozījums likumā „Par valsts pensijām””",
+        [
+            Question(
+                "question",
+                "2008 Latvian referendum on the state pensions bill",
+                "2008. gada tautas nobalsošana par likumprojektu „Grozījums likumā „Par valsts pensijām””",
+                "initiative",
+                (TN_FOR, TN_AGAINST),
+                {14: 346846, 3: 346784, 5: 794},
+                (334429, 11561),
+            )
+        ],
+    ),
+}
+TN_METHOD = (
+    "Published by the Central Election Commission of Latvia on its archive site. The commission prints only the "
+    "national totals for this referendum, in the text of its page, so the whole country is the finest unit "
+    "stored. {figures}"
+)
+TN_METHOD_2003 = (
+    "Published by the Central Election Commission of Latvia on its archive site as a table for each city, each "
+    "district (rajons), and the polling stations abroad; no polling-station figures are published. Voters are the "
+    "voters who took part, and ballots cast are the ballot papers counted. The table also splits voters and "
+    "ballots between the polling station and the voter's location; the split is not stored here."
+)
+TN_FIGURES = {
+    14: "Voters are the voters who took part.",
+    3: "Ballots cast are the ballot papers found in the ballot boxes; the commission counts them as the voters who "
+    "took part.",
+    5: "Invalid ballots are those marked for both answers or for neither.",
+}
+
+
+def tn_url(day: str) -> str:
+    return f"{TN_HOST}/{TN_SLUGS[day]}/"
+
+
+def tn_urls() -> list[str]:
+    return [TN_ROOT, *(tn_url(day) for day in TN_SLUGS), TN_RESULTS_2003]
+
+
+def tn_text(url: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))
+    return re.sub(r"[\s ]+", "", text)
+
+
+def tn_check(day: str, question: Question) -> None:
+    """Fail unless every figure stored from a page's text is printed on that page."""
+    text = tn_text(tn_url(day))
+    for number in (*question.figures.values(), *(question.votes or ())):
+        if str(number) not in text:
+            raise ValueError(f"{day}: {number} is not printed on {tn_url(day)}")
+
+
+@dataclass
+class Territory:
+    name: str
+    voters: int
+    ballots: int
+    votes: tuple[int, int]
+    invalid: int
+
+
+def tn_2003() -> tuple[list[Territory], Territory]:
+    page = tables(TN_RESULTS_2003)
+    rows = next(rows for rows in page.tables.values() if rows[0][0].text.startswith("Teritorija"))
+    head = [cell.text for cell in rows[0]]
+    column = {name: index for index, name in enumerate(head)}
+    found: list[Territory] = []
+    for row in rows[1:]:
+        found.append(
+            Territory(
+                clean(re.sub(r"\s*\(\d+\)\s*$", "", row[0].text)),
+                _n(row[column["Balsotāju kopskaits"]]),
+                _n(row[column["Balsošanas zīmju kopskaits"]]),
+                (_n(row[column["Par"]]), _n(row[column["Pret"]])),
+                _n(row[column["Nederīgas *"]]),
+            )
+        )
+    total = found.pop(0)
+    if total.name != "KOPĀ":
+        raise ValueError(f"the first row of the 2003 table is {total.name}, not the total")
+    for field_ in ("voters", "ballots", "invalid"):
+        if sum(getattr(t, field_) for t in found) != getattr(total, field_):
+            raise ValueError(f"the 2003 {field_} do not sum to the printed total")
+    for side in (0, 1):
+        if sum(t.votes[side] for t in found) != total.votes[side]:
+            raise ValueError("the 2003 votes do not sum to the printed total")
+    headline = {676700, 325980, 7787, 1010467}
+    if headline != {total.votes[0], total.votes[1], total.invalid, total.ballots}:
+        raise ValueError("the 2003 table's total differs from the headline results")
+    return found, total
+
+
+def referendum_archive(day: str) -> Package:
+    vote = TN[day]
+    first = date.fromisoformat(day)
+    p = Package(
+        f"lv.cvk/tn-{day}",
+        SOURCE,
+        f"The {vote.english} from the Central Election Commission's archive",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    page = raw.cached(SOURCE, tn_url(day))
+    p.artifact(page, CVK_SOURCE)
+    p.uses(raw.cached(SOURCE, TN_ROOT))
+    if day == "2003-09-20":
+        p.artifact(raw.cached(SOURCE, TN_RESULTS_2003), CVK_SOURCE)
+        territories, total = tn_2003()
+    election = key("election", day, "tn")
+    where = f"lv/{day}-referendum"
+    p.add("election", id=election, polity_id=LATVIA, kind="referendum", date_from=first, date_to=first, status="held")
+    p.name(election, vote.english, "en", "official")
+    p.name(election, vote.native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    for question in vote.questions:
+        contest = key("contest", day, "tn", question.slug)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="ballot_question",
+            district_area_id=COUNTRY,
+            round_number=1,
+            electoral_system_id=SYSTEM_REFERENDUM,
+            default_result_kind="counted",
+        )
+        p.name(contest, question.english, "en", "official")
+        p.name(contest, question.native, "lv", "native", False)
+        p.add("slug", path=f"{where}/{question.slug}", entity_id=contest, is_current=True)
+        p.add("ballot_question", contest_id=contest, type=question.type)
+        result_set = key("result_set", day, "tn", question.slug)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        if day == "2003-09-20":
+            method = TN_METHOD_2003
+        else:
+            method = TN_METHOD.format(
+                figures=" ".join(TN_FIGURES[m] for m in sorted(question.figures, key=lambda m: (m != 14, m)))
+            )
+            if question.votes is None:
+                method += " The page does not print the votes for and against."
+            tn_check(day, question)
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        options = []
+        for position, (label, english_label) in enumerate(question.answers, 1):
+            option = key("option", day, "tn", question.slug, position)
+            options.append(option)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=f"{label} ({english_label})",
+            )
+        if day == "2003-09-20":
+            for territory in territories:
+                code = f"{day}:tn:{territory.name}"
+                unit = key("unit", code)
+                p.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=LATVIA,
+                    scheme_code="lv.pasvaldiba",
+                    code=code,
+                    area_relation="unlocated",
+                    area_id=None,
+                    kind="standard",
+                )
+                p.name(unit, territory.name, "lv", "official")
+                for measure, value in ((14, territory.voters), (CAST, territory.ballots), (5, territory.invalid)):
+                    _put(p, result_set, unit, None, measure, value)
+                for option, value in zip(options, territory.votes, strict=True):
+                    _put(p, result_set, unit, option, VOTES, value)
+            totals = {14: total.voters, CAST: total.ballots, 5: total.invalid}
+            national = dict(zip(options, total.votes, strict=True))
+        else:
+            code = f"{day}:tn:{question.slug}:valsts"
+            unit = key("unit", code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LATVIA,
+                scheme_code="lv.valsts",
+                code=code,
+                area_relation="equals",
+                area_id=COUNTRY,
+                kind="aggregate",
+            )
+            p.name(unit, "Latvija", "lv", "official")
+            totals = question.figures
+            national = dict(zip(options, question.votes or (), strict=False))
+            for measure, value in totals.items():
+                _put(p, result_set, unit, None, measure, value)
+            for option, value in national.items():
+                _put(p, result_set, unit, option, VOTES, value)
+        for measure, value in totals.items():
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for option, value in national.items():
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
     return p
 
 
