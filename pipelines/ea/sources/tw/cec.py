@@ -78,6 +78,8 @@ def json_url(kind: str, day: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.tw import cec_township
+
     for day in PRESIDENT:
         for url, suffix in (
             (bulk_url(day), ".zip"),
@@ -87,6 +89,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix)
     fetch_legislative()
     local_fetch()
+    cec_township.fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -109,16 +112,21 @@ def office(county: str) -> str:
 
 
 def packages() -> list[str]:
+    from ea.sources.tw import cec_township
+
     return [
         "tw.cec/geo",
         "tw.cec/registry",
         *(f"tw.cec/prez-{day}" for day in PRESIDENT),
         *(f"tw.cec/leg-{day}" for day in leg_days()),
         *(f"tw.cec/local-{day}" for day in LOCAL_DAYS),
+        *cec_township.packages(),
     ]
 
 
 def parse() -> None:
+    from ea.sources.tw import cec_township
+
     geo().write()
     registry().write()
     for day in PRESIDENT:
@@ -127,6 +135,7 @@ def parse() -> None:
         legislative(day).write()
     for day in LOCAL_DAYS:
         local(day).write()
+    cec_township.parse()
 
 
 def emit() -> None:
@@ -309,6 +318,8 @@ def profile(day: str) -> dict[str, object]:
 
 
 def geo() -> Package:
+    from ea.sources.tw import cec_township
+
     p = Package(
         "tw.cec/geo",
         SOURCE,
@@ -356,6 +367,7 @@ def geo() -> Package:
                 townships.add((contest.county, str(row["district"])))
                 if row["village"]:
                     villages.add((contest.county, str(row["district"]), str(row["village"])))
+    cec_township.extend_geo(counties, townships, villages)
     for county in sorted(counties):
         id = area("tw.county", county)
         p.add("area", id=id, scheme_code="tw.county")
@@ -382,10 +394,13 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=f"{number_}|{county}|{district}")
         p.add("area_parent", area_id=id, parent_id=area("tw.county", county))
         p.name(id, f"{county}第{district}選舉區", "zh", "official")
+    cec_township.geo(p)
     return p
 
 
 def registry() -> Package:
+    from ea.sources.tw import cec_township
+
     p = Package(
         "tw.cec/registry",
         SOURCE,
@@ -477,6 +492,8 @@ def registry() -> Package:
     )
     used = {str(t["party"]) for day in PRESIDENT for t in tickets(day)} | leg_parties()
     used |= {c.party for theme in THEMES for contest in contests(theme.day, theme.subject) for c in contest.cands}
+    cec_township.registry(p)
+    used |= cec_township.parties()
     for name in sorted(used - INDEPENDENT):
         id = key("party", name)
         p.add("party", id=id, kind="party", polity_id=TAIWAN)
