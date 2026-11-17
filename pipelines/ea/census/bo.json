@@ -236,7 +236,7 @@
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://atlaselectoral.oep.org.bo/",
    "kind": "official_body",
-   "note": "Reached on 2026-11-17 only as its JavaScript application shell, which holds no data; whether the download files (e.g. https://atlaselectoral.oep.org.bo/descarga/17/votos_totales.csv, one row per mesa with department, province, municipality, recinto, and mesa codes) are open was not confirmed. Print volumes: Tomo I (general elections 1979-2009), Tomo II (referendums), Tomo III (municipal elections 1985-2010), Tomo IV."
+   "note": "The site itself is a JavaScript application shell with no data in the page, but its per-process download files are open: process 1 (https://atlaselectoral.oep.org.bo/descarga/1/votos_totales.csv, the 1999 municipal election) was retrieved on 2026-11-17, pipe-separated with one row per mesa and department, province, municipality, recinto, and mesa codes. Print volumes: Tomo I (general elections 1979-2009), Tomo II (referendums), Tomo III (municipal elections 1985-2010), Tomo IV."
   },
   "oep_atlas_tomo1": {
    "title": "Atlas Electoral de Bolivia, Tomo I: Elecciones Generales 1979-2009",
@@ -257,7 +257,7 @@
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_I.pdf",
    "kind": "official_body",
-   "note": "Read for 1985-1993 (Capítulo I) and 1995, 1999, and 2004 (Capítulo II)."
+   "note": "Read for 1985-1993 (Capítulo I, https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_I.pdf) and 1995, 1999, and 2004 (Capítulo II, https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_II.pdf); both were retrieved as archived copies of those addresses on 2026-11-17, because web.oep.org.bo refuses some networks."
   },
   "oep_computo": {
    "title": "Sistema de Cómputo Oficial del Órgano Electoral Plurinacional",
