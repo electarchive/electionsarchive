@@ -577,7 +577,7 @@ def registry() -> Package:
     for pid, spellings in sorted(names.items()):
         id = party(pid)
         p.add("party", id=id, kind="party", polity_id=GREECE)
-        p.add("external_id", entity_id=id, scheme="gr.ypes.party", value=str(pid))
+        p.add("external_id", entity_id=id, scheme="gr.ypes.results.party", value=str(pid))
         newest = max(spellings, key=lambda text: spellings[text])
         for text in sorted(spellings):
             p.name(id, text, "el", "official" if text == newest else "ballot", text == newest)
