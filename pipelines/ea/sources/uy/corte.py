@@ -7,7 +7,9 @@ received in each circuit, on the national open-data catalog. A circuit is the fi
 import functools
 import io
 import re
+import subprocess
 import unicodedata
+import zipfile
 from datetime import date
 from uuid import uuid5
 
@@ -134,6 +136,24 @@ RUNOFF_TICKETS: dict[str, tuple[list[tuple[str, str, str]], str]] = {
         "FRENTE AMPLIO",
     ),
 }
+# Files of the Corte's own statistics pages that count the "Papeleta por SI" ballots of the 2014 and 2019 plebiscites:
+# the 2014 zip holds a workbook with the count per department, and the 2019 PDF has one row per circuit.
+PLEBISCITE_FILES = {
+    "2014-10-26": "https://www.gub.uy/corte-electoral/download/node/field_documento/852",
+    "2019-10-27": "https://www.gub.uy/corte-electoral/sites/corte-electoral/files/2024-04/"
+    "RESULTADOS_PLEBISCITO_27_10_2019_POR_CIRCUITO_compressed%20%281%29.pdf",
+}
+PLEBISCITE_SUFFIX = {"2014-10-26": ".zip", "2019-10-27": ".pdf"}
+PLEBISCITE_TITLES = {
+    "2014-10-26": (
+        "Plebiscite on lowering the age of criminal responsibility",
+        "Plebiscito por la baja de la edad de imputabilidad",
+    ),
+    "2019-10-27": (
+        "Plebiscite on a constitutional reform on security",
+        "Plebiscito de reforma constitucional en materia de seguridad",
+    ),
+}
 # The 2024 constitutional plebiscites, by the totals column that counts their "Sí" ballots.
 PLEBISCITES = {
     "2024-10-27": [
@@ -185,6 +205,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, f"{CATALOG}{FILES[day]['dataset']}", suffix=".html")
         for link in files(day).values():
             raw.fetch(SOURCE, link, suffix=".csv")
+    for day, link in PLEBISCITE_FILES.items():
+        raw.fetch(SOURCE, link, suffix=PLEBISCITE_SUFFIX[day])
 
 
 def parse() -> None:
@@ -340,6 +362,8 @@ def registry() -> Package:
         p.artifact(raw.cached(SOURCE, f"{CATALOG}{FILES[day]['dataset']}"), UY_SOURCE)
         for link in files(day).values():
             p.artifact(raw.cached(SOURCE, link), UY_SOURCE)
+        if day in PLEBISCITE_FILES:
+            p.artifact(raw.cached(SOURCE, PLEBISCITE_FILES[day]), UY_SOURCE)
     for code, text in (
         (CHAMBER_BODY, "Chamber of Representatives"),
         (SENATE_BODY, "Senate"),
@@ -403,6 +427,8 @@ class Builder:
         self.p.external.add(URUGUAY)
         for link in files(day).values():
             self.p.uses(raw.cached(SOURCE, link))
+        if day in PLEBISCITE_FILES:
+            self.p.uses(raw.cached(SOURCE, PLEBISCITE_FILES[day]))
         self.path = f"uy/{day}-{KIND_PATH[day]}"
         self.totals = totals(day)
         self.units: dict[tuple[str, str], str] = {}
@@ -757,6 +783,8 @@ def national(day: str) -> Package:
         found = found.join(b.unit_frame(), on=["DEPARTAMENTO", "CRV"], how="left")
         b.values(result_set, found.select("UNIT", OPTION=pl.lit(yes), MEASURE=pl.lit(1), VALUE="VALUE"))
         b.accounting_values(result_set)
+    if day in PLEBISCITE_FILES:
+        plebiscite(b, day)
     b.p.add(
         "note",
         id=key("note", b.election_id, "solo-si"),
@@ -769,6 +797,86 @@ def national(day: str) -> Package:
         lang="en",
     )
     return b.p
+
+
+def plebiscite_circuits() -> pl.DataFrame:
+    """The 2019 plebiscite's "Papeleta por SI" ballots per circuit, read from the Corte's PDF."""
+    path = raw.cached(SOURCE, PLEBISCITE_FILES["2019-10-27"]).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    row = re.compile(r"^\s*27/10/2019\s+Plebiscito\s+(.+?)\s+(\d+)\s+([A-Z]{3})\s+Departamental((?:\s+\d+){8})\s*$")
+    codes = {text: code for code, text in DEPARTMENTS.items()}
+    rows = []
+    for line in text.splitlines():
+        found = row.match(line)
+        if found:
+            numbers = [int(n) for n in found.group(4).split()]
+            rows.append((codes[found.group(1)], str(int(found.group(2))), *numbers))
+    names_ = ("DEPARTAMENTO", "CRV", "HAB", "NOOBS", "OBS", "EMITIDOS", "BLANCO", "ANULADOS", "SOLOSI", "SI")
+    return pl.DataFrame(rows, schema=dict.fromkeys(names_, pl.String) | {n: pl.Int64 for n in names_[2:]}, orient="row")
+
+
+def plebiscite_departments() -> pl.DataFrame:
+    """The 2014 plebiscite's "Papeleta por SI" ballots per department, read from the workbook in the Corte's zip."""
+    path = raw.cached(SOURCE, PLEBISCITE_FILES["2014-10-26"]).path
+    with zipfile.ZipFile(path) as archive:
+        data = archive.read("Nacionales 2014.xlsx")
+    sheet = pl.read_excel(io.BytesIO(data), sheet_id=1, has_header=False)
+    codes = {norm(text): code for code, text in DEPARTMENTS.items()}
+    rows = []
+    on = False
+    for line in sheet.rows():
+        cells = [str(c).strip() for c in line if c is not None and str(c).strip()]
+        if cells and cells[0].startswith("5)"):
+            on = True
+        elif cells and cells[0][:2] == "6)":
+            on = False
+        elif on and cells and norm(cells[0]) in codes:
+            rows.append((codes[norm(cells[0])], int(cells[1])))
+    return pl.DataFrame(rows, schema={"DEPARTAMENTO": pl.String, "SI": pl.Int64}, orient="row")
+
+
+def plebiscite(b: Builder, day: str) -> None:
+    """The plebiscite's contest, with its "Sí" ballots per circuit (2019) or per department (2014)."""
+    en, es = PLEBISCITE_TITLES[day]
+    year = day[:4]
+    contest, result_set = b.contest(f"plebiscite:{year}", "ballot_question", f"{year} {en}", en, es=f"{es} {year}")
+    b.p.add("ballot_question", contest_id=contest, type="plebiscite")
+    yes = b.option(contest, "answer", "Sí", "yes", position=1)
+    if day == "2019-10-27":
+        found = plebiscite_circuits()
+        measures = b.accounting().select("DEPARTAMENTO", "CRV").unique()
+        if found.height != measures.height or found.join(measures, on=["DEPARTAMENTO", "CRV"], how="anti").height:
+            raise ValueError("the plebiscite PDF and the totals file list different circuits")
+        found = found.join(b.unit_frame(), on=["DEPARTAMENTO", "CRV"], how="left")
+        b.values(result_set, found.select("UNIT", OPTION=pl.lit(yes), MEASURE=pl.lit(1), VALUE="SI"))
+        b.accounting_values(result_set)
+        text = (
+            "The Corte publishes the plebiscite's results per circuit, and the 'Papeleta por SI' count, the ballots "
+            "with the Sí sheet, is stored as the votes for Sí. Votes against are not published."
+        )
+    else:
+        found = plebiscite_departments()
+        units = []
+        for dept in found["DEPARTAMENTO"]:
+            unit = key("unit", day, "plebiscite", dept)
+            b.p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=URUGUAY,
+                scheme_code="uy.departamento",
+                code=f"{day}:plebiscite:{dept}",
+                area_relation="equal",
+                area_id=key("area", "uy.departamento", dept),
+                kind="standard",
+            )
+            units.append(unit)
+        b.values(result_set, found.select(UNIT=pl.Series(units), OPTION=pl.lit(yes), MEASURE=pl.lit(1), VALUE="SI"))
+        text = (
+            "The Corte's results workbook publishes the 'Papeleta por SI' ballots of this plebiscite per department "
+            "only; the circuit files count only the ballots with the Sí sheet alone, so the count per circuit is not "
+            "published. Votes against are not published."
+        )
+    b.p.add("note", id=key("note", result_set, "yes"), entity_id=result_set, kind="caveat", body_md=text, lang="en")
 
 
 def runoff(day: str) -> Package:
