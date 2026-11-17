@@ -476,11 +476,9 @@ def emit() -> None:
     package.run("load", packages())
 
 
-CEDILLA = str.maketrans("şţŞŢ", "șțȘȚ")
-
-
 def party_key(label: str) -> str:
-    text = re.sub(r"[„”“\"'~]", " ", label.translate(CEDILLA)).strip()
+    # Ids already loaded derive from this exact normalization, so it must not change.
+    text = re.sub(r"[„”“\"']", "", label).strip()
     text = re.sub(r"^(partidul politic|partid politic|partidul)\s+", "", text, flags=re.IGNORECASE)
     return clean(text).casefold()
 
