@@ -47,6 +47,10 @@ def fetch() -> None:
     for name in LISTINGS:
         for url in pdfs(name):
             raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, SENATE_LISTING, suffix=".html")
+    for name, url in SENATE_FILES.items():
+        if name not in SENATE_ABSENT:
+            raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def path(name: str) -> Path:
@@ -71,10 +75,17 @@ DAYS = {
     "2018-12-19": date(2018, 12, 19),
     "2019-05-27": date(2019, 5, 27),
     "2019-11-27": date(2019, 11, 27),
+    "2020-12-11": date(2020, 12, 11),
     "2023-11-16": date(2023, 11, 16),
     "2024-05-29": date(2024, 5, 29),
     "2024-12-11": date(2024, 12, 11),
 }
+SENATE_DAY = "2020-12-11"
+SENATE_PROVINCES = ("ANTANANARIVO", "ANTSIRANANA", "FIANARANTSOA", "MAHAJANGA", "TOAMASINA", "TOLIARY")
+# The authority's page for the 2020 senatorial results links six province sheets; two of them answer 404.
+SENATE_LISTING = f"{SITE}/resultat-des-elections-senatoriales-2020/"
+SENATE_FILES = {name: f"{UPLOADS}/2021/12/{name}.pdf" for name in SENATE_PROVINCES}
+SENATE_ABSENT = ("FIANARANTSOA", "TOAMASINA")
 
 
 def key(kind: str, *parts: object) -> str:
@@ -279,8 +290,8 @@ def independent(label: str) -> bool:
     return norm(label).startswith("INDEPENDANT")
 
 
-def party_id(label: str) -> str:
-    return key("party", norm(label))
+def party_id(label: str, scope: str = "") -> str:
+    return key("party", scope, norm(label)) if scope else key("party", norm(label))
 
 
 @cache
@@ -541,6 +552,7 @@ class Writer:
         label: str = "",
         kind: str = "candidate",
         build_person: bool = True,
+        party_scope: str = "",
     ) -> str:
         """One ballot line: its option, and for a person's candidacy the person and their party or independence."""
         option = key("option", scope, number)
@@ -566,7 +578,7 @@ class Writer:
                 option_id=option,
                 role="head",
                 ballot_name=name,
-                member_of_party_id=party_id(party) if party and not is_independent else None,
+                member_of_party_id=party_id(party, party_scope) if party and not is_independent else None,
                 is_independent=is_independent if party else None,
             )
         return option
@@ -745,6 +757,78 @@ def _legislative_2019(day: str) -> Package:
         s = _count_station(sheet.count)
         s.votes = {c.number: c.votes for c in sheet.candidates}
         _fill(w, result_set, unit, s, options)
+    return p
+
+
+SENATE = key("body", "senate")
+PROVINCE = "mg.province"
+
+
+def senate_sheets() -> list[read.Sheet]:
+    return [
+        read.senate_sheet(raw.cached(SOURCE, url).path)
+        for name, url in SENATE_FILES.items()
+        if name not in SENATE_ABSENT
+    ]
+
+
+def _senate_2020(day: str) -> Package:
+    p = Package(
+        f"mg.ceni/{day}",
+        SOURCE,
+        "The 2020 Malagasy senatorial election by province, from the national election authority's provisional results",
+        depends=["mg.ceni/registry"],
+    )
+    p.external.add(MADAGASCAR)
+    w = Writer(p)
+    for url in (SENATE_LISTING, *(SENATE_FILES[n] for n in SENATE_PROVINCES if n not in SENATE_ABSENT)):
+        p.artifact(raw.cached(SOURCE, url), CENI)
+    p.add("scheme", code=PROVINCE, polity_id=MADAGASCAR, kind="electoral_district", rank=1, noun="province")
+    p.add("body", id=SENATE, polity_id=MADAGASCAR, kind="upper_house")
+    p.name(SENATE, "Senate of Madagascar", "en", "official")
+    p.name(SENATE, "Sénat de Madagascar", "fr", "native", False)
+    election = w.election(
+        "senate2020",
+        day,
+        "indirect",
+        "2020 Malagasy senatorial election",
+        "Élections sénatoriales de 2020",
+        f"mg/{day}-senatorial",
+    )
+    parties: dict[str, str] = {}
+    for sheet in senate_sheets():
+        name = sheet.place["province"]
+        text = titled(name)
+        province = area(PROVINCE, norm(name))
+        p.add("area", id=province, scheme_code=PROVINCE)
+        p.name(province, text, "fr", "official")
+        scope = f"senate2020-{norm(name)}"
+        contest = w.contest(
+            scope,
+            election,
+            "body_seats",
+            f"2020 Malagasy senatorial election, {text} province",
+            f"Élections sénatoriales de 2020, province de {text}",
+            f"mg/{day}-senatorial/{slug(text)}",
+            body_id=SENATE,
+            district_area_id=province,
+        )
+        options = {}
+        for cand in sheet.candidates:
+            options[cand.number] = w.candidate(
+                scope, contest, cand.number, cand.name, cand.party, party_scope="senate2020"
+            )
+            if cand.party and not independent(cand.party):
+                parties[party_id(cand.party, "senate2020")] = cand.party
+        result_set = w.result_set(scope, election, contest, "province", SEPARATE, 1.0, True)
+        unit = w.unit("province", day, norm(name), PROVINCE, f"{text} province", province, "equals")
+        c = sheet.count
+        registered = None if c.registered is None else c.registered + (c.added or 0)
+        s = Station("", "", "", "", registered, c.voters, c.blank, c.invalid, c.valid, dict(c.votes))
+        _fill(w, result_set, unit, s, options)
+    for id, label in sorted(parties.items(), key=lambda item: item[1]):
+        p.add("party", id=id, kind="party", polity_id=MADAGASCAR)
+        p.name(id, label, "fr", "official")
     return p
 
 
@@ -985,6 +1069,8 @@ def _build(day: str) -> Package:
             ("councillor2019", "councillor", communal_2019("councillor")),
         ]
         return _communal(day, sets, 2019)
+    if day == "2020-12-11":
+        return _senate_2020(day)
     if day == "2023-11-16":
         return _president_2023(day)
     if day == "2024-05-29":

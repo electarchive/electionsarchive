@@ -587,3 +587,62 @@ def national_2023(path: Path) -> Count:
             count.names[int(found[1])] = clean(" ".join(label))
             count.votes[int(found[1])] = int(found[2])
     return count
+
+
+@dataclass
+class Ballot:
+    """One senatorial candidate's vote line, with the name and party text on it and on the lines around it."""
+
+    number: int
+    votes: int
+    on_line: dict[str, list[str]]
+    around: dict[str, list[tuple[int, str]]] = field(default_factory=lambda: {"name": [], "party": []})
+
+
+def senate_sheet(path: Path) -> Sheet:
+    """One province's senatorial sheet. A candidate's name and party each wrap onto the lines above and below the line
+    that prints the ballot number and the votes, so every other line joins the nearest vote line, by its column."""
+    text = "\n".join(pages(path))
+    lines = text.splitlines()
+    province = re.search(r"dans la PROVINCE\s+(\S+(?: \S+)*?)\s*\(", text)
+    if not province:
+        raise ValueError(f"{path} names no province")
+    count = Count()
+    accounting(text, count)
+    head = next(i for i, line in enumerate(lines) if "Entit" in line and "Voix" in line)
+    end = next(i for i, line in enumerate(lines) if "Total voix" in line)
+    boundary = (lines[head].index("Nom et") + lines[head].index("Entit")) // 2
+    ballots: dict[int, Ballot] = {}
+    for i in range(head + 1, end):
+        parts = segments(lines[i])
+        if len(parts) >= 3 and parts[0][1].isdigit() and re.fullmatch(PERCENT, parts[-1][1]):
+            middle = parts[1:-2]
+            ballots[i] = Ballot(
+                int(parts[0][1]),
+                number(parts[-2][1]),
+                {"name": [t for a, t in middle if a < boundary], "party": [t for a, t in middle if a >= boundary]},
+            )
+    for i in range(head + 1, end):
+        if i in ballots:
+            continue
+        for start, piece in segments(lines[i]):
+            kind = "party" if start >= boundary else "name"
+            distance = sorted((abs(at - i), at) for at in ballots)
+            near = [at for d, at in distance if d == distance[0][0]]
+            if len(near) > 1:
+                near = [at for at in near if not ballots[at].on_line[kind]]
+            if len(near) != 1:
+                raise ValueError(f"{path}: line {i} {piece!r} cannot be placed with one candidate")
+            ballots[near[0]].around[kind].append((i, piece))
+    candidates = []
+    for at, ballot in sorted(ballots.items()):
+        full: dict[str, str] = {}
+        for kind in ("name", "party"):
+            above = [t for i, t in ballot.around[kind] if i < at]
+            below = [t for i, t in ballot.around[kind] if i > at]
+            full[kind] = clean(" ".join([*above, *ballot.on_line[kind], *below]))
+        candidates.append(Candidate(ballot.number, full["name"], full["party"], ballot.votes))
+    count.votes = {c.number: c.votes for c in candidates}
+    total = re.search(r"Total voix\s*:\s*([\d ]+?)\s", text)
+    count.total = number(total[1]) if total else None
+    return Sheet({"province": clean(province[1])}, count, candidates)
