@@ -82,6 +82,34 @@
    "url": "https://www.ical.ir/",
    "kind": "official_body",
    "note": "The parliament's library keeps the records of the 24 terms of the National Consultative Assembly (1906-1979), the seven terms of the Senate (1949-1979), and the constituent assemblies. Its host reset every connection from the session that wrote this census on 2026-11-16."
+  },
+  "moi_majlis_2012": {
+   "title": "گزارش کلی حوزه‌های انتخابیه و آرای داوطلبان، انتخابات نهمین دوره مجلس شورای اسلامی (general report of the constituencies and the candidates' votes, ninth Majlis, first round)",
+   "publisher": "ستاد انتخابات کشور، وزارت کشور (Election Headquarters of the Ministry of Interior)",
+   "url": "https://irandataportal.syr.edu/wp-content/uploads/9th-parliamentary-election-full-results-.pdf",
+   "kind": "official_body",
+   "note": "The Ministry's report of 8 March 2012, as the Iran Data Portal at Syracuse University republishes it: 202 territorial constituencies in 31 provinces with 285 seats, each with every candidate's votes. The religious-minority constituencies are not in it."
+  },
+  "moi_majlis_2016_districts": {
+   "title": "نام و تعداد نمایندگان مورد نیاز حوزه‌های انتخابیه در انتخابات دهمین دوره مجلس شورای اسلامی – ۱۳۹۴ (جدول ۲۰۷ حوزه انتخابیه مجلس دهم)",
+   "publisher": "ستاد انتخابات کشور، وزارت کشور (Election Headquarters of the Ministry of Interior)",
+   "url": "https://irandataportal.syr.edu/wp-content/uploads/جدول207حوزهانتخابیهمجلسدهم.pdf",
+   "kind": "official_body",
+   "note": "The Ministry's table of the 207 constituencies of the tenth Majlis and the members each elects, as the Iran Data Portal republishes it; rows 43-47 are the five religious-minority constituencies."
+  },
+  "moi_majlis_2024_districts": {
+   "title": "حوزه‌های انتخابیه و تعداد کرسی‌ها، انتخابات دوازدهمین دوره مجلس شورای اسلامی (constituencies and seats, twelfth Majlis)",
+   "publisher": "ستاد انتخابات کشور، وزارت کشور (Election Headquarters of the Ministry of Interior)",
+   "url": "https://irandataportal.syr.edu/wp-content/uploads/Majles-Electoral-Districts-2024.pdf",
+   "kind": "official_body",
+   "note": "The Ministry's table of the 2024 constituencies with each one's seats (تعداد کرسی), by province with a total (مجموع) per province, as the Iran Data Portal republishes it: 208 constituencies, 290 seats, of which the five religious-minority constituencies hold one seat each."
+  },
+  "idp_majlis": {
+   "title": "Parliamentary Elections (one page per election, 1980-2024)",
+   "publisher": "Iran Data Portal, Syracuse University",
+   "url": "https://irandataportal.syr.edu/parliamentary-elections/",
+   "kind": "academic",
+   "note": "Each election's page gives the date, the eligible and actual voters, the number of constituencies (\"Number of Precincts\"), and the seats (\"Number of Candidates Needed\"), citing the Ministry of Interior (www.moi.ir). The constituency count includes the religious-minority constituencies."
   }
  },
  "tiers": [
@@ -237,84 +265,122 @@
      "deferred": [
       "1980-05-09"
      ],
-     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "193 constituencies and 270 seats in all, the religious-minority constituencies included (Constitution art. 64; Majlis Election Law art. 2); the territorial count is not split out here.",
+     "source": "idp_majlis",
+     "quote": "1980-parliamentary-election: Number of Precincts 193 Number of Candidates Needed 270"
     },
     {
      "date": "1984-04-15",
      "deferred": [
       "1984-05-17"
      ],
-     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "193 constituencies and 270 seats in all, the religious-minority constituencies included (Constitution art. 64; Majlis Election Law art. 2); the territorial count is not split out here.",
+     "source": "idp_majlis",
+     "quote": "1984-parliamentary-election: Number of Precincts 193 Number of Candidates Needed 270"
     },
     {
      "date": "1988-04-08",
      "deferred": [
       "1988-05-13"
      ],
-     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "193 constituencies and 270 seats in all, the religious-minority constituencies included (Constitution art. 64; Majlis Election Law art. 2); the territorial count is not split out here.",
+     "source": "idp_majlis",
+     "quote": "1988-parliamentary-election: Number of Precincts 193 Number of Candidates Needed 270"
     },
     {
      "date": "1992-04-10",
      "deferred": [
       "1992-05-08"
      ],
-     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "196 constituencies and 270 seats in all, the religious-minority constituencies included (Constitution art. 64; Majlis Election Law art. 2); the territorial count is not split out here.",
+     "source": "idp_majlis",
+     "quote": "1992-parliamentary-election: Number of Precincts 196 Number of Candidates Needed 270"
     },
     {
      "date": "1996-03-08",
      "deferred": [
       "1996-04-19"
      ],
-     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "196 constituencies and 270 seats in all, the religious-minority constituencies included (Constitution art. 64; Majlis Election Law art. 2); the territorial count is not split out here.",
+     "source": "idp_majlis",
+     "quote": "1996-parliamentary-election: Number of Precincts 196 Number of Candidates Needed 270"
     },
     {
      "date": "2000-02-18",
      "deferred": [
       "2000-05-05"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "207 constituencies and 290 seats in all; less the five religious-minority constituencies (one seat each, class majlis_minorities), 202 territorial constituencies with 285 seats.",
+     "source": "idp_majlis",
+     "quote": "2000-parliamentary-election: Number of Precincts 207 Number of Candidates Needed 290",
+     "contests": 202,
+     "seats": 285
     },
     {
      "date": "2004-02-20",
      "deferred": [
       "2004-05-07"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "207 constituencies and 290 seats in all; less the five religious-minority constituencies (one seat each, class majlis_minorities), 202 territorial constituencies with 285 seats.",
+     "source": "idp_majlis",
+     "quote": "2004-parliamentary-election: Number of Precincts 207 Number of Candidates Needed 290",
+     "contests": 202,
+     "seats": 285
     },
     {
      "date": "2008-03-14",
      "deferred": [
       "2008-04-25"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "207 constituencies and 290 seats in all; less the five religious-minority constituencies (one seat each, class majlis_minorities), 202 territorial constituencies with 285 seats.",
+     "source": "idp_majlis",
+     "quote": "2008-parliamentary-election: Number of Precincts 207 Number of Candidates Needed 290",
+     "contests": 202,
+     "seats": 285
     },
     {
      "date": "2012-03-02",
      "deferred": [
       "2012-05-04"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "202 territorial constituencies with 285 seats; with the five religious-minority constituencies, 207 constituencies and 290 seats.",
+     "contests": 202,
+     "seats": 285,
+     "source": "moi_majlis_2012",
+     "quote": "202 «حوزه انتخابیه» headings under 31 «استان» headings; «تعداد نمایندگان مورد نیاز» adds up to 285"
     },
     {
      "date": "2016-02-26",
      "deferred": [
       "2016-04-29"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "207 constituencies and 290 seats in all; less the five religious-minority constituencies, 202 territorial constituencies with 285 seats.",
+     "contests": 202,
+     "seats": 285,
+     "source": "moi_majlis_2016_districts",
+     "quote": "جدول 207 حوزه انتخابيه مجلس دهم; rows 43-47 «اقلیتهای دینی»: زرتشتیان، کلیمیان، مسیحیان آشوری و کلدانی، مسیحیان ارمنی جنوب ایران، مسیحیان ارمنی شمال ایران"
     },
     {
      "date": "2020-02-21",
      "deferred": [
       "2020-09-11"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "208 constituencies and 290 seats in all; less the five religious-minority constituencies (one seat each, class majlis_minorities), 203 territorial constituencies with 285 seats.",
+     "source": "idp_majlis",
+     "quote": "2020-parliamentary-election: Number of Precincts 208 Number of Candidates Needed 290",
+     "contests": 203,
+     "seats": 285
     },
     {
      "date": "2024-03-01",
      "deferred": [
       "2024-05-10"
      ],
-     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+     "note": "208 constituencies and 290 seats in all; less the five religious-minority constituencies, 203 territorial constituencies with 285 seats.",
+     "contests": 203,
+     "seats": 285,
+     "source": "moi_majlis_2024_districts",
+     "quote": "208 rows with «تعداد کرسی» adding up to 290, among them زرتشتیان، کلیمیان، مسیحیان آشوری وکلدانی، مسیحیان ارمنی جنوب، مسیحیان ارمنی شمال with 1 each"
     }
    ],
    "cadence": [
@@ -381,7 +447,29 @@
     }
    ],
    "est_votes": 600000,
-   "effort": 2
+   "effort": 2,
+   "dates": [
+    {
+     "date": "2016-02-26",
+     "deferred": [
+      "2016-04-29"
+     ],
+     "contests": 5,
+     "seats": 5,
+     "source": "moi_majlis_2016_districts",
+     "quote": "rows 43-47 «اقلیتهای دینی»: زرتشتیان 1، کلیمیان 1، مسیحیان آشوری و کلدانی 1، مسیحیان ارمنی جنوب ایران 1، مسیحیان ارمنی شمال ایران 1"
+    },
+    {
+     "date": "2024-03-01",
+     "deferred": [
+      "2024-05-10"
+     ],
+     "contests": 5,
+     "seats": 5,
+     "source": "moi_majlis_2024_districts",
+     "quote": "زرتشتیان 1، کلیمیان 1، مسیحیان آشوری وکلدانی 1، مسیحیان ارمنی جنوب 1، مسیحیان ارمنی شمال 1"
+    }
+   ]
   },
   {
    "key": "majlis_by",
