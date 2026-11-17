@@ -27,16 +27,18 @@ INBOX = DATA / "inbox" / "pa.te"
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 
 
+DOWNLOAD = SITE + "/wp-content/plugins/download-attachments/includes/download.php?id="
+
+
 def url(name: str) -> str:
-    return BROWSER + name
+    """The URL a file was cached under: a site download id written `dl:<id>`, or a name saved in the browser."""
+    return DOWNLOAD + name[3:] if name.startswith("dl:") else BROWSER + name
 
 
 def fetch() -> None:
     """Load the files that were saved from the Tribunal's site (data/inbox/pa.te/) into the raw cache."""
     index = json.loads((INBOX / "index.json").read_text())
     for key, entry in index.items():
-        if not key.startswith(BROWSER):
-            continue
         content = (INBOX / entry["file"]).read_bytes()
         raw.store(
             SOURCE,
@@ -333,11 +335,16 @@ def circuits(rows: list[Row]) -> list[Unit]:
     """Units of a table by electoral circuit, with provinces, comarcas, and the votes abroad between them."""
     units: list[Unit] = []
     province = ""
-    for row in rows:
+    for i, row in enumerate(rows):
         key = norm(row.label)
         if key == "total":
             continue
         match = re.match(r"circuito\s+(\d+\.\d+)$", key)
+        following = norm(rows[i + 1].label) if i + 1 < len(rows) else ""
+        if not match and row.indent == 0 and key.startswith("comarca") and not following.startswith("circuito"):
+            # A comarca with no electoral circuit of its own (2004): its row is the unit, as a district.
+            units.append(Unit("distrito", (row.label, row.label), row))
+            continue
         if match:
             units.append(Unit("circuito", (province, match[1]), row))
         elif "exterior" in key or key.startswith("panamenos residentes"):
@@ -536,6 +543,12 @@ TICKETS = {
         Ticket("Verde", "Gerardo Barroso", ("José Luís Galloway",), 16, ("VERDE",)),
         Ticket("Chocolate", "Juan Jované", ("Alberto Reyes",), 18, ("CHOCOLATE",)),
     ],
+    2004: [
+        Ticket("Patria Nueva", "Martín Torrijos", ("Samuel Lewis Navarro", "Rubén Arosemena Valdés"), 2, ("PRD", "POPULAR")),
+        Ticket("Visión de País", "José Miguel Alemán", ("Jesús Rosas", "Aníbal Galindo Navarro"), 6, ("ARN", "MOLIRENA", "LIB NAL")),
+        Ticket("Solidaridad", "Guillermo Endara Galimany", ("Guillermo Ford", "Alejandro Posse"), 11, ("SOL",)),
+        Ticket("Cambio Democrático", "Ricardo Martinelli", ("Roberto Henríquez", "Roxana Méndez"), 13, ("CAM DEM",)),
+    ],
     2009: [
         Ticket("Un País para Todos", "Balbina del Carmen Herrera Araúz", ("Juan Carlos Navarro Quelquejeu",), 2, ("PRD", "POPULAR", "LIBERAL")),
         Ticket("Alianza por el Cambio", "Ricardo Alberto Martinelli Berrocal", ("Juan Carlos Varela Rodríguez",), 7, ("MOLIRENA", "PAN", "CD", "UNIÓN PATRIOTICA")),
@@ -552,9 +565,9 @@ def president_table(
     tickets = TICKETS[year]
     cells = sheet_rows(two, {"valid": 1}, {t.label: t.column for t in tickets})
     e.tickets = tickets
-    by_circuit = {u.path[-1]: u for u in circuits(cells)}
+    by_circuit = {place_key(u.path[-1]): u for u in circuits(cells)}
     for unit in circuits(rows):
-        votes = by_circuit[unit.path[-1]].row
+        votes = by_circuit[place_key(unit.path[-1])].row
         if votes.valid != unit.row.valid:
             e.issues.append(
                 f"president {unit.path[-1]}: valid {unit.row.valid:,} in table 1, {votes.valid:,} in table 2"
@@ -601,6 +614,18 @@ def load_2009() -> Election:
     party_table(next(iter(grids(e.files[3]).values())), "mayor", e, 2, "mayor")
     party_table(next(iter(grids(e.files[4]).values())), "rep", e, 3, "rep")
     party_table(next(iter(grids(e.files[5]).values())), "council", e, 2, "council")
+    return e
+
+
+def load_2004() -> Election:
+    e = Election(2004, date(2004, 5, 2), [])
+    names = ["dl:6948", "dl:6949", "dl:6951", "dl:6955", "dl:6942", "dl:6945"]
+    e.files = names
+    president_table(2004, next(iter(grids(names[0]).values())), C1, next(iter(grids(names[1]).values())), e)
+    party_table(next(iter(grids(names[2]).values())), "dep", e, "c", "deputy")
+    party_table(next(iter(grids(names[3]).values())), "mayor", e, 2, "mayor")
+    party_table(next(iter(grids(names[4]).values())), "rep", e, 3, "rep")
+    party_table(next(iter(grids(names[5]).values())), "council", e, 2, "council")
     return e
 
 
@@ -672,7 +697,9 @@ def alliance_id(label: str) -> str:
 
 @functools.cache
 def elections() -> dict[int, Election]:
-    loaders = {1994: load_1994, 1999: load_1999, 2009: load_2009, 2014: load_2014, 2024: load_2024}
+    loaders = {
+        1994: load_1994, 1999: load_1999, 2004: load_2004, 2009: load_2009, 2014: load_2014, 2024: load_2024,
+    }  # fmt: skip
     return {year: load() for year, load in sorted(loaders.items())}
 
 
@@ -684,6 +711,7 @@ PROVINCE_ALIASES = {
     "kanquintu": "kankintu", "nole duina": "nole duima", "renacimientos": "renacimiento",
     "sta catalina o calovebora": "santa catalina o calovebora",
     "santa catalina o calovebora (bledeshia)": "santa catalina o calovebora",
+    "comarca k. de madungandi": "comarca kuna de madungandi", "comarca k. de wargandi": "comarca kuna de wargandi",
     "comarca de san blas": "kuna yala", "com. de kuna yala": "kuna yala", "comarca de kuna yala": "kuna yala",
 }  # fmt: skip
 
