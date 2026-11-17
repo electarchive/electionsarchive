@@ -1,0 +1,245 @@
+# Senate, 21 April 1929. Volume GRESYE_02_2101_00003 (ELSTAT, Statistics of the Senate elections of 21 April 1929).
+# General tables, printed pages 16-22 (PDF pages 15-20): Table I (population, voters, invalid ballots; PDF p15),
+# Table II (seats, lists, candidates; PDF p16), Table IV (votes by party; PDF p18, proportions on p19 not transcribed),
+# Table V (senators elected by party; PDF p20). Tables III (candidates per party) and VI (1926/1928/1929 comparison) are
+# not transcribed. The volume prints no registered electors: Table I gives population, voters and invalid ballots only.
+# The volume gives party totals (Table IV), so votes are by party, not by candidate.
+# Structure: A = constituencies under proportional representation (1-11), B = majority-system constituencies (12-37);
+# their subtotals are the two '=' rows and the "total of the election by the people" (A + B) is the '==' row.
+# 92 of the 120 seats were elected by the people. C = professional organizations (order numbers 1-8 in the volume,
+# coded C1-C8 here because the volume reuses 1-8) elected 18 senators; D = election by the Chamber and Senate
+# (code D) elected 10. Table IV gives no party votes for C and D, and Table V puts all 28 C and D seats under
+# Indéterminés (AK). In the turnout block the C rows, their '=' subtotal and D follow the popular '==' row as printed.
+# Printed grand totals (Γενικόν σύνολον / Total général), = popular + C + D, checked by hand:
+#   Table I: voters 838865 (836917 + 1679 + 269), invalid 11266 (11262 + 3 + 1).
+#   Table V: seats 120 = LK 10, EL 2, SD 5, PE 2, FIL 64, PRO 3, AEK 4, AGR 2, AK 28 (C 18 + D 10).
+election senate 1929-04-21
+# Parties as the column headers of Tables IV and V print them, in printed order.
+party RI list | Ανεξάρτητοι Βασιλόφρονες | Royalistes indépendants
+party LK list | Λαϊκοί | Populaires
+party EL list | Ελευθερόφρονες | Opinion libre
+party SD list | Συντηρητικοί Δημοκρατικοί | Républicains conservateurs
+party PE list | Προοδευτική Ένωσις | Union Progressiste
+party FIL list | Φιλελεύθεροι | Libéraux
+party PRO list | Προοδευτικοί | Progressistes
+party AD list | Ανεξάρτητοι Δημοκρατικοί | Républicains indépendants
+party AEK list | Αγροτικόν-Εργατικόν Κόμμα (Δημοκρ. Ένωσις) | Parti Agraire et Ouvrier (Union Républicaine)
+party AGR list | Αγροτικοί | Agrariens
+party EM list | Ενιαίον Μέτωπον (Κομμουνισταί) | Front Unifié (Communistes)
+party AK independents | Ακαθόριστοι | Indéterminés
+# Constituencies by the volume's order numbers (Table I).
+district 1 | Νομός Αττικής και Βοιωτίας | Département d'Attique et Béotie
+district 2 | Νομός Φθιώτιδος και Φωκίδος | Département de Phtiotide et Phocide
+district 3 | Νομός Αιτωλίας και Ακαρνανίας | Département d'Aetolie et Acarnanie
+district 4 | Νομός Λαρίσης | Département de Larissa
+district 5 | Νομός Τρικκάλων | Département de Trikkala
+district 6 | Νομός Αχαΐας και Ήλιδος | Département d'Achaïe et Élide
+district 7 | Νομός Αργολίδος και Κορινθίας | Département d'Argolide et Corinthie
+district 8 | Νομός Μεσσηνίας | Département de Messénie
+district 9 | Νομός Θεσσαλονίκης | Département de Salonique
+district 10 | Νομός Σερρών | Département de Serrès
+district 11 | Νομός Ιωαννίνων | Département de Jannina
+district 12 | Νομός Ευβοίας | Département d'Eubée
+district 13 | Νομός Άρτης | Département d'Arta
+district 14 | Νομός Κερκύρας | Département de Corfou
+district 15 | Νομός Κεφαλληνίας | Département de Céphalonie
+district 16 | Νομός Ζακύνθου | Département de Zante
+district 17 | Νομός Κυκλάδων | Département de Cyclades
+district 18 | Νομός Αρκαδίας | Département d'Arcadie
+district 19 | Νομός Λακωνίας | Département de Laconie
+district 20 | Νομός Χαλκιδικής | Département de Chalcidique
+district 21 | Νομός Πέλλης | Département de Pella
+district 22 | Νομός Κοζάνης | Département de Cozane
+district 23 | Νομός Φλωρίνης | Département de Florina
+district 24 | Νομός Δράμας | Département de Drama
+district 25 | Νομός Καβάλλας | Département de Cavalla
+district 26 | Νομός Έβρου | Département d'Hevros
+district 27 | Νομός Ροδόπης | Département de Rhodope
+district 28 | Νομός Πρεβέζης | Département de Prévéza
+district 29 | Νομός Λέσβου | Département de Lesbos
+district 30 | Νομός Σάμου | Département de Samos
+district 31 | Νομός Χίου | Département de Chio
+district 32 | Νομός Ηρακλείου | Département d'Héraclion
+district 33 | Νομός Λασηθίου | Département de Lassithi
+district 34 | Νομός Ρεθύμνης | Département de Réthymno
+district 35 | Νομός Χανίων | Département de la Canée
+district 36 | Εκλογικός σύλλογος Μουσουλμάνων Θράκης | Collège électoral des Musulmans de Thrace
+district 37 | Εκλογικός σύλλογος Ισραηλιτών Θεσσαλονίκης | Collège électoral des Israélites de Salonique
+district C1 | Εμπορικά τμήματα των εμπορικών και βιομηχανικών επιμελητηρίων | Sections commerciales des chambres de commerce et d'industrie
+district C2 | Βιομηχανικά τμήματα των εμπορικών και βιομηχανικών επιμελητηρίων | Sections industrielles des chambres de commerce et d'industrie
+district C3 | Επαγγελματικά και βιοτεχνικά επιμελητήρια | Chambres des métiers et professions
+district C4 | Ένωσις Ελλήνων Εφοπλιστών | Union des armateurs de la Grèce
+district C5 | Γεωργικά επιμελητήρια | Chambres d'agriculture
+district C6 | Γενική Συνομοσπονδία των Εργατών της Ελλάδος | Confédération générale du travail de la Grèce
+district C7 | Ακαδημία - Πανεπιστήμια | Académie-Universités
+district C8 | Πολυτεχνείον και τεχνικόν επιμελητήριον | École Polytechn. et Chambre technique
+district D | Εκλογή υπό της Βουλής και Γερουσίας | Élection par la Chambre et le Sénat
+
+# Table I (PDF p15): voters and invalid ballots, election by the people (A, B, total of the election by the people).
+table turnout volume=3 page=15
+columns cast invalid
+y .32 .875
+x .418 .490 .557 .627
+1 @0.3290:0.3344 131006 1742
+2 @0.3367:0.3421 26296 158
+3 @0.3444:0.3501 32546 155
+4 @0.3521:0.3580 34587 370
+5 @0.3597:0.3657 24535 247
+6 @0.3672:0.3731 41132 252
+7 @0.3751:0.3811 25660 135
+8 @0.3828:0.3891 36562 353
+9 @0.3905:0.3962 65712 3153
+10 @0.3985:0.4042 25527 316
+11 @0.4062:0.4119 14542 317
+= @0.4210:0.4270 458105 7198
+12 @0.4675:0.4732 20856 -
+13 @0.4755:0.4806 6781 24
+14 @0.4832:0.4886 14944 182
+15 @0.4909:0.4963 10873 54
+16 @0.4986:0.5040 7968 18
+17 @0.5063:0.5117 22609 122
+18 @0.5140:0.5197 25988 102
+19 @0.5219:0.5274 20073 265
+20 @0.5296:0.5348 8434 298
+21 @0.5373:0.5425 15521 68
+22 @0.5448:0.5502 18159 274
+23 @0.5527:0.5582 14615 117
+24 @0.5601:0.5656 17262 437
+25 @0.5678:0.5735 16404 603
+26 @0.5755:0.5812 18609 455
+27 @0.5832:0.5889 13154 256
+28 @0.5909:0.5966 13115 106
+29 @0.5989:0.6043 21503 -
+30 @0.6066:0.6120 7419 207
+31 @0.6140:0.6197 9473 123
+32 @0.6217:0.6274 15614 62
+33 @0.6297:0.6351 10806 41
+34 @0.6371:0.6428 9486 25
+35 @0.6448:0.6505 15893 -
+36 @0.6528:0.6582 14994 162
+37 @0.6605:0.6659 8259 63
+= @0.6753:0.6813 378812 4064
+== @0.6981:0.7047 836917 11262
+# Sections C and D follow the total of the election by the people, as printed; grand total in the header comment.
+C1 @0.7375:0.7429 305 1
+C2 @0.7531:0.7583 104 -
+C3 @0.7682:0.7737 268 -
+C4 @0.7836:0.7891 162 -
+C5 @0.7916:0.7968 668 -
+C6 @0.7993:0.8047 22 -
+C7 @0.8150:0.8204 126 2
+C8 @0.8227:0.8281 24 -
+= @0.8372:0.8435 1679 3
+D @0.8603:0.8666 269 1
+
+# Table IV (PDF p18), absolute figures: valid ballots and votes by party, election by the people.
+table votes volume=3 page=18
+columns valid RI LK EL SD PE FIL PRO AD AEK AGR EM AK
+y .318 .74
+x .307 .3495 .3857 .427 .4627 .499 .5276 .5707 .600 .6372 .6735 .7094 .7453 .7701
+1 @0.3270:0.3330 129264 12838 36674 - - - 76451 - 1129 - - 2084 88
+2 @0.3349:0.3406 26138 - 4351 2428 - - 10336 3077 - 5580 - 366 -
+3 @0.3426:0.3486 32391 955 5452 - - - 13853 11747 - - - 384 -
+4 @0.3506:0.3560 34217 - 10510 - - - 20547 - 3 - - 3157 -
+5 @0.3583:0.3640 24288 4581 - - - - 6636 4842 1 3708 4462 - 58
+6 @0.3660:0.3714 40880 4 14490 - 10179 - 15855 - 70 - - 282 -
+7 @0.3737:0.3794 25525 - 11428 - 20 - 13649 - 428 - - - -
+8 @0.3814:0.3868 36209 4798 12536 - - - 14168 4479 - 228 - - -
+9 @0.3891:0.3945 62559 727 8608 3749 4010 - 34911 - - 10432 - 122 -
+10 @0.3968:0.4025 25211 - 6963 - - - 10173 - - 6619 - 1455 1
+11 @0.4048:0.4102 14225 - 2869 - - - 7438 - 3918 - - - -
+= @0.4208:0.4267 450907 23903 113881 6177 14209 - 224017 24145 5549 26567 4462 7850 147
+12 @0.4658:0.4715 20856 55 5416 - - - 9940 5442 - 2 - - 1
+13 @0.4735:0.4789 6757 - 2595 - - - 4161 - - - - - 1
+14 @0.4812:0.4897 14762 243 - - - 9807 - 2456 - - 2256 - -
+15 @0.4892:0.4943 10819 - 303 5345 - - 5171 - - - - - -
+16 @0.4966:0.5023 7950 593 4201 - - - 3156 - - - - - -
+17 @0.5046:0.5097 22487 904 8055 - - - 13281 - 247 - - - -
+18 @0.5120:0.5174 25886 3789 8321 4606 - - 5231 - - 3939 - - -
+19 @0.5200:0.5254 19808 3466 4792 2928 - - 6929 - 1495 - 198 - -
+# Row 20 AEK: the middle digit of "100" is a damaged 0 that looks like a 9; 100 fits the row sum, the AEK subtotal
+# and the printed proportion (1.23 %, p19).
+20 @0.5274:0.5331 8136 20 - - - - 5353 2663 - 100 - - -
+21 @0.5351:0.5408 15453 - 3907 - - - 6553 - 1767 3117 - 109 -
+22 @0.5428:0.5487 17885 - - 11 5810 - 6126 - - 5938 - - -
+23 @0.5507:0.5562 14498 - 2511 2708 - - 3820 - - 4131 - 1327 1
+24 @0.5584:0.5639 16825 - - - - - 8285 - - 1290 6803 447 -
+25 @0.5661:0.5716 15801 4 26 - - - 12445 - 826 - 1 2499 -
+26 @0.5735:0.5795 18154 - - - - - 18154 - - - - - -
+27 @0.5832:0.5888 12898 - - - - - 7778 - - 4014 - 1101 5
+28 @0.5895:0.5949 13009 - 2781 743 3152 - 6333 - - - - - -
+29 @0.5969:0.6029 21503 3 - - - - 16926 6 - 3973 - 595 -
+30 @0.6052:0.6103 7212 - 515 - - - 6697 - - - - - -
+31 @0.6126:0.6177 9350 - - - - - 9350 - - - - - -
+32 @0.6219:0.6273 15552 - - - - - 15401 - - - - 141 10
+33 @0.6280:0.6334 10765 - - - - - 10765 - - - - - -
+34 @0.6354:0.6411 9461 - - - - - 9461 - - - - - -
+35 @0.6434:0.6485 15893 2364 - - - - 13529 - - - - - -
+36 @0.6511:0.6565 14832 - - - - - 13566 - - 1266 - - -
+37 @0.6665:0.6719 8196 - - - - - 8196 - - - - - -
+= @0.6913:0.6973 374748 11441 43423 16341 8962 9807 226607 10567 4335 27770 9258 6219 18
+== @0.7044:0.7115 825655 35344 157304 22518 23171 9807 450624 34712 9884 54337 13720 14069 165
+
+# Table V (PDF p20): senators elected by party, election by the people.
+table seats volume=3 page=20
+columns seats RI LK EL SD PE FIL PRO AD AEK AGR EM AK
+y .29 .725
+x .3263 .362 .3926 .423 .4532 .4843 .5147 .5451 .576 .6064 .6425 .6729 .6979 .7289
+1 @0.2979:0.3033 15 - 4 - - - 11 - - - - - -
+2 @0.3056:0.3110 3 - - - - - 3 - - - - - -
+3 @0.3201:0.3261 3 - - - - - 2 1 - - - - -
+4 @0.3321:0.3373 4 - 1 - - - 3 - - - - - -
+5 @0.3441:0.3495 3 - - - - - 1 1 - 1 - - -
+6 @0.3518:0.3570 5 - 1 - 2 - 2 - - - - - -
+7 @0.3595:0.3649 3 - 1 - - - 2 - - - - - -
+8 @0.3749:0.3800 4 - 1 - - - 3 - - - - - -
+9 @0.3826:0.3877 7 - - - 1 - 6 - - - - - -
+10 @0.3903:0.3954 3 - - - - - 2 - - 1 - - -
+11 @0.3977:0.4031 3 - - - - - 3 - - - - - -
+= @0.4122:0.4185 53 - 8 - 3 - 38 2 - 2 - - -
+12 @0.4666:0.4718 2 - 1 - - - - 1 - - - - -
+13 @0.4746:0.4798 1 - - - - - 1 - - - - - -
+14 @0.4823:0.4875 2 - - - - 2 - - - - - - -
+15 @0.4900:0.4952 1 - - 1 - - - - - - - - -
+16 @0.4977:0.5029 1 - 1 - - - - - - - - - -
+17 @0.5051:0.5105 2 - - - - - 2 - - - - - -
+18 @0.5134:0.5185 2 - - 1 - - 1 - - - - - -
+19 @0.5208:0.5262 2 - - - - - 2 - - - - - -
+20 @0.5288:0.5339 1 - - - - - 1 - - - - - -
+21 @0.5368:0.5419 1 - - - - - 1 - - - - - -
+22 @0.5445:0.5499 2 - - - 1 - 1 - - - - - -
+23 @0.5522:0.5573 2 - - - - - 1 - - 1 - - -
+24 @0.5599:0.5653 2 - - - - - - - - - 2 - -
+25 @0.5753:0.5807 2 - - - - - 2 - - - - - -
+26 @0.5794:0.5846 2 - - - - - 2 - - - - - -
+27 @0.5835:0.5884 1 - - - - - 1 - - - - - -
+28 @0.5909:0.5961 1 - - - 1 - - - - - - - -
+29 @0.5986:0.6040 2 - - - - - 1 - - 1 - - -
+30 @0.6063:0.6115 1 - - - - - 1 - - - - - -
+31 @0.6140:0.6192 1 - - - - - 1 - - - - - -
+32 @0.6214:0.6266 2 - - - - - 2 - - - - - -
+33 @0.6297:0.6345 1 - - - - - 1 - - - - - -
+34 @0.6371:0.6422 1 - - - - - 1 - - - - - -
+35 @0.6445:0.6497 2 - - - - - 2 - - - - - -
+36 @0.6525:0.6576 1 - - - - - 1 - - - - - -
+37 @0.6679:0.6730 1 - - - - - 1 - - - - - -
+= @0.6899:0.6961 39 - 2 2 2 2 26 1 - 2 2 - -
+== @0.7129:0.7192 92 - 10 2 5 2 64 3 - 4 2 - -
+
+# Table II (PDF p16): senate seats of sections C and D (Table V gives only the section totals, 18 and 10, all under
+# Indéterminés, so the per-organization seats come from Table II's seats column). The printed C subtotal is 18
+# (= C1-C8, checked by hand); it is not written as an '=' row because the checker keys '=' rows by their order
+# within a block and a second block's first '=' would collide with the popular block's.
+table seats volume=3 page=16
+columns seats
+y .73 .885
+x .335 .400
+C1 @0.7352:0.7403 1
+C2 @0.7509:0.7557 1
+C3 @0.7734:0.7788 3
+C4 @0.7851:0.7903 1
+C5 @0.7968:0.8016 5
+C6 @0.8044:0.8096 4
+C7 @0.8193:0.8247 2
+C8 @0.8275:0.8324 1
+D @0.8726:0.8786 10

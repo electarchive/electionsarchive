@@ -1,0 +1,278 @@
+# Parliament, 25 September 1932 (proportional system). Volume GRESYE_02_2101_00005, ELSTAT, "Statistique des élections
+# des députés du 25 septembre 1932". General tables (Γενικοί πίνακες / Tableaux généraux, PDF pp. 17-25): party list
+# (p. 18); Table I (p. 19) population, electors who voted and null ballots; Table II (p. 20) seats, lists and candidates;
+# Table III (p. 21) candidates by party (skipped); Table IV (p. 22) valid ballots and the distribution of electors by party
+# (absolute figures; the proportions on p. 23 were used only to settle readings); Table V (p. 24) deputies elected by party.
+# No table prints registered electors, so the turnout table has only cast and invalid (population is skipped); valid is
+# printed in Table IV and equals cast - invalid on every row.
+# The volume has 38 constituencies that take part in all three seat distributions, grouped by court of appeal (the '='
+# subtotals), and a printed total of those 38 (the '==' of the first block of each table); then the two electoral colleges
+# of the Israelites of Salonica and the Muslims of Thrace (numbered 39-40 in the volume, coded I39-I40 here because they are
+# not places), the three privileged constituencies of Hydra, Spetses and Psara (41-43), each group with its subtotal, and
+# the general total of the State (the '==' of the second block).
+# Table V gives each constituency's seats after all three distributions; the volume's general tables print no breakdown of
+# seats by distribution, so there are no tier rows. Table II (p. 20, not transcribed) prints each constituency's allotted
+# seats, which differ from the seats won in Table V where the second and third distributions moved seats between
+# constituencies (e.g. Athens 22 allotted, 23 won; court of Athens 56 and 57; both tables total 237 for 1-38 and 250 in all).
+election parliament 1932-09-25
+# Parties as Tables IV and V head their columns (the party list on p. 18 names their leaders and emblems).
+party LK list | Λαϊκοί | Populaires
+party EF list | Ελευθερόφρονες | Opinion libre
+party SD list | Συντηρητικοί Δημοκρατικοί | Républicains Conservateurs
+party KF list | Φιλελεύθεροι | Libéraux
+party PR list | Προοδευτικοί | Progressistes
+party ER list | Εθνικοριζοσπαστικοί | Nationaux radicaux
+# Table IV footnotes: the Agrarian and Workers' votes include socialdemocrats (256 in Athens, 398 in Piraeus, 64 in Achaea,
+# 19 in Elis; 737 in all).
+party AEK list | Αγροτοεργατικοί | Agraires et ouvriers
+party AK list | Αγροτικοί | Agrariens
+party SOC list | Σοσιαλισταί | Socialistes
+party EM list | Ενιαίον Μέτωπον (Κομμουνισταί) | Front Unifié (Communistes)
+party LO list | Λοιπά κόμματα | Autres partis
+party AA independents | Ανεξάρτητοι και ακαθόριστοι | Indépendants et indéterminés
+# Constituencies by the volume's order numbers; Greek and French names from Table I.
+district 1 | Πρώην Δήμος Αθηναίων | Municipalité d'Athènes
+district 2 | Πρώην Δήμος Πειραιώς κλπ. | Municipalité du Pirée etc.
+district 3 | Υπόλοιπον Νομού Αττικής και Βοιωτίας | Département d'Attique et Béotie
+district 4 | Νομός Φθιώτιδος και Φωκίδος | Département de Phtiotide et Phocide
+district 5 | Νομός Ευβοίας | Département d'Eubée
+district 6 | Νομός Αργολίδος και Κορινθίας | Département d'Argolide et Corinthie
+district 7 | Νομός Αρκαδίας | Département d'Arcadie
+district 8 | Νομός Λακωνίας | Département de Laconie
+district 9 | Νομός Μεσσηνίας | Département de Messénie
+district 10 | Νομός Αχαΐας | Département d'Achaïe
+district 11 | Νομός Ηλείας | Département d'Élie
+district 12 | Νομός Αιτωλίας και Ακαρνανίας | Département d'Aetolie et Acarnanie
+district 13 | Νομός Ζακύνθου | Département de Zante
+district 14 | Νομός Κεφαλληνίας | Département de Céphalonie
+district 15 | Νομός Κερκύρας | Département de Corfou
+district 16 | Νομός Ιωαννίνων | Département de Jannina
+district 17 | Νομοί Πρεβέζης και Άρτης | Département de Prévéza et d'Arta
+district 18 | Νομός Λαρίσης | Département de Larissa
+district 19 | Νομός Τρικκάλων | Département de Trikkala
+district 20 | Νομός Κοζάνης | Département de Cozane
+district 21 | Νομός Θεσσαλονίκης | Département de Salonique
+district 22 | Επαρχίαι Ημαθίας (Βεροίας), Πιερίας (Κατερίνης) | Provinces d'Emathie (Véria) et Piéria (Katérina)
+district 23 | Νομός Χαλκιδικής | Département de Chalcidique
+district 24 | Νομός Πέλλης | Département de Pella
+district 25 | Νομός Φλωρίνης | Département de Florina
+district 26 | Νομός Σερρών | Département de Serrès
+district 27 | Νομός Κυκλάδων | Département de Cyclades
+district 28 | Νομός Λέσβου | Département de Lesbos
+district 29 | Νομός Σάμου | Département de Samos
+district 30 | Νομός Χίου | Département de Chio
+district 31 | Νομός Χανίων | Département de la Canée
+district 32 | Νομός Ηρακλείου | Département d'Héraclion
+district 33 | Νομός Λασηθίου | Département de Lassithi
+district 34 | Νομός Ρεθύμνης | Département de Réthymno
+district 35 | Νομός Έβρου | Département d'Hevros
+district 36 | Νομός Ροδόπης | Département de Rhodope
+district 37 | Νομός Δράμας | Département de Drama
+district 38 | Νομός Καβάλλας | Département de Cavalla
+district I39 | Εκλογικός Σύλλογος Ισραηλιτών Θεσσαλονίκης | Collège électoral des Israélites de Salonique
+district I40 | Εκλογικός Σύλλογος Μουσουλμάνων Θράκης | Collège électoral des Musulmans de Thrace
+district 41 | Προνομιούχος Εκλογική περιφέρεια Ύδρας | Circonscription électorale privilégiée d'Hydra
+district 42 | Προνομιούχος Εκλογική περιφέρεια Σπετσών | Circonscription électorale privilégiée de Spétzia
+district 43 | Προνομιούχος Εκλογική περιφέρεια Ψαρών | Circonscription électorale privilégiée de Psara
+# Table I (page 19): electors who voted and null ballots (absolute figures); population and percentages skipped.
+# Subtotals are the nine courts of appeal (Athens 1-5, Nauplia 6-9, Patras 10-14, Corfu 15-17, Larissa 18-20,
+# Salonica 21-26, Aegean 27-30, Crete 31-34, Thrace 35-38); '==' is the printed total of constituencies 1-38.
+table turnout volume=5 page=19
+columns cast invalid
+y .262 .79
+x .4669 .5714 .6181
+1 @0.2620:0.2697 96191 193
+2 @0.2711:0.2774 48680 161
+3 @0.2785:0.2851 39697 80
+4 @0.2865:0.2928 39186 108
+5 @0.2942:0.3007 30751 66
+= @0.3087:0.3161 254505 608
+6 @0.3250:0.3312 37349 140
+7 @0.3327:0.3392 34741 101
+8 @0.3404:0.3469 27908 67
+9 @0.3481:0.3549 52555 232
+= @0.3629:0.3694 152553 540
+10 @0.3788:0.3854 39525 116
+11 @0.3868:0.3931 26798 58
+12 @0.3945:0.4011 44518 226
+13 @0.4022:0.4088 9744 42
+14 @0.4099:0.4165 14657 59
+= @0.4247:0.4319 135242 501
+15 @0.4407:0.4473 20854 48
+16 @0.4484:0.4547 24557 107
+17 @0.4561:0.4629 26537 57
+= @0.4709:0.4783 71948 212
+18 @0.4869:0.4934 52538 257
+19 @0.4949:0.5014 39649 74
+20 @0.5023:0.5091 28639 96
+= @0.5171:0.5245 120826 427
+21 @0.5331:0.5396 70359 464
+22 @0.5410:0.5473 19898 102
+23 @0.5487:0.5550 11342 41
+24 @0.5567:0.5630 17811 47
+25 @0.5641:0.5716 19615 83
+26 @0.5718:0.5784 32246 90
+= @0.5867:0.5938 171271 827
+27 @0.6026:0.6089 28945 103
+28 @0.6112:0.6166 30101 119
+29 @0.6189:0.6243 15169 40
+30 @0.6257:0.6323 14431 129
+= @0.6405:0.6477 88646 391
+31 @0.6565:0.6628 20631 36
+32 @0.6645:0.6708 27092 24
+33 @0.6719:0.6784 14171 44
+34 @0.6799:0.6861 13580 29
+= @0.6944:0.7015 75474 133
+35 @0.7115:0.7166 21468 199
+36 @0.7184:0.7246 14874 54
+37 @0.7261:0.7323 20389 50
+38 @0.7338:0.7403 21266 104
+= @0.7486:0.7557 77997 407
+== @0.7680:0.7751 1148462 4046
+# Table I (page 19), continued: the two electoral colleges and the three privileged constituencies, with the general total.
+table turnout volume=5 page=19
+columns cast invalid
+y .79 .915
+x .4669 .5714 .6181
+I39 @0.7895:0.7950 7933 161
+I40 @0.7963:0.8015 16162 100
+= @0.8144:0.8213 24095 261
+41 @0.8349:0.8404 1443 6
+42 @0.8426:0.8481 1453 32
+43 @0.8506:0.8558 530 1
+= @0.8652:0.8712 3426 39
+== @0.8877:0.8951 1175983 4346
+# Table IV (page 22): valid ballots and electors by party (absolute figures).
+table votes volume=5 page=22
+columns valid LK EF SD KF PR ER AEK AK SOC EM LO AA
+y .238 .775
+x .258 .3125 .358 .395 .4335 .48 .516 .55 .5907 .629 .647 .6915 .71 .748
+1 @0.2446:0.2500 95998 38047 - 1479 38294 5331 2668 3107 - 90 6308 426 248
+2 @0.2529:0.2583 48519 17967 - 250 23080 2106 1087 973 - 180 2661 177 38
+3 @0.2603:0.2657 39617 19915 - - 10756 4799 120 3312 80 - 635 - -
+4 @0.2671:0.2728 39078 16453 - - 11424 6553 - 2219 1802 - 619 - 8
+5 @0.2751:0.2814 30685 13091 - - 9282 2967 1043 3410 - - 833 59 -
+= @0.2916:0.2979 253897 105473 - 1729 92836 21756 4918 13021 1882 270 11056 662 294
+6 @0.3062:0.3130 37209 20297 136 - 11250 1227 - 838 3083 - 227 - 151
+7 @0.3137:0.3190 34640 8964 8605 - 3705 3526 2060 7582 - - 197 - 1
+8 @0.3218:0.3273 27841 14916 123 - 4523 5732 - 623 1423 - 474 - 27
+9 @0.3302:0.3355 52323 23652 164 - 10170 7238 - 4556 5296 17 625 - 605
+= @0.3449:0.3511 152013 67829 9028 - 29648 17723 2060 13599 9802 17 1523 - 784
+10 @0.3606:0.3657 39409 16768 - 6871 9345 4160 849 618 - 42 543 - 213
+11 @0.3679:0.3733 26740 11851 2726 274 7338 2875 1276 127 150 - 108 - 15
+12 @0.3759:0.3813 44292 17319 - - 9950 15287 - - 773 - 721 - 242
+13 @0.3817:0.3871 9702 5143 744 - 3087 - - 466 - - 262 - -
+14 @0.3905:0.3965 14598 2016 6093 - 5820 - 49 101 - - 519 - -
+= @0.4066:0.4126 134741 53097 9563 7145 35540 22322 2174 1312 923 42 2153 - 470
+15 @0.4225:0.4279 20806 10940 - - 3585 3895 - 544 1441 - 399 - 2
+16 @0.4309:0.4363 24450 5313 - - 10504 3135 - 368 4276 - 720 - 134
+17 @0.4380:0.4434 26480 11923 - - 9474 - - 2785 1994 - 304 - -
+= @0.4534:0.4595 71736 28176 - - 23563 7030 - 3697 7711 - 1423 - 136
+18 @0.4695:0.4749 52281 14226 - - 8542 3628 4931 2591 7833 - 9308 - 1222
+19 @0.4772:0.4823 39575 9982 - - 7994 2744 6408 1862 9040 - 1545 - -
+20 @0.4847:0.4903 28543 8631 - - 8938 791 3029 4033 2227 - 894 - -
+= @0.5000:0.5058 120399 32839 - - 25474 7163 14368 8486 19100 - 11747 - 1222
+21 @0.5157:0.5214 69895 18002 - 230 22495 3246 8340 5000 5256 158 7162 - 6
+22 @0.5235:0.5294 19796 6661 - - 6979 1324 372 1226 2046 - 1188 - -
+23 @0.5389:0.5443 11301 6084 - - 2173 98 1049 791 900 - 206 - -
+24 @0.5465:0.5519 17764 5253 - - 6419 686 674 2722 1037 - 973 - -
+25 @0.5544:0.5596 19532 9210 - - 5665 1966 788 429 483 - 991 - -
+26 @0.5624:0.5678 32156 7890 - - 11765 256 1810 557 7480 - 2384 - 14
+= @0.5775:0.5835 170444 53100 - 230 55496 7576 13033 10725 17202 158 12904 - 20
+27 @0.5932:0.5986 28842 15201 - - 10040 3321 - 115 - - 109 - 56
+28 @0.6012:0.6063 29982 4804 - - 13818 444 2595 4420 - - 3866 - 35
+29 @0.6080:0.6140 15129 6944 - - 6129 711 - 794 - - 551 - -
+30 @0.6156:0.6213 14302 3858 - - 5537 - 2368 2013 - - 251 - 275
+= @0.6310:0.6371 88255 30807 - - 35524 4476 4963 7342 - - 4777 - 366
+31 @0.6474:0.6525 20595 1938 - - 12536 1593 3996 - 364 - 168 - -
+32 @0.6552:0.6605 27068 6057 - - 13773 2097 - 216 4627 - 263 - 35
+33 @0.6599:0.6653 14127 2716 - - 6765 3686 - - 960 - - - -
+34 @0.6699:0.6753 13551 2391 - - 10265 161 409 - 325 - - - -
+= @0.6853:0.6913 75341 13102 - - 43339 7537 4405 216 6276 - 431 - 35
+35 @0.7015:0.7070 21269 1578 - 2390 11007 469 - 1433 2464 273 1655 - -
+36 @0.7095:0.7147 14820 1477 - - 7858 236 - 2778 604 89 1778 - -
+37 @0.7169:0.7223 20339 3157 - - 10175 1355 - 713 3216 - 1723 - -
+38 @0.7249:0.7300 21162 1862 - - 8317 50 1777 2316 2065 - 4775 - -
+= @0.7383:0.7454 77590 8074 - 2390 37357 2110 1777 7240 8349 362 9931 - -
+== @0.7551:0.7617 1144416 392497 18591 11494 378777 97693 47698 65638 71245 849 55945 662 3327
+# Table IV (page 22), continued.
+table votes volume=5 page=22
+columns valid LK EF SD KF PR ER AEK AK SOC EM LO AA
+y .775 .892
+x .258 .3125 .358 .395 .4335 .48 .516 .55 .5907 .629 .647 .6915 .71 .748
+I39 @0.7799:0.7856 7772 2867 - - - - - - - - 1698 - 3207
+I40 @0.7945:0.8000 16062 - - - 10447 - - 3419 1066 - 580 - 550
+= @0.8153:0.8213 23834 2867 - - 10447 - - 3419 1066 - 2278 - 3757
+41 @0.8369:0.8429 1437 - - - 1437 - - - - - - - -
+42 @0.8469:0.8526 1421 610 - - 636 143 - - - - - - 32
+43 @0.8549:0.8603 529 - - - 224 - - - - - - - 305
+= @0.8692:0.8754 3387 610 - - 2297 143 - - - - - - 337
+== @0.8885:0.8957 1171637 395974 18591 11494 391521 97836 47698 69057 72311 849 58223 662 7421
+# Table V (page 24): deputies elected by party (after all three distributions).
+table seats volume=5 page=24
+columns seats LK EF SD KF PR ER AEK AK SOC EM LO AA
+y .226 .772
+x .331 .3526 .3787 .4024 .4275 .4593 .483 .5115 .5376 .5637 .585 .6135 .6372 .661
+# anchor: the order-number column
+anchor .055 .085
+1 @0.2377:0.2429 23 10 - - 11 1 - - - - 1 - -
+2 @0.2454:0.2506 12 5 - - 6 - - - - - 1 - -
+3 @0.2511:0.2563 7 4 - - 2 1 - - - - - - -
+4 @0.2586:0.2637 9 4 - - 3 2 - - - - - - -
+5 @0.2662:0.2714 6 3 - - 2 1 - - - - - - -
+= @0.2832:0.2892 57 26 - - 24 5 - - - - 2 - -
+6 @0.2968:0.3019 6 4 - - 2 - - - - - - - -
+7 @0.3044:0.3099 8 2 1 - 2 1 1 1 - - - - -
+8 @0.3124:0.3176 5 3 - - 1 1 - - - - - - -
+9 @0.3227:0.3278 10 5 - - 2 1 - 1 1 - - - -
+= @0.3374:0.3432 29 14 1 - 7 3 1 2 1 - - - -
+10 @0.3509:0.3563 8 3 - 1 3 1 - - - - - - -
+11 @0.3586:0.3640 5 3 1 - 1 - - - - - - - -
+12 @0.3666:0.3717 9 4 - - 2 3 - - - - - - -
+13 @0.3740:0.3794 2 1 - - 1 - - - - - - - -
+14 @0.3814:0.3868 1 - 1 - - - - - - - - - -
+= @0.3994:0.4051 25 11 2 1 7 4 - - - - - - -
+15 @0.4119:0.4173 3 2 - - 1 - - - - - - - -
+16 @0.4196:0.4250 6 1 - - 3 1 - - 1 - - - -
+17 @0.4325:0.4379 6 3 - - 2 - - - 1 - - - -
+= @0.4455:0.4509 15 6 - - 6 1 - - 2 - - - -
+18 @0.4584:0.4638 11 3 - - 2 - 1 1 2 - 2 - -
+19 @0.4661:0.4715 8 3 - - 2 - 1 - 2 - - - -
+20 @0.4741:0.4795 6 2 - - 2 - 1 1 - - - - -
+= @0.4920:0.4980 25 8 - - 6 - 3 2 4 - 2 - -
+21 @0.5083:0.5134 15 4 - - 5 - 2 1 1 - 2 - -
+22 @0.5123:0.5174 4 2 - - 2 - - - - - - - -
+23 @0.5277:0.5331 1 1 - - - - - - - - - - -
+24 @0.5356:0.5405 4 1 - - 2 - - 1 - - - - -
+25 @0.5428:0.5485 4 3 - - 1 - - - - - - - -
+26 @0.5510:0.5562 6 1 - - 3 - - - 2 - - - -
+= @0.5698:0.5755 34 12 - - 13 - 2 2 3 - 2 - -
+27 @0.5815:0.5869 5 3 - - 2 - - - - - - - -
+28 @0.5892:0.5946 6 2 - - 3 - - 1 - - - - -
+29 @0.5972:0.6023 4 2 - - 2 - - - - - - - -
+30 @0.6049:0.6100 2 1 - - 1 - - - - - - - -
+= @0.6237:0.6291 17 8 - - 8 - - 1 - - - - -
+31 @0.6357:0.6411 4 1 - - 3 - - - - - - - -
+32 @0.6436:0.6490 6 1 - - 3 1 - - 1 - - - -
+33 @0.6514:0.6568 3 - - - 2 1 - - - - - - -
+34 @0.6591:0.6642 3 1 - - 2 - - - - - - - -
+= @0.6784:0.6843 16 3 - - 10 2 - - 1 - - - -
+35 @0.6896:0.6953 4 1 - 1 2 - - - - - - - -
+36 @0.6978:0.7032 5 1 - - 3 - - - - - 1 - -
+37 @0.7055:0.7112 6 2 - - 3 - - - - - 1 - -
+38 @0.7132:0.7189 4 1 - - 2 - - - - - 1 - -
+= @0.7325:0.7385 19 5 - 1 10 - - - - - 3 - -
+== @0.7529:0.7588 237 93 3 2 91 15 6 7 11 - 9 - -
+# Table V (page 24), continued.
+table seats volume=5 page=24
+columns seats LK EF SD KF PR ER AEK AK SOC EM LO AA
+y .772 .885
+x .331 .3526 .3787 .4024 .4275 .4593 .483 .5115 .5376 .5637 .585 .6135 .6372 .661
+I39 @0.7719:0.7768 2 1 - - - - - - - - 1 - -
+I40 @0.7794:0.7842 4 - - - 3 - - 1 - - - - -
+= @0.7979:0.8039 6 1 - - 3 - - 1 - - 1 - -
+41 @0.8181:0.8233 3 - - - 3 - - - - - - - -
+42 @0.8261:0.8310 2 1 - - 1 - - - - - - - -
+43 @0.8338:0.8387 2 - - - - - - - - - - - 2
+= @0.8480:0.8540 7 1 - - 4 - - - - - - - 2
+== @0.8729:0.8790 250 95 3 2 98 15 6 8 11 - 10 - 2
