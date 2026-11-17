@@ -1,0 +1,1390 @@
+{
+  "polity": "MW",
+  "name": "Malawi",
+  "sources": {
+    "constitution": {
+      "title": "Constitution of the Republic of Malawi: revised constitutional provisions on elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2023/03/Revised-Constitutional-Provisions-Elections.pdf",
+      "kind": "official_body",
+      "note": "Sections 40 (political rights), 51 (qualification of members of Parliament), 62-63 (composition of the National Assembly, one member per constituency, and vacancies), 67 (dissolution and the polling day), 75-77 (Malawi Electoral Commission, constituency boundaries, franchise), and 80 (election of the President and First Vice-President, by more than fifty percent with a second poll since Act 13 of 2020 and Act 4 of 2023)."
+    },
+    "laws-2025": {
+      "title": "Electoral Laws Grey Book, 2025",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/08/compendium-of-electoral-laws-2025.pdf",
+      "kind": "official_body",
+      "note": "Compendium of the Constitution's election sections (including s. 147(5), local government elections held concurrently with the general election), the Malawi Electoral Commission Act (Cap. 2:03), the Presidential, Parliamentary and Local Government Elections Act and its 2025 amendment, and the 2025 regulations."
+    },
+    "pplge-act": {
+      "title": "Presidential, Parliamentary and Local Government Elections Act, 2023 (No. 10 of 2023)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2023/03/Presidential-Parliamentary-and-Local-Government-Elections-Act-2023.pdf",
+      "kind": "official_body",
+      "note": "Section 22 (the polls for President, National Assembly, and councillors are taken concurrently), 23 (by-elections on a vacancy other than by dissolution), 35 (second poll in a presidential election), and 123 (repeals the Parliamentary and Presidential Elections Act and the Local Government Elections Act)."
+    },
+    "mec-act": {
+      "title": "Malawi Electoral Commission Act (Cap. 2:03)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2023/03/Malawi-Electoral-Commission-Act-final.pdf",
+      "kind": "official_body"
+    },
+    "report-1994": {
+      "title": "Report on the Parliamentary and Presidential Elections held on 17th May, 1994",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/1994-Parliamentary-and-presidential-Elections-Report.pdf",
+      "kind": "official_body",
+      "note": "Scanned. Describes the change from the one-party system after the National Referendum of 14 June 1993 and the increase of constituencies from 141 to 177."
+    },
+    "report-1999": {
+      "title": "Report on the 1999 Parliamentary and Presidential Elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/1999-Parliamentary-and-presidential-election-report.pdf",
+      "kind": "official_body",
+      "note": "Scanned."
+    },
+    "boundary-1999": {
+      "title": "Constituency boundary review report to Parliament, 1999",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/1999-Constituency-boundary-review-report-to-Parliament.pdf",
+      "kind": "official_body",
+      "note": "Scanned. The review that raised the constituencies from 177 to 193 for the 1999 election."
+    },
+    "report-2000": {
+      "title": "Report on the 2000 Local Government Elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2000-LOCAL-GOVT-ELECTIONS-REPORT.pdf",
+      "kind": "official_body",
+      "note": "Scanned. First local elections of the multiparty era, 21 November 2000, in 861 demarcated wards; the last earlier local elections were in 1992."
+    },
+    "report-2004": {
+      "title": "Report on the 2004 Parliamentary and Presidential Elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2004-Parliamentary-and-presidential-election-report.pdf",
+      "kind": "official_body",
+      "note": "Scanned."
+    },
+    "report-2009": {
+      "title": "Report on the 2009 Parliamentary and Presidential Elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2009-Parliamentary-and-Presidential-Elections-REPORT.pdf",
+      "kind": "official_body",
+      "note": "Scanned."
+    },
+    "report-2014": {
+      "title": "2014 Tripartite Elections Report",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2014-Tripartite-Elections-report.pdf",
+      "kind": "official_body"
+    },
+    "report-2019": {
+      "title": "2019 Tripartite Elections Report",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2019-TRIPARTITE-ELECTIONS-REPORT-V2-1.pdf",
+      "kind": "official_body"
+    },
+    "report-2020": {
+      "title": "2020 Fresh Presidential Elections Report",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2020-FRESH-PRESIDENTIAL-ELECTIONS-REPORT-V2-1.pdf",
+      "kind": "official_body"
+    },
+    "boundary-2022": {
+      "title": "Report on the Review and Determination of Number and Boundaries of Constituencies and Wards for the 2025 General Elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2022/11/2022-Boundary-review-report-final.pdf",
+      "kind": "official_body",
+      "note": "Table 3 gives 229 constituencies and 509 wards in 36 councils."
+    },
+    "results-1994": {
+      "title": "Parliamentary and Presidential Elections Results 1994",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2018/11/PPE-RESULTS-1994.pdf",
+      "kind": "official_body"
+    },
+    "results-1999": {
+      "title": "Parliamentary and Presidential Elections Results 1999",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2018/11/PPE-RESULTS-1999.pdf",
+      "kind": "official_body"
+    },
+    "results-2004": {
+      "title": "Parliamentary summary results for 2004 elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2018/11/PARLIAMENTARY-SUMMARY-RESULTS-FOR-2004-ELECTIONS.pdf",
+      "kind": "official_body"
+    },
+    "results-2009-parliament": {
+      "title": "Parliamentary results as at 29 May 2009",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2018/11/Parliamentary-Results-@29May09.pdf",
+      "kind": "official_body"
+    },
+    "results-2009-president": {
+      "title": "Presidential summary results for 2009 elections",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2018/11/PRESIDENTIAL-SUMMARY-RESULTS-FOR-2009-ELECTIONS.pdf",
+      "kind": "official_body"
+    },
+    "results-2019-president": {
+      "title": "2019 Presidential results by polling station",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2022/11/2019-Presidential-Results-By-Polling-Station.pdf",
+      "kind": "official_body"
+    },
+    "results-2019-parliament": {
+      "title": "2019 Parliamentary results by polling station",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2022/11/2019-Parliamentary-Results-By-Polling-Station.pdf",
+      "kind": "official_body"
+    },
+    "results-2019-local": {
+      "title": "2019 Local Government results by polling station",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2022/11/2019-Local-Government-Results-By-Polling-Station.pdf",
+      "kind": "official_body"
+    },
+    "results-2020": {
+      "title": "2020 Fresh Presidential Election results per station",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2022/11/2020-Fresh-Presidential-Election-Results-Per-station.pdf",
+      "kind": "official_body"
+    },
+    "portal-2025": {
+      "title": "2025 General Election Results",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/GEResults2025/results/dashboard",
+      "kind": "official_body",
+      "note": "Presidential, parliamentary, and local government results by region, council, constituency, ward, and polling station, with PDF result summaries (Form 26A and constituency and ward summaries)."
+    },
+    "by-2014": {
+      "title": "2014 Tripartite Elections Report, section 11.6 (postponed elections)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/09/2014-Tripartite-Elections-report.pdf",
+      "kind": "official_body",
+      "note": "Polls postponed in Blantyre North constituency and five wards were held as by-elections on 7 October 2014."
+    },
+    "by-2020": {
+      "title": "Results declaration speech for the 15 December 2020 by-elections (Mangochi West, Mangochi North East, Phalombe North)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2024/02/2020-12-15-Results-Declaration-of-results-Mangochi-Phalombe-by-elections-1.pdf",
+      "kind": "official_body"
+    },
+    "by-2024": {
+      "title": "Results declaration speech for the 26 March 2024 local government by-elections (Kaporo, Chilanga, Rukuru)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2024/04/Results-declaration-for-Kaporo-Rukuru-Chilanga-wards.pdf",
+      "kind": "official_body"
+    },
+    "by-2026-03": {
+      "title": "Declaration of results for the 17 March 2026 by-election",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/08/Declaration-of-results-17-March-2026.pdf",
+      "kind": "official_body"
+    },
+    "by-2026-06": {
+      "title": "Declaration of results for the 30 June 2026 by-election and fresh election",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/wp-content/uploads/2026/08/20260702-Final-Declaration-Speech-for-30th-June-2026.pdf",
+      "kind": "official_body"
+    },
+    "fresh-2026-09": {
+      "title": "29 September 2026 Fresh Election (Rescheduled)",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/29-september-2026-fresh-election/",
+      "kind": "official_body",
+      "note": "The fresh parliamentary elections in Nsanje South and Mangochi East, set for 29 September 2026, were postponed with no new date as of 2026-11-17."
+    },
+    "mec-by-elections": {
+      "title": "By-Election",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/by-election/",
+      "kind": "official_body",
+      "note": "MEC's page on by-elections to the National Assembly and councils, with Form 9A and 9B archives."
+    },
+    "parliament": {
+      "title": "Parliament of Malawi",
+      "publisher": "Parliament of Malawi",
+      "url": "https://www.parliament.gov.mw/",
+      "kind": "official_body",
+      "note": "History of the Legislative Council, the one-party Parliament, and the Senate of the 1994 Constitution. The host refused automated requests (403) on 2026-11-17."
+    },
+    "malawilii": {
+      "title": "Laws of Malawi: Local Government Act (Cap. 22:01), Chiefs Act (Cap. 22:03), Political Parties Act, 2018",
+      "publisher": "Judiciary of Malawi (MalawiLII)",
+      "url": "https://www.malawilii.org/",
+      "kind": "official_body",
+      "note": "The Judiciary's legal information institute. Local Government Act: each council elects its chairperson or mayor from among the ward councillors; Members of Parliament sit as non-voting members."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Malawi",
+      "name_en": "Malawi",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "constitution"
+    },
+    {
+      "key": "region",
+      "name": "Region",
+      "name_en": "Regions (Northern, Central, Southern)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "mw.region",
+      "elects": false,
+      "source": "portal-2025",
+      "counts": [
+        {
+          "date": "2025-09-16",
+          "value": 3,
+          "source": "portal-2025",
+          "locator": "2025 General Election Results dashboard: Regions 3, Administrative regions"
+        }
+      ]
+    },
+    {
+      "key": "council",
+      "name": "District, city, municipal, and town councils",
+      "name_en": "Local government authorities (councils)",
+      "parent": "region",
+      "polity_kind": "county",
+      "scheme": "mw.district",
+      "elects": false,
+      "source": "laws-2025",
+      "counts": [
+        {
+          "date": "2022-11-01",
+          "precision": "month",
+          "value": 36,
+          "source": "boundary-2022",
+          "locator": "Table 3, Determined Number of Constituencies and Wards per Council (36 councils)"
+        },
+        {
+          "date": "2025-09-16",
+          "value": 36,
+          "source": "portal-2025",
+          "locator": "2025 General Election Results dashboard: Districts & councils 36, Election authorities"
+        }
+      ]
+    },
+    {
+      "key": "constituency",
+      "name": "Constituency",
+      "name_en": "National Assembly constituencies",
+      "parent": "council",
+      "scheme": "mw.constituency",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "1994-05-17",
+          "value": 177,
+          "source": "report-1994",
+          "locator": "Report on the 1994 elections, B. Demarcation of constituency boundaries: 36 additional constituencies increased the number from 141 to 177"
+        },
+        {
+          "date": "2009-05-19",
+          "value": 193,
+          "source": "results-2009-parliament",
+          "locator": "Parliamentary results as at 29 May 2009: one table for each of 193 constituencies"
+        },
+        {
+          "date": "2019-05-21",
+          "value": 193,
+          "source": "report-2019",
+          "locator": "There are, currently, 193 Parliamentary constituencies and 462 wards in Malawi"
+        },
+        {
+          "date": "2025-09-16",
+          "value": 229,
+          "source": "boundary-2022",
+          "locator": "Table 3, NATIONAL TOTAL 229 constituencies and 509 wards"
+        }
+      ]
+    },
+    {
+      "key": "ward",
+      "name": "Ward",
+      "name_en": "Local government wards",
+      "parent": "constituency",
+      "scheme": "mw.ward",
+      "source": "pplge-act",
+      "valid_from": "2000-11-21",
+      "counts": [
+        {
+          "date": "2000-11-21",
+          "value": 861,
+          "source": "report-2000",
+          "locator": "Message from the Chairman: the elections took place with 861 wards throughout the country"
+        },
+        {
+          "date": "2014-05-20",
+          "value": 462,
+          "source": "report-2014",
+          "locator": "District Elections Coordinators for 462 wards in Malawi"
+        },
+        {
+          "date": "2019-05-21",
+          "value": 462,
+          "source": "report-2019",
+          "locator": "For Local Government Elections, the country has 462 wards"
+        },
+        {
+          "date": "2025-09-16",
+          "value": 509,
+          "source": "boundary-2022",
+          "locator": "Table 3, NATIONAL TOTAL 229 constituencies and 509 wards"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidential election",
+      "name_en": "President and First Vice-President",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ],
+        "grain": [
+          "mw.district",
+          "mw.constituency"
+        ],
+        "fine": [
+          "mw.ward",
+          "mw.station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Constitution, s. 80(1)-(4): direct election concurrently with the general election; the First Vice-President is elected on the same ticket",
+      "valid_from": "1994-05-17",
+      "first_held": "1994-05-17",
+      "earliest_record": "1994-05-17",
+      "finest_note": "District in the 1994 to 2009 books, polling station for 2019, 2020, and 2025",
+      "note": "First held on 17 May 1994; before that the President was not chosen by popular vote (Life President from 1971). Plurality until 2019. The Constitutional Court annulled the 2019 result on 3 February 2020 and read 'majority' as more than half the valid votes; Act 13 of 2020 and Act 4 of 2023 wrote the rule into s. 80(2) with a second poll within sixty days. The fresh election of 23 June 2020 re-ran 2019. No second poll has been needed: the 2025 winner took 56.8%.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 9,
+          "day_rule": "sep_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "s. 80(2): more than fifty percent of the valid votes, else a second poll between the top two within sixty days of the declaration",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "2020-02-03",
+          "source": "constitution",
+          "locator": "Constitution, ss. 67(1) (the Tuesday in the third week of September) and 80(2)"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 5,
+          "day_rule": "may_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "1994-05-17",
+          "valid_to": "2020-02-03",
+          "source": "report-2019",
+          "locator": "2019 Tripartite Elections Report: the presidential result by plurality before the 2020 Constitutional Court ruling"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/wp-content/uploads/2018/11/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "1994-05-17",
+          "finest": "mw.district",
+          "source": "results-2009-president",
+          "evidence": "Result books with presidential votes by district for 1994, 1999, and 2009 (text layer). The 2004 presidential summary link serves an HTML page instead of the PDF.",
+          "last_date": "2009-05-19"
+        },
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/wp-content/uploads/2022/11/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2019-05-21",
+          "finest": "mw.station",
+          "source": "results-2020",
+          "evidence": "2019 and 2020 presidential results by polling station (text layer); answered 200 on 2026-11-17.",
+          "last_date": "2020-06-23"
+        },
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/GEResults2025/results?tab=presidential",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-09-16",
+          "finest": "mw.station",
+          "source": "portal-2025",
+          "evidence": "2025 results portal: national totals for 17 candidates (5,347,757 votes) with filters down to polling station, and Form 26A summaries; answered 200 on 2026-11-17.",
+          "last_date": "2025-09-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-05-17",
+          "contests": 1,
+          "seats": 1,
+          "source": "results-1994"
+        },
+        {
+          "date": "1999-06-15",
+          "contests": 1,
+          "seats": 1,
+          "source": "results-1999"
+        },
+        {
+          "date": "2004-05-20",
+          "contests": 1,
+          "seats": 1,
+          "source": "report-2004",
+          "note": "The report is scanned and the presidential summary link is broken; votes by district not yet taken from an official record."
+        },
+        {
+          "date": "2009-05-19",
+          "contests": 1,
+          "seats": 1,
+          "source": "results-2009-president"
+        },
+        {
+          "date": "2014-05-20",
+          "contests": 1,
+          "seats": 1,
+          "source": "report-2014",
+          "quote": "Total Valid votes – 5,228,583"
+        },
+        {
+          "date": "2019-05-21",
+          "contests": 1,
+          "seats": 1,
+          "source": "report-2019",
+          "quote": "Total Valid votes – 5,031,264",
+          "note": "Annulled by the Constitutional Court on 3 February 2020."
+        },
+        {
+          "date": "2020-06-23",
+          "contests": 1,
+          "seats": 1,
+          "source": "report-2020",
+          "quote": "Total valid votes were 4, 389,303.",
+          "note": "Fresh presidential election ordered by the Constitutional Court."
+        },
+        {
+          "date": "2025-09-16",
+          "contests": 1,
+          "seats": 1,
+          "source": "portal-2025"
+        }
+      ],
+      "est_votes": 37000000,
+      "effort": 2
+    },
+    {
+      "key": "national_assembly",
+      "tier": "constituency",
+      "name": "Parliamentary election (National Assembly)",
+      "name_en": "National Assembly, general election",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mw.constituency"
+        ],
+        "fine": [
+          "mw.ward",
+          "mw.station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Constitution, s. 62: one member for every constituency, elected as an Act of Parliament prescribes",
+      "valid_from": "1994-05-17",
+      "first_held": "1994-05-17",
+      "earliest_record": "1994-05-17",
+      "finest_note": "Constituency in the 1994 to 2009 books, polling station for 2019 and 2025; 2014 constituency results are not on MEC's site",
+      "boundary_source": "boundary-2022",
+      "note": "Single-member constituencies by plurality: 177 in 1994, 193 from 1999, 229 from 2025. A poll postponed by a nominee's death is completed later as a by-election (Blantyre North 2014, Lilongwe South 2019). Before 1994 see one_party_parliament.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 9,
+          "day_rule": "sep_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "2020-02-03",
+          "source": "constitution",
+          "locator": "Constitution, s. 67(1): dissolution on 23 July in the fifth year; polling on the Tuesday in the third week of September (Act 13 of 2020)"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 5,
+          "day_rule": "may_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "1994-05-17",
+          "valid_to": "2020-02-03",
+          "source": "constitution",
+          "locator": "Constitution, s. 67(1) as amended by Acts 38 of 1998 and 11 of 1999 (the Tuesday in the third week of May)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/wp-content/uploads/2018/11/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "1994-05-17",
+          "finest": "mw.constituency",
+          "source": "results-2009-parliament",
+          "evidence": "Result books by constituency for 1994, 1999, 2004, and 2009 (text layer); answered 200 on 2026-11-17.",
+          "last_date": "2009-05-19"
+        },
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/wp-content/uploads/2022/11/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2019-05-21",
+          "finest": "mw.station",
+          "source": "results-2019-parliament",
+          "evidence": "2019 parliamentary results by polling station (text layer).",
+          "last_date": "2019-05-21"
+        },
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/GEResults2025/results?tab=parliamentary",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-09-16",
+          "finest": "mw.station",
+          "source": "portal-2025",
+          "evidence": "2025 results portal: 229 constituencies with candidates and votes, polling-station filters, and constituency PDF summaries.",
+          "last_date": "2025-09-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-05-17",
+          "contests": 177,
+          "seats": 177,
+          "source": "results-1994",
+          "note": "The results book prints 177 constituency tables."
+        },
+        {
+          "date": "1999-06-15",
+          "contests": 193,
+          "seats": 193,
+          "source": "boundary-1999",
+          "note": "The results book prints 192 constituency tables."
+        },
+        {
+          "date": "2004-05-20",
+          "contests": 193,
+          "seats": 193,
+          "source": "report-2004",
+          "note": "The parliamentary summary prints 187 constituencies; the other six are not yet accounted for from an official record."
+        },
+        {
+          "date": "2009-05-19",
+          "contests": 193,
+          "seats": 193,
+          "source": "results-2009-parliament"
+        },
+        {
+          "date": "2014-05-20",
+          "contests": 192,
+          "seats": 192,
+          "source": "report-2014",
+          "quote": "parliamentary elections took place in 192 constituencies",
+          "note": "Blantyre North was postponed and held on 7 October 2014."
+        },
+        {
+          "date": "2019-05-21",
+          "contests": 192,
+          "seats": 192,
+          "source": "report-2019",
+          "quote": "parliamentary elections took place in 192 constituencies",
+          "note": "Lilongwe South was postponed after the death of a nominated candidate."
+        },
+        {
+          "date": "2025-09-16",
+          "contests": 229,
+          "seats": 229,
+          "source": "portal-2025",
+          "note": "The Commission nullified Lilongwe City Bwaila and the courts voided Balaka Mulunguzi, Nsanje South, and Mangochi East; those seats were or are being refilled."
+        }
+      ],
+      "est_votes": 32000000,
+      "effort": 3
+    },
+    {
+      "key": "local_government",
+      "tier": "ward",
+      "name": "Local government election (ward councillors)",
+      "name_en": "District, city, municipal, and town councils, ward councillors",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mw.ward"
+        ],
+        "fine": [
+          "mw.station"
+        ]
+      },
+      "source": "laws-2025",
+      "locator": "Constitution, s. 147(5): local government elections concurrently with the general election; Presidential, Parliamentary and Local Government Elections Act, 2023, s. 22(3)",
+      "valid_from": "2000-11-21",
+      "first_held": "2000-11-21",
+      "earliest_record": "2019-05-21",
+      "finest_note": "Ward; 2019 and 2025 by polling station. The 2000 report gives only seats won by party and 2014 ward results are not on MEC's site",
+      "boundary_source": "boundary-2022",
+      "note": "One councillor per ward by plurality. Held on their own on 21 November 2000 under the Local Government Elections Act, 1996; the 2005 local elections were not held, and from 2014 they are held with the general election (tripartite). Members of Parliament sit in councils without a vote, and chiefs' representatives are appointed. Before 1994 see local_one_party.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1996-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 9,
+          "day_rule": "sep_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "2020-02-03",
+          "source": "laws-2025",
+          "locator": "Constitution, s. 147(5) as amended by Acts 13 of 2020 and 18 of 2021"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 5,
+          "day_rule": "may_third_tuesday",
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "2014-05-20",
+          "valid_to": "2020-02-03",
+          "source": "report-2014",
+          "locator": "2014 Tripartite Elections Report: first local elections held with the general election"
+        },
+        {
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "called": true,
+          "administered_by": "Malawi Electoral Commission",
+          "valid_from": "2000-11-21",
+          "valid_to": "2014-05-20",
+          "source": "report-2000",
+          "locator": "Report on the 2000 Local Government Elections, 2. Historical background"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/wp-content/uploads/2022/11/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2019-05-21",
+          "finest": "mw.station",
+          "source": "results-2019-local",
+          "evidence": "2019 local government results by polling station (text layer).",
+          "last_date": "2019-05-21"
+        },
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/GEResults2025/results?tab=local_government",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-09-16",
+          "finest": "mw.station",
+          "source": "portal-2025",
+          "evidence": "2025 results portal: 509 wards with candidates and votes, polling-station filters, and ward PDF summaries.",
+          "last_date": "2025-09-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-11-21",
+          "contests": 861,
+          "seats": 861,
+          "source": "report-2000",
+          "note": "Polls did not take place in 15 wards and two were tied; 860 results were gazetted. The report gives seats won by party, not votes by ward."
+        },
+        {
+          "date": "2014-05-20",
+          "contests": 458,
+          "seats": 458,
+          "source": "report-2014",
+          "quote": "For the Local Government race, elections took place in 458 wards.",
+          "note": "Five postponed wards were polled on 7 October 2014. Ward results are not on MEC's site."
+        },
+        {
+          "date": "2019-05-21",
+          "contests": 462,
+          "seats": 462,
+          "source": "report-2019",
+          "quote": "For the Local Government race, elections took place in all 462 wards."
+        },
+        {
+          "date": "2025-09-16",
+          "contests": 509,
+          "seats": 509,
+          "source": "portal-2025"
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 3
+    },
+    {
+      "key": "national_assembly_by",
+      "tier": "constituency",
+      "name": "Parliamentary by-election and fresh election",
+      "name_en": "National Assembly by-elections and court-ordered fresh elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mw.constituency"
+        ],
+        "fine": [
+          "mw.station"
+        ]
+      },
+      "source": "pplge-act",
+      "locator": "Presidential, Parliamentary and Local Government Elections Act, 2023, s. 23 (by-election when a seat falls vacant otherwise than by dissolution)",
+      "valid_from": "1994-05-18",
+      "first_held": "1994-05-18",
+      "earliest_record": "2014-10-07",
+      "finest_note": "Constituency in the declaration speeches; Form 9A and 9B archives per polling station for some",
+      "note": "Also covers polls postponed from a general election and fresh elections a court orders after voiding a result (Balaka Mulunguzi 2026; Nsanje South and Mangochi East pending).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election in the constituency, after any appeal against the vacancy is decided",
+          "administered_by": "Malawi Electoral Commission",
+          "source": "pplge-act",
+          "locator": "Presidential, Parliamentary and Local Government Elections Act, 2023, ss. 23 and 47"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/by-election/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2020-12-15",
+          "finest": "mw.constituency",
+          "source": "mec-by-elections",
+          "evidence": "Declaration speeches with candidate votes per constituency and ward, and Form 9A/9B archives for some polls.",
+          "last_date": "2026-06-30"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-05-18",
+          "through": "2014-10-06",
+          "note": "By-elections from 1994 to 2014, beginning with Machinga North-East in 1994, are not yet counted from an official record."
+        },
+        {
+          "date": "2014-10-07",
+          "contests": 1,
+          "seats": 1,
+          "source": "by-2014",
+          "note": "Blantyre North, postponed from the 2014 tripartite elections."
+        },
+        {
+          "date": "2014-10-08",
+          "through": "2020-12-14",
+          "note": "By-elections in this span, including the postponed Lilongwe South poll of 2019, are not yet counted from an official record."
+        },
+        {
+          "date": "2020-12-15",
+          "contests": 3,
+          "seats": 3,
+          "source": "by-2020"
+        },
+        {
+          "date": "2026-03-17",
+          "contests": 4,
+          "seats": 4,
+          "source": "by-2026-03",
+          "quote": "held on Tuesday, 17 March 2026 in four constituencies and nine wards"
+        },
+        {
+          "date": "2026-06-30",
+          "contests": 3,
+          "seats": 3,
+          "source": "by-2026-06",
+          "quote": "held on Tuesday, 30th June 2026 in three (3) constituencies and two (2) wards",
+          "note": "Lilongwe City Bwaila and Machinga Mikoko by-elections and the Balaka Mulunguzi fresh election."
+        }
+      ],
+      "est_votes": 500000,
+      "effort": 3
+    },
+    {
+      "key": "local_government_by",
+      "tier": "ward",
+      "name": "Local government by-election",
+      "name_en": "Ward councillor by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mw.ward"
+        ],
+        "fine": [
+          "mw.station"
+        ]
+      },
+      "source": "pplge-act",
+      "locator": "Presidential, Parliamentary and Local Government Elections Act, 2023, s. 23",
+      "valid_from": "2000-11-22",
+      "first_held": "2000-11-22",
+      "earliest_record": "2014-10-07",
+      "finest_note": "Ward in the declaration speeches; Form 9A and 9B archives per polling station for some",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1996-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election in the ward",
+          "administered_by": "Malawi Electoral Commission",
+          "source": "pplge-act",
+          "locator": "Presidential, Parliamentary and Local Government Elections Act, 2023, s. 23"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Malawi Electoral Commission",
+          "url": "https://mec.org.mw/by-election/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-03-26",
+          "finest": "mw.ward",
+          "source": "mec-by-elections",
+          "evidence": "Declaration speeches with ward results, and Form 9A/9B archives for the March 2024 wards.",
+          "last_date": "2026-06-30"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-11-22",
+          "through": "2014-10-06",
+          "note": "Ward by-elections after 2000, including the 15 wards postponed that year, are not yet counted from an official record."
+        },
+        {
+          "date": "2014-10-07",
+          "contests": 5,
+          "seats": 5,
+          "source": "by-2014",
+          "note": "Zgeba, Lifupa, Kandeu, Lisanjala, and Mbalachanda, postponed from the 2014 tripartite elections."
+        },
+        {
+          "date": "2014-10-08",
+          "through": "2024-03-25",
+          "note": "Ward by-elections in this span are not yet counted from an official record."
+        },
+        {
+          "date": "2024-03-26",
+          "contests": 3,
+          "seats": 3,
+          "source": "by-2024"
+        },
+        {
+          "date": "2026-03-17",
+          "contests": 9,
+          "seats": 9,
+          "source": "by-2026-03",
+          "quote": "held on Tuesday, 17 March 2026 in four constituencies and nine wards"
+        },
+        {
+          "date": "2026-06-30",
+          "contests": 2,
+          "seats": 2,
+          "source": "by-2026-06",
+          "quote": "held on Tuesday, 30th June 2026 in three (3) constituencies and two (2) wards"
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "National referendum",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "world.country"
+        ]
+      },
+      "source": "report-1994",
+      "locator": "Report on the 1994 elections: the change from a one-party to a multiparty system followed the National Referendum on June 14, 1993",
+      "first_held": "1993-06-14",
+      "disposition": "blocked",
+      "disposition_reason": "The only referendum, on 14 June 1993, was run by the National Referendum Commission, and its results by district are not on MEC's site or any other official host reachable from here. The Constitution (s. 196) requires a referendum to amend certain sections, but none has been held since.",
+      "note": "Multiparty system against the one-party state, 14 June 1993; the multiparty option won.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "MW"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": false,
+          "source": "laws-2025",
+          "locator": "Constitution, s. 76 (the Commission conducts referendums) and s. 196"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-06-14",
+          "contests": 1,
+          "source": "report-1994",
+          "quote": "National Referendum on June 14, 1993"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "key": "one_party_parliament",
+      "tier": "constituency",
+      "name": "Parliamentary elections, 1964 to 1992",
+      "name_en": "National Assembly before the multiparty Constitution",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mw.constituency"
+        ]
+      },
+      "source": "report-1994",
+      "locator": "Report on the 1994 elections: constituencies increased from 141 (the one-party Parliament) to 177",
+      "valid_from": "1964-01-01",
+      "valid_to": "1994-05-17",
+      "disposition": "blocked",
+      "disposition_reason": "Returns were published as notices in the Malawi Gazette, which is not online, and the Parliament of Malawi's site refused automated requests (403). Many seats were returned unopposed; from 1978 voters chose among Malawi Congress Party candidates.",
+      "note": "Self-government general election of April 1964, then Malawi Congress Party elections under the one-party state; 141 constituencies by 1992. Years below are not yet confirmed from an official record.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1964-01-01",
+          "valid_to": "1994-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-04-01",
+          "precision": "month"
+        },
+        {
+          "date": "1971-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1976-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 141,
+          "seats": 141,
+          "source": "report-1994"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 5
+    },
+    {
+      "key": "local_one_party",
+      "tier": "council",
+      "name": "Local council elections before 1994",
+      "name_en": "District and town councils before the multiparty era",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "report-2000",
+      "locator": "Report on the 2000 Local Government Elections: the last Local Government Elections were held in 1992",
+      "valid_to": "1994-05-17",
+      "disposition": "blocked",
+      "disposition_reason": "No official result record of the pre-1994 council elections is online; MEC's 2000 report only says the last were held in 1992.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MW",
+          "valid_to": "1994-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Nyasaland Legislative Council elections",
+      "name_en": "Legislative Council of Nyasaland, elected members",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament",
+      "locator": "Parliament of Malawi, history of the Legislative Council",
+      "valid_from": "1956-01-01",
+      "valid_to": "1964-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Colonial returns sit in the Nyasaland Government Gazette, which is not online, and the Parliament of Malawi's site refused automated requests (403).",
+      "note": "European members elected from 1956 on a restricted roll; the 15 August 1961 election had lower-roll and higher-roll constituencies and gave Africans a majority.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MW",
+          "valid_from": "1956-01-01",
+          "valid_to": "1964-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1956-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1961-08-15"
+        }
+      ],
+      "est_votes": 120000,
+      "effort": 5
+    },
+    {
+      "key": "federal_assembly",
+      "tier": "national",
+      "name": "Federal Assembly of Rhodesia and Nyasaland, Nyasaland seats",
+      "name_en": "Federal Assembly of Rhodesia and Nyasaland (Nyasaland constituencies)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament",
+      "locator": "Parliament of Malawi, history of representation before independence",
+      "disposition": "blocked",
+      "disposition_reason": "The Federation's legislature (1953-1963) elected Nyasaland's members on federal rolls in 1953, 1958, and 1962; its returns are in the Federal Gazette, which is not online.",
+      "match": [],
+      "dates": [],
+      "valid_from": "1953-01-01",
+      "valid_to": "1964-01-01",
+      "est_votes": 20000,
+      "effort": 5
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "Senate",
+      "name_en": "Senate of the 1994 Constitution",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament",
+      "locator": "Parliament of Malawi, history: the Senate provided by the 1994 Constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 1994 Constitution provided a Senate of indirectly chosen members, but it was never constituted and was removed in 2001; no election was ever held.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker",
+      "name_en": "Speaker of the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Constitution, Chapter VI: the National Assembly elects its Speaker from among its members",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An internal vote of the National Assembly at its first sitting, recorded in Hansard rather than run or published as an election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "MW"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "council_chairs",
+      "tier": "council",
+      "name": "Election of council chairpersons and mayors",
+      "name_en": "Council chairpersons and city mayors",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "malawilii",
+      "locator": "Local Government Act (Cap. 22:01): each council elects its chairperson or mayor from among the ward councillors",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the councillors from among themselves; there is no public ballot and MEC publishes no count.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "MW"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "chiefs",
+      "tier": "council",
+      "name": "Traditional leaders (chiefs)",
+      "name_en": "Paramount, senior, and village chiefs",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "malawilii",
+      "locator": "Chiefs Act (Cap. 22:03): the President recognizes chiefs according to customary succession",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chiefs succeed under customary law and are recognized by the President; there is no ballot.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Judicial appointments",
+      "name_en": "Judges of the Supreme Court of Appeal and the High Court",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Constitution, Chapter IX: the President appoints the Chief Justice, confirmed by the National Assembly, and the other judges on the recommendation of the Judicial Service Commission",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed, not elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_primaries",
+      "tier": "constituency",
+      "name": "Party primary elections",
+      "name_en": "Party primaries for parliamentary, ward, and presidential candidates",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "malawilii",
+      "locator": "Political Parties Act, 2018: parties choose their candidates under their own constitutions",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties under their own rules, not by MEC; results are not published officially.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "MW"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "recall",
+      "tier": "constituency",
+      "name": "Recall of a Member of Parliament",
+      "name_en": "Recall of Members of the National Assembly",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament",
+      "locator": "Constitution of 1994, s. 64 (recall), repealed in 1995",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The recall provision of the 1994 Constitution was repealed in 1995 before it was ever used; no recall vote has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "iso_pattern": "MW"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
