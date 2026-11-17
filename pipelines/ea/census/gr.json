@@ -1,0 +1,2203 @@
+{
+  "polity": "GR",
+  "name": "Greece",
+  "sources": {
+    "syntagma": {
+      "title": "Σύνταγμα της Ελλάδας, όπως αναθεωρήθηκε με το Ψήφισμα της 25ης Νοεμβρίου 2019 (ΦΕΚ Α΄ 211/24.12.2019)",
+      "publisher": "Βουλή των Ελλήνων",
+      "url": "https://www.hellenicparliament.gr/UserFiles/f3c70a23-7696-49db-9148-f24dce6a27c8/FEK%20211-A-24-12-2019%20NEO%20SYNTAGMA.pdf",
+      "kind": "official_body"
+    },
+    "n5285": {
+      "title": "Ν. 5285/2026: Ορισμός Εκλογικής Περιφέρειας Απόδημου Ελληνισμού και επιστολική ψήφος εκτός Επικράτειας για τις βουλευτικές εκλογές (ΦΕΚ Α΄ 33/5.3.2026)",
+      "publisher": "Υπουργείο Εξωτερικών",
+      "url": "https://www.mfa.gr/spain/images/stories/madrid/2026/N%205285.2026%20%CE%9F%CF%81%CE%B9%CF%83%CE%BC%CF%8C%CF%82%20%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CE%AE%CF%82%20%CF%80%CE%B5%CF%81%CE%B9%CF%86%CE%AD%CF%81%CE%B5%CE%B9%CE%B1%CF%82%20%CE%B1%CF%80%CF%8C%CE%B4%CE%B7%CE%BC%CE%BF%CF%85%20%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CF%83%CE%BC%CE%BF%CF%8D%20%CE%BA%CE%B1%CE%B9%20%CE%B5%CF%80%CE%B9%CF%83%CF%84%CE%BF%CE%BB%CE%B9%CE%BA%CE%AE%20%CF%88%CE%AE%CF%86%CE%BF%CF%82-2.pdf",
+      "kind": "official_body"
+    },
+    "n4804": {
+      "title": "Ν. 4804/2021: Εκλογή Δημοτικών και Περιφερειακών Αρχών (ΦΕΚ Α΄ 90/5.6.2021), κωδικοποιημένο κείμενο",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf",
+      "kind": "official_body"
+    },
+    "kallikratis": {
+      "title": "Ν. 3852/2010 (Πρόγραμμα Καλλικράτης): σύσταση δήμων και περιφερειών",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/UserFiles/f0ff9297-f516-40ff-a70e-eca84e2ec9b9/SISTASIDIMON_PERIFEREION.pdf",
+      "kind": "official_body"
+    },
+    "egk18_2014": {
+      "title": "Εγκύκλιος 18/2014: εκλογή των μελών του Ευρωπαϊκού Κοινοβουλίου από την Ελλάδα της 25ης Μαΐου 2014 (ν. 4255/2014)",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/UserFiles/f0ff9297-f516-40ff-a70e-eca84e2ec9b9/egk18_22042014.pdf",
+      "kind": "official_body"
+    },
+    "ypes_results": {
+      "title": "Εκλογές: επίσημα αποτελέσματα (ekloges.ypes.gr)",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://ekloges.ypes.gr/",
+      "kind": "official_body"
+    },
+    "ypes_vol_2009": {
+      "title": "Αποτελέσματα βουλευτικών εκλογών της 4ης Οκτωβρίου 2009, τόμος 1",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/wp-content/uploads/2022/12/VOULEFTIKES_04_10_2009_TOMOS_1.pdf",
+      "kind": "official_body"
+    },
+    "ypes_vol_2012a": {
+      "title": "Αποτελέσματα βουλευτικών εκλογών της 6ης Μαΐου 2012, τόμος 1",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/wp-content/uploads/2022/12/VOULEFTIKES_06_05_2012_TOMOS_1.pdf",
+      "kind": "official_body"
+    },
+    "ypes_vol_2012b": {
+      "title": "Αποτελέσματα βουλευτικών εκλογών της 17ης Ιουνίου 2012, τόμος 1",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/wp-content/uploads/2022/12/VOULEFTIKES_17_06_2012_TOMOS_1.pdf",
+      "kind": "official_body"
+    },
+    "ypes_stat_2023": {
+      "title": "Στατιστικά στοιχεία βουλευτικών εκλογών της 21ης Μαΐου 2023",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/wp-content/uploads/2023/05/bibl-stat-boul-ekl-5_2023revised.pdf",
+      "kind": "official_body"
+    },
+    "ypes_local_2010": {
+      "title": "Στατιστικά στοιχεία εκλογικών καταλόγων για τις δημοτικές εκλογές 2010",
+      "publisher": "Υπουργείο Εσωτερικών",
+      "url": "https://www.ypes.gr/UserFiles/f0ff9297-f516-40ff-a70e-eca84e2ec9b9/book_statistika_dhmotikoneklogon2010.pdf",
+      "kind": "official_body"
+    },
+    "elstat_2021": {
+      "title": "Απογραφή Πληθυσμού-Κατοικιών 2021: μόνιμος πληθυσμός κατά δήμο και κοινότητα",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "https://www.statistics.gr/el/2021-census-res-pop-results",
+      "kind": "official_body"
+    },
+    "elstat_dlib": {
+      "title": "Ψηφιακή Βιβλιοθήκη ΕΛΣΤΑΤ: Εκλογές (στατιστικές εκλογών 1926–1951)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/portal/page/portal/ESYE/categoryyears?p_cat=14308576&p_topic=14308576",
+      "kind": "official_body"
+    },
+    "eetaa_2023": {
+      "title": "Οι αριθμοί των Δημοτικών και Περιφερειακών Εκλογών 2023 (Νοέμβριος 2023)",
+      "publisher": "Ελληνική Εταιρεία Τοπικής Ανάπτυξης και Αυτοδιοίκησης (ΕΕΤΑΑ)",
+      "url": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf",
+      "kind": "official_body",
+      "note": "ΕΕΤΑΑ is the Ministry of the Interior's local government agency; its figures rest on the ministry's results site."
+    },
+    "dlib_1926": {
+      "title": "Statistics of parliamentary elections of November 7th 1926 (General Statistical Service of Greece, 1928)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00001.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1928": {
+      "title": "Statistics of parliamentary elections of August 19th 1928 (General Statistical Service of Greece, 1931)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00002.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1929s": {
+      "title": "Senate elections of 21 April 1929 statistics (General Statistical Service of Greece, 1931)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00003.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1932s": {
+      "title": "Senate elections of 25th September 1932 statistics and their alternates until the end of 1933 (General Statistical Service of Greece, 1934)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00004.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1932": {
+      "title": "Parliamentary elections of 25th September 1932 statistics (General Statistical Service of Greece, 1933)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00005.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1935": {
+      "title": "National Assembly elections statistics 9th June 1935 (General Statistical Service of Greece, 1935)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00006.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1936": {
+      "title": "Parliamentary elections of 26th January 1936 statistics (General Statistical Service of Greece, 1938)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00007.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1946": {
+      "title": "Parliamentary elections of 31st March 1946 statistics (General Statistical Service of Greece, 1947)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00008.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1946r": {
+      "title": "Statistics of September 1st, 1946 plebiscite (General Statistical Service of Greece, 1947)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00009.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1950": {
+      "title": "Parliamentary elections of 5th March 1950 statistics (General Statistical Service of Greece, 1951)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00010.pdf",
+      "kind": "official_body"
+    },
+    "dlib_1951": {
+      "title": "Parliamentary elections of 9th September 1951 (General Statistical Service of Greece, 1952)",
+      "publisher": "Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+      "url": "http://dlib.statistics.gr/Book/GRESYE_02_2101_00012.pdf",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Ελληνική Δημοκρατία",
+      "name_en": "Hellenic Republic",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "gr.nation",
+      "source": "syntagma"
+    },
+    {
+      "key": "apokentromeni",
+      "name": "Αποκεντρωμένες Διοικήσεις",
+      "name_en": "Decentralized administrations",
+      "parent": "national",
+      "elects": false,
+      "valid_from": "2011-01-01",
+      "source": "elstat_2021",
+      "counts": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 7,
+          "source": "elstat_2021",
+          "locator": "https://www.statistics.gr/documents/20181/17286366/MON_PLI_DHM_KOIN_2021.xlsx/17bff52d-4fb3-6563-7d67-251116184f56"
+        }
+      ]
+    },
+    {
+      "key": "perifereia",
+      "name": "Περιφέρειες",
+      "name_en": "Regions",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "gr.perifereia",
+      "valid_from": "2011-01-01",
+      "source": "kallikratis",
+      "counts": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 13,
+          "source": "elstat_2021",
+          "locator": "https://www.statistics.gr/documents/20181/17286366/MON_PLI_DHM_KOIN_2021.xlsx/17bff52d-4fb3-6563-7d67-251116184f56"
+        }
+      ]
+    },
+    {
+      "key": "perifereiaki_enotita",
+      "name": "Περιφερειακές Ενότητες",
+      "name_en": "Regional units",
+      "parent": "perifereia",
+      "elects": false,
+      "scheme": "gr.perifereiaki_enotita",
+      "valid_from": "2011-01-01",
+      "source": "elstat_2021",
+      "counts": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 74,
+          "source": "elstat_2021",
+          "locator": "https://www.statistics.gr/documents/20181/17286366/MON_PLI_DHM_KOIN_2021.xlsx/17bff52d-4fb3-6563-7d67-251116184f56"
+        }
+      ]
+    },
+    {
+      "key": "nomarchia",
+      "name": "Νομαρχιακές Αυτοδιοικήσεις",
+      "name_en": "Prefectural self-governments",
+      "parent": "national",
+      "polity_kind": "county",
+      "valid_from": "1995-01-01",
+      "valid_to": "2011-01-01",
+      "source": "syntagma"
+    },
+    {
+      "key": "dimos",
+      "name": "Δήμοι (και κοινότητες ως ΟΤΑ α΄ βαθμού έως το 2010)",
+      "name_en": "Municipalities (and, until 2010, communities as first-tier local authorities)",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "gr.dimos",
+      "source": "kallikratis",
+      "counts": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 332,
+          "source": "elstat_2021",
+          "locator": "https://www.statistics.gr/documents/20181/17286366/MON_PLI_DHM_KOIN_2021.xlsx/17bff52d-4fb3-6563-7d67-251116184f56"
+        },
+        {
+          "date": "1982-10-17",
+          "value": 6033,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "1986-10-19",
+          "value": 5998,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "1990-10-14",
+          "value": 5909,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "1994-10-16",
+          "value": 5814,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "1998-10-11",
+          "value": 1033,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2002-10-13",
+          "value": 1031,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2006-10-15",
+          "value": 1034,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2010-11-07",
+          "value": 325,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2014-05-18",
+          "value": 325,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2019-05-26",
+          "value": 332,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "date": "2023-10-08",
+          "value": 332,
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        }
+      ]
+    },
+    {
+      "key": "koinotita",
+      "name": "Κοινότητες δήμων",
+      "name_en": "Communities within municipalities",
+      "parent": "dimos",
+      "polity_kind": "submunicipal",
+      "scheme": "gr.koinotita",
+      "valid_from": "1999-01-01",
+      "source": "elstat_2021",
+      "counts": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 6070,
+          "source": "elstat_2021",
+          "locator": "https://www.statistics.gr/documents/20181/17286366/MON_PLI_DHM_KOIN_2021.xlsx/17bff52d-4fb3-6563-7d67-251116184f56"
+        }
+      ]
+    },
+    {
+      "key": "historical",
+      "name": "Ιστορικά κράτη και αυτόνομες χώρες πριν από την ενσωμάτωση",
+      "name_en": "Historical states and autonomous lands before union with Greece",
+      "parent": "national",
+      "polity_kind": "historical_state",
+      "valid_to": "1913-12-14",
+      "source": "elstat_dlib"
+    }
+  ],
+  "classes": [
+    {
+      "key": "vouli",
+      "tier": "national",
+      "name": "Βουλευτικές εκλογές",
+      "name_en": "Hellenic Parliament elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "gr.electoral_district"
+        ],
+        "fine": [
+          "gr.dimos",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "finest_note": "The ministry counts votes by polling station (εκλογικό τμήμα) and publishes them by constituency, municipality, municipal unit, and polling station; polling stations have no mapped boundaries.",
+      "note": "300 seats: constituency seats in multi- and single-member constituencies plus a nationwide state list (Επικρατείας); reinforced proportional representation with a majority bonus except in May 2023 (simple proportional, law 4406/2016). Law 5285/2026 adds a three-seat constituency of Greeks abroad from the next general election.",
+      "source": "syntagma",
+      "locator": "https://www.hellenicparliament.gr/UserFiles/f3c70a23-7696-49db-9148-f24dce6a27c8/FEK%20211-A-24-12-2019%20NEO%20SYNTAGMA.pdf",
+      "valid_from": "1974-07-24",
+      "first_held": "1974-11-17",
+      "earliest_record": "1974-11-17",
+      "contests_per_unit": 1,
+      "est_votes": 130000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "source": "syntagma",
+          "locator": "https://www.hellenicparliament.gr/UserFiles/f3c70a23-7696-49db-9148-f24dce6a27c8/FEK%20211-A-24-12-2019%20NEO%20SYNTAGMA.pdf",
+          "vacancy_rule": "Constitution art. 53: four-year term; early dissolution under arts. 32 and 41; a vacant constituency seat goes to the next candidate on the list, so by-elections are not held."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2009-10-04",
+          "evidence": "The ministry's results site and its archive of earlier elections (ekloges-prev.singularlogic.eu) refused this session (Akamai 403); results volumes for 2009, May and June 2012, and May 2023 sit on www.ypes.gr as PDF.",
+          "finest": "gr.eklogiko_tmima"
+        },
+        {
+          "platform": "Υπουργείο Εσωτερικών, τόμοι αποτελεσμάτων",
+          "url": "https://www.ypes.gr/wp-content/uploads/2022/12/VOULEFTIKES_04_10_2009_TOMOS_1.pdf",
+          "format": "pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "first_date": "2009-10-04",
+          "evidence": "Printed results volumes by constituency, municipality, and polling station; www.ypes.gr refused this session (Akamai 403).",
+          "source": "ypes_vol_2009"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1974-07-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1974-11-17",
+          "seats": 300
+        },
+        {
+          "date": "1977-11-20",
+          "seats": 300
+        },
+        {
+          "date": "1981-10-18",
+          "seats": 300
+        },
+        {
+          "date": "1985-06-02",
+          "seats": 300
+        },
+        {
+          "date": "1989-06-18",
+          "seats": 300
+        },
+        {
+          "date": "1989-11-05",
+          "seats": 300
+        },
+        {
+          "date": "1990-04-08",
+          "seats": 300
+        },
+        {
+          "date": "1993-10-10",
+          "seats": 300
+        },
+        {
+          "date": "1996-09-22",
+          "seats": 300
+        },
+        {
+          "date": "2000-04-09",
+          "seats": 300
+        },
+        {
+          "date": "2004-03-07",
+          "seats": 300
+        },
+        {
+          "date": "2007-09-16",
+          "seats": 300
+        },
+        {
+          "date": "2009-10-04",
+          "seats": 300,
+          "source": "ypes_vol_2009"
+        },
+        {
+          "date": "2012-05-06",
+          "seats": 300,
+          "source": "ypes_vol_2012a",
+          "note": "56 constituencies plus the state list."
+        },
+        {
+          "date": "2012-06-17",
+          "seats": 300,
+          "source": "ypes_vol_2012b",
+          "note": "56 constituencies plus the state list."
+        },
+        {
+          "date": "2015-01-25",
+          "seats": 300,
+          "note": "56 constituencies plus the state list."
+        },
+        {
+          "date": "2015-09-20",
+          "seats": 300,
+          "note": "56 constituencies plus the state list."
+        },
+        {
+          "date": "2019-07-07",
+          "seats": 300,
+          "note": "56 constituencies plus the state list."
+        },
+        {
+          "date": "2023-05-21",
+          "seats": 300,
+          "source": "ypes_stat_2023",
+          "note": "59 constituencies (Athens B, East Attica, and West Attica split by law 4648/2019) plus the state list."
+        },
+        {
+          "date": "2023-06-25",
+          "seats": 300,
+          "note": "59 constituencies (Athens B, East Attica, and West Attica split by law 4648/2019) plus the state list."
+        }
+      ]
+    },
+    {
+      "key": "vouli_1844",
+      "tier": "national",
+      "name": "Βουλευτικές εκλογές και εκλογές Εθνοσυνελεύσεων 1844–1964",
+      "name_en": "Parliament and national assembly elections, 1844–1964",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "gr.electoral_district"
+        ],
+        "fine": [
+          "gr.dimos"
+        ]
+      },
+      "finest_note": "The General Statistical Service's volumes for 1926–1951 tabulate votes by constituency and by municipality and community.",
+      "note": "Parliaments of the constitutional monarchy, the Second Republic, and the restored monarchy, with the constituent and revisionary national assemblies of 1862, 1910, 1920, 1923–1924, 1935, and 1946; no elections were held from 1936 to 1946 or under the 1967–1974 dictatorship.",
+      "source": "elstat_dlib",
+      "valid_from": "1844-03-18",
+      "valid_to": "1967-04-21",
+      "earliest_record": "1926-11-07",
+      "est_votes": 35000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "ΕΛΣΤΑΤ, Ψηφιακή Βιβλιοθήκη (Εκλογές)",
+          "url": "http://dlib.statistics.gr/portal/page/portal/ESYE/categoryyears?p_cat=14308576&p_topic=14308576",
+          "format": "pdf (scanned, 400 dpi)",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "elstat_dlib",
+          "first_date": "1926-11-07",
+          "last_date": "1951-09-09",
+          "finest": "gr.dimos",
+          "evidence": "Eleven scanned volumes (parliament 1926, 1928, 1932, 1936, 1946, 1950, 1951; national assembly 1935; senate 1929 and 1932; plebiscite 1946) at dlib.statistics.gr/Book/GRESYE_02_2101_000NN.pdf; no volume after 1951 is in the series."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1844-03-18",
+          "valid_to": "1974-07-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1844-01-01",
+          "precision": "year",
+          "through": "1923-12-31",
+          "note": "Elections from 1844 to the December 1923 Fourth National Assembly; not yet listed day by day."
+        },
+        {
+          "date": "1926-11-07",
+          "source": "dlib_1926",
+          "quote": "ELSTAT digital library catalogue title: Statistics of parliamentary elections of November 7th 1926"
+        },
+        {
+          "date": "1928-08-19",
+          "source": "dlib_1928",
+          "quote": "ELSTAT digital library catalogue title: Statistics of parliamentary elections of August 19th 1928"
+        },
+        {
+          "date": "1932-09-25",
+          "source": "dlib_1932",
+          "quote": "ELSTAT digital library catalogue title: Parliamentary elections of 25th September 1932 statistics"
+        },
+        {
+          "date": "1933-03-05"
+        },
+        {
+          "date": "1935-06-09",
+          "note": "Fifth National Assembly.",
+          "source": "dlib_1935",
+          "quote": "ELSTAT digital library catalogue title: National Assembly Elections Statistics 9th June 1935"
+        },
+        {
+          "date": "1936-01-26",
+          "source": "dlib_1936",
+          "quote": "ELSTAT digital library catalogue title: Parliamentary elections of 26th January 1936 statistics"
+        },
+        {
+          "date": "1946-03-31",
+          "source": "dlib_1946",
+          "quote": "ELSTAT digital library catalogue title: Parliamentary elections of 31th Mars 1946 statistics"
+        },
+        {
+          "date": "1950-03-05",
+          "source": "dlib_1950",
+          "quote": "ELSTAT digital library catalogue title: Parliamentary elections of 5th March 1950 statistics"
+        },
+        {
+          "date": "1951-09-09",
+          "source": "dlib_1951",
+          "quote": "ELSTAT digital library catalogue title: Parliamentary elections of 9th September  1951"
+        },
+        {
+          "date": "1952-11-16"
+        },
+        {
+          "date": "1956-02-19"
+        },
+        {
+          "date": "1958-05-11"
+        },
+        {
+          "date": "1961-10-29"
+        },
+        {
+          "date": "1963-11-03"
+        },
+        {
+          "date": "1964-02-16"
+        }
+      ]
+    },
+    {
+      "key": "gerousia",
+      "tier": "national",
+      "name": "Εκλογές Γερουσίας 1929–1935",
+      "name_en": "Senate elections, 1929–1935",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "gr.electoral_district"
+        ]
+      },
+      "note": "The 1927 Constitution's elected Senate, chosen in 1929 and partly renewed in 1932; abolished in 1935.",
+      "source": "dlib_1929s",
+      "valid_from": "1927-06-03",
+      "valid_to": "1935-10-10",
+      "first_held": "1929-04-21",
+      "earliest_record": "1929-04-21",
+      "est_votes": 1500000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "ΕΛΣΤΑΤ, Ψηφιακή Βιβλιοθήκη (Εκλογές)",
+          "url": "http://dlib.statistics.gr/portal/page/portal/ESYE/categoryyears?p_cat=14308576&p_topic=14308576",
+          "format": "pdf (scanned, 400 dpi)",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "elstat_dlib",
+          "first_date": "1929-04-21",
+          "last_date": "1932-09-25",
+          "evidence": "Senate volumes for 1929 (232 pages) and 1932 (87 pages, with alternates to the end of 1933)."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1927-01-01",
+          "valid_to": "1936-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1929-04-21",
+          "source": "dlib_1929s",
+          "quote": "ELSTAT digital library catalogue title: Senate elections of 21th statistics"
+        },
+        {
+          "date": "1932-09-25",
+          "note": "Partial renewal.",
+          "source": "dlib_1932s",
+          "quote": "ELSTAT digital library catalogue title: Senate elections of 25th September statistics and their alternates until the end of 1933"
+        }
+      ]
+    },
+    {
+      "key": "ethnosyneleuseis",
+      "tier": "national",
+      "name": "Εθνοσυνελεύσεις 1821–1843",
+      "name_en": "National assemblies of the Revolution and of 1843",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {},
+      "note": "Epidaurus (1821), Astros (1823), Troezen (1827), Argos (1829), Nafplio and Pronoia (1831–1832), and the 1843 National Assembly.",
+      "source": "syntagma",
+      "valid_from": "1821-12-20",
+      "valid_to": "1844-03-18",
+      "disposition": "blocked",
+      "disposition_reason": "Delegates were chosen by local notables, communities, and armed bodies under varying rules; no official series of returns is published, only the assemblies' own minutes.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "GR",
+          "valid_to": "1844-03-18"
+        }
+      ]
+    },
+    {
+      "key": "proedros",
+      "tier": "national",
+      "name": "Εκλογή Προέδρου της Δημοκρατίας από τη Βουλή",
+      "name_en": "Election of the President of the Republic by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Constitution arts. 30–33: roll-call ballots of the 300 deputies; up to four (before 2019, three) rounds with falling thresholds.",
+      "source": "syntagma",
+      "valid_from": "1975-06-11",
+      "first_held": "1975-06-19",
+      "earliest_record": "1975-06-19",
+      "est_votes": 3300,
+      "effort": 1,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "administered_by": "Βουλή των Ελλήνων",
+          "source": "syntagma",
+          "locator": "https://www.hellenicparliament.gr/UserFiles/f3c70a23-7696-49db-9148-f24dce6a27c8/FEK%20211-A-24-12-2019%20NEO%20SYNTAGMA.pdf"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1975-06-11"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1975-06-19"
+        },
+        {
+          "date": "1980-05-05"
+        },
+        {
+          "date": "1985-03-29"
+        },
+        {
+          "date": "1990-05-04"
+        },
+        {
+          "date": "1995-03-08"
+        },
+        {
+          "date": "2000-02-08"
+        },
+        {
+          "date": "2005-02-08"
+        },
+        {
+          "date": "2010-02-03"
+        },
+        {
+          "date": "2015-02-18"
+        },
+        {
+          "date": "2020-01-22"
+        },
+        {
+          "date": "2025-02-12"
+        }
+      ]
+    },
+    {
+      "key": "proedros_1924",
+      "tier": "national",
+      "name": "Εκλογή Προέδρου της Δημοκρατίας 1924–1935",
+      "name_en": "Presidential elections of the Second Republic, 1924–1935",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Presidents chosen by Parliament and, under the 1927 Constitution, by Parliament and Senate together.",
+      "source": "elstat_dlib",
+      "valid_from": "1924-03-25",
+      "valid_to": "1935-10-10",
+      "est_votes": 2000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1924-03-25",
+          "valid_to": "1935-10-10"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "through": "1935-10-10",
+          "note": "Not yet listed day by day."
+        }
+      ]
+    },
+    {
+      "key": "proedros_1926",
+      "tier": "national",
+      "name": "Προεδρικές εκλογές 1926",
+      "name_en": "Direct presidential election of 1926",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The only direct presidential election, held under the Pangalos dictatorship.",
+      "source": "elstat_dlib",
+      "valid_from": "1926-04-04",
+      "valid_to": "1926-04-05",
+      "first_held": "1926-04-04",
+      "est_votes": 900000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GR",
+          "valid_from": "1926-04-04",
+          "valid_to": "1926-04-05",
+          "precedence": 1
+        }
+      ],
+      "dates": [
+        {
+          "date": "1926-04-04"
+        }
+      ]
+    },
+    {
+      "key": "dimopsifisma",
+      "tier": "national",
+      "name": "Δημοψηφίσματα",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "schemes": [
+          "gr.electoral_district"
+        ],
+        "fine": [
+          "gr.dimos",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "note": "Constitution art. 44(2): a referendum on crucial national issues or on a passed bill; the 1862–1974 plebiscites settled the head of state and the regime.",
+      "source": "syntagma",
+      "earliest_record": "1946-09-01",
+      "est_votes": 30000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "called": true,
+          "source": "syntagma",
+          "locator": "https://www.hellenicparliament.gr/UserFiles/f3c70a23-7696-49db-9148-f24dce6a27c8/FEK%20211-A-24-12-2019%20NEO%20SYNTAGMA.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2015-07-05",
+          "evidence": "The 2015 referendum is on the ministry's results site, which refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        },
+        {
+          "platform": "ΕΛΣΤΑΤ, Ψηφιακή Βιβλιοθήκη (Εκλογές)",
+          "url": "http://dlib.statistics.gr/portal/page/portal/ESYE/categoryyears?p_cat=14308576&p_topic=14308576",
+          "format": "pdf (scanned, 400 dpi)",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "elstat_dlib",
+          "first_date": "1946-09-01",
+          "last_date": "1946-09-01",
+          "finest": "gr.dimos",
+          "evidence": "The 1946 plebiscite volume (92 pages)."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1862-01-01",
+          "precision": "year",
+          "note": "Plebiscite on the choice of king after Otto's deposition (November–December 1862)."
+        },
+        {
+          "date": "1920-11-22",
+          "note": "Return of King Constantine I."
+        },
+        {
+          "date": "1924-04-13",
+          "note": "Republic."
+        },
+        {
+          "date": "1935-11-03",
+          "note": "Restoration of the monarchy."
+        },
+        {
+          "date": "1946-09-01",
+          "contests": 1,
+          "note": "Return of King George II.",
+          "source": "dlib_1946r",
+          "quote": "ELSTAT digital library catalogue title: Statistics of September 1st, 1946 plebicite"
+        },
+        {
+          "date": "1968-09-29",
+          "note": "Constitution of the dictatorship."
+        },
+        {
+          "date": "1973-07-29",
+          "note": "Republic under the dictatorship."
+        },
+        {
+          "date": "1974-12-08",
+          "note": "Form of government; the monarchy was rejected."
+        },
+        {
+          "date": "2015-07-05",
+          "contests": 1,
+          "source": "ypes_results",
+          "note": "Creditors' bailout proposal."
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Εκλογές μελών του Ευρωπαϊκού Κοινοβουλίου",
+      "name_en": "European Parliament elections in Greece",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "schemes": [
+          "eu.member_state"
+        ],
+        "fine": [
+          "gr.electoral_district",
+          "gr.dimos",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "finest_note": "One nationwide constituency; the ministry counts and publishes by polling station.",
+      "note": "Law 4255/2014: the whole country is a single constituency, seats by proportional representation with a 3% threshold.",
+      "source": "egk18_2014",
+      "valid_from": "1981-01-01",
+      "first_held": "1981-10-18",
+      "earliest_record": "1981-10-18",
+      "est_votes": 55000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "source": "egk18_2014",
+          "locator": "https://www.ypes.gr/UserFiles/f0ff9297-f516-40ff-a70e-eca84e2ec9b9/egk18_22042014.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2014-05-25",
+          "evidence": "The EU census records the 2019 and 2024 pages as web pages with no downloads; the site refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1981-10-18",
+          "contests": 1,
+          "seats": 24,
+          "source": "ypes_results"
+        },
+        {
+          "date": "1984-06-17",
+          "contests": 1,
+          "seats": 24,
+          "source": "ypes_results"
+        },
+        {
+          "date": "1989-06-18",
+          "contests": 1,
+          "seats": 24,
+          "source": "ypes_results"
+        },
+        {
+          "date": "1994-06-12",
+          "contests": 1,
+          "seats": 25,
+          "source": "ypes_results"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 1,
+          "seats": 25,
+          "source": "ypes_results"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 1,
+          "seats": 24,
+          "source": "ypes_results"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 1,
+          "seats": 22,
+          "source": "ypes_results"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "seats": 21,
+          "source": "ypes_results"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "seats": 21,
+          "source": "ypes_results"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "seats": 21,
+          "source": "ypes_results"
+        }
+      ]
+    },
+    {
+      "key": "ionian",
+      "tier": "historical",
+      "name": "Βουλή του Ηνωμένου Κράτους των Ιονίων Νήσων",
+      "name_en": "Parliament of the United States of the Ionian Islands",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {},
+      "note": "Elected assembly of the British protectorate (1817–1864) until union with Greece.",
+      "source": "elstat_dlib",
+      "valid_from": "1817-12-28",
+      "valid_to": "1864-05-21",
+      "est_votes": 200000,
+      "effort": 5,
+      "match": [
+        {
+          "name_pattern": "(Ionian|Ιονίων)",
+          "valid_to": "1864-05-21",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1817-01-01",
+          "precision": "year",
+          "through": "1864-05-21",
+          "note": "Not yet listed."
+        }
+      ]
+    },
+    {
+      "key": "kriti",
+      "tier": "historical",
+      "name": "Βουλή της Κρητικής Πολιτείας",
+      "name_en": "Assembly of the Cretan State",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {},
+      "note": "Elected assembly of the autonomous Cretan State (1898–1913) until union with Greece.",
+      "source": "elstat_dlib",
+      "valid_from": "1898-12-09",
+      "valid_to": "1913-12-14",
+      "est_votes": 400000,
+      "effort": 5,
+      "match": [
+        {
+          "name_pattern": "(Cretan|Κρητικ)",
+          "valid_to": "1913-12-14",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1899-01-01",
+          "precision": "year",
+          "through": "1913-12-14",
+          "note": "Not yet listed."
+        }
+      ]
+    },
+    {
+      "key": "samos",
+      "tier": "historical",
+      "name": "Βουλή της Ηγεμονίας της Σάμου",
+      "name_en": "Assembly of the Principality of Samos",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {},
+      "note": "Elected assembly of the autonomous principality (1834–1912) until union with Greece.",
+      "source": "elstat_dlib",
+      "valid_from": "1834-01-01",
+      "valid_to": "1913-03-02",
+      "est_votes": 150000,
+      "effort": 5,
+      "match": [
+        {
+          "name_pattern": "(Samos|Σάμου)",
+          "valid_to": "1913-03-02",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1834-01-01",
+          "precision": "year",
+          "through": "1912-11-11",
+          "note": "Not yet listed."
+        }
+      ]
+    },
+    {
+      "key": "perifereiarchis",
+      "tier": "perifereia",
+      "name": "Εκλογή Περιφερειάρχη",
+      "name_en": "Regional governor elections",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "gr.perifereiaki_enotita",
+          "gr.dimos",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "finest_note": "Counted by polling station; the regional council is elected on the same ballot.",
+      "note": "The governor heads a combined list (συνδυασμός) whose candidates for the regional council stand in the regional units; one ballot elects both.",
+      "source": "kallikratis",
+      "valid_from": "2010-11-07",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "est_votes": 30000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2014-05-18",
+          "valid_to": "2021-06-05",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 10,
+          "day_rule": "second Sunday of October",
+          "runoff": "threshold",
+          "runoff_threshold": 0.43,
+          "runoff_rule": "A list with more than 43% of the valid votes wins in the first round; otherwise the two leading lists meet the following Sunday.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2021-06-05",
+          "source": "n4804",
+          "locator": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2010-11-07",
+          "evidence": "Regional results by regional unit, municipality, and polling station on the ministry's site; refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07"
+        },
+        {
+          "date": "2010-11-14",
+          "election_kind": "runoff",
+          "note": "Second round in the regions where no list won outright."
+        },
+        {
+          "date": "2014-05-18"
+        },
+        {
+          "date": "2014-05-25",
+          "election_kind": "runoff",
+          "note": "Second round in the regions where no list won outright."
+        },
+        {
+          "date": "2019-05-26"
+        },
+        {
+          "date": "2019-06-02",
+          "election_kind": "runoff",
+          "note": "Second round in the regions where no list won outright."
+        },
+        {
+          "date": "2023-10-08",
+          "contests": 13,
+          "source": "eetaa_2023",
+          "quote": "Στις Περιφερειακές Εκλογές 2023, εξελέγησαν 7 Περιφερειάρχες στον Α’ γύρο των εκλογών και οι υπόλοιποι 6 στο Β’ γύρο."
+        },
+        {
+          "date": "2023-10-15",
+          "election_kind": "runoff",
+          "note": "Second round in the regions where no list won outright."
+        }
+      ]
+    },
+    {
+      "key": "perifereiako_symvoulio",
+      "tier": "perifereia",
+      "name": "Εκλογή Περιφερειακού Συμβουλίου",
+      "name_en": "Regional council elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "gr.perifereiaki_enotita"
+        ],
+        "fine": [
+          "gr.dimos",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "note": "Councillors are elected from the governors' lists by regional unit; the winning list takes a majority bonus.",
+      "source": "kallikratis",
+      "valid_from": "2010-11-07",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "est_votes": 25000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2014-05-18",
+          "valid_to": "2021-06-05",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 10,
+          "day_rule": "second Sunday of October",
+          "runoff": "threshold",
+          "runoff_threshold": 0.43,
+          "runoff_rule": "A list with more than 43% of the valid votes wins in the first round; otherwise the two leading lists meet the following Sunday.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2021-06-05",
+          "source": "n4804",
+          "locator": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2010-11-07",
+          "evidence": "Preference votes for councillors by regional unit on the ministry's site; refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07"
+        },
+        {
+          "date": "2014-05-18"
+        },
+        {
+          "date": "2019-05-26"
+        },
+        {
+          "date": "2023-10-08",
+          "contests": 13,
+          "source": "eetaa_2023",
+          "quote": "Στις Περιφερειακές Εκλογές 2023, εξελέγησαν 7 Περιφερειάρχες στον Α’ γύρο των εκλογών και οι υπόλοιποι 6 στο Β’ γύρο."
+        }
+      ]
+    },
+    {
+      "key": "nomarchis",
+      "tier": "nomarchia",
+      "name": "Εκλογή Νομάρχη",
+      "name_en": "Prefect elections, 1994–2006",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elected prefects of the prefectural self-governments and the three super-prefectures (Athens–Piraeus, Drama–Kavala–Xanthi, Evros–Rhodope), replaced by the regions in 2011.",
+      "source": "syntagma",
+      "valid_from": "1994-01-01",
+      "valid_to": "2011-01-01",
+      "first_held": "1994-10-16",
+      "est_votes": 30000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_to": "2011-01-01",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": null,
+          "valid_from": "1994-01-01",
+          "valid_to": "2011-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-10-16"
+        },
+        {
+          "date": "1994-10-23",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1998-10-11"
+        },
+        {
+          "date": "1998-10-18",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2002-10-13"
+        },
+        {
+          "date": "2002-10-20",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2006-10-15"
+        },
+        {
+          "date": "2006-10-22",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        }
+      ]
+    },
+    {
+      "key": "nomarchiako_symvoulio",
+      "tier": "nomarchia",
+      "name": "Εκλογή Νομαρχιακού Συμβουλίου",
+      "name_en": "Prefectural council elections, 1994–2006",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Councillors elected from the prefects' lists on the same ballot.",
+      "source": "syntagma",
+      "valid_from": "1994-01-01",
+      "valid_to": "2011-01-01",
+      "first_held": "1994-10-16",
+      "est_votes": 25000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_to": "2011-01-01",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": null,
+          "valid_from": "1994-01-01",
+          "valid_to": "2011-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-10-16"
+        },
+        {
+          "date": "1998-10-11"
+        },
+        {
+          "date": "2002-10-13"
+        },
+        {
+          "date": "2006-10-15"
+        }
+      ]
+    },
+    {
+      "key": "dimarchos",
+      "tier": "dimos",
+      "name": "Εκλογή Δημάρχου (και Προέδρου Κοινότητας ως ΟΤΑ έως το 2010)",
+      "name_en": "Mayor elections (and community presidents of first-tier communities until 2010)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "gr.dimotiki_enotita",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "finest_note": "Counted by polling station; the municipal council is elected on the same ballot.",
+      "note": "The mayor heads a combined list; one ballot elects the mayor and the municipal council. Contest counts are the local authorities that voted (municipalities and, until 2010, communities).",
+      "source": "eetaa_2023",
+      "earliest_record": "2010-11-07",
+      "est_votes": 110000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_to": "2014-05-18",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2014-05-18",
+          "valid_to": "2021-06-05",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 10,
+          "day_rule": "second Sunday of October",
+          "runoff": "threshold",
+          "runoff_threshold": 0.43,
+          "runoff_rule": "A list with more than 43% of the valid votes wins in the first round; otherwise the two leading lists meet the following Sunday.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2021-06-05",
+          "source": "n4804",
+          "locator": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2010-11-07",
+          "evidence": "Municipal results by municipal unit and polling station on the ministry's site; refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1834-01-01",
+          "precision": "year",
+          "through": "1964-12-31",
+          "note": "Municipal and communal elections under the Kingdom (from the 1833 municipal law) and in 1951, 1954, 1959, and 1964; not yet listed day by day."
+        },
+        {
+          "date": "1975-03-30"
+        },
+        {
+          "date": "1978-10-15"
+        },
+        {
+          "date": "1982-10-17",
+          "contests": 6033,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 1982. ΟΤΑ 6.033"
+        },
+        {
+          "date": "1982-10-24",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1986-10-19",
+          "contests": 5998,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 1986. ΟΤΑ 5.998"
+        },
+        {
+          "date": "1986-10-26",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1990-10-14",
+          "contests": 5909,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 1990. ΟΤΑ 5.909"
+        },
+        {
+          "date": "1990-10-21",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1994-10-16",
+          "contests": 5814,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 1994. ΟΤΑ 5.814"
+        },
+        {
+          "date": "1994-10-23",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1998-10-11",
+          "contests": 1033,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 1998. ΟΤΑ 1.033"
+        },
+        {
+          "date": "1998-10-18",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2002-10-13",
+          "contests": 1031,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2002. ΟΤΑ 1.031"
+        },
+        {
+          "date": "2002-10-20",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2006-10-15",
+          "contests": 1034,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2006. ΟΤΑ 1.034"
+        },
+        {
+          "date": "2006-10-22",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2010-11-07",
+          "contests": 325,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2010. ΟΤΑ 325"
+        },
+        {
+          "date": "2010-11-14",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2014-05-18",
+          "contests": 325,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2014. ΟΤΑ 325"
+        },
+        {
+          "date": "2014-05-25",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 332,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2019. ΟΤΑ 332"
+        },
+        {
+          "date": "2019-06-02",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2023-10-08",
+          "contests": 332,
+          "source": "eetaa_2023",
+          "quote": "Table 1.8: 2023. ΟΤΑ 332"
+        },
+        {
+          "date": "2023-10-15",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        }
+      ]
+    },
+    {
+      "key": "dimotiko_symvoulio",
+      "tier": "dimos",
+      "name": "Εκλογή Δημοτικού Συμβουλίου",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "gr.dimotiki_enotita",
+          "gr.eklogiko_tmima"
+        ]
+      },
+      "note": "Councillors are elected from the mayoral lists by municipal unit (εκλογική περιφέρεια); 8,482 council seats in 2023 (ΕΕΤΑΑ, table 1.7).",
+      "source": "eetaa_2023",
+      "earliest_record": "2010-11-07",
+      "est_votes": 100000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_to": "2014-05-18",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2014-05-18",
+          "valid_to": "2021-06-05",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 10,
+          "day_rule": "second Sunday of October",
+          "runoff": "threshold",
+          "runoff_threshold": 0.43,
+          "runoff_rule": "A list with more than 43% of the valid votes wins in the first round; otherwise the two leading lists meet the following Sunday.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2021-06-05",
+          "source": "n4804",
+          "locator": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2010-11-07",
+          "evidence": "Preference votes for councillors by municipal unit on the ministry's site; refused this session (Akamai 403).",
+          "finest": "gr.eklogiko_tmima"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1834-01-01",
+          "precision": "year",
+          "through": "1964-12-31",
+          "note": "Municipal and communal elections under the Kingdom (from the 1833 municipal law) and in 1951, 1954, 1959, and 1964; not yet listed day by day."
+        },
+        {
+          "date": "1975-03-30"
+        },
+        {
+          "date": "1978-10-15"
+        },
+        {
+          "date": "1982-10-17"
+        },
+        {
+          "date": "1982-10-24",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1986-10-19"
+        },
+        {
+          "date": "1986-10-26",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1990-10-14"
+        },
+        {
+          "date": "1990-10-21",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1994-10-16"
+        },
+        {
+          "date": "1994-10-23",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "1998-10-11"
+        },
+        {
+          "date": "1998-10-18",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2002-10-13"
+        },
+        {
+          "date": "2002-10-20",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2006-10-15"
+        },
+        {
+          "date": "2006-10-22",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2010-11-07"
+        },
+        {
+          "date": "2010-11-14",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2014-05-18"
+        },
+        {
+          "date": "2014-05-25",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2019-05-26"
+        },
+        {
+          "date": "2019-06-02",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        },
+        {
+          "date": "2023-10-08"
+        },
+        {
+          "date": "2023-10-15",
+          "election_kind": "runoff",
+          "note": "Second round where no list won outright."
+        }
+      ]
+    },
+    {
+      "key": "koinotita",
+      "tier": "koinotita",
+      "name": "Εκλογή Συμβουλίων και Προέδρων Κοινοτήτων",
+      "name_en": "Community council and community president elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Councils (or a single representative in small communities) of the communities inside municipalities, elected with the municipal elections: the local councils of municipal districts from 1998, the municipal and local communities from 2010, and since 2023 a separate ballot for community candidates (law 4804/2021).",
+      "source": "elstat_2021",
+      "valid_from": "1998-01-01",
+      "first_held": "1998-10-11",
+      "earliest_record": "2010-11-07",
+      "est_votes": 30000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "A list with more than half the valid votes wins; otherwise the two leading lists meet a week later.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2014-05-18",
+          "valid_to": "2021-06-05",
+          "source": "eetaa_2023",
+          "locator": "https://www.eetaa.gr/wp-content/uploads/2023/12/2.%CE%9F%CE%B9-%CE%B1%CF%81%CE%B9%CE%B8%CE%BC%CE%BF%CE%AF-%CF%84%CF%89%CE%BD-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CF%8E%CE%BD.pdf"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 10,
+          "day_rule": "second Sunday of October",
+          "runoff": "threshold",
+          "runoff_threshold": 0.43,
+          "runoff_rule": "A list with more than 43% of the valid votes wins in the first round; otherwise the two leading lists meet the following Sunday.",
+          "administered_by": "Υπουργείο Εσωτερικών",
+          "valid_from": "2021-06-05",
+          "source": "n4804",
+          "locator": "https://www.ypes.gr/wp-content/uploads/2024/09/nomos4804-2021-1.pdf"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Υπουργείο Εσωτερικών, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "ypes_results",
+          "first_date": "2010-11-07",
+          "evidence": "Community results on the ministry's site; refused this session (Akamai 403)."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "general"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-10-11"
+        },
+        {
+          "date": "2002-10-13"
+        },
+        {
+          "date": "2006-10-15"
+        },
+        {
+          "date": "2010-11-07"
+        },
+        {
+          "date": "2014-05-18"
+        },
+        {
+          "date": "2019-05-26"
+        },
+        {
+          "date": "2023-10-08"
+        }
+      ]
+    },
+    {
+      "key": "topiko_dimopsifisma",
+      "tier": "dimos",
+      "name": "Δημοτικά και περιφερειακά δημοψηφίσματα",
+      "name_en": "Municipal and regional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Provided for by the local government code; the ministry's results site lists no local referendum.",
+      "source": "kallikratis",
+      "disposition": "blocked",
+      "disposition_reason": "Law 3852/2010 provides for municipal and regional referendums, but no official results of any have been published; the ministry's results site lists none.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "region",
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "agion_oros",
+      "tier": "national",
+      "name": "Ιερά Κοινότητα Αγίου Όρους",
+      "name_en": "Holy Community of Mount Athos",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {},
+      "source": "syntagma",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Constitution art. 105: Mount Athos is self-governed by its twenty monasteries through representatives each monastery appoints to the Holy Community; no electorate votes."
+    },
+    {
+      "key": "dikastiki",
+      "tier": "national",
+      "name": "Δικαστικοί λειτουργοί",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {},
+      "source": "syntagma",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Constitution arts. 88 and 90: judges are career magistrates appointed by presidential decree; the top courts' presidents are chosen by the cabinet. No judicial office is elected."
+    },
+    {
+      "key": "kommatikes",
+      "tier": "national",
+      "name": "Εσωκομματικές εκλογές αρχηγού",
+      "name_en": "Party leadership and candidate selection contests",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {},
+      "source": "syntagma",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Leadership elections and open primaries (New Democracy, SYRIZA, PASOK) are run and counted by the parties under their own statutes; the state runs no nominating contest."
+    },
+    {
+      "key": "epaggelmatika",
+      "tier": "national",
+      "name": "Εκλογές επιμελητηρίων, συλλόγων, πανεπιστημίων και ΣΑΕ",
+      "name_en": "Chamber, professional, university, union, and diaspora council elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "source": "syntagma",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the bodies themselves for their members (chambers of commerce, bar associations, the Technical Chamber, universities, trade unions, the Council of Hellenes Abroad, and land-improvement organizations); no state authority certifies them for a territorial electorate."
+    },
+    {
+      "key": "emmesi",
+      "tier": "national",
+      "name": "Έμμεσες εκλογές οργάνων",
+      "name_en": "Other indirect elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "syntagma",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Speaker and officers of Parliament, the prime minister's investiture, and the boards of the local government associations (KEDE, ENPE) are chosen by sitting members; their votes are recorded in minutes, not as public elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government",
+            "speaker",
+            "other"
+          ],
+          "iso_pattern": "GR"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1800 @@
+{
+  "polity": "FI",
+  "name": "Finland",
+  "sources": {
+    "perustuslaki": {
+      "title": "Suomen perustuslaki (731/1999)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/1999/731",
+      "kind": "official_body",
+      "note": "The Constitution of Finland: s.24 (a unicameral Eduskunta of 200 members elected for four years), s.53 (consultative referendums), s.54 (the President elected directly for six years), s.120 (Åland's autonomy), and s.121 (municipal self-government and Sámi cultural self-government)."
+    },
+    "vaalilaki": {
+      "title": "Vaalilaki (714/1998)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/1998/714",
+      "kind": "official_body",
+      "note": "The Election Act, consolidated: s.5 (13 constituencies for the Eduskunta), s.6 (199 proportional seats plus one for Åland), s.7 (the whole country one constituency for the President and the European Parliament; the wellbeing services county and the municipality the constituency in county and municipal elections), s.107 (parliamentary election day), s.112-115 (party member ballots), s.127 (presidential election day), s.144 (municipal election day), and s.160 (European Parliament election day)."
+    },
+    "kuntalaki": {
+      "title": "Kuntalaki (410/2015)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/2015/410",
+      "kind": "official_body",
+      "note": "The Local Government Act: s.15 (councillors elected in municipal elections for a four-year term from 1 June of the election year), s.16 (the number of councillors), s.24-25 (consultative municipal referendums and referendum initiatives), and s.18 (the council's chair), and s.44 (a mayor chosen by the council)."
+    },
+    "hyvinvointialuelaki": {
+      "title": "Laki hyvinvointialueesta (611/2021)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/2021/611",
+      "kind": "official_body",
+      "note": "The Act on Wellbeing Services Counties: each county has a county council (aluevaltuusto) whose members are elected in the county elections."
+    },
+    "saamelaiskarajalaki": {
+      "title": "Laki saamelaiskäräjistä (974/1995)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/1995/974",
+      "kind": "official_body",
+      "note": "The Act on the Sámi Parliament, in force 1 January 1996: 21 members and four deputies elected for four years from 1 December of the election year; the whole country is one constituency; elections every fourth year, by post and in the Sámi homeland also on election day."
+    },
+    "kainuulaki": {
+      "title": "Laki Kainuun hallintokokeilusta (343/2003)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/2003/343",
+      "kind": "official_body",
+      "note": "The Kainuu regional self-government experiment, repealed from 31 December 2012: a directly elected regional council (maakuntavaltuusto) for the Kainuu region."
+    },
+    "kirkkolaki": {
+      "title": "Kirkkolaki (652/2023)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/2023/652",
+      "kind": "official_body"
+    },
+    "kunnallinen-kansanaanestys": {
+      "title": "Laki hyvinvointialueilla ja kunnissa toimitettavissa neuvoa-antavissa kansanäänestyksissä noudatettavasta menettelystä (656/1990)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/1990/656",
+      "kind": "official_body"
+    },
+    "eu-kansanaanestys-1994": {
+      "title": "Ilmoitus Suomen liittymisestä Euroopan unionin jäseneksi 16 päivänä lokakuuta 1994 toimitetun neuvoa-antavan kansanäänestyksen tuloksesta (921/1994)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/lainsaadanto/1994/921",
+      "kind": "official_body"
+    },
+    "he-109-1994": {
+      "title": "Hallituksen esitys HE 109/1994 neuvoa-antavasta kansanäänestyksestä Suomen liittymisestä Euroopan unioniin",
+      "publisher": "Eduskunta (Parliament of Finland)",
+      "url": "https://www.eduskunta.fi/valtiopaivaasiakirjat/HE+109/1994",
+      "kind": "official_body",
+      "note": "Section 2.2 recounts the only earlier national referendum, on prohibition, held on 29 and 30 December 1931 under Act 340/31."
+    },
+    "presidentti-vaali": {
+      "title": "Election of the President",
+      "publisher": "Office of the President of the Republic of Finland",
+      "url": "https://www.presidentti.fi/en/presidency/election-of-the-president/",
+      "kind": "official_body",
+      "note": "Section 'Presidential elections 1919 – 1988': 300 electors (301 in 1982 and 1988) were elected by popular vote; electors chose the President in 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988; the 1937 electors also chose in 1940 and 1943; Parliament or special Acts chose in 1919, 1944, 1946, and extended the term in 1973."
+    },
+    "tk-presidentit": {
+      "title": "Presidenttien toimikaudet sekä äänestysprosentit valitsijamiesten vaaleissa 1925-1982 sekä presidentin vaaleissa 1988, 1994 ja 2000",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://stat.fi/til/pvaa/2000/pvaa_2000_2004-05-31_tau_001.html",
+      "kind": "official_body"
+    },
+    "tk-12i9": {
+      "title": "12i9 -- Suomessa asuvien Suomen kansalaisten äänestysaktiivisuus eduskuntavaaleissa, 1908-2023",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__evaa/statfin_evaa_pxt_12i9.px/",
+      "kind": "official_body",
+      "note": "The table's year dimension lists every parliamentary election from 1908 to 2023 (38 years). Statistics Finland's election statistics begin with the 1907 election; its 1907-1948 publications are in the National Library's Doria service."
+    },
+    "tk-evaa-doc": {
+      "title": "Tietoa tilastoista: Eduskuntavaalit",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://stat.fi/meta/til/evaa.html",
+      "kind": "official_body"
+    },
+    "tk-13sv": {
+      "title": "13sv -- Äänestystiedot sukupuolittain vaalivuosittaisella kuntajaolla eduskuntavaaleissa, 1983-2023",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__evaa/statfin_evaa_pxt_13sv.px/",
+      "kind": "official_body",
+      "note": "Votes by constituency and municipality as divided in each election year; counts of constituencies (VPxx rows) and municipalities with data in each year."
+    },
+    "tk-14z6": {
+      "title": "14z6 -- Äänestystiedot vaalivuosittaisella kuntajaolla kuntavaaleissa, 1976-2025",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__kvaa/statfin_kvaa_pxt_14z6.px/",
+      "kind": "official_body",
+      "note": "Mainland Finland (Manner-Suomi) only; municipalities counted as the rows with an electorate in each election year."
+    },
+    "tk-14db": {
+      "title": "14db -- Ehdokkaiden kannatus ja äänet vaalipiireittäin presidentinvaaleissa, 1994-2024",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__pvaa/statfin_pvaa_pxt_14db.px/",
+      "kind": "official_body"
+    },
+    "tk-pvaa-1994": {
+      "title": "Presidentinvaali 1994: tilastot",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://stat.fi/tk/he/vaalit/vaalit94pres/index_tpv.html",
+      "kind": "official_body"
+    },
+    "tk-pvaa-2000": {
+      "title": "Presidentinvaalit 2000: taulukot",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://stat.fi/til/pvaa/2000/index.html",
+      "kind": "official_body"
+    },
+    "tk-pvaa-2006": {
+      "title": "Presidentinvaalit 2006: taulukot",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://stat.fi/til/pvaa/2006/index.html",
+      "kind": "official_body"
+    },
+    "tk-14gu": {
+      "title": "14gu -- Äänestystiedot europarlamenttivaaleissa, 1996-2024",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__euvaa/statfin_euvaa_pxt_14gu.px/",
+      "kind": "official_body"
+    },
+    "tk-14y3": {
+      "title": "14y3 -- Äänestystiedot sukupuolittain vaalivuosittaisella kuntajaolla aluevaaleissa, 2022-2025",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__alvaa/statfin_alvaa_pxt_14y3.px/",
+      "kind": "official_body"
+    },
+    "tk-kunta-2025": {
+      "title": "Kunnat 2025 (classification kunta_1_20250101)",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://data.stat.fi/api/classifications/v2/classifications/kunta_1_20250101/classificationItems?content=data&meta=max&lang=fi&format=json",
+      "kind": "official_body"
+    },
+    "tk-kunta-2026": {
+      "title": "Kunnat 2026 (classification kunta_1_20260101)",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://data.stat.fi/api/classifications/v2/classifications/kunta_1_20260101/classificationItems?content=data&meta=max&lang=fi&format=json",
+      "kind": "official_body"
+    },
+    "tk-maakunta-2025": {
+      "title": "Maakunnat 2025 (classification maakunta_1_20250101)",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://data.stat.fi/api/classifications/v2/classifications/maakunta_1_20250101/classificationItems?content=data&meta=max&lang=fi&format=json",
+      "kind": "official_body"
+    },
+    "tk-hyvinvointialue-2025": {
+      "title": "Hyvinvointialueet 2025 (classification hyvinvointialue_1_20250101)",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://data.stat.fi/api/classifications/v2/classifications/hyvinvointialue_1_20250101/classificationItems?content=data&meta=max&lang=fi&format=json",
+      "kind": "official_body",
+      "note": "23 items: the 21 wellbeing services counties, plus the City of Helsinki and Åland, which organize the same services themselves and hold no county elections."
+    },
+    "tulospalvelu": {
+      "title": "Vaalien tulospalvelu (election results service)",
+      "publisher": "Ministry of Justice, Finland (Oikeusministeriö)",
+      "url": "https://tulospalvelu.vaalit.fi/",
+      "kind": "official_body",
+      "note": "One site per election, e.g. https://tulospalvelu.vaalit.fi/EKV-2023/, with nationwide CSV files (<prefix>_alu_maa.csv.zip, _ehd_, _puo_) by voting district from the 2011 parliamentary election on."
+    },
+    "statfin": {
+      "title": "StatFin database: elections (vaalit)",
+      "publisher": "Statistics Finland (Tilastokeskus)",
+      "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Suomi",
+      "name_en": "Finland",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "fi.maa",
+      "source": "perustuslaki",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 1,
+          "source": "perustuslaki",
+          "locator": "s.1: \"Suomi on täysivaltainen tasavalta.\""
+        }
+      ]
+    },
+    {
+      "key": "constituency",
+      "name": "Vaalipiirit",
+      "name_en": "Parliamentary constituencies",
+      "parent": "national",
+      "scheme": "fi.vaalipiiri",
+      "source": "vaalilaki",
+      "counts": [
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "value": 15,
+          "source": "tk-13sv",
+          "locator": "15 constituency rows (VP01 to VP15) with data in 1983"
+        },
+        {
+          "date": "2011-04-17",
+          "value": 15,
+          "source": "tk-13sv",
+          "locator": "15 constituency rows with data in 2011"
+        },
+        {
+          "date": "2015-04-19",
+          "value": 13,
+          "source": "tk-13sv",
+          "locator": "13 constituency rows with data in 2015"
+        },
+        {
+          "date": "2023-04-02",
+          "value": 13,
+          "source": "tk-13sv",
+          "locator": "13 constituency rows with data in 2023"
+        }
+      ]
+    },
+    {
+      "key": "region",
+      "name": "Maakunnat",
+      "name_en": "Regions (regional councils are joint municipal authorities, not elected)",
+      "parent": "national",
+      "elects": false,
+      "source": "tk-maakunta-2025",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 19,
+          "source": "tk-maakunta-2025",
+          "locator": "19 classification items, Uusimaa to Lappi and Ahvenanmaa"
+        }
+      ]
+    },
+    {
+      "key": "kainuu",
+      "name": "Kainuun maakunta (hallintokokeilu)",
+      "name_en": "Kainuu region under the self-government experiment",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "2005-01-01",
+      "valid_to": "2013-01-01",
+      "source": "kainuulaki",
+      "counts": [
+        {
+          "date": "2005-01-01",
+          "value": 1,
+          "source": "kainuulaki",
+          "locator": "Kainuun maakuntavaalit toimitetaan välittöminä, salaisina ja suhteellisina kunnallisvaalien yhteydessä."
+        }
+      ]
+    },
+    {
+      "key": "county",
+      "name": "Hyvinvointialueet",
+      "name_en": "Wellbeing services counties",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "fi.hyvinvointialue",
+      "valid_from": "2021-07-01",
+      "source": "hyvinvointialuelaki",
+      "counts": [
+        {
+          "date": "2022-01-23",
+          "value": 21,
+          "source": "tk-14y3",
+          "locator": "21 wellbeing services counties with data in 2022"
+        },
+        {
+          "date": "2025-01-01",
+          "value": 21,
+          "source": "tk-hyvinvointialue-2025",
+          "locator": "23 classification items less Helsingin kaupunki and Ahvenanmaa"
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Kunnat",
+      "name_en": "Municipalities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "fi.kunta",
+      "source": "kuntalaki",
+      "counts": [
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "value": 461,
+          "source": "tk-13sv",
+          "locator": "461 municipality rows with data in the 1983 parliamentary election"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "value": 336,
+          "source": "tk-13sv",
+          "locator": "336 municipality rows with data in 2011"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "value": 311,
+          "source": "tk-13sv",
+          "locator": "311 municipality rows with data in 2019"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "value": 309,
+          "source": "tk-13sv",
+          "locator": "309 municipality rows with data in 2023"
+        },
+        {
+          "date": "2025-01-01",
+          "value": 308,
+          "source": "tk-kunta-2025",
+          "locator": "308 classification items, Akaa to Ähtäri, 16 of them in Åland"
+        },
+        {
+          "date": "2026-01-01",
+          "value": 308,
+          "source": "tk-kunta-2026",
+          "locator": "308 classification items"
+        }
+      ]
+    },
+    {
+      "key": "saami",
+      "name": "Saamelaiskäräjät",
+      "name_en": "Sámi Parliament (the Sámi as an indigenous people, one nationwide constituency)",
+      "parent": "national",
+      "valid_from": "1996-01-01",
+      "source": "saamelaiskarajalaki",
+      "counts": [
+        {
+          "date": "1996-01-01",
+          "value": 1,
+          "source": "saamelaiskarajalaki",
+          "locator": "Saamelaiskäräjien vaaleja varten maa on yhtenä vaalipiirinä."
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "eduskunta",
+      "tier": "national",
+      "name": "Eduskuntavaalit",
+      "name_en": "Parliamentary elections (Eduskunta)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "fi.vaalipiiri"
+        ],
+        "fine": [
+          "fi.kunta",
+          "fi.aanestysalue"
+        ]
+      },
+      "source": "perustuslaki",
+      "first_held": "1907-01-01",
+      "earliest_record": "1907-01-01",
+      "finest_note": "Votes by voting district (äänestysalue) in the results service from 2011 and in StatFin tables for recent elections; by municipality in StatFin from 1983; earlier volumes by municipality in the Official Statistics of Finland series.",
+      "note": "200 members for four years (Constitution s.24): 199 by D'Hondt among open lists in 12 constituencies (13 counted with Åland) and one in Åland by plurality (Election Act s.6). Fifteen constituencies until 2011; 13 from 2015. Elections from 1907, under the Grand Duchy, belong to the same body. There are no by-elections: a vacancy goes to the next candidate of the list (Election Act s.92), and only an Åland vacancy with no deputy forces a new poll there.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "FI"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "vaalilaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1998/714 (s.107: \"Eduskuntavaalien vaalipäivä on huhtikuun kolmas sunnuntai.\" Early elections 50 to 75 days after the President's order)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Ministry of Justice; constituency electoral committees (vaalipiirilautakunnat)",
+          "vacancy_rule": "The next candidate of the same list by comparative figure takes the seat (Election Act s.92); a new poll only in Åland when no deputy remains."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Justice election results service (tulospalvelu.vaalit.fi)",
+          "url": "https://tulospalvelu.vaalit.fi/EKV-2023/",
+          "format": "csv (zip)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "tulospalvelu",
+          "first_date": "2011-04-17",
+          "last_date": "2023-04-02",
+          "evidence": "Nationwide CSV files by voting district for 2011, 2015, 2019, and 2023",
+          "role": "administers"
+        },
+        {
+          "platform": "Statistics Finland StatFin database (pxdata.stat.fi)",
+          "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__evaa/",
+          "format": "px, csv, json-stat",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.kunta",
+          "source": "statfin",
+          "first_date": "1983-01-01",
+          "last_date": "2023-04-02",
+          "evidence": "Votes by party and municipality as divided in each election year, 1983-2023 (13sw, 13sv); turnout 1908-2023 (12i9)",
+          "license": "CC BY 4.0"
+        }
+      ],
+      "est_votes": 80000000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1907-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-evaa-doc",
+          "quote": "Aikasarja: Tilastoja on olemassa vuodesta 1907 alkaen.",
+          "note": "The first election of the unicameral Eduskunta, under the Parliament Act of 1906; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1908-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1908",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1909-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1909",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1910-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1910",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1911-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1911",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1913-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1913",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1916-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1916",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1917-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1917",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1919-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1919",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1922-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1922",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1924",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1927-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1927",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1929-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1929",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1930",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1933-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1933",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1936-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1936",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1939-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1939",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1945-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1945",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1948-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1948",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1951-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1951",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1954-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1954",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1958",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1962",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1966",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1970",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1972-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1972",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1975",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "seats": 200,
+          "source": "tk-12i9",
+          "quote": "Year dimension: 1979",
+          "note": "Constituency count not yet taken from an official schedule; the polling day is not quoted from a fetched source."
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 1983"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 1987"
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 1991"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 1995"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 1999"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 2003"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 2007"
+        },
+        {
+          "date": "2011-04-17",
+          "seats": 200,
+          "contests": 15,
+          "source": "tk-13sv",
+          "quote": "15 constituency rows with data in 2011",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2015-04-19",
+          "seats": 200,
+          "contests": 13,
+          "source": "tk-13sv",
+          "quote": "13 constituency rows (VP01-VP04, VP06-VP13, and VP05 Åland) with data in 2015",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2019-04-14",
+          "seats": 200,
+          "contests": 13,
+          "source": "tk-13sv",
+          "quote": "13 constituency rows (VP01-VP04, VP06-VP13, and VP05 Åland) with data in 2019",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2023-04-02",
+          "seats": 200,
+          "contests": 13,
+          "source": "tk-13sv",
+          "quote": "13 constituency rows (VP01-VP04, VP06-VP13, and VP05 Åland) with data in 2023",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidentinvaali",
+      "name_en": "Presidential elections (direct)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "fi.vaalipiiri"
+        ],
+        "fine": [
+          "fi.kunta",
+          "fi.aanestysalue"
+        ]
+      },
+      "source": "perustuslaki",
+      "valid_from": "1988-01-01",
+      "first_held": "1988-01-01",
+      "earliest_record": "1988-01-01",
+      "note": "Elected directly for six years, at most two consecutive terms; a candidate with more than half the votes wins, otherwise the top two meet in a second round (Constitution s.54). First round on the fourth Sunday of January, second round two weeks later (Election Act s.127). The 1988 direct vote ran beside an electors' vote (class president_electors).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "FI",
+          "valid_from": "1988-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "vaalilaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1998/714 (s.127: \"Presidentinvaalin ensimmäisen vaalin vaalipäivä on tammikuun neljäs sunnuntai kuudentena vuotena sen vuoden jälkeen, jona tasavallan presidentti viimeksi ryhtyi toimeensa.\")",
+          "period_years": 6,
+          "phase": 2,
+          "month": 1,
+          "term_years": 6,
+          "called": false,
+          "partisan": true,
+          "runoff": "majority",
+          "runoff_rule": "The two leading candidates meet in a second round on the second Sunday after the first (Constitution s.54; Election Act s.127).",
+          "administered_by": "Ministry of Justice; the Helsinki constituency electoral committee draws up the candidate list"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Justice election results service (tulospalvelu.vaalit.fi)",
+          "url": "https://tulospalvelu.vaalit.fi/TPV-2024_1/",
+          "format": "csv (zip)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "tulospalvelu",
+          "first_date": "2012-01-22",
+          "last_date": "2024-02-11",
+          "evidence": "Nationwide CSV files by voting district for each round of 2012, 2018, and 2024",
+          "role": "administers"
+        },
+        {
+          "platform": "Statistics Finland StatFin database (pxdata.stat.fi)",
+          "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__pvaa/",
+          "format": "px, csv, json-stat",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.vaalipiiri",
+          "source": "statfin",
+          "first_date": "1994-01-01",
+          "last_date": "2024-02-11",
+          "evidence": "Votes by candidate, round, and constituency, 1994-2024 (14db)",
+          "license": "CC BY 4.0"
+        }
+      ],
+      "est_votes": 34000000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "presidentti-vaali",
+          "quote": "In 1987, a new two-stage electoral procedure was enacted, but this was only ever used in the 1988 election: first, a direct popular vote was taken on the official candidates",
+          "note": "The direct vote of 1988; the electors chosen at the same poll (class president_electors) then chose the President."
+        },
+        {
+          "date": "1994-01-16",
+          "contests": 1,
+          "source": "tk-pvaa-1994",
+          "quote": "varsinaisina vaalipäivinä 16.1. ja 6.2.1994"
+        },
+        {
+          "date": "1994-02-06",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "tk-pvaa-1994",
+          "quote": "varsinaisina vaalipäivinä 16.1. ja 6.2.1994"
+        },
+        {
+          "date": "2000-01-16",
+          "contests": 1,
+          "source": "tk-pvaa-2000",
+          "quote": "varsinaisina vaalipäivinä 16.1.2000 ja 6.2.2000"
+        },
+        {
+          "date": "2000-02-06",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "tk-pvaa-2000",
+          "quote": "varsinaisina vaalipäivinä 16.1.2000 ja 6.2.2000"
+        },
+        {
+          "date": "2006-01-15",
+          "contests": 1,
+          "source": "tk-pvaa-2006",
+          "quote": "varsinaisina vaalipäivinä 15.1.2006 ja 29.1.2006"
+        },
+        {
+          "date": "2006-01-29",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "tk-pvaa-2006",
+          "quote": "varsinaisina vaalipäivinä 15.1.2006 ja 29.1.2006"
+        },
+        {
+          "date": "2012-01-22",
+          "contests": 1,
+          "source": "tk-14db",
+          "quote": "Kierros: Ensimmäinen vaali, 2012",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2012-02-05",
+          "contests": 1,
+          "source": "tk-14db",
+          "quote": "Kierros: Toinen vaali, 2012",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election.",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2018-01-28",
+          "contests": 1,
+          "source": "tk-14db",
+          "quote": "Kierros: Ensimmäinen vaali, 2018",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election. No second round: the 2018 table has no votes in the second round."
+        },
+        {
+          "date": "2024-01-28",
+          "contests": 1,
+          "source": "tk-14db",
+          "quote": "Kierros: Ensimmäinen vaali, 2024",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2024-02-11",
+          "contests": 1,
+          "source": "tk-14db",
+          "quote": "Kierros: Toinen vaali, 2024",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election.",
+          "election_kind": "runoff"
+        }
+      ]
+    },
+    {
+      "key": "president_electors",
+      "tier": "national",
+      "name": "Valitsijamiesvaalit",
+      "name_en": "Presidential electors (1925-1988)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "fi.vaalipiiri"
+        ],
+        "fine": [
+          "fi.kunta"
+        ]
+      },
+      "source": "presidentti-vaali",
+      "valid_from": "1919-07-17",
+      "valid_to": "1991-01-01",
+      "first_held": "1925-01-01",
+      "earliest_record": "1925-01-01",
+      "note": "From 1919 to 1987 the President was chosen by 300 electors (301 in 1982 and 1988) elected by popular vote by constituency; the 1937 electors also chose in 1940 and 1943, and Parliament or special Acts chose in 1919, 1944, and 1946. In 1988 the electors were elected at the same poll as the direct vote and chose the President because no candidate won a majority. The popular vote for electors is the contest held; the electors' own ballot is not.",
+      "match": [
+        {
+          "body_kinds": [
+            "electoral_college"
+          ],
+          "iso_pattern": "FI"
+        },
+        {
+          "contest_kinds": [
+            "elector_slate"
+          ],
+          "iso_pattern": "FI"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "presidentti-vaali",
+          "locator": "https://www.presidentti.fi/en/presidency/election-of-the-president/ (\"From 1919 to 1987, the President of the Republic was elected by indirect vote. First, 300 electors (301 in the 1982 and 1988 elections) were elected by popular vote\")",
+          "period_years": 6,
+          "term_years": 6,
+          "called": false,
+          "partisan": true,
+          "valid_to": "1991-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Finland: presidents' terms and turnout in electoral college elections 1925-1982",
+          "url": "https://stat.fi/til/pvaa/2000/pvaa_2000_2004-05-31_tau_001.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "tk-presidentit",
+          "first_date": "1925-01-01",
+          "last_date": "1988-01-01",
+          "evidence": "National electorate and turnout per elector election only; votes by party and constituency are in the Official Statistics of Finland volumes"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1925-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1931-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1937-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1950-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1956-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "seats": 300,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "seats": 301,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "seats": 301,
+          "source": "presidentti-vaali",
+          "quote": "300 electors (301 in the 1982 and 1988 elections) were elected by popular vote; The President was chosen by electors in the elections of 1925, 1931, 1937, 1940, 1943, 1950, 1956, 1962, 1968, 1978, 1982 and 1988",
+          "note": "Electors were elected by constituency; the constituency count is not yet taken from an official schedule."
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Europarlamenttivaalit",
+      "name_en": "European Parliament elections in Finland",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "fi.vaalipiiri"
+        ],
+        "fine": [
+          "fi.kunta",
+          "fi.aanestysalue"
+        ]
+      },
+      "source": "vaalilaki",
+      "valid_from": "1995-01-01",
+      "first_held": "1996-01-01",
+      "earliest_record": "1996-01-01",
+      "note": "The whole country is one constituency (Election Act s.7); seats go to open lists by D'Hondt. The first election, of 1996, was held apart from the EU-wide cycle; since 1999 on the Sunday in the Council's June window (s.160).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "FI",
+          "schemes": [
+            "fi.maa"
+          ]
+        },
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null,
+          "schemes": [
+            "fi.maa",
+            "fi.vaalipiiri"
+          ],
+          "precedence": 6
+        }
+      ],
+      "cadence": [
+        {
+          "source": "vaalilaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1998/714 (s.160: \"Europarlamenttivaalien vaalipäivä on sinä sunnuntaina, joka sattuu Euroopan unionin neuvoston päättämään nelipäiväiseen torstaista sunnuntaihin kestävään ajanjaksoon kesäkuussa.\")",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Ministry of Justice"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Justice election results service (tulospalvelu.vaalit.fi)",
+          "url": "https://tulospalvelu.vaalit.fi/EPV-2024/",
+          "format": "csv (zip)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "tulospalvelu",
+          "first_date": "2014-05-25",
+          "last_date": "2024-06-09",
+          "evidence": "Nationwide CSV files by voting district for 2014, 2019, and 2024",
+          "role": "administers"
+        },
+        {
+          "platform": "Statistics Finland StatFin database (pxdata.stat.fi)",
+          "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__euvaa/",
+          "format": "px, csv, json-stat",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.kunta",
+          "source": "statfin",
+          "first_date": "1996-01-01",
+          "last_date": "2024-06-09",
+          "evidence": "Voting data by constituency and municipality 1996-2024 (14gu); party support 1996-2024 (14gv)",
+          "license": "CC BY 4.0"
+        }
+      ],
+      "est_votes": 13000000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 1996"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 1999"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 2004"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 2009"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 2014",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 2019",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "source": "tk-14gu",
+          "quote": "Vuosi: 2024",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Neuvoa-antavat kansanäänestykset",
+      "name_en": "National consultative referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "fi.vaalipiiri"
+        ],
+        "fine": [
+          "fi.kunta"
+        ]
+      },
+      "source": "perustuslaki",
+      "first_held": "1931-12-29",
+      "earliest_record": "1931-12-29",
+      "note": "Every national referendum is consultative and needs its own Act setting the date and the alternatives (Constitution s.53). Two have been held: on prohibition, 29 and 30 December 1931 (Act 340/31), and on joining the European Union, 16 October 1994. Åland voted on EU membership again on 20 November 1994 under its own law (AX census).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "FI"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "perustuslaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1999/731 (s.53: \"Neuvoa-antavan kansanäänestyksen järjestämisestä päätetään lailla, jossa on säädettävä äänestyksen ajankohdasta ja äänestäjille esitettävistä vaihtoehdoista.\")",
+          "called": true,
+          "administered_by": "Ministry of Justice"
+        }
+      ],
+      "access": [],
+      "est_votes": 3800000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1931-12-29",
+          "contests": 1,
+          "deferred": [
+            "1931-12-30"
+          ],
+          "source": "he-109-1994",
+          "quote": "Yleinen kieltolakiin (158/22) kohdistunut kansanäänestys järjestettiin 29 ja 30 päivänä joulukuuta 1931."
+        },
+        {
+          "date": "1994-10-16",
+          "contests": 1,
+          "source": "eu-kansanaanestys-1994",
+          "quote": "Ilmoitus Suomen liittymisestä Euroopan unionin jäseneksi 16 päivänä lokakuuta 1994 toimitetun neuvoa-antavan kansanäänestyksen tuloksesta"
+        }
+      ]
+    },
+    {
+      "key": "municipal",
+      "tier": "municipality",
+      "name": "Kuntavaalit",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "fi.kunta"
+        ],
+        "fine": [
+          "fi.aanestysalue"
+        ]
+      },
+      "source": "kuntalaki",
+      "earliest_record": "1976-01-01",
+      "finest_note": "Each municipality is one constituency; votes by voting district in the results service from 2012, by municipality in StatFin from 1976.",
+      "note": "Each mainland municipality's council is elected for four years from 1 June of the election year (Local Government Act s.15) by D'Hondt among open lists, the municipality being one constituency (Election Act s.7). Universal-suffrage municipal elections go back to the municipal Acts of 1917; StatFin's series starts in 1976, and earlier elections are not yet listed here. Åland's 16 municipalities elect under Åland law (AX census). Held in October until 2012, then in April (2021 moved to June).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "FI",
+          "schemes": [
+            "fi.kunta"
+          ]
+        },
+        {
+          "election_kinds": [
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "vaalilaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1998/714 (s.144: \"Kuntavaalien vaalipäivä on huhtikuun kolmas sunnuntai.\" \"Kuntavaalit toimitetaan samanaikaisesti aluevaalien kanssa.\")",
+          "period_years": 4,
+          "phase": 1,
+          "month": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Municipal central election boards (keskusvaalilautakunnat)",
+          "vacancy_rule": "The next candidate of the same list becomes councillor; councillors' deputies come from the list (Local Government Act s.17)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Justice election results service (tulospalvelu.vaalit.fi)",
+          "url": "https://tulospalvelu.vaalit.fi/KV-2025/",
+          "format": "csv (zip)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "tulospalvelu",
+          "first_date": "2012-10-28",
+          "last_date": "2025-04-13",
+          "evidence": "Nationwide CSV files by voting district for 2012, 2017, 2021, and 2025",
+          "role": "administers"
+        },
+        {
+          "platform": "Statistics Finland StatFin database (pxdata.stat.fi)",
+          "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__kvaa/",
+          "format": "px, csv, json-stat",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.kunta",
+          "source": "statfin",
+          "first_date": "1976-01-01",
+          "last_date": "2025-04-13",
+          "evidence": "Voting data and party support by municipality as divided in each election year, 1976-2025 (14z6, 14z7)",
+          "license": "CC BY 4.0"
+        }
+      ],
+      "est_votes": 45000000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 464,
+          "source": "tk-14z6",
+          "quote": "464 mainland municipalities with an electorate in 1976"
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 461,
+          "source": "tk-14z6",
+          "quote": "461 mainland municipalities with an electorate in 1980"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 461,
+          "source": "tk-14z6",
+          "quote": "461 mainland municipalities with an electorate in 1984"
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 460,
+          "source": "tk-14z6",
+          "quote": "460 mainland municipalities with an electorate in 1988"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 439,
+          "source": "tk-14z6",
+          "quote": "439 mainland municipalities with an electorate in 1992"
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 436,
+          "source": "tk-14z6",
+          "quote": "436 mainland municipalities with an electorate in 1996"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "contests": 432,
+          "source": "tk-14z6",
+          "quote": "432 mainland municipalities with an electorate in 2000"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 416,
+          "source": "tk-14z6",
+          "quote": "416 mainland municipalities with an electorate in 2004"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 332,
+          "source": "tk-14z6",
+          "quote": "332 mainland municipalities with an electorate in 2008"
+        },
+        {
+          "date": "2012-10-28",
+          "contests": 304,
+          "source": "tk-14z6",
+          "quote": "304 mainland municipalities with an electorate in 2012",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2017-04-09",
+          "contests": 295,
+          "source": "tk-14z6",
+          "quote": "295 mainland municipalities with an electorate in 2017",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        },
+        {
+          "date": "2021-06-13",
+          "contests": 293,
+          "source": "tk-14z6",
+          "quote": "293 mainland municipalities with an electorate in 2021",
+          "note": "Moved from 18 April to 13 June 2021 by Act 203/2021 because of the epidemic; polling day as the results service publishes it."
+        },
+        {
+          "date": "2025-04-13",
+          "contests": 292,
+          "source": "tk-14z6",
+          "quote": "292 mainland municipalities with an electorate in 2025",
+          "note": "Polling day as the Ministry of Justice's results service publishes the election."
+        }
+      ]
+    },
+    {
+      "key": "county",
+      "tier": "county",
+      "name": "Aluevaalit",
+      "name_en": "Wellbeing services county elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "fi.hyvinvointialue"
+        ],
+        "fine": [
+          "fi.kunta",
+          "fi.aanestysalue"
+        ]
+      },
+      "source": "hyvinvointialuelaki",
+      "valid_from": "2021-07-01",
+      "first_held": "2022-01-23",
+      "earliest_record": "2022-01-23",
+      "note": "Each of the 21 wellbeing services counties elects its county council by D'Hondt among open lists, the county being one constituency (Election Act s.7). Helsinki and Åland hold no county elections. The first elections were on 23 January 2022; since 2025 they are held with the municipal elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "FI",
+          "schemes": [
+            "fi.hyvinvointialue"
+          ]
+        },
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_from": "2021-07-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "vaalilaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1998/714 (\"Aluevaalien vaalipäivä on huhtikuun kolmas sunnuntai.\" \"Aluevaalit toimitetaan samanaikaisesti kuntavaalien kanssa.\")",
+          "period_years": 4,
+          "phase": 1,
+          "month": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2025-01-01",
+          "administered_by": "County election committees (aluevaalilautakunnat)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Justice election results service (tulospalvelu.vaalit.fi)",
+          "url": "https://tulospalvelu.vaalit.fi/AV-2025/",
+          "format": "csv (zip)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "tulospalvelu",
+          "first_date": "2022-01-23",
+          "last_date": "2025-04-13",
+          "evidence": "Nationwide CSV files by voting district for 2022 and 2025",
+          "role": "administers"
+        },
+        {
+          "platform": "Statistics Finland StatFin database (pxdata.stat.fi)",
+          "url": "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__alvaa/",
+          "format": "px, csv, json-stat",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "fi.aanestysalue",
+          "source": "statfin",
+          "first_date": "2022-01-23",
+          "last_date": "2025-04-13",
+          "evidence": "Voting data by municipality 2022-2025 (14y3); by voting district 2025 (14y1)",
+          "license": "CC BY 4.0"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 1,
+      "dates": [
+        {
+          "date": "2022-01-23",
+          "contests": 21,
+          "source": "tk-14y3",
+          "quote": "21 wellbeing services counties with data in 2022",
+          "note": "The first county elections, held apart from the municipal elections; polling day as the results service publishes it."
+        },
+        {
+          "date": "2025-04-13",
+          "contests": 21,
+          "source": "tk-14y3",
+          "quote": "21 wellbeing services counties with data in 2025",
+          "note": "Held with the municipal elections; polling day as the results service publishes it."
+        }
+      ]
+    },
+    {
+      "key": "kainuu",
+      "tier": "kainuu",
+      "name": "Kainuun maakuntavaalit",
+      "name_en": "Kainuu regional council elections (2004, 2008)",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "fi.kunta"
+        ]
+      },
+      "source": "kainuulaki",
+      "valid_from": "2004-04-15",
+      "valid_to": "2013-01-01",
+      "first_held": "2004-01-01",
+      "note": "Under the Kainuu self-government experiment (Act 343/2003, repealed from 31 December 2012) the regional council was elected directly, by proportional representation, together with the municipal elections; two elections were held, in 2004 and 2008.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "FI",
+          "name_pattern": "Kainuun maakunta|Kainuu regional",
+          "valid_to": "2013-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kainuulaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/2003/343 (\"Kainuun maakuntavaalit toimitetaan välittöminä, salaisina ja suhteellisina kunnallisvaalien yhteydessä.\")",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "valid_to": "2013-01-01"
+        }
+      ],
+      "access": [],
+      "est_votes": 90000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "kainuulaki",
+          "quote": "Kainuun maakuntavaalit toimitetaan välittöminä, salaisina ja suhteellisina kunnallisvaalien yhteydessä.",
+          "note": "Held with the municipal elections of 2004; the count rests on the Act's rule, not a results volume."
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "kainuulaki",
+          "quote": "Kainuun maakuntavaalit toimitetaan välittöminä, salaisina ja suhteellisina kunnallisvaalien yhteydessä.",
+          "note": "Held with the municipal elections of 2008; the count rests on the Act's rule, not a results volume."
+        }
+      ]
+    },
+    {
+      "key": "saami",
+      "tier": "saami",
+      "name": "Saamelaiskäräjien vaalit",
+      "name_en": "Sámi Parliament elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "saamelaiskarajalaki",
+      "valid_from": "1996-01-01",
+      "note": "21 members and four deputies elected for four years from 1 December of the election year by people entered in the Sámi electoral roll, the whole country one constituency, in a six-week postal vote from the Monday of the last full week of August and on election day in the Sámi homeland (Act 974/1995). The Sámi Delegation (saamelaisvaltuuskunta, 1973-1995) that preceded it was also elected and is not yet listed.",
+      "match": [
+        {
+          "name_pattern": "Saamelaiskäräj|Sámi Parliament|Sámediggi|Sametinget",
+          "iso_pattern": "FI"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "saamelaiskarajalaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/1995/974 (\"Saamelaiskäräjien vaalit toimitetaan joka neljäs vuosi\"; \"Saamelaiskäräjien vaalit toimitetaan elokuun viimeisen täyden viikon maanantaista alkavan kuuden viikon aikana.\")",
+          "period_years": 4,
+          "phase": 3,
+          "month": 9,
+          "term_years": 4,
+          "called": false,
+          "partisan": false,
+          "administered_by": "The Sámi Parliament's election committee (vaalilautakunta)"
+        }
+      ],
+      "access": [],
+      "est_votes": 25000,
+      "effort": 3
+    },
+    {
+      "key": "municipal_referendums",
+      "tier": "municipality",
+      "name": "Kunnalliset kansanäänestykset",
+      "name_en": "Consultative municipal and county referendums",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kuntalaki",
+      "note": "A council may put any municipal matter to a consultative referendum of the whole municipality or of some voting districts (Local Government Act s.24); 4 percent of residents aged 15 or more may initiate one (s.25). The procedure is Act 656/1990, which also covers wellbeing services counties. Most were held on municipal mergers; the Ministry of Justice keeps the list.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "FI",
+          "schemes": [
+            "fi.kunta",
+            "fi.aanestysalue",
+            "fi.hyvinvointialue"
+          ]
+        },
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kuntalaki",
+          "locator": "https://www.finlex.fi/fi/lainsaadanto/2015/410 (s.24: \"Kansanäänestys on neuvoa-antava.\")",
+          "called": true,
+          "administered_by": "Municipal central election boards"
+        }
+      ],
+      "access": [],
+      "est_votes": 600000,
+      "effort": 4
+    },
+    {
+      "key": "diet_estates",
+      "tier": "national",
+      "name": "Säätyvaltiopäivät",
+      "name_en": "Diet of the four estates (to 1906)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "tk-12i9",
+      "valid_to": "1906-07-20",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Diet of the Grand Duchy sat by estate: nobles by birth, and clergy, burghers, and peasants chosen by their own corporations and electors under property and status rules; these were not public elections, and no official vote counts were compiled. The Parliament Act of 1906 replaced it with the unicameral Eduskunta (class eduskunta).",
+      "match": []
+    },
+    {
+      "key": "church",
+      "tier": "national",
+      "name": "Seurakuntavaalit",
+      "name_en": "Lutheran and Orthodox parish elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kirkkolaki",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parish councils are elected by church members under the Church Act and the church's own election rules, run and published by the churches, not by the state election authority.",
+      "match": [
+        {
+          "name_pattern": "seurakun|församling|parish",
+          "iso_pattern": "FI"
+        }
+      ]
+    },
+    {
+      "key": "party_ballots",
+      "tier": "national",
+      "name": "Puolueiden jäsenäänestykset",
+      "name_en": "Party member ballots on candidates",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "vaalilaki",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Where more people seek a party's nomination than it may field, the party holds a member ballot under its own rules (Election Act ss.112-115); the party, not the state, runs and records it.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "FI"
+        }
+      ]
+    },
+    {
+      "key": "council_officers",
+      "tier": "municipality",
+      "name": "Valtuuston ja pormestarin valinta",
+      "name_en": "Council chairs and mayors chosen by councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kuntalaki",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The council elects its chair (Local Government Act s.18) and, where it chooses mayoral government, the mayor (s.44); these are councillors' votes recorded in minutes, not public elections.",
+      "match": []
+    }
+  ]
+}

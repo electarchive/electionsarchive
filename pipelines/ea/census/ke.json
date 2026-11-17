@@ -1,0 +1,1751 @@
+{
+ "polity": "KE",
+ "name": "Kenya",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Kenya",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "Kenya",
+    "lang": "sw",
+    "kind": "native"
+   }
+  ],
+  "slug": "ke",
+  "wikidata": "Q114",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "The Constitution of Kenya, 2010",
+   "publisher": "Parliament of Kenya",
+   "url": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf",
+   "kind": "official_body",
+   "note": "Arts. 6 and First Schedule (47 counties), 88 (IEBC), 89 (290 constituencies), 90 (party lists), 97 and 98 (National Assembly and Senate), 101 (general election on the second Tuesday in August every fifth year), 104 (recall), 136 and 138 (President), 166 (judges appointed), 177 and 180 (county assemblies and governors), and 255-257 (referendums). The Kenya Law copy (new.kenyalaw.org) answered with a challenge page on 2026-11-16."
+  },
+  "elections_act": {
+   "title": "Elections Act No. 24 of 2011, Revised Edition 2019 [2011]",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/G16qxyy4rA.pdf",
+   "kind": "official_body",
+   "note": "National Council for Law Reporting revised edition as posted by IEBC under Electoral Acts. Part III (elections, ss. 13-44A), Part IV (recall of a member of Parliament, ss. 45-48), and Part V (referendum, ss. 49-55)."
+  },
+  "boundaries_2012": {
+   "title": "Final Report on the First Review Relating to the Delimitation of Boundaries of Constituencies and Wards",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/9fIr43YjUT.pdf",
+   "kind": "official_body",
+   "note": "IEBC's 2012 delimitation: 290 constituencies and a cap of 1,450 county assembly wards."
+  },
+  "iibrc_2010": {
+   "title": "The Report of the Interim Independent Boundaries Review Commission (IIBRC)",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/oep20PEuYn.pdf",
+   "kind": "official_body",
+   "note": "Section 2.1.2 gives the history of constituencies: 117 at independence (1963), 158 in 1966, 188 in 1986, and 210 in 1996, and the abolition of the seven regions and the Senate between 1964 and 1966."
+  },
+  "rov_2022_county": {
+   "title": "Registered Voters per County for the 2022 General Election",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/docs/rov_per_county.pdf",
+   "kind": "official_body"
+  },
+  "rov_2022_constituency": {
+   "title": "Registered Voters per Constituency for the 2022 General Election",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/docs/rov_per_constituency.pdf",
+   "kind": "official_body"
+  },
+  "rov_2022_caw": {
+   "title": "Registered Voters per County Assembly Ward for the 2022 General Election",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/docs/rov_per_caw.pdf",
+   "kind": "official_body"
+  },
+  "ge2013": {
+   "title": "4th March 2013 General Election: Election Data",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+   "kind": "official_body",
+   "note": "Presidential results by constituency and county (section 6), candidate votes for member of National Assembly, county woman member, senator, and governor by electoral area, and member of county assembly by ward (sections 7-11), with the Gazette declarations (section 4)."
+  },
+  "ge2017": {
+   "title": "Data Report of 2017 Elections",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+   "kind": "official_body",
+   "note": "Results of the 8 August 2017 general election for all six elective positions and of the 26 October 2017 fresh presidential election (section 5)."
+  },
+  "fpe2017": {
+   "title": "Summary Final for Announcement for Fresh Presidential Election 2017",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/A1wUl9EnMM.pdf",
+   "kind": "official_body"
+  },
+  "pee2022": {
+   "title": "Post Election Evaluation Report for the 9th August, 2022 General Election",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/pabjKTV6Xa.pdf",
+   "kind": "official_body"
+  },
+  "notice2027": {
+   "title": "Publication of Notice of General Election (10th August, 2027)",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/Q0FxIpuK3x.pdf",
+   "kind": "official_body"
+  },
+  "forms": {
+   "title": "IEBC Result Forms portal",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://forms.iebc.or.ke/",
+   "kind": "official_body",
+   "note": "Scanned statutory result forms (Form A per polling station stream, Form B per constituency or county, Form C national) for the 2022 general election and the 2022-2027 by-elections."
+  },
+  "annual_2223": {
+   "title": "IEBC Annual Report FY 2022-2023",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/8tIiXFDGzt.pdf",
+   "kind": "official_body",
+   "note": "Section 2.3.3.6: the ten by-elections of 8 December 2022 and 5 January 2023 (Tables 23 and 28)."
+  },
+  "annual_2425": {
+   "title": "IEBC Annual Report FY 2024-2025",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/Q7x0pbVSs9.pdf",
+   "kind": "official_body",
+   "note": "Section 2.3.2: the twelve pending by-elections (Table 12) and the 70 external elections conducted, facilitated, or observed for other institutions."
+  },
+  "iiec_exit": {
+   "title": "Interim Independent Electoral Commission (IIEC) Exit Report 2009-2011",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/2s8zgc5IRB.pdf",
+   "kind": "official_body",
+   "note": "Section 6: eleven parliamentary and 49 civic by-elections in 2009-2011 and the 4 August 2010 constitutional referendum."
+  },
+  "parliament_history": {
+   "title": "Historical Background",
+   "publisher": "Parliament of Kenya",
+   "url": "https://www.parliament.go.ke/Parliament_Historical_Background",
+   "kind": "official_body",
+   "note": "Legislative Council from 1907, first eight elected Africans in 1957, the bicameral parliament of 1963, the merger of the Senate into the National Assembly in 1966, and the 2005 referendum rejected 57% to 43%."
+  },
+  "mca_recall": {
+   "title": "Administrative Procedures on Recall of Member of County Assembly",
+   "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+   "url": "https://www.iebc.or.ke/uploads/resources/ls25i0cQjz.pdf",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Jamhuri ya Kenya",
+   "name_en": "Republic of Kenya",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "ke.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "county",
+   "name": "Kaunti",
+   "name_en": "Counties",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "ke.county",
+   "valid_from": "2010-08-27",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2010-08-27",
+     "value": 47,
+     "source": "constitution",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 6(1) and First Schedule: 47 counties, 1 Mombasa to 47 Nairobi)"
+    },
+    {
+     "date": "2022-08-09",
+     "value": 47,
+     "source": "rov_2022_county",
+     "locator": "47 county rows, 001 MOMBASA to 047 NAIROBI CITY; total 22,102,532 registered voters"
+    }
+   ]
+  },
+  {
+   "key": "constituency",
+   "name": "Eneo bunge",
+   "name_en": "Constituencies (electoral districts of the National Assembly)",
+   "parent": "county",
+   "scheme": "ke.constituency",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1963-01-01",
+     "precision": "year",
+     "value": 117,
+     "source": "iibrc_2010",
+     "locator": "s. 2.1.2, para. 112: \"the creation of 117 Constituencies in 1963\""
+    },
+    {
+     "date": "1966-01-01",
+     "precision": "year",
+     "value": 158,
+     "source": "iibrc_2010",
+     "locator": "s. 2.1.2: \"by 1966 the House of Representatives that had been renamed The National Assembly had 158 parliamentary Constituencies\""
+    },
+    {
+     "date": "1986-01-01",
+     "precision": "year",
+     "value": 188,
+     "source": "iibrc_2010",
+     "locator": "s. 2.1.2, para. 106: \"In 1986, Parliament fixed the number of Constituencies at 188\""
+    },
+    {
+     "date": "1996-01-01",
+     "precision": "year",
+     "value": 210,
+     "source": "iibrc_2010",
+     "locator": "s. 2.1.2, para. 107: \"210 constituencies created in 1996\""
+    },
+    {
+     "date": "2013-03-04",
+     "value": 290,
+     "source": "ge2013",
+     "locator": "Elective positions table: Member of National Assembly 290"
+    },
+    {
+     "date": "2022-08-09",
+     "value": 290,
+     "source": "rov_2022_constituency",
+     "locator": "Constituency rows 001 CHANGAMWE to 290 MATHARE; total 22,102,532"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "Wadi ya bunge la kaunti",
+   "name_en": "County assembly wards",
+   "parent": "constituency",
+   "scheme": "ke.ward",
+   "source": "boundaries_2012",
+   "counts": [
+    {
+     "date": "2013-03-04",
+     "value": 1450,
+     "source": "ge2013",
+     "locator": "Elective positions table: Member of the County Assembly 1,450"
+    },
+    {
+     "date": "2022-08-09",
+     "value": 1450,
+     "source": "rov_2022_caw",
+     "locator": "Ward rows 0001 to 1450 KIAMAIKO; total 22,102,532"
+    }
+   ]
+  },
+  {
+   "key": "region",
+   "name": "Regions (majimbo)",
+   "name_en": "Regions of the independence constitution",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1963-05-18",
+   "valid_to": "1965-01-01",
+   "source": "iibrc_2010",
+   "counts": [
+    {
+     "date": "1963-06-01",
+     "precision": "year",
+     "value": 7,
+     "source": "iibrc_2010",
+     "locator": "s. 2.1.2: \"the seven regions of Kenya and the Senate were abolished\" (plus the Nairobi area, outside the regions)"
+    }
+   ]
+  },
+  {
+   "key": "province",
+   "name": "Mikoa",
+   "name_en": "Provinces (administrative, no elected organs)",
+   "parent": "national",
+   "polity_kind": "region",
+   "elects": false,
+   "valid_to": "2013-03-04",
+   "source": "ge2013",
+   "counts": [
+    {
+     "date": "2013-03-04",
+     "value": 8,
+     "source": "ge2013",
+     "locator": "Section 1 subtotal rows by former province: Coast, North Eastern, Eastern, Central, Rift Valley, Western, Nyanza, and Nairobi"
+    }
+   ]
+  },
+  {
+   "key": "local_authority",
+   "name": "Local authorities (Local Government Act, Cap. 265)",
+   "name_en": "City, municipal, town, and county councils",
+   "parent": "province",
+   "polity_kind": "municipality",
+   "valid_to": "2013-03-04",
+   "source": "iibrc_2010"
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Uchaguzi wa Rais",
+   "name_en": "President, direct, with a deputy president as running mate",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ke.nation"
+    ],
+    "grain": [
+     "ke.county",
+     "ke.constituency"
+    ],
+    "fine": [
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 138(4): more than half of all the votes cast and at least 25% in each of more than half of the counties, else a fresh election between the top two within 30 days)",
+   "first_held": "1992-12-29",
+   "earliest_record": "2013-03-04",
+   "note": "Under the independence constitution as amended, the president was declared elected unopposed with each general election from 1969 to 1988; the first contested presidential poll followed the return to multiparty politics on 29 December 1992. Under the former constitution a winner also needed 25% in at least five of the eight provinces. The Supreme Court annulled the 8 August 2017 result and IEBC held a fresh presidential election on 26 October 2017. Kenyans abroad vote only for President and in referendums.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "KE"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "majority",
+     "runoff_rule": "Art. 138(4)-(5): more than half the votes and 25% in more than half the counties, else a fresh election within 30 days between the top two",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 136(2)(a): \"on the same day as a general election of Members of Parliament, being the second Tuesday in August, in every fifth year\")"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.constituency",
+     "source": "ge2013",
+     "evidence": "Presidential votes per candidate by constituency with county totals (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.constituency",
+     "source": "ge2017",
+     "evidence": "Presidential votes per candidate by constituency with county totals (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    },
+    {
+     "platform": "IEBC, Summary Final for Announcement for Fresh Presidential Election 2017",
+     "url": "https://www.iebc.or.ke/uploads/resources/A1wUl9EnMM.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-10-26",
+     "last_date": "2017-10-26",
+     "finest": "ke.constituency",
+     "source": "fpe2017",
+     "evidence": "Form 34C summary by constituency"
+    },
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "last_date": "2007-12-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1997-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2002-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2007-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Forward: the IEBC conducted the first General Election under the Constitution of Kenya, 2010 on 4th March 2013",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "Foreword: conducted the second General Election under the Constitution of Kenya, 2010 on 8th August 2017",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2017-10-26",
+     "election_kind": "special",
+     "contests": 1,
+     "seats": 1,
+     "source": "ge2017",
+     "quote": "5.2 RESULTS OF THE 26TH OCTOBER 2017 FRESH PRESIDENTIAL ELECTION"
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 77000000,
+   "effort": 2
+  },
+  {
+   "key": "national_assembly",
+   "tier": "national",
+   "name": "Mbunge (Member of the National Assembly), constituency seats",
+   "name_en": "National Assembly (House of Representatives 1963-1966), single-member constituencies",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.constituency"
+    ],
+    "fine": [
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 97(1)(a): \"two hundred and ninety members, each elected by the registered voters of single member constituencies\")",
+   "first_held": "1963-05-18",
+   "earliest_record": "2013-03-04",
+   "boundary_source": "boundaries_2012",
+   "note": "First past the post in single-member constituencies: 117 in 1963, 158 from 1966 (when the Senate merged into the House), 188 from 1986, 210 from 1996, and 290 from 2013 (IIBRC report s. 2.1.2; Constitution Art. 89). The 1966 'little general election' of June 1966 refilled the seats of members who crossed to the KPU and is counted with the by-elections. In 2017 Kikuyu was uncontested and Kitutu Chache South was postponed after a candidate died; in 2022 four constituency polls (Kitui Rural, Kacheliba, Pokot South, Rongai) moved to 29 August.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "iso_pattern": "KE"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "none",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 101(1): \"A general election of members of Parliament shall be held on the second Tuesday in August in every fifth year\")"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.constituency",
+     "source": "ge2013",
+     "evidence": "Votes per candidate by constituency (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.constituency",
+     "source": "ge2017",
+     "evidence": "Votes per candidate by constituency (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    },
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "first_date": "1963-05-18",
+     "last_date": "2007-12-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1963-05-18",
+     "through": "1963-05-26",
+     "note": "Independence elections to the House of Representatives (117 constituencies, IIBRC s. 2.1.2); polling ran over several days."
+    },
+    {
+     "date": "1969-12-06",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1974-10-14",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1979-11-08",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1983-09-26",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1988-03-21",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1992-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1997-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2002-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2007-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Member of National Assembly 290 2098",
+     "contests": 290,
+     "seats": 290
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "Foreword: conducted the second General Election under the Constitution of Kenya, 2010 on 8th August 2017"
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country"
+    },
+    {
+     "date": "2022-08-29",
+     "note": "Postponed polls of 9 August 2022 (Kitui Rural, Kacheliba, Pokot South, Rongai); the forms portal lists the date."
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 85000000,
+   "effort": 3
+  },
+  {
+   "key": "county_woman_member",
+   "tier": "national",
+   "name": "Mwakilishi wa Wanawake wa Kaunti (County Woman Member of the National Assembly)",
+   "name_en": "County woman members of the National Assembly, one per county",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.county"
+    ],
+    "fine": [
+     "ke.constituency",
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 97(1)(b): \"forty-seven women, each elected by the registered voters of the counties, each county constituting a single member constituency\")",
+   "first_held": "2013-03-04",
+   "earliest_record": "2013-03-04",
+   "note": "A separate ballot from the constituency member; first past the post county-wide; only women stand.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "name_pattern": "([Ww]om[ae]n ([Mm]ember|[Rr]ep)|CWMNA|Mwakilishi wa Wanawake)",
+     "iso_pattern": "KE*",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "none",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Arts. 97(1)(b) and 101(1))"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.county",
+     "source": "ge2013",
+     "evidence": "Votes per candidate by county (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.county",
+     "source": "ge2017",
+     "evidence": "Votes per candidate by county (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Women Member to the National Assembly 47 303",
+     "contests": 47,
+     "seats": 47
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "5.4 COUNTY WOMAN MEMBER TO THE NATIONAL ASSEMBLY ELECTION RESULTS FOR THE 8TH AUGUST, 2017 GENERAL ELECTION",
+     "contests": 47,
+     "seats": 47
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country"
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 42000000,
+   "effort": 2
+  },
+  {
+   "key": "senate",
+   "tier": "national",
+   "name": "Seneta (Senator), county seats",
+   "name_en": "Senate, one elected senator per county (since 2013)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.county"
+    ],
+    "fine": [
+     "ke.constituency",
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 98(1)(a): \"forty-seven members each elected by the registered voters of the counties, each county constituting a single member constituency\")",
+   "first_held": "2013-03-04",
+   "earliest_record": "2013-03-04",
+   "note": "First past the post county-wide. The 16 women, 2 youth, and 2 disability members are party-list nominations (class party_lists).",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "iso_pattern": "KE*",
+     "valid_from": "2010-08-27"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "none",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Arts. 98(1)(a) and 101(1))"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.county",
+     "source": "ge2013",
+     "evidence": "Votes per candidate by county (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.county",
+     "source": "ge2017",
+     "evidence": "Votes per candidate by county (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Senator 47 244",
+     "contests": 47,
+     "seats": 47
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "Foreword: conducted the second General Election under the Constitution of Kenya, 2010 on 8th August 2017"
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country"
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 42000000,
+   "effort": 2
+  },
+  {
+   "key": "governor",
+   "tier": "county",
+   "name": "Gavana wa Kaunti (County Governor)",
+   "name_en": "County governors, with a deputy governor as running mate",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.county"
+    ],
+    "fine": [
+     "ke.constituency",
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 180(1) and (4): directly elected on the general election day; \"the candidate who receives the greatest number of votes shall be declared elected\")",
+   "first_held": "2013-03-04",
+   "earliest_record": "2013-03-04",
+   "note": "Plurality county-wide. A vacancy passes to the deputy governor, so there are no governor by-elections. The Mombasa and Kakamega polls of 9 August 2022 were postponed to 29 August after ballot-paper errors.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "iso_pattern": "KE-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "none",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 180(1): \"on the same day as a general election of Members of Parliament, being the second Tuesday in August, in every fifth year\")"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.county",
+     "source": "ge2013",
+     "evidence": "Votes per candidate by county (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.county",
+     "source": "ge2017",
+     "evidence": "Votes per candidate by county (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Governor 47 237",
+     "contests": 47,
+     "seats": 47
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "Foreword: conducted the second General Election under the Constitution of Kenya, 2010 on 8th August 2017"
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country"
+    },
+    {
+     "date": "2022-08-29",
+     "note": "Postponed Mombasa and Kakamega governor polls; the forms portal lists the date."
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 42000000,
+   "effort": 2
+  },
+  {
+   "key": "county_assembly",
+   "tier": "county",
+   "name": "Mjumbe wa Bunge la Kaunti (Member of County Assembly), ward seats",
+   "name_en": "County assemblies, one member per ward",
+   "category": "council",
+   "goal": "subnational",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.ward"
+    ],
+    "fine": [
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 177(1)(a): \"members elected by the registered voters of the wards, each ward constituting a single member constituency\")",
+   "first_held": "2013-03-04",
+   "earliest_record": "2013-03-04",
+   "boundary_source": "boundaries_2012",
+   "note": "First past the post in 1,450 wards. Gender top-up and marginalised-group members are party-list nominations (class party_lists). In 2017 West Seme was uncontested and Bogichora and Masalani were postponed.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "iso_pattern": "KE-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 8,
+     "day_rule": "aug_second_tuesday",
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Independent Electoral and Boundaries Commission",
+     "source": "constitution",
+     "valid_from": "2010-08-27",
+     "runoff": "none",
+     "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 177(1)(a) and (4): elected on the general election day for a term of five years)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC, 4th March 2013 General Election Data",
+     "url": "https://www.iebc.or.ke/docs/4TH%20MARCH%202013%20GENERAL%20ELECTION%20DATA.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2013-03-04",
+     "last_date": "2013-03-04",
+     "finest": "ke.ward",
+     "source": "ge2013",
+     "evidence": "Votes per candidate by ward (2013, text layer)"
+    },
+    {
+     "platform": "IEBC, Data Report of 2017 Elections",
+     "url": "https://www.iebc.or.ke/uploads/resources/siEABKREDq.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-08-08",
+     "last_date": "2017-10-26",
+     "finest": "ke.ward",
+     "source": "ge2017",
+     "evidence": "Votes per candidate by ward (2017, text layer)"
+    },
+    {
+     "platform": "IEBC Result Forms portal",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-08-09",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "2022 General Elections: Forms A, B, and C by position; the portal reported 138,487 of 275,754 series A forms on 2026-11-16 (presidential complete, other positions partial)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-03-04",
+     "source": "ge2013",
+     "quote": "Member of the County Assembly 1,450 9,886",
+     "contests": 1450,
+     "seats": 1450
+    },
+    {
+     "date": "2017-08-08",
+     "source": "ge2017",
+     "quote": "Foreword: conducted the second General Election under the Constitution of Kenya, 2010 on 8th August 2017"
+    },
+    {
+     "date": "2022-08-09",
+     "source": "pee2022",
+     "quote": "16,098 candidates ... were cleared to compete for the 1,882 seats across the country"
+    },
+    {
+     "date": "2027-08-10",
+     "source": "notice2027",
+     "quote": "Notice of the General Election scheduled to be held on Tuesday, 10th August, 2027"
+    }
+   ],
+   "est_votes": 42000000,
+   "effort": 3
+  },
+  {
+   "key": "parliament_by",
+   "tier": "national",
+   "name": "Uchaguzi mdogo (by-elections) to Parliament",
+   "name_en": "By-elections for constituency members, county woman members, and senators",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.constituency",
+     "ke.county"
+    ],
+    "fine": [
+     "ke.ward",
+     "ke.polling_station"
+    ]
+   },
+   "source": "elections_act",
+   "locator": "https://www.iebc.or.ke/uploads/resources/G16qxyy4rA.pdf (s. 47(6): where a recall removes a member \"the Commission shall conduct a by-election in the affected constituency or county\"; Constitution Art. 101(4) for vacancies)",
+   "first_held": "1963-05-18",
+   "earliest_record": "2022-12-08",
+   "note": "Held within 90 days of a vacancy (death, resignation, appointment, or an election court's nullification). The IIEC ran eleven parliamentary by-elections in 2009-2011; IEBC's forms portal lists the 2022-2027 by-election days with 11 MNA and 3 Senate contests among them. Earlier by-elections appear only in the Gazette.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral"
+     ],
+     "iso_pattern": "KE*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC Result Forms portal, 2022-2027 By-Elections",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-12-08",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "By-election days 8 Dec 2022 to 16 Jul 2026 with Forms A, B, and C (11 MNA, 26 MCA, 3 Senate)"
+    },
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "last_date": "2012-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-12-08",
+     "contests": 1,
+     "seats": 1,
+     "source": "annual_2223",
+     "quote": "Table 28: 039 Bungoma ... Senate ... Resignation by Senator Elected"
+    },
+    {
+     "date": "2023-01-05",
+     "contests": 3,
+     "seats": 3,
+     "source": "annual_2223",
+     "quote": "Table 23: Elgeyo Marakwet County Senate; Kandara Constituency Member of National Assembly; Garissa Township Constituency Member of National Assembly"
+    },
+    {
+     "date": "2025-11-27",
+     "source": "forms",
+     "quote": "Election Date: Nov 27th, 2025"
+    },
+    {
+     "date": "2026-02-26",
+     "source": "forms",
+     "quote": "Election Date: Feb 26th, 2026"
+    },
+    {
+     "date": "2026-05-14",
+     "source": "forms",
+     "quote": "Election Date: May 14th, 2026"
+    },
+    {
+     "date": "2026-07-16",
+     "source": "forms",
+     "quote": "Election Date: Jul 16th, 2026"
+    }
+   ],
+   "est_votes": 4000000,
+   "effort": 3
+  },
+  {
+   "key": "ward_by",
+   "tier": "county",
+   "name": "Uchaguzi mdogo (by-elections) to county assemblies",
+   "name_en": "County assembly ward by-elections",
+   "category": "council",
+   "goal": "subnational",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.ward"
+    ],
+    "fine": [
+     "ke.polling_station"
+    ]
+   },
+   "source": "annual_2425",
+   "locator": "https://www.iebc.or.ke/uploads/resources/Q7x0pbVSs9.pdf (s. 2.3.2.1 and Table 12: pending by-elections, seven of them for members of county assembly)",
+   "first_held": "2013-03-04",
+   "earliest_record": "2022-12-08",
+   "note": "Ward by-elections share days with the parliamentary ones; the forms portal counts 26 MCA contests from 2022 to 2026.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "KE-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEBC Result Forms portal, 2022-2027 By-Elections",
+     "url": "https://forms.iebc.or.ke/",
+     "format": "pdf (scanned forms)",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2022-12-08",
+     "finest": "ke.polling_station",
+     "source": "forms",
+     "evidence": "Ward by-elections with Forms A and B"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-12-08",
+     "contests": 5,
+     "seats": 5,
+     "source": "annual_2223",
+     "quote": "Table 28: Kyome/Thaana, Ololmasani, Mumias North, South Gem, and Utawala, Member of County Assembly"
+    },
+    {
+     "date": "2023-01-05",
+     "contests": 1,
+     "seats": 1,
+     "source": "annual_2223",
+     "quote": "Table 23: Shella County Assembly Ward, Member of County Assembly"
+    },
+    {
+     "date": "2025-11-27",
+     "source": "forms",
+     "quote": "Election Date: Nov 27th, 2025"
+    },
+    {
+     "date": "2026-02-26",
+     "source": "forms",
+     "quote": "Election Date: Feb 26th, 2026"
+    },
+    {
+     "date": "2026-05-14",
+     "source": "forms",
+     "quote": "Election Date: May 14th, 2026"
+    },
+    {
+     "date": "2026-07-16",
+     "source": "forms",
+     "quote": "Election Date: Jul 16th, 2026"
+    }
+   ],
+   "est_votes": 300000,
+   "effort": 3
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Kura ya maamuzi (constitutional referendum)",
+   "name_en": "National constitutional referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "ke.constituency"
+    ],
+    "fine": [
+     "ke.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 255(1)-(2): amendments touching the listed matters need approval by referendum; Arts. 256-257 for parliamentary and popular initiatives)",
+   "first_held": "2005-11-21",
+   "note": "Two held: 21 November 2005 (the proposed new constitution, rejected 57% to 43%, run by the former Electoral Commission of Kenya) and 4 August 2010 (the present constitution, approved; run by the IIEC). The Punguza Mizigo (2019) and Building Bridges (2020) popular initiatives reached IEBC's signature verification, but neither went to a vote (BBI was struck down by the courts).",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "KE"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IIEC Exit Report 2009-2011",
+     "url": "https://www.iebc.or.ke/uploads/resources/2s8zgc5IRB.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "2010-08-04",
+     "last_date": "2010-08-04",
+     "finest": "ke.nation",
+     "source": "iiec_exit",
+     "evidence": "National totals only (2,795,059 or 30.1% No; turnout 72.17% of 12.6 million)"
+    },
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "first_date": "2005-11-21",
+     "last_date": "2010-08-04"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2005-11-21",
+     "contests": 1,
+     "source": "parliament_history",
+     "quote": "a Referendum ... was conducted on the Draft Constitution. The document was rejected by the people by 57% to 43% in a National Vote"
+    },
+    {
+     "date": "2010-08-04",
+     "contests": 1,
+     "source": "iiec_exit",
+     "quote": "Constitutional Referendum that was carried out on 4th August 2010"
+    }
+   ],
+   "est_votes": 15000000,
+   "effort": 3
+  },
+  {
+   "key": "recall",
+   "tier": "national",
+   "name": "Recall elections of members of Parliament and county assemblies",
+   "name_en": "Recall elections",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "elections_act",
+   "locator": "https://www.iebc.or.ke/uploads/resources/G16qxyy4rA.pdf (ss. 45-48: petition by 30% of voters after a High Court finding; yes/no recall election valid if at least half the registered voters concur)",
+   "note": "Constitution Art. 104 gives the right to recall members of Parliament; County Governments Act s. 27 gives wards the right to recall their member of county assembly (IEBC's administrative procedures). No recall election has been held.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No recall election has ever been held under ss. 45-48 of the Elections Act or s. 27 of the County Governments Act; the class stays recorded so one would be classified when held.",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "KE*"
+    }
+   ]
+  },
+  {
+   "key": "senate_1963",
+   "tier": "national",
+   "name": "Senate (1963-1966)",
+   "name_en": "Independence Senate, one senator per district and Nairobi",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1963-05-18",
+   "valid_to": "1966-12-31",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "iibrc_2010",
+   "locator": "https://www.iebc.or.ke/uploads/resources/oep20PEuYn.pdf (s. 2.1.2: \"Between 1964 and 1966, there were constitutional amendments, whose consequence was that, the seven regions of Kenya and the Senate were abolished\")",
+   "first_held": "1963-05-18",
+   "note": "Elected once, in the May 1963 independence elections; its members joined the National Assembly in 1966 (Parliament of Kenya, Historical Background). The seat count is not in a source reached here, and valid_to marks only the year of the merger.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "KE*",
+     "valid_to": "1967-01-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "first_date": "1963-05-18",
+     "last_date": "1963-05-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1963-05-18",
+     "through": "1963-05-26",
+     "note": "Independence elections; polling ran over several days."
+    }
+   ],
+   "est_votes": 2000000,
+   "effort": 5
+  },
+  {
+   "key": "regional_assembly",
+   "tier": "region",
+   "name": "Regional Assemblies (1963-1964)",
+   "name_en": "Regional assemblies of the seven regions",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "1963-05-18",
+   "valid_to": "1965-01-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "iibrc_2010",
+   "locator": "https://www.iebc.or.ke/uploads/resources/oep20PEuYn.pdf (s. 2.1.2: the seven regions abolished between 1964 and 1966)",
+   "first_held": "1963-05-18",
+   "note": "Elected once with the May 1963 independence elections under the majimbo constitution; the regions became provinces with appointed administration. valid_to is approximate: the IIBRC dates the abolition only to 1964-1966.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "KE*",
+     "valid_to": "1965-01-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "first_date": "1963-05-18",
+     "last_date": "1963-05-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1963-05-18",
+     "through": "1963-05-26"
+    }
+   ],
+   "est_votes": 2000000,
+   "effort": 5
+  },
+  {
+   "key": "legco",
+   "tier": "national",
+   "name": "Legislative Council (LegCo) elections",
+   "name_en": "Colonial Legislative Council, elected seats",
+   "category": "legislature",
+   "goal": "national",
+   "valid_to": "1963-05-18",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "parliament_history",
+   "locator": "https://www.parliament.go.ke/Parliament_Historical_Background (\"In 1957, after the acquiring of voting rights by Africans based on wealth and education, the first eight elected Africans joined the LEGCO\")",
+   "note": "Communal rolls elected European members from the 1920s and Asian and Arab members alongside them; Africans voted from 1957 (eight seats), with more seats in 1958 and a broader common roll at the February 1961 election. Dates other than 1957 and 1961 are not listed here because no official source was reached.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "KE*",
+     "valid_to": "1963-05-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "last_date": "1961-02-28"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1957-01-01",
+     "precision": "year",
+     "source": "parliament_history",
+     "quote": "In 1957 ... the first eight elected Africans joined the LEGCO"
+    },
+    {
+     "date": "1961-02-01",
+     "precision": "month",
+     "note": "Last LegCo general election before independence; date from the archive's own index, Gazette not reached."
+    }
+   ],
+   "est_votes": 1500000,
+   "effort": 5
+  },
+  {
+   "key": "civic",
+   "tier": "local_authority",
+   "name": "Civic elections (councillors of local authorities)",
+   "name_en": "Councillors of city, municipal, town, and county councils (to 2013)",
+   "category": "council",
+   "goal": "local",
+   "valid_to": "2013-03-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ke.civic_ward"
+    ]
+   },
+   "source": "iibrc_2010",
+   "locator": "https://www.iebc.or.ke/uploads/resources/oep20PEuYn.pdf (para. 152: local authority electoral units under the Local Government Act (Cap. 265), Gazette Supplement No. 70 of 29 September 2006)",
+   "note": "Held with each general election from 1992 to 2007 (and earlier under the one-party state) in single-member civic wards; the councils were abolished when the county governments took office in March 2013. The IIEC ran 49 civic by-elections in 2009-2011.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "KE*",
+     "valid_to": "2013-03-04"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Kenya Gazette (Kenya Law)",
+     "url": "https://new.kenyalaw.org/gazettes/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "evidence": "Declarations of results before 2013 appear only as Gazette notices; new.kenyalaw.org answered with a challenge page (HTTP 202, empty body) and kenyalaw.org with 403 on 2026-11-16",
+     "last_date": "2012-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "1997-12-29",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2002-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    },
+    {
+     "date": "2007-12-27",
+     "note": "Date from the archive's own index; the Gazette notice that fixed it was not reachable (Kenya Law refused this session)."
+    }
+   ],
+   "est_votes": 25000000,
+   "effort": 5
+  },
+  {
+   "key": "party_lists",
+   "tier": "national",
+   "name": "Party-list nominations (Article 90)",
+   "name_en": "Nominated members of the National Assembly, Senate, and county assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2010-08-27",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 90 and Arts. 97(1)(c), 98(1)(b)-(d), 177(1)(b)-(c): seats allocated to parties in proportion to the seats they won)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No vote is cast for these seats: IEBC allocates them from each party's share of elected seats under Art. 90 and gazettes the nominees; the allocation follows from the elected-seat results.",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "KE*"
+    }
+   ]
+  },
+  {
+   "key": "party_primaries",
+   "tier": "national",
+   "name": "Party nominations",
+   "name_en": "Party primaries and nominations",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "elections_act",
+   "locator": "https://www.iebc.or.ke/uploads/resources/G16qxyy4rA.pdf (ss. 13 and 27: parties nominate under their own rules, submitted to the Commission)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties run their own nominations under s. 13 of the Elections Act and the Political Parties Act; IEBC only receives the rules and the nominees, and publishes no primary returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "KE*"
+    }
+   ]
+  },
+  {
+   "key": "speakers",
+   "tier": "national",
+   "name": "Speakers of Parliament and county assemblies",
+   "name_en": "Speakers elected by the houses and county assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "elections_act",
+   "locator": "https://www.iebc.or.ke/uploads/resources/G16qxyy4rA.pdf (s. 21 and First Schedule: election of speaker of county assembly by its members)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Speakers are elected by the members of each house or county assembly (Constitution Arts. 106 and 178), not by voters, and no public returns are published.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "speaker"
+     ],
+     "iso_pattern": "KE*"
+    }
+   ]
+  },
+  {
+   "key": "mayors_indirect",
+   "tier": "local_authority",
+   "name": "Mayors and council chairmen (to 2013)",
+   "name_en": "Mayors and chairmen of local authorities, chosen by councillors",
+   "category": "indirect",
+   "goal": "local",
+   "valid_to": "2013-03-04",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "iibrc_2010",
+   "locator": "https://www.iebc.or.ke/uploads/resources/oep20PEuYn.pdf (para. 113: local authorities under the Local Government Act, Cap. 265)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Councillors chose their mayors and chairmen; no popular vote and no public returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "KE*",
+     "valid_to": "2013-03-04"
+    }
+   ]
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Judges",
+   "name_en": "Judicial offices",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.parliament.go.ke/sites/default/files/2023-03/The_Constitution_of_Kenya_2010.pdf (Art. 166(1): the President appoints the Chief Justice, the Deputy Chief Justice, and all other judges on the recommendation of the Judicial Service Commission)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Kenya elects no judges; all are appointed under Art. 166."
+  },
+  {
+   "key": "external_elections",
+   "tier": "national",
+   "name": "External elections conducted or supervised by IEBC",
+   "name_en": "Elections run for other institutions (cooperatives, unions, universities, professional bodies)",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "annual_2425",
+   "locator": "https://www.iebc.or.ke/uploads/resources/Q7x0pbVSs9.pdf (s. 2.3.2.2: \"The Commission conducted, facilitated, or observed a total of 70 external elections for various institutions\")",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Internal elections of private and statutory institutions, not public office; IEBC publishes no returns for them."
+  }
+ ]
+}

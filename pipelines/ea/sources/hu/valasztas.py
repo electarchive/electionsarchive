@@ -1665,19 +1665,6 @@ def vtr_parliament(d: Day, year: int) -> None:
 # Registry and geography
 
 
-BUILT: set[date] = set()
-
-
-def _complete(name: str) -> None:
-    """Refuse to write geo or registry from a partial parse: both hold what every day's builders found."""
-    _register()
-    missing = sorted(set(DAYS) - BUILT)
-    if missing:
-        raise RuntimeError(
-            f"{SOURCE}/{name} needs every day built in this process; missing {len(missing)}: {missing[:5]}"
-        )
-
-
 def registry() -> Package:
     _complete("registry")
     p = Package(
@@ -1791,6 +1778,7 @@ def geo() -> Package:
 Builder = Callable[[Day], None]
 DAYS: dict[date, list[tuple[str, Builder]]] = defaultdict(list)
 DEPENDS: dict[date, list[str]] = {}
+BUILT: set[date] = set()
 OTHER: list[tuple[date, str, Builder]] = []
 
 
@@ -1828,6 +1816,15 @@ def build(day: date) -> Day:
     return d
 
 
+def _complete(name: str) -> None:
+    _register()
+    if missing := sorted(set(DAYS) - BUILT):
+        raise RuntimeError(
+            f"{SOURCE}/{name} gathers the settlements, parties, and bodies of every day, but {len(missing)} days "
+            f"(from {missing[0]}) were not built in this process; only a full parse builds it"
+        )
+
+
 def packages() -> list[str]:
     _register()
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in sorted(DAYS))]
@@ -1841,6 +1838,7 @@ def parse(only: str | None = None) -> None:
         build(day).write()
         bundle.cache_clear()
     if only:
+        print(f"{SOURCE}/geo and {SOURCE}/registry are left as they were, since only a full parse builds them")
         return
     geo().write()
     registry().write()

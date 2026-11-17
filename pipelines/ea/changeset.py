@@ -658,10 +658,10 @@ class Changeset:
         return tables
 
     def write(self) -> Path:
-        pipeline = self.manifest["pipeline"]
+        pipeline = str(self.manifest["pipeline"])
         if (
             self.manifest["kind"] == "import"
-            and not pipeline.startswith("census.")
+            and not str(pipeline).startswith("census.")
             and self.conn.execute(
                 """select exists (select from changeset where created_at < %(cutoff)s)
                       and not exists (select from changeset where pipeline = %(pipeline)s and created_at < %(cutoff)s)""",

@@ -1,0 +1,3012 @@
+{
+ "polity": "BO",
+ "name": "Bolivia",
+ "sources": {
+  "cpe": {
+   "title": "Constitución Política del Estado (7 de febrero de 2009), edición del Tribunal Constitucional Plurinacional",
+   "publisher": "Tribunal Constitucional Plurinacional",
+   "url": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf",
+   "kind": "official_body"
+  },
+  "cpe_2004": {
+   "title": "Ley N° 2650 de 13 de abril de 2004: texto de la Constitución Política del Estado de 1967 con las reformas de 1994 y 2004",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-2650.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley026": {
+   "title": "Ley N° 026 del Régimen Electoral, 30 de junio de 2010",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N26.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley031": {
+   "title": "Ley N° 031 Marco de Autonomías y Descentralización “Andrés Ibáñez”, 19 de julio de 2010",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N31.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley421": {
+   "title": "Ley N° 421 de Distribución de Escaños entre Departamentos, 7 de octubre de 2013",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N421.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley1614": {
+   "title": "Ley N° 1614 de Distribución de Escaños entre Departamentos, 15 de enero de 2025",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N1614.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley4021": {
+   "title": "Ley N° 4021 del Régimen Electoral Transitorio, 14 de abril de 2009",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-4021.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley3364": {
+   "title": "Ley N° 3364 Especial de Convocatoria a la Asamblea Constituyente, 6 de marzo de 2006",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-3364.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley3365": {
+   "title": "Ley N° 3365 de Convocatoria a Referéndum Nacional Vinculante a la Asamblea Constituyente para las Autonomías Departamentales, 6 de marzo de 2006",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-3365.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley3850": {
+   "title": "Ley N° 3850 de Referéndum Revocatorio de Mandato Popular, 12 de mayo de 2008",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-3850.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley3942": {
+   "title": "Ley N° 3942 de convocatoria al Referéndum Constituyente y Dirimidor, 21 de octubre de 2008",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-3942.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley757": {
+   "title": "Ley N° 757 de Convocatoria a Referendo Constitucional Aprobatorio, 5 de noviembre de 2015",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N757.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ds27449": {
+   "title": "Decreto Supremo N° 27449 de convocatoria al Referéndum vinculante sobre la política energética, 13 de abril de 2004",
+   "publisher": "Poder Ejecutivo de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-DS-27449.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley522": {
+   "title": "Ley N° 522 de Elección Directa de Representantes ante Organismos Parlamentarios Supraestatales, 28 de abril de 2014 (texto con la Ley N° 716)",
+   "publisher": "Cámara de Diputados del Estado Plurinacional de Bolivia",
+   "url": "https://diputados.gob.bo/wp-content/uploads/2025/11/ley-eleccion-supraestatales.pdf",
+   "kind": "official_body"
+  },
+  "ley1096": {
+   "title": "Ley N° 1096 de Organizaciones Políticas, 1 de septiembre de 2018",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N1096.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley1578": {
+   "title": "Ley N° 1578 de suspensión de las elecciones primarias para las Elecciones Generales 2025, 19 de agosto de 2024",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N1578.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley1266": {
+   "title": "Ley N° 1266 de Régimen Excepcional y Transitorio para la realización de Elecciones Generales, 24 de noviembre de 2019",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-N1266.xhtml",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley587": {
+   "title": "Ley N° 587 Transitoria Electoral, Elecciones Subnacionales 2015, 30 de octubre de 2014",
+   "publisher": "Asamblea Legislativa Plurinacional de Bolivia",
+   "url": "https://comunidad.org.bo/assets/normativas/ley_587,_ley_transitoria_electoral_elecciones_subnacionales_2015_.pdf",
+   "kind": "official_body",
+   "note": "A copy of the Gaceta Oficial edition hosted by a civil-society library; the Gaceta site refused connections from the build environment on 2026-11-16."
+  },
+  "ley716_1985": {
+   "title": "Ley N° 716 de 13 de febrero de 1985 (elección de concejales municipales)",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-716.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ds22883": {
+   "title": "Decreto Supremo N° 22883 de convocatoria a elecciones municipales de 1991",
+   "publisher": "Poder Ejecutivo de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-DS-22883.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ds27616": {
+   "title": "Decreto Supremo N° 27616 de convocatoria a Elecciones Municipales 2004, 7 de julio de 2004",
+   "publisher": "Poder Ejecutivo de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-DS-27616.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ley1110": {
+   "title": "Ley N° 1110 de 12 de octubre de 1989",
+   "publisher": "Congreso Nacional de Bolivia",
+   "url": "https://www.lexivox.org/norms/BO-L-1110.html",
+   "kind": "official_body",
+   "note": "Read from the LexiVox transcription of the Gaceta Oficial text (lexivox.org), because gacetaoficialdebolivia.gob.bo refused connections from the build environment on 2026-11-16."
+  },
+  "ine_cpv2024": {
+   "title": "Censo de Población y Vivienda 2024, tabulados de población: Cuadro N° 2, población por sexo según departamento, provincia y municipio o territorio indígena originario campesino (TIOC), censos 2001, 2012 y 2024",
+   "publisher": "Instituto Nacional de Estadística de Bolivia",
+   "url": "https://cpv2024.ine.gob.bo/index.php/tabulados-sobre-la-tematica-pobreza/",
+   "kind": "official_body",
+   "note": "Workbook downloaded from https://nube.ine.gob.bo/index.php/s/0OrfPjzMB16fATQ/download on 2026-11-16. Sheet 2 has 9 Departamento rows, 113 Provincia rows (112 provinces and the Territorio Indígena Multiétnico listed at province level in Beni), and 343 Municipio/TIOC rows (340 municipios and 3 TIOC: Territorio Indígena Multiétnico, Raqaypampa, and Jatun Ayllu Yura), each repeated for 2001, 2012, and 2024."
+  },
+  "oep_separata_2026": {
+   "title": "Separata de información pública: Publicación de resultados, Elecciones Subnacionales 2026, primera y segunda vuelta electoral",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+   "kind": "official_body",
+   "note": "The TSE's own separata (footer: Órgano Electoral Plurinacional), read from a newspaper's copy of the PDF because oep.org.bo refused connections from the build environment on 2026-11-16."
+  },
+  "oep_separata_2021": {
+   "title": "Separata de resultados, Elección de Autoridades Políticas Departamentales, Regionales y Municipales 2021",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2021/05/Separata-Resultados-EDRM-2021.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_runoff_2021": {
+   "title": "Conozca las papeletas electorales para elegir en la segunda vuelta a los gobernadores de Chuquisaca, La Paz, Tarija y Pando",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/institucional-institucional/conozca-las-papeletas-electorales-para-elegir-en-la-segunda-vuelta-a-los-gobernadores-de-chuquisaca-la-paz-tarija-y-pando/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_convocatoria_2015": {
+   "title": "Convocatoria a Elecciones Subnacionales 2015",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://www.oep.org.bo/wp-content/uploads/2017/03/convocatoria_elecciones_2015.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_eg2014": {
+   "title": "Acta de Cómputo Nacional, Elecciones Generales 2014",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2017/01/acta_de_computo_nacional_2014.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_eg2019": {
+   "title": "Separata de Resultados Nacionales, Elecciones Generales 2019",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2019/11/Separata_Resultados_Nacionales_EG_2019.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_eg2020": {
+   "title": "Separata de Resultados, Elecciones Generales 2020",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2020/10/Separata_Resultados_EG_2020.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_eg2025": {
+   "title": "Separata de resultados, Elecciones Generales 2025 (primera vuelta)",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2025/08/30-08-2025-Separata-resultados-EG2025.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_eg2025_2v": {
+   "title": "Separata de resultados, Elecciones Generales 2025, segunda vuelta",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2025/11/31-10-2025-separata-Revisado.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. The TSE convened the runoff by Resolución TSE-RSP-ADM 0387/2025 of 27 August 2025."
+  },
+  "oep_eg2005": {
+   "title": "Observatorio de Democracia Intercultural: Elecciones Generales 2005",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://observatoriodemocraciaintercultural.oep.org.bo/democracia-representativa/ejercicio-de-la-democracia-representativa/eleccion-de-autoridades/elecciones-generales/elecciones-generales-por-gestion/elecciones-generales-2005/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_atlas": {
+   "title": "Atlas Electoral de Bolivia (digital): 45 procesos electorales y referendarios, 1979-2016",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://atlaselectoral.oep.org.bo/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. OEP describes the Atlas as open data downloadable without a request; an indexed file (https://atlaselectoral.oep.org.bo/descarga/17/votos_totales.csv) has one row per mesa with department, province, municipality, recinto, and mesa codes. Print volumes: Tomo I (general elections 1979-2009), Tomo II (referendums), Tomo III (municipal elections 1985-2010), Tomo IV."
+  },
+  "oep_atlas_tomo1": {
+   "title": "Atlas Electoral de Bolivia, Tomo I: Elecciones Generales 1979-2009",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/informacion-publica/atlas-electoral-de-bolivia-tomo-i/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_atlas_tomo2": {
+   "title": "Atlas Electoral de Bolivia, Tomo II: Referendos (capítulos I y II)",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-II_Cap_I-II.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_atlas_tomo3": {
+   "title": "Atlas Electoral de Bolivia, Tomo III: Elecciones Municipales 1985-2010",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_I.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_computo": {
+   "title": "Sistema de Cómputo Oficial del Órgano Electoral Plurinacional",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://computo.oep.org.bo/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. The 2025 general election used https://computo2025-1v.oep.org.bo/ and https://computo2025-2v.oep.org.bo/."
+  },
+  "oep_historia": {
+   "title": "Historia del Órgano Electoral Plurinacional",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/institucional/historia/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. Universal suffrage came by Decreto Supremo 3128 of 21 July 1952, and the Corte Nacional Electoral was created in 1956 to run that year's election."
+  },
+  "oep_ej2011": {
+   "title": "Elecciones Judiciales 2011",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/procesos-electorales-y-consultas/elecciones-judiciales/elecciones-judiciales-2011/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ej2017": {
+   "title": "Separata de resultados, Elecciones Judiciales 2017",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2018/01/separata_resultados_elecciones_judiciales_2017.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ej2024": {
+   "title": "Boletín estadístico, Elecciones Judiciales 2024",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://observatoriodemocraciaintercultural.oep.org.bo/wp-content/uploads/2025/03/19-02-2025_bol_Estadistico_EJ_2024.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_primarias2019": {
+   "title": "Elecciones Primarias 2019: acta de cómputo nacional y separata de resultados",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/elecciones-primarias-2019/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ref2016": {
+   "title": "Referendo Constitucional 2016",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/procesos-electorales-y-consultas/referendos/referendo-constitucional-2016/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ref2015": {
+   "title": "Resultados del Referendo de Estatutos Autonómicos y Cartas Orgánicas 2015",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2017/01/referendo_aprobatorio_2015.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ref2016_estatutos": {
+   "title": "Referendo de Estatutos Autonómicos y Cartas Orgánicas 2016",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/procesos-electorales-y-consultas/referendos/referendo-de-estatutos-y-cartas-organicas-2016/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_ref2017": {
+   "title": "Resultados del Referendo de Estatutos y Acceso a la Autonomía Indígena Originario Campesina 2017",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/wp-content/uploads/2017/07/resultados_reaco_2017.pdf",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+  },
+  "oep_aioc": {
+   "title": "Autonomías Indígena Originario Campesinas: conformación de gobiernos",
+   "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
+   "url": "https://web.oep.org.bo/aioc/conformacion-organo-deliberativo/",
+   "kind": "official_body",
+   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. SIFDE publishes supervision reports and the names of authorities chosen by normas y procedimientos propios, not vote counts."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Estado Plurinacional de Bolivia",
+   "name_en": "Plurinational State of Bolivia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "bo.nation",
+   "source": "cpe"
+  },
+  {
+   "key": "departamento",
+   "name": "Departamentos",
+   "name_en": "Departments",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "bo.departamento",
+   "source": "ine_cpv2024",
+   "counts": [
+    {
+     "date": "2024-03-23",
+     "value": 9,
+     "source": "ine_cpv2024",
+     "locator": "Cuadro N° 2, rows at NIVEL Departamento for 2024: 9"
+    }
+   ]
+  },
+  {
+   "key": "region",
+   "name": "Región autónoma del Gran Chaco",
+   "name_en": "Autonomous region of the Gran Chaco (Tarija)",
+   "parent": "departamento",
+   "polity_kind": "region",
+   "scheme": "bo.region",
+   "valid_from": "2009-12-06",
+   "source": "ley4021",
+   "counts": [
+    {
+     "date": "2009-12-06",
+     "value": 1,
+     "source": "ley4021",
+     "locator": "art. 76: \"la Provincia Gran Chaco del Departamento de Tarija optará por la autonomía regional el 6 de diciembre de 2009 vía referendo\" (Yacuiba, Villamontes, and Caraparí); the only regional autonomy"
+    }
+   ]
+  },
+  {
+   "key": "provincia",
+   "name": "Provincias",
+   "name_en": "Provinces",
+   "parent": "departamento",
+   "polity_kind": "county",
+   "scheme": "bo.provincia",
+   "source": "ine_cpv2024",
+   "counts": [
+    {
+     "date": "2024-03-23",
+     "value": 112,
+     "source": "ine_cpv2024",
+     "locator": "Cuadro N° 2: 113 rows at NIVEL Provincia for 2024, less the Territorio Indígena Multiétnico listed at that level in Beni"
+    }
+   ]
+  },
+  {
+   "key": "municipio",
+   "name": "Municipios",
+   "name_en": "Municipalities",
+   "parent": "provincia",
+   "polity_kind": "municipality",
+   "scheme": "bo.municipio",
+   "source": "ine_cpv2024",
+   "counts": [
+    {
+     "date": "2024-03-23",
+     "value": 340,
+     "source": "ine_cpv2024",
+     "locator": "Cuadro N° 2: 343 rows at NIVEL Municipio/TIOC for 2024, less the 3 TIOC (Territorio Indígena Multiétnico, Raqaypampa, Jatun Ayllu Yura); La Paz 87, Santa Cruz 56, Cochabamba 47, Potosí 41, Oruro 35, Chuquisaca 29, Beni 19, Pando 15, Tarija 11"
+    }
+   ]
+  },
+  {
+   "key": "aioc",
+   "name": "Autonomías indígena originario campesinas",
+   "name_en": "Indigenous autonomies (AIOC): converted municipalities and indigenous territories (TIOC)",
+   "parent": "departamento",
+   "polity_kind": "municipality",
+   "scheme": "bo.tioc",
+   "valid_from": "2009-02-07",
+   "source": "ine_cpv2024",
+   "counts": [
+    {
+     "date": "2024-03-23",
+     "value": 3,
+     "source": "ine_cpv2024",
+     "locator": "Cuadro N° 2: 3 TIOC rows (Territorio Indígena Multiétnico, Raqaypampa, Jatun Ayllu Yura); the five municipalities converted to indigenous autonomy are counted as municipios"
+    }
+   ]
+  },
+  {
+   "key": "distrito",
+   "name": "Distritos municipales, organizaciones territoriales de base y juntas vecinales",
+   "name_en": "Municipal districts and neighborhood organizations",
+   "parent": "municipio",
+   "polity_kind": "submunicipal",
+   "scheme": "bo.distrito",
+   "elects": false,
+   "source": "ley031"
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Elección de Presidenta o Presidente y Vicepresidenta o Vicepresidente del Estado",
+   "name_en": "President and vice president, elected on one ticket",
+   "category": "executive",
+   "goal": "national",
+   "earliest_record": "1979-07-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.provincia",
+     "bo.municipio",
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Since 2009 a ticket wins with over 50% of valid votes, or 40% with a 10-point lead; otherwise a runoff between the top two within 60 days (CPE art. 166; Ley 026 arts. 52-53). Before 2009, when no ticket won an absolute majority, Congress chose among the top candidates (CPE 1967/2004 art. 90), so the popular vote is one contest and the congressional choice an indirect one (class presidente_congreso). The first popular runoff was held on 19 October 2025. The first presidential elections by restricted direct vote date from the 1840s; the first under universal suffrage was in 1956.",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (arts. 166 and 168)",
+   "est_votes": 6500000,
+   "effort": 2,
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "term_years": 5,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_threshold": 50,
+     "runoff_rule": "Elected with over 50% of valid votes, or at least 40% with a 10-point lead over the runner-up; otherwise a runoff between the top two within 60 days; no runoff if a finalist withdraws 45 days before (Ley 026 art. 53).",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "cpe",
+     "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 166: \"cincuenta por ciento más uno de los votos válidos; o que haya obtenido un mínimo del cuarenta por ciento de los votos válidos, con una diferencia de al menos diez por ciento\"; art. 168: five years); the TSE sets each date by convocatoria",
+     "valid_from": "2009-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1979-07-01",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-02-21"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2020-10-18",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    },
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://web.oep.org.bo/wp-content/uploads/2025/08/30-08-2025-Separata-resultados-EG2025.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2014-10-12",
+     "source": "oep_eg2025",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1956-01-01",
+     "through": "1978-12-31",
+     "precision": "year",
+     "source": "oep_historia",
+     "note": "Elections under universal suffrage from 1956 (Decreto Supremo 3128 of 1952; Corte Nacional Electoral created in 1956) to the annulled election of 1978, before the Atlas Electoral's first year; restricted-franchise elections go back to the 19th century. Not yet counted from an official list."
+    },
+    {
+     "date": "1979-07-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1980-06-29",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1985-07-14",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1989-05-07",
+     "election_kind": "general",
+     "source": "ley1110",
+     "contests": 1,
+     "quote": "las elecciones generales del 7 de mayo de 1989"
+    },
+    {
+     "date": "1993-06-06",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1997-06-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2002-06-30",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 1,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2005-12-18",
+     "election_kind": "general",
+     "source": "oep_eg2005",
+     "contests": 1
+    },
+    {
+     "date": "2009-12-06",
+     "election_kind": "general",
+     "source": "ley4021",
+     "contests": 1,
+     "quote": "Las elecciones generales del 6 de diciembre de 2009 y las del 4 de abril de 2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "general",
+     "source": "oep_eg2014",
+     "contests": 1
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "general",
+     "source": "oep_eg2019",
+     "contests": 1,
+     "note": "Annulled by Ley 1266 of 24 November 2019, art. 2: \"Se deja sin efecto legal las Elecciones Generales realizadas el 20 de octubre de 2019 y sus resultados.\" OEP still publishes its results separata."
+    },
+    {
+     "date": "2020-10-18",
+     "election_kind": "general",
+     "source": "oep_eg2020",
+     "contests": 1
+    },
+    {
+     "date": "2025-08-17",
+     "election_kind": "general",
+     "source": "oep_eg2025",
+     "contests": 1
+    },
+    {
+     "date": "2025-10-19",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "oep_eg2025_2v",
+     "note": "First popular presidential runoff, between Rodrigo Paz-Edman Lara (PDC) and Jorge Quiroga-Juan Pablo Velasco (Libre)."
+    }
+   ]
+  },
+  {
+   "key": "presidente_congreso",
+   "tier": "national",
+   "name": "Elección congresal de Presidente y Vicepresidente de la República",
+   "name_en": "Congressional choice of president when no ticket won an absolute majority",
+   "category": "indirect",
+   "goal": "national",
+   "valid_to": "2009-02-07",
+   "earliest_record": "1979-08-06",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under CPE 1967 art. 90 (texts of 1994 and 2004), \"Si en las elecciones generales ninguna de las fórmulas ... obtuviera la mayoría absoluta de sufragios válidos, el Congreso elegirá por mayoría absoluta\" among the top three (top two from 1994). Congress chose the president after every general election from 1979 to 2002; in 2005 Evo Morales won an absolute majority. The votes of members of Congress are in the Congress's records, not OEP's.",
+   "source": "cpe_2004",
+   "locator": "https://www.lexivox.org/norms/BO-L-2650.xhtml (art. 90)",
+   "est_votes": 157,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "diputados",
+   "tier": "national",
+   "name": "Elección de Diputadas y Diputados (uninominales, plurinominales y de circunscripciones especiales)",
+   "name_en": "Chamber of Deputies",
+   "category": "legislature",
+   "goal": "national",
+   "earliest_record": "1979-07-01",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bo.circunscripcion",
+     "bo.circ_especial",
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "130 deputies (CPE art. 146). Since 1997 a mixed-member compensatory system: single-member circunscripciones uninominales by plurality, and departmental list seats allocated by D'Hondt on the presidential vote among parties with 3% nationally, less the single-member seats won (Ley 026 art. 59). From 2009 seven circunscripciones especiales indígena originario campesinas elect one deputy each by plurality (art. 61). Split: 70 uninominal, 53 list, and 7 special in 2009 (Ley 026 art. 57); 63, 60, and 7 since Ley 421 of 2013, kept by Ley 1614 of 2025 after the 2024 census. Contests counted per election: each single-member and special district plus the nine departmental list contests. Before 1997 deputies were elected on departmental lists only (not counted here).",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 146)",
+   "est_votes": 6500000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "runoff_rule": "A tie in a single-member or special district goes to a second vote within 28 days (Ley 026 arts. 60-61).",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 56-61); seat split from Ley 1614 (\"Total 130 7 63 60\")",
+     "valid_from": "2009-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1979-07-01",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-02-21"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2020-10-18",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1956-01-01",
+     "through": "1978-12-31",
+     "precision": "year",
+     "source": "oep_historia",
+     "note": "Elections under universal suffrage from 1956 (Decreto Supremo 3128 of 1952; Corte Nacional Electoral created in 1956) to the annulled election of 1978, before the Atlas Electoral's first year; restricted-franchise elections go back to the 19th century. Not yet counted from an official list."
+    },
+    {
+     "date": "1979-07-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1980-06-29",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1985-07-14",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1989-05-07",
+     "election_kind": "general",
+     "source": "ley1110",
+     "quote": "las elecciones generales del 7 de mayo de 1989"
+    },
+    {
+     "date": "1993-06-06",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1997-06-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "seats": 130,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2002-06-30",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "seats": 130,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2005-12-18",
+     "election_kind": "general",
+     "source": "oep_eg2005",
+     "seats": 130
+    },
+    {
+     "date": "2009-12-06",
+     "election_kind": "general",
+     "source": "ley4021",
+     "contests": 86,
+     "seats": 130,
+     "quote": "Las elecciones generales del 6 de diciembre de 2009 y las del 4 de abril de 2010",
+     "note": "70 uninominal, 7 special, and 9 departmental list contests (Ley 026 art. 57: \"Total 130 70 53 7\")."
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "general",
+     "source": "oep_eg2014",
+     "contests": 79,
+     "seats": 130,
+     "note": "63 uninominal, 7 special, and 9 departmental list contests (Ley 421)."
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "general",
+     "source": "oep_eg2019",
+     "contests": 79,
+     "seats": 130,
+     "note": "Annulled by Ley 1266 of 24 November 2019, art. 2: \"Se deja sin efecto legal las Elecciones Generales realizadas el 20 de octubre de 2019 y sus resultados.\" OEP still publishes its results separata. 63 uninominal, 7 special, and 9 departmental list contests (Ley 421)."
+    },
+    {
+     "date": "2020-10-18",
+     "election_kind": "general",
+     "source": "oep_eg2020",
+     "contests": 79,
+     "seats": 130,
+     "note": "63 uninominal, 7 special, and 9 departmental list contests (Ley 421)."
+    },
+    {
+     "date": "2025-08-17",
+     "election_kind": "general",
+     "source": "oep_eg2025",
+     "contests": 79,
+     "seats": 130,
+     "note": "63 uninominal, 7 special, and 9 departmental list contests (Ley 1614: \"Total 130 7 63 60\")."
+    }
+   ]
+  },
+  {
+   "key": "senadores",
+   "tier": "national",
+   "name": "Elección de Senadoras y Senadores",
+   "name_en": "Chamber of Senators",
+   "category": "legislature",
+   "goal": "national",
+   "earliest_record": "1979-07-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "One contest per department. Since 2009, 36 senators, 4 per department, allocated by D'Hondt (divisors 1 to 4) on the presidential vote of each department (CPE art. 148; Ley 026 arts. 54-55). Until 2005, 27 senators, 3 per department: two for the list with the most votes and one for the runner-up (CPE 1967/2004 art. 60). Senators have no separate ballot: their seats follow the presidential vote.",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 148)",
+   "est_votes": 6500000,
+   "effort": 2,
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 54-55: \"En cada uno de los Departamentos se elegirán cuatro Senadoras y Senadores titulares\")",
+     "valid_from": "2009-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1979-07-01",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-02-21"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2020-10-18",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1956-01-01",
+     "through": "1978-12-31",
+     "precision": "year",
+     "source": "oep_historia",
+     "note": "Elections under universal suffrage from 1956 (Decreto Supremo 3128 of 1952; Corte Nacional Electoral created in 1956) to the annulled election of 1978, before the Atlas Electoral's first year; restricted-franchise elections go back to the 19th century. Not yet counted from an official list."
+    },
+    {
+     "date": "1979-07-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1980-06-29",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1985-07-14",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1989-05-07",
+     "election_kind": "general",
+     "source": "ley1110",
+     "contests": 9,
+     "seats": 27,
+     "quote": "las elecciones generales del 7 de mayo de 1989"
+    },
+    {
+     "date": "1993-06-06",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "1997-06-01",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2002-06-30",
+     "election_kind": "general",
+     "source": "oep_atlas_tomo1",
+     "contests": 9,
+     "seats": 27,
+     "note": "Date from the OEP Atlas Electoral's list of general elections (Tomo I, 1979-2009); the day itself was not read on an OEP page from the build environment."
+    },
+    {
+     "date": "2005-12-18",
+     "election_kind": "general",
+     "source": "oep_eg2005",
+     "contests": 9,
+     "seats": 27
+    },
+    {
+     "date": "2009-12-06",
+     "election_kind": "general",
+     "source": "ley4021",
+     "contests": 9,
+     "seats": 36,
+     "quote": "Las elecciones generales del 6 de diciembre de 2009 y las del 4 de abril de 2010"
+    },
+    {
+     "date": "2014-10-12",
+     "election_kind": "general",
+     "source": "oep_eg2014",
+     "contests": 9,
+     "seats": 36
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "general",
+     "source": "oep_eg2019",
+     "contests": 9,
+     "seats": 36,
+     "note": "Annulled by Ley 1266 of 24 November 2019, art. 2: \"Se deja sin efecto legal las Elecciones Generales realizadas el 20 de octubre de 2019 y sus resultados.\" OEP still publishes its results separata."
+    },
+    {
+     "date": "2020-10-18",
+     "election_kind": "general",
+     "source": "oep_eg2020",
+     "contests": 9,
+     "seats": 36
+    },
+    {
+     "date": "2025-08-17",
+     "election_kind": "general",
+     "source": "oep_eg2025",
+     "contests": 9,
+     "seats": 36
+    }
+   ]
+  },
+  {
+   "key": "supraestatales",
+   "tier": "national",
+   "name": "Elección de Representantes ante Organismos Parlamentarios Supraestatales",
+   "name_en": "Representatives to supranational parliaments (Andean Parliament and others)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2014-04-28",
+   "first_held": "2014-10-12",
+   "earliest_record": "2014-10-12",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Nine representatives, one per department by plurality on the lists headed by the presidential tickets (Ley 522 arts. 6-7), for five years (art. 4); they then share the seats in the Andean Parliament and other bodies among themselves (art. 16). Elected with every general election since 2014 (CPE art. 266; Ley 1266 art. 2 for 2020). Earlier members were appointed by Congress.",
+   "source": "ley522",
+   "locator": "https://diputados.gob.bo/wp-content/uploads/2025/11/ley-eleccion-supraestatales.pdf (art. 6: \"se elegirá por voto popular un total de nueve (9) representantes titulares\")",
+   "est_votes": 6500000,
+   "effort": 2,
+   "match": [
+    {
+     "name_pattern": "supraestatal|parlamento andino|andean parliament|supranational",
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley522",
+     "locator": "https://diputados.gob.bo/wp-content/uploads/2025/11/ley-eleccion-supraestatales.pdf (arts. 4 and 7)",
+     "valid_from": "2014-04-28"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2020-10-18",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2014-10-12",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "ley522"
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "oep_eg2019",
+     "note": "Annulled by Ley 1266 of 24 November 2019, art. 2: \"Se deja sin efecto legal las Elecciones Generales realizadas el 20 de octubre de 2019 y sus resultados.\" OEP still publishes its results separata."
+    },
+    {
+     "date": "2020-10-18",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "ley1266"
+    },
+    {
+     "date": "2025-08-17",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "oep_eg2025"
+    }
+   ]
+  },
+  {
+   "key": "constituyente",
+   "tier": "national",
+   "name": "Elección de Constituyentes a la Asamblea Constituyente",
+   "name_en": "Constituent Assembly of 2006",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2006-03-06",
+   "valid_to": "2007-12-15",
+   "first_held": "2006-07-02",
+   "earliest_record": "2006-07-02",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bo.circunscripcion",
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "255 members: three in each of the 70 single-member districts (two for the first party, one for the second) and five in each department (Ley 3364 art. 5), so 79 contests. The Assembly closed with the draft constitution of December 2007.",
+   "source": "ley3364",
+   "locator": "https://www.lexivox.org/norms/BO-L-3364.xhtml (art. 5: \"La Asamblea Constituyente estará conformada por 255 Constituyentes\")",
+   "est_votes": 3000000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2006-07-02",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2006-07-02"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2006-07-02",
+     "election_kind": "general",
+     "contests": 79,
+     "seats": 255,
+     "source": "ley3364",
+     "quote": "La Asamblea Constituyente estará conformada por 255 Constituyentes"
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "tsj",
+   "tier": "national",
+   "name": "Elección de Magistradas y Magistrados del Tribunal Supremo de Justicia",
+   "name_en": "Supreme Court of Justice",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2009-02-07",
+   "first_held": "2011-10-16",
+   "earliest_record": "2011-10-16",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "One justice per department: voters cast one vote on a women's list and one on a men's list, and the most-voted candidate takes the seat (Ley 026 art. 79). In 2024 the votes in Beni and Pando were suspended by a constitutional ruling, and those seats were still unfilled in November 2026. The Asamblea Legislativa Plurinacional preselects candidates and the TSE runs a nonpartisan vote; campaigning is forbidden and the TSE alone publicizes merits (Ley 026 arts. 75-82). Six-year terms, no reelection (CPE arts. 183 and 200).",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (arts. 182-183)",
+   "est_votes": 5500000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "tribunal supremo de justicia|supreme court of justice",
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 5,
+     "term_years": 6,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 75-79); 2011 and 2017 kept the six-year cycle, the 2024 vote came seven years later after the Assembly's preselection stalled",
+     "valid_from": "2010-06-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-12-03",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2011-10-16",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "oep_ej2011"
+    },
+    {
+     "date": "2017-12-03",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "oep_ej2017"
+    },
+    {
+     "date": "2024-12-15",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 7,
+     "source": "oep_ej2024",
+     "note": "Beni and Pando suspended by SCP 0770/2024."
+    }
+   ]
+  },
+  {
+   "key": "tcp",
+   "tier": "national",
+   "name": "Elección de Magistradas y Magistrados del Tribunal Constitucional Plurinacional",
+   "name_en": "Plurinational Constitutional Court",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2009-02-07",
+   "first_held": "2011-10-16",
+   "earliest_record": "2011-10-16",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Seven justices in one national contest in 2011 (Ley 026 art. 79); from 2017 one per department. In 2024 the votes in Beni, Pando, Cochabamba, Santa Cruz, and Tarija were suspended by a constitutional ruling, so 4 were elected; the 5 seats were still unfilled in November 2026. The 2017 count of 9 is inferred from the TSE's total of 26 titulares less 9 TSJ, 5 agro-environmental, and 3 council members. The Asamblea Legislativa Plurinacional preselects candidates and the TSE runs a nonpartisan vote; campaigning is forbidden and the TSE alone publicizes merits (Ley 026 arts. 75-82). Six-year terms, no reelection (CPE arts. 183 and 200).",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (arts. 198-200)",
+   "est_votes": 5500000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "tribunal constitucional|constitutional court",
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 5,
+     "term_years": 6,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 75-79); 2011 and 2017 kept the six-year cycle, the 2024 vote came seven years later after the Assembly's preselection stalled",
+     "valid_from": "2010-06-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-12-03",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2011-10-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 7,
+     "source": "oep_ej2011"
+    },
+    {
+     "date": "2017-12-03",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "oep_ej2017",
+     "quote": "eligió por voto directo a 26 autoridades titulares e igual número de suplentes"
+    },
+    {
+     "date": "2024-12-15",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 4,
+     "source": "oep_ej2024",
+     "note": "Five departments suspended by SCP 0770/2024."
+    }
+   ]
+  },
+  {
+   "key": "agroambiental",
+   "tier": "national",
+   "name": "Elección de Magistradas y Magistrados del Tribunal Agroambiental",
+   "name_en": "Agro-Environmental Court",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2009-02-07",
+   "first_held": "2011-10-16",
+   "earliest_record": "2011-10-16",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "One national contest: the seven most-voted of up to 28 preselected candidates in 2011 (Ley 026 art. 79); five seats in 2017 and 2024. The Asamblea Legislativa Plurinacional preselects candidates and the TSE runs a nonpartisan vote; campaigning is forbidden and the TSE alone publicizes merits (Ley 026 arts. 75-82). Six-year terms, no reelection (CPE arts. 183 and 200).",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 188)",
+   "est_votes": 5500000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "agroambiental|agro-environmental",
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 5,
+     "term_years": 6,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 75-79); 2011 and 2017 kept the six-year cycle, the 2024 vote came seven years later after the Assembly's preselection stalled",
+     "valid_from": "2010-06-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-12-03",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2011-10-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 7,
+     "source": "oep_ej2011"
+    },
+    {
+     "date": "2017-12-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 5,
+     "source": "oep_ej2017"
+    },
+    {
+     "date": "2024-12-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 5,
+     "source": "oep_ej2024"
+    }
+   ]
+  },
+  {
+   "key": "consejo_magistratura",
+   "tier": "national",
+   "name": "Elección de Consejeras y Consejeros del Consejo de la Magistratura",
+   "name_en": "Council of the Magistracy",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2009-02-07",
+   "first_held": "2011-10-16",
+   "earliest_record": "2011-10-16",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "One national contest: five members in 2011 (Ley 026 art. 79), three in 2017 and 2024. The Asamblea Legislativa Plurinacional preselects candidates and the TSE runs a nonpartisan vote; campaigning is forbidden and the TSE alone publicizes merits (Ley 026 arts. 75-82). Six-year terms, no reelection (CPE arts. 183 and 200).",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 194)",
+   "est_votes": 5500000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "consejo de la magistratura|council of the magistracy|judicial council",
+     "iso_pattern": "BO"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 5,
+     "term_years": 6,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 75-79); 2011 and 2017 kept the six-year cycle, the 2024 vote came seven years later after the Assembly's preselection stalled",
+     "valid_from": "2010-06-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2017-12-03",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2011-10-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 5,
+     "source": "oep_ej2011"
+    },
+    {
+     "date": "2017-12-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 3,
+     "source": "oep_ej2017"
+    },
+    {
+     "date": "2024-12-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 3,
+     "source": "oep_ej2024"
+    }
+   ]
+  },
+  {
+   "key": "referendo_nacional",
+   "tier": "national",
+   "name": "Referendos nacionales",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1931-01-11",
+   "earliest_record": "1931-01-11",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "National referendums by state or popular initiative, at most one of each per constitutional term apart from treaties and constitutional reform (CPE arts. 11 and 411; Ley 026 arts. 12-23). Held: the 1931 plebiscite under the military junta, the 2004 gas referendum, the 2006 autonomy referendum (held with the Constituent Assembly election; Yes won in Santa Cruz, Beni, Pando, and Tarija), the 2009 constitutional referendum with its separate settling question on landholding (art. 398), and the 2016 referendum on presidential reelection (No won). The 2008 recall vote is class revocatoria_nacional.",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 12-23)",
+   "est_votes": 6000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1931-01-11",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-02-21"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1931-01-11",
+     "election_kind": "referendum",
+     "source": "oep_atlas_tomo2",
+     "note": "Plebiscite of the Junta Militar on constitutional reforms; the number of questions was not read from an official page."
+    },
+    {
+     "date": "2004-07-18",
+     "election_kind": "referendum",
+     "source": "ds27449",
+     "quote": "Referéndum vinculante sobre la política energética del país a realizarse el día 18 de julio de 2004",
+     "note": "Several questions on hydrocarbons policy; their number is set by a later decree not read here."
+    },
+    {
+     "date": "2006-07-02",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ley3365",
+     "quote": "El Referéndum Nacional se realizará el día 2 de julio de 2006, simultáneamente a la elección de los miembros de la Asamblea Constituyente"
+    },
+    {
+     "date": "2009-01-25",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "ley3942",
+     "quote": "se convoca para el domingo 25 de enero de 2009 a Referéndum Dirimidor del Artículo 398° ... así como para refrendar el texto íntegro del proyecto"
+    },
+    {
+     "date": "2016-02-21",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ley757",
+     "quote": "El Referendo Constitucional Aprobatorio se realizará el día domingo 21 de febrero de 2016."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "revocatoria_nacional",
+   "tier": "national",
+   "name": "Referéndum Revocatorio de Mandato Popular del Presidente y Vicepresidente",
+   "name_en": "Recall vote on the president and vice president",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2008-08-10",
+   "earliest_record": "2008-08-10",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Any elected official except judges may be recalled after half the term and before its last year, on a petition of 15% of the electorate (CPE art. 240; Ley 026 arts. 25-34). The only national recall vote, on 10 August 2008 under Ley 3850, ratified Evo Morales and Álvaro García Linera.",
+   "source": "ley3850",
+   "locator": "https://www.lexivox.org/norms/BO-L-3850.html (arts. 1-9)",
+   "est_votes": 3300000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2008-08-10",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2008-08-10"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-08-10",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "ley3850",
+     "quote": "Referéndum Revocatorio de Mandato Popular del Presidente de la República, Vicepresidente de la República y Prefectos de Departamento"
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "primarias",
+   "tier": "national",
+   "name": "Elecciones primarias de candidaturas del binomio presidencial",
+   "name_en": "State-run primaries for presidential tickets",
+   "category": "nominating",
+   "goal": "national",
+   "valid_from": "2018-09-01",
+   "first_held": "2019-01-27",
+   "earliest_record": "2019-01-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ]
+   },
+   "note": "Ley 1096 art. 29 has the TSE run closed primaries for every party's presidential ticket on one day, with party members voting. Held once, on 27 January 2019, when every party fielded a single ticket. Ley 1266 dropped them for 2020 and Ley 1578 suspended them for 2025: \"no se llevarán a cabo las Elecciones primarias de candidaturas del binomio presidencial\".",
+   "source": "ley1096",
+   "locator": "https://www.lexivox.org/norms/BO-L-N1096.xhtml (art. 29 and first transitory provision)",
+   "est_votes": 600000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "primary"
+     ],
+     "iso_pattern": "BO"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Elecciones Primarias 2019 (acta de cómputo nacional and separata)",
+     "url": "https://web.oep.org.bo/elecciones-primarias-2019/",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2019-01-27",
+     "last_date": "2019-01-27",
+     "source": "oep_primarias2019",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.departamento"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-01-27",
+     "election_kind": "primary",
+     "source": "oep_primarias2019",
+     "note": "One contest per party ticket (nine parties); the count was not read from the acta from the build environment."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "gobernador",
+   "tier": "departamento",
+   "name": "Elección de Gobernadoras y Gobernadores",
+   "name_en": "Departmental governors",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2009-02-07",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.provincia",
+     "bo.municipio",
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Five-year terms (CPE art. 285). Ley 026 art. 64 required an absolute majority with a runoff; Ley 587 of 2014 changed this to 40% with a 10-point lead, else a runoff within 40 days. In 2010 plurality sufficed except in Santa Cruz (Ley 4021). Where a statute creates a vice governor (Tarija, Santa Cruz, Beni, and Pando in 2026), the vice governor runs on the governor's ticket.",
+   "source": "cpe",
+   "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (arts. 279 and 285)",
+   "est_votes": 6000000,
+   "effort": 2,
+   "match": [
+    {
+     "office_kinds": [
+      "governor"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_from": "2010-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_threshold": 40,
+     "runoff_rule": "Elected with an absolute majority, or at least 40% with a 10-point lead; otherwise a runoff between the top two within 40 days, not held if a finalist withdraws 30 days before (Ley 587, Disposición Adicional Única).",
+     "administered_by": "Tribunal Supremo Electoral and the nine Tribunales Electorales Departamentales",
+     "source": "ley587",
+     "locator": "https://comunidad.org.bo/assets/normativas/ley_587,_ley_transitoria_electoral_elecciones_subnacionales_2015_.pdf (Disposición Adicional Única: \"un mínimo de cuarenta por ciento (40%) de los votos válidos emitidos, con una diferencia de al menos diez por ciento (10%)\")",
+     "valid_from": "2014-10-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2010-04-04",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2015-03-29"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    },
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "contests": 9,
+     "seats": 9,
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015",
+     "contests": 9,
+     "seats": 9
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021",
+     "contests": 9,
+     "seats": 9
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 9,
+     "seats": 9,
+     "quote": "Se eligieron 2.716 autoridades titulares: 9 Gobernadoras/es, 4 Vicegobernadoras/es, 8 Subgobernadoras/es, 19 Corregidoras/es, 249 Asambleístas departamentales por población y territorio, 28 Asambleístas departamentales IOC, 1 Ejecutivo Regional, 2 Ejecutivos de desarrollo, 9 Asambleístas regionales por territorio y población, 3 Asambleístas regionales IOC, 335 Alcaldesas/es, 2.044 Concejalas/es, 5 Concejalas/es IOC"
+    },
+    {
+     "date": "2015-05-03",
+     "election_kind": "runoff",
+     "source": "oep_convocatoria_2015",
+     "note": "Runoff day set by the convocatoria; held in Beni and Tarija (Chuquisaca's was called off)."
+    },
+    {
+     "date": "2021-04-11",
+     "election_kind": "runoff",
+     "contests": 4,
+     "source": "oep_runoff_2021",
+     "quote": "votación de segunda vuelta convocada para el 11 de abril de 2021",
+     "note": "Chuquisaca, La Paz, Tarija, and Pando."
+    },
+    {
+     "date": "2026-04-19",
+     "election_kind": "runoff",
+     "contests": 5,
+     "source": "oep_separata_2026",
+     "note": "Oruro, Beni, Santa Cruz, Tarija, and Chuquisaca; La Paz's runoff was dropped when a finalist withdrew."
+    }
+   ]
+  },
+  {
+   "key": "prefecto",
+   "tier": "departamento",
+   "name": "Elección de Prefectos de Departamento",
+   "name_en": "Departmental prefects",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2005-07-06",
+   "valid_to": "2010-04-04",
+   "first_held": "2005-12-18",
+   "earliest_record": "2005-12-18",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Prefects were appointed by the president until the first direct election of 18 December 2005, held with the general election, by plurality. The 2008 recall removed the prefects of La Paz and Cochabamba (DS 29699); governors replaced prefects in 2010 (Ley 031).",
+   "source": "ley3850",
+   "locator": "https://www.lexivox.org/norms/BO-L-3850.html (art. 8, with each prefect's 2005 vote)",
+   "est_votes": 2900000,
+   "effort": 2,
+   "match": [
+    {
+     "office_kinds": [
+      "governor"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_to": "2010-01-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2005-12-18",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2005-12-18"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2005-12-18",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 9,
+     "source": "ley3850",
+     "quote": "superiores a las obtenidas en las elecciones de 18 de diciembre de 2005",
+     "note": "Art. 8 lists the 2005 vote of all nine prefects."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "revocatoria_subnacional",
+   "tier": "departamento",
+   "name": "Referendos revocatorios de autoridades departamentales y municipales",
+   "name_en": "Recall votes on prefects, governors, and municipal officials",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2008-08-10",
+   "earliest_record": "2008-08-10",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "The 10 August 2008 vote asked in each department whether the prefect should continue (Ley 3850 art. 7); Chuquisaca, whose prefect had been chosen in June 2008, did not vote. CPE art. 240 and Ley 026 arts. 25-34 allow recalls of every elected subnational official on one TSE calendar; none other was found.",
+   "source": "ley3850",
+   "locator": "https://www.lexivox.org/norms/BO-L-3850.html (arts. 1 and 7: \"¿Usted está de acuerdo con la continuidad de las políticas, las acciones y la gestión del Prefecto del Departamento?\")",
+   "est_votes": 3000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2008-08-10",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2008-08-10"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-08-10",
+     "election_kind": "recall",
+     "source": "ley3850",
+     "note": "One question per department that voted; the count of departments was not read from an official result."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "asamblea_departamental",
+   "tier": "departamento",
+   "name": "Elección de Asambleístas Departamentales por territorio y por población",
+   "name_en": "Departmental assemblies, members elected by ballot",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2009-02-07",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bo.provincia",
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Territorial members by plurality, usually one per province, and population members by D'Hondt among lists with 3% of the department's vote, on a ballot separate from the governor's (Ley 026 arts. 63, 65-66; CPE art. 278). Seat numbers come from each department's statute or the transitory electoral law (Ley 587 for 2015: for example Tarija 30 and Beni 28). Indigenous members chosen by normas y procedimientos propios are class asambleistas_ioc. Five-year terms (CPE art. 288).",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 63, 65, and 66)",
+   "est_votes": 6000000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral",
+      "council"
+     ],
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral and the nine Tribunales Electorales Departamentales",
+     "source": "cpe",
+     "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 288)",
+     "valid_from": "2009-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2010-04-04",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2015-03-29"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    },
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "seats": 249,
+     "note": "249 members by territory and population, plus 28 IOC members (class asambleistas_ioc)."
+    }
+   ]
+  },
+  {
+   "key": "referendo_departamental",
+   "tier": "departamento",
+   "name": "Referendos departamentales y de estatutos autonómicos",
+   "name_en": "Departmental referendums, including votes on autonomy and statutes",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2009-12-06",
+   "earliest_record": "2009-12-06",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bo.departamento"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Departmental referendums on exclusive departmental matters and on autonomy statutes (Ley 026 art. 13; Ley 031 art. 54). La Paz, Potosí, Chuquisaca, Oruro, and Cochabamba voted on autonomy on 6 December 2009 (Ley 4021 art. 72), and on their statutes on 20 September 2015 (all rejected). The statute votes held in Santa Cruz, Beni, Pando, and Tarija in May and June 2008 were run by their departmental courts without the Corte Nacional Electoral's recognition, and are left out here.",
+   "source": "ley4021",
+   "locator": "https://www.lexivox.org/norms/BO-L-4021.html (art. 72)",
+   "est_votes": 3000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2009-12-06",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-11-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-12-06",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ley4021",
+     "note": "La Paz, Potosí, Chuquisaca, Oruro, and Cochabamba."
+    },
+    {
+     "date": "2015-09-20",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "oep_ref2015",
+     "note": "Statutes of the same five departments, all rejected."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "asambleistas_ioc",
+   "tier": "departamento",
+   "name": "Asambleístas departamentales, regionales y concejales de naciones y pueblos indígena originario campesinos",
+   "name_en": "Indigenous members of departmental and regional assemblies and municipal councils chosen by their own rules",
+   "category": "non_territorial",
+   "goal": "subnational",
+   "valid_from": "2009-02-07",
+   "first_held": "2010-04-04",
+   "measure": {
+    "unit": "office"
+   },
+   "note": "Minority indigenous peoples choose their members by normas y procedimientos propios, outside the ballot (CPE arts. 278 and 284; Ley 026 arts. 66, 69, and 70). In 2026: 28 departmental, 3 regional, and 5 municipal members.",
+   "source": "oep_separata_2026",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen in assemblies by each people's own rules, not by ballot; OEP's SIFDE only supervises and publishes the names chosen, with no votes (2026 separata: names only, some \"PENDIENTE DE ELECCIÓN\").",
+   "match": [],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "subgobernador",
+   "tier": "provincia",
+   "name": "Elección de Subgobernadoras y Subgobernadores",
+   "name_en": "Provincial sub-governors elected by ballot",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2009-02-07",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.provincia"
+    ],
+    "fine": [
+     "bo.municipio",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Where a department's statute or the transitory law provides it, each province elects a sub-governor by plurality (Ley 031 arts. 579-600 refer to \"Ejecutivos Seccionales, Subgobernadores y Corregidores electos por voto popular\"). In 2015 and 2026, Beni: \"En cada Provincia se elegirá a una o un Subgobernador ... mediante voto universal ... por simple mayoría\" (Ley 587); 8 elected in 2026. Santa Cruz's 2009 departmental election law also provided for elected sub-governors; which years it used them was not checked.",
+   "source": "ley587",
+   "est_votes": 250000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "subgobernador",
+     "iso_pattern": "BO-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 8,
+     "seats": 8,
+     "note": "Beni only."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "corregidor",
+   "tier": "municipio",
+   "name": "Elección de Corregidoras y Corregidores",
+   "name_en": "Municipal-level corregidores of the department (Beni)",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2009-02-07",
+   "first_held": "2015-03-29",
+   "earliest_record": "2015-03-29",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Beni's departmental agents in each municipality, by plurality: \"en cada Municipio a una o un Corregidor, mediante voto universal ... por simple mayoría\" (Ley 587). 19 elected in 2026.",
+   "source": "ley587",
+   "est_votes": 200000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "corregidor",
+     "iso_pattern": "BO-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2015-03-29",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 19,
+     "seats": 19
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "ejecutivo_seccional",
+   "tier": "municipio",
+   "name": "Elección de Ejecutivas y Ejecutivos Seccionales de Desarrollo",
+   "name_en": "Sectional development executives (Tarija and the Gran Chaco)",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2009-04-14",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Tarija elected an ejecutivo seccional de desarrollo in each of its eleven municipalities by plurality in 2010 (Ley 4021 art. 64) and 2015 (Ley 587). In 2026 only the Gran Chaco region elected them, in Caraparí and Villamontes (2 seats).",
+   "source": "ley587",
+   "est_votes": 300000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "ejecutiv[oa]s? (seccional|de desarrollo)",
+     "iso_pattern": "BO-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2010-04-04",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015",
+     "contests": 11,
+     "seats": 11
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 2,
+     "seats": 2
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "asamblea_regional",
+   "tier": "region",
+   "name": "Elección de Asambleístas Regionales del Gran Chaco",
+   "name_en": "Gran Chaco Regional Assembly",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2009-12-06",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "The same number of members per municipality (Yacuiba, Villamontes, and Caraparí), elected with the municipal councils, plus members of the Guaraní, Tapiete, and Weenhayek peoples chosen by their own rules (Ley 026 art. 69). Ley 587 set 9 for 2015: two per municipality by proportional representation plus indigenous members; 9 by ballot and 3 IOC in 2026.",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 67-69)",
+   "est_votes": 170000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "asamblea regional|gran chaco",
+     "iso_pattern": "BO-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2015-03-29",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "seats": 9
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "ejecutivo_regional",
+   "tier": "region",
+   "name": "Elección del Ejecutivo Regional del Gran Chaco",
+   "name_en": "Gran Chaco regional executive",
+   "category": "executive",
+   "goal": "subnational",
+   "valid_from": "2016-11-20",
+   "first_held": "2026-03-22",
+   "earliest_record": "2026-03-22",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Ley 026 art. 68 has the Regional Assembly choose the executive; the 2026 separata shows a popularly elected Ejecutivo Regional, by plurality, presumably under the regional statute approved on 20 November 2016. Whether 2021 used a popular vote was not checked.",
+   "source": "oep_separata_2026",
+   "est_votes": 170000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "ejecutiv[oa] regional",
+     "iso_pattern": "BO-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2026-03-22",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 1,
+     "source": "oep_separata_2026",
+     "quote": "1 Ejecutivo Regional"
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "concejo_municipal",
+   "tier": "municipio",
+   "name": "Elección de Concejalas y Concejales Municipales",
+   "name_en": "Municipal councils",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1985-11-17",
+   "earliest_record": "1985-11-17",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Councils of 5 to 11 members by population (Ley 026 art. 72), by D'Hondt among lists with 3% of the municipal vote (art. 73), on a ballot separate from the mayor's since 2010; five-year terms (CPE art. 288). From 1985 to 2004 councils were elected every two to five years on lists headed by the mayoral candidate. Indigenous council members chosen by their own rules are class asambleistas_ioc. 2,044 council members were elected by ballot in 2026.",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 70, 72, and 73)",
+   "est_votes": 6000000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral and the nine Tribunales Electorales Departamentales",
+     "source": "cpe",
+     "locator": "https://tcpbolivia.bo/wp-content/uploads/2025/04/CPE_2009.pdf (art. 288)",
+     "valid_from": "2009-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1985-11-17",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2015-03-29"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    },
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1985-11-17",
+     "election_kind": "local",
+     "source": "oep_atlas_tomo3",
+     "note": "Ley 716 of 1985 first set 16 June 1985 and a two-year cycle on the first Sunday of December; the actual 1985 polling day was not read from an official page."
+    },
+    {
+     "date": "1987-12-06",
+     "election_kind": "local",
+     "source": "oep_atlas_tomo3",
+     "note": "First Sunday of December under Ley 716; day not read from an official page."
+    },
+    {
+     "date": "1989-12-03",
+     "election_kind": "local",
+     "source": "ley1110",
+     "quote": "Elecciones Municipales del 3 de diciembre de 1989"
+    },
+    {
+     "date": "1991-12-01",
+     "election_kind": "local",
+     "source": "ds22883",
+     "quote": "domingo 1ro. de diciembre de 1991"
+    },
+    {
+     "date": "1993-12-05",
+     "election_kind": "local",
+     "source": "oep_atlas_tomo3",
+     "note": "First Sunday of December; day not read from an official page."
+    },
+    {
+     "date": "1995-12-03",
+     "election_kind": "local",
+     "source": "oep_atlas_tomo3",
+     "note": "Day not read from an official page."
+    },
+    {
+     "date": "1999-12-05",
+     "election_kind": "local",
+     "source": "oep_atlas_tomo3",
+     "note": "Day not read from an official page."
+    },
+    {
+     "date": "2004-12-05",
+     "election_kind": "local",
+     "source": "ds27616",
+     "quote": "Se Convoca a Elecciones Municipales a realizarse el día domingo 5 de diciembre del 2004"
+    },
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 335,
+     "seats": 2044,
+     "note": "335 municipalities voted; the five municipalities governed as indigenous autonomies (Charagua, Gutiérrez, Huacaya, Salinas, and Uru Chipaya) chose their governments by their own rules."
+    }
+   ]
+  },
+  {
+   "key": "alcalde",
+   "tier": "municipio",
+   "name": "Elección de Alcaldesas y Alcaldes",
+   "name_en": "Mayors",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2009-02-07",
+   "first_held": "2010-04-04",
+   "earliest_record": "2010-04-04",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.recinto",
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "By plurality on a separate ballot, five-year terms, one consecutive reelection (Ley 026 arts. 70-71; CPE art. 285). Before 2010 the mayor was the head of a council list: elected outright with an absolute majority of the vote, otherwise chosen by the council between the top two (CPE 1967/2004 art. 200; class alcalde_concejo).",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (art. 71: \"por mayoría simple de votos válidos emitidos\")",
+   "est_votes": 6000000,
+   "effort": 3,
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "2010-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Tribunal Supremo Electoral and the nine Tribunales Electorales Departamentales",
+     "source": "ley026",
+     "locator": "https://www.lexivox.org/norms/BO-L-N26.html (art. 71)",
+     "valid_from": "2010-06-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2010-04-04",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2015-03-29"
+    },
+    {
+     "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
+     "url": "https://computo.oep.org.bo/",
+     "format": "html, csv, xlsx, scanned actas",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_computo",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "finest": "bo.mesa",
+     "role": "administers"
+    },
+    {
+     "platform": "OEP separatas de resultados (PDF)",
+     "url": "https://cd1.eju.tv/wp-content/uploads/2026/04/Resultados-finales-de-las-elecciones-subnacionales-2026.pdf",
+     "format": "pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-03-07",
+     "source": "oep_separata_2026",
+     "evidence": "Results by department, province, and municipality with the names of those elected. Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.municipio",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-04-04",
+     "election_kind": "local",
+     "source": "ley4021",
+     "quote": "se convoca a elecciones de autoridades departamentales y municipales ... para el domingo 4 de abril de 2010; por un periodo constitucional de 5 años"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "local",
+     "source": "oep_convocatoria_2015"
+    },
+    {
+     "date": "2021-03-07",
+     "election_kind": "local",
+     "source": "oep_separata_2021"
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "local",
+     "source": "oep_separata_2026",
+     "contests": 335,
+     "seats": 335
+    }
+   ]
+  },
+  {
+   "key": "alcalde_concejo",
+   "tier": "municipio",
+   "name": "Elección de Alcalde por el Concejo Municipal",
+   "name_en": "Mayors chosen by the council when no list won an absolute majority, 1985-2004",
+   "category": "indirect",
+   "goal": "local",
+   "valid_to": "2010-04-04",
+   "first_held": "1985-11-17",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "\"Si ninguno ... obtuviera la mayoría absoluta, el Concejo tomará a los dos que hubieran logrado el mayor número de sufragios ... y de entre ellos hará la elección por mayoría absoluta\" (CPE 1967/2004 art. 200 VI), with a constructive censure vote after a year (art. 201). The councils' votes are municipal records that OEP does not publish.",
+   "source": "cpe_2004",
+   "locator": "https://www.lexivox.org/norms/BO-L-2650.xhtml (arts. 200-201)",
+   "disposition": "blocked",
+   "disposition_reason": "Council votes are kept in each municipality's minutes; no national authority compiles them.",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "election_kinds": [
+      "indirect"
+     ],
+     "valid_to": "2010-01-01"
+    }
+   ],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "referendo_municipal",
+   "tier": "municipio",
+   "name": "Referendos municipales, regionales y de autonomía indígena originario campesina",
+   "name_en": "Municipal, regional, and indigenous-autonomy referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2009-12-06",
+   "earliest_record": "2009-12-06",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bo.municipio"
+    ],
+    "fine": [
+     "bo.mesa"
+    ]
+   },
+   "finest_note": "Mesa de sufragio (polling table) inside each recinto, in the Atlas's votos_totales.csv and the official count's acta-level results",
+   "note": "Municipal referendums on exclusive municipal matters and cartas orgánicas, regional autonomy referendums, and votes to convert a municipality into an indigenous autonomy and approve its statute (Ley 026 arts. 13 and 24; Ley 031 arts. 50-54). Held: 6 December 2009 (Gran Chaco regional autonomy under Ley 4021 art. 76, and conversions of municipalities to indigenous autonomy under DS 231), 20 September 2015 (Charagua and Totora Marka statutes and cartas orgánicas), 20 November 2016 (15 entities, including the Gran Chaco statute, Uru Chipaya, Raqaypampa, and Gutiérrez), and 9 July 2017 (Huacaya and Macharetí).",
+   "source": "ley4021",
+   "locator": "https://www.lexivox.org/norms/BO-L-4021.html (art. 76)",
+   "est_votes": 400000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
+     "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
+     "format": "csv",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "2009-12-06",
+     "source": "oep_atlas",
+     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "finest": "bo.mesa",
+     "role": "administers",
+     "last_date": "2016-11-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-12-06",
+     "election_kind": "referendum",
+     "source": "ley4021",
+     "note": "Gran Chaco regional autonomy and municipal conversions to indigenous autonomy; the number of municipalities was not read from an official result."
+    },
+    {
+     "date": "2015-09-20",
+     "election_kind": "referendum",
+     "source": "oep_ref2015"
+    },
+    {
+     "date": "2016-11-20",
+     "election_kind": "referendum",
+     "contests": 15,
+     "source": "oep_ref2016_estatutos",
+     "note": "15 autonomous territorial entities voted on statutes, cartas orgánicas, or conversion."
+    },
+    {
+     "date": "2017-07-09",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "oep_ref2017",
+     "note": "Huacaya statute (No) and Macharetí conversion (Yes)."
+    }
+   ],
+   "cadence": []
+  },
+  {
+   "key": "gobierno_aioc",
+   "tier": "aioc",
+   "name": "Conformación de gobiernos de las autonomías indígena originario campesinas",
+   "name_en": "Governments of indigenous autonomies (AIOC)",
+   "category": "non_territorial",
+   "goal": "local",
+   "valid_from": "2009-02-07",
+   "first_held": "2017-01-08",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Charagua Iyambae (from 2017), Uru Chipaya, Raqaypampa, Salinas, Kereimba Iyaambae (Gutiérrez), Jatun Ayllu Yura, the Territorio Indígena Multiétnico, and Huacaya choose their governments by normas y procedimientos propios under their statutes (CPE arts. 289-296; Ley 026 art. 74).",
+   "source": "oep_aioc",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Authorities are chosen in community assemblies by each autonomy's own rules, not by ballot; OEP's SIFDE supervises and publishes reports and the names chosen, with no votes.",
+   "match": [],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "asambleas_cabildos",
+   "tier": "national",
+   "name": "Asambleas, cabildos y consulta previa",
+   "name_en": "Assemblies, cabildos, and prior consultation",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Public meetings and the state's prior consultation of indigenous peoples on resource projects (Ley 026 arts. 35-41).",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (arts. 35-41)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Not ballots: assemblies and cabildos decide in public meetings that OEP's SIFDE only observes and reports on (arts. 37-38), and prior consultation is a deliberative process.",
+   "match": [],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "juntas_vecinales",
+   "tier": "distrito",
+   "name": "Organizaciones territoriales de base y juntas vecinales",
+   "name_en": "Neighborhood councils and grassroots territorial organizations",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Neighborhood and community organizations recognized under the 1994 popular participation law elect their own officers.",
+   "source": "ley031",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Civil-society organizations electing their own boards; no state election, register of results, or electoral authority.",
+   "match": [],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  },
+  {
+   "key": "democracia_interna",
+   "tier": "national",
+   "name": "Elección interna de dirigencias y candidaturas de organizaciones políticas",
+   "name_en": "Party leadership and candidate selection other than the state-run primaries",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "OEP supervises that parties choose leaders and candidates by their own internal rules (Ley 026 art. 49; Ley 1096).",
+   "source": "ley026",
+   "locator": "https://www.lexivox.org/norms/BO-L-N26.html (art. 49)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the parties under their own statutes; OEP only supervises and publishes no returns.",
+   "match": [],
+   "dates": [],
+   "cadence": [],
+   "access": []
+  }
+ ]
+}

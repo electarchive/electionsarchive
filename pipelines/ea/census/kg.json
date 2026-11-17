@@ -1,0 +1,980 @@
+{
+  "polity": "KG",
+  "name": "Kyrgyzstan",
+  "region_schemes": [
+    "kg.oblast"
+  ],
+  "sources": {
+    "constitution": {
+      "title": "Конституция Кыргызской Республики (принята референдумом 11 апреля 2021 года)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/Konstituciya-Konstituciya/Konstituciya-24/",
+      "kind": "official_body",
+      "note": "Text as the CEC hosts it. Art. 2(3-5): elections and referendums; art. 7: the People's Kurultai, a consultative assembly; art. 67(1): the President is elected for 5 years; art. 70: who may call a referendum; art. 76(2): the Jogorku Kenesh has 90 deputies elected for 5 years; art. 95: judges are appointed; art. 113(1): local kenesh deputies are elected by the residents of their administrative-territorial unit."
+    },
+    "kz_elections": {
+      "title": "Конституционный закон Кыргызской Республики от 2 июля 2011 года № 68 «О выборах Президента Кыргызской Республики и депутатов Жогорку Кенеша Кыргызской Республики»",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/",
+      "kind": "official_body",
+      "note": "Consolidated text as the CEC hosts it, with amendments to 28 July 2026 (No. 135). Art. 48: regular presidential elections on the fourth Wednesday of January of the year the term ends; arts. 55-56: a majority of those voting in the first round, else a runoff of the top two; art. 59: 90 deputies for 5 years in 30 three-member districts by the majoritarian system, a vacated seat passes to the next candidate of the same sex, polling on a Wednesday of the month the term ends; art. 63: repeat elections; art. 64: the three candidates with the most votes win. Register copy: https://cbd.minjust.gov.kg/203461."
+    },
+    "z_local": {
+      "title": "Закон Кыргызской Республики от 14 июля 2011 года № 98 «О выборах депутатов местных кенешей»",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/O_vyborax_deputatov_mestnyx_keneshei/",
+      "kind": "official_body",
+      "note": "Consolidated text as the CEC hosts it, with amendments to 30 September 2024 (No. 167). Art. 47: city keneshes by proportional representation, ayil keneshes by the majoritarian system; art. 48: the President calls local elections at least 60 days ahead, and calls early elections when keneshes are dissolved; art. 52: a vacated mandate passes to the next candidate; art. 58: repeat elections; arts. 59 and 59-1: ayil keneshes are elected in multi-member districts with at least 30 percent of mandates reserved for women."
+    },
+    "z_local_status": {
+      "title": "Закон Кыргызской Республики от 13 января 2000 года № 3 «О статусе депутатов местных кенешей»",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/o-statuse-deputatov-mestnyh-keneshej/",
+      "kind": "official_body",
+      "note": "Art. 2: a local kenesh deputy is elected by universal, equal and direct suffrage for five years."
+    },
+    "kz_referendum": {
+      "title": "Конституционный закон Кыргызской Республики от 8 июля 2026 года № 106 «О референдуме Кыргызской Республики»",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/o-referendume-kyrgyzskoj-respubliki/",
+      "kind": "official_body",
+      "note": "Art. 1: a referendum is a nationwide vote on draft constitutional and other laws and questions of state importance. The law provides for no local referendums."
+    },
+    "soate": {
+      "title": "Государственный классификатор СОАТЕ ГК 003-2025 «Система обозначений объектов административно-территориальных и территориальных единиц Кыргызской Республики»",
+      "publisher": "Национальный статистический комитет Кыргызской Республики (Нацстатком)",
+      "url": "https://stat.gov.kg/media/files/a286bc6b-aea0-4c16-aebe-9a972cd33ba5.xlsx",
+      "kind": "official_body",
+      "note": "Adopted by order 20-СТ of 12 June 2025, amended by order 47-СТ of 10 October 2025 (PDF edition: https://stat.gov.kg/media/files/8d597c5c-6d6d-454c-91fd-5bfaf1bb729d.pdf). Counted from the xlsx edition: first-level rows 41702-41708 are the 7 oblasts and 41711 and 41721 are Bishkek and Osh; 44 rows of districts (digit 6 = 2) less the 4 districts of Bishkek give 40 rayons; 14 cities of oblast significance (digit 6 = 4) and 17 of rayon significance (digit 9 = 6) with Bishkek and Osh give 33 cities; 230 ayil aimak rows (digit 9 = 8)."
+    },
+    "cec_elections": {
+      "title": "Выборы (архив страниц выборов ЦИК КР, 2016-2027)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/vybory_shailoolor/",
+      "kind": "official_body",
+      "note": "Two pages of election pages from May 2016 to the presidential election of 2027; nothing earlier is online."
+    },
+    "cec_open": {
+      "title": "Открытые данные ЦИК",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+      "kind": "official_body",
+      "note": "Result tables in html and xlsx by oblast and territorial commission (rayon or city) for the Jogorku Kenesh 2010, 2015, 2020, and 2021, the President 2011, 2017, and 2021, the referendums of 2016 and 2021, and local kenesh results of March 2016 and April 2021."
+    },
+    "od_jk2010": {
+      "title": "Выборы депутатов Жогорку Кенеша Кыргызской Республики, 2010-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-deputatov-zhogorku-kenesha-kyrgyzskoj-respubliki-2010-j-god/",
+      "kind": "official_body"
+    },
+    "od_jk2015": {
+      "title": "Выборы депутатов Жогорку Кенеша Кыргызской Республики, 2015-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-deputatov-zhogorku-kenesha-kyrgyzskoj-respubliki-2015-j-god/",
+      "kind": "official_body"
+    },
+    "od_jk2020": {
+      "title": "Выборы депутатов Жогорку Кенеша Кыргызской Республики, 2020-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-deputatov-zhogorku-kenesha-kyrgyzskoj-respubliki-2020-j-god/",
+      "kind": "official_body"
+    },
+    "od_jk2021": {
+      "title": "Выборы депутатов ЖК КР единый округ, 2021-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-deput-zhk-kr-edin-okrug-2021-god/",
+      "kind": "official_body"
+    },
+    "od_jk2021_smd": {
+      "title": "Одномандатные округа на выборах депутатов ЖК",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/odnom-okr-na-vyborah-deputatov-zhk/",
+      "kind": "official_body",
+      "note": "xlsx https://shailoo.gov.kg/media/alai/2022/09/20/36_Nad2Qjt.xlsx: candidates' votes in 36 single-member districts, from № 1 Лейлекский to №36 Иссык-Кульский."
+    },
+    "jk2025": {
+      "title": "Результаты досрочных выборов депутатов Жогорку Кенеша Кыргызской Республики (30 ноября 2025 года)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/vybory-noyabr-2025/rezultaty-dosrochnyh-vyborov-deputatov-zhogorku-kenesha-kyrgyzskoj-respubliki/",
+      "kind": "official_body",
+      "note": "One PDF per multi-member district, Избирательный округ № 1 to № 30, with electors, ballots, each candidate's votes, the votes against all, and the three elected."
+    },
+    "od_pres2011": {
+      "title": "Выборы Президента Кыргызской Республики, 2011-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-prezidenta-kyrgyzskoj-respubliki-2011-j-god/",
+      "kind": "official_body"
+    },
+    "od_pres2017": {
+      "title": "Выборы Президента Кыргызской Республики, 2017-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-prezidenta-kyrgyzskoj-respubliki-2017-j-god/",
+      "kind": "official_body"
+    },
+    "od_pres2021": {
+      "title": "Выборы Президента Кыргызской Республики, 2021-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/vybory-prezidenta-kyrgyzskoj-respubliki-2021-j-god/",
+      "kind": "official_body"
+    },
+    "pres2027": {
+      "title": "Выборы Президента КР-2027",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/vybory-prezidenta-kr-2027/",
+      "kind": "official_body",
+      "note": "The Jogorku Kenesh resolution calling the regular presidential election, the calendar, and the election schedule page dated 27.01.2027."
+    },
+    "od_ref2016": {
+      "title": "Референдум, 2016-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/referendum-2016-j-god/",
+      "kind": "official_body"
+    },
+    "od_ref2021_jan": {
+      "title": "Референдум, январь 2021-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/referendum-yanvar-2021-j-god/",
+      "kind": "official_body"
+    },
+    "od_ref2021_apr": {
+      "title": "Референдум, апрель 2021-й год",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/referendum-aprel-2021-j-god/",
+      "kind": "official_body"
+    },
+    "by2022_02": {
+      "title": "Повторные выборы депутатов ЖК КР по Первомайскому №27 и Свердловскому №29 одномандатным округам (февраль 2022)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/vybory-fevral-2022/",
+      "kind": "official_body"
+    },
+    "by2023_05": {
+      "title": "Досрочные выборы депутата ЖК КР по Ленинскому одномандатному округу №26 (май 2023)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/dosroch-vybory-deput-zhog-ken-kr-maj-2023/",
+      "kind": "official_body"
+    },
+    "by2023_09": {
+      "title": "Повторные выборы депутата ЖК КР по Ленинскому одномандатному округу №26 (сентябрь 2023)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/dosr-vyb-deput-zh-ken-kr-sentyabr-2023/",
+      "kind": "official_body"
+    },
+    "by2024_04": {
+      "title": "Досрочные выборы депутатов ЖК КР по Баткенскому одномандатному избирательному округу №2 и Кара-Суйскому одномандатному избирательному округу №9 (апрель 2024)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/dosr-vyb-dep-zh-ken-kr-po-batkenskomu-odnomandatnomu-izbiratelnomu-okrugu-2-i-kara-sujskomu-odnomand-izbi-okrugu-9-2024/",
+      "kind": "official_body"
+    },
+    "by2024_06": {
+      "title": "30 июня 2024 года - досрочные выборы депутатов ЖК КР",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/dos-vy-deputat-zhog-ken-kr-odn-izbir-okr-iyun-2024/",
+      "kind": "official_body"
+    },
+    "by2024_09": {
+      "title": "Досрочные выборы депутата ЖК КР по Сузакскому одномандатному избирательному округу №13 (сентябрь 2024)",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/22-iyulya-2024-g-dos-vyb-deputata-zhk-kr/",
+      "kind": "official_body"
+    },
+    "by2026_03": {
+      "title": "Повторные выборы депутатов Жогорку Кенеша КР по 13 избирательному округу - 1 марта 2026 года",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/povtornye-vybory-deputatov-jk-13-okrug/",
+      "kind": "official_body"
+    },
+    "local2024": {
+      "title": "Утверждены протоколы об итогах голосования и о результатах выборов местных кенешей Кыргызской Республики",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/news/7712/",
+      "kind": "official_body",
+      "note": "CEC news item listing one PDF protocol per council for the elections of 17 November 2024: 33 city and 231 ayil keneshes."
+    },
+    "local2024_page": {
+      "title": "17 ноября 2024 года выборы депутатов местных кенешей",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/17-noy-2024-g-vyb-dep-mestnyh-keneshej/",
+      "kind": "official_body",
+      "note": "Links the presidential decree dissolving all local keneshes and calling the elections, and the CEC's lists of 33 city keneshes (https://shailoo.gov.kg/media/azamat/2024/09/19/leqoci.pdf, numbered 1-33) and 231 ayil keneshes (https://shailoo.gov.kg/media/azamat/2024/09/20/no-2-1.pdf, numbered 1-231)."
+    },
+    "local_info": {
+      "title": "Местные кенеши - общая информация",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/mestnye-keneshi-obshaya-informaciya/",
+      "kind": "official_body",
+      "note": "Всего по республике: 484 keneshes, 453 ayil and 31 city, 8,722 mandates; undated, before the 2024 reform."
+    },
+    "omsu": {
+      "title": "Список глaв ОМСУ, депутатов и председателей местных кенешей",
+      "publisher": "Центральная комиссия по выборам и проведению референдумов Кыргызской Республики (ЦИК КР)",
+      "url": "https://shailoo.gov.kg/ru/spisok-izbrannyh-glav-omsu/",
+      "kind": "official_body",
+      "note": "Lists of heads of local self-government bodies and kenesh chairs (October 2023, June 2024), and information on early selections of heads of local executive bodies 2016-2020."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Кыргыз Республикасы",
+      "name_en": "Kyrgyz Republic",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "kg.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "oblast",
+      "name": "Облустар (области)",
+      "name_en": "Oblasts (provinces); Bishkek and Osh, the cities of republican significance, sit beside them and are counted with the cities",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "kg.oblast",
+      "elects": false,
+      "source": "soate",
+      "counts": [
+        {
+          "date": "2025-10-10",
+          "value": 7,
+          "source": "soate",
+          "locator": "СОАТЕ ГК 003-2025 xlsx, first-level rows 41702 Иссык-Кульская, 41703 Джалал-Абадская, 41704 Нарынская, 41705 Баткенская, 41706 Ошская, 41707 Таласская, 41708 Чуйская область"
+        }
+      ]
+    },
+    {
+      "key": "rayon",
+      "name": "Райондор (районы)",
+      "name_en": "Rayons (districts)",
+      "parent": "oblast",
+      "polity_kind": "county",
+      "scheme": "kg.rayon",
+      "elects": false,
+      "source": "soate",
+      "counts": [
+        {
+          "date": "2025-10-10",
+          "value": 40,
+          "source": "soate",
+          "locator": "СОАТЕ ГК 003-2025 xlsx: 44 district rows under the \"Районы ...\" headings, less Ленинский, Октябрьский, Первомайский, and Свердловский районы of Bishkek"
+        }
+      ]
+    },
+    {
+      "key": "city",
+      "name": "Шаарлар (города)",
+      "name_en": "Cities: Bishkek and Osh, and the cities of oblast and rayon significance, each with a city kenesh",
+      "parent": "oblast",
+      "polity_kind": "municipality",
+      "scheme": "kg.city",
+      "source": "soate",
+      "counts": [
+        {
+          "date": "2024-09-19",
+          "value": 33,
+          "source": "local2024_page",
+          "locator": "https://shailoo.gov.kg/media/azamat/2024/09/19/leqoci.pdf: \"Список городских кенешей Кыргызской Республики\", 1. Бишкекский to 33. Кайындинский городской кенеш"
+        },
+        {
+          "date": "2025-10-10",
+          "value": 33,
+          "source": "soate",
+          "locator": "СОАТЕ ГК 003-2025 xlsx: г.Бишкек (41711) and г.Ош (41721), 14 cities of oblast significance and 17 of rayon significance"
+        }
+      ]
+    },
+    {
+      "key": "ayil_aimak",
+      "name": "Айылдык аймактар (айылные аймаки)",
+      "name_en": "Ayil aimaks (rural municipalities), each with an ayil kenesh",
+      "parent": "rayon",
+      "polity_kind": "municipality",
+      "scheme": "kg.ayil_aimak",
+      "source": "soate",
+      "counts": [
+        {
+          "date": "2024-09-20",
+          "value": 231,
+          "source": "local2024_page",
+          "locator": "https://shailoo.gov.kg/media/azamat/2024/09/20/no-2-1.pdf: \"Список айылных кенешей Кыргызской Республики\", 1. Ак-Сайский to 231. Фрунзенский айылный кенеш"
+        },
+        {
+          "date": "2025-10-10",
+          "value": 230,
+          "source": "soate",
+          "locator": "СОАТЕ ГК 003-2025 xlsx: 230 \"Айылный аймак ...\" rows"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Кыргыз Республикасынын Президентин шайлоо",
+      "name_en": "Presidential elections by direct vote",
+      "category": "executive",
+      "goal": "national",
+      "earliest_record": "2011-10-30",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "kg.oblast"
+        ],
+        "fine": [
+          "kg.rayon"
+        ]
+      },
+      "finest_note": "CEC open data by oblast and territorial commission (rayon or city) from 2011; protocols of lower commissions are published under art. 39(3) of the 2011 constitutional law",
+      "note": "Direct election for 5 years (Constitution art. 67): a candidate needs over half of those who voted, else a runoff of the top two decided by plurality (constitutional law arts. 55-56). Regular elections fall on the fourth Wednesday of January of the year the term ends (art. 48), 27 January 2027 next; early elections are called by the Jogorku Kenesh within a week of a vacancy and held within 3 months. The 1991, 1995, 2000, 2005, and 2009 elections are not on the CEC's site; the President elected on 10 January 2021 under the 2010 Constitution serves to January 2027.",
+      "source": "constitution",
+      "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/Konstituciya-Konstituciya/Konstituciya-24/ (art. 67(1))",
+      "est_votes": 5000000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "KG"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kz_elections",
+          "locator": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/ (art. 48(1): \"в четвертую среду января года, в котором истекает срок полномочий Президента\"; Constitution art. 67(1): 5 years)",
+          "period_years": 5,
+          "phase": 2,
+          "month": 1,
+          "day_rule": "jan_fourth_wednesday",
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Over half of those who voted wins in the first round; otherwise the top two meet within 20 days and the plurality wins (arts. 55-56).",
+          "administered_by": "Central Commission for Elections and Referendums (CEC)",
+          "vacancy_rule": "Early election called by the Jogorku Kenesh within a week of the vacancy and held within three months (art. 48(2)).",
+          "valid_from": "2021-05-05"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC open data (shailoo.gov.kg/ru/otkrytye-dannye-cik)",
+          "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+          "format": "html, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2011-10-30",
+          "last_date": "2021-01-10",
+          "finest": "kg.rayon",
+          "source": "cec_open",
+          "evidence": "Tables by oblast and territorial commission for 2011, 2017, and 2021, with xlsx downloads"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "through": "2009-12-31",
+          "note": "Elections of 1991, 1995, 2000, 2005 (early), and 2009 are not published on the CEC's site; their counts await the CEC's printed reports."
+        },
+        {
+          "date": "2011-10-30",
+          "contests": 1,
+          "source": "od_pres2011",
+          "quote": "Выборы Президента Кыргызской Республики 30 октября 2011 года"
+        },
+        {
+          "date": "2017-10-15",
+          "contests": 1,
+          "source": "od_pres2017",
+          "quote": "ВЫБОРЫ ПРЕЗИДЕНТА КЫРГЫЗСКОЙ РЕСПУБЛИКИ 15 октября 2017 года"
+        },
+        {
+          "date": "2021-01-10",
+          "contests": 1,
+          "source": "od_pres2021",
+          "quote": "Досрочные выборы Президента Кыргызской Республики 10 января 2021 года (за исключением аннулированных УИК)"
+        }
+      ]
+    },
+    {
+      "key": "jogorku_kenesh",
+      "tier": "national",
+      "name": "Жогорку Кеңештин депутаттарын шайлоо",
+      "name_en": "Jogorku Kenesh (Supreme Council) general elections",
+      "category": "legislature",
+      "goal": "national",
+      "earliest_record": "2010-10-10",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "kg.jk_okrug"
+        ],
+        "fine": [
+          "kg.oblast",
+          "kg.rayon"
+        ]
+      },
+      "finest_note": "2010-2021 by oblast and territorial commission in CEC open data; 2021 single-member districts and the 2025 multi-member districts by district",
+      "note": "Systems: 120 seats by national party lists in one district (2010, 2015, and the annulled 2020 election); 54 list seats and 36 single-member seats (2021); since 2025, 90 deputies in 30 three-member districts, each voter marking one candidate and the top three winning, with a sex rule on vacancies (constitutional law arts. 59 and 64). Term 5 years (Constitution art. 76(2)); regular elections on a Wednesday of the month the term ends; early elections when the Kenesh dissolves itself. Bicameral from 1995 to 2005 (Legislative Assembly and Assembly of People's Representatives), unicameral from 2005; the 1995, 2000, 2005, and 2007 elections are not on the CEC's site.",
+      "source": "kz_elections",
+      "locator": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/ (arts. 59 and 64)",
+      "est_votes": 7000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "KG"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kz_elections",
+          "locator": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/ (art. 59(1): \"сроком на 5 лет\"; 59(5): \"Днем голосования является среда месяца, в котором истекает конституционный срок\"; 59(6): early elections)",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Commission for Elections and Referendums (CEC)",
+          "vacancy_rule": "The mandate passes to the next candidate of the same sex in the district; a by-election is held only when no such candidate remains (art. 59(9)-(10)).",
+          "valid_from": "2025-11-30"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC open data (shailoo.gov.kg/ru/otkrytye-dannye-cik)",
+          "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+          "format": "html, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2010-10-10",
+          "last_date": "2021-11-28",
+          "finest": "kg.rayon",
+          "source": "cec_open",
+          "evidence": "Party votes by oblast and territorial commission for 2010, 2015, 2020, and the 2021 national list; candidates' votes in the 36 single-member districts of 2021"
+        },
+        {
+          "platform": "CEC election page, results of 30 November 2025",
+          "url": "https://shailoo.gov.kg/ru/vybory-noyabr-2025/rezultaty-dosrochnyh-vyborov-deputatov-zhogorku-kenesha-kyrgyzskoj-respubliki/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2025-11-30",
+          "last_date": "2025-11-30",
+          "finest": "kg.jk_okrug",
+          "source": "jk2025",
+          "evidence": "One PDF per district with each candidate's votes and the three elected"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "through": "2007-12-31",
+          "note": "Elections of 1995 and 2000 (two chambers, single-member districts with runoffs), 2005 (75 single-member districts), and 2007 (90 seats by national lists) are not published on the CEC's site."
+        },
+        {
+          "date": "2010-10-10",
+          "contests": 1,
+          "seats": 120,
+          "source": "od_jk2010",
+          "quote": "Выборы депутатов Жогорку Кенеша Кыргызской Республики 10 октября 2010 года; the мандат column sums to 120"
+        },
+        {
+          "date": "2015-10-04",
+          "contests": 1,
+          "seats": 120,
+          "source": "od_jk2015",
+          "quote": "Итоги голосования на выборах депутатов Жогорку Кенеша Кыргызской Республики 4 октября 2015 год; the Мандат column sums to 120"
+        },
+        {
+          "date": "2020-10-04",
+          "contests": 1,
+          "seats": 120,
+          "source": "od_jk2020",
+          "quote": "Итоги голосования на выборах депутатов Жогорку Кенеша Кыргызской Республики 4 октября 2020 год",
+          "note": "The CEC annulled the results; no seats were filled from this election."
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 37,
+          "seats": 90,
+          "source": "od_jk2021",
+          "quote": "ИТОГИ ВЫБОРОВ ДЕПУТАТОВ ЖОГОРКУ КЕНЕША КЫРГЫЗЫСКОЙ РЕСПУБЛИКИ 28-НОЯБРЯ 2021 ГОДА: \"54 мандата, из них 19 мандатов по женской квоте\"; the single-member xlsx lists 36 districts",
+          "note": "One national list contest for 54 seats and 36 single-member districts."
+        },
+        {
+          "date": "2025-11-30",
+          "contests": 30,
+          "seats": 90,
+          "source": "jk2025",
+          "quote": "Результаты досрочных выборов депутатов Жогорку Кенеша Кыргызской Республики: Избирательный округ № 1 to № 30; art. 59(2): \"90 депутатов Жогорку Кенеша избираются по многомандатным избирательным округам\"",
+          "note": "Early election in 30 three-member districts."
+        }
+      ]
+    },
+    {
+      "key": "jogorku_kenesh_by",
+      "tier": "national",
+      "name": "Жогорку Кеңештин депутаттарын мөөнөтүнөн мурда жана кайталап шайлоо",
+      "name_en": "Jogorku Kenesh by-elections and repeat elections in single districts",
+      "category": "legislature",
+      "goal": "national",
+      "earliest_record": "2022-02-27",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "kg.jk_okrug"
+        ]
+      },
+      "note": "Early elections (досрочные) fill a vacated single-member seat of 2021-2025; repeat elections (повторные) rerun a district whose result was annulled or failed (constitutional law art. 63). Since 2025 a vacated seat passes to the next candidate of the same sex, so by-elections are rare.",
+      "source": "kz_elections",
+      "locator": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/ (arts. 59(9)-(10) and 63)",
+      "est_votes": 300000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "KG"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kz_elections",
+          "locator": "https://shailoo.gov.kg/ru/konstitucionnye-zakony-kr/konstitucionnye-zakony-kr/O_vyborah_Pr-1913/ (art. 63: repeat elections are called by the CEC)",
+          "called": true,
+          "administered_by": "Central Commission for Elections and Referendums (CEC)",
+          "valid_from": "2021-11-28"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC election pages",
+          "url": "https://shailoo.gov.kg/ru/vybory_shailoolor/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2022-02-27",
+          "last_date": "2026-03-01",
+          "finest": "kg.jk_okrug",
+          "source": "cec_elections",
+          "evidence": "One page per by-election with candidates, voter lists, and results"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2022-02-27",
+          "contests": 2,
+          "source": "by2022_02",
+          "quote": "повторные выборы депутатов ЖК КР по Первомайскому № 27 и Свердловскому № 29 избирательным округам; \"Реестр жалоб и нарушений на повторных выборах депутатов ЖК КР - 27 февраля 2022 года\""
+        },
+        {
+          "date": "2023-05-28",
+          "contests": 1,
+          "source": "by2023_05",
+          "quote": "досрочных выборах депутата ЖК КР по Ленинскому одномандатному округу №26 - 28-мая 2023 года"
+        },
+        {
+          "date": "2023-09-10",
+          "contests": 1,
+          "source": "by2023_09",
+          "quote": "повторных выборах депутата ЖК КР по Ленинскому одномандатному округу №26 - 10 сентября 2023 года"
+        },
+        {
+          "date": "2024-04-28",
+          "contests": 2,
+          "source": "by2024_04",
+          "quote": "досрочных выборах депутатов Жогорку Кенеша КР по одномандатным избирательным округам - 28 апреля 2024 года (Баткенскому №2 и Кара-Суйскому №9)"
+        },
+        {
+          "date": "2024-06-30",
+          "contests": 3,
+          "source": "by2024_06",
+          "quote": "30 июня 2024 года - досрочные выборы депутатов ЖК КР: По Иссык-Кульскому избирательному округу №36, По Ноокатскому избирательному округу №5, По Свердловскому избирательному округу №29"
+        },
+        {
+          "date": "2024-09-22",
+          "contests": 1,
+          "source": "by2024_09",
+          "quote": "досрочных выборах депутата Жогорку Кенеша КР по Сузакскому одномандатному избирательному округу №13 - 22 сентября 2024 года"
+        },
+        {
+          "date": "2026-03-01",
+          "contests": 1,
+          "source": "by2026_03",
+          "quote": "Повторные выборы депутатов Жогорку Кенеша КР по 13 избирательному округу - 1 марта 2026 года"
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Референдум (бүткүл элдик добуш берүү)",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "earliest_record": "2016-12-11",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "kg.oblast"
+        ],
+        "fine": [
+          "kg.rayon"
+        ]
+      },
+      "note": "Called by the President on his own initiative, on the initiative of 300,000 voters, or of a majority of the Jogorku Kenesh (Constitution art. 70), on draft constitutional laws and questions of state importance (Constitutional Law No. 106 of 2026, art. 1). The referendums of 1994 to 2010 are not on the CEC's site; the 17 March 1991 Union referendum was held while the republic was part of the USSR.",
+      "source": "kz_referendum",
+      "est_votes": 4000000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "KG"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/Konstituciya-Konstituciya/Konstituciya-24/ (art. 70(1)1: \"принимает решение о назначении референдума\")",
+          "called": true,
+          "administered_by": "Central Commission for Elections and Referendums (CEC)",
+          "valid_from": "2021-05-05"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC open data (shailoo.gov.kg/ru/otkrytye-dannye-cik)",
+          "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+          "format": "html, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2016-12-11",
+          "last_date": "2021-04-11",
+          "finest": "kg.rayon",
+          "source": "cec_open",
+          "evidence": "Results by oblast and territorial commission for 11 December 2016, 10 January 2021, and 11 April 2021"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2010-12-31",
+          "note": "Referendums of 1994 to 2010 are not published on the CEC's site."
+        },
+        {
+          "date": "2016-12-11",
+          "contests": 1,
+          "source": "od_ref2016",
+          "quote": "Итоги референдума 11 декабря 2016 года"
+        },
+        {
+          "date": "2021-01-10",
+          "contests": 1,
+          "source": "od_ref2021_jan",
+          "quote": "Референдум, январь 2021-й год (по определению формы правления, 10 января 2021 года)"
+        },
+        {
+          "date": "2021-04-11",
+          "contests": 1,
+          "source": "od_ref2021_apr",
+          "quote": "Итоги референдума 11 апреля 2021 года"
+        }
+      ]
+    },
+    {
+      "key": "city_kenesh",
+      "tier": "city",
+      "name": "Шаардык кеңештердин депутаттарын шайлоо",
+      "name_en": "City kenesh (city council) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "kg.city"
+        ]
+      },
+      "finest_note": "Kenesh-wide party votes and the elected per council in the CEC's PDF protocols (2024) and open-data tables (March 2016, April 2021)",
+      "note": "Party-list proportional representation across the whole city (Law No. 98 art. 47), for five years (Law No. 3 of 2000 art. 2). Until 2024 councils were elected on staggered days (2016-2023 pages list regular, early, and repeat elections of some councils several times a year); a presidential decree dissolved every local kenesh and all were elected on 17 November 2024.",
+      "source": "z_local",
+      "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/O_vyborax_deputatov_mestnyx_keneshei/ (art. 47)",
+      "est_votes": 1000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(городск|шаардык|\\mcity\\M)",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "source": "z_local_status",
+          "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/o-statuse-deputatov-mestnyh-keneshej/ (art. 2: \"сроком на пять лет\"); Law No. 98 art. 48: called by the President at least 60 days ahead",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Commission for Elections and Referendums (CEC) through the territorial election commissions",
+          "vacancy_rule": "The mandate passes to the next candidate of the same sex on the party's list (Law No. 98 art. 52(1-1)).",
+          "valid_from": "2024-11-17"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC protocols of the local kenesh elections of 17 November 2024",
+          "url": "https://shailoo.gov.kg/ru/news/7712/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2024-11-17",
+          "last_date": "2024-11-17",
+          "finest": "kg.city",
+          "source": "local2024",
+          "evidence": "One PDF per council: electors, ballots, each party's votes and mandates, and the elected"
+        },
+        {
+          "platform": "CEC open data (shailoo.gov.kg/ru/otkrytye-dannye-cik)",
+          "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+          "format": "html, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "last_date": "2021-04-11",
+          "finest": "kg.city",
+          "source": "cec_open",
+          "evidence": "Results of the city kenesh elections of March 2016 and April 2021, one page per council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "through": "2023-12-31",
+          "note": "Councils were elected on staggered days; the CEC's pages from May 2016 list regular, early, and repeat elections of some councils, not yet counted."
+        },
+        {
+          "date": "2024-11-17",
+          "contests": 33,
+          "source": "local2024",
+          "quote": "На заседании Центральной избирательной комиссии утверждены протоколы об итогах голосования и о результатах выборов, 33 городских и 231 айылных кенешей"
+        }
+      ]
+    },
+    {
+      "key": "ayil_kenesh",
+      "tier": "ayil_aimak",
+      "name": "Айылдык кеңештердин депутаттарын шайлоо",
+      "name_en": "Ayil kenesh (rural council) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "kg.ayil_okrug"
+        ]
+      },
+      "finest_note": "Votes per candidate in each multi-member district of the council in the CEC's PDF protocols (2024)",
+      "note": "Majoritarian voting in multi-member districts drawn by the territorial commission, with at least 30 percent of each council's mandates reserved for women (Law No. 98 arts. 47, 59, and 59-1), for five years. Staggered until 2024; all ayil keneshes were elected on 17 November 2024 after the territorial reform cut them from 453 to 231.",
+      "source": "z_local",
+      "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/O_vyborax_deputatov_mestnyx_keneshei/ (arts. 47, 59, and 59-1)",
+      "est_votes": 2000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(айыл|ayil|aiyl|\\mrural\\M)",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "source": "z_local_status",
+          "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/ZakonyMyyzamdar/o-statuse-deputatov-mestnyh-keneshej/ (art. 2: \"сроком на пять лет\"); Law No. 98 art. 48",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Commission for Elections and Referendums (CEC) through the territorial election commissions",
+          "vacancy_rule": "The mandate passes to the next candidate with the most votes in the same district (Law No. 98 art. 52(1)1).",
+          "valid_from": "2024-11-17"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC protocols of the local kenesh elections of 17 November 2024",
+          "url": "https://shailoo.gov.kg/ru/news/7712/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2024-11-17",
+          "last_date": "2024-11-17",
+          "finest": "kg.ayil_okrug",
+          "source": "local2024",
+          "evidence": "One PDF per council with columns per multi-member district (the Ат-Башы council has 8)"
+        },
+        {
+          "platform": "CEC open data (shailoo.gov.kg/ru/otkrytye-dannye-cik)",
+          "url": "https://shailoo.gov.kg/ru/otkrytye-dannye-cik/",
+          "format": "html, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "last_date": "2021-04-11",
+          "finest": "kg.ayil_aimak",
+          "source": "cec_open",
+          "evidence": "Results of the ayil kenesh elections of March 2016 and April 2021, one page per council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "through": "2023-12-31",
+          "note": "Councils were elected on staggered days; the CEC's pages from May 2016 list regular, early, and repeat elections of some councils, not yet counted. The CEC's open data gives 453 ayil and 31 city keneshes with 8,722 mandates before the reform."
+        },
+        {
+          "date": "2024-11-17",
+          "contests": 231,
+          "source": "local2024",
+          "quote": "утверждены протоколы об итогах голосования и о результатах выборов, 33 городских и 231 айылных кенешей"
+        }
+      ]
+    },
+    {
+      "key": "local_heads",
+      "tier": "ayil_aimak",
+      "name": "Жергиликтүү өз алдынча башкаруу органдарынын башчылары",
+      "name_en": "Heads of local executive bodies (ayil okmotu heads and mayors)",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Executive bodies of local self-government answer to the representative bodies (Constitution art. 112(2)); the CEC lists the heads and kenesh chairs in office and the early selections of heads 2016-2020.",
+      "source": "omsu",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Heads are chosen by the local kenesh or appointed, not by a vote of residents; the CEC lists who holds the post, with no popular vote to load.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "iso_pattern": "KG*",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "kurultai",
+      "tier": "national",
+      "name": "Элдик Курултай",
+      "name_en": "People's Kurultai",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2021-05-05",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "A public-representative assembly that gives recommendations on social development (Constitution art. 7), organized under a constitutional law.",
+      "source": "constitution",
+      "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/Konstituciya-Konstituciya/Konstituciya-24/ (art. 7)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A consultative assembly whose delegates are not chosen in elections run by the CEC under the electoral laws.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "appointed_assembly"
+          ],
+          "iso_pattern": "KG"
+        }
+      ]
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Судьялар",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Judges of local courts are appointed by the President on the proposal of the Council for Justice Affairs; chairs of the Constitutional and Supreme Courts are appointed with the Jogorku Kenesh's consent (Constitution art. 95).",
+      "source": "constitution",
+      "locator": "https://shailoo.gov.kg/ru/ZakonodatelstvoMyyzamdar/Konstituciya-Konstituciya/Konstituciya-24/ (art. 95)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed, never elected by voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "(судья|соттук|judge)",
+          "iso_pattern": "KG"
+        }
+      ]
+    }
+  ]
+}

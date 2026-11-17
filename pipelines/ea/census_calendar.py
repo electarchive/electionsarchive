@@ -66,10 +66,13 @@ DAY_RULES = {
     "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
     "mar_second_tuesday": nth_weekday(3, 1, 2),
     "may_third_tuesday": nth_weekday(5, 1, 3),
+    "nov_third_tuesday": nth_weekday(11, 1, 3),
+    "aug_second_tuesday": nth_weekday(8, 1, 2),
     "aug_fourth_tuesday": nth_weekday(8, 1, 4),
     "may_second_monday": nth_weekday(5, 0, 2),
     "sep_last_tuesday": last_weekday(9, 1),
     "oct_first_monday": nth_weekday(10, 0, 1),
+    "oct_second_tuesday": nth_weekday(10, 1, 2),
     "oct_third_monday": nth_weekday(10, 0, 3),
     "oct_fourth_monday": nth_weekday(10, 0, 4),
     "oct_fourth_wednesday": nth_weekday(10, 2, 4),
@@ -80,21 +83,33 @@ DAY_RULES = {
     "oct_third_thursday": nth_weekday(10, 3, 3),
     "nov_first_sunday": nth_weekday(11, 6, 1),
     "oct_second_last_sunday": lambda year: last_weekday(10, 6)(year) - timedelta(days=7),
+    "feb_first_sunday": nth_weekday(2, 6, 1),
     "mar_first_sunday": nth_weekday(3, 6, 1),
+    "mar_first_wednesday": nth_weekday(3, 2, 1),
+    "apr_first_sunday": nth_weekday(4, 6, 1),
     "may_first_sunday": nth_weekday(5, 6, 1),
     "apr_last_sunday_unless_easter": apr_last_sunday_unless_easter,
     "oct_first_sunday": nth_weekday(10, 6, 1),
+    "oct_second_sunday": nth_weekday(10, 6, 2),
     "oct_last_sunday": last_weekday(10, 6),
+    "oct_fourth_sunday": nth_weekday(10, 6, 4),
     "mar_last_sunday": last_weekday(3, 6),
     "may_first_thursday": nth_weekday(5, 3, 1),
     "wednesday_from_apr_9": wednesday_from(4, 9),
     "wednesday_from_may_31_unless_jun_6": wednesday_from(5, 31),
     "apr_first_wednesday": nth_weekday(4, 2, 1),
+    "apr_first_tuesday": nth_weekday(4, 1, 1),
+    "may_first_tuesday": nth_weekday(5, 1, 1),
+    "jan_fourth_wednesday": nth_weekday(1, 2, 4),
     "jun_first_sunday": nth_weekday(6, 6, 1),
     "jul_first_sunday": nth_weekday(7, 6, 1),
     "aug_first_sunday": nth_weekday(8, 6, 1),
     "aug_third_sunday": nth_weekday(8, 6, 3),
     "may_fourth_sunday": nth_weekday(5, 6, 4),
+    "mar_second_sunday": nth_weekday(3, 6, 2),
+    "may_last_sunday": last_weekday(5, 6),
+    "may_third_sunday": nth_weekday(5, 6, 3),
+    "feb_third_sunday": nth_weekday(2, 6, 3),
 }
 
 
@@ -220,3 +235,21 @@ def show(as_json: bool) -> str:
     if as_json:
         return json.dumps(rows, indent=1)
     return "\n".join(f"{r['date']}\t{r['after']}\t{r['polity']}\t{r['kind']}" for r in rows)
+
+
+# Added with setdefault so a rule another census already registered is kept as is.
+for _name, _rule in {
+    "mar_second_sunday": nth_weekday(3, 6, 2),
+    "nov_last_sunday": last_weekday(11, 6),
+}.items():
+    DAY_RULES.setdefault(_name, _rule)
+
+for _month_number, _month in enumerate(
+    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1
+):
+    for _weekday_number, _weekday in enumerate(
+        ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+    ):
+        DAY_RULES.setdefault(f"{_month}_last_{_weekday}", last_weekday(_month_number, _weekday_number))
+        for _nth, _ordinal in enumerate(("first", "second", "third", "fourth", "fifth"), 1):
+            DAY_RULES.setdefault(f"{_month}_{_ordinal}_{_weekday}", nth_weekday(_month_number, _weekday_number, _nth))

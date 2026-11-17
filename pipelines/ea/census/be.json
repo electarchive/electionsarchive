@@ -1,0 +1,2446 @@
+{
+  "polity": "BE",
+  "name": "Belgium",
+  "sources": {
+    "ibz-xml": {
+      "title": "Résultats électoraux / Verkiezingsresultaten: XML files, 1848-2024",
+      "publisher": "SPF Intérieur / FOD Binnenlandse Zaken, Direction des Élections",
+      "url": "https://resultatselection.belgium.be/fr/XmlOverview/Index",
+      "kind": "official_body",
+      "note": "One XML file per body and election year, each opening with <election date=... type=...> and listing every tier the service publishes (country or region, electoral college, constituency, province, arrondissement, canton, district, municipality) with seats and list votes."
+    },
+    "statbel-geo": {
+      "title": "Geografische indeling (REFNIS nomenclature)",
+      "publisher": "Statbel (Algemene Directie Statistiek)",
+      "url": "https://statbel.fgov.be/nl/over-statbel/methodologie/classificaties/geografie",
+      "kind": "official_body",
+      "note": "Downloads REFNIS_2025.csv (valid from 1 January 2025), REFNIS_2019.csv (2019-2024), and REFNIS_DEFINITIEF.csv (until 2018)."
+    },
+    "statbel-refnis-2025": {
+      "title": "REFNIS nomenclature valid from 1 January 2025 (CSV)",
+      "publisher": "Statbel (Algemene Directie Statistiek)",
+      "url": "https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/REFNIS_2025.csv",
+      "kind": "official_body"
+    },
+    "statbel-refnis-2019": {
+      "title": "REFNIS nomenclature valid from 1 January 2019 to 31 December 2024 (CSV)",
+      "publisher": "Statbel (Algemene Directie Statistiek)",
+      "url": "https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/REFNIS_2019.csv",
+      "kind": "official_body"
+    },
+    "statbel-refnis-2018": {
+      "title": "REFNIS nomenclature valid until 31 December 2018 (CSV)",
+      "publisher": "Statbel (Algemene Directie Statistiek)",
+      "url": "https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/REFNIS_DEFINITIEF.csv",
+      "kind": "official_body"
+    },
+    "wallonie-fusions": {
+      "title": "Fusion des communes (1976) et régionalisation de la loi communale (2002)",
+      "publisher": "Service public de Wallonie (Connaître la Wallonie)",
+      "url": "https://connaitrelawallonie.wallonie.be/node/9527",
+      "kind": "official_body"
+    },
+    "kamer-provinces": {
+      "title": "Infofiche 32.00: De provincies",
+      "publisher": "Kamer van volksvertegenwoordigers",
+      "url": "https://www.dekamer.be/kvvcr/pdf_sections/pri/fiche/nl_32_00.pdf",
+      "kind": "official_body"
+    },
+    "antwerpen-districten": {
+      "title": "Feestjaar voor 25-jarig bestaan Antwerpse districten",
+      "publisher": "Stad Antwerpen",
+      "url": "https://pers.antwerpen.be/feestjaar-voor-25-jarig-bestaan-antwerpse-districten",
+      "kind": "official_body"
+    },
+    "const": {
+      "title": "La Constitution coordonnée du 17 février 1994",
+      "publisher": "SPF Justice (Justel, Moniteur belge)",
+      "url": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi",
+      "kind": "official_body"
+    },
+    "code-electoral": {
+      "title": "Code électoral du 12 avril 1894",
+      "publisher": "SPF Justice (Justel, Moniteur belge)",
+      "url": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1894041230&table_name=loi",
+      "kind": "official_body"
+    },
+    "senate-1950": {
+      "title": "Consultation populaire du 12 mars 1950: résultats par arrondissement électoral (document n° 208)",
+      "publisher": "Sénat de Belgique",
+      "url": "https://www.senate.be/lexdocs/S0712/S07122278.pdf",
+      "kind": "official_body"
+    },
+    "agglo-1971": {
+      "title": "Loi du 26 juillet 1971 organisant les agglomérations et les fédérations de communes",
+      "publisher": "SPF Justice (Justel, Moniteur belge)",
+      "url": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg_2.pl?language=fr&nm=1971072603&la=F",
+      "kind": "official_body"
+    },
+    "nlc-brussels": {
+      "title": "Nouvelle loi communale (version bruxelloise, 14 mai 2024)",
+      "publisher": "Bruxelles Pouvoirs Locaux",
+      "url": "https://pouvoirs-locaux.brussels/sites/default/files/legislation_pdf/240514_NLC_FR.pdf",
+      "kind": "official_body"
+    },
+    "lpkd": {
+      "title": "Lokaal en Provinciaal Kiesdecreet van 8 juli 2011 (geconsolideerde versie, 17 november 2023)",
+      "publisher": "Vlaamse overheid, Agentschap Binnenlands Bestuur",
+      "url": "https://assets.vlaanderen.be/image/upload/v1702911730/LPKD_geconsolideerd_20231117_shj5fv.pdf",
+      "kind": "official_body"
+    },
+    "vk-fijnmazig": {
+      "title": "Bekendmaking fijnmazige stemresultaten (lokale en provinciale verkiezingen 13 oktober 2024)",
+      "publisher": "Vlaamse overheid, Agentschap Binnenlands Bestuur",
+      "url": "https://www.vlaanderen.be/vlaanderen-kiest/resultaten/bekendmaking-fijnmazige-stemresultaten",
+      "kind": "official_body",
+      "note": "Per-province xlsx files of results by counting office for the municipal, OCMW, provincial, and Antwerp district council elections of 13 October 2024."
+    },
+    "vk-resultaten": {
+      "title": "Vlaanderen kiest: resultaten",
+      "publisher": "Vlaamse overheid, Agentschap Binnenlands Bestuur",
+      "url": "https://www.vlaanderen.be/vlaanderen-kiest/resultaten",
+      "kind": "official_body"
+    },
+    "wl-elections": {
+      "title": "Élections locales en Wallonie: résultats 2006, 2012 et 2018",
+      "publisher": "Service public de Wallonie Intérieur et Action sociale",
+      "url": "https://electionslocales.wallonie.be/home.html",
+      "kind": "official_body"
+    },
+    "cdld": {
+      "title": "Code de la démocratie locale et de la décentralisation, livre premier de la quatrième partie (élections)",
+      "publisher": "SPF Justice (Justel, Moniteur belge)",
+      "url": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=2004042242&table_name=loi",
+      "kind": "official_body"
+    },
+    "brussels-elections": {
+      "title": "Résultats des élections communales en Région de Bruxelles-Capitale",
+      "publisher": "Brussels Pouvoirs Locaux, Service public régional de Bruxelles",
+      "url": "https://elections.brussels/resultats-elections",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Royaume de Belgique / Koninkrijk België / Königreich Belgien",
+      "name_en": "Kingdom of Belgium",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const"
+    },
+    {
+      "key": "community",
+      "name": "Communautés / Gemeenschappen / Gemeinschaften",
+      "name_en": "Communities (Flemish, French, and German-speaking)",
+      "parent": "national",
+      "source": "const",
+      "counts": [
+        {
+          "date": "1994-02-17",
+          "value": 3,
+          "source": "const",
+          "locator": "Art. 2: \"La Belgique comprend trois communautés : la Communauté française, la Communauté flamande et la Communauté germanophone.\""
+        }
+      ]
+    },
+    {
+      "key": "region",
+      "name": "Régions / Gewesten / Regionen",
+      "name_en": "Regions (Flemish, Walloon, and Brussels-Capital); Flanders' region and community share one parliament",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "source": "statbel-geo",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 3,
+          "source": "statbel-geo",
+          "locator": "\"Level 1: 3 gewesten Level 2: 10 provincies Level 3: 43 bestuurlijke arrondissementen Level 4: 565 gemeenten (581 tot 31/12/2024)\""
+        }
+      ]
+    },
+    {
+      "key": "agglomeration",
+      "name": "Agglomération bruxelloise / Brusselse Agglomeratie",
+      "name_en": "Brussels Agglomeration (1971-1989), replaced by the Brussels-Capital Region",
+      "parent": "national",
+      "valid_from": "1971-01-01",
+      "valid_to": "1989-06-18",
+      "source": "const"
+    },
+    {
+      "key": "province",
+      "name": "Provinces / Provincies / Provinzen",
+      "name_en": "Provinces (Brussels-Capital lies outside any province since 1995)",
+      "parent": "region",
+      "polity_kind": "region",
+      "source": "kamer-provinces",
+      "counts": [
+        {
+          "date": "1995-01-01",
+          "value": 10,
+          "source": "kamer-provinces",
+          "locator": "\"België telt tien provincies\"; \"Op 1 januari 1995 werd de provincie Brabant gesplitst in een Vlaamse en een Waalse provincie\""
+        },
+        {
+          "date": "2025-01-01",
+          "value": 10,
+          "source": "statbel-geo",
+          "locator": "\"Level 2: 10 provincies\""
+        }
+      ]
+    },
+    {
+      "key": "arrondissement",
+      "name": "Arrondissements administratifs / Bestuurlijke arrondissementen",
+      "name_en": "Administrative arrondissements (not elected)",
+      "parent": "province",
+      "elects": false,
+      "source": "statbel-geo",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 43,
+          "source": "statbel-geo",
+          "locator": "\"Level 3: 43 bestuurlijke arrondissementen\""
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Communes / Gemeenten / Gemeinden",
+      "name_en": "Municipalities (the 19 Brussels municipalities sit in no province)",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "source": "statbel-geo",
+      "counts": [
+        {
+          "date": "1976-12-31",
+          "value": 2359,
+          "source": "wallonie-fusions",
+          "locator": "\"il en reste cependant encore 2.359 en 1976\""
+        },
+        {
+          "date": "1977-01-01",
+          "value": 596,
+          "source": "wallonie-fusions",
+          "locator": "\"La Belgique ne compte plus alors que 596 communes (Anvers (-7) en 1983\""
+        },
+        {
+          "date": "1983-01-01",
+          "value": 589,
+          "source": "statbel-refnis-2018",
+          "locator": "REFNIS_DEFINITIEF.csv, \"Nomenclatuur geldig tot 31/12/2018 (589 gemeenten)\": 308 Flemish, 262 Walloon, and 19 Brussels municipality codes"
+        },
+        {
+          "date": "2019-01-01",
+          "value": 581,
+          "source": "statbel-refnis-2019",
+          "locator": "REFNIS_2019.csv, \"Nomenclatuur geldig van 1/01/2019 tot 31/12/2024 (581 huidige gemeenten)\": 300 Flemish, 262 Walloon, and 19 Brussels municipality codes"
+        },
+        {
+          "date": "2025-01-01",
+          "value": 565,
+          "source": "statbel-refnis-2025",
+          "locator": "REFNIS_2025.csv, \"Nomenclatuur geldig vanaf 1/01/2025 (565 gemeenten)\": 285 Flemish, 261 Walloon, and 19 Brussels municipality codes"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Stadsdistricten (Antwerpen)",
+      "name_en": "Antwerp city districts with directly elected district councils",
+      "parent": "municipality",
+      "polity_kind": "submunicipal",
+      "valid_from": "2001-01-01",
+      "source": "antwerpen-districten",
+      "counts": [
+        {
+          "date": "2001-01-01",
+          "value": 9,
+          "source": "ibz-xml",
+          "locator": "2000_Municipality.xml: 9 MunicipalDistrict levels (Antwerpen, Berchem, Berendrecht-Zandvliet-Lillo, Borgerhout, Deurne, Ekeren, Hoboken, Merksem, Wilrijk)"
+        },
+        {
+          "date": "2025-01-01",
+          "value": 10,
+          "source": "antwerpen-districten",
+          "locator": "\"Met de toetreding van Borsbeek als nieuwste district in 2025 telt Antwerpen vandaag 10 districten.\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "chamber",
+      "tier": "national",
+      "name": "Élections de la Chambre des représentants / Verkiezingen voor de Kamer van volksvertegenwoordigers",
+      "name_en": "Chamber of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "1831-08-29",
+      "earliest_record": "1848-06-13",
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 61-65)",
+      "note": "Directly elected by list proportional representation in electoral districts: arrondissements until 1991, 20 constituencies in 1995 and 1999, and 11 provincial constituencies from 2003 (with Brussels-Halle-Vilvoorde until 2012). 150 members since 1995 (Art. 63), 212 from 1949 to 1991. Before 1919 the Chamber was renewed by halves of the provinces every two years, save after a dissolution. Belgium holds no by-elections: a vacancy goes to the next substitute on the list. Seats are divided by D'Hondt within each constituency (Code électoral Art. 167); each province and Brussels-Capital is a constituency (Art. 87). Voting has been compulsory since 1893 (Art. 62).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BE"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 65: \"Les membres de la Chambre des représentants sont élus pour cinq ans. La Chambre est renouvelée intégralement tous les cinq ans. Les élections pour la Chambre ont lieu le même jour que les élections pour le Parlement européen.\")",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken, Direction des Élections, with constituency main offices",
+          "valid_from": "2014-05-25",
+          "vacancy_rule": "No by-election: the first substitute (suppléant / opvolger) of the member's list takes the seat."
+        },
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 65 before 2014: four-year term; Art. 46: dissolution)",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken",
+          "valid_from": "1919-01-01",
+          "valid_to": "2014-05-25"
+        }
+      ],
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1831-08-29",
+          "through": "1847-12-31",
+          "note": "Elections to the Chamber under the 1831 Constitution, by halves of the provinces every two years plus full renewals after dissolutions; the federal results service publishes none of them."
+        },
+        {
+          "date": "1848-06-13",
+          "contests": 19,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1848_Chamber.xml: <election date=\"1848-06-13T00:00:00\" type=\"Chamber\">, 19 Arrondissement levels",
+          "note": "Census suffrage. The file covers only the arrondissements that voted; seats are those the file lists."
+        },
+        {
+          "date": "1850-06-12",
+          "contests": 19,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1850_Chamber.xml: <election date=\"1850-06-12T00:00:00\" type=\"Chamber\">, 19 Arrondissement levels",
+          "note": "Census suffrage. The file covers only the arrondissements that voted; seats are those the file lists."
+        },
+        {
+          "date": "1852-06-08",
+          "contests": 10,
+          "seats": 27,
+          "source": "ibz-xml",
+          "quote": "1852_Chamber.xml: <election date=\"1852-06-08T00:00:00\" type=\"Chamber\">, 10 Arrondissement levels, 27 seats",
+          "note": "Census suffrage. The file covers only the arrondissements that voted; seats are those the file lists."
+        },
+        {
+          "date": "1853-01-01",
+          "precision": "year",
+          "through": "1893-12-31",
+          "note": "Partial and full renewals of the Chamber under census suffrage; the federal results service publishes none of them."
+        },
+        {
+          "date": "1894-10-14",
+          "contests": 41,
+          "seats": 152,
+          "source": "ibz-xml",
+          "quote": "1894_Chamber.xml: <election date=\"1894-10-14T00:00:00\" type=\"Chamber\">, 41 Arrondissement levels, 152 seats"
+        },
+        {
+          "date": "1896-07-12",
+          "contests": 22,
+          "seats": 77,
+          "source": "ibz-xml",
+          "quote": "1896_Chamber.xml: <election date=\"1896-07-12T00:00:00\" type=\"Chamber\">, 22 Arrondissement levels, 77 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1898-05-22",
+          "contests": 19,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1898_Chamber.xml: <election date=\"1898-05-22T00:00:00\" type=\"Chamber\">, 19 Arrondissement levels, 75 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1900-05-27",
+          "contests": 30,
+          "seats": 152,
+          "source": "ibz-xml",
+          "quote": "1900_Chamber.xml: <election date=\"1900-05-27T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 152 seats"
+        },
+        {
+          "date": "1902-05-25",
+          "contests": 15,
+          "seats": 85,
+          "source": "ibz-xml",
+          "quote": "1902_Chamber.xml: <election date=\"1902-05-25T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 85 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1904-05-29",
+          "contests": 15,
+          "seats": 81,
+          "source": "ibz-xml",
+          "quote": "1904_Chamber.xml: <election date=\"1904-05-29T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 81 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1906-05-27",
+          "contests": 15,
+          "seats": 83,
+          "source": "ibz-xml",
+          "quote": "1906_Chamber.xml: <election date=\"1906-05-27T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 83 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1908-05-24",
+          "contests": 15,
+          "seats": 81,
+          "source": "ibz-xml",
+          "quote": "1908_Chamber.xml: <election date=\"1908-05-24T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 81 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1910-05-22",
+          "contests": 15,
+          "seats": 87,
+          "source": "ibz-xml",
+          "quote": "1910_Chamber.xml: <election date=\"1910-05-22T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 87 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1912-06-12",
+          "contests": 30,
+          "seats": 186,
+          "source": "ibz-xml",
+          "quote": "1912_Chamber.xml: <election date=\"1912-06-12T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 186 seats"
+        },
+        {
+          "date": "1914-05-24",
+          "contests": 15,
+          "seats": 88,
+          "source": "ibz-xml",
+          "quote": "1914_Chamber.xml: <election date=\"1914-05-24T00:00:00\" type=\"Chamber\">, 15 Arrondissement levels, 88 seats",
+          "note": "Partial renewal: only the arrondissements of the provinces whose turn it was voted."
+        },
+        {
+          "date": "1919-11-16",
+          "contests": 30,
+          "seats": 186,
+          "source": "ibz-xml",
+          "quote": "1919_Chamber.xml: <election date=\"1919-11-16T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 186 seats"
+        },
+        {
+          "date": "1921-11-20",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1921_Chamber.xml: <election date=\"1921-11-20T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1925-04-15",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1925_Chamber.xml: <election date=\"1925-04-15T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1929-05-26",
+          "contests": 30,
+          "seats": 181,
+          "source": "ibz-xml",
+          "quote": "1929_Chamber.xml: <election date=\"1929-05-26T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 181 seats"
+        },
+        {
+          "date": "1932-11-27",
+          "contests": 30,
+          "seats": 187,
+          "source": "ibz-xml",
+          "quote": "1932_Chamber.xml: <election date=\"1932-11-27T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 187 seats"
+        },
+        {
+          "date": "1936-05-24",
+          "contests": 30,
+          "seats": 202,
+          "source": "ibz-xml",
+          "quote": "1936_Chamber.xml: <election date=\"1936-05-24T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 202 seats"
+        },
+        {
+          "date": "1939-04-12",
+          "contests": 30,
+          "seats": 202,
+          "source": "ibz-xml",
+          "quote": "1939_Chamber.xml: <election date=\"1939-04-12T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 202 seats"
+        },
+        {
+          "date": "1946-02-17",
+          "contests": 30,
+          "seats": 202,
+          "source": "ibz-xml",
+          "quote": "1946_Chamber.xml: <election date=\"1946-02-17T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 202 seats"
+        },
+        {
+          "date": "1949-06-26",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1949_Chamber.xml: <election date=\"1949-06-26T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1950-06-14",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1950_Chamber.xml: <election date=\"1950-06-14T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1954-04-11",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1954_Chamber.xml: <election date=\"1954-04-11T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1958-06-01",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1958_Chamber.xml: <election date=\"1958-06-01T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1961-03-26",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1961_Chamber.xml: <election date=\"1961-03-26T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1965-05-23",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1965_Chamber.xml: <election date=\"1965-05-23T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1968-03-31",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1968_Chamber.xml: <election date=\"1968-03-31T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1971-11-07",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1971_Chamber.xml: <election date=\"1971-11-07T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1974-03-10",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1974_Chamber.xml: <election date=\"1974-03-10T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1977-04-17",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1977_Chamber.xml: <election date=\"1977-04-17T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1978-12-17",
+          "contests": 30,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1978_Chamber.xml: <election date=\"1978-12-17T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1981-11-08",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1981_Chamber.xml: <election date=\"1981-11-08T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1985-10-13",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1985_Chamber.xml: <election date=\"1985-10-13T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1987-12-13",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1987_Chamber.xml: <election date=\"1987-12-13T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1991-11-24",
+          "contests": 30,
+          "seats": 212,
+          "source": "ibz-xml",
+          "quote": "1991_Chamber.xml: <election date=\"1991-11-24T00:00:00\" type=\"Chamber\">, 30 Arrondissement levels, 212 seats"
+        },
+        {
+          "date": "1995-05-21",
+          "contests": 20,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "1995_Chamber.xml: <election date=\"1995-05-21T00:00:00\" type=\"Chamber\">, 20 Constituency levels, 150 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 20,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "1999_Chamber.xml: <election date=\"1999-06-13T00:00:00\" type=\"Chamber\">, 20 Constituency levels, 150 seats"
+        },
+        {
+          "date": "2003-05-18",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2003_Chamber.xml: <election date=\"2003-05-18T00:00:00\" type=\"Chamber\">, 10 ConstituencyProvincial levels, 150 seats and 1 Constituency level",
+          "note": "Ten provincial constituencies plus Brussels-Halle-Vilvoorde, which the file lists as one Constituency level beside ten ConstituencyProvincial levels."
+        },
+        {
+          "date": "2007-06-10",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2007_Chamber.xml: <election date=\"2007-06-10T00:00:00\" type=\"Chamber\">, 11 Constituency levels, 150 seats"
+        },
+        {
+          "date": "2010-06-13",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2010_Chamber.xml: <election date=\"2010-06-13T00:00:00\" type=\"Chamber\">, 11 Constituency levels, 150 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2014_Chamber.xml: <election date=\"2014-05-25T00:00:00\" type=\"Chamber\">, 11 Constituency levels, 150 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2019_Chamber.xml: <election date=\"2019-05-26T00:00:00\" type=\"Chamber\">, 11 Constituency levels, 150 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 11,
+          "seats": 150,
+          "source": "ibz-xml",
+          "quote": "2024_Chamber.xml: <election date=\"2024-06-09T00:00:00\" type=\"Chamber\">, 11 Constituency levels, 150 seats"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1848-06-13",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by country, constituency or arrondissement, canton, and since 2014 municipality, with candidate preference votes"
+        }
+      ],
+      "est_votes": 6984906
+    },
+    {
+      "key": "senate_direct",
+      "tier": "national",
+      "name": "Élection directe des sénateurs / Rechtstreekse verkiezing van senatoren",
+      "name_en": "Senate, directly elected senators (1831-2010)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1831-08-29",
+      "valid_to": "2014-05-25",
+      "first_held": "1831-08-29",
+      "earliest_record": "1900-05-27",
+      "source": "const",
+      "note": "Senators elected directly by arrondissement until 1991, then 40 senators in a Dutch and a French electoral college from 1995 to 2010. The sixth state reform (2014) ended direct election: the Senate is now 50 senators designated by the community and regional parliaments and 10 co-opted (Art. 67). Provincial senators (elected by the provincial councils, 1893-1995) and co-opted senators are in senate_indirect.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BE",
+          "valid_to": "2014-05-25"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Senate provisions before the 2014 state reform: directly elected senators sat for four years and were elected with the Chamber)",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken",
+          "valid_from": "1919-01-01",
+          "valid_to": "2014-05-25"
+        }
+      ],
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1831-08-29",
+          "through": "1899-12-31",
+          "note": "Directly elected senators, renewed by halves every four years and in full after dissolutions; the federal results service publishes nothing before 1900."
+        },
+        {
+          "date": "1900-05-27",
+          "contests": 18,
+          "seats": 32,
+          "source": "ibz-xml",
+          "quote": "1900_Senate.xml: <election date=\"1900-05-27T00:00:00\" type=\"Senate\">, 18 Arrondissement levels, 32 seats"
+        },
+        {
+          "date": "1902-05-25",
+          "contests": 6,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1902_Senate.xml: <election date=\"1902-05-25T00:00:00\" type=\"Senate\">, 6 Arrondissement levels",
+          "note": "Partial renewal: only some provinces voted."
+        },
+        {
+          "date": "1904-05-29",
+          "contests": 9,
+          "seats": 43,
+          "source": "ibz-xml",
+          "quote": "1904_Senate.xml: <election date=\"1904-05-29T00:00:00\" type=\"Senate\">, 9 Arrondissement levels, 43 seats",
+          "note": "Partial renewal: only some provinces voted."
+        },
+        {
+          "date": "1908-05-24",
+          "contests": 9,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1908_Senate.xml: <election date=\"1908-05-24T00:00:00\" type=\"Senate\">, 9 Arrondissement levels",
+          "note": "Partial renewal: only some provinces voted."
+        },
+        {
+          "date": "1912-06-12",
+          "contests": 18,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1912_Senate.xml: <election date=\"1912-06-12T00:00:00\" type=\"Senate\">, 18 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1919-11-16",
+          "contests": 18,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1919_Senate.xml: <election date=\"1919-11-16T00:00:00\" type=\"Senate\">, 18 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1921-11-20",
+          "contests": 20,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1921_Senate.xml: <election date=\"1921-11-20T00:00:00\" type=\"Senate\">, 20 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1925-04-15",
+          "contests": 21,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1925_Senate.xml: <election date=\"1925-04-15T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1929-05-26",
+          "contests": 21,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1929_Senate.xml: <election date=\"1929-05-26T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1932-11-27",
+          "contests": 21,
+          "seats": 93,
+          "source": "ibz-xml",
+          "quote": "1932_Senate.xml: <election date=\"1932-11-27T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 93 seats"
+        },
+        {
+          "date": "1936-05-24",
+          "contests": 21,
+          "seats": 101,
+          "source": "ibz-xml",
+          "quote": "1936_Senate.xml: <election date=\"1936-05-24T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 101 seats"
+        },
+        {
+          "date": "1939-04-12",
+          "contests": 21,
+          "seats": 101,
+          "source": "ibz-xml",
+          "quote": "1939_Senate.xml: <election date=\"1939-04-12T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 101 seats"
+        },
+        {
+          "date": "1946-02-17",
+          "contests": 18,
+          "seats": 101,
+          "source": "ibz-xml",
+          "quote": "1946_Senate.xml: <election date=\"1946-02-17T00:00:00\" type=\"Senate\">, 18 Arrondissement levels, 101 seats"
+        },
+        {
+          "date": "1949-06-26",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1949_Senate.xml: <election date=\"1949-06-26T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1950-06-14",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1950_Senate.xml: <election date=\"1950-06-14T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1954-04-11",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1954_Senate.xml: <election date=\"1954-04-11T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1958-06-01",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1958_Senate.xml: <election date=\"1958-06-01T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1961-03-26",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1961_Senate.xml: <election date=\"1961-03-26T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1965-05-23",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1965_Senate.xml: <election date=\"1965-05-23T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1968-03-31",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1968_Senate.xml: <election date=\"1968-03-31T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1971-11-07",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1971_Senate.xml: <election date=\"1971-11-07T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1974-03-10",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1974_Senate.xml: <election date=\"1974-03-10T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1977-04-17",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1977_Senate.xml: <election date=\"1977-04-17T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1978-12-17",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1978_Senate.xml: <election date=\"1978-12-17T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1981-11-08",
+          "contests": 21,
+          "seats": null,
+          "source": "ibz-xml",
+          "quote": "1981_Senate.xml: <election date=\"1981-11-08T00:00:00\" type=\"Senate\">, 21 Arrondissement levels",
+          "note": "The file's country and province seat totals disagree, so seats are left blank."
+        },
+        {
+          "date": "1985-10-13",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1985_Senate.xml: <election date=\"1985-10-13T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1987-12-13",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1987_Senate.xml: <election date=\"1987-12-13T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1991-11-24",
+          "contests": 21,
+          "seats": 106,
+          "source": "ibz-xml",
+          "quote": "1991_Senate.xml: <election date=\"1991-11-24T00:00:00\" type=\"Senate\">, 21 Arrondissement levels, 106 seats"
+        },
+        {
+          "date": "1995-05-21",
+          "contests": 2,
+          "seats": 40,
+          "source": "ibz-xml",
+          "quote": "1995_Senate.xml: <election date=\"1995-05-21T00:00:00\" type=\"Senate\">, 2 ElectoralCollege levels, 40 seats",
+          "note": "Forty directly elected senators in two electoral colleges, Dutch (25) and French (15)."
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 2,
+          "seats": 40,
+          "source": "ibz-xml",
+          "quote": "1999_Senate.xml: <election date=\"1999-06-13T00:00:00\" type=\"Senate\">, 2 ElectoralCollege levels, 40 seats",
+          "note": "Forty directly elected senators in two electoral colleges, Dutch (25) and French (15)."
+        },
+        {
+          "date": "2003-05-18",
+          "contests": 2,
+          "seats": 40,
+          "source": "ibz-xml",
+          "quote": "2003_Senate.xml: <election date=\"2003-05-18T00:00:00\" type=\"Senate\">, 2 ElectoralCollege levels, 40 seats",
+          "note": "Forty directly elected senators in two electoral colleges, Dutch (25) and French (15)."
+        },
+        {
+          "date": "2007-06-10",
+          "contests": 2,
+          "seats": 40,
+          "source": "ibz-xml",
+          "quote": "2007_Senate.xml: <election date=\"2007-06-10T00:00:00\" type=\"Senate\">, 2 ElectoralCollege levels, 40 seats",
+          "note": "Forty directly elected senators in two electoral colleges, Dutch (25) and French (15)."
+        },
+        {
+          "date": "2010-06-13",
+          "contests": 2,
+          "seats": 40,
+          "source": "ibz-xml",
+          "quote": "2010_Senate.xml: <election date=\"2010-06-13T00:00:00\" type=\"Senate\">, 2 ElectoralCollege levels, 40 seats",
+          "note": "Forty directly elected senators in two electoral colleges, Dutch (25) and French (15)."
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1900-05-27",
+          "last_date": "2010-06-13",
+          "source": "ibz-xml",
+          "evidence": "Results by electoral college or arrondissement, province, and canton"
+        }
+      ],
+      "est_votes": 6469103
+    },
+    {
+      "key": "senate_indirect",
+      "tier": "national",
+      "name": "Sénateurs provinciaux, cooptés et de communauté",
+      "name_en": "Senators chosen by provincial councils (1893-1995), by co-optation, and by the community and regional parliaments (since 2014)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 67, § 1: \"Le Sénat est composé de soixante sénateurs, dont : 1° vingt-neuf sénateurs désignés par le Parlement flamand ...\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "These senators are designated or co-opted by sitting members of other assemblies in proportion to party strength, not chosen at a public election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BE"
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Élections du Parlement européen en Belgique / Europese verkiezingen in België",
+      "name_en": "European Parliament elections in Belgium",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "electoral college"
+      },
+      "first_held": "1979-06-10",
+      "earliest_record": "1979-06-10",
+      "source": "ibz-xml",
+      "note": "List PR in a Dutch and a French electoral college, plus a German-speaking college from 1994; 24 seats (1979-1989), 25 (1994-1999), 24 (2004), 22 (2009), 21 (2014-2019), and 22 (2024).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null,
+          "precedence": 5
+        },
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "^$"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 65 and 117: Chamber and regional elections coincide with the European elections)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken"
+        }
+      ],
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1979-06-10",
+          "contests": 2,
+          "seats": 24,
+          "source": "ibz-xml",
+          "quote": "1979_ParlementEurope.xml: <election date=\"1979-06-10T00:00:00\" type=\"ParlementEurope\">, 2 ElectoralCollege levels, 24 seats"
+        },
+        {
+          "date": "1984-06-17",
+          "contests": 2,
+          "seats": 24,
+          "source": "ibz-xml",
+          "quote": "1984_ParlementEurope.xml: <election date=\"1984-06-17T00:00:00\" type=\"ParlementEurope\">, 2 ElectoralCollege levels, 24 seats"
+        },
+        {
+          "date": "1989-06-18",
+          "contests": 2,
+          "seats": 24,
+          "source": "ibz-xml",
+          "quote": "1989_ParlementEurope.xml: <election date=\"1989-06-18T00:00:00\" type=\"ParlementEurope\">, 2 ElectoralCollege levels, 24 seats"
+        },
+        {
+          "date": "1994-06-12",
+          "contests": 3,
+          "seats": 24,
+          "source": "ibz-xml",
+          "quote": "1994_ParlementEurope.xml: <election date=\"1994-06-12T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 24 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 3,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "1999_ParlementEurope.xml: <election date=\"1999-06-13T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 25 seats"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 3,
+          "seats": 24,
+          "source": "ibz-xml",
+          "quote": "2004_ParlementEurope.xml: <election date=\"2004-06-13T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 24 seats"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 3,
+          "seats": 22,
+          "source": "ibz-xml",
+          "quote": "2009_ParlementEurope.xml: <election date=\"2009-06-07T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 22 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 3,
+          "seats": 21,
+          "source": "ibz-xml",
+          "quote": "2014_ParlementEurope.xml: <election date=\"2014-05-25T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 21 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 3,
+          "seats": 21,
+          "source": "ibz-xml",
+          "quote": "2019_ParlementEurope.xml: <election date=\"2019-05-26T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 21 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 3,
+          "seats": 22,
+          "source": "ibz-xml",
+          "quote": "2024_ParlementEurope.xml: <election date=\"2024-06-09T00:00:00\" type=\"ParlementEurope\">, 3 ElectoralCollege levels, 22 seats"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1979-06-10",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by electoral college, constituency, province, arrondissement, canton, and since 2014 municipality"
+        }
+      ],
+      "est_votes": 7133784
+    },
+    {
+      "key": "consultation_1950",
+      "tier": "national",
+      "name": "Consultation populaire du 12 mars 1950 / Volksraadpleging",
+      "name_en": "National popular consultation on the return of King Leopold III (1950)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_from": "1950-03-12",
+      "valid_to": "1950-03-13",
+      "first_held": "1950-03-12",
+      "source": "const",
+      "note": "The only national popular vote: a non-binding consultation under the law of 11 February 1950. The Constitution provides no national referendum; Art. 39bis (since 2014) allows only regional consultations, none yet held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1950-03-12",
+          "contests": 1,
+          "note": "Not in the federal results service's files. The Senate printed the results by electoral arrondissement as a scanned table: 5,236,740 ballots cast, 2,933,382 yes and 2,151,881 no.",
+          "source": "senate-1950",
+          "quote": "Ces résultats, établis par arrondissement électoral, sont conformes à ceux qui ont été proclamés"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Sénat de Belgique, document n° 208 (1950)",
+          "url": "https://www.senate.be/lexdocs/S0712/S07122278.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1950-03-12",
+          "last_date": "1950-03-12",
+          "source": "senate-1950",
+          "evidence": "Yes and no votes by electoral arrondissement; needs digitizing"
+        }
+      ],
+      "est_votes": 5236740,
+      "effort": 2
+    },
+    {
+      "key": "flemish_parliament",
+      "tier": "community",
+      "name": "Verkiezingen voor het Vlaams Parlement",
+      "name_en": "Flemish Parliament",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1995-05-21",
+      "first_held": "1995-05-21",
+      "earliest_record": "1995-05-21",
+      "source": "const",
+      "note": "Directly elected since 1995: 118 members in 11 constituencies (1995, 1999), then 124 in 5 provincial constituencies plus Brussels (6 seats) from 2004. Its predecessor, the Vlaamse Raad (1980-1995), was made up of the Dutch-language members of the national parliament and is in regional_councils_indirect.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "Flemish Parliament|Vlaams Parlement"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 117: \"Les Parlements de Communauté et de région sont intégralement renouvelés tous les cinq ans.\" \"Les élections pour les Parlements de communauté et de région ont lieu le même jour et coïncident avec les élections pour le Parlement européen.\")",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken"
+        }
+      ],
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1995-05-21",
+          "contests": 11,
+          "seats": 118,
+          "source": "ibz-xml",
+          "quote": "1995_ParlementFlanders.xml: <election date=\"1995-05-21T00:00:00\" type=\"ParlementFlanders\">, 11 Constituency levels, 118 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 11,
+          "seats": 118,
+          "source": "ibz-xml",
+          "quote": "1999_ParlementFlanders.xml: <election date=\"1999-06-13T00:00:00\" type=\"ParlementFlanders\">, 11 Constituency levels, 118 seats"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 6,
+          "seats": 124,
+          "source": "ibz-xml",
+          "quote": "2004_ParlementFlanders.xml: <election date=\"2004-06-13T00:00:00\" type=\"ParlementFlanders\">, 6 Constituency levels, 124 seats"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 6,
+          "seats": 124,
+          "source": "ibz-xml",
+          "quote": "2009_ParlementFlanders.xml: <election date=\"2009-06-07T00:00:00\" type=\"ParlementFlanders\">, 6 Constituency levels, 124 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 6,
+          "seats": 124,
+          "source": "ibz-xml",
+          "quote": "2014_ParlementFlanders.xml: <election date=\"2014-05-25T00:00:00\" type=\"ParlementFlanders\">, 6 Constituency levels, 124 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 6,
+          "seats": 124,
+          "source": "ibz-xml",
+          "quote": "2019_ParlementFlanders.xml: <election date=\"2019-05-26T00:00:00\" type=\"ParlementFlanders\">, 6 Constituency levels, 124 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 6,
+          "seats": 124,
+          "source": "ibz-xml",
+          "quote": "2024_ParlementFlanders.xml: <election date=\"2024-06-09T00:00:00\" type=\"ParlementFlanders\">, 6 Constituency levels, 124 seats"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1995-05-21",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by region, constituency, canton, and since 2014 municipality"
+        }
+      ],
+      "est_votes": 4379440
+    },
+    {
+      "key": "walloon_parliament",
+      "tier": "region",
+      "name": "Élections du Parlement de Wallonie",
+      "name_en": "Walloon Parliament",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1995-05-21",
+      "first_held": "1995-05-21",
+      "earliest_record": "1995-05-21",
+      "source": "const",
+      "note": "75 members, directly elected since 1995 in 13 constituencies (11 from 2019). The Conseil régional wallon (1980-1995) was made up of the French-language members of the national parliament from Wallonia.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "Walloon Parliament|Parlement wallon|Parlement de Wallonie"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 117)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken"
+        }
+      ],
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1995-05-21",
+          "contests": 13,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1995_ParlementWallonia.xml: <election date=\"1995-05-21T00:00:00\" type=\"ParlementWallonia\">, 13 Constituency levels, 75 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 13,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1999_ParlementWallonia.xml: <election date=\"1999-06-13T00:00:00\" type=\"ParlementWallonia\">, 13 Constituency levels, 75 seats"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 13,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "2004_ParlementWallonia.xml: <election date=\"2004-06-13T00:00:00\" type=\"ParlementWallonia\">, 13 Constituency levels, 75 seats"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 13,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "2009_ParlementWallonia.xml: <election date=\"2009-06-07T00:00:00\" type=\"ParlementWallonia\">, 13 Constituency levels, 75 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 13,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "2014_ParlementWallonia.xml: <election date=\"2014-05-25T00:00:00\" type=\"ParlementWallonia\">, 13 Constituency levels, 75 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 11,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "2019_ParlementWallonia.xml: <election date=\"2019-05-26T00:00:00\" type=\"ParlementWallonia\">, 11 Constituency levels, 75 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 11,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "2024_ParlementWallonia.xml: <election date=\"2024-06-09T00:00:00\" type=\"ParlementWallonia\">, 11 Constituency levels, 75 seats"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1995-05-21",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by region, constituency, province, canton, and since 2014 municipality"
+        }
+      ],
+      "est_votes": 2068766
+    },
+    {
+      "key": "brussels_parliament",
+      "tier": "region",
+      "name": "Élections du Parlement de la Région de Bruxelles-Capitale / Brussels Parlement",
+      "name_en": "Brussels-Capital Region Parliament",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1989-06-18",
+      "first_held": "1989-06-18",
+      "earliest_record": "1989-06-18",
+      "source": "const",
+      "note": "One regional constituency with separate French and Dutch language groups of lists: 75 members (1989-1999), 89 (72 French, 17 Dutch) since 2004.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "Brussels Parliament|Parlement bruxellois|Brussels Parlement"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 117)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken",
+          "valid_from": "2004-01-01"
+        },
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 117 before 2005; Special Law of 12 January 1989)",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "valid_to": "2004-01-01"
+        }
+      ],
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1989-06-18",
+          "contests": 1,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1989_ParlementBrussels.xml: <election date=\"1989-06-18T00:00:00\" type=\"ParlementBrussels\">, 1 Region levels, 75 seats"
+        },
+        {
+          "date": "1995-05-21",
+          "contests": 1,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1995_ParlementBrussels.xml: <election date=\"1995-05-21T00:00:00\" type=\"ParlementBrussels\">, 1 Region levels, 75 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 1,
+          "seats": 75,
+          "source": "ibz-xml",
+          "quote": "1999_ParlementBrussels.xml: <election date=\"1999-06-13T00:00:00\" type=\"ParlementBrussels\">, 1 Region levels, 75 seats"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 1,
+          "seats": 89,
+          "source": "ibz-xml",
+          "quote": "2004_ParlementBrussels.xml: <election date=\"2004-06-13T00:00:00\" type=\"ParlementBrussels\">, 1 Constituency levels, 89 seats"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 1,
+          "seats": 89,
+          "source": "ibz-xml",
+          "quote": "2009_ParlementBrussels.xml: <election date=\"2009-06-07T00:00:00\" type=\"ParlementBrussels\">, 1 Constituency levels, 89 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "seats": 89,
+          "source": "ibz-xml",
+          "quote": "2014_ParlementBrussels.xml: <election date=\"2014-05-25T00:00:00\" type=\"ParlementBrussels\">, 1 Constituency levels, 89 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "seats": 89,
+          "source": "ibz-xml",
+          "quote": "2019_ParlementBrussels.xml: <election date=\"2019-05-26T00:00:00\" type=\"ParlementBrussels\">, 1 Constituency levels, 89 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "seats": 89,
+          "source": "ibz-xml",
+          "quote": "2024_ParlementBrussels.xml: <election date=\"2024-06-09T00:00:00\" type=\"ParlementBrussels\">, 1 Constituency levels, 89 seats"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1989-06-18",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by region or constituency, canton, and since 2014 municipality"
+        }
+      ],
+      "est_votes": 470140
+    },
+    {
+      "key": "german_parliament",
+      "tier": "community",
+      "name": "Wahl des Parlaments der Deutschsprachigen Gemeinschaft",
+      "name_en": "Parliament of the German-speaking Community (Council of the German Cultural Community from 1973)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1974-03-10",
+      "first_held": "1974-03-10",
+      "earliest_record": "1990-10-28",
+      "source": "const",
+      "note": "25 members elected in one constituency of the nine German-speaking municipalities. First directly elected on 10 March 1974 as the Rat der deutschen Kulturgemeinschaft; elections in 1974, 1978, 1981, 1986, and 1990 before aligning with the other parliaments in 1995.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "German-speaking|Deutschsprachigen|germanophone"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 117)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "SPF Intérieur / FOD Binnenlandse Zaken",
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1974-03-10",
+          "through": "1989-12-31",
+          "note": "Council elections of 1974, 1978, 1981, and 1986 are not in the federal results service's files and are not yet counted."
+        },
+        {
+          "date": "1990-10-28",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "1990_ParlementGermanRegion.xml: <election date=\"1990-10-28T00:00:00\" type=\"ParlementGermanRegion\">, 1 Region levels, 25 seats"
+        },
+        {
+          "date": "1995-05-21",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "1995_ParlementGermanRegion.xml: <election date=\"1995-05-21T00:00:00\" type=\"ParlementGermanRegion\">, 1 Region levels, 25 seats"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "1999_ParlementGermanRegion.xml: <election date=\"1999-06-13T00:00:00\" type=\"ParlementGermanRegion\">, 1 Region levels, 25 seats"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "2004_ParlementGermanRegion.xml: <election date=\"2004-06-13T00:00:00\" type=\"ParlementGermanRegion\">, 1 Constituency levels, 25 seats"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "2009_ParlementGermanRegion.xml: <election date=\"2009-06-07T00:00:00\" type=\"ParlementGermanRegion\">, 1 Constituency levels, 25 seats"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "2014_ParlementGermanRegion.xml: <election date=\"2014-05-25T00:00:00\" type=\"ParlementGermanRegion\">, 1 Constituency levels, 25 seats"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "2019_ParlementGermanRegion.xml: <election date=\"2019-05-26T00:00:00\" type=\"ParlementGermanRegion\">, 1 Constituency levels, 25 seats"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "seats": 25,
+          "source": "ibz-xml",
+          "quote": "2024_ParlementGermanRegion.xml: <election date=\"2024-06-09T00:00:00\" type=\"ParlementGermanRegion\">, 1 Constituency levels, 25 seats"
+        }
+      ],
+      "effort": 1,
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1990-10-28",
+          "last_date": "2024-06-09",
+          "source": "ibz-xml",
+          "evidence": "Results by region or constituency, canton, and since 2014 municipality"
+        }
+      ],
+      "est_votes": 40047
+    },
+    {
+      "key": "regional_councils_indirect",
+      "tier": "community",
+      "name": "Parlement de la Communauté française, conseils culturels (1971-1980), Vlaamse Raad et Conseil régional wallon (1980-1995)",
+      "name_en": "Community and regional councils made up of members of other assemblies",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 116, § 2)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Their members sit by virtue of a seat won in another assembly (the national parliament before 1995; the Walloon Parliament and the French group of the Brussels Parliament for the French Community since 1995), so no separate election is held.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BE"
+        }
+      ]
+    },
+    {
+      "key": "agglomeration_council",
+      "tier": "agglomeration",
+      "name": "Conseil d'agglomération de Bruxelles / Agglomeratieraad van Brussel",
+      "name_en": "Brussels Agglomeration Council",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1971-11-21",
+      "valid_to": "1989-06-18",
+      "first_held": "1971-11-21",
+      "source": "agglo-1971",
+      "note": "Directly elected council of the 19 Brussels municipalities under the law of 26 July 1971 (Art. 10: \"élus directement par un collège électoral composé de l'ensemble des électeurs des communes\"), elected in 1971 and 1976; its powers passed to the Brussels-Capital Region in 1989.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "[Aa]gglom"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "through": "1976-12-31",
+          "note": "Elections of 1971 and 1976; no official results publication located online."
+        }
+      ],
+      "est_votes": 450000,
+      "effort": 4
+    },
+    {
+      "key": "provincial_council",
+      "tier": "province",
+      "name": "Élections provinciales / Provincieraadsverkiezingen",
+      "name_en": "Provincial councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "district"
+      },
+      "first_held": "1836-05-30",
+      "earliest_record": "1958-06-01",
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 162, 1°: \"l'élection directe des membres des conseils provinciaux et communaux\")",
+      "note": "Elected by list PR with D'Hondt divisors in provincial districts (Flanders adds a 5% threshold, LPKD Art. 178/1). Held with the Chamber elections until 1991, and with the municipal elections from 1994. Organized by the regions since 2006: Flanders cut its provincial councils in 2018 and 2024; the Brussels-Capital Region has had no province since 1995.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "[Pp]rovinc|[Pp]rovinz"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "lpkd",
+          "locator": "https://assets.vlaanderen.be/image/upload/v1702911730/LPKD_geconsolideerd_20231117_shj5fv.pdf (Art. 6: \"De verkiezingen voor de vernieuwing van de gemeenteraden, provincieraden en stadsdistrictsraden hebben van rechtswege plaats om de zes jaar, op de tweede zondag van oktober.\")",
+          "period_years": 6,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_second_sunday",
+          "term_years": 6,
+          "called": false,
+          "administered_by": "Regions (Agentschap Binnenlands Bestuur; SPW Intérieur) since 2006; SPF Intérieur before",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1836-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "Provincial elections before 1958 are not in the federal results service's files and are not yet counted."
+        },
+        {
+          "date": "1958-06-01",
+          "contests": 101,
+          "seats": 690,
+          "source": "ibz-xml",
+          "quote": "1958_Province.xml: <election date=\"1958-06-01T00:00:00\" type=\"Province\">, 101 District levels, 690 seats"
+        },
+        {
+          "date": "1961-03-26",
+          "contests": 101,
+          "seats": 690,
+          "source": "ibz-xml",
+          "quote": "1961_Province.xml: <election date=\"1961-03-26T00:00:00\" type=\"Province\">, 101 District levels, 690 seats"
+        },
+        {
+          "date": "1965-05-23",
+          "contests": 105,
+          "seats": 708,
+          "source": "ibz-xml",
+          "quote": "1965_Province.xml: <election date=\"1965-05-23T00:00:00\" type=\"Province\">, 105 District levels, 708 seats"
+        },
+        {
+          "date": "1968-03-31",
+          "contests": 105,
+          "seats": 706,
+          "source": "ibz-xml",
+          "quote": "1968_Province.xml: <election date=\"1968-03-31T00:00:00\" type=\"Province\">, 105 District levels, 706 seats"
+        },
+        {
+          "date": "1971-11-07",
+          "contests": 105,
+          "seats": 706,
+          "source": "ibz-xml",
+          "quote": "1971_Province.xml: <election date=\"1971-11-07T00:00:00\" type=\"Province\">, 105 District levels, 706 seats"
+        },
+        {
+          "date": "1974-03-10",
+          "contests": 105,
+          "seats": 720,
+          "source": "ibz-xml",
+          "quote": "1974_Province.xml: <election date=\"1974-03-10T00:00:00\" type=\"Province\">, 105 District levels, 720 seats"
+        },
+        {
+          "date": "1977-04-17",
+          "contests": 105,
+          "seats": 720,
+          "source": "ibz-xml",
+          "quote": "1977_Province.xml: <election date=\"1977-04-17T00:00:00\" type=\"Province\">, 105 District levels, 720 seats"
+        },
+        {
+          "date": "1978-12-17",
+          "contests": 105,
+          "seats": 720,
+          "source": "ibz-xml",
+          "quote": "1978_Province.xml: <election date=\"1978-12-17T00:00:00\" type=\"Province\">, 105 District levels, 720 seats"
+        },
+        {
+          "date": "1981-11-08",
+          "contests": 105,
+          "seats": 612,
+          "source": "ibz-xml",
+          "quote": "1981_Province.xml: <election date=\"1981-11-08T00:00:00\" type=\"Province\">, 105 District levels, 612 seats"
+        },
+        {
+          "date": "1985-10-13",
+          "contests": 104,
+          "seats": 715,
+          "source": "ibz-xml",
+          "quote": "1985_Province.xml: <election date=\"1985-10-13T00:00:00\" type=\"Province\">, 104 District levels, 715 seats"
+        },
+        {
+          "date": "1991-11-24",
+          "contests": 104,
+          "seats": 715,
+          "source": "ibz-xml",
+          "quote": "1991_Province.xml: <election date=\"1991-11-24T00:00:00\" type=\"Province\">, 104 District levels, 715 seats"
+        },
+        {
+          "date": "1994-10-09",
+          "contests": 80,
+          "seats": 565,
+          "source": "ibz-xml",
+          "quote": "1994_Province.xml: <election date=\"1994-10-09T00:00:00\" type=\"Province\">, 80 District levels, 565 seats"
+        },
+        {
+          "date": "2000-10-08",
+          "contests": 97,
+          "seats": 738,
+          "source": "ibz-xml",
+          "quote": "2000_Province.xml: <election date=\"2000-10-08T00:00:00\" type=\"Province\">, 97 District levels, 738 seats"
+        },
+        {
+          "date": "2006-10-08",
+          "note": "Organized by the regions; districts not yet counted."
+        },
+        {
+          "date": "2012-10-14",
+          "note": "Organized by the regions; districts not yet counted."
+        },
+        {
+          "date": "2018-10-14",
+          "note": "Organized by the regions; districts not yet counted."
+        },
+        {
+          "date": "2024-10-13",
+          "note": "Organized by the regions; districts not yet counted.",
+          "source": "vk-fijnmazig",
+          "quote": "Fijnmazige_resultaten_provincieraadsverkiezingen_13_oktober_2024_Antwerpen"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Vlaanderen kiest (Agentschap Binnenlands Bestuur)",
+          "url": "https://www.vlaanderen.be/vlaanderen-kiest/resultaten/bekendmaking-fijnmazige-stemresultaten",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2006-10-08",
+          "last_date": "2024-10-13",
+          "source": "vk-resultaten",
+          "evidence": "xlsx provincial council results for 2006, 2012, 2018, and 2024 (by counting office in 2024)"
+        },
+        {
+          "role": "publishes",
+          "platform": "Élections locales en Wallonie (SPW Intérieur)",
+          "url": "https://electionslocales.wallonie.be/resultats/{year}/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2006-10-08",
+          "last_date": "2018-10-14",
+          "source": "wl-elections",
+          "evidence": "HTML provincial results for 2006, 2012, and 2018; the 2024 site elections2024.wallonie.be reset the connection"
+        },
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1958-06-01",
+          "last_date": "2000-10-08",
+          "source": "ibz-xml",
+          "evidence": "Results by provincial district, arrondissement, and province"
+        }
+      ],
+      "est_votes": 5800000,
+      "effort": 3
+    },
+    {
+      "key": "municipal_council",
+      "tier": "municipality",
+      "name": "Élections communales / Gemeenteraadsverkiezingen / Gemeinderatswahlen",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "contests_per_unit": 1,
+      "first_held": "1830-10-01",
+      "earliest_record": "1976-10-10",
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 162, 1°)",
+      "note": "Every municipal council is elected by list PR, with Imperiali divisors (1, 1.5, 2, ...) in all three regions (LPKD Art. 166; CDLD L4145-5; Brussels), every six years on the second Sunday of October (Flanders: Lokaal en Provinciaal Kiesdecreet Art. 6; Wallonia: CDLD; Brussels: Brussels electoral ordinance). Organized by the federal Interior until 2000 and by the regions (and for its nine municipalities the German-speaking Community from 2018) since 2006. Flanders ended compulsory voting for local elections in 2024. Mayors are not elected separately (mayor class). The federal service publishes municipal results only for 1976 to 2000; the regions publish from 2006.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "[Mm]unicipal|[Gg]emeente|[Cc]ommun"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "lpkd",
+          "locator": "https://assets.vlaanderen.be/image/upload/v1702911730/LPKD_geconsolideerd_20231117_shj5fv.pdf (Art. 6)",
+          "period_years": 6,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_second_sunday",
+          "term_years": 6,
+          "called": false,
+          "administered_by": "Regions since 2006 (Agentschap Binnenlands Bestuur; SPW Intérieur; Brussels Pouvoirs Locaux; Ministerium der Deutschsprachigen Gemeinschaft); SPF Intérieur before",
+          "valid_from": "1976-01-01",
+          "vacancy_rule": "No by-election: the first substitute of the councillor's list takes the seat."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1830-01-01",
+          "precision": "year",
+          "through": "1975-12-31",
+          "note": "Municipal elections before the 1977 mergers (2,359 municipalities in 1976) are not in the federal results service's files and are not yet counted."
+        },
+        {
+          "date": "1976-10-10",
+          "contests": 589,
+          "seats": 12008,
+          "source": "ibz-xml",
+          "quote": "1976_Municipality.xml: <election date=\"1976-10-10T00:00:00\" type=\"Municipality\">, 589 Municipality levels, 12008 seats"
+        },
+        {
+          "date": "1982-10-10",
+          "contests": 589,
+          "seats": 12734,
+          "source": "ibz-xml",
+          "quote": "1982_Municipality.xml: <election date=\"1982-10-10T00:00:00\" type=\"Municipality\">, 589 Municipality levels, 12734 seats"
+        },
+        {
+          "date": "1988-10-09",
+          "contests": 589,
+          "seats": 12694,
+          "source": "ibz-xml",
+          "quote": "1988_Municipality.xml: <election date=\"1988-10-09T00:00:00\" type=\"Municipality\">, 589 Municipality levels, 12694 seats"
+        },
+        {
+          "date": "1994-10-09",
+          "contests": 589,
+          "seats": 9915,
+          "source": "ibz-xml",
+          "quote": "1994_Municipality.xml: <election date=\"1994-10-09T00:00:00\" type=\"Municipality\">, 589 Municipality levels, 9915 seats"
+        },
+        {
+          "date": "2000-10-08",
+          "contests": 590,
+          "seats": 13072,
+          "source": "ibz-xml",
+          "quote": "2000_Municipality.xml: <election date=\"2000-10-08T00:00:00\" type=\"Municipality\">, 590 Municipality levels, 13072 seats"
+        },
+        {
+          "date": "2006-10-08",
+          "contests": 589,
+          "source": "statbel-refnis-2018",
+          "quote": "Nomenclatuur geldig tot 31/12/2018 (589 gemeenten)"
+        },
+        {
+          "date": "2012-10-14",
+          "contests": 589,
+          "source": "statbel-refnis-2018",
+          "quote": "Nomenclatuur geldig tot 31/12/2018 (589 gemeenten)"
+        },
+        {
+          "date": "2018-10-14",
+          "contests": 581,
+          "note": "Elected for the 581 municipalities in force from 1 January 2019, after the Flemish mergers of that day.",
+          "source": "statbel-refnis-2019",
+          "quote": "Nomenclatuur geldig van 1/01/2019 tot 31/12/2024 (581 huidige gemeenten)"
+        },
+        {
+          "date": "2024-10-13",
+          "contests": 565,
+          "note": "Elected for the 565 municipalities in force from 1 January 2025 (285 Flemish after the mergers of that day, 261 Walloon after Bastogne absorbed Bertogne, and 19 in Brussels).",
+          "source": "statbel-refnis-2025",
+          "quote": "Nomenclatuur geldig vanaf 1/01/2025 (565 gemeenten)"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Vlaanderen kiest (Agentschap Binnenlands Bestuur)",
+          "url": "https://www.vlaanderen.be/vlaanderen-kiest/resultaten",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2006-10-08",
+          "last_date": "2024-10-13",
+          "source": "vk-resultaten",
+          "evidence": "xlsx results by municipality for 2006, 2012, 2018, and 2024, and by counting office for 2024 (bekendmaking-fijnmazige-stemresultaten)"
+        },
+        {
+          "role": "publishes",
+          "platform": "Élections locales en Wallonie (SPW Intérieur)",
+          "url": "https://electionslocales.wallonie.be/resultats/{year}/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2006-10-08",
+          "last_date": "2018-10-14",
+          "source": "wl-elections",
+          "evidence": "HTML results by municipality for 2006, 2012, and 2018; the 2024 site elections2024.wallonie.be reset the connection"
+        },
+        {
+          "role": "publishes",
+          "platform": "Bruxelles Pouvoirs Locaux",
+          "url": "https://elections.brussels/resultats-elections",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2006-10-08",
+          "last_date": "2024-10-13",
+          "source": "brussels-elections",
+          "evidence": "Aperçus des résultats_{year}.xlsx for 2006, 2012, 2018, and 2024"
+        },
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1976-10-10",
+          "last_date": "2000-10-08",
+          "source": "ibz-xml",
+          "evidence": "Results by municipality (seats and list votes)"
+        }
+      ],
+      "effort": 3,
+      "est_votes": 6476499
+    },
+    {
+      "key": "antwerp_districts",
+      "tier": "district",
+      "name": "Districtsraadsverkiezingen (Antwerpen)",
+      "name_en": "Antwerp district councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "district"
+      },
+      "valid_from": "2000-10-08",
+      "first_held": "2000-10-08",
+      "earliest_record": "2000-10-08",
+      "source": "antwerpen-districten",
+      "note": "Directly elected with the municipal councils; nine districts from 2000 and ten from 2024, when Borsbeek joined Antwerp as a district. The federal XML gives these contests the municipal council body, so a load that keeps that body classifies them as municipal_council until they get a body of their own.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "[Dd]istrict"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "lpkd",
+          "locator": "https://assets.vlaanderen.be/image/upload/v1702911730/LPKD_geconsolideerd_20231117_shj5fv.pdf (Art. 6)",
+          "period_years": 6,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_second_sunday",
+          "term_years": 6,
+          "called": false,
+          "administered_by": "Agentschap Binnenlands Bestuur"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-10-08",
+          "contests": 9,
+          "seats": 209,
+          "source": "ibz-xml",
+          "quote": "2000_Municipality.xml: <election date=\"2000-10-08T00:00:00\" type=\"Municipality\">, 9 MunicipalDistrict levels, 209 seats"
+        },
+        {
+          "date": "2006-10-08",
+          "contests": 9,
+          "source": "antwerpen-districten",
+          "quote": "Sinds 2001 hebben de verschillende districten een eigen verkozen bestuur."
+        },
+        {
+          "date": "2012-10-14",
+          "contests": 9,
+          "source": "antwerpen-districten",
+          "quote": "Sinds 2001 hebben de verschillende districten een eigen verkozen bestuur."
+        },
+        {
+          "date": "2018-10-14",
+          "contests": 9,
+          "source": "antwerpen-districten",
+          "quote": "Sinds 2001 hebben de verschillende districten een eigen verkozen bestuur."
+        },
+        {
+          "date": "2024-10-13",
+          "contests": 10,
+          "seats": 238,
+          "note": "Ten districts with 238 seats in the Flemish results file, Borsbeek included.",
+          "source": "antwerpen-districten",
+          "quote": "Met de toetreding van Borsbeek als nieuwste district in 2025 telt Antwerpen vandaag 10 districten."
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Vlaanderen kiest (Agentschap Binnenlands Bestuur)",
+          "url": "https://www.vlaanderen.be/vlaanderen-kiest/resultaten/bekendmaking-fijnmazige-stemresultaten",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-10-13",
+          "last_date": "2024-10-13",
+          "source": "vk-fijnmazig",
+          "evidence": "Fijnmazige_resultaten_stadsdistrictsraadsverkiezingen_13_oktober_2024_Antwerpen.xlsx"
+        },
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2000-10-08",
+          "last_date": "2000-10-08",
+          "source": "ibz-xml",
+          "evidence": "Results by district in the 2000 municipal file"
+        }
+      ],
+      "est_votes": 269293,
+      "effort": 2
+    },
+    {
+      "key": "facility_ocmw",
+      "tier": "municipality",
+      "name": "Rechtstreekse verkiezing van de OCMW-raad / Élection directe du conseil de l'action sociale",
+      "name_en": "Directly elected social welfare (OCMW/CPAS) councils in eight municipalities with language facilities",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "valid_from": "1988-10-09",
+      "first_held": "1988-10-09",
+      "earliest_record": "2000-10-08",
+      "source": "ibz-xml",
+      "note": "In the six Brussels periphery municipalities (Drogenbos, Kraainem, Linkebeek, Sint-Genesius-Rode, Wemmel, Wezembeek-Oppem), Voeren, and Comines-Warneton the social welfare council is elected directly with the municipal council (pacification law of 9 August 1988); everywhere else the municipal council elects it.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE",
+          "name_pattern": "OCMW|CPAS|action sociale"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "lpkd",
+          "locator": "https://assets.vlaanderen.be/image/upload/v1702911730/LPKD_geconsolideerd_20231117_shj5fv.pdf (Art. 6)",
+          "period_years": 6,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_second_sunday",
+          "term_years": 6,
+          "called": false
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-10-09",
+          "note": "First direct election under the pacification law; not in the federal 1988 file and not yet counted."
+        },
+        {
+          "date": "1994-10-09",
+          "note": "Not in the federal 1994 file; not yet counted."
+        },
+        {
+          "date": "2000-10-08",
+          "contests": 8,
+          "seats": 76,
+          "source": "ibz-xml",
+          "quote": "2000_Municipality.xml: <election date=\"2000-10-08T00:00:00\" type=\"Municipality\">, 8 OCMW levels, 76 seats"
+        },
+        {
+          "date": "2006-10-08",
+          "note": "Published by Flanders and Wallonia; not yet counted."
+        },
+        {
+          "date": "2012-10-14",
+          "note": "Published by Flanders and Wallonia; not yet counted."
+        },
+        {
+          "date": "2018-10-14",
+          "note": "Published by Flanders and Wallonia; not yet counted."
+        },
+        {
+          "date": "2024-10-13",
+          "contests": 8,
+          "note": "Flanders publishes OCMW council results for Limburg (Voeren) and Vlaams-Brabant (the six periphery municipalities).",
+          "source": "vk-fijnmazig",
+          "quote": "Fijnmazige_resultaten_OCMW-raadsverkiezingen_13_oktober_2024_Vlaams-Brabant"
+        }
+      ],
+      "est_votes": 50000,
+      "effort": 2,
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Federal results service XML files (resultatselection.belgium.be)",
+          "url": "https://resultatselection.belgium.be/xml/{year}_{type}.xml",
+          "format": "xml",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2000-10-08",
+          "last_date": "2000-10-08",
+          "source": "ibz-xml",
+          "evidence": "Results by municipality in the 2000 municipal file"
+        }
+      ]
+    },
+    {
+      "key": "ocmw_indirect",
+      "tier": "municipality",
+      "name": "Conseils de l'action sociale / OCMW-raden (élus par le conseil communal)",
+      "name_en": "Social welfare councils elected by the municipal council",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the municipal councillors, not by voters (in Flanders the municipal council has also been the OCMW council since 2019).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BE"
+        }
+      ]
+    },
+    {
+      "key": "mayor",
+      "tier": "municipality",
+      "name": "Bourgmestre / Burgemeester",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No separate vote: in Wallonia (CDLD L1123-4) and since 2024 in Flanders the councillor with the most preference votes on the largest majority list becomes mayor, and in Brussels the regional government appoints one of the councillors (Nouvelle loi communale Art. 13); the council election already holds those votes.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "BE"
+        }
+      ]
+    },
+    {
+      "key": "local_consultations",
+      "tier": "municipality",
+      "name": "Consultations populaires communales et provinciales / Gemeentelijke en provinciale volksraadplegingen",
+      "name_en": "Municipal and provincial popular consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_from": "1995-04-10",
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 41, last paragraph: matters of municipal or provincial interest may be the subject of a popular consultation)",
+      "disposition": "blocked",
+      "disposition_reason": "Non-binding consultations called by individual municipalities and provinces since the law of 10 April 1995; no regional or federal register lists them or their results, so each must be found in its own municipality's records.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "region"
+          ]
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "key": "regional_consultations",
+      "tier": "region",
+      "name": "Consultation populaire régionale",
+      "name_en": "Regional popular consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_from": "2014-01-01",
+      "source": "const",
+      "locator": "https://www.ejustice.just.fgov.be/cgi_loi/change_lg.pl?language=fr&la=F&cn=1994021730&table_name=loi (Art. 39bis)",
+      "note": "Art. 39bis lets the regions hold consultations on their exclusive matters; none has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Sélection des candidats par les partis",
+      "name_en": "Party candidate selections and leadership votes",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties draw up their lists and elect their presidents under their own statutes; the state neither runs nor publishes these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "BE"
+        }
+      ]
+    },
+    {
+      "key": "social_elections",
+      "tier": "national",
+      "name": "Élections sociales / Sociale verkiezingen",
+      "name_en": "Works council and health and safety committee elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held inside each enterprise under labour law every four years, with candidates presented by the trade unions; not public elections of a government body.",
+      "match": []
+    }
+  ]
+}

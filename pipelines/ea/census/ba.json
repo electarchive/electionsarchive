@@ -1,0 +1,2160 @@
+{
+ "polity": "BA",
+ "name": "Bosnia and Herzegovina",
+ "sources": {
+  "ustav": {
+   "title": "Ustav Bosne i Hercegovine (Aneks 4 Općeg okvirnog sporazuma za mir u BiH), with Amendment I (2009)",
+   "publisher": "Ustavni sud Bosne i Hercegovine",
+   "url": "https://www.ustavnisud.ba/uploads/documents/ustav-bih-bs_1611076095.pdf",
+   "kind": "official_body"
+  },
+  "izborni_zakon": {
+   "title": "Election Law of Bosnia and Herzegovina (Official Gazette of BiH 23/01, as amended), technically consolidated text",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+   "kind": "official_body"
+  },
+  "pec_2000": {
+   "title": "Rules and Regulations of the Provisional Election Commission, General Elections 2000",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/Documents/Rezultati%20izbora%2096-2002/2000gen/rules-egulations-general-elections-2000_eng.pdf",
+   "kind": "official_body",
+   "note": "OSCE Provisional Election Commission rules in force for the 11 November 2000 general elections, hosted in the CEC's results archive."
+  },
+  "rez_1996": {
+   "title": "Rezultati izbora u Bosni i Hercegovini od 14. rujna 1996. (Službene novine Federacije BiH 20/1996)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/Documents/Rezultati%20izbora%2096-2002/96results/FD96_20H.PDF",
+   "kind": "official_body"
+  },
+  "rez_1997": {
+   "title": "1997 Municipal Elections Final Results",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/Documents/Rezultati%20izbora%2096-2002/97results/results97.PDF",
+   "kind": "official_body"
+  },
+  "rez_1998": {
+   "title": "1998 General Elections, seat allocation, all electoral units",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/Documents/Rezultati%20izbora%2096-2002/98results/seats_allocation_all.pdf",
+   "kind": "official_body"
+  },
+  "pokazatelji": {
+   "title": "Election indicators 2002-2014",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Documents/Statistika_i_rezultati_izbora/Statistika_izbora/IZBORNI_POKAZATELJI_2002-2014-eng.pdf",
+   "kind": "official_body"
+  },
+  "arhiva": {
+   "title": "Rezultati izbora 1996-2025 (results archive index)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+   "kind": "official_body"
+  },
+  "api": {
+   "title": "Rezultati izbora, results application and its JSON service (api_2018), elections 2014-2026",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/api_2018/Administration_ElectionController/1",
+   "kind": "official_body",
+   "note": "Per election: races, electoral units, and results down to the polling station."
+  },
+  "rez_2026": {
+   "title": "Opći izbori 2026, rezultati (contests file of the results site)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://rezultati.izbori.ba/assets/data/contests.json",
+   "kind": "official_body"
+  },
+  "cik_2026": {
+   "title": "Confirmed results of the 2026 General Elections in Bosnia and Herzegovina (press release, 3 November 2026)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/?Lang=6&CategoryID=183&Id=6246",
+   "kind": "official_body"
+  },
+  "cik_rs_2025": {
+   "title": "Early Elections for the President of Republika Srpska (press release, 23 November 2025)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/?Lang=6&CategoryID=183&Id=5833",
+   "kind": "official_body"
+  },
+  "cik_rs_2026": {
+   "title": "Repeat early elections for the President of Republika Srpska (press release, 8 February 2026)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/?Lang=6&CategoryID=183&Id=5947",
+   "kind": "official_body"
+  },
+  "bhas_dem": {
+   "title": "Demografija 2025, tematski bilten (Opći podaci o Bosni i Hercegovini)",
+   "publisher": "Agencija za statistiku Bosne i Hercegovine",
+   "url": "https://bhas.gov.ba/data/Publikacije/Bilteni/2026/DEM_00_2025_TB_1_BS.pdf",
+   "kind": "official_body"
+  },
+  "nsrs": {
+   "title": "Narodna skupština Republike Srpske: Ustav i zakoni Republike Srpske (Zakon o lokalnoj samoupravi, Zakon o referendumu i građanskoj inicijativi)",
+   "publisher": "Narodna skupština Republike Srpske",
+   "url": "https://www.narodnaskupstinars.net/",
+   "kind": "official_body"
+  },
+  "sllist": {
+   "title": "Službeni list SR Bosne i Hercegovine / Službeni list RBiH (official gazette archive)",
+   "publisher": "JP NIO Službeni list BiH",
+   "url": "https://www.sllist.ba/",
+   "kind": "official_body"
+  },
+  "landesstatut": {
+   "title": "Landesstatut für Bosnien und die Hercegovina und Landtagswahlordnung (Gesetz- und Verordnungsblatt für Bosnien und die Hercegovina, 1910)",
+   "publisher": "Österreichische Nationalbibliothek (ALEX, historische Rechts- und Gesetzestexte)",
+   "url": "https://alex.onb.ac.at/",
+   "kind": "official_body",
+   "note": "Digitized official gazettes; the Bosnian Landtag (Sabor) of 1910-1914 was elected by curiae."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Bosna i Hercegovina",
+   "name_en": "Bosnia and Herzegovina",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "ustav"
+  },
+  {
+   "key": "entitet",
+   "name": "Entiteti",
+   "name_en": "Entities (Federation of BiH and Republika Srpska)",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "valid_from": "1995-12-14",
+   "source": "ustav",
+   "counts": [
+    {
+     "date": "1995-12-14",
+     "value": 2,
+     "source": "ustav"
+    }
+   ]
+  },
+  {
+   "key": "distrikt",
+   "name": "Brčko distrikt Bosne i Hercegovine",
+   "name_en": "Brčko District",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "2000-03-08",
+   "source": "ustav",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 1,
+     "source": "bhas_dem"
+    }
+   ]
+  },
+  {
+   "key": "kanton",
+   "name": "Kantoni",
+   "name_en": "Cantons of the Federation of BiH",
+   "parent": "entitet",
+   "polity_kind": "region",
+   "source": "bhas_dem",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 10,
+     "source": "bhas_dem"
+    }
+   ]
+  },
+  {
+   "key": "opcina",
+   "name": "Općine/opštine i gradovi",
+   "name_en": "Municipalities and cities",
+   "parent": "entitet",
+   "polity_kind": "municipality",
+   "source": "bhas_dem",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 141,
+     "source": "bhas_dem"
+    },
+    {
+     "date": "2024-10-06",
+     "value": 142,
+     "source": "api",
+     "locator": "https://www.izbori.ba/api_2018/race9_electoralunit/WebResult_2024MUNI_2024_9_19_20_28_13/1"
+    }
+   ]
+  },
+  {
+   "key": "grad",
+   "name": "Gradovi sastavljeni od općina (Grad Sarajevo, Grad Istočno Sarajevo)",
+   "name_en": "Cities made up of municipalities",
+   "parent": "entitet",
+   "polity_kind": "municipality",
+   "source": "izborni_zakon",
+   "counts": [
+    {
+     "date": "2017-02-09",
+     "value": 2,
+     "source": "arhiva",
+     "locator": "https://www.izbori.ba/Default.aspx?CategoryID=700&Lang=3"
+    }
+   ]
+  },
+  {
+   "key": "mjesna_zajednica",
+   "name": "Mjesne zajednice",
+   "name_en": "Local communities",
+   "parent": "opcina",
+   "polity_kind": "submunicipal",
+   "source": "nsrs"
+  },
+  {
+   "key": "sr_bih",
+   "name": "Socijalistička Republika Bosna i Hercegovina",
+   "name_en": "(Socialist) Republic of Bosnia and Herzegovina, 1945-1995",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1945-04-28",
+   "valid_to": "1995-12-14",
+   "source": "sllist"
+  },
+  {
+   "key": "kondominij",
+   "name": "Bosnien und die Hercegovina (Reichsland)",
+   "name_en": "Bosnia and Herzegovina under Austria-Hungary, 1908-1918",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1908-10-07",
+   "valid_to": "1918-10-29",
+   "source": "landesstatut"
+  }
+ ],
+ "classes": [
+  {
+   "key": "predsjednistvo",
+   "tier": "national",
+   "name": "Izbori za članove Predsjedništva Bosne i Hercegovine",
+   "name_en": "Presidency of Bosnia and Herzegovina",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Votes by polling station (biračko mjesto) in the CEC's JSON service from 2014 and in the HTML result sites from 2002; the 1996-2000 PDFs give entity and municipal totals.",
+   "note": "Three members, each elected by plurality: the Bosniak and Croat members by voters registered in the Federation (each voter picks one of the two races), the Serb member by voters registered in the Republika Srpska. Counted as three contests per election. 2000 held no Presidency election (the 1998 term ran four years).",
+   "source": "ustav",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1996-09-14",
+   "contests_per_unit": 3,
+   "est_votes": 15000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+     "vacancy_rule": "Art. 8.4: a vacancy is filled under the Law on Filling a Vacant Position of the Presidency of BiH, without an election"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1996 results printed in Službene novine FBiH 20/1996, 1998 seat allocation PDF, 2002-2010 HTML result sites, and polling-station results from 2014."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 1 (Predsjedništvo BiH) by entity, municipality, and polling station for 2014, 2018, and 2022."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BA",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "(Predsjedni[sš]tv|Presidency of Bosnia)",
+     "iso_pattern": "BA",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "contests": 3,
+     "seats": 3,
+     "source": "rez_1996",
+     "quote": "PREDSJEDNIŠTVO BOSNE I HERCEGOVINE: Bošnjački član; Hrvatski član; Srpski član"
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 3,
+     "seats": 3,
+     "note": "Voting on 12 and 13 September 1998.",
+     "source": "rez_1998",
+     "quote": "701 BiH Presidency (Bosnian Member); 702 BiH Presidency (Croat Member); 703 BiH Presidency (Serb Member)"
+    },
+    {
+     "date": "2002-10-05",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2010-10-03",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2014-10-12",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 3,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 8.1: one Bosniak and one Croat member elected from the Federation of BiH and one Serb member from the Republika Srpska; the candidate with the most votes is elected"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 3,
+     "seats": 3,
+     "note": "The CEC counts the Federation's Bosniak and Croat members as one race with two winners.",
+     "source": "rez_2026",
+     "quote": "PREDSJEDNIŠTVO BiH(FBiH): BOŠNJAČKI/HRVATSKI ČLAN PREDSJEDNIŠTVA, ea 2; PREDSJEDNIŠTVO BiH(RS): SRPSKI ČLAN, ea 1"
+    }
+   ]
+  },
+  {
+   "key": "predstavnicki_dom_bih",
+   "tier": "national",
+   "name": "Izbori za Predstavnički/Zastupnički dom Parlamentarne skupštine BiH",
+   "name_en": "House of Representatives of the Parliamentary Assembly of BiH",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station party and candidate votes from 2014 in the JSON service; municipal totals in the 1996-2000 PDFs.",
+   "note": "List PR (Sainte-Laguë divisors 1, 3, 5, with a 3% threshold), open lists with a 20% preference rule. 1996 and 1998 used one list per entity; since 2000, five Federation and three Republika Srpska constituencies plus compensatory lists per entity.",
+   "source": "ustav",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1996-09-14",
+   "est_votes": 16000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "Seat allocations and party votes for 1996-2000 as PDFs, 2002-2010 HTML sites, polling-station results from 2014."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 2 (Parlamentarna skupština BiH) by constituency, municipality, and polling station."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "BA",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "(Predstavni[cč]ki|Zastupni[cč]ki) dom Parlamentarne|House of Representatives of the Parliamentary Assembly",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "contests": 2,
+     "seats": 42,
+     "note": "Entity-wide lists: 28 seats from the Federation, 14 from the Republika Srpska.",
+     "source": "rez_1996",
+     "quote": "ZASTUPNIČKI DOM BIH S TERITORIJA FEDERACIJE BOSNE I HERCEGOVINE: Broj raspoloživih zastupničkih mjesta: 28; ... Broj raspoloživih zastupničkih mjesta: 14"
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 2,
+     "seats": 42,
+     "note": "Entity-wide lists, as in 1996.",
+     "source": "rez_1998",
+     "quote": "501 House of Representatives of BiH from Federation; 502 House of Representatives of BiH from RS"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 10,
+     "seats": 42,
+     "note": "Counted as eight multi-member constituencies plus the two entity compensatory lists.",
+     "source": "pec_2000",
+     "quote": "Art. 1101-1103: 21 mandates from five Federation multi-member constituencies and seven compensatory; nine mandates from three Republika Srpska multi-member constituencies and five compensatory"
+    },
+    {
+     "date": "2002-10-05",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "izborni_zakon",
+     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "izborni_zakon",
+     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+    },
+    {
+     "date": "2010-10-03",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "izborni_zakon",
+     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+    },
+    {
+     "date": "2014-10-12",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "izborni_zakon",
+     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "api",
+     "quote": "race2_electoralunitparent: IZBORNA JEDINICA 1A-5A and 1B-3B (8 electoral units)"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies plus two compensatory lists.",
+     "source": "api",
+     "quote": "race2_electoralunitparent: IZBORNA JEDINICA 1A-5A and 1B-3B (8 electoral units)"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 10,
+     "seats": 42,
+     "note": "Eight constituencies electing 30 plus 12 compensatory seats.",
+     "source": "rez_2026",
+     "quote": "IZBORNA JEDINICA 1A-5A (3, 3, 4, 6, 5 seats); IZBORNA JEDINICA 1B-3B (3, 3, 3 seats)"
+    }
+   ]
+  },
+  {
+   "key": "dom_naroda_bih",
+   "tier": "national",
+   "name": "Izbor delegata u Dom naroda Parlamentarne skupštine BiH",
+   "name_en": "House of Peoples of the Parliamentary Assembly of BiH (indirect)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "15 delegates: five Bosniaks and five Croats chosen by the caucuses of the Federation House of Peoples, five Serbs by the National Assembly of the Republika Srpska. The CEC certifies the lists and publishes the decision.",
+   "source": "ustav",
+   "valid_from": "1996-09-14",
+   "est_votes": 1000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "BA",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "name_pattern": "Dom naroda Parlamentarne|House of Peoples of the Parliamentary Assembly"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2002-10-05",
+     "through": "2026-12-31",
+     "note": "Indirect elections after each general election; the CEC publishes decisions confirming the delegates. Not yet listed by date."
+    },
+    {
+     "date": "2026-10-04",
+     "seats": 15,
+     "election_kind": "indirect",
+     "note": "Indirect election following the 2026 general election.",
+     "source": "cik_2026",
+     "quote": "The next step is to conduct indirect elections, namely the election of 15 delegates to the House of Peoples of the Parliamentary Assembly of Bosnia and Herzegovina"
+    }
+   ]
+  },
+  {
+   "key": "predstavnicki_dom_fbih",
+   "tier": "entitet",
+   "name": "Izbori za Predstavnički/Zastupnički dom Parlamenta Federacije BiH",
+   "name_en": "House of Representatives of the Parliament of the Federation of BiH",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2014 in the JSON service.",
+   "note": "140 members until 2000, 98 since 2002. List PR in twelve constituencies plus a compensatory list since 2000; one Federation-wide list in 1996 and 1998. Constituency counts for 2002-2014 are not yet confirmed from the CEC's HTML sites.",
+   "source": "izborni_zakon",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1996-09-14",
+   "est_votes": 9500000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1996-2000 PDFs, 2002-2010 HTML sites, polling-station results from 2014."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 4 (Parlament FBiH) by constituency, municipality, and polling station."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "BA-BIH",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "(Predstavni[cč]ki|Zastupni[cč]ki) dom Parlamenta Federacije|House of Representatives of the (Parliament of the )?Federation",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "contests": 1,
+     "seats": 140,
+     "note": "One Federation-wide list.",
+     "source": "rez_1996",
+     "quote": "ZASTUPNIČKI DOM FEDERACIJE BOSNE I HERCEGOVINE: Broj raspoloživih zastupničkih mjesta: 140"
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 1,
+     "seats": 140,
+     "source": "rez_1998",
+     "quote": "400 House of Representatives of Federation BiH"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 13,
+     "seats": 140,
+     "note": "Twelve constituencies plus the compensatory list.",
+     "source": "pec_2000",
+     "quote": "Art. 1201-1202: one hundred forty (140) members; one hundred and five (105) mandates from twelve (12) multi-member constituencies; thirty five (35) compensatory mandates"
+    },
+    {
+     "date": "2002-10-05",
+     "seats": 98,
+     "source": "izborni_zakon",
+     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+    },
+    {
+     "date": "2006-10-01",
+     "seats": 98,
+     "source": "izborni_zakon",
+     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+    },
+    {
+     "date": "2010-10-03",
+     "seats": 98,
+     "source": "izborni_zakon",
+     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+    },
+    {
+     "date": "2014-10-12",
+     "seats": 98,
+     "source": "izborni_zakon",
+     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 13,
+     "seats": 98,
+     "note": "Twelve constituencies plus the compensatory list.",
+     "source": "api",
+     "quote": "race4_electoralunitparent: IZBORNA JEDINICA 1-12 (12 electoral units)"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 13,
+     "seats": 98,
+     "note": "Twelve constituencies plus the compensatory list.",
+     "source": "api",
+     "quote": "race4_electoralunitparent: IZBORNA JEDINICA 1-12 (12 electoral units)"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 13,
+     "seats": 98,
+     "note": "Twelve constituencies electing 73 plus 25 compensatory seats.",
+     "source": "rez_2026",
+     "quote": "ZASTUPNIČKI/PREDSTAVNIČKI DOM PARLAMENTA FEDERACIJE BiH: IZBORNA JEDINICA 1-12, 73 seats"
+    }
+   ]
+  },
+  {
+   "key": "dom_naroda_fbih",
+   "tier": "entitet",
+   "name": "Izbor delegata u Dom naroda Parlamenta Federacije BiH",
+   "name_en": "House of Peoples of the Parliament of the Federation of BiH (indirect)",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "80 delegates since 2002 (23 Bosniaks, 23 Croats, 23 Serbs, 11 Others) elected by the caucuses of the ten cantonal assemblies; the CEC allocates the seats and publishes the results.",
+   "source": "izborni_zakon",
+   "valid_from": "1996-09-14",
+   "est_votes": 3000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "BA-BIH"
+    },
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "name_pattern": "Dom naroda Parlamenta Federacije|House of Peoples of the (Parliament of the )?Federation"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2002-10-05",
+     "through": "2026-12-31",
+     "note": "Indirect elections in the cantonal assemblies after each general election (by canton and caucus); not yet listed by date."
+    },
+    {
+     "date": "2026-10-04",
+     "seats": 80,
+     "election_kind": "indirect",
+     "source": "cik_2026",
+     "quote": "80 delegates to the House of Peoples of the Parliament of the Federation of Bosnia and Herzegovina"
+    }
+   ]
+  },
+  {
+   "key": "predsjednik_fbih",
+   "tier": "entitet",
+   "name": "Izbor predsjednika i potpredsjednika Federacije BiH",
+   "name_en": "President and Vice-Presidents of the Federation of BiH (chosen by parliament)",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "izborni_zakon",
+   "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the two houses of the Federation Parliament from candidates nominated by caucuses of the House of Peoples (Election Law ch. 9A); a parliamentary vote, not a public election.",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BA-BIH"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "narodna_skupstina_rs",
+   "tier": "entitet",
+   "name": "Izbori za Narodnu skupštinu Republike Srpske",
+   "name_en": "National Assembly of the Republika Srpska",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2014 in the JSON service.",
+   "note": "83 members by list PR. One list for the whole entity in 1996-1998, six constituencies plus a compensatory list in 2000, nine constituencies plus a compensatory list by 2018. The November 1997 early election was run by the OSCE Provisional Election Commission.",
+   "source": "izborni_zakon",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1998-09-12",
+   "est_votes": 7500000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": true,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+     "vacancy_rule": "An early election follows a dissolution, as in November 1997"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1998 and 2000 PDFs, 2002-2010 HTML sites, polling-station results from 2014; the 1996 and 1997 results are not online."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 6 (Narodna skupština RS) by constituency, municipality, and polling station."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "BA-SRP",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "Narodn[ae] skup[sš]tin[ae] Republike Srpske|National Assembly of (the )?Republika Srpska",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "note": "Results are not in the CEC's online archive, which holds only the Federation results for 1996."
+    },
+    {
+     "date": "1997-11-22",
+     "seats": 83,
+     "election_kind": "general",
+     "note": "Early election of the National Assembly after its dissolution, voting on 22 and 23 November 1997. Results are not in the CEC's online archive."
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 1,
+     "seats": 83,
+     "note": "One Republika Srpska-wide list.",
+     "source": "rez_1998",
+     "quote": "300 National Assembly RS"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 7,
+     "seats": 83,
+     "note": "Six constituencies plus the compensatory list.",
+     "source": "pec_2000",
+     "quote": "Art. 1301-1302: eighty-three (83) members; sixty-two (62) mandates from six (6) multi-member constituencies; twenty-one (21) compensatory mandates"
+    },
+    {
+     "date": "2002-10-05",
+     "seats": 83,
+     "source": "izborni_zakon",
+     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+    },
+    {
+     "date": "2006-10-01",
+     "seats": 83,
+     "source": "izborni_zakon",
+     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+    },
+    {
+     "date": "2010-10-03",
+     "seats": 83,
+     "source": "izborni_zakon",
+     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+    },
+    {
+     "date": "2014-10-12",
+     "seats": 83,
+     "source": "izborni_zakon",
+     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 10,
+     "seats": 83,
+     "note": "Nine constituencies plus the compensatory list.",
+     "source": "api",
+     "quote": "race6_electoralunitparent: IZBORNA JEDINICA 1-9 (9 electoral units)"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 10,
+     "seats": 83,
+     "note": "Nine constituencies plus the compensatory list.",
+     "source": "api",
+     "quote": "race6_electoralunitparent: IZBORNA JEDINICA 1-9 (9 electoral units)"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 10,
+     "seats": 83,
+     "note": "Nine constituencies electing 63 plus 20 compensatory seats.",
+     "source": "rez_2026",
+     "quote": "NARODNA SKUPŠTINA RS: IZBORNA JEDINICA 1-9, 63 seats"
+    }
+   ]
+  },
+  {
+   "key": "vijece_naroda_rs",
+   "tier": "entitet",
+   "name": "Izbor delegata u Vijeće naroda Republike Srpske",
+   "name_en": "Council of Peoples of the Republika Srpska (indirect)",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "28 members (eight Bosniaks, eight Serbs, eight Croats, four Others) elected by the caucuses of the National Assembly; the CEC allocates the seats (Election Law ch. 11A).",
+   "source": "izborni_zakon",
+   "valid_from": "2002-10-05",
+   "est_votes": 400,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "BA-SRP"
+    },
+    {
+     "name_pattern": "Vije[cć]e naroda|Council of Peoples"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2002-10-05",
+     "through": "2026-12-31",
+     "note": "Indirect elections in the National Assembly after each general election; not yet listed by date."
+    },
+    {
+     "date": "2026-10-04",
+     "seats": 28,
+     "election_kind": "indirect",
+     "source": "cik_2026",
+     "quote": "28 delegates to the Council of Peoples of Republika Srpska"
+    }
+   ]
+  },
+  {
+   "key": "predsjednik_rs",
+   "tier": "entitet",
+   "name": "Izbori za predsjednika i potpredsjednike Republike Srpske",
+   "name_en": "President and Vice-Presidents of the Republika Srpska",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2014 in the JSON service.",
+   "note": "Plurality vote; since 2002 the leading candidate of each constituent people is elected and the overall leader becomes President (Art. 12.3). Before 2002 a President and one Vice-President ran together.",
+   "source": "izborni_zakon",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1998-09-12",
+   "est_votes": 8000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+     "vacancy_rule": "An early election fills a vacant presidency for the rest of the term (2007, 2025)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1998 and 2000 PDFs, the 2007 early-election site, and polling-station results from 2014."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 5 (Predsjednik RS) by municipality and polling station, including the 2025 early election."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BA-SRP",
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "Predsjedni(k|ka) Republike Srpske|President of (the )?Republika Srpska",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "note": "Results are not in the CEC's online archive, which holds only the Federation results for 1996."
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 1,
+     "source": "rez_1998",
+     "quote": "600 President and VicePresident RS"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 1,
+     "seats": 2,
+     "note": "Preferential (instant-runoff) ballot for a President and Vice President ticket.",
+     "source": "pec_2000",
+     "quote": "Elements of the Ballot for President and Vice President of the Republika Srpska ... This shall be a preferential ballot with a preferential voting system as set forth in Article 902."
+    },
+    {
+     "date": "2002-10-05",
+     "contests": 1,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 12.1-12.3: the President and two Vice Presidents of Republika Srpska are directly elected; the top candidate of each constituent people is elected"
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 1,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 12.1-12.3: the President and two Vice Presidents of Republika Srpska are directly elected; the top candidate of each constituent people is elected"
+    },
+    {
+     "date": "2007-12-09",
+     "contests": 1,
+     "seats": 1,
+     "election_kind": "by_election",
+     "note": "Early election after the death of President Milan Jelić; the Vice Presidents kept their seats.",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati prijevremenih izbora za predsjednika RS/e 2007"
+    },
+    {
+     "date": "2010-10-03",
+     "contests": 1,
+     "seats": 3,
+     "source": "izborni_zakon",
+     "quote": "Art. 12.1-12.3: the President and two Vice Presidents of Republika Srpska are directly elected; the top candidate of each constituent people is elected"
+    },
+    {
+     "date": "2014-10-12",
+     "contests": 1,
+     "seats": 3,
+     "source": "api",
+     "quote": "Race 5: Predsjednik RS"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 1,
+     "seats": 3,
+     "source": "api",
+     "quote": "Race 5: Predsjednik RS"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 1,
+     "seats": 3,
+     "source": "api",
+     "quote": "Race 5: Predsjednik RS"
+    },
+    {
+     "date": "2025-11-23",
+     "contests": 1,
+     "seats": 1,
+     "election_kind": "by_election",
+     "note": "Early election of the President; repeat voting at 136 polling stations in 17 basic constituencies on 8 February 2026.",
+     "source": "cik_rs_2025",
+     "quote": "Sarajevo, 23 November 2025 - Today, the Early Elections for the President of Republika Srpska are being held"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 1,
+     "seats": 3,
+     "source": "rez_2026",
+     "quote": "PREDSJEDNIK I POTPREDSJEDNICI RS(RS): PREDSJEDNIK I POTPREDSJEDNICI REPUBLIKE SRPSKE"
+    }
+   ]
+  },
+  {
+   "key": "referendum_rs",
+   "tier": "entitet",
+   "name": "Republički referendum u Republici Srpskoj",
+   "name_en": "Republika Srpska referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Called by the National Assembly under the Law on Referendum and Citizens' Initiative and run by a republic referendum commission, not by the CEC. Held on 15-16 May 1993 (the Vance-Owen plan), 27-28 August 1994 (the Contact Group plan), and 25 September 2016 (the Day of the Republic).",
+   "source": "nsrs",
+   "first_held": "1993-05-15",
+   "est_votes": 2500000,
+   "effort": 4,
+   "disposition": "blocked",
+   "disposition_reason": "Results are published only in the Službeni glasnik Republike Srpske; no official online copy of the 1993, 1994, or 2016 results was found.",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "BA-SRP"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-05-15",
+     "note": "Voting on 15 and 16 May 1993, on the Vance-Owen plan."
+    },
+    {
+     "date": "1994-08-27",
+     "note": "Voting on 27 and 28 August 1994, on the Contact Group plan."
+    },
+    {
+     "date": "2016-09-25",
+     "note": "On the Day of the Republic (9 January)."
+    }
+   ]
+  },
+  {
+   "key": "skupstina_kantona",
+   "tier": "kanton",
+   "name": "Izbori za skupštine kantona u Federaciji BiH",
+   "name_en": "Cantonal assemblies of the Federation of BiH",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2014 in the JSON service.",
+   "note": "One list-PR contest per canton (Art. 13.1-13.5), 20% preference threshold; 406 seats in 1996 and 289 since 2010.",
+   "source": "izborni_zakon",
+   "valid_from": "1996-09-14",
+   "first_held": "1996-09-14",
+   "earliest_record": "1996-09-14",
+   "est_votes": 9000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1996-2000 PDFs by canton, 2002-2010 HTML sites, polling-station results from 2014."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 7 (Skupštine kantona u FBiH) by canton, municipality, and polling station."
+    },
+    {
+     "platform": "rezultati.izbori.ba (CIK BiH)",
+     "url": "https://rezultati.izbori.ba/",
+     "format": "json and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-04",
+     "source": "rez_2026",
+     "evidence": "2026 general election contests, results, and a CSV export (totalized_results/reports/rezultati_bih_2026.csv)."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral",
+      "council",
+      "lower_house"
+     ],
+     "iso_pattern": "BA-0*"
+    },
+    {
+     "body_kinds": [
+      "unicameral",
+      "council",
+      "lower_house"
+     ],
+     "iso_pattern": "BA-10"
+    },
+    {
+     "name_pattern": "Skup[sš]tin[ae] [A-ZČĆŠĐŽ].*[Kk]antona|Skup[sš]tina [Kk]antona|[ŽZ]upanijsk[ae] skup[sš]tin|Cantonal Assembl|Assembly of .*Canton"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-09-14",
+     "contests": 10,
+     "seats": 406,
+     "source": "rez_1996",
+     "quote": "ŽUPANIJSKE SKUPŠTINE FEDERACIJE BiH: Županija 1-10, Broj raspoloživih zastupničkih mjesta: 50, 20, 50, 59, 31, 55, 50, 31, 45, 15"
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 10,
+     "source": "rez_1998",
+     "quote": "201 CANTON 1 ... 210 CANTON 10"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 10,
+     "source": "pec_2000",
+     "quote": "Art. 1401-1402: Mandates for Cantonal Assemblies; number of members by registered voters"
+    },
+    {
+     "date": "2002-10-05",
+     "contests": 10,
+     "source": "izborni_zakon",
+     "quote": "Art. 13.3: between 20 and 35 members per Cantonal Assembly by registered voters"
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 10,
+     "source": "izborni_zakon",
+     "quote": "Art. 13.3: between 20 and 35 members per Cantonal Assembly by registered voters"
+    },
+    {
+     "date": "2010-10-03",
+     "contests": 10,
+     "seats": 289,
+     "source": "pokazatelji",
+     "quote": "Cantonal Assemblies in the BiH Federation - 49 out of 289 mandates belong to women"
+    },
+    {
+     "date": "2014-10-12",
+     "contests": 10,
+     "source": "izborni_zakon",
+     "quote": "Art. 13.3: between 20 and 35 members per Cantonal Assembly by registered voters"
+    },
+    {
+     "date": "2018-10-07",
+     "contests": 10,
+     "source": "api",
+     "quote": "race7_electoralunitparent: KANTON 1 ... KANTON 10"
+    },
+    {
+     "date": "2022-10-02",
+     "contests": 10,
+     "source": "api",
+     "quote": "race7_electoralunitparent: KANTON 1 ... KANTON 10"
+    },
+    {
+     "date": "2026-10-04",
+     "contests": 10,
+     "seats": 289,
+     "source": "rez_2026",
+     "quote": "SKUPŠTINE KANTONA U FEDERACIJI BiH: KANTON 1-10 (30, 21, 35, 35, 25, 30, 30, 23, 35, 25 seats)"
+    }
+   ]
+  },
+  {
+   "key": "skupstina_brcko",
+   "tier": "distrikt",
+   "name": "Izbori za Skupštinu Brčko distrikta BiH",
+   "name_en": "Assembly of the Brčko District",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2016 in the JSON service.",
+   "note": "Elected with the local elections since 2004, in one district-wide constituency with seats reserved for national minorities; before 2004 the Supervisor appointed the Assembly. The mayor is chosen by the Assembly.",
+   "source": "ustav",
+   "valid_from": "2004-10-02",
+   "first_held": "2004-10-02",
+   "earliest_record": "2004-10-02",
+   "est_votes": 250000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "Part of the local-election result sites (2004-2012) and the JSON service from 2016."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 9 unit BRČKO DISTRIKT BIH in 2016, 2020, and 2024."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral",
+      "council"
+     ],
+     "iso_pattern": "BA-BRC",
+     "precedence": 1
+    },
+    {
+     "name_pattern": "Skup[sš]tin[ae] Br[cč]ko|Assembly of (the )?Br[cč]ko",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-10-02",
+     "contests": 1,
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati - Lokalni izbori 2004"
+    },
+    {
+     "date": "2008-10-05",
+     "contests": 1,
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati / LOKALNI IZBORI 2008"
+    },
+    {
+     "date": "2012-10-07",
+     "contests": 1,
+     "source": "pokazatelji",
+     "quote": "Under the Decision on announcing 2012 Local Elections the following levels of authority are elected: ... Assembly of Brčko District of BiH"
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 1,
+     "source": "api",
+     "quote": "race9_electoralunit (Lokalni izbori 2016): BRČKO DISTRIKT BIH"
+    },
+    {
+     "date": "2020-11-15",
+     "contests": 1,
+     "source": "api",
+     "quote": "race9_electoralunit (Lokalni izbori 2020): BRČKO DISTRIKT BIH"
+    },
+    {
+     "date": "2024-10-06",
+     "contests": 1,
+     "source": "api",
+     "quote": "race9_electoralunit (Lokalni izbori 2024): BRČKO DISTRIKT BIH"
+    }
+   ]
+  },
+  {
+   "key": "opcinsko_vijece",
+   "tier": "opcina",
+   "name": "Izbori za općinska vijeća, skupštine opština i gradska vijeća/skupštine gradova",
+   "name_en": "Municipal and city councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2016 in the JSON service; municipal totals by party in the 1997 and 2000 PDFs.",
+   "note": "List PR in each municipality (Art. 13.1-13.5) with a 10% preference threshold and minority seats (ch. 13A). Mostar's City Council has its own rules (ch. 19): six city-area constituencies plus a city-wide one, counted as seven contests; no Mostar election was held in 2012 or 2016. The 1998 general election also elected councils in eleven newly formed municipalities.",
+   "source": "izborni_zakon",
+   "valid_from": "1997-09-13",
+   "first_held": "1997-09-13",
+   "earliest_record": "1997-09-13",
+   "est_votes": 13000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "1997 and 2000 PDFs by municipality, 2004-2012 HTML sites (the 2008 site is now offline), polling-station results from 2016."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 9 (OV/SO/GV/SG/SD) by municipality and polling station for 2016, 2020, the 2020 Mostar election, and 2024."
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "1996-01-01"
+    },
+    {
+     "name_pattern": "Op[cć]insk[aeo] vije[cć]|Skup[sš]tin[ae] op[sš]tine|Gradsk[aeo] vije[cć]|Skup[sš]tin[ae] grada|Municipal (Council|Assembly)|City (Council|Assembly)",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-09-13",
+     "contests": 142,
+     "note": "Voting on 13 and 14 September 1997; the count includes the city-area councils of Mostar.",
+     "source": "rez_1997",
+     "quote": "1997 Municipal Elections Final Results: 001 VELIKA KLADUŠA ... 256 OPĆINA MOSTAR ZAPAD ZA GRADSKO VIJEĆE GRADA (142 units)"
+    },
+    {
+     "date": "1998-09-12",
+     "contests": 11,
+     "note": "Councils of eleven newly formed municipalities, elected with the general election.",
+     "source": "rez_1998",
+     "quote": "007 Bosanski Novi/Novi Grad; 020 Domaljevac - Šamac; 036 Doboj Istok; 037 Doboj Jug; 055 Teočak; 082 Sapna; 143 Pale; 165 Foča; 181 Ravno; 183 Usora; 184 Kostajnica"
+    },
+    {
+     "date": "2000-04-08",
+     "source": "pokazatelji",
+     "quote": "In 2000 both Local (08.04.2000) and General Elections (11.11.2000) were held."
+    },
+    {
+     "date": "2004-10-02",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati - Lokalni izbori 2004"
+    },
+    {
+     "date": "2008-10-05",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati / LOKALNI IZBORI 2008"
+    },
+    {
+     "date": "2012-10-07",
+     "contests": 140,
+     "note": "Mostar held no election.",
+     "source": "pokazatelji",
+     "quote": "78 Municipal Councils in the FBiH, 61 Municipal Assemblies in Republika Srpska, ... Assembly of the City of Banja Luka"
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 141,
+     "note": "142 units less the Brčko District Assembly; Mostar held no election. Stolac repeated its election in 2017.",
+     "source": "api",
+     "quote": "Lokalni izbori 2016, race 9 (OPĆINSKO VIJEĆE/SKUPŠTINA OPĆINE/SKUPŠTINA GRADA): numberMunicipality 142"
+    },
+    {
+     "date": "2020-11-15",
+     "contests": 141,
+     "note": "139 units confirmed with the main results plus Doboj and Srebrenica, confirmed separately after repeat voting on 21 February 2021; Mostar voted on 20 December 2020.",
+     "source": "api",
+     "quote": "Lokalni izbori 2020, race 9 (OV/SO/GV/SG/SD): numberMunicipality 140; Potvrđeni rezultati u Srebrenici i Doboju (15.11.2020. i 21.02.2021.)"
+    },
+    {
+     "date": "2020-12-20",
+     "contests": 7,
+     "note": "Mostar City Council: six city-area constituencies and the city-wide constituency.",
+     "source": "api",
+     "quote": "Lokalni izbori 2020. godine u Gradu Mostaru: IZBORNA JEDINICA 1-6 and GRADSKA IZBORNA JEDINICA"
+    },
+    {
+     "date": "2024-10-06",
+     "contests": 148,
+     "note": "141 municipal and city councils plus the seven Mostar constituencies (149 units less the Brčko District Assembly).",
+     "source": "api",
+     "quote": "Lokalni izbori 2024, race 9 (OV/SO/GV/SG/SD): 149 electoral units"
+    }
+   ]
+  },
+  {
+   "key": "nacelnik",
+   "tier": "opcina",
+   "name": "Izbori za načelnika općine/opštine i gradonačelnika",
+   "name_en": "Municipal and city mayors",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Polling-station results from 2016 in the JSON service.",
+   "note": "Direct plurality election since 2004 in both entities (Art. 13.7); early elections fill vacancies. The mayors of Mostar, the City of Sarajevo, and the Brčko District are chosen by their councils (class gradonacelnik_posredni); Istočno Sarajevo's mayor is elected directly.",
+   "source": "izborni_zakon",
+   "valid_from": "2004-10-02",
+   "first_held": "2004-10-02",
+   "earliest_record": "2004-10-02",
+   "est_votes": 10000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+     "vacancy_rule": "Art. 13.7(3): an early election fills a mayoralty that ends early or after a recall"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Rezultati izbora (CIK BiH)",
+     "url": "https://www.izbori.ba/Default.aspx?CategoryID=48&Lang=3&Mod=0",
+     "format": "pdf (1996-2002), html (2002-2012), json (2014 on)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-09-14",
+     "source": "arhiva",
+     "evidence": "2004-2012 HTML sites and early-election pages, polling-station results from 2016."
+    },
+    {
+     "platform": "Rezultati izbora, JSON service (CIK BiH)",
+     "url": "https://www.izbori.ba/api_2018/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2014-10-12",
+     "source": "api",
+     "evidence": "Race 8 (NAČELNIK/GRADONAČELNIK) for 2016, 2020, 2024, and each early election since 2017."
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "valid_from": "2004-01-01"
+    },
+    {
+     "name_pattern": "Na[cč]elnik|Gradona[cč]elnik|Mayor",
+     "valid_from": "2004-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-10-02",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati - Lokalni izbori 2004"
+    },
+    {
+     "date": "2008-10-05",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati / LOKALNI IZBORI 2008"
+    },
+    {
+     "date": "2012-10-07",
+     "contests": 140,
+     "source": "pokazatelji",
+     "quote": "A total of 5 city mayors and 135 municipal mayors are elected in BiH."
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 141,
+     "source": "api",
+     "quote": "Lokalni izbori 2016, race 8 (NAČELNIK/GRADONAČELNIK): numberMunicipality 141"
+    },
+    {
+     "date": "2020-11-15",
+     "contests": 142,
+     "note": "140 units confirmed with the main results plus Doboj and Srebrenica.",
+     "source": "api",
+     "quote": "Lokalni izbori 2020, race 8: numberMunicipality 140; Potvrđeni rezultati u Srebrenici i Doboju (15.11.2020. i 21.02.2021.)"
+    },
+    {
+     "date": "2024-10-06",
+     "contests": 142,
+     "source": "api",
+     "quote": "Lokalni izbori 2024, race 8 (NAČELNIK/GRADONAČELNIK): 142 electoral units"
+    },
+    {
+     "date": "2010-01-24",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Bileća.",
+     "source": "arhiva",
+     "quote": "Odluka o potvrđivanju i objavljivanju rezultata prijevremenih izbora za načelnika Općine Bileća održanih 24.01.2010.",
+     "contests": 1
+    },
+    {
+     "date": "2011-06-26",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Ilidža and Sanski Most.",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati prijevremenih izbora za načelnika Općine Ilidža održanih dana 26.06.2011.; ... Općine Sanski Most održanih dana 26.06.2011.",
+     "contests": 2
+    },
+    {
+     "date": "2011-08-07",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Travnik.",
+     "source": "arhiva",
+     "quote": "Potvrđeni rezultati prijevremenih izbora za načelnika Općine Travnik održanih dana 07.08.2011.",
+     "contests": 1
+    },
+    {
+     "date": "2014-09-28",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Srebrenik and Laktaši.",
+     "source": "arhiva",
+     "quote": "Odluka o potvrđivanju rezultata prijevremenih izbora za načelnika Općine Srebrenik / Laktaši održanih dana 28.09.2014.",
+     "contests": 2
+    },
+    {
+     "date": "2015-02-01",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: several municipalities.",
+     "source": "arhiva",
+     "quote": "POTVRĐENI REZULTATI ZA PRIJEVREMENE IZBORE I PRVE IZBORE ODRŽANIH DANA 01. FEBRUARA 2015. GODINE"
+    },
+    {
+     "date": "2017-09-24",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Trnovo.",
+     "source": "api",
+     "quote": "Prijevremeni izbori za načelinika općine Trnovo, dateElection 2017-09-24",
+     "contests": 1
+    },
+    {
+     "date": "2017-12-17",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Glamoč.",
+     "source": "api",
+     "quote": "Prijevremeni izbori za načelnika Općine Glamoč, dateElection 2017-12-17",
+     "contests": 1
+    },
+    {
+     "date": "2021-04-11",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Travnik and Foča (FBiH).",
+     "source": "api",
+     "quote": "Prijevremeni izbori za načelnika Općine Travnik i načelnika Općine Foča (FBiH) – 11.04.2021. godine",
+     "contests": 2
+    },
+    {
+     "date": "2021-12-12",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Prijedor.",
+     "source": "api",
+     "quote": "Prijevremeni izbori za gradonačelnika Grada Prijedor, dateElection 2021-12-12",
+     "contests": 1
+    },
+    {
+     "date": "2023-10-29",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Stari Grad Sarajevo.",
+     "source": "api",
+     "quote": "Prijevremeni izbori za načelnika Općine Stari Grad Sarajevo, dateElection 2023-10-29",
+     "contests": 1
+    },
+    {
+     "date": "2026-02-15",
+     "election_kind": "by_election",
+     "note": "Early mayoral election: Vareš.",
+     "source": "api",
+     "quote": "Prijevremeni izbori za načelnika Općine Vareš, dateElection 2026-02-15",
+     "contests": 1
+    },
+    {
+     "date": "2005-01-01",
+     "through": "2026-12-31",
+     "election_kind": "by_election",
+     "note": "Other early mayoral elections listed on the CEC's archive pages (2008-2015, 2019, 2023) are not yet dated here."
+    }
+   ]
+  },
+  {
+   "key": "gradonacelnik_posredni",
+   "tier": "opcina",
+   "name": "Posredni izbor gradonačelnika (Mostar, Grad Sarajevo, Brčko distrikt)",
+   "name_en": "Mayors chosen by their councils",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "izborni_zakon",
+   "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The City Council of Mostar (Art. 19.7), the City Council of Sarajevo (Art. 13.10), and the Brčko District Assembly choose these mayors by a vote of their members; there is no public ballot.",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "election_kinds": [
+      "indirect"
+     ],
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "name_pattern": "(Gradona[cč]elnik|Mayor).*(Mostar|Grada Sarajeva|City of Sarajevo|Br[cč]ko)",
+     "precedence": 1
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "gradsko_vijece_posredno",
+   "tier": "grad",
+   "name": "Posredni izbori za Gradsko vijeće Grada Sarajeva i Skupštinu Grada Istočno Sarajevo",
+   "name_en": "City councils elected by municipal councils (Sarajevo, Istočno Sarajevo)",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected by the councils of the constituent municipalities within 15 days of their constitution (Art. 13.10, 13.12); the CEC confirms the result and allocates the mandates.",
+   "source": "izborni_zakon",
+   "valid_from": "2004-10-02",
+   "est_votes": 500,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 10,
+     "day_rule": "oct_first_sunday",
+     "called": false,
+     "administered_by": "Centralna izborna komisija BiH",
+     "source": "izborni_zakon",
+     "locator": "https://www.izbori.ba/Documents/documents/ZAKONI/BiH_Election_Law_last_consolidated_version.pdf?v-4"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Grad(a|sko vije[cć]e Grada) Sarajev|Isto[cč]no Sarajevo",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-10-02",
+     "through": "2026-12-31",
+     "note": "Indirect elections after each local election; not yet listed by date."
+    },
+    {
+     "date": "2016-10-02",
+     "contests": 2,
+     "election_kind": "indirect",
+     "note": "Held in December 2016 and January 2017 after the 2016 local elections; listed under the local election date.",
+     "source": "arhiva",
+     "quote": "Odluka o potvrđivanju rezultata posrednih izbora i dodjeli mandata za Gradsko vijeće Grada Sarajeva; ... za Skupštinu Grada Istočno Sarajevo"
+    }
+   ]
+  },
+  {
+   "key": "referendum_lokalni",
+   "tier": "opcina",
+   "name": "Lokalni referendumi",
+   "name_en": "Municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "nsrs",
+   "disposition": "blocked",
+   "disposition_reason": "Called by municipal assemblies under entity law and run by municipal commissions; no central register of local referendums or their results exists.",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "savjet_mjesne_zajednice",
+   "tier": "mjesna_zajednica",
+   "name": "Izbori za savjete mjesnih zajednica",
+   "name_en": "Local community councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "nsrs",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elected at residents' meetings or ballots organized by each municipality under its own statute; the CEC does not administer them and no body publishes their results.",
+   "match": [
+    {
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "referendum_1992",
+   "tier": "sr_bih",
+   "name": "Referendum o nezavisnosti Bosne i Hercegovine",
+   "name_en": "1992 independence referendum",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Voting on 29 February and 1 March 1992, run by the Republic Election Commission of SR BiH.",
+   "source": "sllist",
+   "valid_from": "1992-02-29",
+   "valid_to": "1992-03-02",
+   "first_held": "1992-02-29",
+   "est_votes": 2100000,
+   "effort": 3,
+   "disposition": "blocked",
+   "disposition_reason": "The official result was published in the Službeni list RBiH; no official online copy was found, and the CEC archive starts in 1996.",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "BA",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-02-29",
+     "note": "Voting on 29 February and 1 March 1992."
+    }
+   ]
+  },
+  {
+   "key": "predsjednistvo_srbih",
+   "tier": "sr_bih",
+   "name": "Izbori za članove Predsjedništva SR Bosne i Hercegovine (1990)",
+   "name_en": "Presidency of SR Bosnia and Herzegovina (1990)",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Seven members (two Muslims, two Serbs, two Croats, one Other) by popular vote on 18 November 1990, the first multiparty election.",
+   "source": "sllist",
+   "valid_from": "1990-11-18",
+   "valid_to": "1996-09-14",
+   "first_held": "1990-11-18",
+   "est_votes": 2000000,
+   "effort": 4,
+   "disposition": "blocked",
+   "disposition_reason": "Results were published by the Republic Election Commission in the Službeni list SRBiH; no official online copy was found.",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BA",
+     "valid_from": "1990-01-01",
+     "valid_to": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-18",
+     "seats": 7
+    }
+   ]
+  },
+  {
+   "key": "skupstina_srbih",
+   "tier": "sr_bih",
+   "name": "Izbori za Skupštinu SR Bosne i Hercegovine",
+   "name_en": "Assembly of SR Bosnia and Herzegovina",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The 1990 election chose the Chamber of Citizens (130) and the Chamber of Municipalities (110), with runoffs on 2 December 1990. From 1945 to 1986 the assembly was chosen in single-list and, from 1974, delegate elections.",
+   "source": "sllist",
+   "valid_to": "1996-09-14",
+   "first_held": "1945-10-28",
+   "est_votes": 4000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Results exist only in the printed Službeni list (N)RBiH/SRBiH and reports of the republic election commissions; no official online copy was found.",
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral"
+     ],
+     "iso_pattern": "BA",
+     "valid_from": "1945-01-01",
+     "valid_to": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-18",
+     "seats": 240,
+     "note": "Chamber of Citizens (130) and Chamber of Municipalities (110); runoffs on 2 December 1990."
+    },
+    {
+     "date": "1945-10-28",
+     "through": "1986-12-31",
+     "note": "Assembly elections of the People's Republic and Socialist Republic, not yet listed by date."
+    }
+   ]
+  },
+  {
+   "key": "skupstine_opcina_srbih",
+   "tier": "sr_bih",
+   "name": "Izbori za skupštine općina u SR Bosni i Hercegovini",
+   "name_en": "Municipal assemblies of SR Bosnia and Herzegovina",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Held with the republic election on 18 November 1990 (and earlier under the socialist delegate system).",
+   "source": "sllist",
+   "valid_to": "1997-09-13",
+   "first_held": "1990-11-18",
+   "est_votes": 2000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Municipal results of 1990 were published by the municipal election commissions; no official online copy was found.",
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_to": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-18"
+    }
+   ]
+  },
+  {
+   "key": "sabor_1910",
+   "tier": "kondominij",
+   "name": "Wahlen zum Bosnisch-hercegovinischen Landtag (Sabor)",
+   "name_en": "Diet (Sabor) of Bosnia and Herzegovina, 1910",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "72 elected members chosen by confessional curiae in May 1910 under the Landesstatut of 17 February 1910; the Diet sat until 1914 and no further election was held.",
+   "source": "landesstatut",
+   "valid_from": "1910-05-01",
+   "valid_to": "1915-01-01",
+   "first_held": "1910-05-01",
+   "est_votes": 250000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Results by curia and constituency survive only in the period's official gazettes and Landtag papers; the digitized gazette host refused connections when checked on 16 November 2026, and no other official copy was found.",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "BA",
+     "valid_to": "1919-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1910-05-01",
+     "precision": "month",
+     "seats": 72
+    }
+   ]
+  }
+ ]
+}

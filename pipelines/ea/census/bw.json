@@ -1,0 +1,942 @@
+{
+  "polity": "BW",
+  "name": "Botswana",
+  "sources": {
+    "constitution": {
+      "title": "Constitution of Botswana (Cap. 00:00), as amended",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Sections 32-35 (election of the President), 57-58 (composition of the National Assembly), 63-65 (constituencies and the Delimitation Commission), 65A (Independent Electoral Commission), 77-79 (Ntlo ya Dikgosi), 89 (alteration of the Constitution and referendums), 90-91 (dissolution and general elections)."
+    },
+    "electoral-act": {
+      "title": "Electoral Act (Cap. 02:09)",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Conduct of National Assembly and local authority elections: nomination, polling districts, counting at the constituency, by-elections, and the declaration of presidential support by parliamentary candidates."
+    },
+    "referendum-act": {
+      "title": "Referendum Act (Cap. 02:10)",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Referendums on bills altering entrenched sections of the Constitution, called by writ of the President."
+    },
+    "local-government-act": {
+      "title": "Local Government Act, 2012 (Cap. 40:01)",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Establishes the district, city, and town councils, their elected and nominated councillors, and the election of each council's chairperson or mayor by the councillors."
+    },
+    "local-councils-date-1969": {
+      "title": "Local Councils (Date of Elections) Act, 23 of 1969",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Aligns local council elections with the general election from 1969."
+    },
+    "bechuanaland-1960": {
+      "title": "Bechuanaland Protectorate (Constitution) Order in Council, 1960",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body",
+      "note": "Legislative Council of the Bechuanaland Protectorate, 1961-1965."
+    },
+    "iec-2009": {
+      "title": "Report to the Minister of Presidential Affairs and Public Administration on the 2009 General Elections",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/images/2009_report.pdf",
+      "kind": "official_body"
+    },
+    "iec-2014": {
+      "title": "Report to the Minister for Presidential Affairs, Governance and Public Administration on the 2014 General Elections",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/images/documents/2014%20General%20Elections%20Report.pdf",
+      "kind": "official_body"
+    },
+    "iec-2019": {
+      "title": "Report to the Minister for Presidential Affairs, Governance and Public Administration on the 2019 General Elections",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/images/Botswana_2019_General_Elections_REPORT(1).pdf",
+      "kind": "official_body"
+    },
+    "iec-delimitation-2022": {
+      "title": "Report of the Delimitation Commission, 2022",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/images/2022_Delimitation_Final_Report.pdf",
+      "kind": "official_body",
+      "note": "Raised the number of constituencies from 57 to 61, in force from the 2024 general election."
+    },
+    "iec-districts": {
+      "title": "Electoral districts",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/index.php/electoral-districts.html",
+      "kind": "official_body"
+    },
+    "iec-byelection-2022": {
+      "title": "Report on the Moselewapula polling district by-election, 30 July 2022",
+      "publisher": "Independent Electoral Commission (Botswana)",
+      "url": "https://www.iec.gov.bw/images/Moselewapula_REPORT.pdf",
+      "kind": "official_body"
+    },
+    "parliament-2024": {
+      "title": "Parliament of Botswana, Members of the National Assembly (2024)",
+      "publisher": "Parliament of Botswana",
+      "url": "https://www.parliament.gov.bw/documents/PARLY-SPREAD-2024F_01_25_02_18_09_2024.pdf",
+      "kind": "official_body"
+    },
+    "dailynews-2023-10-27": {
+      "title": "Daily News, Friday October 27, 2023, No. 196",
+      "publisher": "Department of Broadcasting Services, Republic of Botswana (Daily News)",
+      "url": "https://dailynews.gov.bw/common_up/dailynews/dailynews_pdf/27-10-2023_08-10-07_1698387007_dailynews_pdf.pdf",
+      "kind": "official_body",
+      "note": "Reports the end of the 2023 demarcation, which raised the polling districts (council wards) from 490 to 609."
+    },
+    "dailynews-2024-results": {
+      "title": "Daily News, 2024 general election results by constituency and ward",
+      "publisher": "Department of Broadcasting Services, Republic of Botswana (Daily News)",
+      "url": "https://dailynews.gov.bw/news-detail/82834",
+      "kind": "official_body"
+    },
+    "dailynews-concourt": {
+      "title": "Constitutional Court - Now over to the Plebes",
+      "publisher": "Department of Broadcasting Services, Republic of Botswana (Daily News)",
+      "url": "https://dailynews.gov.bw/news-detail/91138",
+      "kind": "official_body",
+      "note": "The Constitution (Amendment) Bill No. 14 of 2025, creating a Constitutional Court, alters entrenched sections and goes to a referendum under section 89(3)."
+    },
+    "writ-2001": {
+      "title": "Writ of Referendum by His Excellency the President of Botswana, S.I. No. 58 of 2001",
+      "publisher": "Attorney General's Chambers, Republic of Botswana",
+      "url": "https://elaws.gov.bw/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Botswana",
+      "name_en": "Botswana",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "bw.national",
+      "source": "constitution"
+    },
+    {
+      "key": "constituency",
+      "name": "Constituency",
+      "name_en": "National Assembly constituencies",
+      "parent": "national",
+      "scheme": "bw.constituency",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2014-10-24",
+          "value": 57,
+          "source": "iec-2014",
+          "locator": "Report on the 2014 General Elections, results for each of the 57 constituencies"
+        },
+        {
+          "date": "2024-10-30",
+          "value": 61,
+          "source": "parliament-2024",
+          "locator": "61 Elected Members ... to represent the 61 national Parliamentary Constituencies"
+        }
+      ]
+    },
+    {
+      "key": "council",
+      "name": "District, city, and town councils",
+      "name_en": "Local authorities",
+      "parent": "national",
+      "polity_kind": "county",
+      "scheme": "bw.council",
+      "source": "local-government-act",
+      "elects": false
+    },
+    {
+      "key": "ward",
+      "name": "Polling district (council ward)",
+      "name_en": "Council wards",
+      "parent": "council",
+      "scheme": "bw.ward",
+      "source": "electoral-act",
+      "counts": [
+        {
+          "date": "2014-10-24",
+          "value": 490,
+          "source": "iec-2014",
+          "locator": "Upon completion of the demarcation exercise, the number of polling districts remained the same, at Four Hundred and Ninety (490) as in 2002."
+        },
+        {
+          "date": "2023-10-27",
+          "value": 609,
+          "source": "dailynews-2023-10-27",
+          "locator": "Daily News No. 196, 27 October 2023: polling districts raised from 490 to 609"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "national_assembly",
+      "tier": "constituency",
+      "name": "General election of Members of the National Assembly",
+      "name_en": "National Assembly, constituency members",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.constituency"
+        ],
+        "fine": [
+          "bw.polling_station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, ss. 57-58 (elected members, one per constituency) and 63-64 (constituencies)",
+      "valid_from": "1965-03-01",
+      "first_held": "1965-03-01",
+      "earliest_record": "1965-03-01",
+      "finest_note": "Constituency in the IEC reports and Daily News; polling-station counts are tallied but their publication is not yet confirmed",
+      "boundary_source": "iec-delimitation-2022",
+      "note": "Single-member constituencies by plurality. The constituency count is set by the Delimitation Commission: 31 (1965), 32 (1974), 34 (1984), 40 (1994), 57 (2004), and 61 (2024).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BW",
+          "valid_from": "1965-03-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1998-01-01",
+          "administered_by": "Independent Electoral Commission",
+          "source": "constitution",
+          "locator": "Constitution of Botswana, s. 65A (Independent Electoral Commission, inserted by the 1997 amendment)"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1965-01-01",
+          "valid_to": "1998-01-01",
+          "administered_by": "Supervisor of Elections (from 1987) and before it the Office of the President",
+          "source": "electoral-act",
+          "locator": "Electoral Act (Cap. 02:09), as in force before the 1997 constitutional amendment"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Independent Electoral Commission (Botswana)",
+          "url": "https://www.iec.gov.bw/images/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2009-10-16",
+          "last_date": "2019-10-23",
+          "finest": "bw.constituency",
+          "source": "iec-2019",
+          "evidence": "Report to the Minister on each general election, with results by constituency. The host answered 503 to automated requests on 2026-11-16."
+        },
+        {
+          "platform": "Daily News (Botswana Press Agency)",
+          "url": "https://dailynews.gov.bw/news-detail/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-10-30",
+          "last_date": "2024-10-30",
+          "finest": "bw.constituency",
+          "source": "dailynews-2024-results",
+          "evidence": "Articles giving the 2024 count by constituency and council ward; answered 200 on 2026-11-16."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1965-03-01",
+          "note": "Legislative Assembly under the 1965 self-government constitution, which became the National Assembly at independence on 30 September 1966; 31 constituencies, not yet taken from an official record."
+        },
+        {
+          "date": "1969-10-18",
+          "note": "31 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1974-10-26",
+          "note": "32 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1979-10-20",
+          "note": "32 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1984-09-08",
+          "note": "34 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1989-10-07",
+          "note": "34 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1994-10-15",
+          "note": "40 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "1999-10-16",
+          "note": "40 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "2004-10-30",
+          "note": "57 constituencies; the count is not yet taken from an official record of this election."
+        },
+        {
+          "date": "2009-10-16",
+          "contests": 57,
+          "seats": 57,
+          "source": "iec-2009"
+        },
+        {
+          "date": "2014-10-24",
+          "contests": 57,
+          "seats": 57,
+          "source": "iec-2014"
+        },
+        {
+          "date": "2019-10-23",
+          "contests": 57,
+          "seats": 57,
+          "source": "iec-2019"
+        },
+        {
+          "date": "2024-10-30",
+          "contests": 61,
+          "seats": 61,
+          "source": "parliament-2024",
+          "quote": "61 Elected Members, who are directly elected by the people of Botswana at a General Election to represent the 61 national Parliamentary Constituencies"
+        }
+      ],
+      "est_votes": 4800000,
+      "effort": 3
+    },
+    {
+      "key": "national_assembly_by",
+      "tier": "constituency",
+      "name": "Bye-election of a Member of the National Assembly",
+      "name_en": "National Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.constituency"
+        ]
+      },
+      "source": "electoral-act",
+      "locator": "Electoral Act (Cap. 02:09), bye-elections on a vacancy in the seat of an elected member",
+      "valid_from": "1965-03-01",
+      "note": "Held when an elected seat falls vacant other than by dissolution.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BW"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "bye-election in the constituency",
+          "source": "electoral-act"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1965-03-02",
+          "through": "2026-11-16",
+          "note": "By-elections since 1965 are not yet counted from official records."
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 3
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of the President",
+      "name_en": "President, by declared support of the elected members",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.national"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, s. 32 (each parliamentary candidate declares which presidential candidate they support; the candidate backed by more than half the elected members is President) and s. 35 (the National Assembly elects on a vacancy)",
+      "valid_from": "1965-03-01",
+      "first_held": "1965-03-01",
+      "earliest_record": "1965-03-01",
+      "note": "No separate ballot: the outcome follows from the National Assembly general election. In 1965 the office was Prime Minister; the presidency dates from independence (30 September 1966).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "BW"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "selection": "elected",
+          "source": "constitution",
+          "locator": "Constitution of Botswana, s. 32"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1965-03-01"
+        },
+        {
+          "date": "1969-10-18"
+        },
+        {
+          "date": "1974-10-26"
+        },
+        {
+          "date": "1979-10-20"
+        },
+        {
+          "date": "1984-09-08"
+        },
+        {
+          "date": "1989-10-07"
+        },
+        {
+          "date": "1994-10-15"
+        },
+        {
+          "date": "1999-10-16"
+        },
+        {
+          "date": "2004-10-30"
+        },
+        {
+          "date": "2009-10-16"
+        },
+        {
+          "date": "2014-10-24"
+        },
+        {
+          "date": "2019-10-23"
+        },
+        {
+          "date": "2024-10-30"
+        }
+      ],
+      "est_votes": 800,
+      "effort": 1
+    },
+    {
+      "key": "specially_elected_members",
+      "tier": "national",
+      "name": "Specially elected Members of the National Assembly",
+      "name_en": "Specially elected members of the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, s. 58 (specially elected members, elected by the National Assembly on the nomination of the President)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The National Assembly elects them from the President's nominees by its own vote after the general election; there is no public ballot and no published count.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker of the National Assembly",
+      "name_en": "Speaker of the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, s. 59 (the Speaker is elected by the members of the National Assembly)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An internal vote of the National Assembly at its first sitting, recorded in Hansard rather than run or published as an election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "BW"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "ntlo_ya_dikgosi",
+      "tier": "national",
+      "name": "Ntlo ya Dikgosi",
+      "name_en": "House of Chiefs (Ntlo ya Dikgosi), elected members",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, ss. 77-79 (composition of Ntlo ya Dikgosi: ex officio dikgosi, members elected in regional electoral colleges, and members appointed by the President)",
+      "valid_from": "1966-09-30",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Its elected members are chosen by electoral colleges of dikgosi and headmen in each region, not by the public, and no results are published; the house advises Parliament and does not legislate.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "Constitutional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.national"
+        ],
+        "fine": [
+          "bw.constituency"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Constitution of Botswana, s. 89(3) (a bill altering an entrenched section goes to a referendum after passing the National Assembly)",
+      "first_held": "1987-01-01",
+      "earliest_record": "1997-10-04",
+      "note": "Called by writ of the President under the Referendum Act. Held in 1987 (Supervisor of Elections), 1997 (three questions: an independent electoral commission, voting from abroad, and a voting age of 18), and 2001 (eight questions on the judiciary). A referendum on the Constitution (Amendment) Bill No. 14 of 2025 (Constitutional Court) is announced with no date set.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BW"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Independent Electoral Commission",
+          "valid_from": "1998-01-01",
+          "source": "referendum-act"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "note": "One question, creating the office of Supervisor of Elections; not yet taken from an official record."
+        },
+        {
+          "date": "1997-10-04",
+          "note": "Three questions; not yet taken from an official record."
+        },
+        {
+          "date": "2001-11-03",
+          "contests": 8,
+          "source": "writ-2001",
+          "note": "Eight questions on the judiciary; postponed from 6 October 2001."
+        }
+      ],
+      "est_votes": 450000,
+      "effort": 2
+    },
+    {
+      "key": "council",
+      "tier": "ward",
+      "name": "Local government (council) elections",
+      "name_en": "District, city, and town councils, ward councillors",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.ward"
+        ],
+        "fine": [
+          "bw.polling_station"
+        ]
+      },
+      "source": "local-government-act",
+      "locator": "Local Government Act, 2012 (Cap. 40:01): each council's elected councillors, one per ward (polling district)",
+      "valid_from": "1966-01-01",
+      "first_held": "1966-01-01",
+      "earliest_record": "2009-10-16",
+      "finest_note": "Ward (polling district); each ward elects one councillor by plurality",
+      "boundary_source": "iec-districts",
+      "note": "Councils were set up under the District Councils Law, 1965 and the Town Council Regulations, 1966; from 1969 their elections fall on the general election day. The Minister also nominates councillors, who are not elected. 490 wards from the 2002 demarcation through 2019, 609 from 2024.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "within": null,
+          "iso_pattern": "BW*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1998-01-01",
+          "administered_by": "Independent Electoral Commission",
+          "source": "constitution",
+          "locator": "Constitution of Botswana, s. 65A (Independent Electoral Commission, inserted by the 1997 amendment)"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1969-01-01",
+          "valid_to": "1998-01-01",
+          "administered_by": "Supervisor of Elections (from 1987) and before it the Office of the President",
+          "source": "local-councils-date-1969",
+          "locator": "Local Councils (Date of Elections) Act, 23 of 1969"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Independent Electoral Commission (Botswana)",
+          "url": "https://www.iec.gov.bw/images/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2009-10-16",
+          "last_date": "2019-10-23",
+          "finest": "bw.ward",
+          "source": "iec-2019",
+          "evidence": "Report to the Minister on each general election, with local government results by polling district (ward). The host answered 503 to automated requests on 2026-11-16."
+        },
+        {
+          "platform": "Daily News (Botswana Press Agency)",
+          "url": "https://dailynews.gov.bw/news-detail/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-10-30",
+          "last_date": "2024-10-30",
+          "finest": "bw.ward",
+          "source": "dailynews-2024-results",
+          "evidence": "Articles giving the 2024 count by constituency and council ward; answered 200 on 2026-11-16."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1966-01-01",
+          "precision": "year",
+          "note": "First elections to the district and town councils set up under the District Councils Law, 1965 and the Town Council Regulations, 1966; ward count not yet taken from an official record."
+        },
+        {
+          "date": "1969-10-18",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1974-10-26",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1979-10-20",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1984-09-08",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1989-10-07",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1994-10-15",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "1999-10-16",
+          "note": "Held with the general election (Local Councils (Date of Elections) Act, 1969); ward count before the 2002 delimitation not yet taken from an official record."
+        },
+        {
+          "date": "2004-10-30",
+          "contests": 490,
+          "seats": 490,
+          "source": "iec-2014",
+          "quote": "Upon completion of the demarcation exercise, the number of polling districts remained the same, at Four Hundred and Ninety (490) as in 2002."
+        },
+        {
+          "date": "2009-10-16",
+          "contests": 490,
+          "seats": 490,
+          "source": "iec-2014",
+          "quote": "Upon completion of the demarcation exercise, the number of polling districts remained the same, at Four Hundred and Ninety (490) as in 2002."
+        },
+        {
+          "date": "2014-10-24",
+          "contests": 490,
+          "seats": 490,
+          "source": "iec-2014",
+          "quote": "Upon completion of the demarcation exercise, the number of polling districts remained the same, at Four Hundred and Ninety (490) as in 2002."
+        },
+        {
+          "date": "2019-10-23",
+          "contests": 490,
+          "seats": 490,
+          "source": "dailynews-2023-10-27"
+        },
+        {
+          "date": "2024-10-30",
+          "contests": 609,
+          "seats": 609,
+          "source": "dailynews-2023-10-27"
+        }
+      ],
+      "est_votes": 4500000,
+      "effort": 4
+    },
+    {
+      "key": "council_by",
+      "tier": "ward",
+      "name": "Local government bye-elections",
+      "name_en": "Council ward by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bw.ward"
+        ]
+      },
+      "source": "electoral-act",
+      "locator": "Electoral Act (Cap. 02:09), bye-elections for a vacant local authority seat",
+      "valid_from": "1966-01-01",
+      "note": "The IEC publishes a report on each recent ward by-election (for example Moselewapula, 30 July 2022).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "within": null,
+          "iso_pattern": "BW*"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "government_kind": "ward",
+          "vacancy_rule": "bye-election in the polling district",
+          "source": "electoral-act"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Independent Electoral Commission (Botswana)",
+          "url": "https://www.iec.gov.bw/images/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2022-07-30",
+          "finest": "bw.ward",
+          "source": "iec-byelection-2022",
+          "evidence": "One report per ward by-election. The host answered 503 to automated requests on 2026-11-16."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1966-01-02",
+          "through": "2022-07-29",
+          "note": "Ward by-elections are not yet counted from official records."
+        },
+        {
+          "date": "2022-07-30",
+          "contests": 1,
+          "source": "iec-byelection-2022",
+          "note": "Moselewapula polling district."
+        },
+        {
+          "date": "2022-07-31",
+          "through": "2026-11-16",
+          "note": "Ward by-elections are not yet counted from official records."
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "council_chairs",
+      "tier": "council",
+      "name": "Election of council chairpersons and mayors",
+      "name_en": "Council chairpersons and mayors",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "local-government-act",
+      "locator": "Local Government Act, 2012 (Cap. 40:01): each council elects its chairperson (district councils) or mayor (city and town councils) from among its councillors",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council elects its chairperson or mayor from among its members at its first meeting; the state does not run or publish these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "BW*",
+          "within": null
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "vdc",
+      "tier": "council",
+      "name": "Village Development Committees",
+      "name_en": "Village Development Committees",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "local-government-act",
+      "locator": "Local Government Act, 2012 (Cap. 40:01) and the council by-laws under it",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Committee members are chosen at a village kgotla meeting, not at a poll run by the Independent Electoral Commission, and no results are published.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_primaries",
+      "tier": "national",
+      "name": "Party primary elections",
+      "name_en": "Party primary elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "electoral-act",
+      "locator": "Electoral Act (Cap. 02:09): candidates are nominated by registered voters at the returning officer; parties select their candidates under their own rules",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their candidates (for example in party primaries) under their own constitutions; the state neither runs nor publishes them.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "BW*",
+          "within": null
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Bechuanaland Protectorate Legislative Council",
+      "name_en": "Legislative Council of the Bechuanaland Protectorate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "bechuanaland-1960",
+      "locator": "Bechuanaland Protectorate (Constitution) Order in Council, 1960 (Legislative Council of official, nominated, and elected members)",
+      "valid_from": "1961-01-01",
+      "valid_to": "1965-03-01",
+      "first_held": "1961-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Its elected members were chosen on separate racial rolls and through the African Council before self-government; no official record of the 1961 results is published online, and the protectorate records sit with the Botswana National Archives.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BW",
+          "valid_to": "1965-03-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1961-01-01",
+          "precision": "year"
+        }
+      ]
+    }
+  ]
+}

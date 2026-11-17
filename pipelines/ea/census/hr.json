@@ -1,0 +1,1949 @@
+{
+ "polity": "HR",
+ "name": "Croatia",
+ "sources": {
+  "ustav": {
+   "title": "Ustav Republike Hrvatske (pročišćeni tekst), NN 85/2010",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2010_07_85_2422.html",
+   "kind": "official_body"
+  },
+  "promjena_ustava_2001": {
+   "title": "Promjena Ustava Republike Hrvatske, NN 28/2001",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2001_04_28_487.html",
+   "kind": "official_body"
+  },
+  "zakon_sabor_1990": {
+   "title": "Zakon o izboru i opozivu odbornika i zastupnika, NN 7/1990",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1990_02_7_73.html",
+   "kind": "official_body"
+  },
+  "zakon_sabor_1992": {
+   "title": "Zakon o izborima zastupnika u Sabor Republike Hrvatske, NN 22/1992",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1992_04_22_489.html",
+   "kind": "official_body"
+  },
+  "zakon_sabor_1999": {
+   "title": "Zakon o izborima zastupnika u Hrvatski državni sabor, NN 116/1999",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1999_11_116_1854.html",
+   "kind": "official_body"
+  },
+  "jedinice_1999": {
+   "title": "Zakon o izbornim jedinicama za izbor zastupnika u Zastupnički dom Hrvatskoga državnog sabora, NN 116/1999",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1999_11_116_1855.html",
+   "kind": "official_body"
+  },
+  "sabor_2015": {
+   "title": "Zakon o izmjenama i dopunama Zakona o izborima zastupnika u Hrvatski sabor, NN 19/2015",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2015_02_19_398.html",
+   "kind": "official_body"
+  },
+  "jedinice_2023": {
+   "title": "Zakon o izbornim jedinicama za izbor zastupnika u Hrvatski sabor, NN 114/2023",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2023_10_114_1608.html",
+   "kind": "official_body"
+  },
+  "zakon_predsjednik": {
+   "title": "Zakon o izboru predsjednika Republike Hrvatske, NN 22/1992",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1992_04_22_488.html",
+   "kind": "official_body"
+  },
+  "zakon_ep": {
+   "title": "Zakon o izborima zastupnika iz Republike Hrvatske u Europski parlament, NN 92/2010",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2010_07_92_2591.html",
+   "kind": "official_body"
+  },
+  "zakon_referendum": {
+   "title": "Zakon o referendumu i drugim oblicima osobnog sudjelovanja u obavljanju državne vlasti i lokalne samouprave, NN 33/1996",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1996_04_33_673.html",
+   "kind": "official_body"
+  },
+  "zakon_lokalni_1992": {
+   "title": "Zakon o izboru članova predstavničkih tijela jedinica lokalne samouprave i uprave, NN 90/1992",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1992_12_90_2336.html",
+   "kind": "official_body"
+  },
+  "zakon_lokalna_uprava_1992": {
+   "title": "Zakon o lokalnoj samoupravi i upravi, NN 90/1992",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1992_12_90_2334.html",
+   "kind": "official_body"
+  },
+  "zakon_lokalni_2001": {
+   "title": "Zakon o izboru članova predstavničkih tijela jedinica lokalne i područne (regionalne) samouprave, NN 33/2001",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2001_04_33_570.html",
+   "kind": "official_body"
+  },
+  "zakon_samouprava_2001": {
+   "title": "Zakon o lokalnoj i područnoj (regionalnoj) samoupravi, NN 33/2001",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2001_04_33_569.html",
+   "kind": "official_body"
+  },
+  "zakon_nacelnici_2007": {
+   "title": "Zakon o izborima općinskih načelnika, gradonačelnika, župana i gradonačelnika Grada Zagreba, NN 109/2007",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2007_10_109_3178.html",
+   "kind": "official_body"
+  },
+  "zakon_lokalni_2012": {
+   "title": "Zakon o lokalnim izborima, NN 144/2012",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2012_12_144_3074.html",
+   "kind": "official_body"
+  },
+  "ustavni_manjine": {
+   "title": "Ustavni zakon o pravima nacionalnih manjina, NN 155/2002",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2002_12_155_2532.html",
+   "kind": "official_body"
+  },
+  "zakon_manjine_2019": {
+   "title": "Zakon o izboru vijeća i predstavnika nacionalnih manjina, NN 25/2019",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_03_25_491.html",
+   "kind": "official_body"
+  },
+  "podrucja_1992": {
+   "title": "Zakon o područjima županija, gradova i općina u Republici Hrvatskoj, NN 90/1992",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/1992_12_90_2333.html",
+   "kind": "official_body"
+  },
+  "podrucja_2006": {
+   "title": "Zakon o područjima županija, gradova i općina u Republici Hrvatskoj, NN 86/2006",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2006_07_86_2045.html",
+   "kind": "official_body"
+  },
+  "podrucja_2013": {
+   "title": "Zakon o izmjeni i dopuni Zakona o područjima županija, gradova i općina u Republici Hrvatskoj, NN 45/2013",
+   "publisher": "Narodne novine d.d. (Narodne novine, službeni list Republike Hrvatske)",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2013_04_45_851.html",
+   "kind": "official_body"
+  },
+  "dzs_ljetopis_2009": {
+   "title": "Statistički ljetopis Republike Hrvatske 2009, poglavlje 2: Upravno-teritorijalni ustroj",
+   "publisher": "Državni zavod za statistiku",
+   "url": "https://web.dzs.hr/Hrv_Eng/ljetopis/2009/PDF/02-bind.pdf",
+   "kind": "official_body"
+  },
+  "dzs_popis_2011": {
+   "title": "Popis stanovništva, kućanstava i stanova 2011: teritorijalni ustroj",
+   "publisher": "Državni zavod za statistiku",
+   "url": "https://web.dzs.hr/Eng/censuses/census2011/results/censusterritory.htm",
+   "kind": "official_body"
+  },
+  "dip_arhiva": {
+   "title": "Arhiva izbora",
+   "publisher": "Državno izborno povjerenstvo Republike Hrvatske",
+   "url": "https://www.izbori.hr/arhiva-izbora/",
+   "kind": "official_body",
+   "note": "The commission's archive of every national, European, local, minority, early, and supplementary election it or its predecessors ran since 1990; scanned reports for 1990-2009 and per-polling-station zip files after that."
+  },
+  "dip_sabor_1990": {
+   "title": "Izbori za zastupnike u Hrvatski sabor 1990: rezultati po vijećima",
+   "publisher": "Državno izborno povjerenstvo Republike Hrvatske",
+   "url": "https://www.izbori.hr/arhiva-izbora/#/app/parlament-1990",
+   "kind": "official_body"
+  },
+  "dip_zd_1997": {
+   "title": "Izvješće o konačnim službenim rezultatima izbora zastupnika u Županijski dom Sabora Republike Hrvatske 1997",
+   "publisher": "Državno izborno povjerenstvo Republike Hrvatske",
+   "url": "https://www.izbori.hr/arhiva-izbora/data/parlament/1997/rezultati/1997_3_Rezultati_Sabor_zupanijski_dom.pdf",
+   "kind": "official_body"
+  },
+  "dip_referendum_1996": {
+   "title": "Izvješće o provedenom savjetodavnom referendumu 2. lipnja 1996",
+   "publisher": "Državno izborno povjerenstvo Republike Hrvatske",
+   "url": "https://www.izbori.hr/arhiva-izbora/data/referendum/1996/rezultati/1996_Rezultati_Referendum.pdf",
+   "kind": "official_body"
+  },
+  "dip_lokalni_2001": {
+   "title": "Lokalni izbori 2001: rezultati po županijama",
+   "publisher": "Državno izborno povjerenstvo Republike Hrvatske",
+   "url": "https://www.izbori.hr/arhiva-izbora/#/app/lokalni-2001",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republika Hrvatska",
+   "name_en": "Republic of Croatia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "hr.nation",
+   "valid_from": "1991-06-25",
+   "source": "ustav"
+  },
+  {
+   "key": "zupanija",
+   "name": "Županije i Grad Zagreb",
+   "name_en": "Counties and the City of Zagreb",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "hr.zupanija",
+   "valid_from": "1993-01-01",
+   "source": "podrucja_2006",
+   "counts": [
+    {
+     "date": "1993-01-01",
+     "value": 21,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "1995-09-22",
+     "value": 20,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "1997-02-07",
+     "value": 21,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "2011-03-31",
+     "value": 21,
+     "source": "dzs_popis_2011"
+    }
+   ]
+  },
+  {
+   "key": "grad_opcina",
+   "name": "Gradovi i općine",
+   "name_en": "Towns and municipalities",
+   "parent": "zupanija",
+   "polity_kind": "municipality",
+   "scheme": "hr.opcina",
+   "valid_from": "1993-01-01",
+   "source": "podrucja_2006",
+   "counts": [
+    {
+     "date": "1993-01-01",
+     "value": 489,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "1995-09-22",
+     "value": 499,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "1997-02-07",
+     "value": 538,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "2006-07-28",
+     "value": 556,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "2011-03-31",
+     "value": 556,
+     "source": "dzs_popis_2011"
+    },
+    {
+     "date": "2013-04-01",
+     "precision": "month",
+     "value": 556,
+     "source": "podrucja_2013"
+    }
+   ]
+  },
+  {
+   "key": "mjesna_samouprava",
+   "name": "Mjesni odbori i gradske četvrti",
+   "name_en": "Local committees and city districts",
+   "parent": "grad_opcina",
+   "polity_kind": "submunicipal",
+   "valid_from": "1993-01-01",
+   "source": "zakon_samouprava_2001"
+  },
+  {
+   "key": "srh",
+   "name": "Narodna (Socijalistička) Republika Hrvatska",
+   "name_en": "People's (Socialist) Republic of Croatia within Yugoslavia (1945–1991)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1945-01-01",
+   "valid_to": "1991-06-25",
+   "source": "dzs_ljetopis_2009"
+  },
+  {
+   "key": "opcina_srh",
+   "name": "Općine (kotari do 1967.)",
+   "name_en": "Socialist-era municipalities",
+   "parent": "srh",
+   "polity_kind": "municipality",
+   "valid_from": "1952-01-01",
+   "valid_to": "1993-01-01",
+   "source": "dzs_ljetopis_2009",
+   "counts": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "value": 737,
+     "source": "dzs_ljetopis_2009"
+    },
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "value": 102,
+     "source": "dzs_ljetopis_2009"
+    }
+   ]
+  },
+  {
+   "key": "hrvatska_slavonija",
+   "name": "Kraljevine Hrvatska i Slavonija; Kraljevina Dalmacija i Markgrofovija Istra",
+   "name_en": "Kingdom of Croatia-Slavonia and the Austrian crown lands of Dalmatia and Istria (1848–1918)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1848-01-01",
+   "valid_to": "1918-10-29",
+   "source": "dzs_ljetopis_2009"
+  }
+ ],
+ "classes": [
+  {
+   "key": "sabor",
+   "tier": "national",
+   "name": "Izbori za zastupnike u Hrvatski sabor",
+   "name_en": "Croatian Parliament elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "hr.izborna_jedinica"
+    ],
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "finest_note": "Results by polling station (biračko mjesto) in the commission's zip files from 2000; 1992 and 1995 only as scanned reports by electoral district and municipality.",
+   "note": "Zastupnički dom of the bicameral Sabor 1992–2001, then the unicameral Hrvatski sabor. Since 2000: ten 14-seat list-PR districts (5% threshold per district, D'Hondt), district XI for voters abroad, and district XII for the 8 national-minority seats (3 Serb seats by block vote, others single seats). 1992 and 1995 were mixed systems with single-member districts and a national list.",
+   "source": "ustav",
+   "valid_from": "1992-08-02",
+   "first_held": "1992-08-02",
+   "earliest_record": "1992-08-02",
+   "contests_per_unit": 1,
+   "est_votes": 25000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "ustav",
+     "vacancy_rule": "Ustav art. 73 and 77: the Sabor may dissolve itself by majority vote, or the President dissolves it on the Government's proposal; elections within 60 days of dissolution or the end of term."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): parlament",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/parlament/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2019)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2000-01-03",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for every Sabor election from 2000.",
+     "source": "dip_arhiva"
+    },
+    {
+     "platform": "Arhiva izbora (DIP): parlament 1992 and 1995",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/parlament-1992",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1992-08-02",
+     "finest": "hr.opcina",
+     "evidence": "Scanned reports by electoral district and national list; 1995 as one scanned report.",
+     "source": "dip_arhiva",
+     "last_date": "1995-10-29"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1992-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-08-02",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (02.08.1992.)",
+     "note": "Zastupnički dom: 60 single-member districts, a 60-seat national list, and minority seats."
+    },
+    {
+     "date": "1995-10-29",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (29.10.1995.)",
+     "note": "Zastupnički dom: 28 single-member districts, an 80-seat national list, a diaspora list, and minority seats."
+    },
+    {
+     "date": "2000-01-03",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (03.01.2000.)",
+     "contests": 16,
+     "seats": 151,
+     "note": "Zastupnički dom: ten 14-seat districts, district XI (abroad, 6 seats), and five minority contests in district XII."
+    },
+    {
+     "date": "2003-11-23",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (23.11.2003.)",
+     "contests": 17,
+     "seats": 152
+    },
+    {
+     "date": "2007-11-25",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (25.11.2007.)",
+     "contests": 17,
+     "seats": 153
+    },
+    {
+     "date": "2011-12-04",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (04.12.2011.)",
+     "contests": 17,
+     "seats": 151
+    },
+    {
+     "date": "2015-11-08",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (08.11.2015.)",
+     "contests": 17,
+     "seats": 151,
+     "note": "First election with a preference vote (NN 19/2015)."
+    },
+    {
+     "date": "2016-09-11",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (11.09.2016.)",
+     "contests": 17,
+     "seats": 151,
+     "note": "Early election after the Sabor dissolved itself."
+    },
+    {
+     "date": "2020-07-05",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (05.07.2020.)",
+     "contests": 17,
+     "seats": 151
+    },
+    {
+     "date": "2024-04-17",
+     "source": "dip_arhiva",
+     "quote": "Izbori za zastupnike u Hrvatski sabor (17.04.2024.)",
+     "contests": 17,
+     "seats": 151,
+     "note": "Last election on the 1999 districts; NN 114/2023 redrew districts I–X."
+    }
+   ]
+  },
+  {
+   "key": "zupanijski_dom",
+   "tier": "national",
+   "name": "Izbori za zastupnike u Županijski dom Sabora",
+   "name_en": "Chamber of Counties elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "hr.zupanija"
+    ],
+    "fine": [
+     "hr.opcina"
+    ]
+   },
+   "note": "Upper chamber of 3 members per county and the City of Zagreb by list PR, plus up to 5 members appointed by the President. Abolished by the constitutional amendment of 28 March 2001 (NN 28/2001).",
+   "source": "promjena_ustava_2001",
+   "valid_from": "1993-02-07",
+   "valid_to": "2001-04-02",
+   "first_held": "1993-02-07",
+   "earliest_record": "1993-02-07",
+   "est_votes": 5000000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): parlament 1993 and 1997",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/parlament-1997",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1993-02-07",
+     "finest": "hr.zupanija",
+     "evidence": "One scanned report per election with list votes and seats by county.",
+     "source": "dip_arhiva",
+     "last_date": "1997-04-13"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1993-01-01",
+     "valid_to": "2001-04-02"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-02-07",
+     "source": "dip_arhiva",
+     "contests": 21,
+     "seats": 63,
+     "quote": "Izbori za zastupnike u Hrvatski sabor (07.02.1993.): Županijski dom"
+    },
+    {
+     "date": "1997-04-13",
+     "source": "dip_zd_1997",
+     "contests": 21,
+     "seats": 63,
+     "quote": "IZBOR ZASTUPNIKA U ŽUPANIJSKI DOM SABORA REPUBLIKE HRVATSKE U 01. Zagrebačkoj županiji"
+    }
+   ]
+  },
+  {
+   "key": "predsjednik",
+   "tier": "national",
+   "name": "Izbori za predsjednika Republike Hrvatske",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "hr.nation"
+    ],
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "finest_note": "Per-polling-station results from 2000; 1992 and 1997 as scanned reports by municipality.",
+   "source": "zakon_predsjednik",
+   "valid_from": "1992-08-02",
+   "first_held": "1992-08-02",
+   "earliest_record": "1992-08-02",
+   "contests_per_unit": 1,
+   "est_votes": 30000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "A candidate needs a majority of those who voted; otherwise the top two meet 14 days later (Ustav art. 94).",
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "ustav",
+     "vacancy_rule": "Ustav art. 97: election within 60 days of a vacancy."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): predsjednik",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/predsjednik/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2019)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2000-01-24",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for both rounds from 2000.",
+     "source": "dip_arhiva"
+    },
+    {
+     "platform": "Arhiva izbora (DIP): predsjednik 1992 and 1997",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/predsjednik-1997",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1992-08-02",
+     "finest": "hr.opcina",
+     "evidence": "Scanned reports by municipality and abroad.",
+     "source": "dip_arhiva",
+     "last_date": "1997-06-15"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1992-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-08-02",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "1997-06-15",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2000-01-24",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2000-02-07",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    },
+    {
+     "date": "2005-01-02",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2005-01-16",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    },
+    {
+     "date": "2009-12-27",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2010-01-10",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    },
+    {
+     "date": "2014-12-28",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2015-01-11",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    },
+    {
+     "date": "2019-12-22",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2020-01-05",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    },
+    {
+     "date": "2024-12-29",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 1,
+     "quote": "Izbori za predsjednika Republike Hrvatske"
+    },
+    {
+     "date": "2025-01-12",
+     "source": "dip_arhiva",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "quote": "drugi krug izbora za predsjednika"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Državni referendum",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "note": "Called by the Sabor, by the President on the Government's proposal, or on a citizens' initiative of 10% of voters (Ustav art. 87). Held in 1991 (independence, under the Socialist Republic's constitution), 2012 (EU accession), and 2013 (definition of marriage). Initiatives that failed the signature count never reached a ballot.",
+   "source": "zakon_referendum",
+   "first_held": "1991-05-19",
+   "earliest_record": "1991-05-19",
+   "est_votes": 6400000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): referendum",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/referendum/{year}/zip/rezultati.zip",
+     "format": "zip of csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2012-01-22",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for 2012 and 2013; 1991 as a scanned report.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "HR"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-05-19",
+     "source": "dip_arhiva",
+     "contests": 2,
+     "quote": "REFERENDUM O STATUSU REPUBLIKE HRVATSKE (19.05.1991.)",
+     "note": "Two questions: Croatia as a sovereign state that may join a union of sovereign states, and Croatia remaining in Yugoslavia as a federal state."
+    },
+    {
+     "date": "2012-01-22",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "quote": "Referendum o pristupanju Hrvatske Europskoj uniji (22.01.2012.)"
+    },
+    {
+     "date": "2013-12-01",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "quote": "Referendum o ustavnoj definiciji braka (01.12.2013.)"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Izbori za članove u Europski parlament iz Republike Hrvatske",
+   "name_en": "European Parliament elections in Croatia",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "schemes": [
+     "hr.nation"
+    ],
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "note": "One national constituency, open lists with a preference vote, D'Hondt with a 5% threshold. 12 seats in 2013 and 2024, 11 in 2014 and 2019 (12 from 1 February 2020).",
+   "source": "zakon_ep",
+   "valid_from": "2013-04-14",
+   "first_held": "2013-04-14",
+   "earliest_record": "2013-04-14",
+   "est_votes": 3600000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_ep"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): euparlament",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/euparlament/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2019)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-04-14",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for 2013, 2014, 2019, and 2024, the same layout as the Sabor files.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-04-14",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 12,
+     "quote": "Izbori za Europski parlament (14.04.2013.)"
+    },
+    {
+     "date": "2014-05-25",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 11,
+     "quote": "Izbori za Europski parlament (25.05.2014.)"
+    },
+    {
+     "date": "2019-05-26",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 11,
+     "quote": "Izbori za Europski parlament (2019.)"
+    },
+    {
+     "date": "2024-06-09",
+     "source": "dip_arhiva",
+     "contests": 1,
+     "seats": 12,
+     "quote": "IZBORI ZA EUROPSKI PARLAMENT (09.06.2024.)"
+    }
+   ]
+  },
+  {
+   "key": "sabor_1990",
+   "tier": "srh",
+   "name": "Izbori za zastupnike u Sabor Socijalističke Republike Hrvatske 1990.",
+   "name_en": "1990 multiparty election to the three chambers of the Sabor",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "hr.opcina"
+    ]
+   },
+   "note": "First multiparty election: Društveno-političko vijeće (80 single-member districts), Vijeće općina (one seat per municipality), and Vijeće udruženog rada (160 seats elected by workplace electorates), two-round majority system. First round 22–23 April, second round 6–7 May 1990.",
+   "source": "zakon_sabor_1990",
+   "valid_from": "1990-04-22",
+   "valid_to": "1990-05-31",
+   "first_held": "1990-04-22",
+   "earliest_record": "1990-04-22",
+   "est_votes": 7000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): parlament 1990",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/parlament-1990",
+     "format": "pdf (scanned typescript)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-04-22",
+     "finest": "hr.opcina",
+     "evidence": "Six scanned reports (76 to 152 pages each) with candidate votes, registered voters, and turnout per district and round for each chamber.",
+     "source": "dip_sabor_1990",
+     "last_date": "1990-05-07"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1990-01-01",
+     "valid_to": "1991-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-04-22",
+     "source": "dip_sabor_1990",
+     "quote": "IZBORI ZA ZASTUPNIKE U HRVATSKI SABOR (22.04.1990.): Društveno političko vijeće; Vijeće općina; Vijeće udruženog rada"
+    }
+   ]
+  },
+  {
+   "key": "sabor_nrh_srh",
+   "tier": "srh",
+   "name": "Izbori za Sabor NR/SR Hrvatske 1946.–1986.",
+   "name_en": "Sabor elections of the People's and Socialist Republic, 1946–1986",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-list elections to the Constituent Sabor (1946) and the Sabor (1950, 1953, 1958, 1963, 1967, 1969); from 1974 the chambers were filled by delegations chosen in a multi-stage delegate system (1974, 1978, 1982, 1986), so only the first stage had a popular vote.",
+   "source": "dzs_ljetopis_2009",
+   "valid_from": "1946-11-10",
+   "valid_to": "1990-01-01",
+   "first_held": "1946-11-10",
+   "est_votes": 15000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1945-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1946-01-01",
+     "precision": "year",
+     "through": "1986-12-31",
+     "note": "Eleven elections; dates and returns are in the Narodne novine of each year and the statistical office's election bulletins, not yet listed here."
+    }
+   ]
+  },
+  {
+   "key": "sabor_hrvatsko_slavonski",
+   "tier": "hrvatska_slavonija",
+   "name": "Izbori za Hrvatski sabor (Kraljevine Hrvatska i Slavonija, Dalmatinski i Istarski sabor)",
+   "name_en": "Elections to the Croatian-Slavonian Sabor and the Dalmatian and Istrian Diets, 1848–1913",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Croatian-Slavonian Sabor was first elected in 1848 and then in 1861, 1865, 1867, 1871, 1872, 1875, 1878, 1881, 1884, 1887, 1892, 1897, 1901, 1906, 1908, 1910, 1911, and 1913 under a census franchise, by single-member electoral districts with public voting; the Dalmatian Diet (1861–1908) and the Istrian Diet (1861–1914) were Austrian crown-land diets elected by curiae. Returns survive in the Sabor's stenographic records and the official Narodne novine of each year.",
+   "source": "dzs_ljetopis_2009",
+   "valid_from": "1848-01-01",
+   "valid_to": "1918-10-29",
+   "first_held": "1848-05-01",
+   "est_votes": 1500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1848-01-01",
+     "valid_to": "1918-10-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1848-01-01",
+     "precision": "year",
+     "through": "1913-12-31",
+     "note": "About 19 Croatian-Slavonian Sabor elections plus the Dalmatian and Istrian Diets; not yet listed."
+    }
+   ]
+  },
+  {
+   "key": "zupanijska_skupstina",
+   "tier": "zupanija",
+   "name": "Izbori za članove županijskih skupština i Gradske skupštine Grada Zagreba",
+   "name_en": "County assembly and Zagreb City Assembly elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "hr.zupanija"
+    ],
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "finest_note": "Polling-station results in the zip files from 2013; 1993–2009 as scanned or typeset reports by county.",
+   "note": "List PR in one county-wide constituency, 5% threshold, D'Hondt, with extra seats to keep minority representation (Zakon o lokalnim izborima art. 20). The City of Zagreb is a town with county status, so its Gradska skupština is counted here. Zagreb also elected its assembly early on 29 October 1995.",
+   "source": "zakon_lokalni_2012",
+   "valid_from": "1993-02-07",
+   "first_held": "1993-02-07",
+   "earliest_record": "1993-02-07",
+   "contests_per_unit": 1,
+   "est_votes": 16000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "month": 5,
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_lokalni_2012",
+     "vacancy_rule": "Early elections after dissolution (Zakon o lokalnim izborima art. 105)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): lokalni",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/lokalni/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2021)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-05-19",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for every county assembly from 2013.",
+     "source": "dip_arhiva"
+    },
+    {
+     "platform": "Arhiva izbora (DIP): lokalni 1993–2009",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/lokalni-1997",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1993-02-07",
+     "finest": "hr.zupanija",
+     "evidence": "One report per county: list votes and seats for 1993, 1997, and 2001; elected members only for 2005 and 2009.",
+     "source": "dip_arhiva",
+     "last_date": "2009-05-17"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "within": null,
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-02-07",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (07.02.1993.)"
+    },
+    {
+     "date": "1997-04-13",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (13.04.1997.)"
+    },
+    {
+     "date": "2001-05-20",
+     "election_kind": "local",
+     "source": "dip_lokalni_2001",
+     "quote": "Lokalni izbori (20.05.2001.)",
+     "note": "The commission's archive page heads this election 25.05.2001; polling day was Sunday 20 May 2001."
+    },
+    {
+     "date": "2005-05-15",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (15.05.2005.)"
+    },
+    {
+     "date": "2009-05-17",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (17.05.2009.)"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (19.05.2013.)"
+    },
+    {
+     "date": "2017-05-21",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (21.05.2017.)"
+    },
+    {
+     "date": "2021-05-16",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (16.05.2021.)"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (18.05.2025.)"
+    },
+    {
+     "date": "2010-07-11",
+     "through": "2026-05-31",
+     "election_kind": "by_election",
+     "note": "Early (prijevremeni) and supplementary (dopunski) local elections: the commission's archive lists 76 such days from 11 July 2010 to 31 May 2026; contests not yet counted.",
+     "source": "dip_arhiva",
+     "quote": "Prijevremeni izbori; Dopunski izbori"
+    }
+   ]
+  },
+  {
+   "key": "zupan",
+   "tier": "zupanija",
+   "name": "Izbori za župane i gradonačelnika Grada Zagreba",
+   "name_en": "County prefect and Zagreb mayoral elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "hr.zupanija"
+    ],
+    "fine": [
+     "hr.opcina",
+     "hr.bm"
+    ]
+   },
+   "note": "Directly elected since 2009 with their deputies on the same ticket; before 2009 the assembly chose the župan (see posredni).",
+   "source": "zakon_nacelnici_2007",
+   "valid_from": "2009-05-17",
+   "first_held": "2009-05-17",
+   "earliest_record": "2009-05-17",
+   "contests_per_unit": 1,
+   "est_votes": 13000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "month": 5,
+     "runoff": "majority",
+     "runoff_rule": "More than half of the votes cast elects; otherwise the top two meet on the 14th day (Zakon o lokalnim izborima art. 94).",
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_lokalni_2012"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): lokalni",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/lokalni/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2021)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-05-19",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for both rounds from 2013; 2009 elected candidates only.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "governor",
+      "mayor"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "within": null,
+     "valid_from": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-05-17",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (17.05.2009.)"
+    },
+    {
+     "date": "2009-05-31",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (19.05.2013.)"
+    },
+    {
+     "date": "2013-06-02",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2017-05-21",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (21.05.2017.)"
+    },
+    {
+     "date": "2017-06-04",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2021-05-16",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (16.05.2021.)"
+    },
+    {
+     "date": "2021-05-30",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (18.05.2025.)"
+    },
+    {
+     "date": "2025-06-01",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    }
+   ]
+  },
+  {
+   "key": "vijece",
+   "tier": "grad_opcina",
+   "name": "Izbori za članove gradskih i općinskih vijeća",
+   "name_en": "Town and municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hr.opcina"
+    ],
+    "fine": [
+     "hr.bm"
+    ]
+   },
+   "finest_note": "Polling-station results in the zip files from 2013.",
+   "note": "List PR in one constituency per town or municipality, 5% threshold, D'Hondt; seats for national minorities added where the Constitutional Act requires them. 1993–1997 used a mixed system.",
+   "source": "zakon_lokalni_2012",
+   "valid_from": "1993-02-07",
+   "first_held": "1993-02-07",
+   "earliest_record": "1993-02-07",
+   "contests_per_unit": 1,
+   "est_votes": 18000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "month": 5,
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_lokalni_2012",
+     "vacancy_rule": "Early elections after dissolution (Zakon o lokalnim izborima art. 105)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): lokalni",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/lokalni/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2021)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-05-19",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for every town and municipal council from 2013.",
+     "source": "dip_arhiva"
+    },
+    {
+     "platform": "Arhiva izbora (DIP): lokalni 1993–2009",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/lokalni-1993",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1993-02-07",
+     "finest": "hr.opcina",
+     "evidence": "One report per county: list votes and seats per town and municipality for 1993, 1997, and 2001; elected members only for 2005 and 2009.",
+     "source": "dip_arhiva",
+     "last_date": "2009-05-17"
+    },
+    {
+     "platform": "Arhiva izbora (DIP): prijevremeni i dopunski izbori",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/home",
+     "format": "zip of csv, and pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2010-07-11",
+     "finest": "hr.bm",
+     "evidence": "76 early and supplementary election days from 2010 to 2026.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-02-07",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (07.02.1993.)"
+    },
+    {
+     "date": "1997-04-13",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (13.04.1997.)"
+    },
+    {
+     "date": "2001-05-20",
+     "election_kind": "local",
+     "source": "dip_lokalni_2001",
+     "quote": "Lokalni izbori (20.05.2001.)",
+     "note": "The commission's archive page heads this election 25.05.2001; polling day was Sunday 20 May 2001."
+    },
+    {
+     "date": "2005-05-15",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (15.05.2005.)"
+    },
+    {
+     "date": "2009-05-17",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (17.05.2009.)"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (19.05.2013.)"
+    },
+    {
+     "date": "2017-05-21",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (21.05.2017.)"
+    },
+    {
+     "date": "2021-05-16",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (16.05.2021.)"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (18.05.2025.)"
+    },
+    {
+     "date": "2010-07-11",
+     "through": "2026-05-31",
+     "election_kind": "by_election",
+     "note": "Early (prijevremeni) and supplementary (dopunski) local elections: the commission's archive lists 76 such days from 11 July 2010 to 31 May 2026; contests not yet counted.",
+     "source": "dip_arhiva",
+     "quote": "Prijevremeni izbori; Dopunski izbori"
+    }
+   ]
+  },
+  {
+   "key": "nacelnik",
+   "tier": "grad_opcina",
+   "name": "Izbori za gradonačelnike i općinske načelnike",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "hr.opcina"
+    ],
+    "fine": [
+     "hr.bm"
+    ]
+   },
+   "note": "Directly elected since 2009 with their deputies on the same ticket; before 2009 the council chose the mayor (see posredni). Recall by local referendum is possible.",
+   "source": "zakon_nacelnici_2007",
+   "valid_from": "2009-05-17",
+   "first_held": "2009-05-17",
+   "earliest_record": "2009-05-17",
+   "contests_per_unit": 1,
+   "est_votes": 14000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "month": 5,
+     "runoff": "majority",
+     "runoff_rule": "More than half of the votes cast elects; otherwise the top two meet on the 14th day (Zakon o lokalnim izborima art. 94).",
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_lokalni_2012"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): lokalni",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/lokalni/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2021)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-05-19",
+     "finest": "hr.bm",
+     "evidence": "Per-polling-station results for both rounds from 2013; 2009 elected candidates only.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-05-17",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (17.05.2009.)"
+    },
+    {
+     "date": "2009-05-31",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (19.05.2013.)"
+    },
+    {
+     "date": "2013-06-02",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2017-05-21",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (21.05.2017.)"
+    },
+    {
+     "date": "2017-06-04",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2021-05-16",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (16.05.2021.)"
+    },
+    {
+     "date": "2021-05-30",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (18.05.2025.)"
+    },
+    {
+     "date": "2025-06-01",
+     "election_kind": "runoff",
+     "source": "dip_arhiva",
+     "quote": "Drugi krug"
+    }
+   ]
+  },
+  {
+   "key": "zamjenik_manjina",
+   "tier": "grad_opcina",
+   "name": "Izbori za zamjenike župana, gradonačelnika i općinskih načelnika iz reda pripadnika nacionalnih manjina",
+   "name_en": "Elections of deputy prefects and deputy mayors from national minorities",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "hr.bm"
+    ]
+   },
+   "note": "Where a minority makes up enough of the population, its members elect a deputy župan or deputy mayor in a separate contest held with the local elections (Ustavni zakon o pravima nacionalnih manjina art. 20; Zakon o lokalnim izborima art. 96–97); also held as supplementary elections when a contest fails.",
+   "source": "zakon_lokalni_2012",
+   "valid_from": "2009-05-17",
+   "first_held": "2009-05-17",
+   "earliest_record": "2013-05-19",
+   "est_votes": 300000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): lokalni",
+     "url": "https://www.izbori.hr/arhiva-izbora/data/lokalni/{year}/zip/rezultati.zip",
+     "format": "zip of csv (json from 2021)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-05-19",
+     "finest": "hr.bm",
+     "evidence": "Deputy contests sit beside the mayoral contests in the local election files from 2013.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "deputy_mayor"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-05-17",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (17.05.2009.)"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (19.05.2013.)"
+    },
+    {
+     "date": "2017-05-21",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (21.05.2017.)"
+    },
+    {
+     "date": "2021-05-16",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (16.05.2021.)"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "local",
+     "source": "dip_arhiva",
+     "quote": "Lokalni izbori (18.05.2025.)"
+    }
+   ]
+  },
+  {
+   "key": "lokalni_referendum",
+   "tier": "grad_opcina",
+   "name": "Lokalni i savjetodavni referendumi",
+   "name_en": "Local, recall, and consultative referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Local referendums called by a council, the mayor, or 20% of voters, including recall votes on a mayor or župan since 2009; and consultative referendums on boundary changes, which the state commission ran for 1996 (Zakon o referendumu arts. 23–26). No central list of local referendums.",
+   "source": "zakon_referendum",
+   "first_held": "1996-06-02",
+   "earliest_record": "1996-06-02",
+   "est_votes": 300000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): referendum 1996",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/referendum-1996",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-06-02",
+     "finest": "hr.opcina",
+     "evidence": "Scanned report on the 2 June 1996 consultative referendums, one decision per area.",
+     "source": "dip_referendum_1996",
+     "last_date": "1996-06-02"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "recall"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-06-02",
+     "source": "dip_referendum_1996",
+     "quote": "utvrđuje i objavljuje službene rezultate provedenog glasovanja na savjetodavnom referendumu održanom dana 2. lipnja 1996. godine"
+    }
+   ]
+  },
+  {
+   "key": "skupstine_opcina",
+   "tier": "opcina_srh",
+   "name": "Izbori za skupštine općina (narodni odbori 1946.–1963., skupštine općina 1963.–1990.)",
+   "name_en": "Socialist-era municipal assembly elections, through the 1990 multiparty vote",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "People's committees from 1946, then municipal assemblies; delegate system from 1974. The last, held with the Sabor on 22 April and 6 May 1990, elected the three-chamber assemblies of 102 municipalities in multiparty contests; no central report is in the commission's archive.",
+   "source": "zakon_sabor_1990",
+   "valid_from": "1946-01-01",
+   "valid_to": "1993-02-07",
+   "first_held": "1946-01-01",
+   "est_votes": 10000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "1945-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1946-01-01",
+     "precision": "year",
+     "through": "1990-05-07",
+     "note": "Communal elections not yet listed; the last was the 1990 multiparty round."
+    }
+   ]
+  },
+  {
+   "key": "vijeca_manjina",
+   "tier": "national",
+   "name": "Izbori za članove vijeća i predstavnike nacionalnih manjina",
+   "name_en": "National minority council and representative elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Members of each recognized national minority elect a council (10, 15, or 25 members) or a single representative in each county, town, and municipality where the minority reaches the legal thresholds (Ustavni zakon o pravima nacionalnih manjina arts. 23–24). Plurality: the candidates with the most votes win.",
+   "source": "zakon_manjine_2019",
+   "valid_from": "2003-05-18",
+   "first_held": "2003-05-18",
+   "earliest_record": "2003-05-18",
+   "est_votes": 300000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Državno izborno povjerenstvo Republike Hrvatske",
+     "source": "zakon_manjine_2019"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Arhiva izbora (DIP): manjine",
+     "url": "https://www.izbori.hr/arhiva-izbora/#/app/manjine-2023",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2003-05-18",
+     "finest": "hr.opcina",
+     "evidence": "Elected candidates by county (2003–2015) and by unit (2019, 2023); vote counts per candidate in the per-unit reports from 2019.",
+     "source": "dip_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "manjin|minorit",
+     "within": null,
+     "valid_from": "2003-01-01"
+    },
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "office_kinds": [
+      "other"
+     ],
+     "name_pattern": "manjin|minorit",
+     "within": null,
+     "valid_from": "2003-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2003-05-18",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (18.05.2003.)"
+    },
+    {
+     "date": "2007-06-17",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (17.06.2007.)"
+    },
+    {
+     "date": "2011-07-10",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (10.07.2011.)"
+    },
+    {
+     "date": "2015-05-31",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (31.05.2015.)"
+    },
+    {
+     "date": "2019-05-05",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (05.05.2019.)"
+    },
+    {
+     "date": "2023-05-07",
+     "source": "dip_arhiva",
+     "election_kind": "local",
+     "quote": "Izbori za članove vijeća i predstavnike nacionalnih manjina (07.05.2023.)"
+    }
+   ]
+  },
+  {
+   "key": "mjesni_odbori",
+   "tier": "mjesna_samouprava",
+   "name": "Izbori za vijeća mjesnih odbora i gradskih četvrti",
+   "name_en": "Local committee and city district council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Councils of local committees (mjesni odbori) and of city districts (gradske četvrti, mainly Zagreb's 17).",
+   "source": "zakon_samouprava_2001",
+   "disposition": "blocked",
+   "disposition_reason": "Each town or municipality calls and runs these under its own statute and decision (Zakon o lokalnoj i područnoj (regionalnoj) samoupravi arts. 57–61); the State Electoral Commission neither runs nor compiles them, and no register lists the units or their returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "posredni",
+   "tier": "national",
+   "name": "Posredni izbori",
+   "name_en": "Indirect elections",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "ustav",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers chosen by elected bodies: the Prime Minister and Government (Sabor vote of confidence), the Speaker, Constitutional Court judges, and the Ombudsman by the Sabor; the President of the Presidency by the Sabor in 1990; župans and mayors by their assemblies and councils before 2009; council and assembly chairs. No electorate votes.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "HR",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "suci_porotnici",
+   "tier": "zupanija",
+   "name": "Izbor sudaca porotnika i sudaca",
+   "name_en": "Lay judges and judges",
+   "category": "judicial",
+   "goal": "local",
+   "measure": {},
+   "source": "ustav",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judge is elected by voters: judges are appointed by the State Judicial Council (Ustav art. 124), and lay judges are named by county assemblies; no electorate votes.",
+   "dates": []
+  },
+  {
+   "key": "nedrzavni_izbori",
+   "tier": "national",
+   "name": "Izbori u komorama, sveučilištima, radničkim vijećima i strankama",
+   "name_en": "Chamber, university, works council, and party elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {},
+   "source": "ustav",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the bodies themselves for their members (professional and economic chambers, universities, works councils, and party primaries); the law provides no state-run nominating contest, and no electoral authority certifies these for a territorial electorate.",
+   "dates": []
+  }
+ ]
+}

@@ -1,0 +1,2219 @@
+{
+  "polity": "CO",
+  "name": "Colombia",
+  "sources": {
+    "cp1991": {
+      "title": "Constitución Política de Colombia 1991 (texto vigente)",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html",
+      "kind": "official_body"
+    },
+    "ce1986": {
+      "title": "Decreto 2241 de 1986, por el cual se adopta el Código Electoral (artículos 177 a 210)",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html",
+      "kind": "official_body"
+    },
+    "ley163-1994": {
+      "title": "Ley 163 de 1994, por la cual se expiden algunas disposiciones en materia electoral",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html",
+      "kind": "official_body"
+    },
+    "al02-2002": {
+      "title": "Acto Legislativo 02 de 2002, por el cual se modifica el período de los gobernadores, diputados, alcaldes, concejales y ediles",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html",
+      "kind": "official_body"
+    },
+    "ley1475-2011": {
+      "title": "Ley 1475 de 2011, por la cual se adoptan reglas de organización y funcionamiento de los partidos y movimientos políticos, de los procesos electorales y se dictan otras disposiciones",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1475_2011.html",
+      "kind": "official_body"
+    },
+    "ley134-1994": {
+      "title": "Ley 134 de 1994, por la cual se dictan normas sobre mecanismos de participación ciudadana",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0134_1994.html",
+      "kind": "official_body"
+    },
+    "ley1757-2015": {
+      "title": "Ley 1757 de 2015, por la cual se dictan disposiciones en materia de promoción y protección del derecho a la participación democrática",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html",
+      "kind": "official_body"
+    },
+    "ley1885-2018": {
+      "title": "Ley 1885 de 2018, por la cual se modifica la Ley Estatutaria 1622 de 2013 (Estatuto de Ciudadanía Juvenil)",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1885_2018.html",
+      "kind": "official_body"
+    },
+    "al02-2021": {
+      "title": "Acto Legislativo 02 de 2021, por medio del cual se crean 16 Circunscripciones Transitorias Especiales de Paz para la Cámara de Representantes en los períodos 2022-2026 y 2026-2030",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2021.html",
+      "kind": "official_body"
+    },
+    "ley649-2001": {
+      "title": "Ley 649 de 2001, por la cual se reglamenta el artículo 176 de la Constitución Política de Colombia",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0649_2001.html",
+      "kind": "official_body"
+    },
+    "ley1909-2018": {
+      "title": "Ley 1909 de 2018, por medio de la cual se adoptan el Estatuto de la Oposición Política",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1909_2018.html",
+      "kind": "official_body"
+    },
+    "al03-2017": {
+      "title": "Acto Legislativo 03 de 2017, por medio del cual se regula parcialmente el componente de reincorporación política del Acuerdo Final",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_03_2017.html",
+      "kind": "official_body"
+    },
+    "ley1157-2007": {
+      "title": "Ley 1157 de 2007, por la cual se desarrolla el artículo 227 de la Constitución Política con relación a la elección directa de Parlamentarios Andinos",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1157_2007.html",
+      "kind": "official_body"
+    },
+    "ley1729-2014": {
+      "title": "Ley 1729 de 2014, por la cual se deroga la Ley Estatutaria 1157 de 2007",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1729_2014.html",
+      "kind": "official_body"
+    },
+    "ley796-2003": {
+      "title": "Ley 796 de 2003, por la cual se convoca un referendo y se somete a consideración del pueblo un proyecto de Reforma Constitucional",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0796_2003.html",
+      "kind": "official_body"
+    },
+    "ley1806-2016": {
+      "title": "Ley 1806 de 2016, por medio de la cual se regula el plebiscito para la refrendación del acuerdo final",
+      "publisher": "Secretaría General del Senado de la República",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1806_2016.html",
+      "kind": "official_body"
+    },
+    "divipola": {
+      "title": "DIVIPOLA - Códigos municipios (actualización a corte 30 de diciembre de 2024)",
+      "publisher": "Departamento Administrativo Nacional de Estadística (DANE)",
+      "url": "https://www.datos.gov.co/resource/gdxc-w37w.json",
+      "kind": "official_body"
+    },
+    "rnec-obs": {
+      "title": "Observatorio de la Registraduría: visor de histórico de resultados electorales",
+      "publisher": "Registraduría Nacional del Estado Civil",
+      "url": "https://observatorio.registraduria.gov.co/views/electoral/historicos-resultados.php",
+      "kind": "official_body",
+      "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source"
+    },
+    "rnec-mmv2019": {
+      "title": "Archivo de votación mesa a mesa, elecciones territoriales 2019 (MMV_2019_NACIONAL.csv)",
+      "publisher": "Registraduría Nacional del Estado Civil",
+      "url": "https://observatorio.registraduria.gov.co/comprimidosTwo/MMV_TERRITORIALES2019_COLOMBIA.zip",
+      "kind": "official_body",
+      "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source"
+    },
+    "rnec-mmv2023": {
+      "title": "Archivo de votación mesa a mesa, elecciones territoriales 2023 (MMV_2023_NACIONAL.csv)",
+      "publisher": "Registraduría Nacional del Estado Civil",
+      "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+      "kind": "official_body",
+      "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source"
+    },
+    "rnec-mmv2026": {
+      "title": "Archivos de votación mesa a mesa y archivos básicos, elecciones de Congreso 2026",
+      "publisher": "Registraduría Nacional del Estado Civil",
+      "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+      "kind": "official_body",
+      "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República de Colombia",
+      "name_en": "Republic of Colombia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "co.pais",
+      "source": "cp1991"
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos",
+      "name_en": "Departments (32; Bogotá, D.C. sits outside them and votes as its own House constituency)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "co.departamento",
+      "source": "divipola",
+      "counts": [
+        {
+          "date": "2024-12-30",
+          "value": 32,
+          "source": "divipola",
+          "locator": "https://www.datos.gov.co/resource/gdxc-w37w.json (33 distinct cod_dpto values less 11, Bogotá, D.C.)"
+        }
+      ]
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios y distritos",
+      "name_en": "Municipalities and districts, including Bogotá, D.C.",
+      "parent": "departamento",
+      "polity_kind": "municipality",
+      "scheme": "co.municipio",
+      "source": "divipola",
+      "counts": [
+        {
+          "date": "2024-12-30",
+          "value": 1103,
+          "source": "divipola",
+          "locator": "https://www.datos.gov.co/resource/gdxc-w37w.json (1,122 rows: 1,103 with tipo_municipio Municipio, including 11001 Bogotá, D.C.; 18 Área no municipalizada and 1 Isla, San Andrés, are not municipalities)"
+        }
+      ]
+    },
+    {
+      "key": "anm",
+      "name": "Áreas no municipalizadas",
+      "name_en": "Non-municipalized areas of Amazonas, Guainía, and Vaupés (and San Andrés island)",
+      "parent": "departamento",
+      "elects": false,
+      "source": "divipola",
+      "counts": [
+        {
+          "date": "2024-12-30",
+          "value": 19,
+          "source": "divipola",
+          "locator": "https://www.datos.gov.co/resource/gdxc-w37w.json (18 rows with tipo_municipio Área no municipalizada and 1 Isla, 88001 San Andrés)"
+        }
+      ]
+    },
+    {
+      "key": "comuna",
+      "name": "Comunas, corregimientos y localidades con junta administradora local",
+      "name_en": "Comunas, corregimientos, and Bogotá's localidades that elect a local board",
+      "parent": "municipio",
+      "polity_kind": "submunicipal",
+      "scheme": "co.comuna",
+      "source": "cp1991",
+      "counts": [
+        {
+          "date": "2019-10-27",
+          "value": 668,
+          "source": "rnec-mmv2019",
+          "locator": "MMV_2019_NACIONAL.csv: 668 comunas with JAL rows in 72 municipalities"
+        },
+        {
+          "date": "2023-10-29",
+          "value": 699,
+          "source": "rnec-mmv2023",
+          "locator": "MMV_2023_NACIONAL.csv: 699 comunas with JAL rows in 76 municipalities"
+        }
+      ]
+    },
+    {
+      "key": "citrep",
+      "name": "Circunscripciones Transitorias Especiales de Paz",
+      "name_en": "Special transitional peace constituencies of the House",
+      "parent": "national",
+      "scheme": "co.citrep",
+      "valid_from": "2021-08-25",
+      "valid_to": "2030-07-20",
+      "source": "al02-2021",
+      "counts": [
+        {
+          "date": "2021-08-25",
+          "value": 16,
+          "source": "al02-2021",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2021.html (art. transitorio 1: \"Circunscripción 1\" to \"Circunscripción 16\")"
+        }
+      ]
+    },
+    {
+      "key": "especial",
+      "name": "Circunscripciones especiales y electorados no territoriales",
+      "name_en": "Non-territorial electorates: indigenous and Afro-Colombian communities, Colombians abroad, and customary or civic bodies",
+      "parent": "national",
+      "source": "cp1991"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Elección de Presidente y Vicepresidente de la República",
+      "name_en": "President and vice president",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1914-02-08",
+      "earliest_record": "1998-05-31",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Direct popular election since the constitutional reform of 1910 (Acto Legislativo 3 de 1910), first held in February 1914; electoral colleges chose the president under the 1886 Constitution until then (class presidente_1886). Plurality until 1990; since 1994 an absolute majority or a runoff three weeks later between the top two (Constitución art. 190), and the vice president is elected on the same ticket (art. 202). Four-year terms; immediate re-election was allowed only from 2006 to 2014. Colombians abroad vote. The Frente Nacional rotated the presidency between the two traditional parties from 1958 to 1974. Since 2018 the runner-up ticket takes seats in the Senate and the House (Ley 1909 de 2018 art. 24).",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 190: \"por la mitad más uno de los votos ... Si ningún candidato obtiene dicha mayoría, se celebrará una nueva votación que tendrá lugar tres semanas más tarde\")",
+      "finest_note": "mesa (polling table) inside the puesto de votación; mesa-by-mesa files on the Observatorio for 2018, 2022, and 2026, and per-year statistics databases for 1998 to 2014",
+      "est_votes": 420000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CO",
+          "valid_from": "1910-10-31"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 5,
+          "day_rule": "may_last_sunday",
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "If no ticket wins half the votes plus one, the top two meet three weeks later (Constitución art. 190)",
+          "administered_by": "Registraduría Nacional del Estado Civil; the Consejo Nacional Electoral declares the election",
+          "source": "ce1986",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 207: corporaciones públicas el segundo domingo de marzo, Presidente el último domingo de mayo); http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 190)",
+          "valid_from": "1991-07-04"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_Presidente1V_2026.zip",
+          "first_date": "2018-05-27",
+          "last_date": "2026-06-21",
+          "evidence": "Mesa-by-mesa files for both rounds of 2018, 2022, and 2026 (MMV_NACIONAL_PRESIDENTE_2018_1v.zip and on); 2026 as a zip of escrutinio CSVs and fixed-width basics"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1998-05-31",
+          "last_date": "2014-06-15",
+          "evidence": "Statistics CDs for 1998, 2002, 2006, 2010, and 2014, not yet extracted"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1914-02-08"
+        },
+        {
+          "date": "1918-02-10"
+        },
+        {
+          "date": "1922-02-12"
+        },
+        {
+          "date": "1926-02-14"
+        },
+        {
+          "date": "1930-02-09"
+        },
+        {
+          "date": "1934-02-11"
+        },
+        {
+          "date": "1938-05-01"
+        },
+        {
+          "date": "1942-05-03"
+        },
+        {
+          "date": "1946-05-05"
+        },
+        {
+          "date": "1949-11-27"
+        },
+        {
+          "date": "1958-05-04"
+        },
+        {
+          "date": "1962-05-06"
+        },
+        {
+          "date": "1966-05-01"
+        },
+        {
+          "date": "1970-04-19"
+        },
+        {
+          "date": "1974-04-21"
+        },
+        {
+          "date": "1978-06-04"
+        },
+        {
+          "date": "1982-05-30"
+        },
+        {
+          "date": "1986-05-25"
+        },
+        {
+          "date": "1990-05-27"
+        },
+        {
+          "date": "1994-05-29"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1998-05-31"
+        },
+        {
+          "date": "1998-06-21",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2002-05-26"
+        },
+        {
+          "date": "2006-05-28"
+        },
+        {
+          "date": "2010-05-30"
+        },
+        {
+          "date": "2010-06-20",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2014-05-25"
+        },
+        {
+          "date": "2014-06-15",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2018-05-27"
+        },
+        {
+          "date": "2018-06-17",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2022-05-29"
+        },
+        {
+          "date": "2022-06-19",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2026-05-31"
+        },
+        {
+          "date": "2026-06-21",
+          "election_kind": "runoff"
+        }
+      ]
+    },
+    {
+      "key": "presidente_1886",
+      "tier": "national",
+      "name": "Elección presidencial por asambleas electorales (Constitución de 1886)",
+      "name_en": "President chosen by electoral colleges, 1886-1910",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1886-08-05",
+      "valid_to": "1910-10-31",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under the 1886 Constitution the president was chosen for six-year terms by electoral assemblies (asambleas electorales) that voters elected in each district, until Acto Legislativo 3 de 1910 restored direct election from 1914. Earlier presidents of the Granadine and federal republics (1821-1885) were chosen under other constitutions by electors, direct vote, or the votes of the states.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 190 replaces the regime of the 1886 Constitution; see the Antecedentes)",
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of the electoral college returns is online: the Registraduría's published series start with the 1997-1998 statistics CDs, and the nineteenth-century returns sit in the Diario Oficial and congressional archives, which are not digitized as results.",
+      "est_votes": 20000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CO",
+          "valid_to": "1910-10-31"
+        }
+      ]
+    },
+    {
+      "key": "senado",
+      "tier": "national",
+      "name": "Elección de Senado de la República",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1991-07-04",
+      "first_held": "1991-10-27",
+      "earliest_record": "1998-03-08",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "100 senators in one national constituency and two more in a national special constituency for indigenous communities (Constitución art. 171); Colombians abroad vote. Lists with or without a preferential vote; seats by cifra repartidora (D'Hondt) among lists above 3% of valid votes (art. 263, since 2003; largest remainders before). Two contests per election: the national and the indigenous constituency. Seats that no ballot fills sit outside the contest: the runner-up presidential ticket (one seat since 2018, Ley 1909 de 2018 art. 24) and five seats guaranteed to the party of the former FARC-EP for 2018-2026 (Acto Legislativo 03 de 2017). Before 1991 senators were elected by department (class senado_1886).",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 171 and 263)",
+      "finest_note": "mesa; mesa-by-mesa files for 2022 and 2026 on the Observatorio, statistics databases for 1998-2014",
+      "est_votes": 160000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CO",
+          "valid_from": "1991-07-04"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; the Consejo Nacional Electoral declares the election",
+          "source": "ce1986",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 207: corporaciones públicas el segundo domingo de marzo, Presidente el último domingo de mayo)",
+          "valid_from": "1991-07-04",
+          "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Constitución art. 134)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+          "first_date": "2022-03-13",
+          "last_date": "2026-03-08",
+          "evidence": "Mesa-by-mesa escrutinio files for 2022 (one zip per department) and 2026"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1998-03-08",
+          "last_date": "2014-03-09",
+          "evidence": "Statistics CDs for 1998, 2002, 2006, 2010, and 2014"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-10-27"
+        },
+        {
+          "date": "1994-03-13"
+        },
+        {
+          "date": "1998-03-08"
+        },
+        {
+          "date": "2002-03-10"
+        },
+        {
+          "date": "2006-03-12"
+        },
+        {
+          "date": "2010-03-14"
+        },
+        {
+          "date": "2014-03-09"
+        },
+        {
+          "date": "2018-03-11"
+        },
+        {
+          "date": "2022-03-13"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 2,
+          "source": "rnec-mmv2026",
+          "quote": "CANDIDATOS file in ArchivosBasicosDiaElectoralCOngreso2026.zip: corporación 001 (Senado) under circunscripción 0 (nacional) and 4 (indígena)"
+        }
+      ]
+    },
+    {
+      "key": "senado_1886",
+      "tier": "national",
+      "name": "Elección de Senado por departamentos (Constitución de 1886)",
+      "name_en": "Senate by department, before 1991",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1991-07-04",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.departamento"
+        ]
+      },
+      "note": "Under the 1886 Constitution senators represented the departments: the departmental assemblies chose them until direct popular election by department replaced that in the 1940s, and lists were elected by electoral quotient in each department with the House until the 1991 Constitution created the national constituency. The Congress elected in 1990 was dissolved by the Constituent Assembly in 1991.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 171 and its Antecedentes)",
+      "disposition": "blocked",
+      "disposition_reason": "No official machine-readable results before 1997: the Registraduría's Observatorio begins with the 1997-1998 statistics CDs, the printed Estadísticas Electorales volumes are not online, and www.registraduria.gov.co refuses automated requests (HTTP 403).",
+      "est_votes": 70000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CO",
+          "valid_to": "1991-07-04"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1958-03-16"
+        },
+        {
+          "date": "1960-03-20"
+        },
+        {
+          "date": "1962-03-18"
+        },
+        {
+          "date": "1964-03-15"
+        },
+        {
+          "date": "1966-03-20"
+        },
+        {
+          "date": "1968-03-17"
+        },
+        {
+          "date": "1970-04-19"
+        },
+        {
+          "date": "1974-04-21"
+        },
+        {
+          "date": "1978-02-26"
+        },
+        {
+          "date": "1982-03-14"
+        },
+        {
+          "date": "1986-03-09"
+        },
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1886-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "Senate elections under the 1886 Constitution before the Frente Nacional, not yet listed"
+        }
+      ]
+    },
+    {
+      "key": "camara",
+      "tier": "national",
+      "name": "Elección de Cámara de Representantes, circunscripciones territoriales",
+      "name_en": "House of Representatives, territorial constituencies",
+      "category": "legislature",
+      "goal": "national",
+      "earliest_record": "1998-03-08",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "co.departamento"
+        ],
+        "fine": [
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Each department and Bogotá, D.C. forms a constituency with two representatives plus one per 365,000 inhabitants over the first 365,000 (Constitución art. 176): 33 constituencies, with 161 territorial seats in 2022 and 2026, plus the raizal seat inside San Andrés. Lists by cifra repartidora above half the quotient (a third of it where two are elected; plurality where one is). Before 1991 the departments, intendencias, and comisarías elected the House with the Senate. The non-territorial seats are class camara_especial and the peace seats class camara_citrep.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 176 and 263)",
+      "finest_note": "mesa; mesa-by-mesa files for 2022 and 2026, statistics databases for 1998-2014",
+      "est_votes": 230000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; the Consejo Nacional Electoral's delegates declare each department's result",
+          "source": "ce1986",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 207: corporaciones públicas el segundo domingo de marzo, Presidente el último domingo de mayo)",
+          "valid_from": "1991-07-04",
+          "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Constitución art. 134)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+          "first_date": "2022-03-13",
+          "last_date": "2026-03-08",
+          "evidence": "Mesa-by-mesa escrutinio files for 2022 (one zip per department) and 2026"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1998-03-08",
+          "last_date": "2014-03-09",
+          "evidence": "Statistics CDs for 1998, 2002, 2006, 2010, and 2014"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1958-03-16"
+        },
+        {
+          "date": "1960-03-20"
+        },
+        {
+          "date": "1962-03-18"
+        },
+        {
+          "date": "1964-03-15"
+        },
+        {
+          "date": "1966-03-20"
+        },
+        {
+          "date": "1968-03-17"
+        },
+        {
+          "date": "1970-04-19"
+        },
+        {
+          "date": "1974-04-21"
+        },
+        {
+          "date": "1978-02-26"
+        },
+        {
+          "date": "1982-03-14"
+        },
+        {
+          "date": "1986-03-09"
+        },
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1991-10-27"
+        },
+        {
+          "date": "1994-03-13"
+        },
+        {
+          "date": "1998-03-08"
+        },
+        {
+          "date": "2002-03-10"
+        },
+        {
+          "date": "2006-03-12"
+        },
+        {
+          "date": "2010-03-14"
+        },
+        {
+          "date": "2014-03-09"
+        },
+        {
+          "date": "2018-03-11"
+        },
+        {
+          "date": "2022-03-13"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 33,
+          "source": "rnec-mmv2026",
+          "quote": "CANDIDATOS file: corporación 002 (Cámara) under circunscripción 1 (territorial) in 33 department and Bogotá codes, plus code 88 for Colombians abroad"
+        },
+        {
+          "date": "1886-01-01",
+          "precision": "year",
+          "through": "1957-12-31",
+          "note": "House elections under the 1886 Constitution before the Frente Nacional, not yet listed"
+        }
+      ]
+    },
+    {
+      "key": "camara_especial",
+      "tier": "especial",
+      "name": "Elección de Cámara de Representantes, circunscripciones especiales",
+      "name_en": "House of Representatives, special constituencies (Afro-Colombian, indigenous, abroad)",
+      "category": "non_territorial",
+      "goal": "national",
+      "valid_from": "1993-08-27",
+      "first_held": "1994-03-13",
+      "earliest_record": "1998-03-08",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "National special constituencies of the House: two seats for Afro-Colombian communities (first elected in 1994 under Ley 70 de 1993), one for indigenous communities and one for Colombians abroad (from 2002 under Ley 649 de 2001, which also had a political-minorities seat until 2014), as set by Constitución art. 176 since Acto Legislativo 2 de 2015. Three contests per election; the raizal seat of San Andrés is elected inside that department's territorial constituency.",
+      "source": "ley649-2001",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0649_2001.html (art. 1) and http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 176)",
+      "finest_note": "mesa; the abroad seat is reported by consulate",
+      "est_votes": 9000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CO",
+          "schemes": [
+            "co.pais"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; the Consejo Nacional Electoral declares the election",
+          "source": "ce1986",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 207: corporaciones públicas el segundo domingo de marzo, Presidente el último domingo de mayo)",
+          "valid_from": "1993-08-27"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+          "first_date": "2022-03-13",
+          "last_date": "2026-03-08",
+          "evidence": "Afro-Colombian, indigenous, and abroad lists in the 2022 and 2026 mesa-by-mesa files"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-03-13"
+        },
+        {
+          "date": "1998-03-08"
+        },
+        {
+          "date": "2002-03-10"
+        },
+        {
+          "date": "2006-03-12"
+        },
+        {
+          "date": "2010-03-14"
+        },
+        {
+          "date": "2014-03-09"
+        },
+        {
+          "date": "2018-03-11"
+        },
+        {
+          "date": "2022-03-13"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 3,
+          "source": "rnec-mmv2026",
+          "quote": "CANDIDATOS file: corporación 002 under circunscripción 5 (afro) and 4 (indígena), and the abroad code 88"
+        }
+      ]
+    },
+    {
+      "key": "camara_citrep",
+      "tier": "citrep",
+      "name": "Elección de Cámara de Representantes, Circunscripciones Transitorias Especiales de Paz",
+      "name_en": "House of Representatives, special transitional peace constituencies",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2021-08-25",
+      "valid_to": "2030-07-20",
+      "first_held": "2022-03-13",
+      "earliest_record": "2022-03-13",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "co.citrep"
+        ],
+        "fine": [
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Sixteen single-seat constituencies of 167 conflict-affected municipalities for the terms 2022-2026 and 2026-2030, voted only at rural polling places, with lists from victims' and social organizations; the seat goes to the top candidate of the most-voted list (Acto Legislativo 02 de 2021, art. transitorio 1).",
+      "source": "al02-2021",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2021.html (art. transitorio 1: \"La Cámara de Representantes tendrá 16 representantes adicionales para los períodos constitucionales 2022-2026 y 2026-2030\")",
+      "finest_note": "mesa; the 2026 Observatorio file holds the preliminary count (preconteo) for these seats",
+      "est_votes": 1600000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CO",
+          "schemes": [
+            "co.citrep"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "al02-2021",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2021.html (art. transitorio 1)",
+          "valid_from": "2021-08-25",
+          "valid_to": "2030-07-20"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+          "first_date": "2022-03-13",
+          "last_date": "2026-03-08",
+          "evidence": "CITREP rows in the 2022 files and CTP_MMV_9999.txt (preconteo) in 2026"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2022-03-13"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 16,
+          "source": "rnec-mmv2026",
+          "quote": "CANDIDATOS file: corporación 007 (CITREP) in circunscripciones 01 to 16"
+        }
+      ]
+    },
+    {
+      "key": "constituyente_1990",
+      "tier": "national",
+      "name": "Elección de la Asamblea Nacional Constituyente",
+      "name_en": "National Constituent Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1990-08-24",
+      "valid_to": "1991-07-05",
+      "first_held": "1990-12-09",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.pais"
+        ]
+      },
+      "note": "Seventy members elected on 9 December 1990 in one national constituency by electoral quotient, after the vote of 27 May 1990 approved convening the assembly (class consulta_nacional); it wrote the 1991 Constitution and closed on 4 July 1991. Constitución art. 260 still lists the members of a Constituent Assembly among elected officers, and art. 376 lets Congress put a new assembly to the voters.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 260 and 376)",
+      "disposition": "blocked",
+      "disposition_reason": "No official results file is online: the Registraduría's Observatorio starts with the 1997-1998 statistics CDs, and www.registraduria.gov.co, which hosts its historical publications, refuses automated requests (HTTP 403).",
+      "est_votes": 3700000,
+      "effort": 4,
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-12-09"
+        }
+      ]
+    },
+    {
+      "key": "parlamento_andino",
+      "tier": "national",
+      "name": "Elección de Representantes de Colombia al Parlamento Andino",
+      "name_en": "Andean Parliament",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2007-09-20",
+      "valid_to": "2014-07-29",
+      "first_held": "2010-03-14",
+      "earliest_record": "2010-03-14",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Five representatives elected directly in one national constituency with the Congress in 2010 and 2014 (Ley 1157 de 2007); Ley 1729 de 2014 repealed direct election, and Congress has named them since.",
+      "source": "ley1157-2007",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1157_2007.html (art. 1: \"los ciudadanos elegirán en forma directa ... cinco (5) representantes de Colombia al Parlamento Andino\"); repealed by http://www.secretariasenado.gov.co/senado/basedoc/ley_1729_2014.html",
+      "finest_note": "mesa, in the 2010 and 2014 statistics databases",
+      "est_votes": 20000000,
+      "effort": 4,
+      "match": [
+        {
+          "name_pattern": "Parlamento Andino|Andean Parliament",
+          "within": null
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "2010-03-14",
+          "last_date": "2014-03-09",
+          "evidence": "Andean Parliament tables in the 2010 and 2014 statistics CDs"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-03-14"
+        },
+        {
+          "date": "2014-03-09"
+        }
+      ]
+    },
+    {
+      "key": "consultas",
+      "tier": "national",
+      "name": "Consultas populares e interpartidistas de partidos y movimientos políticos",
+      "name_en": "State-run party and coalition primaries (consultas)",
+      "category": "nominating",
+      "goal": "national",
+      "first_held": "1990-03-11",
+      "earliest_record": "2022-03-13",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Open primaries that parties, movements, and coalitions convene to choose candidates, run by the Registraduría with ordinary-election rules and binding on the participants (Ley 1475 de 2011 arts. 5-7; Ley 130 de 1994 before). National presidential consultas are held with the March Congress election (the Liberal consulta of 1990 and 1994, party consultas in 2006, 2009, 2010, and 2014, and interparty consultas in 2018, 2022, and 2026); parties also hold separate-day and local consultas, as in October 2025. Party-internal votes the Registraduría does not run are class votos_no_estatales.",
+      "source": "ley1475-2011",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1475_2011.html (art. 6: \"En las consultas populares se aplicarán las normas que rigen para las elecciones ordinarias\")",
+      "finest_note": "mesa; the 2026 Observatorio file holds the preliminary count (CNS_MMV_9999.txt)",
+      "est_votes": 45000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Registraduría Nacional del Estado Civil, at the request of the parties",
+          "source": "ley1475-2011",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1475_2011.html (arts. 5-7)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/anexos/MMV_CONGRESO_2026.zip",
+          "first_date": "2022-03-13",
+          "last_date": "2026-03-08",
+          "evidence": "Consulta rows in the 2022 congress files and CNS_MMV_9999.txt in 2026"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1994-03-13"
+        },
+        {
+          "date": "2006-03-12"
+        },
+        {
+          "date": "2009-09-27"
+        },
+        {
+          "date": "2010-03-14"
+        },
+        {
+          "date": "2014-03-09"
+        },
+        {
+          "date": "2018-03-11"
+        },
+        {
+          "date": "2022-03-13"
+        },
+        {
+          "date": "2025-10-26"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 3,
+          "source": "rnec-mmv2026",
+          "quote": "CANDIDATOS file: corporación 006 (consulta) with groups 00100, 00200, and 00300"
+        }
+      ]
+    },
+    {
+      "key": "consulta_nacional",
+      "tier": "national",
+      "name": "Referendo, plebiscito y consulta popular nacional",
+      "name_en": "National referendums, plebiscites, and popular consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1957-12-01",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "co.pais"
+        ],
+        "fine": [
+          "co.departamento",
+          "co.municipio"
+        ]
+      },
+      "note": "The plebiscite of 1 December 1957 that founded the Frente Nacional; the official count of the consultation of 27 May 1990 on convening a constituent assembly; the constitutional referendum of 25 October 2003 (15 questions, Ley 796 de 2003, only one reached the turnout quorum); the plebiscite of 2 October 2016 on the peace agreement (Ley 1806 de 2016); and the anticorruption popular consultation of 26 August 2018 (seven questions, short of the quorum). Referendums, plebiscites, and consultations follow Ley 134 de 1994 and Ley 1757 de 2015 and Constitución arts. 103, 104, 170, 377, and 378.",
+      "source": "ley1757-2015",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html (art. 3 and title II)",
+      "finest_note": "mesa for 2016 and 2018 in the Registraduría's result sites; department and municipality in its bulletins",
+      "est_votes": 45000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley1757-2015",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1957-12-01"
+        },
+        {
+          "date": "1990-05-27"
+        },
+        {
+          "date": "2003-10-25"
+        },
+        {
+          "date": "2016-10-02"
+        },
+        {
+          "date": "2018-08-26"
+        }
+      ]
+    },
+    {
+      "key": "elecciones_congreso",
+      "tier": "national",
+      "name": "Elecciones que hace el Congreso (organismos de control, Consejo Nacional Electoral, magistrados)",
+      "name_en": "Officers elected by Congress",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Congress in full session elects the nine members of the Consejo Nacional Electoral by cifra repartidora (Constitución art. 264) and the Comptroller General; the Senate elects the Constitutional Court's magistrates and the Procurator General from shortlists, and the House the Ombudsman. Until 1991 Congress also elected the presidential designado.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 173, 174, 178, 239, 264, 267, and 276)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes of Congress on shortlisted officers, recorded in the Gaceta del Congreso; they are appointments by a legislature rather than elections, as the archive treats other countries' confirmations.",
+      "est_votes": 0,
+      "effort": 4
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "Cargos judiciales y de control",
+      "name_en": "Judges, prosecutors, and comptrollers",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "office"
+      },
+      "note": "No judicial or law-enforcement office is filled by popular vote: the high courts co-opt their members or the Senate elects them, the Supreme Court elects the Attorney General (Fiscal General) from the President's shortlist, and municipal ombudsmen (personeros) and comptrollers are chosen by councils and assemblies.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 231, 239, 249, 272, and 313)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No judicial, prosecutorial, or police office is elected by voters in Colombia.",
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "votos_no_estatales",
+      "tier": "especial",
+      "name": "Elecciones no organizadas por la Organización Electoral",
+      "name_en": "Votes the electoral organization does not run (indigenous cabildos, community action boards, party-internal votes)",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Indigenous cabildos and resguardo authorities chosen by their own customs (Constitución art. 330), Afro-Colombian community councils, about 64,000 juntas de acción comunal, and party-internal votes without the Registraduría elect their officers under their own rules.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 330 and 38)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Not run, scrutinized, or published by the Registraduría or the Consejo Nacional Electoral; they are civil-society and customary elections.",
+      "est_votes": 0,
+      "effort": 5
+    },
+    {
+      "key": "gobernador",
+      "tier": "departamento",
+      "name": "Elección de Gobernadores",
+      "name_en": "Governors",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "1991-07-04",
+      "first_held": "1991-10-27",
+      "earliest_record": "1997-10-26",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.departamento"
+        ],
+        "fine": [
+          "co.municipio",
+          "co.comuna",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Popular election of the 32 governors by plurality since 27 October 1991 (the President appointed them before); three-year terms from 1992 and four-year terms from 2004, without immediate re-election (Constitución art. 303). The runner-up takes a seat in the assembly since 2019 (Ley 1909 de 2018 art. 25). Atypical elections fill vacancies more than 18 months before the term ends.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 303)",
+      "finest_note": "mesa, with the comuna of each polling place; mesa-by-mesa files for 2019 and 2023",
+      "est_votes": 150000000,
+      "effort": 2,
+      "match": [
+        {
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; scrutiny commissions and the Consejo Nacional Electoral's delegates declare the result",
+          "source": "al02-2002",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html (four-year institutional terms from the 2003 election) and http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre)",
+          "valid_from": "2002-08-06",
+          "vacancy_rule": "An absolute vacancy more than 18 months before the term ends is filled by a new election; otherwise the President appoints (Constitución art. 303)"
+        },
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley163-1994",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre); three-year terms of the 1991 Constitution (1994, 1997, and 2000)",
+          "valid_from": "1994-08-31",
+          "valid_to": "2002-08-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+          "first_date": "2019-10-27",
+          "last_date": "2023-10-29",
+          "evidence": "MMV_2019_NACIONAL.csv and MMV_2023_NACIONAL.csv, about 3 GB each"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1997-10-26",
+          "last_date": "2015-10-25",
+          "evidence": "Statistics CDs for 1997, 2000, 2003, 2007, 2011, and 2015"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-10-27"
+        },
+        {
+          "date": "1994-10-30"
+        },
+        {
+          "date": "1997-10-26"
+        },
+        {
+          "date": "2000-10-29"
+        },
+        {
+          "date": "2003-10-26"
+        },
+        {
+          "date": "2007-10-28"
+        },
+        {
+          "date": "2011-10-30"
+        },
+        {
+          "date": "2015-10-25"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 32,
+          "source": "rnec-mmv2019",
+          "quote": "MMV_2019_NACIONAL.csv: GOBERNADOR rows in 32 Código Departamento values"
+        },
+        {
+          "date": "2023-10-29",
+          "contests": 32,
+          "source": "rnec-mmv2023",
+          "quote": "MMV_2023_NACIONAL.csv: GOBERNADOR rows in 32 Código Departamento values"
+        }
+      ]
+    },
+    {
+      "key": "asamblea",
+      "tier": "departamento",
+      "name": "Elección de Asambleas Departamentales",
+      "name_en": "Departmental assemblies",
+      "category": "legislature",
+      "goal": "subnational",
+      "earliest_record": "1997-10-26",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.departamento"
+        ],
+        "fine": [
+          "co.municipio",
+          "co.comuna",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Each department elects an assembly of 11 to 31 deputies (Constitución art. 299) in one department-wide list contest by cifra repartidora; 418 deputies in 2023. Assemblies were elected with the Congress every two years until 1988 and on the territorial election day since 1994.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 299)",
+      "finest_note": "mesa, with the comuna of each polling place; mesa-by-mesa files for 2019 and 2023",
+      "est_votes": 160000000,
+      "effort": 2,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CO",
+          "name_pattern": "^(Asamblea|Departmental Assembly|Assembly of)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; scrutiny commissions and the Consejo Nacional Electoral's delegates declare the result",
+          "source": "al02-2002",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html (four-year institutional terms from the 2003 election) and http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre)",
+          "valid_from": "2002-08-06",
+          "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Constitución art. 134)"
+        },
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley163-1994",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre); three-year terms of the 1991 Constitution (1994, 1997, and 2000)",
+          "valid_from": "1994-08-31",
+          "valid_to": "2002-08-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+          "first_date": "2019-10-27",
+          "last_date": "2023-10-29",
+          "evidence": "MMV_2019_NACIONAL.csv and MMV_2023_NACIONAL.csv"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1997-10-26",
+          "last_date": "2015-10-25",
+          "evidence": "Statistics CDs for 1997, 2000, 2003, 2007, 2011, and 2015"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-03-13"
+        },
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1992-03-08"
+        },
+        {
+          "date": "1994-10-30"
+        },
+        {
+          "date": "1997-10-26"
+        },
+        {
+          "date": "2000-10-29"
+        },
+        {
+          "date": "2003-10-26"
+        },
+        {
+          "date": "2007-10-28"
+        },
+        {
+          "date": "2011-10-30"
+        },
+        {
+          "date": "2015-10-25"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 32,
+          "source": "rnec-mmv2019",
+          "quote": "MMV_2019_NACIONAL.csv: ASAMBLEA rows in 32 Código Departamento values"
+        },
+        {
+          "date": "2023-10-29",
+          "contests": 32,
+          "source": "rnec-mmv2023",
+          "quote": "MMV_2023_NACIONAL.csv: ASAMBLEA rows in 32 Código Departamento values"
+        },
+        {
+          "date": "1886-01-01",
+          "precision": "year",
+          "through": "1987-12-31",
+          "note": "Assembly elections under the 1886 Constitution, held with the Congress and in the mid-term years, not yet listed"
+        }
+      ]
+    },
+    {
+      "key": "consejo_intendencial",
+      "tier": "departamento",
+      "name": "Elección de Consejos Intendenciales y Comisariales",
+      "name_en": "Councils of the intendencias and comisarías (national territories), before 1991",
+      "category": "council",
+      "goal": "subnational",
+      "valid_to": "1991-07-04",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The national territories (intendencias and comisarías) elected councils with the departmental assemblies until the 1991 Constitution made them departments (Código Electoral art. 209 still names the consejeros intendenciales y comisariales).",
+      "source": "ce1986",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 209)",
+      "disposition": "blocked",
+      "disposition_reason": "No official results published online for elections before 1997; the Registraduría's printed statistics are not digitized and www.registraduria.gov.co refuses automated requests (HTTP 403).",
+      "est_votes": 1000000,
+      "effort": 5,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CO",
+          "name_pattern": "^Consejo (Intendencial|Comisarial)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1986-03-09"
+        },
+        {
+          "date": "1988-03-13"
+        },
+        {
+          "date": "1990-03-11"
+        }
+      ]
+    },
+    {
+      "key": "alcalde",
+      "tier": "municipio",
+      "name": "Elección de Alcaldes",
+      "name_en": "Mayors (including Bogotá's Alcalde Mayor)",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "1986-01-09",
+      "first_held": "1988-03-13",
+      "earliest_record": "1997-10-26",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.municipio"
+        ],
+        "fine": [
+          "co.comuna",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Popular election of mayors since 13 March 1988 (Acto Legislativo 1 de 1986): two-year terms to 1992, three-year terms 1994-2000, and four-year terms since 2003, without immediate re-election (Constitución art. 314). Plurality, except Bogotá's Alcalde Mayor, who since 2023 needs 40% and a ten-point lead or faces a runoff three weeks later (art. 323). San Andrés island and the 18 non-municipalized areas elect no mayor. Atypical elections fill vacancies more than 18 months before the term ends.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 314 and 323)",
+      "finest_note": "mesa, with the comuna of each polling place; mesa-by-mesa files for 2019 and 2023",
+      "est_votes": 220000000,
+      "effort": 2,
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; scrutiny commissions and the Consejo Nacional Electoral's delegates declare the result",
+          "source": "al02-2002",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html (four-year institutional terms from the 2003 election) and http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre)",
+          "valid_from": "2002-08-06",
+          "vacancy_rule": "\"Siempre que se presente falta absoluta a más de dieciocho (18) meses de la terminación del período, se elegirá alcalde para el tiempo que reste\" (Constitución art. 314); otherwise the governor appoints"
+        },
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley163-1994",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre); three-year terms of the 1991 Constitution (1994, 1997, and 2000)",
+          "valid_from": "1994-08-31",
+          "valid_to": "2002-08-06"
+        },
+        {
+          "period_years": 2,
+          "phase": 0,
+          "term_years": 2,
+          "month": 3,
+          "day_rule": "mar_second_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ce1986",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/decreto_2241_1986_pr004.html (art. 207: corporaciones públicas el segundo domingo de marzo, Presidente el último domingo de mayo); two-year mayoral terms of Acto Legislativo 1 de 1986",
+          "valid_from": "1986-01-09",
+          "valid_to": "1992-12-31"
+        },
+        {
+          "name_pattern": "Bogot",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "runoff": "threshold",
+          "runoff_threshold": 0.4,
+          "runoff_rule": "Elected with 40% of the votes and a lead of ten percentage points over the runner-up; otherwise the top two meet three weeks later (Constitución art. 323)",
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "cp1991",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (art. 323, as amended by Acto Legislativo 3 de 2019)",
+          "valid_from": "2019-07-22"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+          "first_date": "2019-10-27",
+          "last_date": "2023-10-29",
+          "evidence": "MMV_2019_NACIONAL.csv and MMV_2023_NACIONAL.csv"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1997-10-26",
+          "last_date": "2015-10-25",
+          "evidence": "Statistics CDs for 1997, 2000, 2003, 2007, 2011, and 2015"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-03-13"
+        },
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1992-03-08"
+        },
+        {
+          "date": "1994-10-30"
+        },
+        {
+          "date": "1997-10-26"
+        },
+        {
+          "date": "2000-10-29"
+        },
+        {
+          "date": "2003-10-26"
+        },
+        {
+          "date": "2007-10-28"
+        },
+        {
+          "date": "2011-10-30"
+        },
+        {
+          "date": "2015-10-25"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 1100,
+          "source": "rnec-mmv2019",
+          "quote": "MMV_2019_NACIONAL.csv: ALCALDE rows in 1,100 Código Departamento and Código Municipio pairs"
+        },
+        {
+          "date": "2023-10-29",
+          "contests": 1101,
+          "source": "rnec-mmv2023",
+          "quote": "MMV_2023_NACIONAL.csv: ALCALDE rows in 1,101 Código Departamento and Código Municipio pairs"
+        }
+      ]
+    },
+    {
+      "key": "concejo",
+      "tier": "municipio",
+      "name": "Elección de Concejos Municipales y Distritales",
+      "name_en": "Municipal and district councils (including Bogotá's Concejo Distrital)",
+      "category": "council",
+      "goal": "local",
+      "earliest_record": "1997-10-26",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.municipio"
+        ],
+        "fine": [
+          "co.comuna",
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Each municipality elects a council of 7 to 21 members (Constitución art. 312) and Bogotá a council of 45 (art. 323) in one municipality-wide list contest by cifra repartidora; 12,072 councillors in 2023. Councils were elected with the Congress every two years until 1988, with the mayors in 1988-1992, and on the territorial election day since 1994. The mayoral runner-up takes a council seat since 2019.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 312 and 323)",
+      "finest_note": "mesa, with the comuna of each polling place; mesa-by-mesa files for 2019 and 2023",
+      "est_votes": 230000000,
+      "effort": 2,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CO",
+          "name_pattern": "^(Concejo|Municipal Council|District Council|City Council)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; scrutiny commissions and the Consejo Nacional Electoral's delegates declare the result",
+          "source": "al02-2002",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html (four-year institutional terms from the 2003 election) and http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre)",
+          "valid_from": "2002-08-06",
+          "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Constitución art. 134)"
+        },
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley163-1994",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre); three-year terms of the 1991 Constitution (1994, 1997, and 2000)",
+          "valid_from": "1994-08-31",
+          "valid_to": "2002-08-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+          "first_date": "2019-10-27",
+          "last_date": "2023-10-29",
+          "evidence": "MMV_2019_NACIONAL.csv and MMV_2023_NACIONAL.csv"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1997-10-26",
+          "last_date": "2015-10-25",
+          "evidence": "Statistics CDs for 1997, 2000, 2003, 2007, 2011, and 2015"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1988-03-13"
+        },
+        {
+          "date": "1990-03-11"
+        },
+        {
+          "date": "1992-03-08"
+        },
+        {
+          "date": "1994-10-30"
+        },
+        {
+          "date": "1997-10-26"
+        },
+        {
+          "date": "2000-10-29"
+        },
+        {
+          "date": "2003-10-26"
+        },
+        {
+          "date": "2007-10-28"
+        },
+        {
+          "date": "2011-10-30"
+        },
+        {
+          "date": "2015-10-25"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 1099,
+          "source": "rnec-mmv2019",
+          "quote": "MMV_2019_NACIONAL.csv: CONCEJO rows in 1,099 Código Departamento and Código Municipio pairs"
+        },
+        {
+          "date": "2023-10-29",
+          "contests": 1101,
+          "source": "rnec-mmv2023",
+          "quote": "MMV_2023_NACIONAL.csv: CONCEJO rows in 1,101 Código Departamento and Código Municipio pairs"
+        },
+        {
+          "date": "1886-01-01",
+          "precision": "year",
+          "through": "1987-12-31",
+          "note": "Council elections under the 1886 Constitution, held with the Congress and in the mid-term years, not yet listed"
+        }
+      ]
+    },
+    {
+      "key": "jal",
+      "tier": "comuna",
+      "name": "Elección de Juntas Administradoras Locales (ediles)",
+      "name_en": "Local administrative boards of comunas, corregimientos, and Bogotá's localidades",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1992-03-08",
+      "earliest_record": "1997-10-26",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.comuna"
+        ],
+        "fine": [
+          "co.puesto",
+          "co.mesa"
+        ]
+      },
+      "note": "Each comuna (urban) or corregimiento (rural) that a council creates, and each of Bogotá's 20 localidades, elects a junta administradora local of at least five ediles (seven or more in Bogotá) by list on the territorial election day (Constitución arts. 318 and 323): 668 boards in 72 municipalities in 2019 and 699 in 76 in 2023. Bogotá's localities first elected theirs in 1992.",
+      "source": "cp1991",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/constitucion_politica_1991.html (arts. 318 and 323)",
+      "finest_note": "mesa; mesa-by-mesa files for 2019 and 2023",
+      "est_votes": 60000000,
+      "effort": 2,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CO",
+          "name_pattern": "^(Junta Administradora Local|Local Administrative Board)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil; scrutiny commissions and the Consejo Nacional Electoral's delegates declare the result",
+          "source": "al02-2002",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/acto_legislativo_02_2002.html (four-year institutional terms from the 2003 election) and http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre)",
+          "valid_from": "2002-08-06",
+          "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Constitución art. 134)"
+        },
+        {
+          "period_years": 3,
+          "phase": 2,
+          "term_years": 3,
+          "month": 10,
+          "day_rule": "oct_last_sunday",
+          "called": false,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley163-1994",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0163_1994.html (art. 1: gobernadores, alcaldes, diputados, concejales y ediles el último domingo de octubre); three-year terms of the 1991 Constitution (1994, 1997, and 2000)",
+          "valid_from": "1994-08-31",
+          "valid_to": "2002-08-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Observatorio de la Registraduría: archivos de votación mesa a mesa",
+          "format": "csv or fixed-width text in zip",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "finest": "co.mesa",
+          "source": "rnec-obs",
+          "url": "https://observatorio.registraduria.gov.co/comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
+          "first_date": "2019-10-27",
+          "last_date": "2023-10-29",
+          "evidence": "JAL rows in MMV_2019_NACIONAL.csv and MMV_2023_NACIONAL.csv"
+        },
+        {
+          "platform": "Observatorio de la Registraduría: CD de estadísticas electorales 1997-2015",
+          "url": "https://observatorio.registraduria.gov.co/comprimidoThree/{year}_ELECCIONES_*.zip",
+          "format": "zip of CAB, MSI, and EXE installers around a per-year database",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "license": "Public information published by the Registraduría Nacional del Estado Civil under the transparency law (Ley 1712 de 2014); reuse requires citing the source",
+          "source": "rnec-obs",
+          "first_date": "1997-10-26",
+          "last_date": "2015-10-25",
+          "evidence": "Statistics CDs for 1997, 2000, 2003, 2007, 2011, and 2015"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-03-08"
+        },
+        {
+          "date": "1994-10-30"
+        },
+        {
+          "date": "1997-10-26"
+        },
+        {
+          "date": "2000-10-29"
+        },
+        {
+          "date": "2003-10-26"
+        },
+        {
+          "date": "2007-10-28"
+        },
+        {
+          "date": "2011-10-30"
+        },
+        {
+          "date": "2015-10-25"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 668,
+          "source": "rnec-mmv2019",
+          "quote": "MMV_2019_NACIONAL.csv: JAL rows in 668 Código Departamento, Código Municipio, and Código Comuna triples in 72 municipalities"
+        },
+        {
+          "date": "2023-10-29",
+          "contests": 699,
+          "source": "rnec-mmv2023",
+          "quote": "MMV_2023_NACIONAL.csv: JAL rows in 699 Código Departamento, Código Municipio, and Código Comuna triples in 76 municipalities"
+        }
+      ]
+    },
+    {
+      "key": "consejo_juventud",
+      "tier": "municipio",
+      "name": "Elección de Consejos Municipales, Distritales y Locales de Juventud",
+      "name_en": "Youth councils (municipal, district, and local)",
+      "category": "special_purpose",
+      "goal": "local",
+      "valid_from": "2018-03-01",
+      "first_held": "2021-12-05",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "co.municipio",
+          "co.comuna"
+        ]
+      },
+      "note": "Voters aged 14 to 28 elect municipal and district youth councils and local youth councils in districts' localities, on a single day the Registraduría sets apart from other elections, every four years (Ley 1622 de 2013 as amended by Ley 1885 de 2018, arts. 43 and 52); closed lists from parties, youth organizations, and independent lists. Held on 5 December 2021 and 19 October 2025.",
+      "source": "ley1885-2018",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1885_2018.html (art. 43: \"La Registraduría Nacional tendrá a su cargo la organización y dirección de las elecciones para conformar los Consejos Municipales y Locales de Juventud\")",
+      "finest_note": "mesa in the Registraduría's E-14 and preconteo sites for 2021",
+      "est_votes": 3000000,
+      "effort": 3,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CO",
+          "name_pattern": "Juventud|Youth Council"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley1885-2018",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1885_2018.html (art. 52 and the transitional article: \"En lo sucesivo, se realizará tal elección y posesión cada cuatro (4) años\")",
+          "valid_from": "2018-03-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Registraduría: resultados de Consejos de Juventud 2021",
+          "url": "https://wapp.registraduria.gov.co/electoral/Elecciones-consejos-juventud-2021/mapa-consejos/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2021-12-05",
+          "last_date": "2021-12-05",
+          "source": "rnec-obs",
+          "evidence": "Linked from the Observatorio; returns HTTP 403 to automated requests, and the E-14 site juventudes2021.registraduria.gov.co did not answer"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-12-05"
+        },
+        {
+          "date": "2025-10-19"
+        }
+      ]
+    },
+    {
+      "key": "consulta_local",
+      "tier": "municipio",
+      "name": "Consultas populares, referendos y plebiscitos departamentales, distritales y municipales",
+      "name_en": "Local popular consultations and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1994-05-31",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "co.municipio",
+          "co.departamento"
+        ]
+      },
+      "note": "Governors and mayors may put a question of departmental, district, or municipal concern to the voters, and citizens may initiate local referendums (Constitución arts. 104-106; Ley 134 de 1994 and Ley 1757 de 2015), as in the mining consultations of 2013-2018. Dates are set case by case; the Registraduría publishes each result in a bulletin.",
+      "source": "ley1757-2015",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html (title II, chapter on the consulta popular)",
+      "finest_note": "municipality, in the Registraduría's bulletins",
+      "est_votes": 2000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CO",
+          "schemes": [
+            "co.municipio",
+            "co.departamento",
+            "co.comuna"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley1757-2015",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html",
+          "valid_from": "1994-05-31"
+        }
+      ]
+    },
+    {
+      "key": "revocatoria",
+      "tier": "municipio",
+      "name": "Revocatoria del mandato de gobernadores y alcaldes",
+      "name_en": "Recall votes against governors and mayors",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1994-05-31",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "co.municipio",
+          "co.departamento"
+        ]
+      },
+      "note": "Citizens may petition to recall a governor or mayor after the first year of the term; the vote succeeds with more than half of the votes cast and turnout of at least 40% of the votes that elected the officer (Constitución art. 103; Ley 134 de 1994 and Ley 1757 de 2015 arts. 6 and 41). Most petitions fail before a vote, and no vote has yet reached the quorum.",
+      "source": "ley1757-2015",
+      "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html (art. 41)",
+      "finest_note": "municipality, in the Registraduría's bulletins",
+      "est_votes": 500000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "iso_pattern": "CO"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Registraduría Nacional del Estado Civil",
+          "source": "ley1757-2015",
+          "locator": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1757_2015.html (art. 41)",
+          "valid_from": "1994-05-31"
+        }
+      ]
+    }
+  ]
+}

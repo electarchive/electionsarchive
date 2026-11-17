@@ -1,0 +1,978 @@
+{
+  "polity": "AL",
+  "name": "Albania",
+  "sources": {
+    "kushtetuta": {
+      "title": "Kushtetuta e Republikës së Shqipërisë (e ndryshuar, deri te ligji nr. 115/2020)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf",
+      "kind": "official_body"
+    },
+    "kodi": {
+      "title": "Ligj nr. 10 019, datë 29.12.2008, Kodi Zgjedhor i Republikës së Shqipërisë (i përditësuar, deri te ligji nr. 10/2025)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf",
+      "kind": "official_body"
+    },
+    "ligj139": {
+      "title": "Ligj nr. 139/2015 për vetëqeverisjen vendore (i përditësuar)",
+      "publisher": "Ministria e Drejtësisë (aksesdrejtesi.al)",
+      "url": "https://aksesdrejtesi.al/dokumenta/1619781069LIGJ_139-2015_17122015_përditësuar.pdf",
+      "kind": "official_body"
+    },
+    "ligj115": {
+      "title": "Ligj nr. 115/2014 për ndarjen administrativo-territoriale të njësive të qeverisjes vendore në Republikën e Shqipërisë",
+      "publisher": "Agjencia për Mbështetjen e Vetëqeverisjes Vendore (qeverisjavendore.gov.al)",
+      "url": "https://qeverisjavendore.gov.al/wp-content/uploads/2024/08/Ligj-115_2014-Per-ndarjen-administrativo-territoriale-te-njesive-te-qeverisjes-vendore-ne-RSH.pdf",
+      "kind": "official_body"
+    },
+    "reforma": {
+      "title": "Komisioni i Posaçëm për Reformën Administrativo-Territoriale: Historiku",
+      "publisher": "Kuvendi i Republikës së Shqipërisë",
+      "url": "https://reformaterritoriale.parlament.al/",
+      "kind": "official_body"
+    },
+    "kqz-rezultate": {
+      "title": "Rezultate zgjedhore",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz.gov.al/rezultate-zgjedhore",
+      "kind": "official_body"
+    },
+    "kqz-2021": {
+      "title": "Zgjedhjet për Kuvend 25 prill 2021: rezultatet (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2021/results2021.htm",
+      "kind": "official_body"
+    },
+    "kqz-2025": {
+      "title": "Zgjedhjet për Kuvend 11 maj 2025: rezultatet përfundimtare (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2025-finale/",
+      "kind": "official_body"
+    },
+    "kqz-2023": {
+      "title": "Zgjedhjet për Organet e Qeverisjes Vendore 14 maj 2023: rezultatet (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2023/results2023.htm",
+      "kind": "official_body"
+    },
+    "kqz-2023-kukes": {
+      "title": "Zgjedhje të pjesshme për kryetarin e Bashkisë Kukës, 24 shtator 2023 (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2023_kukes/",
+      "kind": "official_body"
+    },
+    "kqz-2024-himare": {
+      "title": "Zgjedhje të pjesshme për kryetarin e Bashkisë Himarë, 4 gusht 2024 (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2024_himare/",
+      "kind": "official_body"
+    },
+    "kqz-2025-pjesshme": {
+      "title": "Zgjedhje të pjesshme për kryetar bashkie, 9 nëntor 2025 (IEMIS)",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://iemis.kqz.gov.al/results2025-vendore/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republika e Shqipërisë",
+      "name_en": "Albania",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "kushtetuta"
+    },
+    {
+      "key": "qarku",
+      "name": "Qarqet",
+      "name_en": "Counties (qarqe); each is also an Assembly constituency",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "al.qarku",
+      "elects": false,
+      "source": "ligj115",
+      "counts": [
+        {
+          "date": "2014-07-31",
+          "value": 12,
+          "source": "ligj115",
+          "locator": "Neni 1, pika 1: \"Njësitë e qeverisjes vendore në Republikën e Shqipërisë janë: a) bashki - 61 b) qarqe - 12\""
+        }
+      ]
+    },
+    {
+      "key": "bashkia",
+      "name": "Bashkitë (dhe komunat deri në 2015)",
+      "name_en": "Municipalities (bashki; before 2015 also communes, komuna)",
+      "parent": "qarku",
+      "polity_kind": "municipality",
+      "scheme": "al.bashkia",
+      "source": "ligj115",
+      "counts": [
+        {
+          "date": "2011-05-08",
+          "value": 373,
+          "source": "reforma",
+          "locator": "Historiku: \"Ligji 115/2014 konsolidoi 373 njësi në 61 bashki dhe 12 qarqe\" (the units elected in 2011)"
+        },
+        {
+          "date": "2015-06-21",
+          "value": 61,
+          "source": "ligj115",
+          "locator": "Neni 1, pika 1: \"bashki - 61\"; neni 3, pika 2: the 2015 local elections are held on this division"
+        }
+      ]
+    },
+    {
+      "key": "njesia",
+      "name": "Njësitë administrative",
+      "name_en": "Administrative units (the former communes and municipalities)",
+      "parent": "bashkia",
+      "polity_kind": "submunicipal",
+      "scheme": "al.njesia",
+      "elects": false,
+      "valid_from": "2015-06-21",
+      "source": "ligj115"
+    },
+    {
+      "key": "fshati",
+      "name": "Fshatrat",
+      "name_en": "Villages (their presidency is chosen at a village meeting)",
+      "parent": "bashkia",
+      "polity_kind": "submunicipal",
+      "source": "ligj139"
+    }
+  ],
+  "classes": [
+    {
+      "key": "kuvendi",
+      "tier": "national",
+      "name": "Zgjedhjet për Kuvendin",
+      "name_en": "Assembly of Albania, general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "al.qarku"
+        ],
+        "fine": [
+          "al.bashkia",
+          "al.njesia",
+          "al.qv"
+        ]
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 64: 140 deputetë, sistem proporcional me konkurrim rajonal; neni 65: çdo 4 vjet)",
+      "valid_from": "1991-01-01",
+      "first_held": "1991-03-31",
+      "earliest_record": "2001-06-24",
+      "note": "Multiparty elections since 31 March 1991. The systems changed often: 250 single-member seats in 1991, mixed member systems with 100 to 115 districts from 1992 to 2005, and regional list proportional representation in the 12 counties since 2009 (a D'Hondt divisor count per county among lists with at least 1 percent of the national vote, Code art. 162). Voters abroad cast ballots by post for the first time in 2025. The Commission's results page links each election from 2001; 1991-1997 results are not published online by the Commission.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "AL",
+          "valid_from": "1991-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kodi",
+          "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 8: 15 April-15 May or 15 October-15 November; neni 9: a Sunday set by presidential decree, no later than 9 months before the term ends)",
+          "runoff": "none",
+          "valid_from": "2008-12-29"
+        }
+      ],
+      "access": [
+        {
+          "platform": "IEMIS, the Commission's results platform",
+          "url": "https://iemis.kqz.gov.al/{results2021,results2025-finale}/input/results/json_{all,qarku,qv}.txt",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2021-04-25",
+          "last_date": "2025-05-11",
+          "finest": "al.qv",
+          "source": "kqz-rezultate",
+          "license": "Official results published for public use; no license stated",
+          "evidence": "json_qarku.txt for 2021 and json_all.txt for 2025 returned JSON on 2026-11-16; list votes by voting center (QV)"
+        },
+        {
+          "platform": "Komisioni Qendror i Zgjedhjeve, kandidatet2017.cec.org.al",
+          "url": "https://kandidatet2017.cec.org.al/Results/LocalAssembly",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2017-06-25",
+          "last_date": "2017-06-25",
+          "source": "kqz-rezultate",
+          "evidence": "linked from the Commission's results page; the host did not answer from a cloud session on 2026-11-16"
+        },
+        {
+          "platform": "Komisioni Qendror i Zgjedhjeve, cec.org.al (old site)",
+          "url": "https://cec.org.al/zgjedhjet-{2009,2013}/, https://cec.org.al/zgjedhjet-per-kuvend-{2001,2005}/",
+          "format": "html, pdf, xls",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2001-06-24",
+          "last_date": "2013-06-23",
+          "source": "kqz-rezultate",
+          "evidence": "linked from the Commission's results page; cec.org.al answered a bot challenge (HTTP 403) from a cloud session on 2026-11-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-03-31",
+          "note": "People's Assembly, 250 seats in single-member districts, two rounds"
+        },
+        {
+          "date": "1991-04-07",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1992-03-22",
+          "note": "140 seats: 100 single-member districts and 40 compensatory list seats"
+        },
+        {
+          "date": "1992-03-29",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1996-05-26",
+          "note": "115 single-member districts and 25 list seats; repeat votes in some districts followed"
+        },
+        {
+          "date": "1996-06-02",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1997-06-29",
+          "note": "Early election after the dissolution of the Assembly; held with the monarchy referendum"
+        },
+        {
+          "date": "1997-07-06",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2001-06-24",
+          "note": "100 single-member districts and 40 compensatory list seats; later rounds and repeats ran into August"
+        },
+        {
+          "date": "2001-07-08",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2005-07-03",
+          "note": "100 single-member districts and 40 compensatory list seats"
+        },
+        {
+          "date": "2009-06-28",
+          "contests": 12,
+          "seats": 140,
+          "source": "kodi",
+          "quote": "Neni 74: \"Zona zgjedhore përputhet me territorin e qarkut\"; neni 75: \"pjesëtohet me numrin 140 të mandateve të Kuvendit\""
+        },
+        {
+          "date": "2013-06-23",
+          "contests": 12,
+          "seats": 140,
+          "source": "kodi",
+          "quote": "Neni 74: \"Zona zgjedhore përputhet me territorin e qarkut\"; neni 75: \"pjesëtohet me numrin 140 të mandateve të Kuvendit\""
+        },
+        {
+          "date": "2017-06-25",
+          "contests": 12,
+          "seats": 140,
+          "source": "kodi",
+          "quote": "Neni 74: \"Zona zgjedhore përputhet me territorin e qarkut\"; neni 75: \"pjesëtohet me numrin 140 të mandateve të Kuvendit\""
+        },
+        {
+          "date": "2021-04-25",
+          "contests": 12,
+          "seats": 140,
+          "source": "kodi",
+          "quote": "Neni 74: \"Zona zgjedhore përputhet me territorin e qarkut\"; neni 75: \"pjesëtohet me numrin 140 të mandateve të Kuvendit\""
+        },
+        {
+          "date": "2025-05-11",
+          "contests": 12,
+          "seats": 140,
+          "source": "kodi",
+          "quote": "Neni 74: \"Zona zgjedhore përputhet me territorin e qarkut\"; neni 75: \"pjesëtohet me numrin 140 të mandateve të Kuvendit\""
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 3
+    },
+    {
+      "key": "kuvendi_by",
+      "tier": "national",
+      "name": "Zgjedhjet e pjesshme për Kuvendin",
+      "name_en": "Assembly by-elections in single-member districts",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kodi",
+      "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 164: a vacant seat passes to the next candidate on the same list)",
+      "valid_from": "1991-01-01",
+      "valid_to": "2008-12-29",
+      "note": "Until 2009 a vacant single-member seat was filled by a partial election in its district. Since the 2008 Code a vacancy passes to the next candidate on the list, so no by-elections are held. The Commission lists none of the earlier ones.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "AL",
+          "valid_to": "2008-12-29"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kodi",
+          "valid_to": "2008-12-29",
+          "vacancy_rule": "Since 2009 the next candidate on the party's list in the same constituency takes the seat (Code art. 164)"
+        }
+      ],
+      "dates": [],
+      "est_votes": 100000,
+      "effort": 5
+    },
+    {
+      "key": "presidenti",
+      "tier": "national",
+      "name": "Zgjedhja e Presidentit të Republikës nga Kuvendi",
+      "name_en": "President of the Republic, elected by the Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 87: secret vote of the Assembly, up to five ballots, three fifths of all members in the first three, a majority after; neni 88: five years, one re-election)",
+      "first_held": "1991-04-30",
+      "note": "The Assembly elects the president; if five ballots fail it is dissolved and a general election follows (art. 87(5)). Final votes: 30 April 1991, 9 April 1992, 23 July 1996, 24 July 1997, 24 June 2002, 20 July 2007, 11 June 2012, 28 April 2017, and 4 June 2022. The Assembly's minutes are the record.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "AL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Kuvendi i Republikës së Shqipërisë",
+          "source": "kushtetuta",
+          "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 88, pika 2/1: the procedure starts no later than 60 days before the term ends)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-04-30"
+        },
+        {
+          "date": "1992-04-09"
+        },
+        {
+          "date": "1996-07-23"
+        },
+        {
+          "date": "1997-07-24"
+        },
+        {
+          "date": "2002-06-24"
+        },
+        {
+          "date": "2007-07-20"
+        },
+        {
+          "date": "2012-06-11"
+        },
+        {
+          "date": "2017-04-28"
+        },
+        {
+          "date": "2022-06-04"
+        }
+      ],
+      "est_votes": 1500,
+      "effort": 2
+    },
+    {
+      "key": "referendumet",
+      "tier": "national",
+      "name": "Referendumet kombëtare",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "al.qarku"
+        ]
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 150: 50,000 voters or the Assembly may call one; neni 152: the President sets the date, one referendum day a year; neni 177: constitutional referendums)",
+      "first_held": "1994-11-06",
+      "note": "Three national referendums: the draft constitution rejected on 6 November 1994, the monarchy question on 29 June 1997 (held with the Assembly election), and the 1998 Constitution approved on 22 November 1998. No official results publication is online; the Commission's results page lists none.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "AL"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kushtetuta",
+          "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 152, pika 3)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-11-06"
+        },
+        {
+          "date": "1997-06-29"
+        },
+        {
+          "date": "1998-11-22"
+        }
+      ],
+      "est_votes": 4500000,
+      "effort": 4
+    },
+    {
+      "key": "kryetar_bashkie",
+      "tier": "bashkia",
+      "name": "Zgjedhjet për kryetarët e bashkive (dhe të komunave deri në 2015)",
+      "name_en": "Mayors of municipalities (and of communes until 2015), general local elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "al.njesia",
+          "al.qv"
+        ]
+      },
+      "source": "kodi",
+      "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 165: mayors and councils are elected directly; neni 166: the candidate with the most valid votes wins)",
+      "first_held": "1992-07-26",
+      "earliest_record": "2003-10-12",
+      "note": "Mayors of the 61 municipalities since 2015; before then of 65 municipalities and over 300 communes (373 units in 2011). Elected by plurality in one round. The Commission's results page links each local election from 2003; 2023 is on IEMIS with mayoral votes by voting center.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kodi",
+          "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 8: 15 April-15 May or 15 October-15 November; neni 10: the President sets the date by decree, the term counted to the same date in the fourth year)",
+          "valid_from": "2015-06-21",
+          "runoff": "none"
+        }
+      ],
+      "access": [
+        {
+          "platform": "IEMIS, the Commission's results platform",
+          "url": "https://iemis.kqz.gov.al/results2023/results2023.htm",
+          "format": "html, json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-05-14",
+          "last_date": "2023-05-14",
+          "finest": "al.qv",
+          "source": "kqz-2023",
+          "license": "Official results published for public use; no license stated",
+          "evidence": "page offers mayoral (Për kryetar bashkie) and council (Për këshill) results by county, municipality, and voting center, loaded from input/*.txt JSON"
+        },
+        {
+          "platform": "Komisioni Qendror i Zgjedhjeve, cec.org.al (old site)",
+          "url": "https://cec.org.al/zgjedhjet-vendore-{2003,2007,2011,2015,2019}/",
+          "format": "html, pdf, xls",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2003-10-12",
+          "last_date": "2019-06-30",
+          "source": "kqz-rezultate",
+          "evidence": "linked from the Commission's results page; cec.org.al answered a bot challenge (HTTP 403) from a cloud session on 2026-11-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-07-26"
+        },
+        {
+          "date": "1996-10-20"
+        },
+        {
+          "date": "2000-10-01"
+        },
+        {
+          "date": "2003-10-12"
+        },
+        {
+          "date": "2007-02-18"
+        },
+        {
+          "date": "2011-05-08",
+          "contests": 373,
+          "source": "reforma",
+          "quote": "\"Ligji 115/2014 konsolidoi 373 njësi në 61 bashki dhe 12 qarqe\""
+        },
+        {
+          "date": "2015-06-21",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        },
+        {
+          "date": "2019-06-30",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 3
+    },
+    {
+      "key": "kryetar_bashkie_by",
+      "tier": "bashkia",
+      "name": "Zgjedhjet e pjesshme për kryetar bashkie",
+      "name_en": "Mayoral by-elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "al.njesia",
+          "al.qv"
+        ]
+      },
+      "source": "kodi",
+      "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 10, pika 3: within 30 to 45 days when a mandate ends early)",
+      "earliest_record": "2022-03-06",
+      "note": "Held when a mayor's mandate ends early: six municipalities on 6 March 2022, Kukës on 24 September 2023, Himarë on 4 August 2024, and Vlorë, Berat, Tepelenë, Cërrik, and Mat on 9 November 2025 (Tiranë's was suspended by the Constitutional Court). Earlier partial elections are not listed by the Commission. Council vacancies pass down the list and are never contested (Code art. 161(5) and 164(2)).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kodi",
+          "vacancy_rule": "A by-election 30 to 45 days after the mandate ends; the President sets the date within 48 hours (Code art. 10(3))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "IEMIS, the Commission's results platform",
+          "url": "https://iemis.kqz.gov.al/{results2023_kukes,results2024_himare,results2025-vendore}/",
+          "format": "html, json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-09-24",
+          "last_date": "2025-11-09",
+          "finest": "al.qv",
+          "source": "kqz-rezultate",
+          "license": "Official results published for public use; no license stated",
+          "evidence": "each page answered on 2026-11-16 and loads its results from input/*.txt JSON"
+        },
+        {
+          "platform": "Komisioni Qendror i Zgjedhjeve, arkiva.kqz.gov.al",
+          "url": "https://arkiva.kqz.gov.al/results/preliminary2022/results2022.htm",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2022-03-06",
+          "last_date": "2022-03-06",
+          "source": "kqz-rezultate",
+          "evidence": "arkiva.kqz.gov.al answered HTTP 403 from a cloud session on 2026-11-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2022-03-06",
+          "source": "kqz-rezultate",
+          "quote": "\"ZGJEDHJE TË PJESSHME 2022\""
+        },
+        {
+          "date": "2023-09-24",
+          "contests": 1,
+          "source": "kqz-2023-kukes",
+          "quote": "\"Zgjedhje të pjesshme për kryetarin e Bashkisë Kukës, 24 Shtator 2023\""
+        },
+        {
+          "date": "2024-08-04",
+          "contests": 1,
+          "source": "kqz-2024-himare",
+          "quote": "\"Zgjedhje të pjesshme për kryetarin e Bashkisë Himarë, 04 Gusht 2024\""
+        },
+        {
+          "date": "2025-11-09",
+          "contests": 5,
+          "source": "kqz-2025-pjesshme",
+          "quote": "\"Zgjedhje të pjesshme për kryetar e Bashkie, 09 Nëntor 2025\" (Berat, Cërrik, Mat, Tepelenë, Vlorë)"
+        }
+      ],
+      "est_votes": 350000,
+      "effort": 1
+    },
+    {
+      "key": "keshilli_bashkiak",
+      "tier": "bashkia",
+      "name": "Zgjedhjet për këshillat e bashkive (dhe të komunave deri në 2015)",
+      "name_en": "Municipal councils (and commune councils until 2015)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "al.njesia",
+          "al.qv"
+        ]
+      },
+      "source": "kodi",
+      "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 165, pika 2: party and coalition lists; neni 166, pika 3: seats by the art. 162 divisor method)",
+      "first_held": "1992-07-26",
+      "earliest_record": "2003-10-12",
+      "note": "Each municipality is one list contest. Council size follows population: 15 members up to 20,000 residents, then 21, 31, 41, 51, and 61 above 400,000 (Law 139/2015 art. 46).",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kodi",
+          "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 8: 15 April-15 May or 15 October-15 November; neni 10: the President sets the date by decree, the term counted to the same date in the fourth year)",
+          "valid_from": "2015-06-21"
+        }
+      ],
+      "access": [
+        {
+          "platform": "IEMIS, the Commission's results platform",
+          "url": "https://iemis.kqz.gov.al/results2023/results2023.htm",
+          "format": "html, json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-05-14",
+          "last_date": "2023-05-14",
+          "finest": "al.qv",
+          "source": "kqz-2023",
+          "license": "Official results published for public use; no license stated",
+          "evidence": "council results (Për këshill) by municipality and voting center"
+        },
+        {
+          "platform": "Komisioni Qendror i Zgjedhjeve, cec.org.al (old site)",
+          "url": "https://cec.org.al/zgjedhjet-vendore-{2003,2007,2011,2015,2019}/",
+          "format": "html, pdf, xls",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "first_date": "2003-10-12",
+          "last_date": "2019-06-30",
+          "source": "kqz-rezultate",
+          "evidence": "linked from the Commission's results page; cec.org.al answered a bot challenge (HTTP 403) from a cloud session on 2026-11-16"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-07-26"
+        },
+        {
+          "date": "1996-10-20"
+        },
+        {
+          "date": "2000-10-01"
+        },
+        {
+          "date": "2003-10-12"
+        },
+        {
+          "date": "2007-02-18"
+        },
+        {
+          "date": "2011-05-08",
+          "contests": 373,
+          "source": "reforma",
+          "quote": "\"Ligji 115/2014 konsolidoi 373 njësi në 61 bashki dhe 12 qarqe\""
+        },
+        {
+          "date": "2015-06-21",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        },
+        {
+          "date": "2019-06-30",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 61,
+          "source": "ligj115",
+          "quote": "Neni 1, pika 1: \"bashki - 61\""
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 3
+    },
+    {
+      "key": "referendum_vendor",
+      "tier": "bashkia",
+      "name": "Referendumet vendore",
+      "name_en": "Local referendums",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 108, pika 4: self-government through representative organs and local referendums, by law)",
+      "note": "Provided for by the Constitution and Law 139/2015 (initiative for local referendums), but the Commission's results page lists none and no held local referendum was found.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "keshilli_qarkut",
+      "tier": "qarku",
+      "name": "Këshilli i qarkut",
+      "name_en": "County councils, delegated by the municipal councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 110, pika 3)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Mayors sit ex officio and each municipal council delegates further members from among its councillors by proportional lists (Constitution art. 110(3), Law 139/2015 art. 73); no public vote and no published results.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "kryesia_fshatit",
+      "tier": "fshati",
+      "name": "Kryesia dhe kryetari i fshatit",
+      "name_en": "Village presidency and village head",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "ligj139",
+      "locator": "https://aksesdrejtesi.al/dokumenta/1619781069LIGJ_139-2015_17122015_përditësuar.pdf (neni 70)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members are chosen at a village meeting attended by at least half the voters, under voting rules each municipal council sets, and the head is chosen by the presidency from its members (Law 139/2015 art. 70); the Commission does not run or publish them.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "keshillat_gjyqesore",
+      "tier": "national",
+      "name": "Anëtarët gjyqtarë dhe prokurorë të KLGJ dhe KLP",
+      "name_en": "Judge and prosecutor members of the High Judicial and High Prosecutorial Councils",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://kqz.gov.al/pdf/kushtetuta-ndryshuar.pdf (neni 147, pika 2; neni 149, pika 2)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Six members of each council are elected by the judges or prosecutors themselves and five by the Assembly; the electorate is the profession, not the public.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "partite",
+      "tier": "national",
+      "name": "Zgjedhjet brenda partive",
+      "name_en": "Party leadership and candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kodi",
+      "locator": "https://kqz.gov.al/pdf/kodi-zgjedhor.pdf (neni 67: parties submit their own candidate lists)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose leaders and candidates under their own statutes; the state neither runs nor publishes these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "AL"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "kuvendi_popullor",
+      "tier": "national",
+      "name": "Kuvendi Popullor (1945-1987)",
+      "name_en": "People's Assembly under the single-list system, 1945-1987",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kqz-rezultate",
+      "valid_from": "1945-01-01",
+      "valid_to": "1991-01-01",
+      "first_held": "1945-12-02",
+      "disposition": "blocked",
+      "disposition_reason": "Single-list elections from the Constituent Assembly of 2 December 1945 to 1 February 1987; no official results publication is online and the Commission's results page starts in 2001.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "AL",
+          "valid_from": "1945-01-01",
+          "valid_to": "1991-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-12-02",
+          "through": "1987-02-01"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 5
+    },
+    {
+      "key": "parlamenti_1920_1939",
+      "tier": "national",
+      "name": "Parlamenti dhe asambletë kushtetuese (1920-1939)",
+      "name_en": "Parliaments and constituent assemblies of the principality and kingdom, 1920-1939",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kqz-rezultate",
+      "valid_to": "1945-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Indirect two-stage elections between the wars; no official results publication is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "AL",
+          "valid_to": "1945-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1921-01-01",
+          "precision": "year",
+          "through": "1937-12-31"
+        }
+      ],
+      "est_votes": 500000,
+      "effort": 5
+    }
+  ]
+}

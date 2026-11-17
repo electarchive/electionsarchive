@@ -1,0 +1,1866 @@
+{
+  "polity": "CY",
+  "name": "Cyprus",
+  "sources": {
+    "const": {
+      "title": "Constitution of the Republic of Cyprus (Σύνταγμα της Κυπριακής Δημοκρατίας)",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html",
+      "kind": "official_body"
+    },
+    "l72": {
+      "title": "Law 72/1979 on the election of members of the House of Representatives, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1979_1_72/full.html",
+      "kind": "official_body"
+    },
+    "l72-1979": {
+      "title": "Law 72/1979, Official Gazette 1540, 27 July 1979",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1979_1_072.pdf",
+      "kind": "official_body"
+    },
+    "l37-1976": {
+      "title": "Law 37/1976, Official Gazette 1283, 9 July 1976",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1976_1_037.pdf",
+      "kind": "official_body"
+    },
+    "l45-1970": {
+      "title": "Law 45/1970, Official Gazette 796, 29 May 1970",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1970_1_045.pdf",
+      "kind": "official_body"
+    },
+    "l124-1985": {
+      "title": "Law 124/1985, Official Gazette 2086, 1 November 1985",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1985_1_124.pdf",
+      "kind": "official_body"
+    },
+    "l118-1996": {
+      "title": "Law 118(I)/1996, Official Gazette 3111, 31 December 1996",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1996_1_118.pdf",
+      "kind": "official_body"
+    },
+    "l226-2025": {
+      "title": "Law 226(I)/2025, Official Gazette 5067, 19 December 2025",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/2025_1_226.pdf",
+      "kind": "official_body"
+    },
+    "l58-1970": {
+      "title": "Law 58/1970 on the representation of the religious groups, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1970_1_58/full.html",
+      "kind": "official_body"
+    },
+    "l53-1981": {
+      "title": "Law 53/1981 (postponement of the Armenian group's vote)",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1981_1_053.pdf",
+      "kind": "official_body"
+    },
+    "l37-1959": {
+      "title": "Law 37/1959 on the election of the President and Vice-President, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1959_1_37/full.html",
+      "kind": "official_body"
+    },
+    "l74-1977": {
+      "title": "Law 74/1977, Official Gazette 1408, 10 December 1977",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1977_1_074.pdf",
+      "kind": "official_body"
+    },
+    "l12-1965": {
+      "title": "Law 12/1965 on the Greek Communal Chamber, Official Gazette 398, 31 March 1965",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1965_1_012.pdf",
+      "kind": "official_body"
+    },
+    "l74-2004": {
+      "title": "Law 74(I)/2004 on the referendum of 24 April 2004, Official Gazette 3835, 14 April 2004",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/2004_1_074.pdf",
+      "kind": "official_body"
+    },
+    "l206-1989": {
+      "title": "Law 206/1989 on referendums, Official Gazette 2462, 1 December 1989",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1989_1_206.pdf",
+      "kind": "official_body"
+    },
+    "l10-2004": {
+      "title": "Law 10(I)/2004 on the election of members of the European Parliament, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/2004_1_10/full.html",
+      "kind": "official_body"
+    },
+    "eu-2023-2061": {
+      "title": "European Council Decision (EU) 2023/2061 establishing the composition of the European Parliament",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023D2061",
+      "kind": "official_body"
+    },
+    "l52-2022": {
+      "title": "Municipalities Law 52(I)/2022, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_52/full.html",
+      "kind": "official_body"
+    },
+    "l52-2022-og": {
+      "title": "Municipalities Law 52(I)/2022, Official Gazette 4887, 15 April 2022 (Annex I: municipalities and municipal districts)",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/2022_1_052.pdf",
+      "kind": "official_body"
+    },
+    "l111-1985": {
+      "title": "Municipalities Law 111/1985, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1985_1_111/full.html",
+      "kind": "official_body"
+    },
+    "l86-1999": {
+      "title": "Communities Law 86(I)/1999, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1999_1_86/full.html",
+      "kind": "official_body"
+    },
+    "l55-1979": {
+      "title": "Law 55/1979 on village committee elections",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1979_1_055.pdf",
+      "kind": "official_body"
+    },
+    "l80-1983": {
+      "title": "Law 80/1983 (postponement of village committee elections)",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/arith/1983_1_080.pdf",
+      "kind": "official_body"
+    },
+    "l37-2022": {
+      "title": "District Self-Government Organisations Law 37(I)/2022, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_37/full.html",
+      "kind": "official_body"
+    },
+    "l108-1997": {
+      "title": "School Boards Law 108(I)/1997, consolidated",
+      "publisher": "Official Gazette of the Republic of Cyprus (text on CyLaw)",
+      "url": "https://www.cylaw.org/nomoi/enop/non-ind/1997_1_108/full.html",
+      "kind": "official_body"
+    },
+    "ucm-results": {
+      "title": "Results of municipal elections, 1986 to 2016",
+      "publisher": "Union of Cyprus Municipalities",
+      "url": "https://ucm.org.cy/meli/dimi-istorika-stichia/apotelesmata-dimotikon-eklogon/",
+      "kind": "official_body"
+    },
+    "moi": {
+      "title": "Official results of elections (Επίσημα Αποτελέσματα)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/",
+      "kind": "official_body",
+      "note": "Covers elections from 2001; each election is served as JSON down to the ballot box."
+    },
+    "moi-197": {
+      "title": "Δημοτικές Εκλογές 2026 - Αντιδήμαρχοι: official results (election 197)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=197&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-159": {
+      "title": "Δημοτικές Εκλογές 2024 - Δήμαρχοι: official results (election 159)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=159&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-161": {
+      "title": "Κοινοτικές Εκλογές 2024 - Κοινοτικά συμβούλια: official results (election 161)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=161&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-163": {
+      "title": "Ευρωεκλογές 2024: official results (election 163)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=163&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-164": {
+      "title": "Δημοτικές Εκλογές 2024 - Δημοτικά συμβούλια: official results (election 164)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=164&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-165": {
+      "title": "Δημοτικές Εκλογές 2024 - Αντιδήμαρχοι: official results (election 165)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=165&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-172": {
+      "title": "Σχολικές εφορείες 2024: official results (election 172)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=172&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-173": {
+      "title": "Κοινοτικές Εκλογές 2024 - Κοινοτάρχες: official results (election 173)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=173&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-174": {
+      "title": "Εκλογές Προέδρων Ε. Ο. Αυτοδιοίκησης 2024: official results (election 174)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=174&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-154": {
+      "title": "Προεδρικές Εκλογές 2023: official results (election 154)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=154&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-127": {
+      "title": "Βουλευτικές Εκλογές 2021: official results (election 127)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=127&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-133": {
+      "title": "Δημοτικές Εκλογές 2020 - Δήμαρχοι: official results (election 133)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=133&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-129": {
+      "title": "Δημοτικές Εκλογές 2019 - Δήμαρχοι: official results (election 129)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=129&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-112": {
+      "title": "Ευρωεκλογές 2019: official results (election 112)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=112&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-101": {
+      "title": "Προεδρικές Εκλογές 2018: official results (election 101)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=101&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-96": {
+      "title": "Δημοτικές Εκλογές 2016 - Δήμαρχοι: official results (election 96)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=96&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-97": {
+      "title": "Δημοτικές Εκλογές 2016 - Δημοτικά συμβούλια: official results (election 97)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=97&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-98": {
+      "title": "Κοινοτικές Εκλογές 2016 - Κοινοτικά συμβούλια: official results (election 98)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=98&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-99": {
+      "title": "Σχολικές εφορείες 2016: official results (election 99)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=99&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-100": {
+      "title": "Κοινοτικές Εκλογές 2016 - Κοινοτάρχες: official results (election 100)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=100&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-89": {
+      "title": "Βουλευτικές Εκλογές 2016: official results (election 89)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=89&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-85": {
+      "title": "Ευρωεκλογές 2014: official results (election 85)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=85&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-81": {
+      "title": "Προεδρικές Εκλογές 2013: official results (election 81)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=81&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-71": {
+      "title": "Δημοτικές Εκλογές 2011 - Δήμαρχοι: official results (election 71)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=71&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-72": {
+      "title": "Κοινοτικές Εκλογές 2011 - Κοινοτικά συμβούλια: official results (election 72)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=72&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-73": {
+      "title": "Σχολικές εφορείες 2011: official results (election 73)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=73&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-74": {
+      "title": "Δημοτικές Εκλογές 2011 - Δημοτικά συμβούλια: official results (election 74)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=74&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-75": {
+      "title": "Κοινοτικές Εκλογές 2011 - Κοινοτάρχες: official results (election 75)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=75&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-59": {
+      "title": "Βουλευτικές Εκλογές 2011: official results (election 59)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=59&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-58": {
+      "title": "Ευρωεκλογές 2009: official results (election 58)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=58&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-56": {
+      "title": "Προεδρικές Εκλογές 2008: official results (election 56)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=56&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-43": {
+      "title": "Βουλευτικές Εκλογές 2006: official results (election 43)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=43&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-41": {
+      "title": "Ευρωεκλογές 2004: official results (election 41)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=41&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-34": {
+      "title": "Προεδρικές Εκλογές 2003: official results (election 34)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=34&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    },
+    "moi-22": {
+      "title": "Βουλευτικές Εκλογές 2001: official results (election 22)",
+      "publisher": "Ministry of Interior, Central Elections Service",
+      "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId=22&districtId=&areaId=&pollingstationId=&ballotboxId=",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Κυπριακή Δημοκρατία",
+      "name_en": "Republic of Cyprus",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const"
+    },
+    {
+      "key": "religious_group",
+      "name": "Θρησκευτικές ομάδες",
+      "name_en": "Religious groups (Maronites, Armenians, Latins), non-territorial",
+      "parent": "national",
+      "source": "l58-1970"
+    },
+    {
+      "key": "district",
+      "name": "Επαρχίες",
+      "name_en": "Districts: House constituencies and, except Kyrenia, District Self-Government Organisations",
+      "parent": "national",
+      "scheme": "cy.district",
+      "source": "l72",
+      "counts": [
+        {
+          "date": "1979-07-27",
+          "value": 6,
+          "source": "l72-1979",
+          "locator": "\"διαιρείται εις εξ εκλογικάς περιφερείας\""
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Δήμοι",
+      "name_en": "Municipalities",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "cy.municipality",
+      "source": "l52-2022",
+      "counts": [
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "value": 39,
+          "source": "moi-74",
+          "locator": "39 municipalities listed for the 2011 municipal council elections (30 free, 9 displaced)"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 29,
+          "source": "moi-159",
+          "locator": "29 municipalities listed for the 2024 mayoral elections: 20 under Law 52(I)/2022 Annex I and art. 3(2), and 9 displaced (art. 4)"
+        }
+      ]
+    },
+    {
+      "key": "municipal_district",
+      "name": "Δημοτικά διαμερίσματα",
+      "name_en": "Municipal districts",
+      "parent": "municipality",
+      "polity_kind": "submunicipal",
+      "scheme": "cy.municipal_district",
+      "valid_from": "2022-04-15",
+      "source": "l52-2022-og",
+      "counts": [
+        {
+          "date": "2022-04-15",
+          "value": 91,
+          "source": "l52-2022-og",
+          "locator": "Annex I (Παράρτημα Ι): 91 municipal districts in the 18 merged municipalities, counted from the schedule's rows"
+        }
+      ]
+    },
+    {
+      "key": "school_board",
+      "name": "Σχολικές εφορείες",
+      "name_en": "School boards",
+      "parent": "municipality",
+      "elects": true,
+      "source": "l108-1997",
+      "counts": [
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 27,
+          "source": "moi-172",
+          "locator": "27 school boards listed for the 2024 school board elections"
+        }
+      ]
+    },
+    {
+      "key": "community",
+      "name": "Κοινότητες",
+      "name_en": "Communities",
+      "parent": "district",
+      "polity_kind": "submunicipal",
+      "scheme": "cy.community",
+      "source": "l86-1999"
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "Βουλευτικές εκλογές",
+      "name_en": "House of Representatives general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy.district"
+        ],
+        "fine": [
+          "cy.community",
+          "cy.ballot_box"
+        ]
+      },
+      "finest_note": "Votes are counted and published by ballot box; seats are first allocated by electoral quota in each of the six district constituencies and the remainders nationally among lists over the threshold.",
+      "note": "The 24 Turkish-community seats of art. 62 have stayed empty since 1964. Kyrenia's voters are displaced and vote in the free areas. Counted as one contest per district constituency.",
+      "source": "const",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html (art. 62, 65, 66)",
+      "first_held": "1960-01-01",
+      "earliest_record": "1960-01-01",
+      "est_votes": 3000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CY",
+          "precedence": 5
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html (art. 65: «Η Βουλή των Αντιπροσώπων εκλέγεται διά περίοδον πέντε ετών»; art. 66(1): second Sunday of the month before the term ends)",
+          "period_years": 5,
+          "phase": 1,
+          "month": 5,
+          "day_rule": "second Sunday of the month before the term ends (art. 66(1))",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Chief Returning Officer (Central Elections Service, Ministry of Interior)",
+          "vacancy_rule": "Since Law 118(I)/1996 a vacant seat goes to the next candidate of the same party list in the same district; a by-election is held only when that is impossible (Law 72/1979 s.35)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Parliamentary elections 2001, 2006, 2011, 2016, 2021, and 2026, by district, community, polling station, and ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-01-01",
+          "precision": "year",
+          "note": "First House election, for the 35 Greek-community and 15 Turkish-community seats of art. 62; no reachable official text gives its date or constituencies."
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "source": "l45-1970",
+          "quote": "εκλογή ήτις θά διεξαχθή εντός τοΟ 1970",
+          "note": "Constituencies and seats for 1970 are not stated in the law found; the 1970 House was elected by Greek-community voters only."
+        },
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 6,
+          "seats": 35,
+          "source": "l37-1976",
+          "quote": "Λευκωσία 12, Λεμεσός 7, Αμμόχωστος 7, Πάφος 4, Λάρναξ 3, Κυρήνεια 2"
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "contests": 6,
+          "seats": 35,
+          "source": "l72-1979",
+          "quote": "διαιρείται εις εξ εκλογικάς περιφερείας… Λευκωσίας, Λεμεσού, Αμμoχώστoυ, Λάρvακoς, Πάφου και Κυρηνείας",
+          "note": "Seats from the original table of Law 72/1979 (Nicosia 12, Limassol 7, Famagusta 7, Larnaca 3, Paphos 4, Kyrenia 2); Law 18/1981 confirms the term ending within 1981."
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "contests": 6,
+          "seats": 56,
+          "source": "l124-1985",
+          "quote": "Λευκωσία 21, Λεμεσός 12, Αμμόχωστος 11, Λάρναξ 5, Πάφος 4, Κυρήνεια 3"
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "contests": 6,
+          "seats": 56,
+          "source": "l124-1985",
+          "quote": "Λευκωσία 21, Λεμεσός 12, Αμμόχωστος 11, Λάρναξ 5, Πάφος 4, Κυρήνεια 3",
+          "note": "Year of the five-yearly general election; no reachable official text gives the polling day."
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 6,
+          "seats": 56,
+          "source": "l124-1985",
+          "quote": "Λευκωσία 21, Λεμεσός 12, Αμμόχωστος 11, Λάρναξ 5, Πάφος 4, Κυρήνεια 3",
+          "note": "Year of the five-yearly general election; no reachable official text gives the polling day."
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "moi-22",
+          "quote": "Βουλευτικές Εκλογές 2001: 514 places listed in 6 districts",
+          "seats": 56,
+          "note": "Seats per district: Nicosia 21, Limassol 12, Famagusta 11, Larnaca 5, Paphos 4, Kyrenia 3 (Law 124/1985). The results site lists the election by district and ballot box."
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "moi-43",
+          "quote": "Βουλευτικές Εκλογές 2006: 469 places listed in 6 districts",
+          "seats": 56,
+          "note": "Seats per district: Nicosia 21, Limassol 12, Famagusta 11, Larnaca 5, Paphos 4, Kyrenia 3 (Law 124/1985). The results site lists the election by district and ballot box."
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "moi-59",
+          "quote": "Βουλευτικές Εκλογές 2011: 481 places listed in 6 districts",
+          "seats": 56,
+          "note": "Seats per district: Nicosia 21, Limassol 12, Famagusta 11, Larnaca 5, Paphos 4, Kyrenia 3 (Law 124/1985). The results site lists the election by district and ballot box."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "moi-89",
+          "quote": "Βουλευτικές Εκλογές 2016: 479 places listed in 6 districts",
+          "seats": 56,
+          "note": "Seats per district: Nicosia 21, Limassol 12, Famagusta 11, Larnaca 5, Paphos 4, Kyrenia 3 (Law 124/1985). The results site lists the election by district and ballot box."
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "moi-127",
+          "quote": "Βουλευτικές Εκλογές 2021: 481 places listed in 6 districts",
+          "seats": 56,
+          "note": "Seats per district: Nicosia 21, Limassol 12, Famagusta 11, Larnaca 5, Paphos 4, Kyrenia 3 (Law 124/1985). The results site lists the election by district and ballot box."
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "l226-2025",
+          "quote": "Λευκωσία 19, Λεμεσός 12, Αμμόχωστος 11, Λάρνακα 6, Πάφος 5, Κερύνεια 3",
+          "seats": 56,
+          "note": "Seat table of Law 226(I)/2025; the results site lists the election as Βουλευτικές Εκλογές 2026."
+        }
+      ]
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "Αναπληρωματικές βουλευτικές εκλογές",
+      "name_en": "House of Representatives by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "By-elections filled vacancies until Law 118(I)/1996 gave vacant seats to the next candidate on the list; since then a by-election is only a fallback. No official list of the by-elections held before 1997 was found.",
+      "source": "l118-1996",
+      "valid_to": "1996-12-31",
+      "est_votes": 100000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CY",
+          "precedence": 6
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "religious_groups",
+      "tier": "religious_group",
+      "name": "Εκλογή εκπροσώπων θρησκευτικών ομάδων",
+      "name_en": "Representatives of the Maronite, Armenian, and Latin religious groups",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Each group elects one representative by plurality on the day of the House general election, for the House's term; the representatives sit in the House without a vote. Before 1965 the groups voted in the Greek Communal Chamber (art. 109).",
+      "source": "l58-1970",
+      "first_held": "1970-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "The Ministry of Interior results site has no election type for the religious groups' representatives, and no other official publication of their results was found online.",
+      "est_votes": 30000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "iso_pattern": "CY",
+          "name_pattern": "(?i)maronit|armeni|latin|μαρωνιτ|αρμεν|λατιν",
+          "precedence": 7
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l58-1970",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1970_1_58/full.html («ως ημερομηνία εκλογής θα ορίζηται η ημερομηνία διεξαγωγής των γενικών βουλευτικών εκλογών»)",
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "classes": 3,
+          "called": false,
+          "administered_by": "Chief Returning Officer (Central Elections Service, Ministry of Interior)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1981-09-27",
+          "note": "The Armenian group's vote set for this day was postponed.",
+          "source": "l53-1981",
+          "quote": "άνέβαλε τήν ψηφοφορίαν ήτις είχε όριίσθή διά τήν 27ην Σεπτεμβρίου, 1981"
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Προεδρικές εκλογές",
+      "name_en": "President of the Republic",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cy.district"
+        ],
+        "fine": [
+          "cy.community",
+          "cy.ballot_box"
+        ]
+      },
+      "note": "Elected by the Greek community under art. 1 and 39; a sole candidate is declared elected without a poll. Elections whose dates no reachable official text gives (1968, 1973, 1978, 1983, 1988, 1993, 1998) are not listed.",
+      "source": "const",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html (art. 39, 43, 44)",
+      "first_held": "1959-01-01",
+      "earliest_record": "1959-01-01",
+      "est_votes": 4500000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CY",
+          "precedence": 5
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html (art. 39: «υπέρ τα πεντήκοντα επί τοις εκατόν»; art. 43: «Η θητεία… είναι πενταετής»)",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "If no candidate wins more than half the valid votes, the top two meet again on the same day of the following week (art. 39).",
+          "administered_by": "Chief Returning Officer (Central Elections Service, Ministry of Interior)",
+          "vacancy_rule": "A by-election within 45 days (art. 44)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Presidential elections 2003, 2008, 2013, 2018, and 2023 with their runoffs, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "note": "First election of the President by the Greek community under Law 37/1959; no reachable official text gives its date.",
+          "source": "l37-1959",
+          "quote": "divided into six Greek and six Turkish constituencies"
+        },
+        {
+          "date": "1977-08-31",
+          "contests": 1,
+          "election_kind": "special",
+          "note": "By-election after the death of the President (art. 44).",
+          "source": "l74-1977",
+          "quote": "κατά την άναπληρωματικήν έκλογήν της 31ης Αυγούστου, 1977 εκλεγέντος Προέδρου"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-34",
+          "quote": "Προεδρικές Εκλογές 2003",
+          "note": "Decided in the first round."
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "moi-56",
+          "quote": "Προεδρικές Εκλογές 2008; Προεδρικές Εκλογές 2008 επαναληπτική εκλογή",
+          "note": "Two rounds: the runoff a week later is counted as a second contest."
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "moi-81",
+          "quote": "Προεδρικές Εκλογές 2013; Προεδρικές Εκλογές 2013 επαναληπτική εκλογή",
+          "note": "Two rounds: the runoff a week later is counted as a second contest."
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "moi-101",
+          "quote": "Προεδρικές Εκλογές 2018; Προεδρικές Εκλογές 2018 επαναληπτική εκλογή",
+          "note": "Two rounds: the runoff a week later is counted as a second contest."
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "moi-154",
+          "quote": "Προεδρικές Εκλογές 2023; Προεδρικές Εκλογές 2023 επαναληπτική εκλογή",
+          "note": "Two rounds: the runoff a week later is counted as a second contest."
+        }
+      ]
+    },
+    {
+      "key": "vice_president",
+      "tier": "national",
+      "name": "Εκλογή Αντιπροέδρου",
+      "name_en": "Vice-President of the Republic (elected by the Turkish community)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under art. 1 and 39 the Turkish community elected the Vice-President on the same day as, but separately from, the presidential election. The office has been vacant since the Turkish Cypriots left the Republic's institutions in 1963-64.",
+      "source": "const",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/syntagma/full.html (art. 1: «ο Πρόεδρος είναι Έλλην και ο Αντιπρόεδρος Τούρκος»)",
+      "first_held": "1959-01-01",
+      "valid_to": "1964-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "No official result of a Vice-President election is published by the Republic's election authority, and no reachable official text dates them.",
+      "est_votes": 50000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "iso_pattern": "CY",
+          "name_pattern": "(?i)vice.?president|αντιπρόεδρ",
+          "precedence": 8
+        }
+      ],
+      "dates": [
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "note": "First election, under Law 37/1959."
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Δημοψηφίσματα",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "cy.district"
+        ]
+      },
+      "note": "Law 206/1989 lets the House call a referendum; the only one held is the 24 April 2004 vote of the Greek Cypriot community on the UN settlement plan, called under its own Law 74(I)/2004.",
+      "finest_note": "The 2004 result is not on the Ministry of Interior results site; no official breakdown below the island was found online.",
+      "source": "l206-1989",
+      "first_held": "2004-04-24",
+      "earliest_record": "2004-04-24",
+      "est_votes": 430000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CY"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-04-24",
+          "contests": 1,
+          "source": "l74-2004",
+          "quote": "ΔΙΕΞΑΓΩΓΗ ΔΗΜΟΨΗΦΙΣΜΑΤΟΣ ΣΤΙΣ 24 ΑΠΡΙΛΙΟΥ 2004 ΑΠΟ ΤΗΝ ΕΛΛΗΝΟΚΥΠΡΙΑΚΗ ΚΟΙΝΟΤΗΤΑ"
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Ευρωεκλογές",
+      "name_en": "European Parliament elections",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cy.district"
+        ],
+        "fine": [
+          "cy.community",
+          "cy.ballot_box"
+        ]
+      },
+      "note": "The whole Republic is one constituency electing 6 members by list proportional representation.",
+      "source": "l10-2004",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2004_1_10/full.html («ολόκληρη η επικράτεια της Δημοκρατίας αποτελεί μια ενιαία εκλογική περιφέρεια»)",
+      "first_held": "2004-01-01",
+      "earliest_record": "2004-01-01",
+      "est_votes": 1600000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "CY",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "source": "eu-2023-2061",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Chief Returning Officer (Central Elections Service, Ministry of Interior)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "European Parliament elections 2004, 2009, 2014, 2019, and 2024, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-41",
+          "quote": "Ευρωεκλογές 2004: 334 places listed",
+          "seats": 6
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-58",
+          "quote": "Ευρωεκλογές 2009: 344 places listed",
+          "seats": 6
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-85",
+          "quote": "Ευρωεκλογές 2014: 332 places listed",
+          "seats": 6
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-112",
+          "quote": "Ευρωεκλογές 2019: 334 places listed",
+          "seats": 6
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-163",
+          "quote": "Ευρωεκλογές 2024: 360 places listed",
+          "seats": 6
+        }
+      ]
+    },
+    {
+      "key": "communal_chambers",
+      "tier": "national",
+      "name": "Κοινοτικές Συνελεύσεις",
+      "name_en": "Greek and Turkish Communal Chambers",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Each community elected its own Communal Chamber (art. 86) in 1960. Law 12/1965 dissolved the Greek Communal Chamber and moved its legislative powers to the House and its administration to a Ministry of Education; the Turkish Communal Chamber continued only outside the Republic's institutions.",
+      "source": "l12-1965",
+      "locator": "https://www.cylaw.org/nomoi/arith/1965_1_012.pdf («ή Συνέλευσις… θεωρούνται ώς παύσασαι λειτουργούσαι… πασαι αϊ έδραι των μελών αυτής θεωρούνται ώς κενωθεΐσαι»); art. 86 of the Constitution establishes the chambers",
+      "first_held": "1960-01-01",
+      "valid_to": "1965-03-31",
+      "disposition": "blocked",
+      "disposition_reason": "No official result or official date of the 1960 Communal Chamber elections was found online.",
+      "est_votes": 200000,
+      "effort": 5,
+      "match": [
+        {
+          "iso_pattern": "CY",
+          "name_pattern": "(?i)communal chamber|κοινοτική συνέλευση",
+          "precedence": 8
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-01-01",
+          "precision": "year",
+          "note": "The only election of the chambers under the Republic."
+        }
+      ]
+    },
+    {
+      "key": "occupied_area",
+      "tier": "national",
+      "name": "Εκλογές στις κατεχόμενες περιοχές",
+      "name_en": "Elections held by the authorities in the area not under the Republic's control",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l37-1976",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held by an administration the Republic does not recognize, in territory its laws call occupied («κατεχόμενα εδάφη»); they are not elections of the Republic and are not run or published by its election authority.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Εσωκομματικές εκλογές",
+      "name_en": "Party candidate selections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l72",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose candidates under their own rules; the state neither runs nor publishes these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "CY*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Δικαστές",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed, not elected; no judicial office in the Republic is filled by popular vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "eoa_president",
+      "tier": "district",
+      "name": "Εκλογή Προέδρων Επαρχιακών Οργανισμών Αυτοδιοίκησης",
+      "name_en": "Presidents of the District Self-Government Organisations",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cy.district"
+        ],
+        "fine": [
+          "cy.community",
+          "cy.ballot_box"
+        ]
+      },
+      "note": "Five organisations (Nicosia, Famagusta, Larnaca, Limassol, Paphos; none for Kyrenia). The president is elected by plurality by the district's voters; first held in 2024 with the European and local elections.",
+      "source": "l37-2022",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_37/full.html (art. 10Ε(1): «Ο Πρόεδρος κάθε Συμβουλίου εκλέγεται από τους εκλογείς της οικείας εκλογικής περιφέρειας»)",
+      "first_held": "2024-01-01",
+      "earliest_record": "2024-01-01",
+      "est_votes": 390000,
+      "effort": 2,
+      "match": [
+        {
+          "iso_pattern": "CY*",
+          "name_pattern": "(?i)district self-government|επαρχιακ",
+          "precedence": 8
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l37-2022",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "2024 election of the presidents, by district, community, and ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "moi-174",
+          "quote": "Εκλογές Προέδρων Ε. Ο. Αυτοδιοίκησης 2024: 357 communities listed in 5 districts",
+          "seats": 5
+        }
+      ]
+    },
+    {
+      "key": "indirect_local",
+      "tier": "district",
+      "name": "Έμμεσες εκλογές τοπικής αυτοδιοίκησης",
+      "name_en": "Members of district organisation councils, deputy community leaders, and deputy mayors of occupied municipalities chosen by councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l37-2022",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_37/full.html (art. 5(1): ten members from the municipal councils and six from the community councils)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by and from councillors, not by voters; recorded in council minutes, not published as election results.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "mayors",
+      "tier": "municipality",
+      "name": "Εκλογή δημάρχων",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy.municipality"
+        ],
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "Directly elected by plurality. Mayors of the nine displaced municipalities are elected by their displaced voters. From 1964 to 1986 municipalities were run by appointed committees. By-elections fill vacancies within 60 days (Law 52(I)/2022 art. 20-21).",
+      "source": "l52-2022",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_52/full.html (art. 13(5)(β): «ο υποψήφιος o οποίος λαμβάνει τις περισσότερες έγκυρες ψήφους»)",
+      "first_held": "1986-12-01",
+      "earliest_record": "1986-12-01",
+      "est_votes": 1500000,
+      "effort": 3,
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "CY*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l52-2022",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_52/full.html (art. 14(1): «η θητεία κάθε συμβουλίου είναι πενταετής»; art. 19(2): with the European Parliament election)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior",
+          "valid_from": "2022-04-15",
+          "vacancy_rule": "By-election within 60 days, except in the last year of the term (art. 20-21)."
+        },
+        {
+          "source": "l111-1985",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1985_1_111/full.html (art. 19(1): «ημέρα εκλογής oιαδήπoτε ημέρα εντός του μηνός Δεκεμβρίου»)",
+          "period_years": 5,
+          "phase": 1,
+          "month": 12,
+          "term_years": 5,
+          "called": false,
+          "valid_to": "2022-04-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Mayoral elections 2011, 2016, and 2024 and by-elections 2019-2020, by polling station and ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1986-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016",
+          "note": "December general municipal elections under Law 111/1985 (art. 19(1)); the 1986 ones were the first in 33 years."
+        },
+        {
+          "date": "1991-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016",
+          "note": "December general municipal elections under Law 111/1985 (art. 19(1)); the 1986 ones were the first in 33 years."
+        },
+        {
+          "date": "1996-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016",
+          "note": "December general municipal elections under Law 111/1985 (art. 19(1)); the 1986 ones were the first in 33 years."
+        },
+        {
+          "date": "2001-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016",
+          "note": "December general municipal elections under Law 111/1985 (art. 19(1)); the 1986 ones were the first in 33 years."
+        },
+        {
+          "date": "2006-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016",
+          "note": "December general municipal elections under Law 111/1985 (art. 19(1)); the 1986 ones were the first in 33 years."
+        },
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "contests": 34,
+          "source": "moi-71",
+          "quote": "Δημοτικές Εκλογές 2011 - Δήμαρχοι: 34 municipalities listed",
+          "seats": 34,
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count. 39 municipalities (30 free, 9 displaced) elected councils that year."
+        },
+        {
+          "date": "2016-12-01",
+          "precision": "month",
+          "contests": 36,
+          "source": "moi-96",
+          "quote": "Δημοτικές Εκλογές 2016 - Δήμαρχοι: 36 municipalities listed",
+          "seats": 36,
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-129",
+          "quote": "Δημοτικές Εκλογές 2019 - Δήμαρχοι: 1 municipality listed",
+          "seats": 1,
+          "note": "By-election for the mayor of Famagusta (displaced municipality).",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "moi-133",
+          "quote": "Δημοτικές Εκλογές 2020 - Δήμαρχοι (election 133): ΑΓΙΑ ΝΑΠΑ; Δημοτικές Εκλογές 2020 - Δήμαρχοι (election 139): ΑΓΛΑΝΤΖΙΑ",
+          "seats": 2,
+          "note": "Two by-elections in 2020, for the mayors of Agia Napa (election 133) and Aglantzia (election 139).",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 29,
+          "source": "moi-159",
+          "quote": "Δημοτικές Εκλογές 2024 - Δήμαρχοι: 29 municipalities listed",
+          "seats": 29,
+          "note": "First election after the 2022 reform: 20 municipalities in the free areas and 9 displaced ones, held with the European Parliament election."
+        }
+      ]
+    },
+    {
+      "key": "municipal_councils",
+      "tier": "municipality",
+      "name": "Εκλογή δημοτικών συμβουλίων",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy.municipality",
+          "cy.municipal_district"
+        ],
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "List proportional representation by electoral quota with preference votes; since 2024 seats are apportioned to municipal districts by electorate, 16 to 30 councillors per municipality (8 to 26 in displaced ones).",
+      "source": "l52-2022",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_52/full.html (art. 13(4), 35(2): «το πηλίκο … αποτελεί το εκλογικό μέτρο»)",
+      "first_held": "1986-12-01",
+      "earliest_record": "1986-12-01",
+      "est_votes": 1500000,
+      "effort": 3,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ],
+          "iso_pattern": "CY*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l52-2022",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Central Elections Service, Ministry of Interior",
+          "valid_from": "2022-04-15"
+        },
+        {
+          "source": "l111-1985",
+          "period_years": 5,
+          "phase": 1,
+          "month": 12,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_to": "2022-04-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Municipal council elections 2011, 2016, and 2024, by polling station and ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1986-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016"
+        },
+        {
+          "date": "1991-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016"
+        },
+        {
+          "date": "1996-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016"
+        },
+        {
+          "date": "2001-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016"
+        },
+        {
+          "date": "2006-12-01",
+          "precision": "month",
+          "source": "ucm-results",
+          "quote": "Τα επίσημα αποτελέσματα των Δημοτικών Εκλογών από το 1986 μέχρι και το 2016"
+        },
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "contests": 39,
+          "source": "moi-74",
+          "quote": "Δημοτικές Εκλογές 2011 - Δημοτικά συμβούλια: 39 municipalities listed",
+          "note": "30 municipalities in the free areas and 9 displaced ones."
+        },
+        {
+          "date": "2016-12-01",
+          "precision": "month",
+          "contests": 38,
+          "source": "moi-97",
+          "quote": "Δημοτικές Εκλογές 2016 - Δημοτικά συμβούλια: 38 municipalities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 72,
+          "source": "moi-164",
+          "quote": "Δημοτικές Εκλογές 2024 - Δημοτικά συμβούλια: 72 municipal districts and municipalities listed",
+          "note": "Since 2024 councillors of merged municipalities are elected by municipal district: 63 polled districts and undivided municipalities plus 9 displaced municipalities. Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        }
+      ]
+    },
+    {
+      "key": "deputy_mayors",
+      "tier": "municipal_district",
+      "name": "Εκλογή αντιδημάρχων",
+      "name_en": "Deputy mayors of municipal districts",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy.municipal_district"
+        ],
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "Since 2024 one deputy mayor per municipal district is elected by plurality in that district (one municipality-wide where there are no districts); in displaced municipalities the council chooses the deputy mayor.",
+      "source": "l52-2022",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/2022_1_52/full.html (art. 13(3): «Σε κάθε συμβούλιο μετέχει ένας αντιδήμαρχος για κάθε δημοτικό διαμέρισμα»)",
+      "first_held": "2024-01-01",
+      "earliest_record": "2024-01-01",
+      "est_votes": 300000,
+      "effort": 2,
+      "match": [
+        {
+          "office_kinds": [
+            "deputy_mayor"
+          ],
+          "iso_pattern": "CY*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l52-2022",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Deputy mayor elections 2024 and the 2026 Aglantzia by-election, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 78,
+          "source": "moi-165",
+          "quote": "Δημοτικές Εκλογές 2024 - Αντιδήμαρχοι: 78 municipal districts and municipalities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moi-197",
+          "quote": "Δημοτικές Εκλογές 2026 - Αντιδήμαρχοι: 1 district listed",
+          "note": "By-election for the deputy mayor of the Aglantzia district of the municipality of Nicosia.",
+          "election_kind": "by_election"
+        }
+      ]
+    },
+    {
+      "key": "school_boards",
+      "tier": "school_board",
+      "name": "Εκλογή σχολικών εφορειών",
+      "name_en": "School boards",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "Voters elect 4 or 5 members of each municipal school board on the day of the municipal elections; the municipal council appoints the rest. Law 52(I)/2022 art. 147 provides for moving the boards' work to municipal committees after five years.",
+      "source": "l108-1997",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1997_1_108/full.html (art. 4(2)(α), 4Α, 5)",
+      "first_held": "2011-12-01",
+      "earliest_record": "2011-12-01",
+      "est_votes": 800000,
+      "effort": 2,
+      "match": [
+        {
+          "iso_pattern": "CY*",
+          "name_pattern": "(?i)school board|σχολικ",
+          "precedence": 8
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l108-1997",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "School board elections 2011, 2016, and 2024, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "contests": 33,
+          "source": "moi-73",
+          "quote": "Σχολικές εφορείες 2011: 33 school boards listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2016-12-01",
+          "precision": "month",
+          "contests": 31,
+          "source": "moi-99",
+          "quote": "Σχολικές εφορείες 2016: 31 school boards listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 27,
+          "source": "moi-172",
+          "quote": "Σχολικές εφορείες 2024: 27 school boards listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        }
+      ]
+    },
+    {
+      "key": "community_leaders",
+      "tier": "community",
+      "name": "Εκλογή κοινοταρχών",
+      "name_en": "Community leaders (κοινοτάρχες)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "The community leader chairs the community council and is elected directly by plurality.",
+      "source": "l86-1999",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1999_1_86/full.html (art. 11(1), 17(1))",
+      "first_held": "2001-12-01",
+      "earliest_record": "2001-12-01",
+      "est_votes": 450000,
+      "effort": 3,
+      "match": [
+        {
+          "office_kinds": [
+            "muhtar",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal",
+            "municipality"
+          ],
+          "iso_pattern": "CY*",
+          "name_pattern": "(?i)community leader|κοινοτάρχ"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l86-1999",
+          "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1999_1_86/full.html (art. 17(1): «Γενική εκλογή κοινοταρχών και μελών των Συμβουλίων διενεργείται κάθε πέντε χρόνια»)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Community leader elections 2011, 2016, and 2024, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-12-01",
+          "precision": "month",
+          "source": "l86-1999",
+          "quote": "δε διατάσσεται πριν τις επόμενες δημοτικές εκλογές του Δεκεμβρίου του 2001",
+          "note": "First elections under the Communities Law, with the municipal elections."
+        },
+        {
+          "date": "2006-12-01",
+          "precision": "month",
+          "note": "Five years later, with the municipal elections."
+        },
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "contests": 281,
+          "source": "moi-75",
+          "quote": "Κοινοτικές Εκλογές 2011 - Κοινοτάρχες: 281 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2016-12-01",
+          "precision": "month",
+          "contests": 255,
+          "source": "moi-100",
+          "quote": "Κοινοτικές Εκλογές 2016 - Κοινοτάρχες: 255 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 213,
+          "source": "moi-173",
+          "quote": "Κοινοτικές Εκλογές 2024 - Κοινοτάρχες: 213 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        }
+      ]
+    },
+    {
+      "key": "community_councils",
+      "tier": "community",
+      "name": "Εκλογή κοινοτικών συμβουλίων",
+      "name_en": "Community councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "cy.ballot_box"
+        ]
+      },
+      "note": "4, 6, or 8 members besides the leader, by electorate size; displaced communities elect three members.",
+      "source": "l86-1999",
+      "locator": "https://www.cylaw.org/nomoi/enop/non-ind/1999_1_86/full.html (art. 11)",
+      "first_held": "2001-12-01",
+      "earliest_record": "2001-12-01",
+      "est_votes": 450000,
+      "effort": 3,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CY*",
+          "name_pattern": "(?i)community council|κοινοτικό συμβούλιο",
+          "precedence": 2
+        }
+      ],
+      "cadence": [
+        {
+          "source": "l86-1999",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Central Elections Service, Ministry of Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministry of Interior official results site",
+          "url": "https://results.elections.moi.gov.cy/api/Greek/Results?electionId={id}",
+          "format": "json, html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "cy.ballot_box",
+          "source": "moi",
+          "evidence": "Community council elections 2011, 2016, and 2024, by ballot box"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-12-01",
+          "precision": "month",
+          "source": "l86-1999",
+          "quote": "δε διατάσσεται πριν τις επόμενες δημοτικές εκλογές του Δεκεμβρίου του 2001"
+        },
+        {
+          "date": "2006-12-01",
+          "precision": "month"
+        },
+        {
+          "date": "2011-12-01",
+          "precision": "month",
+          "contests": 286,
+          "source": "moi-72",
+          "quote": "Κοινοτικές Εκλογές 2011 - Κοινοτικά συμβούλια: 286 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2016-12-01",
+          "precision": "month",
+          "contests": 251,
+          "source": "moi-98",
+          "quote": "Κοινοτικές Εκλογές 2016 - Κοινοτικά συμβούλια: 251 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 212,
+          "source": "moi-161",
+          "quote": "Κοινοτικές Εκλογές 2024 - Κοινοτικά συμβούλια: 212 communities listed",
+          "note": "Counted from the places the results site lists for this election; it lists only polled contests, so unopposed seats declared without a poll are missing from the count."
+        }
+      ]
+    },
+    {
+      "key": "village_committees",
+      "tier": "community",
+      "name": "Εκλογή χωριτικών επιτροπών",
+      "name_en": "Village committees (before the Communities Law)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Village committees, replaced by community councils under Law 86(I)/1999.",
+      "source": "l55-1979",
+      "valid_to": "2001-12-01",
+      "first_held": "1979-07-08",
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of village committee results was found online.",
+      "est_votes": 200000,
+      "effort": 5,
+      "match": [
+        {
+          "iso_pattern": "CY*",
+          "name_pattern": "(?i)village committee|χωριτικ",
+          "precedence": 8
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-07-08",
+          "source": "l55-1979",
+          "quote": "εκλογής … μελών Χωριτικών Επιτροπών τήν 8ην Ιουλίου, 1979"
+        },
+        {
+          "date": "1984-05-06",
+          "note": "Polling set for 18 December 1983 was moved to this day; no text confirming the poll was found.",
+          "source": "l80-1983",
+          "quote": "ωρίσθη … την 18ην Δεκεμβρίου, 1983, αναβάλλεται διά την 6ην Μαΐου, 1984"
+        }
+      ]
+    }
+  ]
+}

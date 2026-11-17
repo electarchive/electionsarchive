@@ -1,0 +1,1089 @@
+{
+  "polity": "DM",
+  "name": "Dominica",
+  "sources": {
+    "const": {
+      "title": "The Constitution of the Commonwealth of Dominica, Chapter 1:01, Schedule 1 (Revised Laws 1990)",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf",
+      "kind": "official_body",
+      "note": "Scanned revised edition linked from the Electoral Office's legislation page."
+    },
+    "hoa-elections": {
+      "title": "House of Assembly (Elections) Act, Chapter 2:01 (Act 14 of 1951, as amended)",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap2-01.pdf",
+      "kind": "official_body"
+    },
+    "roseau-act": {
+      "title": "Roseau City Council Act, Chapter 25:01 (Act 17 of 1982)",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap25-01.pdf",
+      "kind": "official_body"
+    },
+    "portsmouth-act": {
+      "title": "Portsmouth Town Council Act, Chapter 25:10 (Act 27 of 1969)",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap25-10.pdf",
+      "kind": "official_body"
+    },
+    "canefield-act": {
+      "title": "Canefield Urban Council Act, Chapter 25:30 (Act 19 of 1984)",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap25-30.pdf",
+      "kind": "official_body"
+    },
+    "carib-act": {
+      "title": "Carib Reserve Act, Chapter 25:90 (Act 22 of 1978), now the Kalinago Territory Act",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/chapters/chap25-90.pdf",
+      "kind": "official_body"
+    },
+    "village-act-1994": {
+      "title": "Village Councils (Amendment) Act 1994, Act 7 of 1994",
+      "publisher": "Government of the Commonwealth of Dominica",
+      "url": "https://www.dominica.gov.dm/laws/1994/act7-1994.pdf",
+      "kind": "official_body",
+      "note": "Amends the Village Councils Ordinance, Cap. 190 of the Revised Laws of Dominica (1961), which is not online."
+    },
+    "eo-legislation": {
+      "title": "Legislation",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/index.php/legislation",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-history": {
+      "title": "Brief History",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/about-us/brief-history",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-constituencies": {
+      "title": "List of Constituencies",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/constituencies/list-of-constituencies",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-polling": {
+      "title": "Electorate Statistics",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/constituencies/electorate-statistics",
+      "kind": "official_body",
+      "note": "Constituencies with their number of polling districts and electorate, published November 2016.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-past": {
+      "title": "Past General Elections (results index, 1970 to 2022)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/past-general-elections",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-roseau-north-2026": {
+      "title": "2026 Roseau North By-Election Results",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/images/docs/roseau_north_by_election_results_sep2026.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-village-list": {
+      "title": "List of Village Councils",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections/list-of-village-councils",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-village": {
+      "title": "Village Council Elections (notices and results, from 2012)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-news": {
+      "title": "News (election notices and results, from 2017)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-roseau-2013": {
+      "title": "Roseau City Council Election Results (19 November 2013)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections/roseau-city-council-election-results",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-roseau-2026": {
+      "title": "Notice: Roseau City Council General Election 2026",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news/notice-roseau-city-council-general-election-2026",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-portsmouth-2014": {
+      "title": "Portsmouth Election Results (16 September 2014)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections/portsmouth-election-results",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-portsmouth-2023": {
+      "title": "Notice: Portsmouth Town Council Results (21 December 2023)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news/notice-portsmouth-town-council-results",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-canefield-2022": {
+      "title": "Notice: Residents of Canefield and Morne Daniel (22 November 2022)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news/notice-residents-of-canefield-and-morne-daniel",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-carib-chief-2014": {
+      "title": "Carib Chief Election Results (7 July 2014)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections/carib-chief-election-results",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-carib-council-2014": {
+      "title": "Candidates Elected to Carib Council (28 July 2014)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/village-council-elections/candidates-elected-to-carib-council",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-kalinago-chief-2024": {
+      "title": "Kalinago Chief Election Results (22 July 2024)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news/kalinago-chief-election-results-2",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "eo-kalinago-council-2024": {
+      "title": "Kalinago Council Village Council General Election Results (14 August 2024)",
+      "publisher": "Electoral Office of the Commonwealth of Dominica",
+      "url": "https://electoraloffice.gov.dm/news/kalinago-council-village-council-general-election-results",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Commonwealth of Dominica",
+      "name_en": "Dominica",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const"
+    },
+    {
+      "key": "municipal",
+      "name": "City, town, and urban councils",
+      "name_en": "Roseau City Council, Portsmouth Town Council, and Canefield Urban Council",
+      "parent": "national",
+      "source": "eo-legislation",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 3,
+          "source": "eo-legislation",
+          "locator": "\"The conduct of local authority elections are governed by the Village Councils Ordinance, CAP. 190, Roseau City Council Act, Chapter 25:01, Portsmouth Town Council Act, Chapter 25:10, Canefield Urban Council Act, Chapter 25:30 and the Carib Reserve Act, Chapter 25:90\": one city, one town, and one urban council"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "Village councils",
+      "name_en": "Village councils",
+      "parent": "national",
+      "source": "eo-village-list",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 38,
+          "source": "eo-village-list",
+          "locator": "List of Village Councils: 42 councils in seven regions (East 5, North 8, Northeast 4, South 6, Southeast 5, Southwest 7, West 7), less the Carib Council, Portsmouth Town Council, Roseau City Council, and Canefield Urban Council"
+        }
+      ]
+    },
+    {
+      "key": "kalinago",
+      "name": "Kalinago Territory (Carib Reserve)",
+      "name_en": "Kalinago Territory",
+      "parent": "national",
+      "source": "carib-act",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 1,
+          "source": "carib-act",
+          "locator": "s.14(1)-(2): \"There shall be in and for the Reserve a body corporate ... the Carib Reserve Council\" (one territory of 3,700 acres in the Parish of St. David, s.41)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "House of Assembly general elections",
+      "name_en": "House of Assembly general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "dm.constituency"
+        ]
+      },
+      "valid_from": "1967-03-01",
+      "first_held": "1970-10-26",
+      "earliest_record": "1970-10-26",
+      "finest_note": "The Electoral Office publishes every candidate's votes by polling station for 2014, 2016, 2019, 2021, and 2022 (JSON behind its results maps), every candidate by constituency for 2009 and 2010, and only the electorate, votes cast, and winner of each constituency from 1970 to 2005.",
+      "note": "Representatives are elected by first past the post in single-member constituencies (Constitution s.30(1)(a)), 11 under the Associated State constitution of 1967 and 21 since 1975. Parliament lasts five years from the first sitting of the House after a dissolution unless dissolved sooner on the Prime Minister's advice (s.54(2) and (4)), and the general election follows within three months of a dissolution (s.55(1)). The nine senators are appointed (class senators). Elections before 1967 were to the colonial Legislative Council (class legco).",
+      "source": "const",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.30, s.54, s.55)",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "DM",
+          "valid_from": "1967-03-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-10-26",
+          "contests": 11,
+          "seats": 11,
+          "source": "eo-past",
+          "quote": "1970 General Election Results: \"Results of the General Election held on October 26, 1970\"; 11 electoral districts listed"
+        },
+        {
+          "date": "1975-03-24",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "1975 General Election Results: \"Results of the General Election held on March 24, 1975\"; 21 constituencies listed"
+        },
+        {
+          "date": "1980-07-21",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "1980 General Election Results: \"Results of the General Election held on July 21, 1980\"; 21 constituencies listed"
+        },
+        {
+          "date": "1985-07-01",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "1985 General Election Results: \"Results of the General Election held on July 1, 1985\"; 21 constituencies listed"
+        },
+        {
+          "date": "1990-05-28",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "1990 General Election Results: \"Results of the General Election held on May 28, 1990\"; 21 constituencies listed"
+        },
+        {
+          "date": "1995-06-12",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "1995 General Election Results: \"Results of General Election held on June 12, 1995\"; 21 constituencies listed"
+        },
+        {
+          "date": "2000-01-31",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2000 General Election Results: \"Results of the General Election held on January 31, 2000\"; 21 constituencies listed"
+        },
+        {
+          "date": "2005-05-05",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2005 General Election Results: \"Results of the General Election held on May 5, 2005\"; 21 constituencies listed"
+        },
+        {
+          "date": "2009-12-18",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2009 General Election Results: \"Results of the General Election held on Friday 18 December 2009\"; 21 constituencies listed"
+        },
+        {
+          "date": "2014-12-08",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2014 General Elections Results: results by polling station for the 21 constituencies of the map legend (CB to WES)"
+        },
+        {
+          "date": "2019-12-06",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2019 General Elections Results: \"Results of the 2019 General Election held on Friday 6th December 2019\"; 21 constituencies in the map legend"
+        },
+        {
+          "date": "2022-12-06",
+          "contests": 21,
+          "seats": 21,
+          "source": "eo-past",
+          "quote": "2022 General Election Results: \"Results of the 2022 General Election held on Tuesday 6th December 2022\"; 21 constituencies in the map legend"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.54(2): \"Parliament, unless sooner dissolved, shall continue for five years from the date of the first sitting of the House after any dissolution and shall then stand dissolved\"; s.55(1): a general election within three months after any dissolution)",
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Electoral Commission and Chief Elections Officer (Constitution ss.38 and 56)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/past-general-elections",
+          "source": "eo-past",
+          "first_date": "1970-10-26",
+          "last_date": "2022-12-06",
+          "finest": "dm.polling_station",
+          "evidence": "One page per election; polling-station JSON at /images/json_files/<year>/<letter>_breakdown.json for 2014 to 2022"
+        }
+      ],
+      "est_votes": 40000,
+      "effort": 2
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "House of Assembly by-elections",
+      "name_en": "House of Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1967-03-01",
+      "earliest_record": "1992-07-27",
+      "finest_note": "Polling station from 2016; constituency for 2010; winner only before.",
+      "note": "A Representative's seat that falls vacant other than by dissolution is filled by by-election within three months unless the House is dissolved first (Constitution s.55(3)(a)); the writ is issued by the President (House of Assembly (Elections) Act s.12(1)). The Electoral Office lists no by-election before 1992.",
+      "source": "const",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.55(3))",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "DM",
+          "valid_from": "1967-03-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-07-27",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-past",
+          "quote": "1992 By-Election Results: \"Results of the By-Election held on July 27, 1992\" (Portsmouth)"
+        },
+        {
+          "date": "1993-12-20",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-past",
+          "quote": "1993 By-Election Results: \"Results of the By-Election held on December 20, 1993\" (Salybia)"
+        },
+        {
+          "date": "1996-08-12",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-past",
+          "quote": "1996 By-Election Results: \"Results of the By-Election held on August 12, 1996\" (Mahaut)"
+        },
+        {
+          "date": "2010-07-09",
+          "contests": 2,
+          "seats": 2,
+          "source": "eo-past",
+          "quote": "2010 By-Election Results: \"Results of the By-Election held on Friday 9th July 2010\" (Marigot and Salisbury)"
+        },
+        {
+          "date": "2016-06-07",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-past",
+          "quote": "2016 Soufriere By-Election Results"
+        },
+        {
+          "date": "2021-11-25",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-past",
+          "quote": "2021 Grand Bay By-Election Results: \"Results of the 2021 Grand Bay By-Election held on Thursday 25th November 2021\""
+        },
+        {
+          "date": "2026-09-01",
+          "precision": "month",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-roseau-north-2026",
+          "quote": "2026 Roseau North By-Election Results: 28 polling stations, totals 49, 998, and 1473 votes for Boston, Danny, and Ashma, 47 rejected, 2520 votes, 8036 registered voters",
+          "note": "The results file is dated September 2026; the day of the poll is not on it."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.55(3)(a): \"if the vacant seat is that of a Representative, a by-election shall be held\" within three months of the vacancy)",
+          "called": true,
+          "administered_by": "Electoral Commission and Chief Elections Officer",
+          "vacancy_rule": "By-election within three months of the vacancy unless the House is sooner dissolved (Constitution s.55(3))."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/past-general-elections",
+          "source": "eo-past",
+          "first_date": "1992-07-27",
+          "last_date": "2021-11-25",
+          "finest": "dm.polling_station",
+          "evidence": "By-election pages in the results index"
+        },
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/images/docs/roseau_north_by_election_results_sep2026.pdf",
+          "source": "eo-roseau-north-2026",
+          "first_date": "2026-09-01",
+          "last_date": "2026-09-01",
+          "finest": "dm.polling_station",
+          "evidence": "Text PDF, one row per polling station with each candidate's votes, rejected ballots, and registered voters"
+        }
+      ],
+      "est_votes": 2500,
+      "effort": 1
+    },
+    {
+      "key": "legco",
+      "tier": "national",
+      "name": "Legislative Council elections",
+      "name_en": "Legislative Council elections (Crown colony)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_to": "1967-03-01",
+      "note": "Until March 1967 Dominica was a Crown colony with a Governor and a Legislative Council (Electoral Office, Brief History). The elections law in force, now the House of Assembly (Elections) Act, began as Act 14 of 1951, and the Legislative Council's elected members were chosen under it until the Associated State constitution created the House of Assembly in 1967.",
+      "source": "eo-history",
+      "locator": "https://electoraloffice.gov.dm/about-us/brief-history (\"The form of government in the Commonwealth of Dominica was Crown Colony with a Governor and a Legislative Council until March 1967 when it became an Associated State\")",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "DM",
+          "valid_to": "1967-03-01"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Electoral Office publishes no result before 1970; the colonial returns are in the Dominica Official Gazette and the colonial blue books, which no official host has online.",
+      "est_votes": 20000,
+      "effort": 5
+    },
+    {
+      "key": "senators",
+      "tier": "national",
+      "name": "Senators of the House of Assembly",
+      "name_en": "Senators (appointed)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Five senators are appointed on the Prime Minister's advice and four on the Leader of the Opposition's (Constitution s.34(1)). Parliament may provide that they be elected by the voters for Representatives instead (s.34(1) proviso and (2)), but the House of Assembly (Elections) Act makes no such provision.",
+      "source": "const",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.34)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed, not elected: Parliament has never prescribed the election of senators that s.34(1) allows.",
+      "match": []
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of the President by the House of Assembly",
+      "name_en": "President of Dominica",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1978-11-03",
+      "note": "The President serves five years from being declared elected (s.23(1)). On a joint nomination by the Prime Minister and the Leader of the Opposition the Speaker declares the nominee elected without a vote (s.19(2)); otherwise the House elects by secret ballot, a majority of all its members being needed (s.19(4)-(5A)).",
+      "source": "const",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.19)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the members of the House of Assembly by secret ballot or declared on a joint nomination (Constitution s.19); not a public election.",
+      "match": []
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Constitutional referendums",
+      "name_en": "Constitutional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_from": "1978-11-03",
+      "note": "A bill altering s.42, Schedule 1, or a provision listed in Schedule 1 needs three quarters of the elected members and then a majority of the votes cast in a referendum of the voters for Representatives, run by the Electoral Commission (s.42(2), (3)(b), (5), and (7)).",
+      "source": "const",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.42)",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DM"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "const",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap1-01-sch1.pdf (s.42(3)(b))",
+          "administered_by": "Electoral Commission"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "None held: the Electoral Office's records list no referendum since independence."
+    },
+    {
+      "key": "candidate_selection",
+      "tier": "national",
+      "name": "Party candidate selection",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hoa-elections",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap2-01.pdf (s.15(2): every candidate \"must be nominated in writing by not less than six registered electors of the constituency\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their candidates under their own rules; no law provides for a state-run primary.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "DM"
+        }
+      ]
+    },
+    {
+      "key": "roseau_city",
+      "tier": "municipal",
+      "name": "Roseau City Council elections",
+      "name_en": "Roseau City Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "first_held": "1982-05-31",
+      "earliest_record": "2013-11-19",
+      "finest_note": "The Chief Elections Officer's notice gives each candidate's votes by ward, with turnout and the split by sex.",
+      "note": "Eight of the thirteen members are elected, two from each of four wards; the Minister nominates five (Roseau City Council Act s.3(2)-(3)). The council's term is three years (s.65); the first election under the Act was on 31 May 1982 (s.64). The Mayor of Roseau is the council's chairman, whom the council elects from its members (ss.10 and 11). The Act replaced an older Roseau town council whose elections are not on the Electoral Office's record. By-elections fill elected vacancies (s.35).",
+      "source": "roseau-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-01.pdf (ss.3, 64, 65)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "Roseau City Council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1982-05-31",
+          "contests": 4,
+          "seats": 8,
+          "source": "roseau-act",
+          "quote": "s.64: \"The first election under this Act shall take place on 31st of May, 1982\"; s.3(3): the city \"shall be divided into four wards ... and each ward shall elect not more than two persons to the Council\""
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "through": "2012-12-31",
+          "note": "Triennial elections under s.65 that the Electoral Office does not list online."
+        },
+        {
+          "date": "2013-11-19",
+          "contests": 3,
+          "seats": 6,
+          "source": "eo-roseau-2013",
+          "quote": "\"at the final counting of the votes on Tuesday, November 19, 2013 the results of the votes polled for each candidate in the three Wards were as follows\" (Wards I, II, and IV)",
+          "note": "Ward III is not in the notice."
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "through": "2025-12-31",
+          "note": "Elections between 2013 and 2026, including the general election set for 8 February 2023 and the Ward III by-election set for 5 July 2023 in the Office's news notices, not yet counted."
+        },
+        {
+          "date": "2026-03-24",
+          "contests": 4,
+          "seats": 8,
+          "source": "eo-roseau-2026",
+          "quote": "\"at the final counting of the votes on Tuesday, March 24, 2026 the results of the votes polled for each candidate in the four Wards were as follows\""
+        }
+      ],
+      "cadence": [
+        {
+          "source": "roseau-act",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-01.pdf (s.65: \"The term of office of each Council shall unless sooner dissolved, be of three years duration\")",
+          "term_years": 3,
+          "called": true,
+          "administered_by": "Chief Elections Officer",
+          "vacancy_rule": "An elected member's vacancy is filled by by-election in the ward (s.35(1))."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2013-11-19",
+          "last_date": "2026-03-24",
+          "evidence": "Results notices by ward under Village Council Elections (2013) and News (from 2017)"
+        }
+      ],
+      "est_votes": 2000,
+      "effort": 1
+    },
+    {
+      "key": "portsmouth_town",
+      "tier": "municipal",
+      "name": "Portsmouth Town Council elections",
+      "name_en": "Portsmouth Town Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "earliest_record": "2014-09-16",
+      "finest_note": "Each candidate's votes by ward, with turnout, in the Chief Elections Officer's notice.",
+      "note": "Eight of the thirteen members are elected, two from each of four wards; the Minister nominates five (Portsmouth Town Council Act s.3(2)-(3)). Terms run three years from 1 November triennially after 31 October 1971 (s.28), though the published elections (2014, 2023) are not on that cycle. The Mayor of Portsmouth is the council's chairman.",
+      "source": "portsmouth-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-10.pdf (ss.3, 28)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "Portsmouth Town Council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "through": "2013-12-31",
+          "note": "Elections under the 1969 Act that the Electoral Office does not list online."
+        },
+        {
+          "date": "2014-09-16",
+          "contests": 3,
+          "seats": 6,
+          "source": "eo-portsmouth-2014",
+          "quote": "\"at the final count of the votes on Tuesday, September 16, 2014, the votes polled for each candidate in the three contested wards were as follows\"",
+          "note": "The fourth ward was not contested."
+        },
+        {
+          "date": "2023-12-21",
+          "contests": 3,
+          "seats": 6,
+          "source": "eo-portsmouth-2023",
+          "quote": "\"at the final count of the votes on Thursday, December 21, 2023, the votes polled for each candidate in the three contested wards were as follows\"",
+          "note": "The fourth ward was not contested."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "portsmouth-act",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-10.pdf (s.28(1): the term \"shall unless the Council is sooner dissolved be of three years duration and shall commence on 1st November triennially\")",
+          "term_years": 3,
+          "called": true,
+          "administered_by": "Chief Elections Officer"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2014-09-16",
+          "last_date": "2023-12-21",
+          "evidence": "Results notices by ward"
+        }
+      ],
+      "est_votes": 800,
+      "effort": 1
+    },
+    {
+      "key": "canefield_urban",
+      "tier": "municipal",
+      "name": "Canefield Urban Council elections",
+      "name_en": "Canefield Urban Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "earliest_record": "2022-11-22",
+      "finest_note": "The council area, at large; results notices list each candidate's votes.",
+      "note": "Five of the eight members are elected by the electors of the area at large and the Minister nominates three (Canefield Urban Council Act s.3(2)); the term is about three years from the council's first meeting after a general election (s.29(1)). In 2022 the five candidates nominated were declared elected unopposed on nomination day. The next general election is set for 21 December 2026.",
+      "source": "canefield-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-30.pdf (ss.3, 29)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "Canefield Urban Council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "through": "2021-12-31",
+          "note": "Elections under the 1984 Act that the Electoral Office does not list online."
+        },
+        {
+          "date": "2022-11-22",
+          "contests": 1,
+          "seats": 5,
+          "source": "eo-canefield-2022",
+          "quote": "\"on Tuesday, November 22, 2022 Margaret Seaman, Miles Christian, Ian Williams, Leola Edwards Samuel and Deri Dee Lestrade was declared duly elected to the Canefield Urban Council\"",
+          "note": "Unopposed; the poll had been set for 12 December 2022."
+        }
+      ],
+      "cadence": [
+        {
+          "source": "canefield-act",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-30.pdf (s.29(1): the term \"shall, unless the Council is sooner dissolved, be approximately three years duration\")",
+          "term_years": 3,
+          "called": true,
+          "administered_by": "Chief Elections Officer"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2022-11-22",
+          "last_date": "2022-11-22",
+          "evidence": "Declaration notice"
+        }
+      ],
+      "est_votes": 1500,
+      "effort": 1
+    },
+    {
+      "key": "village_councils",
+      "tier": "village",
+      "name": "Village council elections",
+      "name_en": "Village council general elections and by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "earliest_record": "2012-01-01",
+      "finest_note": "Each council's area at large; the notices give every candidate's votes, the turnout, and the split by sex.",
+      "note": "Each village council has elected members chosen by the residents of its village district and members nominated by the Minister, under the Village Councils Ordinance, Cap. 190 of the Revised Laws of Dominica (1961), as amended by Act 7 of 1994 (qualifications in s.5). The Chief Elections Officer runs each council's general election on its own date, with a presiding officer appointed under s.41(1), and by-elections fill vacancies. The Electoral Office's List of Village Councils names 38 village councils; it omits Salisbury, whose council held elections the Office announced, so the register is not current.",
+      "source": "village-act-1994",
+      "locator": "https://www.dominica.gov.dm/laws/1994/act7-1994.pdf (s.5, replacing s.5 of the Ordinance)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "Village Council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "About 150 notices from 2012 to 2016 under Village Council Elections and more than 300 news items from 2017, mixing general elections, by-elections, nominations, and appointments of officers; not yet counted by year."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/village-council-elections",
+          "source": "eo-village",
+          "first_date": "2012-01-01",
+          "last_date": "2016-12-31",
+          "evidence": "148 articles, 15 index pages"
+        },
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2017-01-01",
+          "last_date": "2026-11-11",
+          "evidence": "31 index pages of notices, results included"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 3
+    },
+    {
+      "key": "kalinago_chief",
+      "tier": "kalinago",
+      "name": "Kalinago (Carib) Chief elections",
+      "name_en": "Kalinago Chief",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "earliest_record": "2014-07-07",
+      "finest_note": "The territory at large; the notice gives each candidate's votes, the rejected ballots, the turnout, and the split by sex.",
+      "note": "The Chief is elected by the voters registered in the Reserve (Carib Reserve Act s.3, as amended by Act 15 of 1984) and chairs the Kalinago Council. The 1978 Act continued a council that existed before it (s.14(4)) and is now cited as the Kalinago Territory Act.",
+      "source": "carib-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-90.pdf (s.3)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(Kalinago|Carib).*Chief"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "through": "2013-12-31",
+          "note": "Elections under the 1978 Act that the Electoral Office does not list online."
+        },
+        {
+          "date": "2014-07-07",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-carib-chief-2014",
+          "quote": "\"the final count of the votes for the Carib Chief Election which was held on Monday, July 7, 2014\""
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "through": "2023-12-31",
+          "note": "Any Chief election between 2014 and 2024 is not yet counted."
+        },
+        {
+          "date": "2024-07-22",
+          "contests": 1,
+          "seats": 1,
+          "source": "eo-kalinago-chief-2024",
+          "quote": "\"was elected Kalinago Chief in the Election held on Monday, July 22, 2024 having polled Six Hundred and Ninety Seven (697) votes\""
+        }
+      ],
+      "cadence": [
+        {
+          "source": "carib-act",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-90.pdf (s.3(1), as amended by Act 15 of 1984)",
+          "called": true,
+          "administered_by": "Chief Elections Officer"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2014-07-07",
+          "last_date": "2024-07-22",
+          "evidence": "Results notices"
+        }
+      ],
+      "est_votes": 1200,
+      "effort": 1
+    },
+    {
+      "key": "kalinago_council",
+      "tier": "kalinago",
+      "name": "Kalinago (Carib) Council elections",
+      "name_en": "Kalinago Council",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "earliest_record": "2014-07-28",
+      "finest_note": "The territory at large; the notice gives each candidate's votes and the turnout.",
+      "note": "The council is the Chief and six members elected at large by the residents registered in the Reserve (Carib Reserve Act ss.14(2) and 40), for about five years from its first meeting (s.52(1), as amended by Act 15 of 1984). By-elections fill vacancies (s.68(5)), as on 17 August 2026.",
+      "source": "carib-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-90.pdf (ss.14, 40, 52)",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(Kalinago|Carib).*Council"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "through": "2013-12-31",
+          "note": "Elections under the 1978 Act that the Electoral Office does not list online."
+        },
+        {
+          "date": "2014-07-28",
+          "contests": 1,
+          "seats": 6,
+          "source": "eo-carib-council-2014",
+          "quote": "\"the under-mentioned candidates were on Monday, July 28, 2014 elected to serve as members of the Carib Council\" (six names)"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "through": "2023-12-31",
+          "note": "Any council election between 2014 and 2024 is not yet counted."
+        },
+        {
+          "date": "2024-08-14",
+          "contests": 1,
+          "seats": 6,
+          "source": "eo-kalinago-council-2024",
+          "quote": "\"the under-mentioned candidates were on Wednesday, August 14, 2024 elected to serve as members of the Kalinago Council\" (six names)"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "carib-act",
+          "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-90.pdf (s.52(1)(a): the term \"shall, unless the Council is sooner dissolved, be approximately of five years duration\")",
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Chief Elections Officer",
+          "vacancy_rule": "By-election (s.68(5))."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Office of the Commonwealth of Dominica (electoraloffice.gov.dm)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "url": "https://electoraloffice.gov.dm/news",
+          "source": "eo-news",
+          "first_date": "2014-07-28",
+          "last_date": "2026-08-17",
+          "evidence": "Results notices, by-elections included"
+        }
+      ],
+      "est_votes": 1000,
+      "effort": 1
+    },
+    {
+      "key": "local_chairs",
+      "tier": "municipal",
+      "name": "Mayors and council chairs chosen by councils",
+      "name_en": "Mayors of Roseau and Portsmouth and council chairpersons",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "roseau-act",
+      "locator": "https://www.dominica.gov.dm/laws/chapters/chap25-01.pdf (s.10: election of Chairman by the council; s.11: the Chairman \"shall ... be entitled to the title of 'Mayor of Roseau'\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council chooses its chairman (styled Mayor in Roseau and Portsmouth) from its members; a vote of councillors, not a public election.",
+      "match": []
+    }
+  ]
+}

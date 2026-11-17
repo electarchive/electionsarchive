@@ -1,0 +1,1158 @@
+{
+  "polity": "ET",
+  "name": "Ethiopia",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Ethiopia",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "ኢትዮጵያ",
+        "lang": "am",
+        "kind": "native"
+      }
+    ],
+    "slug": "et",
+    "wikidata": "Q115",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "publisher": "Office of the Prime Minister of the Federal Democratic Republic of Ethiopia",
+      "title": "Constitution of the Federal Democratic Republic of Ethiopia, Proclamation No. 1/1995",
+      "url": "https://www.pmo.gov.et/constitution/",
+      "kind": "official_body",
+      "note": "Arts. 50-54 (two federal houses; the House of Peoples' Representatives elected every five years by plurality in single-member constituencies, at most 550 members with at least 20 seats for minority nationalities), 61 (House of Federation members elected by the state councils, which may hold direct elections), 70 (President elected by a two-thirds vote of a joint session for six years, at most two terms), 73 (Prime Minister elected by the House from among its members)"
+    },
+    "hopr-history": {
+      "publisher": "House of Peoples' Representatives of the Federal Democratic Republic of Ethiopia",
+      "title": "የምክር ቤቱ ሥልጣን፣ ተግባር እና አደረጃጀት: የኢትዮዽያ ፓርላማ ታሪክ (About the House: parliamentary history of Ethiopia)",
+      "url": "https://www.hopr.gov.et/Home/AboutUs",
+      "kind": "official_body",
+      "note": "The 1931 constitution's appointed chambers; the 1955 revision making the Chamber of Deputies directly elected (125 deputies, 250 senators appointed); the Derg's dissolution of parliament in September 1974; the 1987 PDRE constitution's National Shengo of 835 constituencies with a five-year term; the Transitional Government's 86-member Council of Representatives (1991-1995); the FDRE constitution adopted 29 Hidar 1987 E.C. and the House first elected in Ginbot 1987 E.C."
+    },
+    "p1162": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "Ethiopian Electoral, Political Parties Registration and Elections Code of Conduct Proclamation No. 1162/2019 (Federal Negarit Gazette No. 97, 16 October 2019)",
+      "url": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf",
+      "kind": "official_body",
+      "note": "Art. 4 (plurality; regional councils may elect several members per constituency, filled in order of votes), 6 (types: general, local, by-election, re-election, referendum), 7 (general elections of the House and the regional state councils every five years, simultaneously), 8 (local elections of nationality-zone, zone, woreda, city, sub-city, and kebele councils), 9 (by-elections, including after a recall), 10 (re-elections), 11 (referendums), 13 (constituencies, including the minority-nationality constituencies)"
+    },
+    "nebe-past": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "ቀደምት ምርጫዎች (Past elections)",
+      "url": "https://www.nebe.org.et/am/past-elections",
+      "kind": "official_body",
+      "note": "Six general elections, four local elections, and eight referendums since the Board's founding; for each general election 1987-2007 E.C. (1995-2015) the registered voters, voters, parties, candidates, and seats won by party in the House and each regional council, with registration by region"
+    },
+    "nebe-results": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "Election Result",
+      "url": "https://www.nebe.org.et/en/electionresult",
+      "kind": "official_body",
+      "note": "2021 (6th) general election: summaries for 21 June and 30 September 2021 and the Board-approved result forms by region for the House and the regional councils; 2026 (7th) general election national figures"
+    },
+    "nebe-results-am": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የምርጫ ውጤት (Election result, Amharic page)",
+      "url": "https://www.nebe.org.et/am/electionresult",
+      "kind": "official_body",
+      "note": "Summary tables of the 21 June 2021 polling: House constituencies held (436) and regional council constituencies held by region (506), seats won by party, and recounts and re-elections pending; links to the constituency result forms on Google Drive"
+    },
+    "nebe-sep30": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "Announcement of the Results of the 6th General Election Conducted on September 30",
+      "url": "https://www.nebe.org.et/sites/default/files/Announcement%20of%20the%20Results%20of%20the%206th%20General%20Election%20Conducted%20on%20September%2030%20(2).pdf",
+      "kind": "official_body",
+      "note": "Harari, SNNP, and Somali: 47 House constituencies and 105 regional council constituencies (377 seats) held on 30 September 2021"
+    },
+    "nebe-7th-seats": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "በ2018 ዓ/ም ለሚካሄደው 7ኛው ዙር የጠቅላላ ምርጫ የህዝብ ተወካዮች እና የክልል ምክር ቤት አባላት ብዛት (Number of House and regional council members for the 7th general election)",
+      "url": "https://www.nebe.org.et/sites/default/files/Summary_0.pdf",
+      "kind": "official_body",
+      "note": "By region and city administration (14 rows, Tigray included): House constituencies and seats (547), regional council constituencies (684), and regional council seats (2,451 in the 6th round, 2,916 for the 7th)"
+    },
+    "nebe-7th-figures": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "The 7th General Election figures excluding recounts and re-elections",
+      "url": "https://www.nebe.org.et/sites/default/files/The_7th_General_Election_figures_excluding_recounts_and_re-elections.pdf",
+      "kind": "official_body",
+      "note": "54,057,861 registered, 51,734,193 voted, 320,781 invalid and spoiled ballots"
+    },
+    "nebe-news": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "ዜናዎችና ኩነቶች (News and events)",
+      "url": "https://www.nebe.org.et/am/news-archive",
+      "kind": "official_body",
+      "note": "Items of 2026-06-01 (polling for the 7th general election across constituencies and polling stations) and 2026-06-21 (announcement of the 7th general election results)"
+    },
+    "nebe-timeline": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የምርጫ የጊዜ ሰሌዳ (Election timelines)",
+      "url": "https://www.nebe.org.et/am/election-timeline",
+      "kind": "official_body",
+      "note": "Calendars for 2007, 2012 (cancelled for COVID-19), 2013, and 2018 E.C.: polling days 16 Ginbot 2007 (24 May 2015), 14 Sene 2013 (21 June 2021), and 24 Ginbot 2018 (1 June 2026); polling-station lists published 20 Tir 2018 (28 January 2026)"
+    },
+    "nebe-ps": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "7th General Election Polling Stations List",
+      "url": "https://www.nebe.org.et/en/List_of_polling_stations",
+      "kind": "official_body",
+      "note": "Twenty PDF lists (technology and manual registration) for 13 regions and city administrations, Tigray not listed; each polling station carries region, zone, woreda, and kebele codes, its House and regional council constituency, and a code built as region, House constituency (3 digits), woreda, zone, kebele, and station (2 digits each). Decoded: 50,395 polling stations, 509 House constituencies (each region's count equals the Board's seat table), 165 zones and sub-cities, 1,393 woredas, and 18,799 kebeles"
+    },
+    "nebe-cci": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "Electoral Special Measures in Response to COVID-19 and Scenarios, presented for the Council for Constitutional Inquiry (June 2020)",
+      "url": "https://www.nebe.org.et/sites/default/files/2021-03/NEBE-assessment-report-to-CCI-english.pdf",
+      "kind": "official_body",
+      "note": "Since its establishment the Board organized five general elections, four local elections, six referendums, and various by-elections; the general election had been scheduled for 29 August 2020"
+    },
+    "nebe-referendum": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "ሕዝበ ውሳኔ (Referendums)",
+      "url": "https://www.nebe.org.et/am/referendum",
+      "kind": "official_body",
+      "note": "Reports on the Begi (1995), Oromia-Somali (2004), Wondo Genet (2008), Amhara-Qimant (2017), Sidama (2019), and southern (2023) referendums and the Wolayta re-run (2023)"
+    },
+    "nebe-ref-result": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የህዝበ ውሳኔ ውጤት (Referendum result)",
+      "url": "https://www.nebe.org.et/am/Referendum_Result",
+      "kind": "official_body",
+      "note": "6 February 2023 referendum in six zones and five special woredas of the SNNP region: summary and Board-approved results for each zone and special woreda"
+    },
+    "ref-begi": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የቤጊ ወረዳ ህዝበ ውሳኔ (1987 ዓ.ም) (Begi woreda referendum, 1995)",
+      "url": "https://www.nebe.org.et/sites/default/files/Begi-referendum.pdf",
+      "kind": "official_body",
+      "note": "Polling 25 Sene 1987 E.C. (2 July 1995) in 88 kebeles; 56,586 registered and 45,965 voted"
+    },
+    "ref-oromia-somali": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የሶማሌና ኦሮሚያ ክልሎች ሕዝበ ውሳኔ (Somali and Oromia regions referendum)",
+      "url": "https://www.nebe.org.et/sites/default/files/Oromia-and-Somali-Referendum.pdf",
+      "kind": "official_body",
+      "note": "Polling 14 Tikimt 1997 E.C. (24 October 2004) in disputed woredas and kebeles under Proclamation 532/2007 art. 32"
+    },
+    "ref-wondo-genet": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የወንዶ ገነት ሕዝቦች ሕዝበ ውሳኔ (Wondo Genet referendum)",
+      "url": "https://www.nebe.org.et/sites/default/files/Wondo%20Genet%20Referendum-Final.pdf",
+      "kind": "official_body",
+      "note": "Polling 30 Tikimt 2001 E.C. (9 November 2008), requested by the House of Federation"
+    },
+    "ref-qimant": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የአማራና ቅማንት ሕዝቦች ሕዝበ ውሳኔ (Amhara and Qimant referendum)",
+      "url": "https://www.nebe.org.et/sites/default/files/Amhara-and-Qimant-Referendum.pdf",
+      "kind": "official_body",
+      "note": "Polling 7 Meskerem 2010 E.C. (17 September 2017) in 12 kebeles of four woredas of North Gondar zone, at the House of Federation's request"
+    },
+    "ref-sidama": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "የሲዳማ በክልልነት የመደራጀት ሕዝበ ውሳኔ (Sidama statehood referendum)",
+      "url": "https://www.nebe.org.et/sites/default/files/Sidama-referendum_0.pdf",
+      "kind": "official_body",
+      "note": "Polling 10 Hidar 2012 E.C. (20 November 2019); final result announced 24 Hidar 2012 E.C.; held under Proclamation 1162/2019 art. 11"
+    },
+    "ref-swe": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "Statement on the South West Ethiopia People's Referendum (9 October 2021)",
+      "url": "https://www.nebe.org.et/en/node/657",
+      "kind": "official_body",
+      "note": "Referendum in Konta special woreda and the West Omo, Bench Sheko, Dawro, and Kafa zones, held on 30 September 2021 in 1,613 polling stations of 22 constituencies, results combined at the House of Federation's request"
+    },
+    "ref-south-2023": {
+      "publisher": "National Election Board of Ethiopia",
+      "title": "በደቡብ ብ/ብ/ሕ/ክልል በስድስት ዞኖች እና በአምስት ልዩ ወረዳዎች የተከናወነው ህዝበ-ውሣኔ አፈፃፀም ማጠቃለያ ሪፖርት (Summary report, June 2023)",
+      "url": "https://www.nebe.org.et/sites/default/files/Final_Report_05-07-23_0.pdf",
+      "kind": "official_body",
+      "note": "Referendum of 29 Tir 2015 E.C. (6 February 2023) in the Gamo, Gofa, Wolayta, Gedeo, Konso, and South Omo zones and the Burji, Amaro, Dirashe, Basketo, and Ale special woredas (3,542 polling stations), and the Wolayta re-run of 12 Sene 2015 E.C. (19 June 2023)"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "የኢትዮጵያ ፌዴራላዊ ዴሞክራሲያዊ ሪፐብሊክ",
+      "name_en": "Federal Democratic Republic of Ethiopia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "et.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "region",
+      "name": "ክልሎች እና የከተማ አስተዳደሮች",
+      "name_en": "Regional states and the Addis Ababa and Dire Dawa city administrations",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "scheme": "et.region",
+      "source": "nebe-7th-seats",
+      "counts": [
+        {
+          "date": "2026-06-01",
+          "value": 14,
+          "source": "nebe-7th-seats",
+          "locator": "Rows 1-14: Dire Dawa, Central Ethiopia, Sidama, Addis Ababa, South Ethiopia, South West Ethiopia, Gambela, Benishangul-Gumuz, Oromia, Afar, Somali, Harari, Amhara, Tigray (12 regional states and 2 city administrations)"
+        }
+      ]
+    },
+    {
+      "key": "zone",
+      "name": "ዞኖች፣ ልዩ ወረዳዎች እና ክፍለ ከተሞች",
+      "name_en": "Zones, special woredas' zones, and city sub-cities",
+      "parent": "region",
+      "polity_kind": "region",
+      "scheme": "et.zone",
+      "source": "nebe-ps",
+      "counts": [
+        {
+          "date": "2026-01-28",
+          "value": 165,
+          "source": "nebe-ps",
+          "locator": "https://www.nebe.org.et/en/List_of_polling_stations (distinct region and zone codes in the 20 lists, Tigray not listed: Afar 7, Amhara 14, Oromia 69, Somali 16, Benishangul-Gumuz 8, Central Ethiopia 10, Sidama 5, South Ethiopia 12, South West Ethiopia 6, Gambela 6, Harari 1, Addis Ababa 10, Dire Dawa 1)"
+        }
+      ]
+    },
+    {
+      "key": "woreda",
+      "name": "ወረዳዎች እና የከተማ አስተዳደሮች",
+      "name_en": "Woredas and town administrations",
+      "parent": "zone",
+      "polity_kind": "county",
+      "scheme": "et.woreda",
+      "source": "nebe-ps",
+      "counts": [
+        {
+          "date": "2026-01-28",
+          "value": 1393,
+          "source": "nebe-ps",
+          "locator": "https://www.nebe.org.et/en/List_of_polling_stations (distinct region, zone, and woreda codes, Tigray not listed: Afar 51, Amhara 197, Oromia 586, Somali 80, Benishangul-Gumuz 27, Central Ethiopia 94, Sidama 44, South Ethiopia 113, South West Ethiopia 61, Gambela 15, Harari 11, Addis Ababa 113, Dire Dawa 1)"
+        }
+      ]
+    },
+    {
+      "key": "kebele",
+      "name": "ቀበሌዎች",
+      "name_en": "Kebeles",
+      "parent": "woreda",
+      "polity_kind": "submunicipal",
+      "scheme": "et.kebele",
+      "source": "nebe-ps",
+      "counts": [
+        {
+          "date": "2026-01-28",
+          "value": 18799,
+          "source": "nebe-ps",
+          "locator": "https://www.nebe.org.et/en/List_of_polling_stations (distinct region, zone, woreda, and kebele codes, Tigray not listed: Afar 555, Amhara 3,742, Oromia 7,745, Somali 1,280, Benishangul-Gumuz 567, Central Ethiopia 1,302, Sidama 613, South Ethiopia 1,588, South West Ethiopia 932, Gambela 277, Harari 38, Addis Ababa 113, Dire Dawa 47)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "hopr",
+      "tier": "national",
+      "name": "የሕዝብ ተወካዮች ምክር ቤት ምርጫ",
+      "name_en": "House of Peoples' Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1995-05-07",
+      "first_held": "1995-05-07",
+      "earliest_record": "1995-05-07",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.hopr_constituency"
+        ],
+        "fine": [
+          "et.polling_station"
+        ]
+      },
+      "finest_note": "Constituency forms with votes per candidate for 2021; polling-station tallies are posted at each station (Proc. 1162/2019 art. 16) but not published centrally",
+      "source": "constitution",
+      "locator": "https://www.pmo.gov.et/constitution/ (arts. 54(1)-(3))",
+      "note": "547 single-member constituencies elected by plurality every five years; at least 20 seats are reserved minority-nationality constituencies drawn inside the regions (Proc. 1162/2019 art. 13(1)(c)-(e)), so they are contests of this class. Polling was split in 1995 and 2000 (Somali later), in 2021 (21 June and 30 September; Tigray not held, and some constituencies in Amhara, Oromia, Benishangul-Gumuz, and SNNP postponed), and in 2026 (no polling in Tigray). Dates in 1995 and 2000 are the main polling days; the Board's page gives only the year.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "ET",
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "National Election Board of Ethiopia",
+          "source": "constitution",
+          "locator": "https://www.pmo.gov.et/constitution/ (art. 54(1): elected for a term of five years; art. 54(2): plurality in single-member constituencies)",
+          "valid_from": "1995-05-07"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEBE election results page",
+          "url": "https://www.nebe.org.et/en/electionresult",
+          "format": "pdf (signed constituency result forms, scanned), jpg summaries",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2021-06-21",
+          "last_date": "2021-09-30",
+          "finest": "et.hopr_constituency",
+          "source": "nebe-results",
+          "evidence": "Board-approved result form per constituency: registered, ballots, invalid, and votes per candidate and party; 24 pages for Addis Ababa's 23 constituencies; regional files on nebe.org.et and Google Drive"
+        },
+        {
+          "platform": "NEBE past elections page",
+          "url": "https://www.nebe.org.et/am/past-elections",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "1995-05-07",
+          "last_date": "2015-05-24",
+          "finest": "et.region",
+          "source": "nebe-past",
+          "evidence": "Registered voters and voters by region and seats won by party in each region; no votes by party or candidate"
+        },
+        {
+          "platform": "NEBE 7th general election figures",
+          "url": "https://www.nebe.org.et/sites/default/files/The_7th_General_Election_figures_excluding_recounts_and_re-elections.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2026-06-01",
+          "last_date": "2026-06-01",
+          "finest": "et.nation",
+          "source": "nebe-7th-figures",
+          "evidence": "National registration, turnout, and ballot totals only; no constituency results posted by 16 November 2026"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-05-07",
+          "note": "1st general election, Ginbot 1987 E.C.; the Board's page gives the year only. 547 constituencies, 21,337,379 registered, 20,068,513 voted (nebe-past)"
+        },
+        {
+          "date": "2000-05-14",
+          "note": "2nd general election, 1992 E.C.; the Board's page gives the year only. 21,655,752 registered, 19,602,783 voted (nebe-past)"
+        },
+        {
+          "date": "2005-05-15",
+          "note": "3rd general election, 7 Ginbot 1997 E.C.; 27,372,888 registered, 22,610,690 voted (nebe-past)"
+        },
+        {
+          "date": "2010-05-23",
+          "contests": 547,
+          "source": "nebe-past",
+          "quote": "በአጠቃላይ ለሕዝብ ተወካዮች ምክር ቤት መቀመጫ ምርጫ በተካሄደባቸው አምስት መቶ አርባ ሰባት (547) የምርጫ ክልሎች (15 Ginbot 2002 E.C.)"
+        },
+        {
+          "date": "2015-05-24",
+          "source": "nebe-timeline",
+          "quote": "የድምፅ መስጫ ቀን ግንቦት 16 ቀን 2007 ዓ.ም. (polling day 16 Ginbot 2007 E.C.)"
+        },
+        {
+          "date": "2021-06-21",
+          "contests": 436,
+          "source": "nebe-results-am",
+          "quote": "ሰኔ 14 ቀን የተካሄደባቸው የሕዝብ ተወካዮች ምክር ቤት ምርጫ ክልል ብዛት: 436 (House constituencies held on 14 Sene 2013 E.C.)"
+        },
+        {
+          "date": "2021-09-30",
+          "contests": 47,
+          "source": "nebe-sep30",
+          "quote": "No. of constituencies that conducted election on September 30 for HoPR: Harari 2, SNNP 22, Somali 23"
+        },
+        {
+          "date": "2026-06-01",
+          "source": "nebe-news",
+          "quote": "ለ7ኛዉ ጠቅላላ ምርጫ የድምፅ አሰጣጥ ሂደት በምስል ከተለያዩ የምርጫ ክልሎች እና የምርጫ ጣቢያዎች (2026-06-01)",
+          "note": "7th general election, 24 Ginbot 2018 E.C.; 547 constituencies apportioned (nebe-7th-seats), none listed in Tigray; 54,057,861 registered and 51,734,193 voted before recounts and re-elections (nebe-7th-figures)"
+        }
+      ],
+      "est_votes": 215000000,
+      "effort": 4
+    },
+    {
+      "key": "by_elections",
+      "tier": "national",
+      "name": "ማሟያ እና ድጋሚ ምርጫ",
+      "name_en": "By-elections and re-elections to the House and the regional councils",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1995-05-07",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.hopr_constituency",
+          "et.rc_constituency"
+        ]
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (arts. 9-10)",
+      "note": "By-elections fill seats vacated for any reason, including recall (art. 9), within six months of the request and never in a council's last six months; re-elections rerun a constituency whose result the Board cancelled (art. 10). The Board reports 'various' by-elections and re-elections without a list (nebe-past); 2021 and 2026 recounts and re-elections are listed on the results page.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "ET",
+          "valid_from": "1995-01-01"
+        },
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ],
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEBE election results page",
+          "url": "https://www.nebe.org.et/en/electionresult",
+          "format": "pdf (signed constituency result forms, scanned), jpg summaries",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2021-06-21",
+          "last_date": "2021-09-30",
+          "finest": "et.hopr_constituency",
+          "source": "nebe-results",
+          "evidence": "Recount and re-election constituencies listed in the 2021 summaries; forms for re-run constituencies with the regional files"
+        }
+      ],
+      "dates": [],
+      "est_votes": 2000000,
+      "effort": 4
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "የኢትዮጵያ ፌዴራላዊ ዴሞክራሲያዊ ሪፐብሊክ ፕሬዚዳንት",
+      "name_en": "President, elected by a joint session of the two federal houses",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1995-08-22",
+      "first_held": "1995-08-22",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.pmo.gov.et/constitution/ (art. 70)",
+      "note": "Nominated by the House of Peoples' Representatives and elected by a two-thirds vote of a joint session with the House of Federation for six years, at most two terms. Elections of 1995, 2001, 2007, 2013, 2018, and 2024 are recorded in the joint sessions' minutes, which the houses do not publish online.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "ET"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "term_years": 6,
+          "called": true,
+          "administered_by": "Joint session of the House of Peoples' Representatives and the House of Federation",
+          "source": "constitution",
+          "locator": "https://www.pmo.gov.et/constitution/ (art. 70(1)-(4))",
+          "valid_from": "1995-08-21"
+        }
+      ],
+      "dates": [],
+      "est_votes": 1000,
+      "effort": 3
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "ጠቅላይ ሚኒስትር",
+      "name_en": "Prime Minister, elected by the House of Peoples' Representatives",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1995-08-21",
+      "first_held": "1995-08-23",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (the House named Meles Zenawi Prime Minister at its session in mid-Nehase 1987 E.C.)",
+      "note": "Elected by the House from among its members (constitution art. 73) at the opening of each term and on a vacancy (1995, 2000, 2005, 2010, 2012, 2015, 2018, 2021, 2026); usually by acclamation, and no division lists are published online.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "ET"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "House of Peoples' Representatives",
+          "source": "constitution",
+          "locator": "https://www.pmo.gov.et/constitution/ (arts. 72-73)",
+          "valid_from": "1995-08-21"
+        }
+      ],
+      "dates": [],
+      "est_votes": 5000,
+      "effort": 3
+    },
+    {
+      "key": "hof",
+      "tier": "region",
+      "name": "የፌዴሬሽን ምክር ቤት",
+      "name_en": "House of Federation, designated by the regional state councils",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1995-08-21",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 7(5))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members are chosen by each regional state council for its nations and nationalities (constitution art. 61(3)) without a published vote; Proclamation 1162/2019 art. 7(5) lets a council opt for direct election with the general election, which no council has notified the Board of.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "regional_council",
+      "tier": "region",
+      "name": "የክልል ምክር ቤቶች ምርጫ",
+      "name_en": "Regional state councils and the Addis Ababa and Dire Dawa city councils",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1995-05-07",
+      "first_held": "1995-05-07",
+      "earliest_record": "1995-05-07",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.rc_constituency"
+        ],
+        "fine": [
+          "et.polling_station"
+        ]
+      },
+      "finest_note": "Constituencies elect one or more members, filled in order of votes (Proc. 1162/2019 art. 4(1)); 684 constituencies and 2,916 seats for 2026",
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (arts. 4(1), 7(1)-(4))",
+      "note": "Each regional state council is elected with the House on the same day; council sizes are set by regional law (Tigray 152, Oromia 537, Amhara 294, Somali 273; 2,916 seats in 14 councils for 2026). The Board counts the Addis Ababa (138, from 2026 158) and Dire Dawa (189) city councils with them: Addis Ababa's council was elected with the general elections of 2000 and 2005, in the local elections of 2008 and 2013, and again with the general elections from 2021. Regions changed as Sidama (2020), South West Ethiopia (2021), and South Ethiopia and Central Ethiopia (2023) split from SNNP, which ended in 2023. Tigray's council was not elected in 2021 or 2026.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ],
+          "valid_from": "1995-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "National Election Board of Ethiopia",
+          "source": "p1162",
+          "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 7(1)-(2): every five years, simultaneously with the House)",
+          "valid_from": "1995-05-07"
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEBE election results page",
+          "url": "https://www.nebe.org.et/en/electionresult",
+          "format": "pdf (signed constituency result forms, scanned), jpg summaries",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2021-06-21",
+          "last_date": "2021-09-30",
+          "finest": "et.rc_constituency",
+          "source": "nebe-results",
+          "evidence": "Board-approved result form per regional council constituency (multi-member), votes per candidate; same regional files as the House"
+        },
+        {
+          "platform": "NEBE past elections page",
+          "url": "https://www.nebe.org.et/am/past-elections",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "1995-05-07",
+          "last_date": "2015-05-24",
+          "finest": "et.region",
+          "source": "nebe-past",
+          "evidence": "Seats won by party in each regional council; registration by region"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-05-07",
+          "note": "With the 1st general election; 1,432 regional council winners in nine regions (nebe-past)"
+        },
+        {
+          "date": "2000-05-14",
+          "note": "With the 2nd general election; Addis Ababa council 138 seats (nebe-past)"
+        },
+        {
+          "date": "2005-05-15",
+          "note": "With the 3rd general election; seats by council: Addis Ababa 138, Afar 87, Amhara 294, Benishangul-Gumuz 99, Gambela 82, Harari 36, Oromia 537, SNNP 348, Tigray 152, Somali 183 (nebe-past)"
+        },
+        {
+          "date": "2010-05-23",
+          "note": "With the 4th general election (nebe-past)"
+        },
+        {
+          "date": "2015-05-24",
+          "seats": 1987,
+          "source": "nebe-past",
+          "quote": "ለክልል ምክር ቤቶች ... ድምር 1187 800 1987 (regional council winners by sex, total 1,987)"
+        },
+        {
+          "date": "2021-06-21",
+          "contests": 506,
+          "source": "nebe-results-am",
+          "quote": "ሰኔ 14 ቀን የተካሄደባቸው የክልል ምክር ቤት ምርጫ ክልል ብዛት: Addis Ababa 10, Afar 25, Amhara 125, Benishangul-Gumuz 6, Dire Dawa 47, Gambela 14, Oromia 171, Sidama 19, SNNP 89"
+        },
+        {
+          "date": "2021-09-30",
+          "contests": 105,
+          "seats": 377,
+          "source": "nebe-sep30",
+          "quote": "No. of RC constituencies / seats that conducted election on September 30: Harari 3/36, SNNP 30/68, Somali 72/273"
+        },
+        {
+          "date": "2026-06-01",
+          "seats": 2916,
+          "source": "nebe-7th-seats",
+          "quote": "ለ7ኛው ዙር ጠቅላላ ምርጫ የክልል ምክር ቤት አባላት ብዛት ድምር 2916 (Tigray's 152 included)"
+        }
+      ],
+      "est_votes": 210000000,
+      "effort": 4
+    },
+    {
+      "key": "referendums",
+      "tier": "zone",
+      "name": "ሕዝበ ውሳኔ",
+      "name_en": "Referendums on statehood and on boundaries and self-administration",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1995-07-02",
+      "first_held": "1995-07-02",
+      "earliest_record": "1995-07-02",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "et.zone",
+          "et.woreda"
+        ],
+        "fine": [
+          "et.kebele",
+          "et.polling_station"
+        ]
+      },
+      "finest_note": "2023 results by zone and special woreda; boundary referendums by kebele in the Board's reports",
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 11)",
+      "note": "The Board runs a referendum when the body empowered by the constitution decides one: statehood referendums under art. 47(3) (Sidama 2019, South West Ethiopia 2021, the southern zones 2023 and the Wolayta re-run) and boundary or self-administration referendums referred by the House of Federation (Begi 1995 under the Transitional Charter, Oromia-Somali 2004, Wondo Genet 2008, Amhara-Qimant 2017). Eight in all (nebe-past). No national referendum is provided for; constitutional amendments go to the federal houses and the regional councils (art. 105).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ]
+        }
+      ],
+      "access": [
+        {
+          "platform": "NEBE referendum results page",
+          "url": "https://www.nebe.org.et/am/Referendum_Result",
+          "format": "pdf (Google Drive), jpg summary",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2023-02-06",
+          "last_date": "2023-06-19",
+          "finest": "et.zone",
+          "source": "nebe-ref-result",
+          "evidence": "Board-approved result for each of six zones and five special woredas"
+        },
+        {
+          "platform": "NEBE referendum reports",
+          "url": "https://www.nebe.org.et/am/referendum",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "1995-07-02",
+          "last_date": "2023-06-19",
+          "finest": "et.kebele",
+          "source": "nebe-referendum",
+          "evidence": "Implementation reports with registration, turnout, and results; Begi by its 88 kebeles in total, Oromia-Somali by woreda and kebele"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-07-02",
+          "contests": 1,
+          "source": "ref-begi",
+          "quote": "ሰኔ 25 ቀን 1987 ዓ.ም. የሕዝበ ውሳኔው ድምፅ አሰጣጥ ተከናውኗል (88 kebeles)"
+        },
+        {
+          "date": "2004-10-24",
+          "source": "ref-oromia-somali",
+          "quote": "የድምፅ መስጫ ዕለት ጥቅምት 14 ቀን 1997 ዓ.ም"
+        },
+        {
+          "date": "2008-11-09",
+          "source": "ref-wondo-genet",
+          "quote": "ጥቅምት 30 ቀን 2001 ዓ.ም. ከጠዋቱ 12፡00 ሰዓት"
+        },
+        {
+          "date": "2017-09-17",
+          "source": "ref-qimant",
+          "quote": "የድምፅ መስጫ ዕለት መስከረም 7 ቀን 2010 ዓ.ም. (12 kebeles of four woredas)"
+        },
+        {
+          "date": "2019-11-20",
+          "contests": 1,
+          "source": "ref-sidama",
+          "quote": "ሕዝበ ውሳኔውን ኅዳር 10 ቀን 2012 ዓ.ም. በተሳካ ሁኔታ አከናውኗል"
+        },
+        {
+          "date": "2021-09-30",
+          "contests": 1,
+          "source": "ref-swe",
+          "quote": "the referendum took place on September 30, 2021 ... in 1,613 poll stations found in 22 constituencies"
+        },
+        {
+          "date": "2023-02-06",
+          "contests": 11,
+          "source": "ref-south-2023",
+          "quote": "ጥር 29 ቀን 2015 ዓ/ም የተካሄደው ህዝበ ውሣኔ (six zones and five special woredas)"
+        },
+        {
+          "date": "2023-06-19",
+          "contests": 1,
+          "source": "ref-south-2023",
+          "quote": "ሰኔ 12 ቀን 2015 ዓ/ም በዎላይታ ዞን የተካሄደው የድጋሚ ህዝበ ውሣኔ"
+        }
+      ],
+      "est_votes": 9000000,
+      "effort": 2
+    },
+    {
+      "key": "zone_council",
+      "tier": "zone",
+      "name": "የብሔረሰብ ዞን፣ የዞን እና የክፍለ ከተማ ምክር ቤቶች",
+      "name_en": "Nationality-zone, zone, and sub-city councils (local elections)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.zone"
+        ]
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 8(1)-(2), 13(2))",
+      "disposition": "blocked",
+      "disposition_reason": "The Board lists four local elections (nebe-past, nebe-cci) but publishes no local results, dates, or seat counts on nebe.org.et; the regional councils that set local seats publish none online.",
+      "note": "Elected in local elections under regional law, in proportional multi-member constituencies (Proc. 1162/2019 art. 13(2)); zone councils exist only in some regions (nationality zones in Amhara, zones of the former SNNP), sub-city councils in Addis Ababa.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "dates": [],
+      "est_votes": 20000000,
+      "effort": 5
+    },
+    {
+      "key": "woreda_council",
+      "tier": "woreda",
+      "name": "የወረዳ እና የከተማ ምክር ቤቶች",
+      "name_en": "Woreda and city councils (local elections)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.woreda"
+        ]
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 8(1)-(2))",
+      "disposition": "blocked",
+      "disposition_reason": "The Board lists four local elections (nebe-past, nebe-cci) but publishes no local results on nebe.org.et and no regional body publishes them online.",
+      "note": "Every woreda and town administration elects a council in local elections; 1,393 woreda-level units in the 2026 polling-station register outside Tigray.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county",
+            "municipality"
+          ]
+        }
+      ],
+      "dates": [],
+      "est_votes": 60000000,
+      "effort": 5
+    },
+    {
+      "key": "kebele_council",
+      "tier": "kebele",
+      "name": "የቀበሌ ምክር ቤቶች",
+      "name_en": "Kebele councils (local elections)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "et.kebele"
+        ]
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 8(1)-(2))",
+      "disposition": "blocked",
+      "disposition_reason": "The Board lists four local elections (nebe-past, nebe-cci) but publishes no local results on nebe.org.et and no regional body publishes them online.",
+      "note": "The kebele is the smallest unit that elects anyone; 18,799 kebeles in the 2026 polling-station register outside Tigray.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "dates": [],
+      "est_votes": 60000000,
+      "effort": 5
+    },
+    {
+      "key": "council_executives",
+      "tier": "region",
+      "name": "የክልል ርዕሳነ መስተዳድሮች፣ ከንቲባዎች እና አስተዳዳሪዎች",
+      "name_en": "Regional presidents, mayors, and zone and woreda administrators chosen by their councils",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "p1162",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by vote of the regional, city, zone, or woreda council from among its members under regional constitutions and city charters; no tallies are published and the Board does not run them.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "recall",
+      "tier": "national",
+      "name": "የመራጮች አመኔታ ማጣት (recall)",
+      "name_en": "Recall of council members",
+      "category": "direct_democracy",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "p1162",
+      "locator": "https://www.nebe.org.et/sites/default/files/Ethiopian-Electoral-Proclamtion-No-1162.pdf (art. 9(1)(b))",
+      "note": "Constituents may recall a member of any council (constitution art. 12(3)); the Board's Directive 22 sets the procedure and an accepted recall leads to a by-election (class by_elections). No recall vote is on the Board's record.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ]
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "ዳኞች",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.pmo.gov.et/constitution/ (art. 81)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Federal and regional judges are appointed by the legislatures on nomination by the judicial administration councils (constitution art. 81); none is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selection",
+      "tier": "national",
+      "name": "የፓርቲ ዕጩ ምርጫ",
+      "name_en": "Parties' selection of candidates",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "p1162",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose candidates by their own rules; Proclamation 1162/2019 provides no state-run nominating contest, and independents qualify by endorsement signatures.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "constituent_assembly",
+      "tier": "national",
+      "name": "የሕገ መንግሥት ጉባኤ ምርጫ",
+      "name_en": "Constituent Assembly (1994)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1994-06-05",
+      "valid_to": "1994-12-09",
+      "first_held": "1994-06-05",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (the constitution commission's draft, adopted 29 Hidar 1987 E.C.)",
+      "disposition": "blocked",
+      "disposition_reason": "Elected under the Transitional Government before the Board's founding; no official canvass by constituency is published online by the Board or the House.",
+      "note": "The assembly adopted the FDRE constitution on 8 December 1994.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "ET"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-06-05"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 5
+    },
+    {
+      "key": "transitional_councils",
+      "tier": "region",
+      "name": "የሽግግር ወቅት የክልልና የወረዳ ምክር ቤቶች ምርጫ",
+      "name_en": "Transitional regional and woreda council elections (1992)",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "1992-06-21",
+      "valid_to": "1995-05-07",
+      "first_held": "1992-06-21",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (Transitional Government, Sene 1983 to Hamle 1987 E.C.)",
+      "disposition": "blocked",
+      "disposition_reason": "Run by the Transitional Government's election commission under the Transitional Charter; no official results are published online.",
+      "match": [],
+      "dates": [
+        {
+          "date": "1992-06-21"
+        }
+      ],
+      "est_votes": 10000000,
+      "effort": 5
+    },
+    {
+      "key": "shengo",
+      "tier": "national",
+      "name": "ብሔራዊ ሸንጎ",
+      "name_en": "National Shengo of the People's Democratic Republic of Ethiopia (1987)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1987-02-22",
+      "valid_to": "1991-05-28",
+      "first_held": "1987-06-14",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (five-year term, members elected from 835 constituencies)",
+      "disposition": "blocked",
+      "disposition_reason": "One-party election under the 1987 PDRE constitution; no official canvass is published online, and the Shengo's records were not taken over by an institution that publishes them.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "ET",
+          "valid_to": "1991-06-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1987-06-14"
+        }
+      ],
+      "est_votes": 14000000,
+      "effort": 5
+    },
+    {
+      "key": "referendum_1987",
+      "tier": "national",
+      "name": "የኢሕዲሪ ሕገ መንግሥት ሕዝበ ውሳኔ",
+      "name_en": "Constitutional referendum of the People's Democratic Republic (1987)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1987-02-01",
+      "valid_to": "1987-02-02",
+      "first_held": "1987-02-01",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (the PDRE constitution, in force 2 Meskerem 1980 E.C.)",
+      "disposition": "blocked",
+      "disposition_reason": "No official canvass of the 1987 referendum is published online.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ET",
+          "valid_to": "1991-06-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1987-02-01"
+        }
+      ],
+      "est_votes": 14000000,
+      "effort": 5
+    },
+    {
+      "key": "chamber_of_deputies",
+      "tier": "national",
+      "name": "የሕግ መምሪያ ምክር ቤት",
+      "name_en": "Imperial Chamber of Deputies (1957-1974)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1955-11-04",
+      "valid_to": "1974-09-12",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hopr-history",
+      "locator": "https://www.hopr.gov.et/Home/AboutUs (the 1948 E.C. revision made the Chamber of Deputies directly elected; the Derg dissolved parliament after 2 Meskerem 1967 E.C.)",
+      "disposition": "blocked",
+      "disposition_reason": "Elections of 1957, 1961, 1965, 1969, and 1973 under the 1955 Revised Constitution had no parties and no published canvass; the House's history gives no counts.",
+      "note": "The Senate was appointed by the Emperor; under the 1931 constitution deputies were chosen by notables, not elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "ET",
+          "valid_to": "1975-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1957-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1961-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1969-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 5
+    }
+  ]
+}

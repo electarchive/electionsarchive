@@ -1,0 +1,1778 @@
+{
+ "polity": "CR",
+ "name": "Costa Rica",
+ "region_schemes": [
+  "cr.provincia"
+ ],
+ "sources": {
+  "constitucion": {
+   "title": "Constitución Política de la República de Costa Rica de 7 de noviembre de 1949 (y sus reformas)",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "The TSE's consolidated text. Art. 105 (referendum, as reformed by Law 8281 of 2002), 106 (57 deputies elected by provinces, as reformed by Law 2741 of 1961), 107 (four-year term), 133 (first Sunday of February), 138 (40 percent threshold, runoff on the first Sunday of April), 168 (provinces, cantons and districts; plebiscite before a new province), 169 and 171 (municipal government and regidores for four years), 172 (a síndico for each district; concejos municipales de distrito, as reformed by Law 8105 of 2001), 100 and 158 (magistrates appointed by the Supreme Court and elected by the Assembly)."
+  },
+  "codigo_electoral": {
+   "title": "Código Electoral, Ley n.° 8765 (y sus reformas)",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "Art. 12(p) (the TSE organizes the referendums and plebiscites of Constitution arts. 105 and 168), 52(k) (parties choose their candidates; a party convention's presidential nominee is final), 147 (partial extraordinary elections for a municipality that disintegrates or under Código Municipal art. 19), 150 (national elections on the first Sunday of February; municipal elections on the first Sunday of February two years later; every four years), 201-205 (majority for president, cociente and subcociente for deputies, regidores and district councils, relative majority for mayors, intendentes and síndicos)."
+  },
+  "codigo_municipal": {
+   "title": "Código Municipal, Ley n.° 7794 (y sus reformas)",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/normativa/codigomunicipal.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "Art. 13(g) (the municipal council appoints the juntas de educación and juntas administrativas), 13(k) (the council calls plebiscites, referendos and cabildos, with TSE delegates attending), 14 (mayor and two vice-mayors), 19 (plebiscite to remove the mayor, two thirds of votes cast and at least 10 percent of the canton's electors), 21 (regidores by population), 54-55 (district councils)."
+  },
+  "estadisticas": {
+   "title": "Estadísticas de elecciones",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/estadisticas_elecciones.html",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "The TSE's statistics page: Cómputo de votos workbooks (xlsx in zip) and books (pdf) for every election from February 2002 to February 2026 (national 2002, 2006, 2010, 2014, 2018, 2022, 2026; municipal December 2002, December 2006, December 2010, February 2016, 2020, 2024; referendum 2007); Estadísticas del sufragio (turnout by sex, age and zone) from 1994; Elecciones en cifras 1953-2022; Municipales en cifras 2002-2024. The site footer licenses its content CC BY-SA 4.0."
+  },
+  "declaratorias": {
+   "title": "Declaratorias definitivas de elecciones",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/declaratorias.html",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "The TSE's index of its definitive declarations of election, 1998-2026: president, deputies, regidores (and síndicos in 1998), mayors, district councils, intendencias and concejos municipales de distrito, the 2007 referendum (resolution 2944-E-2007, 7 October 2007) and the April 2019 plebiscite on the seat of Río Cuarto canton (resolution 2688-E11-2019)."
+  },
+  "cifras": {
+   "title": "Elecciones en cifras 1953-2022",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/elecciones/eleccionescifras.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "TSE Unidad de Estadística, November 2022. Cuadro 1.1 lists the 18 presidential elections 1953-2022 with electorate and votes; Parte III gives each presidential election's votes by party and province, first and second rounds. Presidential only; no deputies or municipal results."
+  },
+  "muni_cifras": {
+   "title": "Municipales en cifras 2002-2024",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/elecciones/eleccionesmunicipalescifras.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "TSE Unidad de Estadística, February 2025. Cuadro 1 gives the six municipal elections 2002-2024; Cuadro 8 counts the posts elected in each by office (regidurías, sindicaturas, alcaldías, concejalías de distrito, concejalías municipales de distrito, intendencias); note 1/ says regidores were elected with the general elections in 2002, 2006 and 2010. Parte III gives mayoral votes by party for each canton."
+  },
+  "computo2024": {
+   "title": "Cómputo de votos y declaratorias de elección, elecciones municipales 4 de febrero de 2024",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/elecciones/computovotos_febrero2024.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "Includes decree 6-2023 convening the election: art. 2, a mayoralty in each of the 84 municipalities; art. 3, regidores per canton; art. 4, a síndico in 491 districts of the Administrative Territorial Division (all but uninhabited Isla del Coco), concejos municipales de distrito with an intendencia in the seven districts of Cervantes, Cóbano, Colorado, Lepanto, Paquera, Peñas Blancas and Tucurrique, and district councils in the rest. Chapter IV has one table row per district electing a síndico (491). Results by administrative and electoral district."
+  },
+  "computo2026": {
+   "title": "Cómputo de votos y declaratorias de elección, elecciones nacionales 1 de febrero de 2026",
+   "publisher": "Tribunal Supremo de Elecciones (TSE)",
+   "url": "https://www.tse.go.cr/pdf/elecciones/computovotos_febrero2026.pdf",
+   "kind": "official_body",
+   "license": "CC BY-SA 4.0",
+   "note": "Includes decree 21-2025 convening the election (La Gaceta 190, 10 October 2025): art. 2 allots the 57 deputies to the seven provinces (San José 18, Alajuela 12, Cartago 6, Heredia 5, Guanacaste 5, Puntarenas 6, Limón 5). The introduction counts 7,154 juntas receptoras in 2,130 electoral districts in the country and 91 abroad, and 3,731,792 registered electors."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "República de Costa Rica",
+   "name_en": "Republic of Costa Rica",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "1949-11-08",
+     "value": 1,
+     "source": "constitucion",
+     "locator": "Constitution art. 1"
+    }
+   ]
+  },
+  {
+   "key": "provincia",
+   "name": "Provincias",
+   "name_en": "Provinces, the constituencies of the Legislative Assembly",
+   "parent": "national",
+   "scheme": "cr.provincia",
+   "elects": false,
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2026-02-01",
+     "value": 7,
+     "source": "computo2026",
+     "locator": "Decree 21-2025 art. 2, CANTIDAD DE DIPUTACIONES A ELEGIR POR PROVINCIA: San José, Alajuela, Cartago, Heredia, Guanacaste, Puntarenas, Limón"
+    }
+   ]
+  },
+  {
+   "key": "canton",
+   "name": "Cantones (municipalidades)",
+   "name_en": "Cantons and their municipalities",
+   "parent": "provincia",
+   "polity_kind": "municipality",
+   "scheme": "cr.canton",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2002-12-01",
+     "value": 81,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2002 81"
+    },
+    {
+     "date": "2006-12-03",
+     "value": 81,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2006 81"
+    },
+    {
+     "date": "2010-12-05",
+     "value": 81,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2010 81"
+    },
+    {
+     "date": "2016-02-07",
+     "value": 81,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2016 81"
+    },
+    {
+     "date": "2020-02-02",
+     "value": 82,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2020 82"
+    },
+    {
+     "date": "2024-02-04",
+     "value": 84,
+     "source": "computo2024",
+     "locator": "Decree 6-2023 art. 2: \"cada una de las ochenta y cuatro municipalidades del país\""
+    }
+   ]
+  },
+  {
+   "key": "distrito",
+   "name": "Distritos administrativos",
+   "name_en": "Districts",
+   "parent": "canton",
+   "polity_kind": "submunicipal",
+   "scheme": "cr.distrito",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2024-02-04",
+     "value": 492,
+     "source": "computo2024",
+     "locator": "Decree 6-2023 art. 4: a síndico in 491 districts of the Administrative Territorial Division, Isla del Coco excepted for lack of population; 491 district rows in chapter IV"
+    }
+   ]
+  },
+  {
+   "key": "concejo_municipal_distrito",
+   "name": "Concejos municipales de distrito",
+   "name_en": "Districts with a district municipal council",
+   "parent": "canton",
+   "polity_kind": "submunicipal",
+   "scheme": "cr.distrito",
+   "valid_from": "2002-01-10",
+   "source": "computo2024",
+   "counts": [
+    {
+     "date": "2002-12-01",
+     "value": 8,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2002 8"
+    },
+    {
+     "date": "2006-12-03",
+     "value": 8,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2006 8"
+    },
+    {
+     "date": "2010-12-05",
+     "value": 8,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2010 8"
+    },
+    {
+     "date": "2016-02-07",
+     "value": 8,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2016 8"
+    },
+    {
+     "date": "2020-02-02",
+     "value": 8,
+     "source": "muni_cifras",
+     "locator": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2020 8"
+    },
+    {
+     "date": "2024-02-04",
+     "value": 7,
+     "source": "computo2024",
+     "locator": "Decree 6-2023 art. 4: Cervantes, Cóbano, Colorado, Lepanto, Paquera, Peñas Blancas y Tucurrique"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Presidencia y Vicepresidencias de la República",
+   "name_en": "President and vice presidents",
+   "category": "executive",
+   "goal": "national",
+   "valid_from": "1949-11-08",
+   "first_held": "1953-07-26",
+   "earliest_record": "1953-07-26",
+   "measure": {
+    "schemes": [
+     "cr.provincia"
+    ],
+    "fine": [
+     "cr.canton",
+     "cr.distrito",
+     "cr.centro",
+     "cr.distrito_electoral",
+     "cr.pais"
+    ]
+   },
+   "finest_note": "Votes by voting center (or electoral district) in the Cómputo de votos workbooks from 2002, abroad by country from 2014; by province only for 1953-1998 (Elecciones en cifras). The 2026 book mentions an interactive report by junta receptora.",
+   "note": "One ticket of a president and two vice presidents, elected nationally with more than 40 percent of valid votes, else a runoff between the top two on the first Sunday of April (Constitution art. 138); four-year term, no immediate re-election. Runoffs were held in 2002, 2014, 2018 and 2022. Elections before the 1949 Constitution are the abolished class presidente_1949.",
+   "source": "constitucion",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "CR"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (arts. 133, 134 and 138)",
+     "period_years": 4,
+     "phase": 2,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "runoff": "threshold",
+     "runoff_threshold": 40,
+     "runoff_rule": "If no ticket exceeds 40 percent of valid votes, the top two meet on the first Sunday of April (Constitution art. 138).",
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "A vice president succeeds; there is no special election (Constitution art. 135).",
+     "valid_from": "1949-11-08"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Elecciones en cifras 1953-2022",
+     "url": "https://www.tse.go.cr/zip/elecciones/eleccionescifras.zip",
+     "format": "xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "1953-07-26",
+     "last_date": "2022-04-03",
+     "finest": "cr.provincia",
+     "source": "cifras",
+     "evidence": "Votes by party and province for each presidential election and runoff 1953-2022"
+    },
+    {
+     "platform": "TSE, Cómputo de votos",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-02-03",
+     "last_date": "2026-02-01",
+     "finest": "cr.centro",
+     "source": "estadisticas",
+     "evidence": "One workbook archive per national election, February 2002 to February 2026, with results by province, canton, administrative and electoral district, and voting center"
+    },
+    {
+     "platform": "TSE, declaratorias definitivas",
+     "url": "https://www.tse.go.cr/declaratorias.html",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "1998-02-01",
+     "last_date": "2026-02-01",
+     "finest": "cr.provincia",
+     "source": "declaratorias",
+     "evidence": "Definitive declaration of each presidential election and runoff from 1998"
+    }
+   ],
+   "est_votes": 38000000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "1953-07-26",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "The first general election under the 1949 Constitution, held on Sunday 26 July 1953 by the TSE; later elections fall on the first Sunday of February."
+    },
+    {
+     "date": "1958-02-02",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1962-02-04",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1966-02-06",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1970-02-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1974-02-03",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1978-02-05",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1982-02-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1986-02-02",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1990-02-04",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1994-02-06",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1998-02-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2002-02-03",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2002-04-07",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.7, \"ELECCIONES PRESIDENCIALES SEGUNDA RONDA 2002, 2014, 2018 Y 2022\"",
+     "note": "Second round on the first Sunday of April (Constitution art. 138)."
+    },
+    {
+     "date": "2006-02-05",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2010-02-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2014-02-02",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2014-04-06",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.7, \"ELECCIONES PRESIDENCIALES SEGUNDA RONDA 2002, 2014, 2018 Y 2022\"",
+     "note": "Second round on the first Sunday of April (Constitution art. 138)."
+    },
+    {
+     "date": "2018-02-04",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2018-04-01",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.7, \"ELECCIONES PRESIDENCIALES SEGUNDA RONDA 2002, 2014, 2018 Y 2022\"",
+     "note": "Second round on the first Sunday of April (Constitution art. 138)."
+    },
+    {
+     "date": "2022-02-06",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2022-04-03",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cifras",
+     "quote": "Cuadro 1.7, \"ELECCIONES PRESIDENCIALES SEGUNDA RONDA 2002, 2014, 2018 Y 2022\"",
+     "note": "Second round on the first Sunday of April (Constitution art. 138)."
+    },
+    {
+     "date": "2026-02-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "computo2026",
+     "quote": "ELECCIONES 1° DE FEBRERO DE 2026; decree 21-2025 art. 2: TOTAL 57 (CINCUENTA Y SIETE)"
+    }
+   ]
+  },
+  {
+   "key": "asamblea",
+   "tier": "national",
+   "name": "Diputaciones a la Asamblea Legislativa",
+   "name_en": "Legislative Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1949-11-08",
+   "first_held": "1953-07-26",
+   "earliest_record": "1998-02-01",
+   "measure": {
+    "schemes": [
+     "cr.provincia"
+    ],
+    "fine": [
+     "cr.canton",
+     "cr.distrito",
+     "cr.centro",
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by voting center (or electoral district) in the Cómputo de votos workbooks from 2002; the 1998 declaration gives provinces; no official digital results for 1953-1994",
+   "note": "Unicameral, elected on the presidential ballot day by closed lists in the seven provinces, seats allotted by population, by cociente and subcociente (Hare quota, largest remainders, with a threshold of half a quota; Código Electoral arts. 201-205); 45 deputies in 1953 and 1958, 57 since Law 2741 of 1961 (Constitution art. 106); four-year term, no immediate re-election (art. 107). Votes from abroad count only for president.",
+   "source": "constitucion",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "CR"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (arts. 106, 107 and 133); Código Electoral art. 150",
+     "period_years": 4,
+     "phase": 2,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "Filled by the next candidate on the party's provincial list, declared by the TSE (Código Electoral art. 207); no by-elections.",
+     "valid_from": "1949-11-08"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-02-03",
+     "last_date": "2026-02-01",
+     "finest": "cr.centro",
+     "source": "estadisticas",
+     "evidence": "Deputies by party for each province, canton, administrative and electoral district and voting center"
+    },
+    {
+     "platform": "TSE, declaratorias definitivas",
+     "url": "https://www.tse.go.cr/declaratorias.html",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "1998-02-01",
+     "last_date": "2026-02-01",
+     "finest": "cr.provincia",
+     "source": "declaratorias",
+     "evidence": "Definitive declaration of the deputies elected from 1998, with the quotient count by province"
+    }
+   ],
+   "est_votes": 31000000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "1953-07-26",
+     "election_kind": "general",
+     "contests": 7,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "The first general election under the 1949 Constitution, held on Sunday 26 July 1953 by the TSE; later elections fall on the first Sunday of February. The Assembly then had 45 seats; Law 2741 of 1961 fixed 57."
+    },
+    {
+     "date": "1958-02-02",
+     "election_kind": "general",
+     "contests": 7,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year. The Assembly then had 45 seats; Law 2741 of 1961 fixed 57."
+    },
+    {
+     "date": "1962-02-04",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1966-02-06",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1970-02-01",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1974-02-03",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1978-02-05",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1982-02-07",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1986-02-02",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1990-02-04",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1994-02-06",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "1998-02-01",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2002-02-03",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2006-02-05",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2010-02-07",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2014-02-02",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2018-02-04",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2022-02-06",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "cifras",
+     "quote": "Cuadro 1.1, \"ELECCIONES PRESIDENCIALES 1953 - 2022\": year columns 1953, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022",
+     "note": "Day from Constitution art. 133 (the first Sunday of February of the renewal year); the TSE's tables give the year."
+    },
+    {
+     "date": "2026-02-01",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 57,
+     "source": "computo2026",
+     "quote": "ELECCIONES 1° DE FEBRERO DE 2026; decree 21-2025 art. 2: TOTAL 57 (CINCUENTA Y SIETE)"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referéndum",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "2002-06-20",
+   "first_held": "2007-10-07",
+   "earliest_record": "2007-10-07",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "cr.provincia"
+    ],
+    "fine": [
+     "cr.canton",
+     "cr.distrito",
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by electoral district in the 2007 Cómputo de votos workbooks",
+   "note": "A referendum approves or repeals a law or partial constitutional reform when called by 5 percent of registered electors, two thirds of the Assembly, or the Executive with an absolute majority of the Assembly (Constitution art. 105, added by Law 8281 of 2002, in force 20 June 2002; Law 8492 of 2006). The only one held approved the Central America-Dominican Republic free trade agreement on 7 October 2007.",
+   "source": "constitucion",
+   "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (art. 105); Código Electoral art. 12(p)",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "CR"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (art. 105)",
+     "called": true,
+     "partisan": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "valid_from": "2002-06-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos, Referéndum 2007",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_referendum2007.zip",
+     "format": "xls in zip",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2007-10-07",
+     "last_date": "2007-10-07",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Yes and no votes by electoral district"
+    }
+   ],
+   "est_votes": 1600000,
+   "effort": 1,
+   "dates": [
+    {
+     "date": "2007-10-07",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "declaratorias",
+     "quote": "Referéndum 2007, Octubre: 2944-E-2007, Declaratoria oficial de resultados de la consulta popular realizada el día 07 de octubre de 2007"
+    }
+   ]
+  },
+  {
+   "key": "plebiscito",
+   "tier": "national",
+   "name": "Plebiscitos territoriales",
+   "name_en": "Territorial plebiscites run by the TSE",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2019-04-01",
+   "earliest_record": "2019-04-01",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cr.distrito",
+     "cr.distrito_electoral"
+    ]
+   },
+   "note": "The TSE runs the plebiscite that must approve a new province in the provinces losing territory (Constitution art. 168; Código Electoral art. 12(p)) and plebiscites ordered by law on cantonal matters, such as the April 2019 vote on the seat (cabecera) of the new canton of Río Cuarto. No province has been created since 1949. Earlier boundary plebiscites have not been found in the TSE's published declarations.",
+   "source": "codigo_electoral",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 12(p)); Constitution art. 168",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, declaratorias definitivas",
+     "url": "https://www.tse.go.cr/declaratorias.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2019-04-01",
+     "last_date": "2019-04-30",
+     "finest": null,
+     "source": "declaratorias",
+     "evidence": "Resolution 2688-E11-2019 declares the result of the Río Cuarto plebiscite"
+    }
+   ],
+   "est_votes": 6000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "2019-04-01",
+     "precision": "month",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "declaratorias",
+     "quote": "Plebiscito 2019, Abril: Plebiscito para decidir la cabecera del cantón Río Cuarto de la provincia Alajuela: 2688-E11-2019"
+    }
+   ]
+  },
+  {
+   "key": "constituyente",
+   "tier": "national",
+   "name": "Asamblea Nacional Constituyente",
+   "name_en": "Constituent assembly",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1948-12-08",
+   "measure": {
+    "schemes": [
+     "cr.provincia"
+    ]
+   },
+   "note": "The Asamblea Nacional Constituyente that wrote the 1949 Constitution was elected on 8 December 1948, before the TSE existed. A future constituent assembly would be elected by cociente and subcociente on the national total (Código Electoral arts. 150, 201 and 204; Constitution art. 196).",
+   "source": "codigo_electoral",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (arts. 150, 201 and 204)",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "CR"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "The TSE publishes no results for the 1948 election, which an earlier electoral tribunal ran; none has been held since.",
+   "est_votes": 90000,
+   "effort": 4,
+   "dates": []
+  },
+  {
+   "key": "presidente_1949",
+   "tier": "national",
+   "name": "Elecciones de Presidente y Congreso antes de 1949",
+   "name_en": "Presidential and congressional elections before the 1949 Constitution",
+   "category": "executive",
+   "goal": "national",
+   "valid_to": "1948-05-08",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Heads of state and presidents, and the Congreso Constitucional, from the 1820s to 1948: indirect (through electoral assemblies) until 1913, direct afterwards, declared by Congress. The 1948 election was annulled and the Congreso dissolved; a junta governed until the 1949 Constitution.",
+   "source": "constitucion",
+   "match": [
+    {
+     "iso_pattern": "CR",
+     "valid_to": "1948-05-08",
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "precedence": 1
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No official body publishes these results; the TSE's series begins in 1953, and the Asamblea Legislativa's site refuses automated requests.",
+   "est_votes": 1500000,
+   "effort": 5,
+   "dates": []
+  },
+  {
+   "key": "convenciones",
+   "tier": "national",
+   "name": "Convenciones y asambleas de los partidos",
+   "name_en": "Party conventions and assemblies",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties choose their candidates under their own statutes, through district, cantonal, provincial and national assemblies or, for president, open conventions such as Liberación Nacional's; the convention's presidential nominee is final (Código Electoral art. 52(k)).",
+   "source": "codigo_electoral",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 52(k))",
+   "match": [
+    {
+     "election_kinds": [
+      "primary"
+     ],
+     "iso_pattern": "CR*"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run, counted and published by the parties themselves; the TSE neither administers nor publishes them.",
+   "dates": []
+  },
+  {
+   "key": "magistraturas",
+   "tier": "national",
+   "name": "Magistraturas de la Corte Suprema y del TSE",
+   "name_en": "Supreme Court and electoral tribunal magistrates",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Supreme Court magistrates are elected by two thirds of the Legislative Assembly for eight years (Constitution art. 158); TSE magistrates are appointed by two thirds of the Supreme Court (art. 100). No judge is elected by voters.",
+   "source": "constitucion",
+   "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (arts. 100 and 158)",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "CR"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect votes of the Assembly and the Court, not popular elections.",
+   "dates": []
+  },
+  {
+   "key": "organizaciones",
+   "tier": "national",
+   "name": "Elecciones de colegios profesionales, cooperativas, sindicatos, universidades y asociaciones",
+   "name_en": "Professional bodies, cooperatives, unions, universities and associations",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Professional colleges, cooperatives, unions, public universities, community development associations (including those governing indigenous territories) and water associations elect their own boards under their own laws and statutes.",
+   "source": "codigo_electoral",
+   "match": [],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Internal votes of private or corporate bodies, not run by the TSE.",
+   "dates": []
+  },
+  {
+   "key": "juntas",
+   "tier": "canton",
+   "name": "Juntas de educación y juntas administrativas",
+   "name_en": "School boards",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "The boards of public schools (juntas de educación) and secondary schools (juntas administrativas) are appointed by the municipal council (Código Municipal art. 13(g)). Costa Rica has no elected special-purpose districts.",
+   "source": "codigo_municipal",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigomunicipal.pdf (art. 13(g))",
+   "match": [],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the municipal council, not elected.",
+   "dates": []
+  },
+  {
+   "key": "alcalde",
+   "tier": "canton",
+   "name": "Alcaldías y vicealcaldías",
+   "name_en": "Mayors",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "1998-05-18",
+   "first_held": "2002-12-01",
+   "earliest_record": "2002-12-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito",
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks",
+   "note": "Each canton elects a mayor by relative majority (Código Electoral art. 202), with two alternates in 2002 and 2006 and a first and second vice-mayor since 2010 (Código Municipal art. 14). The Código Municipal of 1998 replaced the council-appointed ejecutivo municipal; the first direct election was in December 2002, separate from the national elections, and since February 2016 all municipal posts are elected together two years after the national elections. Mayors may be removed by plebiscite (class consulta_cantonal).",
+   "source": "muni_cifras",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 150)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "The first vice-mayor, then the second, completes the term; if both are removed or resign, the TSE calls an election in the canton within six months (Código Municipal art. 19; Código Electoral art. 147).",
+     "valid_from": "2009-09-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos (municipal)",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Archives for December 2002, 2006 and 2010 and February 2016, 2020 and 2024"
+    },
+    {
+     "platform": "TSE, Municipales en cifras 2002-2024",
+     "url": "https://www.tse.go.cr/zip/elecciones/eleccionesmunicipalescifras.zip",
+     "format": "xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.canton",
+     "source": "muni_cifras",
+     "evidence": "Mayoral votes by party for every canton and election"
+    }
+   ],
+   "est_votes": 5400000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "2002-12-01",
+     "election_kind": "local",
+     "contests": 81,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2002 81"
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "local",
+     "contests": 81,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2006 81"
+    },
+    {
+     "date": "2010-12-05",
+     "election_kind": "local",
+     "contests": 81,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2010 81"
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "contests": 81,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2016 81"
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "contests": 82,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": ALCALDÍAS PROPIETARIAS 2020 82"
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "contests": 84,
+     "source": "computo2024",
+     "quote": "Decree 6-2023 art. 2: \"para cada una de las ochenta y cuatro municipalidades del país se elegirán una alcaldía, una vicealcaldía primera y una vicealcaldía segunda\""
+    }
+   ]
+  },
+  {
+   "key": "regidores",
+   "tier": "canton",
+   "name": "Regidurías del concejo municipal",
+   "name_en": "Municipal councils",
+   "category": "council",
+   "goal": "local",
+   "earliest_record": "1998-02-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito",
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks from 2002; the 1998 declarations give cantons",
+   "note": "Each canton's council of regidores, five to thirteen by population (Código Municipal art. 21; Constitution art. 171), elected by closed lists in the canton by cociente and subcociente (Código Electoral arts. 201-205). Elected with the national elections until February 2010 and with the municipal elections since February 2016 (the 2010 councils served six years). Municipal councils go back to the nineteenth century; the TSE's published declarations begin in 1998.",
+   "source": "constitucion",
+   "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (arts. 169 and 171)",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "cr.canton"
+     ],
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 150)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "Filled by the next candidate on the party's cantonal list (Código Electoral art. 208); the TSE calls a partial election only if the council disintegrates (art. 147).",
+     "valid_from": "2016-02-07"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-02-03",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Regidores in the national archives of 2002, 2006 and 2010 and the municipal archives of 2016, 2020 and 2024"
+    },
+    {
+     "platform": "TSE, declaratorias definitivas",
+     "url": "https://www.tse.go.cr/declaratorias.html",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "1998-02-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.canton",
+     "source": "declaratorias",
+     "evidence": "Declarations of the regidores elected by province, 1998-2024"
+    }
+   ],
+   "est_votes": 26000000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "1953-07-26",
+     "through": "1998-02-01",
+     "election_kind": "general",
+     "note": "Regidores were elected with every general election from 1953 to 1998, one list per canton; the number of cantons at each election is not yet counted from an official register."
+    },
+    {
+     "date": "2002-02-03",
+     "election_kind": "general",
+     "contests": 81,
+     "seats": 501,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2002 501; ALCALDÍAS PROPIETARIAS (one per canton) 81; note 1/: Para los años 2002, 2006 y 2010 se eligieron en la elecciones generales."
+    },
+    {
+     "date": "2006-02-05",
+     "election_kind": "general",
+     "contests": 81,
+     "seats": 503,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2006 503; ALCALDÍAS PROPIETARIAS (one per canton) 81; note 1/: Para los años 2002, 2006 y 2010 se eligieron en la elecciones generales."
+    },
+    {
+     "date": "2010-02-07",
+     "election_kind": "general",
+     "contests": 81,
+     "seats": 495,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2010 495; ALCALDÍAS PROPIETARIAS (one per canton) 81; note 1/: Para los años 2002, 2006 y 2010 se eligieron en la elecciones generales."
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "contests": 81,
+     "seats": 505,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2016 505; ALCALDÍAS PROPIETARIAS (one per canton) 81"
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "contests": 82,
+     "seats": 508,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2020 508; ALCALDÍAS PROPIETARIAS (one per canton) 82"
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "contests": 84,
+     "seats": 518,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": REGIDURÍAS PROPIETARIAS 2024 518; ALCALDÍAS PROPIETARIAS (one per canton) 84"
+    }
+   ]
+  },
+  {
+   "key": "consulta_cantonal",
+   "tier": "canton",
+   "name": "Plebiscitos, referendos y cabildos municipales",
+   "name_en": "Municipal plebiscites, referendums and recalls",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "1998-05-18",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A municipal council may call plebiscites, referendos and cabildos under a regulation drafted with the TSE, whose delegates attend (Código Municipal art. 13(k)), and must call a plebiscite on removing the mayor when three quarters of the regidores approve a motion; removal needs two thirds of votes cast and at least 10 percent of the canton's electors (art. 19).",
+   "source": "codigo_municipal",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigomunicipal.pdf (arts. 13(k) and 19)",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "within": null
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Each municipality runs and records its own consultations; the TSE publishes no list or results of them.",
+   "est_votes": 100000,
+   "effort": 5,
+   "dates": []
+  },
+  {
+   "key": "sindico",
+   "tier": "distrito",
+   "name": "Sindicaturas",
+   "name_en": "Síndicos (district representatives)",
+   "category": "executive",
+   "goal": "local",
+   "earliest_record": "1998-02-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks from 2002",
+   "note": "Each district elects a síndico and an alternate by relative majority (Código Electoral art. 202); the síndico sits on the municipal council with voice but no vote (Constitution art. 172) and chairs the district council or the concejo municipal de distrito. Elected with the national elections until 1998, in December 2002, 2006 and 2010, and with the other municipal posts since 2016.",
+   "source": "constitucion",
+   "locator": "https://www.tse.go.cr/pdf/normativa/constitucion.pdf (art. 172)",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "schemes": [
+      "cr.distrito"
+     ],
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 150)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "The alternate síndico completes the term.",
+     "valid_from": "2009-09-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos (municipal)",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Síndicos and district councils by administrative and electoral district"
+    },
+    {
+     "platform": "TSE, declaratorias definitivas",
+     "url": "https://www.tse.go.cr/declaratorias.html",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "1998-02-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito",
+     "source": "declaratorias",
+     "evidence": "One declaration per canton of the síndicos and district councils elected, 2002-2024; the 1998 declarations of regidores and síndicos by province"
+    }
+   ],
+   "est_votes": 10000000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "1953-07-26",
+     "through": "1998-02-01",
+     "election_kind": "general",
+     "note": "Síndicos were elected with the general elections until 1998 (the 1998 declarations are titled Regidurías y Sindicaturas); the number of districts at each election is not yet counted."
+    },
+    {
+     "date": "2002-12-01",
+     "election_kind": "local",
+     "contests": 453,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": SINDICATURAS PROPIETARIAS 2002 453"
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "local",
+     "contests": 469,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": SINDICATURAS PROPIETARIAS 2006 469"
+    },
+    {
+     "date": "2010-12-05",
+     "election_kind": "local",
+     "contests": 470,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": SINDICATURAS PROPIETARIAS 2010 470"
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "contests": 480,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": SINDICATURAS PROPIETARIAS 2016 480"
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "contests": 486,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": SINDICATURAS PROPIETARIAS 2020 486"
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "contests": 491,
+     "source": "computo2024",
+     "quote": "Decree 6-2023 art. 4: \"Se elegirán, además, en cuatrocientos noventa y un distritos de la División Territorial Administrativa, una sindicatura propietaria y una sindicatura suplente -exceptuando el distrito Isla del Coco que, al carecer de población, no elegirá representantes-\""
+    }
+   ]
+  },
+  {
+   "key": "concejo_distrito",
+   "tier": "distrito",
+   "name": "Concejos de distrito",
+   "name_en": "District councils",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "1998-05-18",
+   "first_held": "2002-12-01",
+   "earliest_record": "2002-12-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks",
+   "note": "Each district without a concejo municipal de distrito has a council of five, the síndico and four members elected by closed lists in the district by cociente and subcociente (Código Municipal arts. 54-55; Código Electoral arts. 201 and 204). First elected in December 2002.",
+   "source": "codigo_municipal",
+   "locator": "https://www.tse.go.cr/pdf/normativa/codigomunicipal.pdf (arts. 54 and 55)",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "cr.distrito"
+     ],
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 150)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "vacancy_rule": "Filled by the next candidate on the list.",
+     "valid_from": "2009-09-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos (municipal)",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "District council lists by administrative and electoral district"
+    }
+   ],
+   "est_votes": 5400000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "2002-12-01",
+     "election_kind": "local",
+     "seats": 1755,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2002 1755; SINDICATURAS PROPIETARIAS 453; INTENDENCIA 8",
+     "note": "Not counted: 453 síndicos less 8 concejos municipales de distrito gives 445 councils, which does not match 1755 members at four each; the per-canton declarations would settle it."
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "local",
+     "seats": 1844,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2006 1844; SINDICATURAS PROPIETARIAS 469; INTENDENCIA 8",
+     "contests": 461,
+     "note": "Contests are the districts electing a síndico less those with a concejo municipal de distrito, which has no district council (TSE resolution 1529-E-2002), four members each."
+    },
+    {
+     "date": "2010-12-05",
+     "election_kind": "local",
+     "seats": 1856,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2010 1856; SINDICATURAS PROPIETARIAS 470; INTENDENCIA 8",
+     "note": "Not counted: 470 síndicos less 8 concejos municipales de distrito gives 462 councils, which does not match 1856 members at four each; the per-canton declarations would settle it."
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "seats": 1888,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2016 1888; SINDICATURAS PROPIETARIAS 480; INTENDENCIA 8",
+     "contests": 472,
+     "note": "Contests are the districts electing a síndico less those with a concejo municipal de distrito, which has no district council (TSE resolution 1529-E-2002), four members each."
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "seats": 1912,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2020 1912; SINDICATURAS PROPIETARIAS 486; INTENDENCIA 8",
+     "contests": 478,
+     "note": "Contests are the districts electing a síndico less those with a concejo municipal de distrito, which has no district council (TSE resolution 1529-E-2002), four members each."
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "seats": 1935,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": CONCEJAL DE DISTRITO PROPIETARIAS 2024 1935; SINDICATURAS PROPIETARIAS 491; INTENDENCIA 7",
+     "contests": 484,
+     "note": "Contests are the districts electing a síndico less those with a concejo municipal de distrito, which has no district council (TSE resolution 1529-E-2002), four members each."
+    }
+   ]
+  },
+  {
+   "key": "intendente",
+   "tier": "concejo_municipal_distrito",
+   "name": "Intendencias y viceintendencias",
+   "name_en": "Intendentes of district municipal councils",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2002-01-10",
+   "first_held": "2002-12-01",
+   "earliest_record": "2002-12-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks",
+   "note": "Each concejo municipal de distrito (Ley General de Concejos Municipales de Distrito, Law 8173 of 2002) elects an intendente, its executive, by relative majority, with a vice-intendente since 2010. Eight districts had one from 2002 to 2020; Monteverde became a canton in 2022, leaving seven.",
+   "source": "computo2024",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "name_pattern": "[Ii]ntenden",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (arts. 150 and 202)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "valid_from": "2009-09-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos (municipal)",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Chapter V of the 2024 book: intendencias by electoral district"
+    }
+   ],
+   "est_votes": 100000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "2002-12-01",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2002 8"
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2006 8"
+    },
+    {
+     "date": "2010-12-05",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2010 8"
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2016 8"
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2020 8"
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "contests": 7,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA 2024 7"
+    }
+   ]
+  },
+  {
+   "key": "concejo_municipal_distrito",
+   "tier": "concejo_municipal_distrito",
+   "name": "Concejos municipales de distrito",
+   "name_en": "District municipal councils",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "2002-01-10",
+   "first_held": "2002-12-01",
+   "earliest_record": "2002-12-01",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "cr.distrito_electoral"
+    ]
+   },
+   "finest_note": "Votes by administrative and electoral district in the Cómputo de votos books and workbooks",
+   "note": "Five members, the síndico and four elected by closed lists in the district by cociente and subcociente (Law 8173 art. 6; Código Electoral arts. 201 and 204). Four seats were filled in each in 2002 except where Cuadro 8 shows fewer.",
+   "source": "computo2024",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "name_pattern": "[Mm]unicipal de [Dd]istrito",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "source": "codigo_electoral",
+     "locator": "https://www.tse.go.cr/pdf/normativa/codigoelectoral.pdf (art. 150)",
+     "period_years": 4,
+     "phase": 0,
+     "month": 2,
+     "day_rule": "feb_first_sunday",
+     "term_years": 4,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Supremo de Elecciones",
+     "valid_from": "2009-09-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "TSE, Cómputo de votos (municipal)",
+     "url": "https://www.tse.go.cr/zip/elecciones/computovotos_*.zip",
+     "format": "xls/xlsx in zip, pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "license": "CC BY-SA 4.0",
+     "first_date": "2002-12-01",
+     "last_date": "2024-02-04",
+     "finest": "cr.distrito_electoral",
+     "source": "estadisticas",
+     "evidence": "Concejo municipal de distrito lists by electoral district"
+    }
+   ],
+   "est_votes": 100000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "2002-12-01",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2002 8, seats 32",
+     "seats": 32
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2006 8, seats 32",
+     "seats": 32
+    },
+    {
+     "date": "2010-12-05",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2010 8, seats 32",
+     "seats": 32
+    },
+    {
+     "date": "2016-02-07",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2016 8, seats 32",
+     "seats": 32
+    },
+    {
+     "date": "2020-02-02",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2020 8, seats 32",
+     "seats": 32
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "local",
+     "contests": 7,
+     "source": "muni_cifras",
+     "quote": "Cuadro 8, \"PUESTOS ELECTOS, SEGÚN TIPO DE CANDIDATURA Y CARGO, ELECCIONES MUNICIPALES 2002 - 2024\": INTENDENCIA (one council each); CONCEJAL MUNICIPAL DE DISTRITO PROPIETARIAS 2024 7, seats 28",
+     "seats": 28
+    }
+   ]
+  }
+ ]
+}

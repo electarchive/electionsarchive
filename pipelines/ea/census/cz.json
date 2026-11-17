@@ -1,0 +1,2751 @@
+{
+ "polity": "CZ",
+ "name": "Czechia",
+ "sources": {
+  "ustava": {
+   "title": "Ústavní zákon č. 1/1993 Sb., Ústava České republiky",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1993/1",
+   "kind": "official_body"
+  },
+  "zps": {
+   "title": "Zákon č. 247/1995 Sb., o volbách do Parlamentu České republiky",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1995/247",
+   "kind": "official_body"
+  },
+  "zps2021": {
+   "title": "Zákon č. 189/2021 Sb., kterým se mění zákon o volbách do Parlamentu České republiky",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2021/189",
+   "kind": "official_body"
+  },
+  "zzo": {
+   "title": "Zákon č. 491/2001 Sb., o volbách do zastupitelstev obcí",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2001/491",
+   "kind": "official_body"
+  },
+  "zzk": {
+   "title": "Zákon č. 130/2000 Sb., o volbách do zastupitelstev krajů",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2000/130",
+   "kind": "official_body"
+  },
+  "zep": {
+   "title": "Zákon č. 62/2003 Sb., o volbách do Evropského parlamentu",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2003/62",
+   "kind": "official_body"
+  },
+  "zprez": {
+   "title": "Zákon č. 275/2012 Sb., o volbě prezidenta republiky",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2012/275",
+   "kind": "official_body"
+  },
+  "zref2003": {
+   "title": "Ústavní zákon č. 515/2002 Sb., o referendu o přistoupení České republiky k Evropské unii",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2002/515",
+   "kind": "official_body"
+  },
+  "zmr": {
+   "title": "Zákon č. 22/2004 Sb., o místním referendu",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2004/22",
+   "kind": "official_body"
+  },
+  "zkr": {
+   "title": "Zákon č. 118/2010 Sb., o krajském referendu",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2010/118",
+   "kind": "official_body"
+  },
+  "zobce": {
+   "title": "Zákon č. 128/2000 Sb., o obcích (obecní zřízení)",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2000/128",
+   "kind": "official_body"
+  },
+  "zkraje": {
+   "title": "Zákon č. 129/2000 Sb., o krajích (krajské zřízení)",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2000/129",
+   "kind": "official_body"
+  },
+  "zpraha": {
+   "title": "Zákon č. 131/2000 Sb., o hlavním městě Praze",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2000/131",
+   "kind": "official_body"
+  },
+  "vusc": {
+   "title": "Ústavní zákon č. 347/1997 Sb., o vytvoření vyšších územních samosprávných celků",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1997/347",
+   "kind": "official_body"
+  },
+  "zokresy": {
+   "title": "Zákon č. 51/2020 Sb., o územně správním členění státu",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2020/51",
+   "kind": "official_body"
+  },
+  "zsv": {
+   "title": "Zákon č. 88/2024 Sb., o správě voleb",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/2024/88",
+   "kind": "official_body"
+  },
+  "zkv1990": {
+   "title": "Zákon č. 368/1990 Sb., o volbách do zastupitelstev v obcích",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1990/368",
+   "kind": "official_body"
+  },
+  "zcnr1990": {
+   "title": "Zákon České národní rady č. 54/1990 Sb., o volbách do České národní rady",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1990/54",
+   "kind": "official_body"
+  },
+  "zfs1990": {
+   "title": "Zákon č. 47/1990 Sb., o volbách do Federálního shromáždění",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1990/47",
+   "kind": "official_body"
+  },
+  "uzfed": {
+   "title": "Ústavní zákon č. 143/1968 Sb., o československé federaci",
+   "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+   "url": "https://e-sbirka.gov.cz/sb/1968/143",
+   "kind": "official_body"
+  },
+  "volby": {
+   "title": "Volby.cz: výsledky voleb a referend",
+   "publisher": "Český statistický úřad",
+   "url": "https://www.volby.cz/",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "ruian": {
+   "title": "RÚIAN statistical units (Shapefile, S-JTSK)",
+   "publisher": "Český úřad zeměměřický a katastrální",
+   "url": "https://services.cuzk.gov.cz/shp/stat/epsg-5514/",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "se_vse": {
+   "title": "Otevřená data pro volby do Senátu Parlamentu ČR 1996–2025: seznam konaných voleb a registr kandidátů",
+   "publisher": "Český statistický úřad",
+   "url": "https://www.volby.cz/opendata/senat_vse/senat_vse_opendata.htm",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "se2026": {
+   "title": "Volby do Senátu Parlamentu ČR 2026: výsledky (XML)",
+   "publisher": "Český statistický úřad",
+   "url": "https://www.volby.cz/appdata/senat/20261009/odata/vysledky.xml",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "kv_od": {
+   "title": "Otevřená data pro volby do zastupitelstev obcí 2002–2026: registry zastupitelstev a výsledky",
+   "publisher": "Český statistický úřad",
+   "url": "https://www.volby.cz/opendata/kv2026/kv2026_opendata.htm",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "kz_od": {
+   "title": "Otevřená data pro volby do zastupitelstev krajů 2000–2024: číselník krajů a mandátů",
+   "publisher": "Český statistický úřad",
+   "url": "https://www.volby.cz/opendata/kz2024/kz2024_opendata.htm",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "uzemi": {
+   "title": "Územní jednotky České republiky (údaje za rok 2025)",
+   "publisher": "Český statistický úřad",
+   "url": "https://csu.gov.cz/uzemni-jednotky",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "ns1920": {
+   "title": "Volby do Národního shromáždění 1920 až 1935",
+   "publisher": "Český statistický úřad",
+   "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "mv_mr": {
+   "title": "Místní referenda v České republice (od r. 2006): tabulka hlášení",
+   "publisher": "Ministerstvo vnitra České republiky",
+   "url": "https://mv.gov.cz/volby-referenda/oznamena-referenda-2",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Česká republika",
+   "name_en": "Czech Republic",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "ustava"
+  },
+  {
+   "key": "kraj",
+   "name": "Kraje",
+   "name_en": "Regions (kraje)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "cz.kraj",
+   "valid_from": "2000-01-01",
+   "source": "vusc",
+   "counts": [
+    {
+     "date": "2025-01-01",
+     "value": 14,
+     "source": "uzemi",
+     "locator": "https://csu.gov.cz/uzemni-jednotky (Území České republiky se člení na 14 krajů; Praha is both a kraj and an obec)"
+    }
+   ]
+  },
+  {
+   "key": "okres",
+   "name": "Okresy",
+   "name_en": "Districts (okresy)",
+   "parent": "kraj",
+   "polity_kind": "county",
+   "scheme": "cz.okres",
+   "elects": false,
+   "source": "zokresy",
+   "counts": [
+    {
+     "date": "2025-01-01",
+     "value": 76,
+     "source": "uzemi",
+     "locator": "https://csu.gov.cz/uzemni-jednotky (vymezeno území 76 okresů)"
+    }
+   ]
+  },
+  {
+   "key": "obec",
+   "name": "Obce",
+   "name_en": "Municipalities (obce)",
+   "parent": "kraj",
+   "polity_kind": "municipality",
+   "scheme": "cz.obec",
+   "source": "zobce",
+   "counts": [
+    {
+     "date": "2025-01-01",
+     "value": 6258,
+     "source": "uzemi",
+     "locator": "https://csu.gov.cz/uzemni-jednotky (6 258 obcí a 4 vojenské újezdy)"
+    }
+   ]
+  },
+  {
+   "key": "mestska_cast",
+   "name": "Městské části a městské obvody",
+   "name_en": "City districts of Prague and the statutory cities",
+   "parent": "obec",
+   "polity_kind": "submunicipal",
+   "source": "zobce",
+   "counts": [
+    {
+     "date": "2026-10-09",
+     "value": 140,
+     "source": "kv_od",
+     "locator": "https://www.volby.cz/appdata/kv2026/20261009/vysled/0_2.json (140 zastupitelstev městských částí a obvodů zvolených 9.–10. 10. 2026: Praha 57, other statutory cities 83)"
+    }
+   ]
+  },
+  {
+   "key": "ceskoslovensko",
+   "name": "Československo",
+   "name_en": "Czechoslovakia (1918–1992), in the Czech lands",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1918-10-28",
+   "valid_to": "1993-01-01",
+   "source": "uzfed"
+  }
+ ],
+ "classes": [
+  {
+   "key": "ps",
+   "tier": "national",
+   "name": "Volby do Poslanecké sněmovny Parlamentu České republiky",
+   "name_en": "Chamber of Deputies elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "cz.kraj"
+    ],
+    "fine": [
+     "cz.obec",
+     "cz.okrsek"
+    ]
+   },
+   "finest_note": "Polling-district (okrsek) counts in the open data from 2002; 1996 and 1998 are HTML tables by obec. Okrsky are lists of addresses; their outlines are drawn from RÚIAN address points.",
+   "boundary_source": "ruian",
+   "note": "200 seats by list PR. 1996 and 1998: 8 electoral regions (the former kraje), D'Hondt at national level after Hagenbach-Bischoff in the regions. 2002–2017: the 14 kraje with D'Hondt in each. Since 2021 (Act 189/2021 after Constitutional Court ruling Pl. ÚS 44/17): Imperiali quota in the kraje, then Hagenbach-Bischoff on pooled remainders; thresholds 5%, 8%, and 11%. The Czech National Council elected in 1992 became the first Chamber on 1 January 1993.",
+   "source": "zps",
+   "locator": "https://e-sbirka.gov.cz/sb/1995/247 (§ 24, § 26, § 49–51)",
+   "valid_from": "1993-01-01",
+   "first_held": "1996-05-31",
+   "earliest_record": "1996-05-31",
+   "est_votes": 48000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Ministerstvo vnitra; results by Český statistický úřad; Státní volební komise",
+     "source": "ustava",
+     "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 16, čl. 35)",
+     "vacancy_rule": "A seat falls to the next candidate on the same list (§ 28); the Chamber can be dissolved under čl. 35, giving early elections (1998 and 2013)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2002-06-14",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for 2002–2025, with candidates' preference votes."
+    },
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/ps1996/u0",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-05-31",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for 1996 and 1998 by electoral region, okres, and obec."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-05-31",
+     "contests": 8,
+     "seats": 200,
+     "source": "volby",
+     "quote": "Volby do Poslanecké sněmovny 31.5.–1.6.1996: 8 volebních krajů"
+    },
+    {
+     "date": "1998-06-19",
+     "contests": 8,
+     "seats": 200,
+     "source": "volby",
+     "quote": "Volby do Poslanecké sněmovny 19.–20.6.1998: 8 volebních krajů"
+    },
+    {
+     "date": "2002-06-14",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2006-06-02",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2010-05-28",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2013-10-25",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2017-10-20",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2021-10-08",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    },
+    {
+     "date": "2025-10-03",
+     "contests": 14,
+     "seats": 200,
+     "source": "zps",
+     "quote": "§ 24 a § 26: 200 poslanců; volebním obvodem je volební kraj (14 krajů)"
+    }
+   ]
+  },
+  {
+   "key": "senat",
+   "tier": "national",
+   "name": "Volby do Senátu Parlamentu České republiky",
+   "name_en": "Senate elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "cz.senat"
+    ],
+    "fine": [
+     "cz.obec",
+     "cz.okrsek"
+    ]
+   },
+   "finest_note": "Polling-district counts in the open data from 2008 and in the cumulative 1996–2025 file; earlier dates by obec.",
+   "boundary_source": "ruian",
+   "note": "81 single-member districts (Annex 3 of Act 247/1995); a third elected every two years for six-year terms; two-round majority, the runoff a week after the first round between the top two. All 81 seats in 1996. Vacancies are filled by by-elections (doplňovací volby).",
+   "source": "zps",
+   "locator": "https://e-sbirka.gov.cz/sb/1995/247 (§ 56–59, příloha 3)",
+   "valid_from": "1996-01-01",
+   "first_held": "1996-11-16",
+   "earliest_record": "1996-11-16",
+   "est_votes": 40000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 2,
+     "phase": 0,
+     "term_years": 6,
+     "classes": 3,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 50,
+     "runoff_rule": "Top two candidates, seven days after the first round, when no one has an absolute majority of valid votes",
+     "administered_by": "Ministerstvo vnitra; results by Český statistický úřad",
+     "source": "zps",
+     "locator": "https://e-sbirka.gov.cz/sb/1995/247 (§ 56, § 76–77)",
+     "vacancy_rule": "By-election (doplňovací volby) in the district for the rest of the term, called by the President (§ 84)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/senat_vse/senat_vse_opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1996-11-16",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Cumulative 1996–2025 registry and polling-district files, and per-date open data from 2008."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-11-16",
+     "election_kind": "general",
+     "contests": 81,
+     "seats": 81,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 19961116, řádné volby: 81 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "1996-11-23",
+     "election_kind": "runoff",
+     "contests": 77,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 19961116: 77 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "1998-11-14",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 19981114, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "1998-11-21",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 19981114: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "1999-08-28",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 19990828, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2000-11-12",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20001112, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2000-11-19",
+     "election_kind": "runoff",
+     "contests": 26,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20001112: 26 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2002-10-25",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20021025, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2002-11-01",
+     "election_kind": "runoff",
+     "contests": 26,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20021025: 26 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2003-10-31",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20031031, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2003-11-07",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20031107, doplňovací volby: 1 senátní obvod v registru kandidátů",
+     "note": "Also holds 1 runoff contest of the by-election a week earlier (DATUMVOLEB 20031031: 1 obvod s hlasy ve 2. kole)."
+    },
+    {
+     "date": "2003-11-14",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20031107: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2004-10-08",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20041008, doplňovací volby: 2 senátní obvody v registru kandidátů"
+    },
+    {
+     "date": "2004-10-15",
+     "election_kind": "runoff",
+     "contests": 2,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20041008: 2 obvody s hlasy ve 2. kole"
+    },
+    {
+     "date": "2004-11-05",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20041105, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2004-11-12",
+     "election_kind": "runoff",
+     "contests": 26,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20041105: 26 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2006-10-20",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20061020, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2006-10-27",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20061020: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2007-04-13",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20070413, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2007-04-20",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20070413: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2007-04-27",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20070427, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2007-05-04",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20070427: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2008-10-17",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20081017, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2008-10-24",
+     "election_kind": "runoff",
+     "contests": 26,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20081017: 26 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2010-10-15",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20101015, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2010-10-22",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20101015: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2011-03-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20110318, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2011-03-25",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20110318: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2012-10-12",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20121012, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2012-10-19",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20121012: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2014-01-10",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20140110, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2014-01-17",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20140110: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2014-09-19",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20140919, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2014-09-26",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20140919: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2014-10-10",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20141010, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2014-10-17",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20141010: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2016-10-07",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20161007, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2016-10-14",
+     "election_kind": "runoff",
+     "contests": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20161007: 27 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2017-01-27",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20170127, opakované volby: 1 senátní obvod v registru kandidátů",
+     "note": "Repeat election in district 4 (Most) after the Supreme Administrative Court annulled the 2016 vote."
+    },
+    {
+     "date": "2018-01-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20180105, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2018-01-12",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20180105: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2018-05-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20180518, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2018-05-25",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20180518: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2018-10-05",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20181005, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2018-10-12",
+     "election_kind": "runoff",
+     "contests": 25,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20181005: 25 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2019-04-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20190405, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2019-04-12",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20190405: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2020-06-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20200605, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2020-06-12",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20200605: 1 obvod s hlasy ve 2. kole"
+    },
+    {
+     "date": "2020-10-02",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20201002, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2020-10-09",
+     "election_kind": "runoff",
+     "contests": 26,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20201002: 26 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2022-09-23",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20220923, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2022-09-30",
+     "election_kind": "runoff",
+     "contests": 24,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20220923: 24 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2024-09-20",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20240920, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2024-09-27",
+     "election_kind": "runoff",
+     "contests": 22,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20240920: 22 obvodů s hlasy ve 2. kole"
+    },
+    {
+     "date": "2025-01-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "se_vse",
+     "quote": "DATUMVOLEB 20250117, doplňovací volby: 1 senátní obvod v registru kandidátů"
+    },
+    {
+     "date": "2026-10-09",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 27,
+     "source": "se2026",
+     "quote": "DATUMVOLEB 20261009, řádné volby: 27 senátní obvodů v registru kandidátů"
+    },
+    {
+     "date": "2026-10-16",
+     "election_kind": "runoff",
+     "contests": 22,
+     "source": "se2026",
+     "quote": "DATUMVOLEB 20261009: 22 obvodů s hlasy ve 2. kole"
+    }
+   ]
+  },
+  {
+   "key": "prezident",
+   "tier": "national",
+   "name": "Volba prezidenta republiky",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cz.obec",
+     "cz.okrsek"
+    ]
+   },
+   "note": "Direct election since the constitutional amendment 71/2012 Sb.; two rounds, the second 14 days after the first between the top two. One national constituency.",
+   "source": "zprez",
+   "locator": "https://e-sbirka.gov.cz/sb/2012/275 (§ 2, § 55)",
+   "valid_from": "2012-10-01",
+   "first_held": "2013-01-11",
+   "earliest_record": "2013-01-11",
+   "est_votes": 32000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 3,
+     "term_years": 5,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 50,
+     "runoff_rule": "Top two candidates, 14 days after the first round",
+     "administered_by": "Ministerstvo vnitra; results by Český statistický úřad",
+     "source": "ustava",
+     "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 54–56)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2013-01-11",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for 2013, 2018, and 2023, both rounds."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "CZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-01-11",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2013, 1. kolo"
+    },
+    {
+     "date": "2013-01-25",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2013, 2. kolo"
+    },
+    {
+     "date": "2018-01-12",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2018, 1. kolo"
+    },
+    {
+     "date": "2018-01-26",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2018, 2. kolo"
+    },
+    {
+     "date": "2023-01-13",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2023, 1. kolo"
+    },
+    {
+     "date": "2023-01-27",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "volby",
+     "quote": "Volba prezidenta republiky 2023, 2. kolo"
+    }
+   ]
+  },
+  {
+   "key": "prezident_parlament",
+   "tier": "national",
+   "name": "Volba prezidenta republiky Parlamentem",
+   "name_en": "Presidential elections by Parliament",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the original čl. 54 of the Constitution, the joint session of both chambers elected the president (1993, 1998, 2003 in three attempts, and 2008 in two). Roll-call or ballot counts are in the parliamentary records, not on volby.cz.",
+   "source": "ustava",
+   "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 54, original wording)",
+   "valid_from": "1993-01-01",
+   "valid_to": "2012-10-01",
+   "first_held": "1993-01-26",
+   "est_votes": 5000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "CZ"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Volby do Evropského parlamentu na území České republiky",
+   "name_en": "European Parliament elections in Czechia",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cz.obec",
+     "cz.okrsek"
+    ]
+   },
+   "note": "One national constituency (§ 2(3) of Act 62/2003), 5% threshold, D'Hondt. 24 seats in 2004, 22 in 2009, and 21 since 2014.",
+   "source": "zep",
+   "locator": "https://e-sbirka.gov.cz/sb/2003/62 (§ 2, § 47–48)",
+   "valid_from": "2004-05-01",
+   "first_held": "2004-06-11",
+   "earliest_record": "2004-06-11",
+   "est_votes": 12000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Ministerstvo vnitra; results by Český statistický úřad",
+     "source": "zep",
+     "locator": "https://e-sbirka.gov.cz/sb/2003/62"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2004-06-11",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for 2004–2024."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "2004-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-11",
+     "contests": 1,
+     "seats": 24,
+     "source": "volby",
+     "quote": "Volby do Evropského parlamentu 2004: 24 mandátů v jednom volebním obvodu"
+    },
+    {
+     "date": "2009-06-05",
+     "contests": 1,
+     "seats": 22,
+     "source": "volby",
+     "quote": "Volby do Evropského parlamentu 2009: 22 mandátů v jednom volebním obvodu"
+    },
+    {
+     "date": "2014-05-23",
+     "contests": 1,
+     "seats": 21,
+     "source": "volby",
+     "quote": "Volby do Evropského parlamentu 2014: 21 mandátů v jednom volebním obvodu"
+    },
+    {
+     "date": "2019-05-24",
+     "contests": 1,
+     "seats": 21,
+     "source": "volby",
+     "quote": "Volby do Evropského parlamentu 2019: 21 mandátů v jednom volebním obvodu"
+    },
+    {
+     "date": "2024-06-07",
+     "contests": 1,
+     "seats": 21,
+     "source": "volby",
+     "quote": "Volby do Evropského parlamentu 2024: 21 mandátů v jednom volebním obvodu"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Celostátní referendum",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "cz.obec"
+    ]
+   },
+   "note": "The only national referendum, on accession to the European Union, was held under its own constitutional act (515/2002 Sb.); no general law on national referendums exists.",
+   "source": "zref2003",
+   "locator": "https://e-sbirka.gov.cz/sb/2002/515 (čl. 1, čl. 5)",
+   "first_held": "2003-06-13",
+   "earliest_record": "2003-06-13",
+   "est_votes": 4500000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/ref2003/re?xjazyk=CZ",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2003-06-13",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results by kraj, okres, and obec."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "sovereign_state"
+     ],
+     "iso_pattern": "CZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2003-06-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "volby",
+     "quote": "Referendum o přistoupení České republiky k Evropské unii konané ve dnech 13.–14.06.2003"
+    }
+   ]
+  },
+  {
+   "key": "cnr",
+   "tier": "national",
+   "name": "Volby do České národní rady",
+   "name_en": "Czech National Council elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cz.obec"
+    ]
+   },
+   "note": "Legislature of the Czech Socialist (from 1990 Czech) Republic within the federation from 1969 to 1992. Single-list elections in 200 single-member districts in 1971, 1976, 1981, and 1986; list PR in 8 electoral regions with a 5% threshold in 1990 and 1992. The 1992 council became the Chamber of Deputies on 1 January 1993.",
+   "source": "zcnr1990",
+   "locator": "https://e-sbirka.gov.cz/sb/1990/54",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "earliest_record": "1990-06-08",
+   "est_votes": 26000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/cnr1990/u0",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-06-08",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for 1990 and 1992 by electoral region, okres, and obec; the single-list elections of 1971–1986 are not on volby.cz."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1971-11-26",
+     "note": "Single-list election, counts not read."
+    },
+    {
+     "date": "1976-10-22",
+     "note": "Single-list election, counts not read."
+    },
+    {
+     "date": "1981-06-05",
+     "note": "Single-list election, counts not read."
+    },
+    {
+     "date": "1986-05-23",
+     "note": "Single-list election, counts not read."
+    },
+    {
+     "date": "1990-06-08",
+     "contests": 8,
+     "seats": 200,
+     "source": "volby",
+     "quote": "Volby do České národní rady konané ve dnech 8.–9.6.1990: 8 krajů (Hl.m.Praha, Středočeský … Severomoravský)"
+    },
+    {
+     "date": "1992-06-05",
+     "contests": 8,
+     "seats": 200,
+     "source": "volby",
+     "quote": "Volby do České národní rady konané ve dnech 5.–6.6.1992: 8 volebních krajů"
+    }
+   ]
+  },
+  {
+   "key": "fs_sl",
+   "tier": "ceskoslovensko",
+   "name": "Volby do Sněmovny lidu Federálního shromáždění (v České republice)",
+   "name_en": "Federal Assembly House of the People elections, in the Czech lands",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cz.obec"
+    ]
+   },
+   "note": "Chamber of the Czechoslovak Federal Assembly elected by population. Single lists from 1971 to 1986; in 1990 and 1992 list PR in 8 Czech electoral regions (101 Czech seats of 150 in 1990, 99 in 1992). volby.cz publishes the Czech part only.",
+   "source": "zfs1990",
+   "locator": "https://e-sbirka.gov.cz/sb/1990/47",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "earliest_record": "1990-06-08",
+   "est_votes": 14000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/sl1990/u0",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-06-08",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for the Czech Republic in 1990 and 1992, by region, okres, and obec."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-06-08",
+     "contests": 8,
+     "source": "volby",
+     "quote": "Volby do Sněmovny lidu Federálního shromáždění 8.–9.6.1990: na území České republiky: kraje 31–38"
+    },
+    {
+     "date": "1992-06-05",
+     "contests": 8,
+     "source": "volby",
+     "quote": "Volby do Sněmovny lidu Federálního shromáždění 5.–6.6.1992: na území České republiky: kraje 31–38"
+    }
+   ]
+  },
+  {
+   "key": "fs_sn",
+   "tier": "ceskoslovensko",
+   "name": "Volby do Sněmovny národů Federálního shromáždění (v České republice)",
+   "name_en": "Federal Assembly House of the Nations elections, in the Czech lands",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "cz.obec"
+    ]
+   },
+   "note": "Chamber of the Federal Assembly with 75 members from each republic. Single lists from 1971 to 1986; list PR in 8 Czech electoral regions in 1990 and 1992.",
+   "source": "zfs1990",
+   "locator": "https://e-sbirka.gov.cz/sb/1990/47",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "earliest_record": "1990-06-08",
+   "est_votes": 14000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/sn1990/u0",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-06-08",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for the Czech Republic in 1990 and 1992, by region, okres, and obec."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-06-08",
+     "contests": 8,
+     "source": "volby",
+     "quote": "Volby do Sněmovny národů Federálního shromáždění 8.–9.6.1990 na území České republiky: kraje 31–38"
+    },
+    {
+     "date": "1992-06-05",
+     "contests": 8,
+     "source": "volby",
+     "quote": "Volby do Sněmovny národů Federálního shromáždění 5.–6.6.1992 na území České republiky: kraje 31–38"
+    }
+   ]
+  },
+  {
+   "key": "ns_1920",
+   "tier": "ceskoslovensko",
+   "name": "Volby do Národního shromáždění (poslanecká sněmovna a senát) 1920–1935",
+   "name_en": "First Republic National Assembly elections (Chamber of Deputies and Senate)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "List PR in 23 (Chamber) and 13 (Senate) constituencies across Czechoslovakia in 1920, 1925, 1929, and 1935. ČSÚ republishes the State Statistical Office returns as a scanned overview.",
+   "source": "ns1920",
+   "valid_from": "1920-01-01",
+   "valid_to": "1939-03-15",
+   "first_held": "1920-04-18",
+   "earliest_record": "1920-04-18",
+   "est_votes": 50000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "ČSÚ publikace",
+     "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1920-04-18",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Scanned overview tables for the Chamber and Senate, 1920–1935, by constituency and party."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1918-01-01",
+     "valid_to": "1946-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-04-18",
+     "source": "ns1920"
+    },
+    {
+     "date": "1925-11-15",
+     "source": "ns1920"
+    },
+    {
+     "date": "1929-10-27",
+     "source": "ns1920"
+    },
+    {
+     "date": "1935-05-19",
+     "source": "ns1920"
+    }
+   ]
+  },
+  {
+   "key": "ns_1946",
+   "tier": "ceskoslovensko",
+   "name": "Volby do Ústavodárného národního shromáždění a Národního shromáždění 1946–1964",
+   "name_en": "Constituent and National Assembly elections, 1946–1964",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The 1946 Constituent National Assembly election (list PR among National Front parties) and the single-list National Assembly elections of 1948, 1954, 1960, and 1964.",
+   "source": "uzfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found on volby.cz or csu.gov.cz; the figures exist only in printed statistical yearbooks and the gazettes of the time.",
+   "valid_from": "1945-10-28",
+   "valid_to": "1969-01-01",
+   "first_held": "1946-05-26",
+   "est_votes": 40000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1945-01-01",
+     "valid_to": "1969-01-01"
+    }
+   ]
+  },
+  {
+   "key": "rakousko",
+   "tier": "national",
+   "name": "Volby do Říšské rady a zemských sněmů (do 1918)",
+   "name_en": "Austrian Imperial Council and land diet elections in Bohemia, Moravia, and Silesia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "ns1920",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of the Austrian monarchy before Czechoslovakia existed; they belong to Austria's history, not to a Czech or Czechoslovak electoral authority.",
+   "valid_to": "1918-10-28"
+  },
+  {
+   "key": "kz",
+   "tier": "kraj",
+   "name": "Volby do zastupitelstev krajů",
+   "name_en": "Regional council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "cz.kraj"
+    ],
+    "fine": [
+     "cz.obec",
+     "cz.okrsek"
+    ]
+   },
+   "finest_note": "Polling-district counts in the open data for every election since 2000.",
+   "boundary_source": "ruian",
+   "note": "13 regional councils of 45, 55, or 65 members by population (Prague's council is its municipal council); list PR with a 5% threshold and divisors 1.42, 2, 3, …. Single polling day in 2000, two days since 2004.",
+   "source": "zzk",
+   "locator": "https://e-sbirka.gov.cz/sb/2000/130 (§ 43)",
+   "valid_from": "2000-01-01",
+   "first_held": "2000-11-12",
+   "earliest_record": "2000-11-12",
+   "est_votes": 18000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnitra and the regional offices; results by Český statistický úřad",
+     "source": "ustava",
+     "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 102)",
+     "vacancy_rule": "A seat falls to the next candidate on the list; a dissolved council is re-elected in early elections (§ 45)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2000-11-12",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for 2000–2024."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "cz.kraj"
+     ],
+     "iso_pattern": "CZ"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-11-12",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2000 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2004-11-05",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2004 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2008-10-17",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2008 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2012-10-12",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2012 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2016-10-07",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2016 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2020-10-02",
+     "contests": 13,
+     "seats": 675,
+     "source": "kz_od",
+     "quote": "kz2020 kzciskr: 13 krajů, 675 mandátů"
+    },
+    {
+     "date": "2024-09-20",
+     "contests": 13,
+     "seats": 685,
+     "source": "kz_od",
+     "quote": "kz2024 kzciskr: 13 krajů, 685 mandátů"
+    }
+   ]
+  },
+  {
+   "key": "krajske_referendum",
+   "tier": "kraj",
+   "name": "Krajské referendum",
+   "name_en": "Regional referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Possible since 2011 under Act 118/2010; the Ministry of Interior reports that no regional referendum has yet been called (Žádné krajské referendum dosud nebylo vyhlášeno).",
+   "source": "zkr",
+   "valid_from": "2011-01-01",
+   "est_votes": 0,
+   "effort": 1,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "zo",
+   "tier": "obec",
+   "name": "Volby do zastupitelstev obcí",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "cz.obec"
+    ],
+    "fine": [
+     "cz.okrsek"
+    ]
+   },
+   "finest_note": "Polling-district counts with each candidate's votes in the open data from 2002; 1990, 1994, and 1998 are HTML tables by obec. A council may be split into several electoral districts.",
+   "boundary_source": "ruian",
+   "note": "Councils of every obec, town, městys, statutory city, and the capital (Zastupitelstvo hlavního města Prahy), and of the city districts of Prague and the statutory cities (140 since 2006). The district councils are counted here because the held contests carry the parent city's area and cannot be told apart by selector. Open lists with up to as many votes as seats; 5% threshold, D'Hondt. New, supplementary, and repeat elections between the regular ones are called by Ministry of Interior notices.",
+   "source": "zzo",
+   "locator": "https://e-sbirka.gov.cz/sb/2001/491 (§ 45–46)",
+   "valid_from": "1990-11-24",
+   "first_held": "1990-11-24",
+   "earliest_record": "1990-11-24",
+   "est_votes": 40000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnitra and the municipal offices; results by Český statistický úřad",
+     "source": "ustava",
+     "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 102)",
+     "vacancy_rule": "Substitutes from the list; when a council falls below its members or is dissolved, new elections (nové volby) are held (§ 58 of Act 491/2001)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/kv2026/kv2026_opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2002-11-01",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for the regular elections and the new, supplementary, and repeat elections, 2002–2026."
+    },
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/kv1994/kv?xjazyk=CZ&xid=1",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-11-24",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for 1990, 1994, and 1998 by obec; parts of 1990 did not survive."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1990-11-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-24",
+     "election_kind": "local",
+     "contests": 5691,
+     "source": "volby",
+     "quote": "kv1990: 5 691 zastupitelstev; ve městě Havířov se volby konaly až 15. prosince 1990",
+     "note": "One polling day. Results for some obce are incomplete in the source; Havířov voted on 15 December 1990 and is outside the national totals."
+    },
+    {
+     "date": "1994-11-18",
+     "election_kind": "local",
+     "contests": 6262,
+     "source": "volby",
+     "quote": "kv1994: 6 262 zastupitelstev (6 130 obcí, měst a Prahy, 132 městských částí a obvodů)"
+    },
+    {
+     "date": "1998-11-13",
+     "election_kind": "local",
+     "contests": 6347,
+     "source": "volby",
+     "quote": "kv1998: 6 347 zastupitelstev (6 213 obcí, měst a Prahy, 134 městských částí a obvodů)"
+    },
+    {
+     "date": "1991-01-01",
+     "through": "2002-10-31",
+     "election_kind": "by_election",
+     "note": "New, supplementary, and repeat municipal elections called by Ministry of Interior notices between the regular elections of 1990, 1994, and 1998; volby.cz holds no open data for them."
+    },
+    {
+     "date": "2002-11-01",
+     "election_kind": "local",
+     "contests": 6371,
+     "seats": 62827,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20021101: 6344 zastupitelstev (6205 obcí, 139 městských částí a obvodů), 6371 volebních obvodů, 62827 mandátů",
+     "note": "6344 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2003-01-25",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 16,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20030125 (Sdělení MV č. 558/2002 Sb. - opakované hlasování ve 2 obcích): 2 zastupitelstev (2 obcí, 0 městských částí a obvodů), 2 volebních obvodů, 16 mandátů"
+    },
+    {
+     "date": "2003-03-29",
+     "election_kind": "by_election",
+     "contests": 68,
+     "seats": 482,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20030329 (Sdělení MV č. 496/2002 Sb. - dodatečné volby ve 41 obcích): 68 zastupitelstev (64 obcí, 4 městských částí a obvodů), 68 volebních obvodů, 482 mandátů"
+    },
+    {
+     "date": "2003-07-12",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 33,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20030712 (Sdělení MV č. 102/2003 Sb. - nové volby ve 3 obcích): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 33 mandátů"
+    },
+    {
+     "date": "2003-09-27",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 36,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20030927 (Sdělení MV č. 136/2003 Sb. - nové volby v 1 obci): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 36 mandátů"
+    },
+    {
+     "date": "2003-12-13",
+     "election_kind": "by_election",
+     "contests": 11,
+     "seats": 70,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20031213 (Sdělení MV č. 213/2003 Sb. - nové volby v 1 obci): 11 zastupitelstev (11 obcí, 0 městských částí a obvodů), 11 volebních obvodů, 70 mandátů"
+    },
+    {
+     "date": "2004-01-17",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 24,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20040117 (Sdělení MV č. 335/2003 Sb. - nové volby v 1 městské části): 4 zastupitelstev (3 obcí, 1 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2004-04-24",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 45,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20040424 (Sdělení MV č. 389/2003 Sb. - nové volby v 1 obci): 7 zastupitelstev (7 obcí, 0 městských částí a obvodů), 7 volebních obvodů, 45 mandátů"
+    },
+    {
+     "date": "2004-09-04",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 57,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20040904 (Sdělení MV č. 75/2004 Sb. - nové volby v 1 obci): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 57 mandátů"
+    },
+    {
+     "date": "2004-12-04",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 39,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20041204 (Sdělení MV č. 380/2004 Sb. - nové volby v 1 obci): 7 zastupitelstev (7 obcí, 0 městských částí a obvodů), 7 volebních obvodů, 39 mandátů"
+    },
+    {
+     "date": "2005-05-07",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 36,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20050507 (Sdělení MV č. 625/2004 Sb. - nové volby v 1 obci): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 36 mandátů"
+    },
+    {
+     "date": "2005-09-03",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 44,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20050903 (Sdělení MV č. 85/2005 Sb. - nové volby v 1 obci): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 44 mandátů"
+    },
+    {
+     "date": "2005-12-03",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 12,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20051203 (Sdělení MV č. 281/2005 Sb. - nové volby v 1 obci): 2 zastupitelstev (2 obcí, 0 městských částí a obvodů), 2 volebních obvodů, 12 mandátů"
+    },
+    {
+     "date": "2006-03-04",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 27,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20060304 (Sdělení MV č. 396/2005 Sb. - nové volby v 1 obci): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 27 mandátů"
+    },
+    {
+     "date": "2006-10-20",
+     "election_kind": "local",
+     "contests": 6385,
+     "seats": 62652,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20061020: 6365 zastupitelstev (6225 obcí, 140 městských částí a obvodů), 6385 volebních obvodů, 62652 mandátů",
+     "note": "6365 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2006-12-16",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 139,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20061216 (Sdělení MV č. 521/2006 Sb. Opakované hlasování v 6 obcích a 1 městské části.): 6 zastupitelstev (5 obcí, 1 městských částí a obvodů), 6 volebních obvodů, 139 mandátů"
+    },
+    {
+     "date": "2007-02-17",
+     "election_kind": "by_election",
+     "contests": 19,
+     "seats": 130,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20070217 (Sdělení MV č. 497/2006 Sb. Dodatečné volby v 19 obcích.): 19 zastupitelstev (19 obcí, 0 městských částí a obvodů), 19 volebních obvodů, 130 mandátů"
+    },
+    {
+     "date": "2007-03-31",
+     "election_kind": "by_election",
+     "contests": 28,
+     "seats": 192,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20070331 (Sdělení MV č. 586/2006 Sb. Opakované volby v 1 obci a 3 městských částech.): 28 zastupitelstev (27 obcí, 1 městských částí a obvodů), 28 volebních obvodů, 192 mandátů"
+    },
+    {
+     "date": "2007-06-23",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 45,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20070623 (Sdělení MV č. 21/2007 Sb. Nové volby ve 2 obcích.): 7 zastupitelstev (7 obcí, 0 městských částí a obvodů), 7 volebních obvodů, 45 mandátů"
+    },
+    {
+     "date": "2007-09-22",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 55,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20070922 (Sdělení MV č. 78/2007 Sb. Nové volby v 1 obci.): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 55 mandátů"
+    },
+    {
+     "date": "2007-12-01",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 52,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20071201 (Sdělení MV č. 169/2007 Sb. Nové volby v 1 obci.): 8 zastupitelstev (8 obcí, 0 městských částí a obvodů), 8 volebních obvodů, 52 mandátů"
+    },
+    {
+     "date": "2008-03-29",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 62,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20080329 (Sdělení MV č. 274/2007 Sb. Nové volby v 1 obci.): 8 zastupitelstev (8 obcí, 0 městských částí a obvodů), 8 volebních obvodů, 62 mandátů"
+    },
+    {
+     "date": "2008-06-28",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 24,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20080628 (Sdělení MV č. 15/2008 Sb. Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2008-09-06",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 26,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20080906 (Sdělení MV č. 155/2008 Sb. Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 26 mandátů"
+    },
+    {
+     "date": "2009-01-10",
+     "election_kind": "by_election",
+     "contests": 11,
+     "seats": 63,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20090110 (Sdělení MV č. 241/2008 Sb. Nové volby v 1 obci.): 11 zastupitelstev (11 obcí, 0 městských částí a obvodů), 11 volebních obvodů, 63 mandátů"
+    },
+    {
+     "date": "2009-04-04",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 27,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20090404 (Sdělení MV č. 397/2008 Sb. Nové volby v 1 obci.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 27 mandátů"
+    },
+    {
+     "date": "2009-06-27",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 42,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20090627 (Sdělení MV č. 19/2009 Sb. Nové volby v 1 obci.): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 42 mandátů"
+    },
+    {
+     "date": "2009-09-05",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 28,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20090905 (Sdělení MV č. 89/2009 Sb. Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 28 mandátů"
+    },
+    {
+     "date": "2009-12-12",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20091212 (Sdělení MV č. 182/2009 Sb. Nové volby v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 7 mandátů"
+    },
+    {
+     "date": "2010-01-09",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 17,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20100109 (Sdělení MV č. 254/2009 Sb. Nové volby v 1 obci.): 2 zastupitelstev (2 obcí, 0 městských částí a obvodů), 2 volebních obvodů, 17 mandátů"
+    },
+    {
+     "date": "2010-03-13",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 24,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20100313 (Sdělení MV č. 370/2009 Sb. Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2010-04-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 5,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20100417 (Sdělení MV č. 82/2010 Sb. Opakované hlasování v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 5 mandátů"
+    },
+    {
+     "date": "2010-10-15",
+     "election_kind": "local",
+     "contests": 6395,
+     "seats": 62459,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20101015: 6367 zastupitelstev (6227 obcí, 140 městských částí a obvodů), 6395 volebních obvodů, 62459 mandátů",
+     "note": "6367 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2011-01-08",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 105,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110108 (Sdělení MV č. 239/2010 Sb. Nové volby v 1 obci.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 105 mandátů"
+    },
+    {
+     "date": "2011-02-05",
+     "election_kind": "by_election",
+     "contests": 16,
+     "seats": 106,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110205 (Sdělení MV č. 305/2010 Sb. Dodatečné volby v 18 obcích.): 16 zastupitelstev (16 obcí, 0 městských částí a obvodů), 16 volebních obvodů, 106 mandátů"
+    },
+    {
+     "date": "2011-04-09",
+     "election_kind": "by_election",
+     "contests": 47,
+     "seats": 307,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110409 (Sdělení MV č. 328/2010 Sb. Nové volby v 1 obci.): 47 zastupitelstev (47 obcí, 0 městských částí a obvodů), 47 volebních obvodů, 307 mandátů"
+    },
+    {
+     "date": "2011-05-07",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 21,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110507 (Sdělení MV č. 102/2011 Sb. Opakované hlasování v 1 městě.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 21 mandátů"
+    },
+    {
+     "date": "2011-07-02",
+     "election_kind": "by_election",
+     "contests": 24,
+     "seats": 148,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110702 (Sdělení MV č. 10/2011 Sb. Nové volby ve 3 obcích.): 24 zastupitelstev (24 obcí, 0 městských částí a obvodů), 24 volebních obvodů, 148 mandátů"
+    },
+    {
+     "date": "2011-09-10",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 21,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20110910 (Sdělení MV č. 197/2011 Sb. Opakované hlasování v 1 městě.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 21 mandátů"
+    },
+    {
+     "date": "2011-10-22",
+     "election_kind": "by_election",
+     "contests": 13,
+     "seats": 91,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20111022 (Sdělení MV č. 113/2011 Sb. Nové volby ve 2 obcích.): 13 zastupitelstev (13 obcí, 0 městských částí a obvodů), 13 volebních obvodů, 91 mandátů"
+    },
+    {
+     "date": "2011-12-10",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 61,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20111210 (Sdělení MV č. 227/2011 Sb. Nové volby ve 2 obcích.): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 61 mandátů"
+    },
+    {
+     "date": "2012-01-28",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 14,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20120128 (Sdělení MV č. 313/2011 Sb. Opakované volby v 1 obci.): 2 zastupitelstev (2 obcí, 0 městských částí a obvodů), 2 volebních obvodů, 14 mandátů"
+    },
+    {
+     "date": "2012-04-07",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 28,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20120407 (Sdělení MV č. 332/2011 Sb. Nové volby v 1 obci.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 28 mandátů"
+    },
+    {
+     "date": "2012-07-14",
+     "election_kind": "by_election",
+     "contests": 14,
+     "seats": 92,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20120714 (Sdělení MV č. 14/2012 Sb. Nové volby v 1 obci.): 14 zastupitelstev (14 obcí, 0 městských částí a obvodů), 14 volebních obvodů, 92 mandátů"
+    },
+    {
+     "date": "2012-10-13",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 52,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20121013 (Sdělení MV č. 140/2012 Sb. Nové volby ve 2 obcích.): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 52 mandátů"
+    },
+    {
+     "date": "2013-01-05",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 83,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20130105 (Sdělení MV č. 266/2012 Sb. Dodatečné volby v 1 obci.): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 83 mandátů"
+    },
+    {
+     "date": "2013-04-13",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 44,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20130413 (Sdělení MV č. 349/2012 Sb. Nové volby v 1 obci.): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 44 mandátů"
+    },
+    {
+     "date": "2013-07-20",
+     "election_kind": "by_election",
+     "contests": 12,
+     "seats": 82,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20130720 (Sdělení MV č. 19/2013 Sb. Nové volby ve 4 obcích.): 12 zastupitelstev (12 obcí, 0 městských částí a obvodů), 12 volebních obvodů, 82 mandátů"
+    },
+    {
+     "date": "2013-11-23",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 27,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20131123 (Sdělení MV č. 123/2013 Sb. Nové volby v 1 obci.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 27 mandátů"
+    },
+    {
+     "date": "2014-03-15",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 38,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20140315 (Sdělení MV č. 291/2013 Sb. Nové volby ve 2 obcích.): 7 zastupitelstev (7 obcí, 0 městských částí a obvodů), 7 volebních obvodů, 38 mandátů"
+    },
+    {
+     "date": "2014-10-10",
+     "election_kind": "local",
+     "contests": 6382,
+     "seats": 62213,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20141010: 6375 zastupitelstev (6235 obcí, 140 městských částí a obvodů), 6382 volebních obvodů, 62213 mandátů",
+     "note": "6375 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2015-01-31",
+     "election_kind": "by_election",
+     "contests": 15,
+     "seats": 146,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20150131 (Sdělení MV č. 232/2014 Sb. Dodatečné volby ve 13 obcích.): 15 zastupitelstev (15 obcí, 0 městských částí a obvodů), 15 volebních obvodů, 146 mandátů"
+    },
+    {
+     "date": "2015-03-14",
+     "election_kind": "by_election",
+     "contests": 41,
+     "seats": 274,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20150314 (Sdělení MV č. 277/2014 Sb. Nové volby v 5 obcích.): 41 zastupitelstev (41 obcí, 0 městských částí a obvodů), 41 volebních obvodů, 274 mandátů"
+    },
+    {
+     "date": "2015-06-13",
+     "election_kind": "by_election",
+     "contests": 22,
+     "seats": 138,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20150613 (Sdělení MV č. 349/2014 Sb. Nové volby ve 4 obcích.): 22 zastupitelstev (21 obcí, 1 městských částí a obvodů), 22 volebních obvodů, 138 mandátů"
+    },
+    {
+     "date": "2015-09-26",
+     "election_kind": "by_election",
+     "contests": 16,
+     "seats": 103,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20150926 (Sdělení MV č. 70/2015 Sb. Nové volby v 1 obci.): 16 zastupitelstev (16 obcí, 0 městských částí a obvodů), 16 volebních obvodů, 103 mandátů"
+    },
+    {
+     "date": "2016-01-16",
+     "election_kind": "by_election",
+     "contests": 10,
+     "seats": 70,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20160116 (Sdělení MV č. 193/2015 Sb. Nové volby v 1 obci.): 10 zastupitelstev (10 obcí, 0 městských částí a obvodů), 10 volebních obvodů, 70 mandátů"
+    },
+    {
+     "date": "2016-04-16",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 29,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20160416 (Sdělení MV č. 281/2015 Sb. Nové volby v 1 obci.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 29 mandátů"
+    },
+    {
+     "date": "2016-07-16",
+     "election_kind": "by_election",
+     "contests": 12,
+     "seats": 83,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20160716 (Sdělení MV č. 7/2016 Sb. Nové volby v 1 obci.): 12 zastupitelstev (12 obcí, 0 městských částí a obvodů), 12 volebních obvodů, 83 mandátů"
+    },
+    {
+     "date": "2016-11-05",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 39,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20161105 (Sdělení MV č. 146/2016 Sb. Nové volby v 1 městské části.): 7 zastupitelstev (6 obcí, 1 městských částí a obvodů), 7 volebních obvodů, 39 mandátů"
+    },
+    {
+     "date": "2017-02-04",
+     "election_kind": "by_election",
+     "contests": 9,
+     "seats": 59,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20170204 (Sdělení MV č. 267/2016 Sb. Nové volby v 1 obci.): 9 zastupitelstev (9 obcí, 0 městských částí a obvodů), 9 volebních obvodů, 59 mandátů"
+    },
+    {
+     "date": "2017-05-20",
+     "election_kind": "by_election",
+     "contests": 10,
+     "seats": 74,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20170520 (Sdělení MV č. 385/2016 Sb. Nové volby v 1 obci.): 10 zastupitelstev (10 obcí, 0 městských částí a obvodů), 10 volebních obvodů, 74 mandátů"
+    },
+    {
+     "date": "2017-08-19",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 19,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20170819 (Sdělení MV č. 54/2017 Sb. Nové volby v 1 obci.): 3 zastupitelstev (3 obcí, 0 městských částí a obvodů), 3 volebních obvodů, 19 mandátů"
+    },
+    {
+     "date": "2017-11-04",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 36,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20171104 (Sdělení MV č. 161/2017 Sb. Nové volby v 1 obci.): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 36 mandátů"
+    },
+    {
+     "date": "2018-01-06",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 5,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20180106 (Sdělení MV č. 242/2017 Sb. Nové volby v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 5 mandátů"
+    },
+    {
+     "date": "2018-03-31",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 26,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20180331 (Sdělení MV č. 350/2017 Sb. Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 26 mandátů"
+    },
+    {
+     "date": "2018-10-05",
+     "election_kind": "local",
+     "contests": 6380,
+     "seats": 61939,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20181005: 6377 zastupitelstev (6237 obcí, 140 městských částí a obvodů), 6380 volebních obvodů, 61939 mandátů",
+     "note": "6377 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2019-01-26",
+     "election_kind": "by_election",
+     "contests": 19,
+     "seats": 151,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190126 (Sdělení MV č. 243/2018 Sb. -  Dodatečné volby v 17 obcích.): 19 zastupitelstev (19 obcí, 0 městských částí a obvodů), 19 volebních obvodů, 151 mandátů"
+    },
+    {
+     "date": "2019-03-16",
+     "election_kind": "by_election",
+     "contests": 31,
+     "seats": 201,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190316 (Sdělení MV č. 262/2018 Sb. -  Nové volby v 1 obci.): 31 zastupitelstev (31 obcí, 0 městských částí a obvodů), 31 volebních obvodů, 201 mandátů"
+    },
+    {
+     "date": "2019-03-30",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 31,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190330 (Sdělení MV č. 302/2018 Sb. -  Opakované volby v 1 městě.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 31 mandátů"
+    },
+    {
+     "date": "2019-06-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190615 (Sdělení MV č. 55/2019 Sb. -  Nové volby v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 7 mandátů"
+    },
+    {
+     "date": "2019-09-14",
+     "election_kind": "by_election",
+     "contests": 11,
+     "seats": 71,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190914 (Sdělení MV č. 105/2019 Sb. - Nové volby v 1 obci.): 11 zastupitelstev (10 obcí, 1 městských částí a obvodů), 11 volebních obvodů, 71 mandátů"
+    },
+    {
+     "date": "2019-12-14",
+     "election_kind": "by_election",
+     "contests": 10,
+     "seats": 74,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20191214 (Sdělení MV č. 182/2019 Sb. - Nové volby ve 3 obcích.): 10 zastupitelstev (10 obcí, 0 městských částí a obvodů), 10 volebních obvodů, 74 mandátů"
+    },
+    {
+     "date": "2020-03-14",
+     "election_kind": "by_election",
+     "contests": 16,
+     "seats": 102,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20200314 (Sdělení MV č. 257/2019 Sb. - Nové volby ve 3 obcích.): 16 zastupitelstev (16 obcí, 0 městských částí a obvodů), 16 volebních obvodů, 102 mandátů"
+    },
+    {
+     "date": "2020-06-20",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 19,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20200620 (Sdělení MV č. 8/2020 Sb. - Nové volby v 1 obci.): 3 zastupitelstev (3 obcí, 0 městských částí a obvodů), 3 volebních obvodů, 19 mandátů"
+    },
+    {
+     "date": "2020-09-19",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 21,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20200919 (Sdělení MV č. 182/2020 Sb. - Nové volby v 1 obci.): 3 zastupitelstev (3 obcí, 0 městských částí a obvodů), 3 volebních obvodů, 21 mandátů"
+    },
+    {
+     "date": "2020-12-12",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 26,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20201212 (Sdělení MV č. 321/2020 Sb. - Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 26 mandátů"
+    },
+    {
+     "date": "2021-03-20",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 29,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20210320 (Sdělení MV č. 468/2020 Sb. – Nové volby ve 3 obcích.): 5 zastupitelstev (5 obcí, 0 městských částí a obvodů), 5 volebních obvodů, 29 mandátů"
+    },
+    {
+     "date": "2021-06-19",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 42,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20210619 (Sdělení MV č. 15/2021 Sb. - Nové volby ve 2 obcích.): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 42 mandátů"
+    },
+    {
+     "date": "2021-09-18",
+     "election_kind": "by_election",
+     "contests": 13,
+     "seats": 81,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20210918 (Sdělení MV č. 164/2021 Sb. – Nové volby ve 4 obcích.): 13 zastupitelstev (13 obcí, 0 městských částí a obvodů), 13 volebních obvodů, 81 mandátů"
+    },
+    {
+     "date": "2021-12-11",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 28,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20211211 (Sdělení MV č. 268/2021 Sb. – Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 28 mandátů"
+    },
+    {
+     "date": "2022-01-08",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20220108 (Sdělení MV č. 361/2021 Sb. – Dodatečné volby v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 7 mandátů"
+    },
+    {
+     "date": "2022-03-19",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 28,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20220319 (Sdělení MV č. 373/2021 Sb. – Nové volby ve 3 obcích.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 28 mandátů"
+    },
+    {
+     "date": "2022-09-23",
+     "election_kind": "local",
+     "contests": 6384,
+     "seats": 61811,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20220923: 6383 zastupitelstev (6243 obcí, 140 městských částí a obvodů), 6384 volebních obvodů, 61811 mandátů",
+     "note": "6383 councils; councils with several electoral districts count once per district."
+    },
+    {
+     "date": "2023-01-07",
+     "election_kind": "by_election",
+     "contests": 12,
+     "seats": 82,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20230107 (Sdělení MV č. 282/2022 Sb. - Dodatečné volby v 11 obcích.): 12 zastupitelstev (12 obcí, 0 městských částí a obvodů), 12 volebních obvodů, 82 mandátů"
+    },
+    {
+     "date": "2023-02-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20230218 (Sdělení MV č. 342/2022 Sb. - Opakované volby v 1 obci.): 1 zastupitelstev (1 obcí, 0 městských částí a obvodů), 1 volebních obvodů, 7 mandátů"
+    },
+    {
+     "date": "2023-03-25",
+     "election_kind": "by_election",
+     "contests": 33,
+     "seats": 223,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20230325 (Sdělení MV č. 327/2022 Sb. - Nové volby ve 4 obcích.): 33 zastupitelstev (33 obcí, 0 městských částí a obvodů), 33 volebních obvodů, 223 mandátů"
+    },
+    {
+     "date": "2023-06-17",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 54,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20230617 (Sdělení MV č. 22/2023 Sb. - Dodatečné volby v 1 obci.): 8 zastupitelstev (8 obcí, 0 městských částí a obvodů), 8 volebních obvodů, 54 mandátů"
+    },
+    {
+     "date": "2023-09-16",
+     "election_kind": "by_election",
+     "contests": 10,
+     "seats": 70,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20230916 (Sdělení MV č. 116/2023 Sb. - Nové volby ve 2 obcích.): 10 zastupitelstev (10 obcí, 0 městských částí a obvodů), 10 volebních obvodů, 70 mandátů"
+    },
+    {
+     "date": "2023-12-09",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 54,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20231209 (Sdělení MV č. 219/2023 Sb. - Nové volby ve 2 obcích.): 8 zastupitelstev (7 obcí, 1 městských částí a obvodů), 8 volebních obvodů, 54 mandátů"
+    },
+    {
+     "date": "2024-03-23",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 51,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20240323 (Sdělení MV č. 314/2023 Sb. - Nové volby ve 2 obcích.): 8 zastupitelstev (8 obcí, 0 městských částí a obvodů), 8 volebních obvodů, 51 mandátů"
+    },
+    {
+     "date": "2024-06-22",
+     "election_kind": "by_election",
+     "contests": 8,
+     "seats": 54,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20240622 (Sdělení MV č. 2/2024 Sb. - Dodatečné volby v 1 obci.): 8 zastupitelstev (8 obcí, 0 městských částí a obvodů), 8 volebních obvodů, 54 mandátů"
+    },
+    {
+     "date": "2024-10-05",
+     "election_kind": "by_election",
+     "contests": 11,
+     "seats": 71,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20241005 (Sdělení MV č. 95/2024 Sb. - Nové volby v 5 obcích.): 11 zastupitelstev (11 obcí, 0 městských částí a obvodů), 11 volebních obvodů, 71 mandátů"
+    },
+    {
+     "date": "2024-12-07",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 24,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20241207 (Sdělení MV č. 226/2024 Sb. - Nové volby ve 2 obcích.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2025-03-15",
+     "election_kind": "by_election",
+     "contests": 6,
+     "seats": 34,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20250315 (Sdělení MV č. 336/2024 Sb. - Nové volby ve 2 obcích.): 6 zastupitelstev (6 obcí, 0 městských částí a obvodů), 6 volebních obvodů, 34 mandátů"
+    },
+    {
+     "date": "2025-06-14",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 20,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20250614 (Sdělení MV č. 1/2025 Sb. - Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 20 mandátů"
+    },
+    {
+     "date": "2025-09-13",
+     "election_kind": "by_election",
+     "contests": 7,
+     "seats": 41,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20250913 (Sdělení MV č. 101/2025 Sb. - Nové volby ve 3 obcích.): 7 zastupitelstev (7 obcí, 0 městských částí a obvodů), 7 volebních obvodů, 41 mandátů"
+    },
+    {
+     "date": "2025-12-06",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 21,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20251206 (Sdělení MV č. 240/2025 Sb. - Dodatečné volby v 1 obci.): 3 zastupitelstev (3 obcí, 0 městských částí a obvodů), 3 volebních obvodů, 21 mandátů"
+    },
+    {
+     "date": "2026-03-28",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 24,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20260328 (Sdělení MV č. 375/2025 Sb. - Nové volby v 1 obci.): 4 zastupitelstev (4 obcí, 0 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2026-10-09",
+     "election_kind": "local",
+     "contests": 6390,
+     "seats": 61710,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20261009: 6389 zastupitelstev (6249 obcí, 140 městských částí a obvodů), 6390 volebních obvodů, 61710 mandátů",
+     "note": "6389 councils; councils with several electoral districts count once per district."
+    }
+   ]
+  },
+  {
+   "key": "mistni_referendum",
+   "tier": "obec",
+   "name": "Místní referendum",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Held by obce and city districts under Act 298/1992 and since 2004 Act 22/2004 (valid at 35% turnout, binding with a majority that is at least 25% of the electorate). The Ministry of Interior table lists 569 announced referendums since 2006 with turnout and yes and no counts.",
+   "source": "zmr",
+   "locator": "https://e-sbirka.gov.cz/sb/2004/22 (§ 48)",
+   "valid_from": "1992-07-01",
+   "earliest_record": "2006-03-25",
+   "est_votes": 800000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Ministerstvo vnitra: oznámená referenda",
+     "url": "https://mv.gov.cz/volby-referenda/oznamena-referenda-2",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2006-03-25",
+     "finest": "cz.obec",
+     "evidence": "One row per referendum: obec, question, date, turnout, yes and no votes, and whether the result binds."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "narodni_vybory",
+   "tier": "ceskoslovensko",
+   "name": "Volby do národních výborů",
+   "name_en": "National committee elections (local, district, and regional), 1954–1986",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Single-list elections to the local, town, district, and regional national committees in 1954, 1957, 1960, 1964, 1971, 1976, 1981, and 1986.",
+   "source": "uzfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found on volby.cz or csu.gov.cz; only national totals were printed at the time.",
+   "valid_from": "1954-05-16",
+   "valid_to": "1990-11-24",
+   "first_held": "1954-05-16",
+   "est_votes": 70000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1950-01-01",
+     "valid_to": "1990-11-01"
+    }
+   ]
+  },
+  {
+   "key": "samosprava_1919",
+   "tier": "ceskoslovensko",
+   "name": "Volby do obecních, okresních a zemských zastupitelstev 1919–1938",
+   "name_en": "Municipal, district, and land assembly elections of the First Republic",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Municipal elections from 1919 (staggered, mostly 1919, 1923, 1927, 1931, and 1938) and the district and land assemblies of Bohemia and Moravia-Silesia in 1928 and 1935.",
+   "source": "ns1920",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found; they are in printed State Statistical Office volumes and municipal records.",
+   "valid_from": "1919-06-15",
+   "valid_to": "1939-03-15",
+   "first_held": "1919-06-15",
+   "est_votes": 30000000,
+   "effort": 5
+  },
+  {
+   "key": "neprime_volby",
+   "tier": "national",
+   "name": "Nepřímé volby orgánů",
+   "name_en": "Indirect elections by councils and Parliament",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "zobce",
+   "locator": "https://e-sbirka.gov.cz/sb/2000/128 (§ 84(2)(m)); https://e-sbirka.gov.cz/sb/2000/129",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers chosen by elected bodies, not by voters: mayors (starosta, primátor) and boards by municipal councils, the hejtman and regional board by regional councils, lay judges by councils, and the speakers of both chambers; no electorate votes.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "deputy_mayor",
+      "governor",
+      "head_of_government",
+      "speaker",
+      "other"
+     ],
+     "iso_pattern": "CZ"
+    }
+   ]
+  },
+  {
+   "key": "osadni_vybor",
+   "tier": "obec",
+   "name": "Osadní a místní výbory",
+   "name_en": "Settlement committees of parts of obce",
+   "category": "council",
+   "goal": "local",
+   "measure": {},
+   "source": "zobce",
+   "locator": "https://e-sbirka.gov.cz/sb/2000/128 (§ 120)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the municipal council (§ 120 of Act 128/2000: členy osadního výboru určuje zastupitelstvo obce); residents' meetings only propose members."
+  },
+  {
+   "key": "vnitrni_volby",
+   "tier": "national",
+   "name": "Volby samosprávných komor, škol a stran",
+   "name_en": "Chamber, school board, university, workplace, and party elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the bodies themselves for their members: professional and agricultural chambers, school boards (školské rady), university senates, works councils, and party candidate selections. No state-run nominating contest exists; candidates are nominated by parties, movements, and petitions."
+  }
+ ]
+}

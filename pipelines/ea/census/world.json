@@ -288,6 +288,462 @@
       "publisher": "Governatorato dello Stato della Città del Vaticano",
       "url": "https://www.vaticanstate.va/it/stato-governo/norme-fondamentali/legge-fondamentale-dello-stato-della-citta-del-vaticano.html",
       "kind": "official_body"
+    },
+    "ai-electoral-office": {
+      "title": "Supervisor of Elections Report 2025",
+      "publisher": "Central Electoral Office, Anguilla",
+      "url": "https://www.electoraloffice.gov.ai/",
+      "kind": "official_body"
+    },
+    "al-kqz": {
+      "title": "Komisioni Qendror i Zgjedhjeve",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz.gov.al/",
+      "kind": "official_body"
+    },
+    "ao-cne": {
+      "title": "Comissao Nacional Eleitoral",
+      "publisher": "CNE Angola",
+      "url": "https://www.cne.ao/",
+      "kind": "official_body"
+    },
+    "ar-interior": {
+      "title": "Elecciones Legislativas 2025: el proceso electoral en numeros",
+      "publisher": "Ministerio del Interior, Argentina",
+      "url": "https://www.argentina.gob.ar/",
+      "kind": "official_body"
+    },
+    "at-bmi": {
+      "title": "Bundesministerium fuer Inneres, Nationalratswahlen",
+      "publisher": "Austrian Federal Ministry of the Interior",
+      "url": "https://www.bmi.gv.at/412/nationalratswahlen/",
+      "kind": "official_body"
+    },
+    "au-aec": {
+      "title": "Enrolment statistics",
+      "publisher": "Australian Electoral Commission",
+      "url": "https://www.aec.gov.au/enrolling_to_vote/enrolment_stats/",
+      "kind": "official_body"
+    },
+    "aw-gov": {
+      "title": "Electoral register 2024",
+      "publisher": "Government of Aruba",
+      "url": "https://gobierno.aw/en/electoral-register-2024",
+      "kind": "official_body"
+    },
+    "ax-asub": {
+      "title": "Lagtings- och kommunalvalet 2023, Statistik 2023:7",
+      "publisher": "Statistics and Research Åland (ÅSUB)",
+      "url": "https://www.asub.ax/",
+      "kind": "official_body"
+    },
+    "ba-cik": {
+      "title": "CIK BiH: Opci izbori 2026",
+      "publisher": "Central Election Commission of Bosnia and Herzegovina",
+      "url": "https://www.izbori.ba/",
+      "kind": "official_body"
+    },
+    "bb-ebc": {
+      "title": "Report on the Barbados General Election 2022",
+      "publisher": "Electoral and Boundaries Commission",
+      "url": "https://www.ebc.gov.bb/",
+      "kind": "official_body"
+    },
+    "bd-ec": {
+      "title": "Constituency voter totals",
+      "publisher": "Bangladesh Election Commission",
+      "url": "https://ecs.gov.bd/",
+      "kind": "official_body"
+    },
+    "bi-ceni": {
+      "title": "Arret RCCB 453 proclamation des resultats definitifs",
+      "publisher": "CENI Burundi",
+      "url": "https://www.ceniburundi.bi/",
+      "kind": "official_body"
+    },
+    "by-cik": {
+      "title": "CEC Belarus announcement on 2025 presidential results",
+      "publisher": "Central Commission of Belarus on Elections and Referendums",
+      "url": "https://www.rec.gov.by/",
+      "kind": "official_body"
+    },
+    "bz-ebd": {
+      "title": "Official Results 2025 General Elections",
+      "publisher": "Elections and Boundaries Department, Belize",
+      "url": "https://elections.gov.bz/",
+      "kind": "official_body"
+    },
+    "ca-elections": {
+      "title": "Official Voting Results, 45th general election",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/",
+      "kind": "official_body"
+    },
+    "cd-ceni": {
+      "title": "Commission Electorale Nationale Independante",
+      "publisher": "CENI RDC",
+      "url": "https://www.ceni.cd/",
+      "kind": "official_body"
+    },
+    "ch-bfs": {
+      "title": "Nationalratswahlen 2023: Wahlberechtigte, Wählende, Wahlbeteiligung",
+      "publisher": "Federal Statistical Office (BFS)",
+      "url": "https://www.bfs.admin.ch/bfs/de/home/statistiken/politik/wahlen/eidgenoessische-wahlen/nationalrat/wahlbeteiligung.html",
+      "kind": "official_body"
+    },
+    "ci-cei": {
+      "title": "Commission Electorale Independante",
+      "publisher": "CEI Cote d'Ivoire",
+      "url": "https://cei.ci/",
+      "kind": "official_body"
+    },
+    "cr-tse": {
+      "title": "Boletin Elecciones Febrero 2026",
+      "publisher": "Tribunal Supremo de Elecciones de Costa Rica",
+      "url": "https://tse.go.cr/",
+      "kind": "official_body"
+    },
+    "cv-cne": {
+      "title": "Comissao Nacional de Eleicoes",
+      "publisher": "Comissao Nacional de Eleicoes de Cabo Verde",
+      "url": "https://cne.cv/",
+      "kind": "official_body"
+    },
+    "de-bundeswahlleiterin": {
+      "title": "Die Bundeswahlleiterin",
+      "publisher": "Federal Returning Officer",
+      "url": "https://www.bundeswahlleiterin.de/",
+      "kind": "official_body"
+    },
+    "dk-dst": {
+      "title": "Folketingsvalg 24. marts 2026",
+      "publisher": "Danmarks Statistik",
+      "url": "https://www.dst.dk/da/Statistik/temaer/folketingsvalg2026",
+      "kind": "official_body"
+    },
+    "do-jce": {
+      "title": "Junta Central Electoral",
+      "publisher": "Junta Central Electoral",
+      "url": "https://jce.gob.do/",
+      "kind": "official_body"
+    },
+    "ee-valimised": {
+      "title": "Statistics about Internet voting in Estonia",
+      "publisher": "Estonian National Electoral Committee",
+      "url": "https://www.valimised.ee/",
+      "kind": "official_body"
+    },
+    "es-ine": {
+      "title": "Elecciones a Cortes Generales de 29 de noviembre de 2026",
+      "publisher": "Instituto Nacional de Estadistica (Oficina del Censo Electoral)",
+      "url": "https://www.ine.es/dyngs/Prensa/EG2026.htm",
+      "kind": "official_body"
+    },
+    "fi-vaalit": {
+      "title": "Presidentinvaali 2024 tulospalvelu",
+      "publisher": "Oikeusministeriö (vaalit.fi)",
+      "url": "https://tulospalvelu.vaalit.fi/",
+      "kind": "official_body"
+    },
+    "fj-feo": {
+      "title": "Issuance of Writ of Elections",
+      "publisher": "Fijian Elections Office",
+      "url": "https://www.feo.org.fj/",
+      "kind": "official_body"
+    },
+    "gb-ons": {
+      "title": "Electoral registration statistics for the UK, December 2025",
+      "publisher": "Office for National Statistics",
+      "url": "https://www.ons.gov.uk/peoplepopulationandcommunity/elections/electoralregistration/datasets/electoralstatisticsforuk",
+      "kind": "official_body"
+    },
+    "gg-states": {
+      "title": "Results of the 2025 General Election",
+      "publisher": "States of Guernsey",
+      "url": "https://www.gov.gg/",
+      "kind": "official_body"
+    },
+    "gl-rigsombudsmand": {
+      "title": "Resultater fra Gronland, Folketingsvalg 2026",
+      "publisher": "Rigsombudsmanden i Gronland",
+      "url": "https://www.dst.dk/valg/Valg2546527/other/Resultater%20fra%20Gr%C3%B8nland.pdf",
+      "kind": "official_body"
+    },
+    "gm-iec": {
+      "title": "Independent Electoral Commission The Gambia",
+      "publisher": "Independent Electoral Commission (Gambia)",
+      "url": "https://iec.gm/",
+      "kind": "official_body"
+    },
+    "gn-presidence": {
+      "title": "Referendum du 21 septembre 2025: lancement de la distribution des cartes d electeurs",
+      "publisher": "Presidence de la Republique de Guinee",
+      "url": "https://presidence.gov.gn/",
+      "kind": "official_body"
+    },
+    "gq-gobierno": {
+      "title": "Entrega del Censo Electoral 2022",
+      "publisher": "Oficina de Informacion y Prensa de Guinea Ecuatorial",
+      "url": "https://www.guineaecuatorialpress.com/",
+      "kind": "official_body"
+    },
+    "gt-tse": {
+      "title": "Electores empadronados 2023",
+      "publisher": "Tribunal Supremo Electoral de Guatemala",
+      "url": "https://tse.org.gt/",
+      "kind": "official_body"
+    },
+    "hk-eac": {
+      "title": "2025 LegCo General Election turnout",
+      "publisher": "Electoral Affairs Commission / REO",
+      "url": "https://www.elections.gov.hk/legco2025/",
+      "kind": "official_body"
+    },
+    "hr-dip": {
+      "title": "Izvješće o provedenim izborima za zastupnike u Hrvatski sabor 2024.",
+      "publisher": "Državno izborno povjerenstvo",
+      "url": "https://www.izbori.hr/",
+      "kind": "official_body"
+    },
+    "id-kpu": {
+      "title": "Lembar Fakta KPU: DPT Pemilu 2024",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://www.kpu.go.id/",
+      "kind": "official_body"
+    },
+    "il-cec": {
+      "title": "Central Elections Committee for the 26th Knesset",
+      "publisher": "Knesset Central Elections Committee",
+      "url": "https://votes26.bechirot.gov.il/",
+      "kind": "official_body"
+    },
+    "is-hagstofa": {
+      "title": "Hagtidindi: Althingiskosningar 2024",
+      "publisher": "Statistics Iceland",
+      "url": "https://www.hagstofa.is/",
+      "kind": "official_body"
+    },
+    "it-interno-dait": {
+      "title": "Dossier Elezioni Politiche 25 settembre 2022",
+      "publisher": "Ministero dell'Interno, DAIT",
+      "url": "https://dait.interno.gov.it/",
+      "kind": "official_body"
+    },
+    "jp-soumu": {
+      "title": "Reiwa 8 Feb 8 House of Representatives election results (preliminary)",
+      "publisher": "Ministry of Internal Affairs and Communications (Japan)",
+      "url": "https://www.soumu.go.jp/senkyo/51syusokuhou/index.html",
+      "kind": "official_body"
+    },
+    "ke-iebc": {
+      "title": "Registered Voters per County",
+      "publisher": "Independent Electoral and Boundaries Commission",
+      "url": "https://www.iebc.or.ke/",
+      "kind": "official_body"
+    },
+    "kg-cec": {
+      "title": "ЦИК КР",
+      "publisher": "Central Commission for Elections and Referenda of the Kyrgyz Republic",
+      "url": "https://shailoo.gov.kg/",
+      "kind": "official_body"
+    },
+    "kz-cik": {
+      "title": "CEC Kazakhstan press release on Kurultai election results",
+      "publisher": "Central Election Commission of Kazakhstan",
+      "url": "https://www.election.gov.kz/",
+      "kind": "official_body"
+    },
+    "la-nec": {
+      "title": "Over 4.7 Million Voters Registered for Upcoming General Elections in Laos",
+      "publisher": "Lao National Election Committee via Lao News Agency (KPL)",
+      "url": "https://kpl.gov.la/",
+      "kind": "official_body"
+    },
+    "li-landtagswahlen": {
+      "title": "Landtagswahlen 2025 Stimmbeteiligung",
+      "publisher": "Regierung des Fuerstentums Liechtenstein",
+      "url": "https://www.landtagswahlen.li/",
+      "kind": "official_body"
+    },
+    "lu-elections": {
+      "title": "Elections legislatives 2023",
+      "publisher": "Gouvernement du Grand-Duche de Luxembourg",
+      "url": "https://elections.public.lu/",
+      "kind": "official_body"
+    },
+    "lv-cvk": {
+      "title": "SV2026 Saeimas velesanu rezultati",
+      "publisher": "Centrala velesanu komisija",
+      "url": "https://www.cvk.lv/",
+      "kind": "official_body"
+    },
+    "ma-interieur": {
+      "title": "Elections de septembre 2026: inscrits sur les listes electorales",
+      "publisher": "Ministere de l'Interieur (via maroc.ma)",
+      "url": "https://maroc.ma/",
+      "kind": "official_body"
+    },
+    "md-cec": {
+      "title": "Numărul alegătorilor înscriși în Registrul de Stat al Alegătorilor",
+      "publisher": "Comisia Electorală Centrală",
+      "url": "https://a.cec.md/",
+      "kind": "official_body"
+    },
+    "me-dik": {
+      "title": "Konačni rezultati 2023",
+      "publisher": "Državna izborna komisija Crne Gore",
+      "url": "https://www.dik.co.me/",
+      "kind": "official_body"
+    },
+    "mu-electoral-commissioner": {
+      "title": "Distribution of electors by country of citizenship",
+      "publisher": "Electoral Commissioner Mauritius",
+      "url": "https://www.electionsmauritius.com/",
+      "kind": "official_body"
+    },
+    "mv-ec": {
+      "title": "Election Commission of Maldives statistics",
+      "publisher": "Elections Commission of Maldives",
+      "url": "https://www.elections.gov.mv/",
+      "kind": "official_body"
+    },
+    "mw-mec": {
+      "title": "2025 Voter Registration Statistics",
+      "publisher": "Malawi Electoral Commission",
+      "url": "https://mec.org.mw/",
+      "kind": "official_body"
+    },
+    "mx-ine": {
+      "title": "Estadisticas Lista Nominal y Padron Electoral",
+      "publisher": "Instituto Nacional Electoral",
+      "url": "https://www.ine.mx/",
+      "kind": "official_body"
+    },
+    "nl-kiesraad": {
+      "title": "Uitslag Tweede Kamerverkiezing 2025",
+      "publisher": "Kiesraad",
+      "url": "https://www.kiesraad.nl/",
+      "kind": "official_body"
+    },
+    "no-ssb": {
+      "title": "Personer med stemmerett",
+      "publisher": "Statistics Norway (SSB)",
+      "url": "https://www.ssb.no/valg/stortingsvalg",
+      "kind": "official_body"
+    },
+    "nz-electoral-commission": {
+      "title": "Report on the 2023 General Election",
+      "publisher": "Electoral Commission New Zealand",
+      "url": "https://elections.nz/",
+      "kind": "official_body"
+    },
+    "pe-jne": {
+      "title": "Reporte N.5 Analisis del padron electoral, EG 2026",
+      "publisher": "Jurado Nacional de Elecciones",
+      "url": "https://www.jne.gob.pe/",
+      "kind": "official_body"
+    },
+    "ph-comelec": {
+      "title": "Number of Registered Voters, 2025 NLE",
+      "publisher": "Commission on Elections",
+      "url": "https://comelec.gov.ph/",
+      "kind": "official_body"
+    },
+    "pl-pkw": {
+      "title": "PKW announcement on result of repeat vote for President 2025",
+      "publisher": "National Electoral Commission (PKW)",
+      "url": "https://pkw.gov.pl/",
+      "kind": "official_body"
+    },
+    "pt-sgmai": {
+      "title": "Secretaria-Geral do Ministerio da Administracao Interna",
+      "publisher": "SGMAI Portugal",
+      "url": "https://www.sg.mai.gov.pt/",
+      "kind": "official_body"
+    },
+    "rs-rik": {
+      "title": "33rd Session of the Republic Electoral Commission",
+      "publisher": "Republic Electoral Commission of Serbia",
+      "url": "https://www.rik.parlament.gov.rs/",
+      "kind": "official_body"
+    },
+    "sc-gazette": {
+      "title": "Extraordinary Gazette No 73, 16 October 2025",
+      "publisher": "Government of Seychelles (Official Gazette, Electoral Commission notice)",
+      "url": "https://www.gazette.sc/",
+      "kind": "official_body"
+    },
+    "se-valmyndigheten": {
+      "title": "Valresultat 2026",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/",
+      "kind": "official_body"
+    },
+    "sg-eld": {
+      "title": "Media release: certification of revised Registers of Electors 2025",
+      "publisher": "Elections Department Singapore",
+      "url": "https://www.eld.gov.sg/",
+      "kind": "official_body"
+    },
+    "si-dvk": {
+      "title": "Znano je stevilo volilnih upravicencev za zakonodajni referendum",
+      "publisher": "Drzavna volilna komisija",
+      "url": "https://www.dvk-rs.si/",
+      "kind": "official_body"
+    },
+    "sv-tse": {
+      "title": "Estadisticas del Registro Electoral",
+      "publisher": "Tribunal Supremo Electoral de El Salvador",
+      "url": "https://tse.gob.sv/",
+      "kind": "official_body"
+    },
+    "sx-government": {
+      "title": "Official Voter Registration Statistics, August 2024",
+      "publisher": "Government of Sint Maarten",
+      "url": "https://www.sintmaartengov.org/",
+      "kind": "official_body"
+    },
+    "tg-ceni": {
+      "title": "Communique N 014 relatif au recensement",
+      "publisher": "CENI Togo",
+      "url": "https://cenitogo.tg/",
+      "kind": "official_body"
+    },
+    "tn-isie": {
+      "title": "Instance Supérieure Indépendante pour les Élections",
+      "publisher": "ISIE",
+      "url": "https://www.isie.tn/",
+      "kind": "official_body"
+    },
+    "tt-ebc": {
+      "title": "EBC media release on 2025 parliamentary election",
+      "publisher": "Elections and Boundaries Commission, Trinidad and Tobago",
+      "url": "https://ebctt.com/",
+      "kind": "official_body"
+    },
+    "ua-cvk": {
+      "title": "CEC Strategic Plan for 2020-2025",
+      "publisher": "Central Election Commission of Ukraine",
+      "url": "https://www.cvk.gov.ua/en/",
+      "kind": "official_body"
+    },
+    "ug-ec": {
+      "title": "General Elections Report 2025/2026",
+      "publisher": "Electoral Commission of Uganda",
+      "url": "https://www.ec.or.ug/",
+      "kind": "official_body"
+    },
+    "za-iec": {
+      "title": "Voter Registration Statistics",
+      "publisher": "Electoral Commission of South Africa",
+      "url": "https://www.elections.org.za/",
+      "kind": "official_body"
+    },
+    "zm-ecz": {
+      "title": "Registered voters per polling station 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/",
+      "kind": "official_body"
     }
   },
   "countries": [
@@ -323,14 +779,28 @@
       "iso": "AI",
       "name_en": "Anguilla",
       "status": "own",
-      "source": "ai-gov"
+      "source": "ai-gov",
+      "electorate": {
+        "value": 12550,
+        "date": "2025-02-26",
+        "precision": "day",
+        "source": "ai-electoral-office",
+        "locator": "https://www.electoraloffice.gov.ai/documents/Supervisor of Elections Report 2025.pdf"
+      }
     },
     {
       "iso": "AL",
       "name_en": "Albania",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/AL/"
+      "locator": "https://data.ipu.org/parliament/AL/",
+      "electorate": {
+        "value": 3467962,
+        "date": "2025-05-11",
+        "precision": "day",
+        "source": "al-kqz",
+        "locator": "https://kqz.gov.al/lajme/zgjedhjet-2025-kshz-miraton-sasine-e-fleteve-te-votimit-per-votimin-brenda-vendit"
+      }
     },
     {
       "iso": "AM",
@@ -344,7 +814,14 @@
       "name_en": "Angola",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/AO/"
+      "locator": "https://data.ipu.org/parliament/AO/",
+      "electorate": {
+        "value": 14399291,
+        "date": "2022-08-24",
+        "precision": "day",
+        "source": "ao-cne",
+        "locator": "https://cne.ao/noticia/Catorze+Milh%C3%B5es+trezentos+e+noventa+e+nove+mil%2C+duzentos+e+noventa+e+um+cidad%C3%A3os+maiores+est%C3%A3o+habilitados+para+votar+no+dia+24+de+Agosto+de+2022"
+      }
     },
     {
       "iso": "AQ",
@@ -358,7 +835,14 @@
       "name_en": "Argentina",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/AR/"
+      "locator": "https://data.ipu.org/parliament/AR/",
+      "electorate": {
+        "value": 35987634,
+        "date": "2025-10-26",
+        "precision": "day",
+        "source": "ar-interior",
+        "locator": "https://www.argentina.gob.ar/noticias/elecciones-legislativas-2025-el-proceso-electoral-en-numeros"
+      }
     },
     {
       "iso": "AS",
@@ -373,26 +857,54 @@
       "name_en": "Austria",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/AT/"
+      "locator": "https://data.ipu.org/parliament/AT/",
+      "electorate": {
+        "value": 6346059,
+        "date": "2024-09-29",
+        "precision": "day",
+        "source": "at-bmi",
+        "locator": "https://www.bmi.gv.at/412/Nationalratswahlen/Nationalratswahl_2024/files/Verlautbarung_der_Bundeswahlbehoerde_16102024_BF.pdf"
+      }
     },
     {
       "iso": "AU",
       "name_en": "Australia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/AU/"
+      "locator": "https://data.ipu.org/parliament/AU/",
+      "electorate": {
+        "value": 18098797,
+        "date": "2025-05-03",
+        "precision": "day",
+        "source": "au-aec",
+        "locator": "https://www.aec.gov.au/enrolling_to_vote/enrolment_stats/national/2025-fe.htm"
+      }
     },
     {
       "iso": "AW",
       "name_en": "Aruba",
       "status": "own",
-      "source": "aw-staten"
+      "source": "aw-staten",
+      "electorate": {
+        "value": 69823,
+        "date": "2024-12-06",
+        "precision": "day",
+        "source": "aw-gov",
+        "locator": "https://gobierno.aw/en/electoral-register-2024"
+      }
     },
     {
       "iso": "AX",
       "name_en": "Åland Islands",
       "status": "own",
-      "source": "ax-autonomy"
+      "source": "ax-autonomy",
+      "electorate": {
+        "value": 21279,
+        "date": "2023-10-15",
+        "precision": "day",
+        "source": "ax-asub",
+        "locator": "https://www.asub.ax/sites/default/files/media/document/VAL%202023.pdf"
+      }
     },
     {
       "iso": "AZ",
@@ -406,21 +918,42 @@
       "name_en": "Bosnia & Herzegovina",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BA/"
+      "locator": "https://data.ipu.org/parliament/BA/",
+      "electorate": {
+        "value": 3408517,
+        "date": "2026-08-20",
+        "precision": "day",
+        "source": "ba-cik",
+        "locator": "https://www.izbori.ba/?Lang=3&CategoryID=64&Id=6166"
+      }
     },
     {
       "iso": "BB",
       "name_en": "Barbados",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BB/"
+      "locator": "https://data.ipu.org/parliament/BB/",
+      "electorate": {
+        "value": 266339,
+        "date": "2022-01-19",
+        "precision": "day",
+        "source": "bb-ebc",
+        "locator": "https://www.ebc.gov.bb/wp-content/uploads/2026/01/Election-Report-2022.pdf"
+      }
     },
     {
       "iso": "BD",
       "name_en": "Bangladesh",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BD/"
+      "locator": "https://data.ipu.org/parliament/BD/",
+      "electorate": {
+        "value": 127711899,
+        "date": "2026-02-12",
+        "precision": "day",
+        "source": "bd-ec",
+        "locator": "https://ecs.gov.bd/en/constituency"
+      }
     },
     {
       "iso": "BE",
@@ -455,7 +988,14 @@
       "name_en": "Burundi",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BI/"
+      "locator": "https://data.ipu.org/parliament/BI/",
+      "electorate": {
+        "value": 6013498,
+        "date": "2025-06-05",
+        "precision": "day",
+        "source": "bi-ceni",
+        "locator": "https://www.ceniburundi.bi/wp-content/uploads/2025/06/ARRET-RCCB-453-PROCLATION-RESULTATS-DEFIONITIFS.pdf"
+      }
     },
     {
       "iso": "BJ",
@@ -540,21 +1080,42 @@
       "name_en": "Belarus",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BY/"
+      "locator": "https://data.ipu.org/parliament/BY/",
+      "electorate": {
+        "value": 6903994,
+        "date": "2025-01-26",
+        "precision": "day",
+        "source": "by-cik",
+        "locator": "https://www.rec.gov.by/uploads/files/Pdf/2024/Soobsenie.pdf"
+      }
     },
     {
       "iso": "BZ",
       "name_en": "Belize",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/BZ/"
+      "locator": "https://data.ipu.org/parliament/BZ/",
+      "electorate": {
+        "value": 208565,
+        "date": "2025-08-01",
+        "precision": "month",
+        "source": "bz-ebd",
+        "locator": "https://elections.gov.bz/wp-content/uploads/2025/09/ELECTORS-BY-DIVISION-AND-SEX-AS-AT-AUGUST-2025-1.pdf"
+      }
     },
     {
       "iso": "CA",
       "name_en": "Canada",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CA/"
+      "locator": "https://data.ipu.org/parliament/CA/",
+      "electorate": {
+        "value": 28731275,
+        "date": "2025-04-28",
+        "precision": "day",
+        "source": "ca-elections",
+        "locator": "https://www.elections.ca/res/rep/off/ovrGE45/62/table4E.html"
+      }
     },
     {
       "iso": "CC",
@@ -569,7 +1130,14 @@
       "name_en": "Congo - Kinshasa",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CD/"
+      "locator": "https://data.ipu.org/parliament/CD/",
+      "electorate": {
+        "value": 43491891,
+        "date": "2023-06-24",
+        "precision": "day",
+        "source": "cd-ceni",
+        "locator": "https://www.ceni.cd/sites/default/files/2023-10/J.O.%20n%C2%B0%20sp%C3%A9cial%20du%2024%20juin%202023_REPARTITION%20DES%20SIEGES.pdf"
+      }
     },
     {
       "iso": "CF",
@@ -590,14 +1158,28 @@
       "name_en": "Switzerland",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CH/"
+      "locator": "https://data.ipu.org/parliament/CH/",
+      "electorate": {
+        "value": 5583221,
+        "date": "2023-10-22",
+        "precision": "day",
+        "source": "ch-bfs",
+        "locator": "https://dam-api.bfs.admin.ch/hub/api/dam/assets/28845368/master"
+      }
     },
     {
       "iso": "CI",
       "name_en": "Côte d’Ivoire",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CI/"
+      "locator": "https://data.ipu.org/parliament/CI/",
+      "electorate": {
+        "value": 8727431,
+        "date": "2025-10-25",
+        "precision": "day",
+        "source": "ci-cei",
+        "locator": "https://cei.ci/wp-content/uploads/2025/10/EPR_2025_RESULTAT_NATIONAL.pdf"
+      }
     },
     {
       "iso": "CK",
@@ -638,7 +1220,14 @@
       "name_en": "Costa Rica",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CR/"
+      "locator": "https://data.ipu.org/parliament/CR/",
+      "electorate": {
+        "value": 3731788,
+        "date": "2026-02-01",
+        "precision": "day",
+        "source": "cr-tse",
+        "locator": "https://tse.go.cr/pdf/boletines/Bol_Ele_Esp_febrero_2026.pdf"
+      }
     },
     {
       "iso": "CU",
@@ -652,7 +1241,14 @@
       "name_en": "Cape Verde",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/CV/"
+      "locator": "https://data.ipu.org/parliament/CV/",
+      "electorate": {
+        "value": 416096,
+        "date": "2026-05-17",
+        "precision": "day",
+        "source": "cv-cne",
+        "locator": "https://cne.cv/sala_de_imprensa_/cne-declara-paicv-vencedor-das-legislativas-de-2026-com-eleicao-de-37-dos-72-deputados/"
+      }
     },
     {
       "iso": "CW",
@@ -687,7 +1283,14 @@
       "name_en": "Germany",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/DE/"
+      "locator": "https://data.ipu.org/parliament/DE/",
+      "electorate": {
+        "value": 60510631,
+        "date": "2025-02-23",
+        "precision": "day",
+        "source": "de-bundeswahlleiterin",
+        "locator": "https://www.bundeswahlleiterin.de/bundestagswahlen/2025/ergebnisse/bund-99.html"
+      }
     },
     {
       "iso": "DJ",
@@ -701,7 +1304,14 @@
       "name_en": "Denmark",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/DK/"
+      "locator": "https://data.ipu.org/parliament/DK/",
+      "electorate": {
+        "value": 4303429,
+        "date": "2026-03-24",
+        "precision": "day",
+        "source": "dk-dst",
+        "locator": "https://dst.dk/valg/Valg2546527/valgopg/valgopgHL.htm"
+      }
     },
     {
       "iso": "DM",
@@ -715,7 +1325,14 @@
       "name_en": "Dominican Republic",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/DO/"
+      "locator": "https://data.ipu.org/parliament/DO/",
+      "electorate": {
+        "value": 8145548,
+        "date": "2024-05-19",
+        "precision": "day",
+        "source": "do-jce",
+        "locator": "https://jce.gob.do/Noticias/jce-detalla-impacto-del-voto-en-el-exterior-para-las-elecciones-del-19-de-mayo-en-rd-votaran-7281763-y-en-el-extranjero-863785"
+      }
     },
     {
       "iso": "DZ",
@@ -736,7 +1353,14 @@
       "name_en": "Estonia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/EE/"
+      "locator": "https://data.ipu.org/parliament/EE/",
+      "electorate": {
+        "value": 966129,
+        "date": "2023-03-05",
+        "precision": "day",
+        "source": "ee-valimised",
+        "locator": "https://www.valimised.ee/en/archive/statistics-about-internet-voting-estonia"
+      }
     },
     {
       "iso": "EG",
@@ -766,7 +1390,14 @@
       "name_en": "Spain",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/ES/"
+      "locator": "https://data.ipu.org/parliament/ES/",
+      "electorate": {
+        "value": 38728356,
+        "date": "2026-10-09",
+        "precision": "day",
+        "source": "es-ine",
+        "locator": "https://www.ine.es/dyngs/Prensa/EG2026.pdf"
+      }
     },
     {
       "iso": "ET",
@@ -780,14 +1411,28 @@
       "name_en": "Finland",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/FI/"
+      "locator": "https://data.ipu.org/parliament/FI/",
+      "electorate": {
+        "value": 4546041,
+        "date": "2024-02-11",
+        "precision": "day",
+        "source": "fi-vaalit",
+        "locator": "https://tulospalvelu.vaalit.fi/TPV-2024_2/fi/aanestys1.html"
+      }
     },
     {
       "iso": "FJ",
       "name_en": "Fiji",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/FJ/"
+      "locator": "https://data.ipu.org/parliament/FJ/",
+      "electorate": {
+        "value": 692918,
+        "date": "2022-10-28",
+        "precision": "day",
+        "source": "fj-feo",
+        "locator": "https://www.feo.org.fj/issuance-of-writ-of-elections-2/"
+      }
     },
     {
       "iso": "FK",
@@ -827,7 +1472,14 @@
       "name_en": "United Kingdom",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/GB/"
+      "locator": "https://data.ipu.org/parliament/GB/",
+      "electorate": {
+        "value": 47518488,
+        "date": "2025-12-01",
+        "precision": "day",
+        "source": "gb-ons",
+        "locator": "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/elections/electoralregistration/datasets/electoralstatisticsforuk/december2025/offsenelectoralregistrationstatistics2025.xlsx"
+      }
     },
     {
       "iso": "GD",
@@ -855,7 +1507,14 @@
       "iso": "GG",
       "name_en": "Guernsey",
       "status": "own",
-      "source": "gg-elections"
+      "source": "gg-elections",
+      "electorate": {
+        "value": 27293,
+        "date": "2025-06-18",
+        "precision": "day",
+        "source": "gg-states",
+        "locator": "https://www.gov.gg/election2025results"
+      }
     },
     {
       "iso": "GH",
@@ -868,27 +1527,55 @@
       "iso": "GI",
       "name_en": "Gibraltar",
       "status": "own",
-      "source": "gi-parliament"
+      "source": "gi-parliament",
+      "electorate": {
+        "value": 25200,
+        "date": "2023-10-12",
+        "precision": "day",
+        "source": "gi-parliament",
+        "locator": "https://www.parliament.gi/uploads/docs/elections/2023/information/general_election_2023_results.pdf"
+      }
     },
     {
       "iso": "GL",
       "name_en": "Greenland",
       "status": "own",
-      "source": "gl-inatsisartut"
+      "source": "gl-inatsisartut",
+      "electorate": {
+        "value": 40952,
+        "date": "2026-03-24",
+        "precision": "day",
+        "source": "gl-rigsombudsmand",
+        "locator": "https://dst.dk/valg/Valg2546527/other/Resultater%20fra%20Gr%C3%B8nland.pdf"
+      }
     },
     {
       "iso": "GM",
       "name_en": "Gambia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/GM/"
+      "locator": "https://data.ipu.org/parliament/GM/",
+      "electorate": {
+        "value": 1146474,
+        "date": "2026-01-01",
+        "precision": "year",
+        "source": "gm-iec",
+        "locator": "https://iec.gm/"
+      }
     },
     {
       "iso": "GN",
       "name_en": "Guinea",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/GN/"
+      "locator": "https://data.ipu.org/parliament/GN/",
+      "electorate": {
+        "value": 6768458,
+        "date": "2025-09-06",
+        "precision": "day",
+        "source": "gn-presidence",
+        "locator": "https://presidence.gov.gn/referendum-du-21-septembre-2025-lancement-officiel-de-la-distribution-des-cartes-delecteurs-par-le-president-mamadi-doumbouya/"
+      }
     },
     {
       "iso": "GP",
@@ -903,7 +1590,14 @@
       "name_en": "Equatorial Guinea",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/GQ/"
+      "locator": "https://data.ipu.org/parliament/GQ/",
+      "electorate": {
+        "value": 427661,
+        "date": "2022-11-20",
+        "precision": "day",
+        "source": "gq-gobierno",
+        "locator": "https://www.guineaecuatorialpress.com/index.php/noticias/entrega_del_censo_electoral_2022_al_presidente_de_la_republica"
+      }
     },
     {
       "iso": "GR",
@@ -924,7 +1618,14 @@
       "name_en": "Guatemala",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/GT/"
+      "locator": "https://data.ipu.org/parliament/GT/",
+      "electorate": {
+        "value": 10018025,
+        "date": "2026-03-17",
+        "precision": "day",
+        "source": "gt-tse",
+        "locator": "https://tse.org.gt/comunicacion/noticias/tse-supera-los-10-millones-de-ciudadanos-empadronados"
+      }
     },
     {
       "iso": "GU",
@@ -952,7 +1653,14 @@
       "iso": "HK",
       "name_en": "Hong Kong SAR China",
       "status": "own",
-      "source": "hk-basic-law"
+      "source": "hk-basic-law",
+      "electorate": {
+        "value": 4131298,
+        "date": "2025-12-07",
+        "precision": "day",
+        "source": "hk-eac",
+        "locator": "https://www.elections.gov.hk/legco2025/eng/turnout_gc_overall.html"
+      }
     },
     {
       "iso": "HM",
@@ -973,7 +1681,14 @@
       "name_en": "Croatia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/HR/"
+      "locator": "https://data.ipu.org/parliament/HR/",
+      "electorate": {
+        "value": 3733398,
+        "date": "2024-04-17",
+        "precision": "day",
+        "source": "hr-dip",
+        "locator": "https://www.izbori.hr/site/UserDocsImages/2024/Izbori_za_zastupnike_u_Hrvatski_sabor/Rezultati/Izvje%C5%A1%C4%87e%20o%20provedenim%20izborima%20za%20zastupnike%20u%20Hrvatski%20sabor%202024.pdf"
+      }
     },
     {
       "iso": "HT",
@@ -994,7 +1709,14 @@
       "name_en": "Indonesia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/ID/"
+      "locator": "https://data.ipu.org/parliament/ID/",
+      "electorate": {
+        "value": 204807222,
+        "date": "2024-02-14",
+        "precision": "day",
+        "source": "id-kpu",
+        "locator": "https://www.kpu.go.id/dmdocument/1759822082Lembar%20Fakta%20KPU%20edisi%201%20OKE.pdf"
+      }
     },
     {
       "iso": "IE",
@@ -1008,7 +1730,14 @@
       "name_en": "Israel",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/IL/"
+      "locator": "https://data.ipu.org/parliament/IL/",
+      "electorate": {
+        "value": 7331981,
+        "date": "2026-10-27",
+        "precision": "day",
+        "source": "il-cec",
+        "locator": "https://votes26.bechirot.gov.il/nationalresults?lang=en"
+      }
     },
     {
       "iso": "IM",
@@ -1049,20 +1778,41 @@
       "name_en": "Iceland",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/IS/"
+      "locator": "https://data.ipu.org/parliament/IS/",
+      "electorate": {
+        "value": 268490,
+        "date": "2024-11-30",
+        "precision": "day",
+        "source": "is-hagstofa",
+        "locator": "https://hagstofas3bucket.hagstofa.is/hagstofan/media/public/2025/9572a72b-76f3-481b-ba87-217bdf8858b5.pdf"
+      }
     },
     {
       "iso": "IT",
       "name_en": "Italy",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/IT/"
+      "locator": "https://data.ipu.org/parliament/IT/",
+      "electorate": {
+        "value": 50869304,
+        "date": "2022-09-25",
+        "precision": "day",
+        "source": "it-interno-dait",
+        "locator": "https://dait.interno.gov.it/documenti/dossier-elezioni-politiche-2022.pdf"
+      }
     },
     {
       "iso": "JE",
       "name_en": "Jersey",
       "status": "own",
-      "source": "je-vote"
+      "source": "je-vote",
+      "electorate": {
+        "value": 60701,
+        "date": "2022-06-22",
+        "precision": "day",
+        "source": "je-vote",
+        "locator": "https://www.vote.je/news/election-2022-registered-voter-numbers/"
+      }
     },
     {
       "iso": "JM",
@@ -1083,21 +1833,42 @@
       "name_en": "Japan",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/JP/"
+      "locator": "https://data.ipu.org/parliament/JP/",
+      "electorate": {
+        "value": 103211224,
+        "date": "2026-02-08",
+        "precision": "day",
+        "source": "jp-soumu",
+        "locator": "https://www.soumu.go.jp/main_content/001055230.pdf"
+      }
     },
     {
       "iso": "KE",
       "name_en": "Kenya",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/KE/"
+      "locator": "https://data.ipu.org/parliament/KE/",
+      "electorate": {
+        "value": 22102532,
+        "date": "2022-08-09",
+        "precision": "day",
+        "source": "ke-iebc",
+        "locator": "https://www.iebc.or.ke/docs/rov_per_county.pdf"
+      }
     },
     {
       "iso": "KG",
       "name_en": "Kyrgyzstan",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/KG/"
+      "locator": "https://data.ipu.org/parliament/KG/",
+      "electorate": {
+        "value": 4294243,
+        "date": "2025-11-30",
+        "precision": "day",
+        "source": "kg-cec",
+        "locator": "https://shailoo.gov.kg/ru/news/8402/"
+      }
     },
     {
       "iso": "KH",
@@ -1159,14 +1930,28 @@
       "name_en": "Kazakhstan",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/KZ/"
+      "locator": "https://data.ipu.org/parliament/KZ/",
+      "electorate": {
+        "value": 12623289,
+        "date": "2026-08-23",
+        "precision": "day",
+        "source": "kz-cik",
+        "locator": "https://www.election.gov.kz/rus/news/releases/index.php?ID=10586"
+      }
     },
     {
       "iso": "LA",
       "name_en": "Laos",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/LA/"
+      "locator": "https://data.ipu.org/parliament/LA/",
+      "electorate": {
+        "value": 4764384,
+        "date": "2026-02-22",
+        "precision": "day",
+        "source": "la-nec",
+        "locator": "https://kpl.gov.la/detail.aspx?id=96910"
+      }
     },
     {
       "iso": "LB",
@@ -1187,7 +1972,14 @@
       "name_en": "Liechtenstein",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/LI/"
+      "locator": "https://data.ipu.org/parliament/LI/",
+      "electorate": {
+        "value": 21183,
+        "date": "2025-02-09",
+        "precision": "day",
+        "source": "li-landtagswahlen",
+        "locator": "https://www.landtagswahlen.li/stimmbeteiligung/16"
+      }
     },
     {
       "iso": "LK",
@@ -1222,14 +2014,28 @@
       "name_en": "Luxembourg",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/LU/"
+      "locator": "https://data.ipu.org/parliament/LU/",
+      "electorate": {
+        "value": 286739,
+        "date": "2023-10-08",
+        "precision": "day",
+        "source": "lu-elections",
+        "locator": "https://elections.public.lu/fr/elections-legislatives/2023/resultats.html"
+      }
     },
     {
       "iso": "LV",
       "name_en": "Latvia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/LV/"
+      "locator": "https://data.ipu.org/parliament/LV/",
+      "electorate": {
+        "value": 1557615,
+        "date": "2026-10-03",
+        "precision": "day",
+        "source": "lv-cvk",
+        "locator": "https://dati.cvk.lv/SV2026/velesanu-rezultati/"
+      }
     },
     {
       "iso": "LY",
@@ -1243,7 +2049,14 @@
       "name_en": "Morocco",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MA/"
+      "locator": "https://data.ipu.org/parliament/MA/",
+      "electorate": {
+        "value": 15801162,
+        "date": "2026-07-10",
+        "precision": "day",
+        "source": "ma-interieur",
+        "locator": "https://maroc.ma/fr/actualites/elections-de-septembre-2026-plus-de-15801-millions-dinscrits-sur-les-listes-electorales-dont-46-de"
+      }
     },
     {
       "iso": "MC",
@@ -1257,14 +2070,28 @@
       "name_en": "Moldova",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MD/"
+      "locator": "https://data.ipu.org/parliament/MD/",
+      "electorate": {
+        "value": 3299396,
+        "date": "2025-09-01",
+        "precision": "day",
+        "source": "md-cec",
+        "locator": "https://a.cec.md/ro/numarul-alegatorilor-inscrisi-in-registrul-de-stat-al-alegatorilor-2781_114999.html"
+      }
     },
     {
       "iso": "ME",
       "name_en": "Montenegro",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/ME/"
+      "locator": "https://data.ipu.org/parliament/ME/",
+      "electorate": {
+        "value": 542468,
+        "date": "2023-06-11",
+        "precision": "day",
+        "source": "me-dik",
+        "locator": "https://dik.co.me/images/DIK-media/izbori/parlamentarni/2023/KONACNI-REZULTATI-2023.pdf"
+      }
     },
     {
       "iso": "MF",
@@ -1363,28 +2190,56 @@
       "name_en": "Mauritius",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MU/"
+      "locator": "https://data.ipu.org/parliament/MU/",
+      "electorate": {
+        "value": 1002857,
+        "date": "2024-11-10",
+        "precision": "day",
+        "source": "mu-electoral-commissioner",
+        "locator": "https://www.electionsmauritius.com/2024/extra/2/distribution-of-electors-by-country-of-citizenship-commonwealth/"
+      }
     },
     {
       "iso": "MV",
       "name_en": "Maldives",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MV/"
+      "locator": "https://data.ipu.org/parliament/MV/",
+      "electorate": {
+        "value": 284663,
+        "date": "2024-04-21",
+        "precision": "day",
+        "source": "mv-ec",
+        "locator": "https://stat.elections.gov.mv/"
+      }
     },
     {
       "iso": "MW",
       "name_en": "Malawi",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MW/"
+      "locator": "https://data.ipu.org/parliament/MW/",
+      "electorate": {
+        "value": 7203490,
+        "date": "2025-09-16",
+        "precision": "day",
+        "source": "mw-mec",
+        "locator": "https://mec.org.mw/2025-voter-registration-statistics/"
+      }
     },
     {
       "iso": "MX",
       "name_en": "Mexico",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/MX/"
+      "locator": "https://data.ipu.org/parliament/MX/",
+      "electorate": {
+        "value": 102651810,
+        "date": "2026-11-05",
+        "precision": "day",
+        "source": "mx-ine",
+        "locator": "https://www.ine.mx/credencial/estadisticas-lista-nominal-padron-electoral/"
+      }
     },
     {
       "iso": "MY",
@@ -1449,14 +2304,28 @@
       "name_en": "Netherlands",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/NL/"
+      "locator": "https://data.ipu.org/parliament/NL/",
+      "electorate": {
+        "value": 13589128,
+        "date": "2025-10-29",
+        "precision": "day",
+        "source": "nl-kiesraad",
+        "locator": "https://www.kiesraad.nl/actueel/nieuws/2025/11/7/kiesraad-uitslag-tweede-kamerverkiezing-betrouwbaar"
+      }
     },
     {
       "iso": "NO",
       "name_en": "Norway",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/NO/"
+      "locator": "https://data.ipu.org/parliament/NO/",
+      "electorate": {
+        "value": 4053900,
+        "date": "2025-09-08",
+        "precision": "day",
+        "source": "no-ssb",
+        "locator": "https://www.ssb.no/valg/stortingsvalg/statistikk/personer-med-stemmerett/artikler/rekordmange-kan-stemme"
+      }
     },
     {
       "iso": "NP",
@@ -1483,7 +2352,14 @@
       "name_en": "New Zealand",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/NZ/"
+      "locator": "https://data.ipu.org/parliament/NZ/",
+      "electorate": {
+        "value": 3688292,
+        "date": "2023-10-14",
+        "precision": "day",
+        "source": "nz-electoral-commission",
+        "locator": "https://elections.nz/assets/2023-General-Election/Report-on-the-2023-General-Election.pdf"
+      }
     },
     {
       "iso": "OM",
@@ -1504,7 +2380,14 @@
       "name_en": "Peru",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/PE/"
+      "locator": "https://data.ipu.org/parliament/PE/",
+      "electorate": {
+        "value": 27325432,
+        "date": "2026-04-12",
+        "precision": "day",
+        "source": "pe-jne",
+        "locator": "https://www.jne.gob.pe/dneect/2026/P_JNE_040226_1.pdf"
+      }
     },
     {
       "iso": "PF",
@@ -1526,7 +2409,14 @@
       "name_en": "Philippines",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/PH/"
+      "locator": "https://data.ipu.org/parliament/PH/",
+      "electorate": {
+        "value": 68431965,
+        "date": "2025-01-23",
+        "precision": "day",
+        "source": "ph-comelec",
+        "locator": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Statistics/CONSOLIDATED_2025_Number_Of_Registered_Voters.pdf"
+      }
     },
     {
       "iso": "PK",
@@ -1540,7 +2430,14 @@
       "name_en": "Poland",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/PL/"
+      "locator": "https://data.ipu.org/parliament/PL/",
+      "electorate": {
+        "value": 29363722,
+        "date": "2025-06-01",
+        "precision": "day",
+        "source": "pl-pkw",
+        "locator": "https://eli.gov.pl/api/acts/DU/2025/714/text/I/D20250714.pdf"
+      }
     },
     {
       "iso": "PM",
@@ -1575,7 +2472,14 @@
       "name_en": "Portugal",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/PT/"
+      "locator": "https://data.ipu.org/parliament/PT/",
+      "electorate": {
+        "value": 10850215,
+        "date": "2025-05-03",
+        "precision": "day",
+        "source": "pt-sgmai",
+        "locator": "https://www.sg.mai.gov.pt/pt/AdministracaoEleitoral/EleicoesReferendos/AssembleiaRepublica/Documents/AR2025/Relat%C3%B3rio%20C%C3%ADrculos%20Nacionais%20AR2025%20pro.pdf"
+      }
     },
     {
       "iso": "PW",
@@ -1618,7 +2522,14 @@
       "name_en": "Serbia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/RS/"
+      "locator": "https://data.ipu.org/parliament/RS/",
+      "electorate": {
+        "value": 6500165,
+        "date": "2023-12-01",
+        "precision": "day",
+        "source": "rs-rik",
+        "locator": "https://www.rik.parlament.gov.rs/vest/en/3070/33rd-session-of-the-republic-electoral-commission-.php"
+      }
     },
     {
       "iso": "RU",
@@ -1653,7 +2564,14 @@
       "name_en": "Seychelles",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/SC/"
+      "locator": "https://data.ipu.org/parliament/SC/",
+      "electorate": {
+        "value": 77045,
+        "date": "2025-10-09",
+        "precision": "day",
+        "source": "sc-gazette",
+        "locator": "https://www.gazette.sc/sites/default/files/2025-10/Extraordinary%20Gazette%20No%2073%20-%2016th%20October%202025.pdf"
+      }
     },
     {
       "iso": "SD",
@@ -1667,14 +2585,28 @@
       "name_en": "Sweden",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/SE/"
+      "locator": "https://data.ipu.org/parliament/SE/",
+      "electorate": {
+        "value": 8051355,
+        "date": "2026-09-13",
+        "precision": "day",
+        "source": "se-valmyndigheten",
+        "locator": "https://www.val.se/valresultat-och-statistik/riksdags--region--och-kommunval/valresultat-2026"
+      }
     },
     {
       "iso": "SG",
       "name_en": "Singapore",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/SG/"
+      "locator": "https://data.ipu.org/parliament/SG/",
+      "electorate": {
+        "value": 2758095,
+        "date": "2025-03-25",
+        "precision": "day",
+        "source": "sg-eld",
+        "locator": "https://www.eld.gov.sg/press/2025/Media%20Release%20on%20Certification%20of%20Revised%20Registers%20of%20Electors%202025.pdf"
+      }
     },
     {
       "iso": "SH",
@@ -1687,7 +2619,14 @@
       "name_en": "Slovenia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/SI/"
+      "locator": "https://data.ipu.org/parliament/SI/",
+      "electorate": {
+        "value": 1698752,
+        "date": "2026-10-30",
+        "precision": "day",
+        "source": "si-dvk",
+        "locator": "https://www.dvk-rs.si/novica/znano-je-stevilo-volilnih-upravicencev-za-zakonodajni-referendum-o-ziurs/"
+      }
     },
     {
       "iso": "SJ",
@@ -1758,13 +2697,27 @@
       "name_en": "El Salvador",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/SV/"
+      "locator": "https://data.ipu.org/parliament/SV/",
+      "electorate": {
+        "value": 6214399,
+        "date": "2024-02-04",
+        "precision": "day",
+        "source": "sv-tse",
+        "locator": "https://tse.gob.sv/publico/estadisticas"
+      }
     },
     {
       "iso": "SX",
       "name_en": "Sint Maarten",
       "status": "own",
-      "source": "sx-parliament"
+      "source": "sx-parliament",
+      "electorate": {
+        "value": 22747,
+        "date": "2024-08-19",
+        "precision": "day",
+        "source": "sx-government",
+        "locator": "https://www.sintmaartengov.org/news/Pages/Official-Voter-Registration-Statistics-Announced-for-August-19th-2024-Parliamentary-Elections.aspx"
+      }
     },
     {
       "iso": "SY",
@@ -1805,7 +2758,14 @@
       "name_en": "Togo",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/TG/"
+      "locator": "https://data.ipu.org/parliament/TG/",
+      "electorate": {
+        "value": 4203711,
+        "date": "2024-04-29",
+        "precision": "day",
+        "source": "tg-ceni",
+        "locator": "https://cenitogo.tg/uploads/docs/COMMUNIQUE N 014 RELATIF AU RECENSEMENT_0001.pdf"
+      }
     },
     {
       "iso": "TH",
@@ -1846,7 +2806,14 @@
       "name_en": "Tunisia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/TN/"
+      "locator": "https://data.ipu.org/parliament/TN/",
+      "electorate": {
+        "value": 9753217,
+        "date": "2024-10-06",
+        "precision": "day",
+        "source": "tn-isie",
+        "locator": "https://www.isie.tn/en/elections_en/%D8%A7%D9%84%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8%D8%A7%D8%AA-%D8%A7%D9%84%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9-2024/"
+      }
     },
     {
       "iso": "TO",
@@ -1867,7 +2834,14 @@
       "name_en": "Trinidad & Tobago",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/TT/"
+      "locator": "https://data.ipu.org/parliament/TT/",
+      "electorate": {
+        "value": 1153850,
+        "date": "2025-04-28",
+        "precision": "day",
+        "source": "tt-ebc",
+        "locator": "https://ebctt.com/category/parliamentary-elections/"
+      }
     },
     {
       "iso": "TV",
@@ -1894,14 +2868,28 @@
       "name_en": "Ukraine",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/UA/"
+      "locator": "https://data.ipu.org/parliament/UA/",
+      "electorate": {
+        "value": 35477188,
+        "date": "2019-12-31",
+        "precision": "day",
+        "source": "ua-cvk",
+        "locator": "https://www.cvk.gov.ua/wp-content/uploads/2023/03/CEC_Strategic_plan_for_2020-2025_-en-as_amended.pdf"
+      }
     },
     {
       "iso": "UG",
       "name_en": "Uganda",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/UG/"
+      "locator": "https://data.ipu.org/parliament/UG/",
+      "electorate": {
+        "value": 21649067,
+        "date": "2026-01-15",
+        "precision": "day",
+        "source": "ug-ec",
+        "locator": "https://ec.or.ug/sites/default/files/docs/EC%20_General_Elections_Report_2025_2026.pdf"
+      }
     },
     {
       "iso": "UM",
@@ -2021,14 +3009,28 @@
       "name_en": "South Africa",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/ZA/"
+      "locator": "https://data.ipu.org/parliament/ZA/",
+      "electorate": {
+        "value": 29230808,
+        "date": "2026-09-29",
+        "precision": "day",
+        "source": "za-iec",
+        "locator": "https://www.elections.org.za/pw/StatsData/Voter-Registration-Statistics"
+      }
     },
     {
       "iso": "ZM",
       "name_en": "Zambia",
       "status": "own",
       "source": "ipu-parline",
-      "locator": "https://data.ipu.org/parliament/ZM/"
+      "locator": "https://data.ipu.org/parliament/ZM/",
+      "electorate": {
+        "value": 8786300,
+        "date": "2026-05-08",
+        "precision": "day",
+        "source": "zm-ecz",
+        "locator": "https://www.elections.org.zm/wp-content/uploads/rptPDListing20260508.pdf"
+      }
     },
     {
       "iso": "ZW",

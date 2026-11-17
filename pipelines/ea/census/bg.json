@@ -1,0 +1,1380 @@
+{
+  "polity": "BG",
+  "name": "Bulgaria",
+  "sources": {
+    "konst1991": {
+      "title": "Конституция на Република България (ДВ, бр. 56 от 13.07.1991)",
+      "publisher": "Народно събрание на Република България",
+      "url": "https://www.parliament.bg/bg/const",
+      "kind": "official_body"
+    },
+    "ik2014": {
+      "title": "Изборен кодекс (ДВ, бр. 19 от 05.03.2014)",
+      "publisher": "Народно събрание на Република България (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body",
+      "note": "In force from 5 March 2014; replaced the Electoral Code of 2011 and governs elections to the National Assembly, the President, the European Parliament, and municipal councils and mayors."
+    },
+    "ik2011": {
+      "title": "Изборен кодекс (ДВ, бр. 9 от 28.01.2011), извлечение: § 16 и § 18 от преходните и заключителните разпоредби",
+      "publisher": "Национален статистически институт (Национален регистър на населените места)",
+      "url": "https://nrnm.nsi.bg/reports/front-documents/1833/download",
+      "kind": "official_body"
+    },
+    "zmsma": {
+      "title": "Закон за местното самоуправление и местната администрация (ДВ, бр. 77 от 17.09.1991)",
+      "publisher": "Народно събрание на Република България (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "zaturb": {
+      "title": "Закон за административно-териториалното устройство на Република България (ДВ, бр. 63 от 14.07.1995)",
+      "publisher": "Народно събрание на Република България (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "zpugdvmsu": {
+      "title": "Закон за прякото участие на гражданите в държавната власт и местното самоуправление (ДВ, бр. 44 от 12.06.2009)",
+      "publisher": "Народно събрание на Република България (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "konst1971": {
+      "title": "Конституция на Народна република България (ДВ, бр. 39 от 18.05.1971)",
+      "publisher": "Народно събрание (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "konst1947": {
+      "title": "Конституция на Народна република България (ДВ, бр. 284 от 06.12.1947)",
+      "publisher": "Народно събрание (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "konst1879": {
+      "title": "Конституция на Българското княжество (Търновска конституция, 16.04.1879)",
+      "publisher": "Учредително събрание (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    },
+    "cik_results": {
+      "title": "Централна избирателна комисия: резултати от избори и референдуми",
+      "publisher": "Централна избирателна комисия",
+      "url": "https://results.cik.bg/",
+      "kind": "official_body"
+    },
+    "cik": {
+      "title": "Централна избирателна комисия: решения, доклади и местни референдуми",
+      "publisher": "Централна избирателна комисия",
+      "url": "https://www.cik.bg/",
+      "kind": "official_body"
+    },
+    "ekatte": {
+      "title": "Национален регистър на населените места: Единен класификатор на административно-териториалните и териториалните единици (ЕКАТТЕ)",
+      "publisher": "Национален статистически институт",
+      "url": "https://www.nsi.bg/nrnm/ekatte/index",
+      "kind": "official_body"
+    },
+    "dv": {
+      "title": "Държавен вестник: архив на броевете",
+      "publisher": "Народно събрание на Република България (Държавен вестник)",
+      "url": "https://dv.parliament.bg/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Република България",
+      "name_en": "Republic of Bulgaria",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "bg.country",
+      "source": "konst1991"
+    },
+    {
+      "key": "oblast",
+      "name": "Области",
+      "name_en": "Provinces (oblasti)",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "valid_from": "1999-01-01",
+      "source": "zaturb",
+      "counts": [
+        {
+          "date": "2026-11-16",
+          "value": 28,
+          "source": "ekatte",
+          "locator": "https://www.nsi.bg/nrnm/ekatte/regions/json (28 oblasti, register current as of 05.10.2015)"
+        }
+      ]
+    },
+    {
+      "key": "obshtina",
+      "name": "Общини",
+      "name_en": "Municipalities (obshtini)",
+      "parent": "oblast",
+      "polity_kind": "municipality",
+      "source": "zmsma",
+      "counts": [
+        {
+          "date": "2023-12-12",
+          "value": 265,
+          "source": "ekatte",
+          "locator": "https://www.nsi.bg/nrnm/ekatte/municipalities/json (265 obshtini, register current as of 12.12.2023)"
+        }
+      ]
+    },
+    {
+      "key": "rayon",
+      "name": "Райони на Столична община, Пловдив и Варна",
+      "name_en": "City districts (rayoni) of Sofia, Plovdiv, and Varna",
+      "parent": "obshtina",
+      "polity_kind": "submunicipal",
+      "source": "zaturb",
+      "counts": [
+        {
+          "date": "2005-01-24",
+          "value": 35,
+          "source": "ekatte",
+          "locator": "https://www.nsi.bg/nrnm/ekatte/areas/json (24 rayoni of Sofia, 6 of Plovdiv, and 5 of Varna; register current as of 24.01.2005)"
+        }
+      ]
+    },
+    {
+      "key": "kmetstvo",
+      "name": "Кметства",
+      "name_en": "Mayoralties (kmetstva)",
+      "parent": "obshtina",
+      "polity_kind": "submunicipal",
+      "source": "zaturb",
+      "counts": [
+        {
+          "date": "2025-12-22",
+          "value": 3041,
+          "source": "ekatte",
+          "locator": "https://www.nsi.bg/nrnm/ekatte/town-halls/json (3,041 kmetstva, register current as of 22.12.2025)"
+        }
+      ]
+    },
+    {
+      "key": "nrb",
+      "name": "Народна република България",
+      "name_en": "People's Republic of Bulgaria (1946–1990)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1946-09-15",
+      "valid_to": "1990-11-15",
+      "source": "konst1947"
+    },
+    {
+      "key": "knyazhestvo_tsarstvo",
+      "name": "Княжество и Царство България",
+      "name_en": "Principality and Kingdom of Bulgaria (1879–1946)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1879-04-16",
+      "valid_to": "1946-09-15",
+      "source": "konst1879"
+    }
+  ],
+  "classes": [
+    {
+      "key": "narodno_sabranie",
+      "tier": "national",
+      "name": "Избори за народни представители в Народното събрание",
+      "name_en": "National Assembly elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "bg.mir"
+        ],
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "finest_note": "Votes are published by polling section (секция); section areas are lists of streets and addresses, not mapped. Votes cast abroad are counted in sections outside the country and allocated nationally.",
+      "note": "240 members for four years (Constitution arts. 63–64). List PR with preference votes in 31 multi-member constituencies (МИР), seats shared nationally by the Hare–Niemeyer method among lists over 4% and then to constituencies; 2009 used 209 PR seats plus 31 single-member districts. Many early elections since 2013, after failed government formation (Constitution art. 99).",
+      "source": "konst1991",
+      "locator": "https://www.parliament.bg/bg/const (arts. 62–64, 99)",
+      "valid_from": "1991-07-13",
+      "first_held": "1991-10-13",
+      "earliest_record": "2013-05-12",
+      "contests_per_unit": 1,
+      "est_votes": 60000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Централна избирателна комисия",
+          "source": "konst1991",
+          "locator": "https://www.parliament.bg/bg/const (arts. 64 and 99)",
+          "vacancy_rule": "A seat that falls vacant passes to the next candidate on the same list in the same constituency (Изборен кодекс); a dissolved Assembly is followed by an early election within two months (Constitution art. 99)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2013-05-12",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); the archive's bg.cik pipeline reads the open-data bundles for every Assembly election from 2013 to April 2026, by polling section. Older results sites (2005, 2009) are not yet read."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1991-07-13"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-10-13"
+        },
+        {
+          "date": "1994-12-18",
+          "note": "Early election."
+        },
+        {
+          "date": "1997-04-19",
+          "note": "Early election."
+        },
+        {
+          "date": "2001-06-17"
+        },
+        {
+          "date": "2005-06-25"
+        },
+        {
+          "date": "2009-07-05",
+          "note": "Mixed system: 209 seats by list PR in 31 constituencies and 31 in single-member districts."
+        },
+        {
+          "date": "2013-05-12",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2017-03-26",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2021-04-04",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната"
+        },
+        {
+          "date": "2021-07-11",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2021-11-14",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election, held with the presidential election."
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2023-04-02",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election, held with the European Parliament election."
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        },
+        {
+          "date": "2026-04-19",
+          "contests": 31,
+          "seats": 240,
+          "source": "cik_results",
+          "quote": "results.cik.bg: протоколи и резултати по 31 многомандатни изборни района (МИР 01–31) и секции извън страната",
+          "note": "Early election."
+        }
+      ]
+    },
+    {
+      "key": "veliko_narodno_sabranie",
+      "tier": "national",
+      "name": "Избори за Велико Народно събрание",
+      "name_en": "Grand National Assembly elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "400 members. The 7th Grand National Assembly, elected in June 1990 under the 1971 Constitution as amended (200 seats in single-member districts in two rounds and 200 by list PR in 28 constituencies), adopted the 1991 Constitution. The 1991 Constitution (arts. 157–163) keeps the Grand National Assembly for a new constitution, territorial changes, and certain amendments; none has been elected since.",
+      "source": "konst1991",
+      "locator": "https://www.parliament.bg/bg/const (arts. 157–163)",
+      "valid_from": "1990-01-01",
+      "first_held": "1990-06-10",
+      "est_votes": 12000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1990-01-01",
+          "valid_to": "1991-07-13"
+        },
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1991-07-13"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-06-10",
+          "seats": 400,
+          "note": "First round: 200 single-member districts and 200 list seats."
+        },
+        {
+          "date": "1990-06-17",
+          "election_kind": "runoff",
+          "note": "Second round in single-member districts with no majority winner."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Държавен вестник (архив)",
+          "url": "https://dv.parliament.bg/",
+          "format": "scanned issues",
+          "access": "manual",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "first_date": "1990-06-10",
+          "source": "dv",
+          "evidence": "Results notices of the central election commission of 1990 are in the State Gazette; no machine-readable official return was found."
+        }
+      ]
+    },
+    {
+      "key": "prezident",
+      "tier": "national",
+      "name": "Избори за президент и вицепрезидент на републиката",
+      "name_en": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "finest_note": "Polling-section protocols from 2016 in the open data; the President and Vice President run on one ticket.",
+      "note": "Direct election of the President and Vice President on one ticket for five years, at most two terms (Constitution arts. 92–95). The first President, Zhelyu Zhelev, was chosen by the Grand National Assembly in 1990 (see nepreki_izbori).",
+      "source": "konst1991",
+      "locator": "https://www.parliament.bg/bg/const (arts. 93–95)",
+      "valid_from": "1991-07-13",
+      "first_held": "1992-01-12",
+      "earliest_record": "2016-11-06",
+      "est_votes": 55000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Elected in the first round with more than half of the valid votes if more than half of the voters on the rolls voted; otherwise the top two meet seven days later and the one with more votes wins (Constitution art. 93).",
+          "administered_by": "Централна избирателна комисия",
+          "valid_from": "1996-01-01",
+          "source": "konst1991",
+          "locator": "https://www.parliament.bg/bg/const (art. 93)",
+          "vacancy_rule": "The Vice President serves out the term (Constitution art. 97)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2016-11-06",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); the bg.cik pipeline reads the 2016 and October 2026 first-round bundles; the 2021 rounds and the November 2026 second round are listed but not yet fetched, and the 2011 and older results sites are not read."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1991-07-13"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-12",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 12.01.1992"
+        },
+        {
+          "date": "1992-01-19",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 19.01.1992"
+        },
+        {
+          "date": "1996-10-27",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 27.10.1996"
+        },
+        {
+          "date": "1996-11-03",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 03.11.1996"
+        },
+        {
+          "date": "2001-11-11",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 11.11.2001"
+        },
+        {
+          "date": "2001-11-18",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 18.11.2001"
+        },
+        {
+          "date": "2006-10-22",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 22.10.2006"
+        },
+        {
+          "date": "2006-10-29",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 29.10.2006"
+        },
+        {
+          "date": "2011-10-23",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 23.10.2011"
+        },
+        {
+          "date": "2011-10-30",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 30.10.2011"
+        },
+        {
+          "date": "2016-11-06",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 06.11.2016"
+        },
+        {
+          "date": "2016-11-13",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 13.11.2016"
+        },
+        {
+          "date": "2021-11-14",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 14.11.2021"
+        },
+        {
+          "date": "2021-11-21",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 21.11.2021"
+        },
+        {
+          "date": "2026-10-25",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: избори за президент и вицепрезидент на републиката, първи тур 25.10.2026"
+        },
+        {
+          "date": "2026-11-01",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg: втори тур 01.11.2026"
+        }
+      ]
+    },
+    {
+      "key": "evropeyski_parlament",
+      "tier": "national",
+      "name": "Избори за членове на Европейския парламент от Република България",
+      "name_en": "European Parliament elections",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "finest_note": "One national constituency; polling-section protocols from 2014 in the open data.",
+      "note": "One nationwide constituency; list PR by the Hare–Niemeyer method with preference votes (Изборен кодекс, part four). 18 seats in 2007, 17 since 2009.",
+      "source": "ik2014",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part four)",
+      "valid_from": "2007-01-01",
+      "first_held": "2007-05-20",
+      "earliest_record": "2014-05-25",
+      "est_votes": 10000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "administered_by": "Централна избирателна комисия",
+          "valid_from": "2009-01-01",
+          "source": "ik2014",
+          "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2014-05-25",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); the bg.cik pipeline reads 2014, 2019, and 2024 by polling section; the 2009 bundle at ep2009.cik.bg is listed but not read, and 2007 has no open-data bundle."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "schemes": [
+            "bg.country"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "2007-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-05-20",
+          "contests": 1,
+          "seats": 18,
+          "source": "cik_results",
+          "quote": "Избори за членове на Европейския парламент от Република България, 20.05.2007: 18 мандата"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 1,
+          "seats": 17,
+          "source": "cik_results",
+          "quote": "ep2009.cik.bg: избори за членове на Европейския парламент, 07.06.2009"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "seats": 17,
+          "source": "cik_results",
+          "quote": "results.cik.bg/ep2014: избори за членове на Европейския парламент, 25.05.2014"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "seats": 17,
+          "source": "cik_results",
+          "quote": "results.cik.bg/ep2019: избори за членове на Европейския парламент, 26.05.2019"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "seats": 17,
+          "source": "cik_results",
+          "quote": "results.cik.bg/europe2024: избори за членове на Европейския парламент, 09.06.2024"
+        }
+      ]
+    },
+    {
+      "key": "nacionalen_referendum",
+      "tier": "national",
+      "name": "Национален референдум",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "note": "Called by the National Assembly (Constitution art. 84 item 5; Закон за прякото участие на гражданите в държавната власт и местното самоуправление). Binding when turnout reaches that of the last Assembly election and more than half vote yes; otherwise the Assembly must consider a question that met a lower turnout bar.",
+      "source": "zpugdvmsu",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 44/2009)",
+      "valid_from": "1991-07-13",
+      "first_held": "2013-01-27",
+      "earliest_record": "2013-01-27",
+      "est_votes": 8000000,
+      "effort": 1,
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2013-01-27",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); the bg.cik pipeline reads all three national referendums by polling section."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-01-27",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg/referendum: национален референдум за развитие на ядрената енергетика, 27.01.2013"
+        },
+        {
+          "date": "2015-10-25",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015: национален референдум за дистанционно електронно гласуване, 25.10.2015"
+        },
+        {
+          "date": "2016-11-06",
+          "election_kind": "referendum",
+          "contests": 3,
+          "source": "cik_results",
+          "quote": "results.cik.bg/pvrnr2016: национален референдум с три въпроса, 06.11.2016"
+        }
+      ]
+    },
+    {
+      "key": "obshtinski_savet",
+      "tier": "obshtina",
+      "name": "Избори за общински съветници",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "bg.obshtina"
+        ],
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "finest_note": "Section protocols on the CIK results sites from 2015.",
+      "note": "Councils of 11 to 61 members by population, elected for four years by list PR (Hare–Niemeyer) in one municipality-wide constituency with preference votes and the quota as threshold. Partial and new elections fill councils dissolved or created between general rounds.",
+      "source": "ik2014",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part five)",
+      "valid_from": "1991-09-17",
+      "first_held": "1991-10-13",
+      "earliest_record": "2015-10-25",
+      "contests_per_unit": 1,
+      "est_votes": 27000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "administered_by": "Централна избирателна комисия и общински избирателни комисии",
+          "source": "ik2014",
+          "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014)",
+          "vacancy_rule": "A vacant seat passes to the next candidate on the same list; a dissolved council is replaced in a new election for the rest of the term."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/mi2023/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2015-10-25",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); results sites mi2015, mi2019, and mi2023 publish section protocols; no pipeline reads them yet."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1991-01-01"
+        }
+      ]
+    },
+    {
+      "key": "kmet_obshtina",
+      "tier": "obshtina",
+      "name": "Избори за кметове на общини",
+      "name_en": "Municipal mayor elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "bg.obshtina"
+        ],
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "note": "Direct election for four years with a majority runoff.",
+      "source": "ik2014",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part five)",
+      "valid_from": "1991-09-17",
+      "first_held": "1991-10-13",
+      "earliest_record": "2015-10-25",
+      "contests_per_unit": 1,
+      "est_votes": 35000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "A candidate with more than half of the valid votes is elected; otherwise the top two meet in a second round seven days later, and the one with more votes wins (Изборен кодекс, chapter on the election of mayors).",
+          "administered_by": "Централна избирателна комисия и общински избирателни комисии",
+          "source": "ik2014",
+          "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014)",
+          "vacancy_rule": "A partial election (частични избори) fills a mayoralty that falls vacant before the term ends."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/mi2023/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2015-10-25",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); both rounds by section on the mi2015, mi2019, and mi2023 sites; partial elections on separate CIK pages."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1991-01-01"
+        }
+      ]
+    },
+    {
+      "key": "kmet_rayon",
+      "tier": "rayon",
+      "name": "Избори за кметове на райони",
+      "name_en": "City district mayor elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "note": "Mayors of the 35 districts of Sofia, Plovdiv, and Varna, elected directly with the municipal mayors under the same majority-runoff rule.",
+      "source": "ik2014",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part five)",
+      "valid_from": "1991-09-17",
+      "earliest_record": "2015-10-25",
+      "contests_per_unit": 1,
+      "est_votes": 6000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "A candidate with more than half of the valid votes is elected; otherwise the top two meet in a second round seven days later, and the one with more votes wins (Изборен кодекс, chapter on the election of mayors).",
+          "administered_by": "Централна избирателна комисия и общински избирателни комисии",
+          "source": "ik2014",
+          "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/mi2023/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2015-10-25",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); district mayor results by section on the mi2015, mi2019, and mi2023 sites."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "район|rayon|raion|district",
+          "within": null,
+          "valid_from": "1991-01-01"
+        }
+      ]
+    },
+    {
+      "key": "kmet_kmetstvo",
+      "tier": "kmetstvo",
+      "name": "Избори за кметове на кметства",
+      "name_en": "Mayoralty (village) mayor elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "bg.sik"
+        ]
+      },
+      "note": "Held only in mayoralties that meet the population bar on the day the decree calling the election is published: 350 residents under the Act on Administrative-Territorial Division art. 16 item 1 (Electoral Code 2011, § 16 of the transitional provisions), and more than 100 residents by permanent address under § 17 of the transitional provisions of the 2014 Electoral Code. Smaller places get an appointed deputy mayor (кметски наместник). So the elected count is below the register's 3,041 kmetstva, and dates are listed without counts until the CIK's per-election counts are cited.",
+      "source": "ik2014",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, § 17 ПЗР)",
+      "valid_from": "1991-09-17",
+      "earliest_record": "2015-10-25",
+      "contests_per_unit": 1,
+      "est_votes": 7000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "month": 10,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "A candidate with more than half of the valid votes is elected; otherwise the top two meet in a second round seven days later, and the one with more votes wins (Изборен кодекс, chapter on the election of mayors).",
+          "administered_by": "Централна избирателна комисия и общински избирателни комисии",
+          "source": "ik2014",
+          "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Резултати (ЦИК): отворени данни",
+          "url": "https://results.cik.bg/mi2023/",
+          "format": "semicolon-separated text in zip bundles, and html",
+          "access": "open",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "finest": "bg.sik",
+          "source": "cik_results",
+          "first_date": "2015-10-25",
+          "evidence": "results.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); mayoralty results by section on the mi2015, mi2019, and mi2023 sites."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null,
+          "valid_from": "1991-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-10-23",
+          "election_kind": "local",
+          "source": "ik2011",
+          "quote": "§ 16 ПЗР: Избори за кметове на кметства се произвеждат само в тези кметства, които към датата на обнародване на указа на президента за насрочване на изборите за общински съветници и кметове отговарят на изискванията на чл. 16, т. 1 от Закона за административно-териториалното устройство на Република България."
+        },
+        {
+          "date": "2015-10-25",
+          "election_kind": "local"
+        },
+        {
+          "date": "2019-10-27",
+          "election_kind": "local"
+        },
+        {
+          "date": "2023-10-29",
+          "election_kind": "local"
+        }
+      ]
+    },
+    {
+      "key": "mesten_referendum",
+      "tier": "obshtina",
+      "name": "Местен референдум",
+      "name_en": "Local referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Called by a municipal council on matters within its powers, including boundary and kmetstvo changes (Закон за прякото участие на гражданите в държавната власт и местното самоуправление, chapter four; before 2009 the Закон за допитване до народа of 1996). Run by the municipal election commission, which publishes the result.",
+      "source": "zpugdvmsu",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 44/2009, chapter four)",
+      "valid_from": "1996-01-01",
+      "est_votes": 1000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "ЦИК: местни референдуми",
+          "url": "https://www.cik.bg/",
+          "format": "html and pdf",
+          "access": "manual",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "cik",
+          "evidence": "www.cik.bg refused automated requests from a cloud host on 2026-11-16 (HTTP 403); the CIK keeps a register of local referendums with links to municipal decisions, but no consolidated results file is known."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "narodno_sabranie_nrb",
+      "tier": "nrb",
+      "name": "Избори за Народно събрание на Народна република България",
+      "name_en": "National Assembly elections of the People's Republic",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The 6th Grand National Assembly (1946) and the ordinary National Assemblies from 1949 to 1986, elected on the single Fatherland Front list in single-member districts. Results notices are in the State Gazette.",
+      "source": "konst1971",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 39/1971)",
+      "valid_from": "1946-09-15",
+      "valid_to": "1990-01-01",
+      "first_held": "1946-10-27",
+      "est_votes": 55000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1946-09-15",
+          "valid_to": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-10-27",
+          "note": "6th Grand National Assembly."
+        },
+        {
+          "date": "1949-12-18"
+        },
+        {
+          "date": "1953-12-20"
+        },
+        {
+          "date": "1957-12-22"
+        },
+        {
+          "date": "1962-02-25"
+        },
+        {
+          "date": "1966-02-27"
+        },
+        {
+          "date": "1971-06-27"
+        },
+        {
+          "date": "1976-05-30"
+        },
+        {
+          "date": "1981-06-07"
+        },
+        {
+          "date": "1986-06-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Държавен вестник (архив)",
+          "url": "https://dv.parliament.bg/",
+          "format": "scanned issues",
+          "access": "manual",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "dv",
+          "evidence": "Results notices in the State Gazette, national and district totals only."
+        }
+      ]
+    },
+    {
+      "key": "narodni_saveti",
+      "tier": "nrb",
+      "name": "Избори за народни съвети",
+      "name_en": "People's council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "District and municipal people's councils elected on single Fatherland Front lists from 1949 until the 1991 local self-government reform.",
+      "source": "konst1971",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 39/1971)",
+      "valid_from": "1946-09-15",
+      "valid_to": "1991-09-17",
+      "disposition": "blocked",
+      "disposition_reason": "Only national summaries were printed in the State Gazette; returns by council survive only in regional state archives, with no official digital copy.",
+      "est_votes": 50000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "BG",
+          "within": null,
+          "valid_from": "1946-09-15",
+          "valid_to": "1991-01-01"
+        }
+      ]
+    },
+    {
+      "key": "referendum_istoricheski",
+      "tier": "nrb",
+      "name": "Народни допитвания от 1946 и 1971 г.",
+      "name_en": "Referendums of 1946 and 1971",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The referendum of 8 September 1946 abolished the monarchy and led to the People's Republic; the referendum of 16 May 1971 adopted the 1971 Constitution.",
+      "source": "konst1971",
+      "locator": "https://dv.parliament.bg/ (ДВ бр. 39/1971)",
+      "valid_from": "1946-09-01",
+      "valid_to": "1990-11-15",
+      "first_held": "1946-09-08",
+      "est_votes": 10000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1946-09-01",
+          "valid_to": "1990-11-15",
+          "precedence": 1
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-09-08",
+          "election_kind": "referendum"
+        },
+        {
+          "date": "1971-05-16",
+          "election_kind": "referendum"
+        }
+      ]
+    },
+    {
+      "key": "narodno_sabranie_tsarstvo",
+      "tier": "knyazhestvo_tsarstvo",
+      "name": "Избори за Обикновено и Велико Народно събрание (1879–1945)",
+      "name_en": "National Assembly elections of the Principality and Kingdom",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Ordinary and Grand National Assemblies under the Tarnovo Constitution, from the first ordinary Assembly in 1879 to the 25th in 1945, by majority and later PR systems that changed many times. Results are in the State Gazette and the statistical yearbooks.",
+      "source": "konst1879",
+      "valid_from": "1879-04-16",
+      "valid_to": "1946-09-15",
+      "est_votes": 25000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "BG",
+          "valid_from": "1879-01-01",
+          "valid_to": "1946-09-15"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1879-04-16",
+          "through": "1945-12-31",
+          "note": "Elections from 1879 to 1945 are known to exist and are not yet listed."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Държавен вестник (архив)",
+          "url": "https://dv.parliament.bg/",
+          "format": "scanned issues",
+          "access": "manual",
+          "checked_at": "2026-11-16T00:00:00Z",
+          "source": "dv",
+          "evidence": "Results by district in State Gazette notices and the statistical yearbooks of the Kingdom."
+        }
+      ]
+    },
+    {
+      "key": "nepreki_izbori",
+      "tier": "national",
+      "name": "Непреки избори",
+      "name_en": "Indirect elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "konst1991",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Officers chosen by elected bodies: the Prime Minister and the chair of the National Assembly by the Assembly, the President by the Grand National Assembly in 1990, Constitutional Court and Supreme Judicial Council members partly by the Assembly, and council chairs by municipal councils; no electorate votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state",
+            "head_of_government",
+            "speaker",
+            "mayor",
+            "other"
+          ],
+          "iso_pattern": "BG",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "sadebna_vlast",
+      "tier": "national",
+      "name": "Съдебна власт",
+      "name_en": "Judiciary",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {},
+      "source": "konst1991",
+      "locator": "https://www.parliament.bg/bg/const (arts. 129–130a)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No judge, prosecutor, or police officer is elected by voters: judges are appointed by the Supreme Judicial Council (Constitution art. 129), and lay judges are chosen by municipal councils and general assemblies of courts."
+    },
+    {
+      "key": "partiyni_nominatsii",
+      "tier": "national",
+      "name": "Издигане на кандидати",
+      "name_en": "Candidate nomination",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {},
+      "source": "ik2014",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No state-run primaries: parties, coalitions, and initiative committees nominate candidates by their own rules and register them with the election commissions (Изборен кодекс); there is no public nominating vote."
+    },
+    {
+      "key": "nyeteritorialni",
+      "tier": "national",
+      "name": "Нетериториални избори",
+      "name_en": "Non-territorial elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {},
+      "source": "konst1991",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Bulgaria has no minority rolls, reserved communal seats, or other non-territorial electorates; elections inside professional chambers, universities, and trade unions are private and run by those bodies."
+    }
+  ]
+}
