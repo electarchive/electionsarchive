@@ -550,7 +550,7 @@ REFERENCES = [
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 
 CHECKS = {
-    "unique.fact": """select result_set_id, unit_id, option_id, measure, count(*) as n from result_value
+    "unique.fact": """select result_set_id, unit_id, option_id, channel, measure, count(*) as n from result_value
                       group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """select v.result_set_id, v.option_id from result_value v
