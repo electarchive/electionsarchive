@@ -1,0 +1,865 @@
+{
+ "year": 1988,
+ "date_from": "1988-01-31",
+ "date_to": "1988-02-01",
+ "electors": 301,
+ "parties": [
+  {
+   "key": "sdp",
+   "fi": "Suomen Sosialidemokraattinen Puolue",
+   "sv": "Finlands Socialdemokratiska Partiet",
+   "fr": null,
+   "supports": "Mauno Koivisto"
+  },
+  {
+   "key": "smp",
+   "fi": "Suomen Maaseudun Puolue",
+   "sv": "Finlands Landsbygds Parti",
+   "fr": null,
+   "supports": "Mauno Koivisto"
+  },
+  {
+   "key": "pro_koivisto",
+   "fi": "Pro Koivisto",
+   "sv": "Pro Koivisto",
+   "fr": null,
+   "supports": "Mauno Koivisto"
+  },
+  {
+   "key": "aland",
+   "fi": "Ahvenanmaan valitsijayhdistys",
+   "sv": "Åländsk samling",
+   "fr": null,
+   "supports": "Mauno Koivisto"
+  },
+  {
+   "key": "ml",
+   "fi": "Keskustapuolue",
+   "sv": "Centerpartiet",
+   "fr": null,
+   "supports": "Paavo Väyrynen"
+  },
+  {
+   "key": "kok",
+   "fi": "Kokoomus",
+   "sv": "Samlingspartiet",
+   "fr": null,
+   "supports": "Harri Holkeri"
+  },
+  {
+   "key": "liike88",
+   "fi": "Liike-88",
+   "sv": "Aktion -88",
+   "fr": null,
+   "supports": "Kalevi Kivistö"
+  },
+  {
+   "key": "deva",
+   "fi": "Demokraattinen Vaihtoehto",
+   "sv": "Demokratiskt Alternativ",
+   "fr": null,
+   "supports": "Jouko Kajanoja"
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Helsingin kaupungin vaalipiiri",
+   "sv": "Helsingfors stads valkrets",
+   "registered": 442647,
+   "voters": 322907,
+   "cast": 322907,
+   "valid": 306273,
+   "invalid": 16634,
+   "votes": {
+    "sdp": 131403,
+    "smp": 5028,
+    "pro_koivisto": 20478,
+    "ml": 23126,
+    "kok": 90674,
+    "liike88": 29473,
+    "deva": 6091
+   },
+   "electors": {
+    "sdp": 14,
+    "pro_koivisto": 2,
+    "ml": 2,
+    "kok": 9,
+    "liike88": 3
+   },
+   "seats": 30,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 554712,
+   "voters": 441397,
+   "cast": 441397,
+   "valid": 416022,
+   "invalid": 25375,
+   "votes": {
+    "sdp": 178460,
+    "smp": 11466,
+    "pro_koivisto": 32618,
+    "ml": 48336,
+    "kok": 104545,
+    "liike88": 32940,
+    "deva": 7657
+   },
+   "electors": {
+    "sdp": 20,
+    "smp": 1,
+    "pro_koivisto": 3,
+    "ml": 5,
+    "kok": 11,
+    "liike88": 3
+   },
+   "seats": 43,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 334829,
+   "voters": 267263,
+   "cast": 267263,
+   "valid": 253904,
+   "invalid": 13359,
+   "votes": {
+    "sdp": 97090,
+    "smp": 19415,
+    "pro_koivisto": 11837,
+    "ml": 38255,
+    "kok": 57978,
+    "liike88": 21845,
+    "deva": 7484
+   },
+   "electors": {
+    "sdp": 10,
+    "smp": 2,
+    "pro_koivisto": 1,
+    "ml": 4,
+    "kok": 6,
+    "liike88": 2
+   },
+   "seats": 25,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 247248,
+   "voters": 198930,
+   "cast": 198930,
+   "valid": 190129,
+   "invalid": 8801,
+   "votes": {
+    "sdp": 78288,
+    "smp": 9937,
+    "ml": 38257,
+    "kok": 37723,
+    "liike88": 23424,
+    "deva": 2500
+   },
+   "electors": {
+    "sdp": 8,
+    "smp": 1,
+    "ml": 4,
+    "kok": 4,
+    "liike88": 2
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Ahvenanmaan maakunnan vaalipiiri",
+   "sv": "Landskapet Ålands valkrets",
+   "registered": 24400,
+   "voters": 9584,
+   "cast": 9584,
+   "valid": 7484,
+   "invalid": 2100,
+   "votes": {
+    "aland": 7484
+   },
+   "electors": {
+    "aland": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 291369,
+   "voters": 232192,
+   "cast": 232192,
+   "valid": 220924,
+   "invalid": 11268,
+   "votes": {
+    "sdp": 106189,
+    "smp": 7214,
+    "ml": 31286,
+    "kok": 54087,
+    "liike88": 18431,
+    "deva": 3717
+   },
+   "electors": {
+    "sdp": 11,
+    "ml": 3,
+    "kok": 6,
+    "liike88": 2
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 261950,
+   "voters": 208081,
+   "cast": 208081,
+   "valid": 197521,
+   "invalid": 10560,
+   "votes": {
+    "sdp": 89781,
+    "smp": 6440,
+    "ml": 21020,
+    "kok": 49705,
+    "liike88": 22293,
+    "deva": 8282
+   },
+   "electors": {
+    "sdp": 10,
+    "ml": 2,
+    "kok": 6,
+    "liike88": 2
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Kymen läänin vaalipiiri",
+   "sv": "Kymmene läns valkrets",
+   "registered": 278819,
+   "voters": 221634,
+   "cast": 221634,
+   "valid": 211208,
+   "invalid": 10426,
+   "votes": {
+    "sdp": 109333,
+    "smp": 6456,
+    "ml": 42275,
+    "kok": 41078,
+    "liike88": 9143,
+    "deva": 2923
+   },
+   "electors": {
+    "sdp": 12,
+    "ml": 4,
+    "kok": 4,
+    "liike88": 1
+   },
+   "seats": 21,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 167943,
+   "voters": 132421,
+   "cast": 132421,
+   "valid": 126028,
+   "invalid": 6393,
+   "votes": {
+    "sdp": 57974,
+    "smp": 4380,
+    "ml": 34527,
+    "kok": 22016,
+    "liike88": 6032,
+    "deva": 1099
+   },
+   "electors": {
+    "sdp": 7,
+    "ml": 4,
+    "kok": 2
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Pohjois-Karjalan läänin vaalipiiri",
+   "sv": "Norra Karelens läns valkrets",
+   "registered": 140981,
+   "voters": 109953,
+   "cast": 109953,
+   "valid": 104839,
+   "invalid": 5114,
+   "votes": {
+    "sdp": 47430,
+    "smp": 5143,
+    "ml": 29406,
+    "kok": 15066,
+    "liike88": 6335,
+    "deva": 1459
+   },
+   "electors": {
+    "sdp": 6,
+    "ml": 3,
+    "kok": 2
+   },
+   "seats": 11,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Kuopion läänin vaalipiiri",
+   "sv": "Kuopio läns valkrets",
+   "registered": 204007,
+   "voters": 160446,
+   "cast": 160446,
+   "valid": 153147,
+   "invalid": 7299,
+   "votes": {
+    "sdp": 51616,
+    "smp": 13714,
+    "ml": 46921,
+    "kok": 20457,
+    "liike88": 18034,
+    "deva": 2405
+   },
+   "electors": {
+    "sdp": 6,
+    "smp": 1,
+    "ml": 5,
+    "kok": 2,
+    "liike88": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Keski-Suomen läänin vaalipiiri",
+   "sv": "Mellersta Finlands läns valkrets",
+   "registered": 200355,
+   "voters": 158250,
+   "cast": 158250,
+   "valid": 150124,
+   "invalid": 8126,
+   "votes": {
+    "sdp": 59920,
+    "smp": 7670,
+    "ml": 36496,
+    "kok": 23261,
+    "liike88": 21397,
+    "deva": 1380
+   },
+   "electors": {
+    "sdp": 7,
+    "ml": 4,
+    "kok": 2,
+    "liike88": 2
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Vaasan läänin vaalipiiri",
+   "sv": "Vasa läns valkrets",
+   "registered": 376590,
+   "voters": 283073,
+   "cast": 283073,
+   "valid": 271243,
+   "invalid": 11830,
+   "votes": {
+    "sdp": 69366,
+    "smp": 10587,
+    "pro_koivisto": 23730,
+    "ml": 102446,
+    "kok": 45231,
+    "liike88": 16678,
+    "deva": 3205
+   },
+   "electors": {
+    "sdp": 7,
+    "smp": 1,
+    "pro_koivisto": 2,
+    "ml": 11,
+    "kok": 5,
+    "liike88": 1
+   },
+   "seats": 27,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Oulun läänin vaalipiiri",
+   "sv": "Uleåborgs läns valkrets",
+   "registered": 339697,
+   "voters": 263562,
+   "cast": 263562,
+   "valid": 251045,
+   "invalid": 12517,
+   "votes": {
+    "sdp": 64843,
+    "smp": 10467,
+    "ml": 102815,
+    "kok": 29517,
+    "liike88": 38887,
+    "deva": 4516
+   },
+   "electors": {
+    "sdp": 7,
+    "smp": 1,
+    "ml": 11,
+    "kok": 3,
+    "liike88": 4
+   },
+   "seats": 26,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  },
+  {
+   "fi": "Lapin läänin vaalipiiri",
+   "sv": "Lapplands läns valkrets",
+   "registered": 170622,
+   "voters": 131667,
+   "cast": 131667,
+   "valid": 125818,
+   "invalid": 5849,
+   "votes": {
+    "sdp": 33516,
+    "smp": 2126,
+    "ml": 52603,
+    "kok": 11842,
+    "liike88": 21921,
+    "deva": 3810
+   },
+   "electors": {
+    "sdp": 3,
+    "ml": 6,
+    "kok": 1,
+    "liike88": 2
+   },
+   "seats": 12,
+   "pages": {
+    "turnout": 30,
+    "votes": 32,
+    "electors": 96
+   }
+  }
+ ],
+ "national": {
+  "registered": 4036169,
+  "voters": 3141360,
+  "cast": 3141360,
+  "valid": 2985709,
+  "invalid": 155651,
+  "votes": {
+   "sdp": 1175209,
+   "smp": 120043,
+   "pro_koivisto": 88663,
+   "aland": 7484,
+   "ml": 647769,
+   "kok": 603180,
+   "liike88": 286833,
+   "deva": 56528
+  },
+  "electors": {
+   "sdp": 128,
+   "smp": 7,
+   "pro_koivisto": 8,
+   "aland": 1,
+   "ml": 68,
+   "kok": 63,
+   "liike88": 26
+  },
+  "seats": 301,
+  "pages": {
+   "turnout": 30,
+   "votes": 32,
+   "electors": 96
+  }
+ },
+ "notes": [
+  "Polling days 31 January - 1 February 1988. The direct popular vote for president and the vote for presidential electors were separate ballots held at the same time; no candidate won more than half of the direct vote, so the electors chose the president.",
+  "Electors: 301 in total, one from the Åland constituency (fixed by law) plus 300 apportioned among the other constituencies. Changes from 1982: Uusimaa 41 -> 43, Häme South 23 -> 22, Kymi 22 -> 21.",
+  "Votes table (page 32) prints an extra column 'A,B,C,D yhteensä' (sum of SDP, SMP, Pro Koivisto and the Åland group, all supporting Mauno Koivisto); it is a subtotal and is not transcribed as a party.",
+  "Party keys: smp = Suomen Maaseudun Puolue (FLP); pro_koivisto = the Pro Koivisto lists; aland = Ahvenanmaan valitsijayhdistys / Åländsk samling (column 'AHV. ÅLAND', the only list in the Åland constituency); ml = Keskustapuolue (KESK); liike88 = Liike-88 / Aktion -88, the lists supporting Kalevi Kivistö (abbreviated LIIKE-88 in the tables); deva = Demokraattinen Vaihtoehto (DEVA). No RKP or other party ran its own elector lists in this table.",
+  "voters = persons who voted in the elector election (turnout table A, page 30); in every row it equals cast. The direct election has its own turnout column on page 30 (persons who voted in the direct election), which equals direct cast.",
+  "Electors by party come from table 6 (number of persons elected by sex, party and constituency, page 96); seats = its total column. Demokraattinen Vaihtoehto won no electors.",
+  "Direct vote (page 31, table B): candidate keys koivisto (Mauno Koivisto, nominated by SDP and SMP), vayrynen (Paavo Väyrynen, KESK), holkeri (Harri Holkeri, KOK), kivisto (Kalevi Kivistö, Liike-88), kajanoja (Jouko Kajanoja, DEVA). Direct 'registered' is the same electorate as the elector vote (page 30)."
+ ],
+ "misprints": [],
+ "direct": {
+  "date_from": "1988-01-31",
+  "candidates": [
+   {
+    "key": "koivisto",
+    "name": "Mauno Koivisto",
+    "party": "sdp"
+   },
+   {
+    "key": "vayrynen",
+    "name": "Paavo Väyrynen",
+    "party": "ml"
+   },
+   {
+    "key": "holkeri",
+    "name": "Harri Holkeri",
+    "party": "kok"
+   },
+   {
+    "key": "kivisto",
+    "name": "Kalevi Kivistö",
+    "party": "liike88"
+   },
+   {
+    "key": "kajanoja",
+    "name": "Jouko Kajanoja",
+    "party": "deva"
+   }
+  ],
+  "districts": [
+   {
+    "fi": "Helsingin kaupungin vaalipiiri",
+    "sv": "Helsingfors stads valkrets",
+    "registered": 442647,
+    "cast": 324891,
+    "valid": 316946,
+    "invalid": 7945,
+    "votes": {
+     "koivisto": 169987,
+     "vayrynen": 22735,
+     "holkeri": 83849,
+     "kivisto": 35435,
+     "kajanoja": 4940
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Uudenmaan läänin vaalipiiri",
+    "sv": "Nylands läns valkrets",
+    "registered": 554712,
+    "cast": 443317,
+    "valid": 434293,
+    "invalid": 9024,
+    "votes": {
+     "koivisto": 240030,
+     "vayrynen": 47975,
+     "holkeri": 99363,
+     "kivisto": 41174,
+     "kajanoja": 5751
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Turun läänin eteläinen vaalipiiri",
+    "sv": "Åbo läns södra valkrets",
+    "registered": 334829,
+    "cast": 269052,
+    "valid": 264349,
+    "invalid": 4703,
+    "votes": {
+     "koivisto": 141443,
+     "vayrynen": 37529,
+     "holkeri": 54275,
+     "kivisto": 25469,
+     "kajanoja": 5633
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Turun läänin pohjoinen vaalipiiri",
+    "sv": "Åbo läns norra valkrets",
+    "registered": 247248,
+    "cast": 199928,
+    "valid": 196076,
+    "invalid": 3852,
+    "votes": {
+     "koivisto": 94849,
+     "vayrynen": 37283,
+     "holkeri": 36248,
+     "kivisto": 25426,
+     "kajanoja": 2270
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Ahvenanmaan maakunnan vaalipiiri",
+    "sv": "Landskapet Ålands valkrets",
+    "registered": 24400,
+    "cast": 9730,
+    "valid": 9550,
+    "invalid": 180,
+    "votes": {
+     "koivisto": 7305,
+     "vayrynen": 1220,
+     "holkeri": 888,
+     "kivisto": 117,
+     "kajanoja": 20
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Hämeen läänin eteläinen vaalipiiri",
+    "sv": "Tavastehus läns södra valkrets",
+    "registered": 291369,
+    "cast": 233314,
+    "valid": 228822,
+    "invalid": 4492,
+    "votes": {
+     "koivisto": 124124,
+     "vayrynen": 30834,
+     "holkeri": 50045,
+     "kivisto": 20876,
+     "kajanoja": 2943
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Hämeen läänin pohjoinen vaalipiiri",
+    "sv": "Tavastehus läns norra valkrets",
+    "registered": 261950,
+    "cast": 208923,
+    "valid": 204768,
+    "invalid": 4155,
+    "votes": {
+     "koivisto": 103308,
+     "vayrynen": 21062,
+     "holkeri": 47624,
+     "kivisto": 26505,
+     "kajanoja": 6269
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Kymen läänin vaalipiiri",
+    "sv": "Kymmene läns valkrets",
+    "registered": 278819,
+    "cast": 222568,
+    "valid": 218463,
+    "invalid": 4105,
+    "votes": {
+     "koivisto": 123625,
+     "vayrynen": 41648,
+     "holkeri": 38605,
+     "kivisto": 12293,
+     "kajanoja": 2292
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Mikkelin läänin vaalipiiri",
+    "sv": "S:t Michels läns valkrets",
+    "registered": 167943,
+    "cast": 133208,
+    "valid": 130347,
+    "invalid": 2861,
+    "votes": {
+     "koivisto": 67681,
+     "vayrynen": 33521,
+     "holkeri": 20556,
+     "kivisto": 7855,
+     "kajanoja": 734
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Pohjois-Karjalan läänin vaalipiiri",
+    "sv": "Norra Karelens läns valkrets",
+    "registered": 140981,
+    "cast": 110580,
+    "valid": 108381,
+    "invalid": 2199,
+    "votes": {
+     "koivisto": 56725,
+     "vayrynen": 28540,
+     "holkeri": 14389,
+     "kivisto": 7601,
+     "kajanoja": 1126
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Kuopion läänin vaalipiiri",
+    "sv": "Kuopio läns valkrets",
+    "registered": 204007,
+    "cast": 161339,
+    "valid": 158135,
+    "invalid": 3204,
+    "votes": {
+     "koivisto": 71871,
+     "vayrynen": 45571,
+     "holkeri": 19372,
+     "kivisto": 19388,
+     "kajanoja": 1933
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Keski-Suomen läänin vaalipiiri",
+    "sv": "Mellersta Finlands läns valkrets",
+    "registered": 200355,
+    "cast": 159510,
+    "valid": 155975,
+    "invalid": 3535,
+    "votes": {
+     "koivisto": 74893,
+     "vayrynen": 35415,
+     "holkeri": 21462,
+     "kivisto": 23040,
+     "kajanoja": 1165
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Vaasan läänin vaalipiiri",
+    "sv": "Vasa läns valkrets",
+    "registered": 376590,
+    "cast": 284502,
+    "valid": 279146,
+    "invalid": 5356,
+    "votes": {
+     "koivisto": 113138,
+     "vayrynen": 99682,
+     "holkeri": 44230,
+     "kivisto": 19375,
+     "kajanoja": 2721
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Oulun läänin vaalipiiri",
+    "sv": "Uleåborgs läns valkrets",
+    "registered": 339697,
+    "cast": 265054,
+    "valid": 259634,
+    "invalid": 5420,
+    "votes": {
+     "koivisto": 84259,
+     "vayrynen": 101353,
+     "holkeri": 27980,
+     "kivisto": 42314,
+     "kajanoja": 3728
+    },
+    "pages": {
+     "votes": 31
+    }
+   },
+   {
+    "fi": "Lapin läänin vaalipiiri",
+    "sv": "Lapplands läns valkrets",
+    "registered": 170622,
+    "cast": 132174,
+    "valid": 129564,
+    "invalid": 2610,
+    "votes": {
+     "koivisto": 39996,
+     "vayrynen": 52007,
+     "holkeri": 11454,
+     "kivisto": 23204,
+     "kajanoja": 2903
+    },
+    "pages": {
+     "votes": 31
+    }
+   }
+  ],
+  "national": {
+   "registered": 4036169,
+   "cast": 3158090,
+   "valid": 3094449,
+   "invalid": 63641,
+   "votes": {
+    "koivisto": 1513234,
+    "vayrynen": 636375,
+    "holkeri": 570340,
+    "kivisto": 330072,
+    "kajanoja": 44428
+   },
+   "pages": {
+    "votes": 31
+   }
+  }
+ }
+}

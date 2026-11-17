@@ -1,0 +1,566 @@
+{
+ "year": 1925,
+ "date_from": "1925-01-15",
+ "date_to": "1925-01-16",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "sdp",
+   "fi": "Sosialidemokraattinen puolue",
+   "sv": "Socialdemokratiska partiet",
+   "fr": "Parti socialdémocrate",
+   "supports": null
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen kokoomuspuolue",
+   "sv": "Nationella samlingspartiet",
+   "fr": "Parti national de coalition",
+   "supports": null
+  },
+  {
+   "key": "ml",
+   "fi": "Maalaisliitto",
+   "sv": "Agrarförbundet",
+   "fr": "Union agraire",
+   "supports": null
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": "Parti suédois",
+   "supports": null
+  },
+  {
+   "key": "edistys",
+   "fi": "Kansallinen edistyspuolue",
+   "sv": "Nationella framstegspartiet",
+   "fr": "Parti national progressiste",
+   "supports": null
+  },
+  {
+   "key": "stpv",
+   "fi": "Työväen ja pienviljelijäin vaaliliitto",
+   "sv": "Arbetar- och småbrukarpartiet",
+   "fr": "Parti d'ouvriers et de petits fermiers",
+   "supports": null
+  },
+  {
+   "key": "other",
+   "fi": "Muut puolueet",
+   "sv": "Övriga partier",
+   "fr": "Autres partis",
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 233890,
+   "voters": 106975,
+   "cast": 106975,
+   "valid": 106687,
+   "invalid": 288,
+   "votes": {
+    "sdp": 27260,
+    "kok": 17828,
+    "ml": 1444,
+    "rkp": 41060,
+    "edistys": 11123,
+    "stpv": 7895,
+    "other": 77
+   },
+   "electors": {
+    "sdp": 10,
+    "kok": 6,
+    "rkp": 16,
+    "edistys": 4,
+    "stpv": 3
+   },
+   "seats": 39,
+   "pages": {
+    "turnout": 9,
+    "votes": 51,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Turun-Porin läänin eteläinen vaalipiiri",
+   "sv": "Åbo-Björneborgs läns södra valkrets",
+   "registered": 135519,
+   "voters": 50750,
+   "cast": 50750,
+   "valid": 50422,
+   "invalid": 328,
+   "votes": {
+    "sdp": 9182,
+    "kok": 13131,
+    "ml": 3778,
+    "rkp": 11778,
+    "edistys": 8112,
+    "stpv": 4421,
+    "other": 20
+   },
+   "electors": {
+    "sdp": 4,
+    "ml": 2,
+    "kok": 6,
+    "rkp": 6,
+    "edistys": 4,
+    "stpv": 2
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 9,
+    "votes": 52,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Turun-Porin läänin pohjoinen vaalipiiri",
+   "sv": "Åbo-Björneborgs läns norra valkrets",
+   "registered": 113876,
+   "voters": 44527,
+   "cast": 44527,
+   "valid": 44317,
+   "invalid": 210,
+   "votes": {
+    "sdp": 16663,
+    "kok": 14628,
+    "ml": 6665,
+    "edistys": 3493,
+    "stpv": 2552,
+    "other": 316
+   },
+   "electors": {
+    "sdp": 9,
+    "ml": 3,
+    "kok": 8,
+    "edistys": 1,
+    "stpv": 1
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 9,
+    "votes": 54,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 90404,
+   "voters": 41910,
+   "cast": 41910,
+   "valid": 41691,
+   "invalid": 219,
+   "votes": {
+    "sdp": 15241,
+    "kok": 12263,
+    "ml": 3417,
+    "edistys": 7403,
+    "stpv": 3319,
+    "other": 48
+   },
+   "electors": {
+    "sdp": 6,
+    "ml": 1,
+    "kok": 6,
+    "edistys": 3,
+    "stpv": 1
+   },
+   "seats": 17,
+   "pages": {
+    "turnout": 9,
+    "votes": 55,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 91437,
+   "voters": 41006,
+   "cast": 41006,
+   "valid": 40848,
+   "invalid": 158,
+   "votes": {
+    "sdp": 21120,
+    "kok": 10216,
+    "ml": 2425,
+    "edistys": 5666,
+    "stpv": 1384,
+    "other": 37
+   },
+   "electors": {
+    "sdp": 10,
+    "ml": 1,
+    "kok": 4,
+    "edistys": 2
+   },
+   "seats": 17,
+   "pages": {
+    "turnout": 9,
+    "votes": 56,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Viipurin läänin läntinen vaalipiiri",
+   "sv": "Viborgs läns västra valkrets",
+   "registered": 129031,
+   "voters": 60331,
+   "cast": 60331,
+   "valid": 60146,
+   "invalid": 185,
+   "votes": {
+    "sdp": 16811,
+    "kok": 18571,
+    "ml": 13276,
+    "edistys": 9556,
+    "stpv": 1878,
+    "other": 54
+   },
+   "electors": {
+    "sdp": 7,
+    "ml": 5,
+    "kok": 8,
+    "edistys": 4
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 9,
+    "votes": 56,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Viipurin läänin itäinen vaalipiiri",
+   "sv": "Viborgs läns östra valkrets",
+   "registered": 134451,
+   "voters": 51774,
+   "cast": 51774,
+   "valid": 51545,
+   "invalid": 229,
+   "votes": {
+    "sdp": 9657,
+    "kok": 10179,
+    "ml": 26911,
+    "edistys": 4101,
+    "stpv": 658,
+    "other": 39
+   },
+   "electors": {
+    "sdp": 5,
+    "ml": 14,
+    "kok": 5,
+    "edistys": 2
+   },
+   "seats": 26,
+   "pages": {
+    "turnout": 9,
+    "votes": 57,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 96686,
+   "voters": 32487,
+   "cast": 32487,
+   "valid": 32346,
+   "invalid": 141,
+   "votes": {
+    "sdp": 13513,
+    "kok": 6050,
+    "ml": 4481,
+    "edistys": 8250,
+    "other": 52
+   },
+   "electors": {
+    "sdp": 8,
+    "ml": 2,
+    "kok": 4,
+    "edistys": 5
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 9,
+    "votes": 58,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Kuopion läänin läntinen vaalipiiri",
+   "sv": "Kuopio läns västra valkrets",
+   "registered": 86793,
+   "voters": 31639,
+   "cast": 31639,
+   "valid": 31527,
+   "invalid": 112,
+   "votes": {
+    "sdp": 5780,
+    "kok": 5468,
+    "ml": 10577,
+    "edistys": 3424,
+    "stpv": 6239,
+    "other": 39
+   },
+   "electors": {
+    "sdp": 3,
+    "ml": 6,
+    "kok": 3,
+    "edistys": 3,
+    "stpv": 3
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 9,
+    "votes": 59,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Kuopion läänin itäinen vaalipiiri",
+   "sv": "Kuopio läns östra valkrets",
+   "registered": 66304,
+   "voters": 19199,
+   "cast": 19199,
+   "valid": 19106,
+   "invalid": 93,
+   "votes": {
+    "sdp": 7419,
+    "kok": 3854,
+    "ml": 5965,
+    "edistys": 1829,
+    "other": 39
+   },
+   "electors": {
+    "sdp": 6,
+    "ml": 5,
+    "kok": 3,
+    "edistys": 1
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 9,
+    "votes": 59,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Vaasan läänin itäinen vaalipiiri",
+   "sv": "Vasa läns östra valkrets",
+   "registered": 76823,
+   "voters": 30659,
+   "cast": 30659,
+   "valid": 30572,
+   "invalid": 87,
+   "votes": {
+    "sdp": 14421,
+    "kok": 5073,
+    "ml": 7853,
+    "edistys": 3191,
+    "other": 34
+   },
+   "electors": {
+    "sdp": 8,
+    "ml": 5,
+    "kok": 2,
+    "edistys": 1
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 9,
+    "votes": 60,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Vaasan läänin eteläinen vaalipiiri",
+   "sv": "Vasa läns södra valkrets",
+   "registered": 97383,
+   "voters": 35705,
+   "cast": 35705,
+   "valid": 35656,
+   "invalid": 49,
+   "votes": {
+    "sdp": 2373,
+    "kok": 8056,
+    "ml": 7576,
+    "rkp": 13955,
+    "edistys": 292,
+    "stpv": 3399,
+    "other": 5
+   },
+   "electors": {
+    "sdp": 1,
+    "ml": 5,
+    "kok": 4,
+    "rkp": 7,
+    "stpv": 1
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 9,
+    "votes": 61,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Vaasan läänin pohjoinen vaalipiiri",
+   "sv": "Vasa läns norra valkrets",
+   "registered": 73942,
+   "voters": 29454,
+   "cast": 29454,
+   "valid": 29429,
+   "invalid": 25,
+   "votes": {
+    "sdp": 2401,
+    "kok": 6093,
+    "ml": 7741,
+    "rkp": 11629,
+    "edistys": 402,
+    "stpv": 1141,
+    "other": 22
+   },
+   "electors": {
+    "sdp": 1,
+    "ml": 5,
+    "kok": 3,
+    "rkp": 6
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 9,
+    "votes": 62,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Oulun läänin eteläinen vaalipiiri",
+   "sv": "Uleåborgs läns södra valkrets",
+   "registered": 89559,
+   "voters": 31396,
+   "cast": 31396,
+   "valid": 31304,
+   "invalid": 92,
+   "votes": {
+    "sdp": 2583,
+    "kok": 5413,
+    "ml": 15297,
+    "edistys": 2912,
+    "stpv": 5072,
+    "other": 27
+   },
+   "electors": {
+    "sdp": 1,
+    "ml": 10,
+    "kok": 3,
+    "edistys": 2,
+    "stpv": 3
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 9,
+    "votes": 62,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Oulun läänin pohjoinen vaalipiiri",
+   "sv": "Uleåborgs läns norra valkrets",
+   "registered": 48602,
+   "voters": 14965,
+   "cast": 14965,
+   "valid": 14927,
+   "invalid": 38,
+   "votes": {
+    "sdp": 667,
+    "kok": 3440,
+    "ml": 6524,
+    "edistys": 1231,
+    "stpv": 3052,
+    "other": 13
+   },
+   "electors": {
+    "ml": 5,
+    "kok": 2,
+    "edistys": 1,
+    "stpv": 2
+   },
+   "seats": 10,
+   "pages": {
+    "turnout": 9,
+    "votes": 63,
+    "electors": 31
+   }
+  },
+  {
+   "fi": "Lapin vaalipiiri",
+   "sv": "Lappmarkens valkrets",
+   "registered": 7785,
+   "voters": 1400,
+   "cast": 1400,
+   "valid": 1396,
+   "invalid": 4,
+   "votes": {
+    "kok": 977,
+    "ml": 2,
+    "edistys": 214,
+    "stpv": 203
+   },
+   "electors": {
+    "kok": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 9,
+    "votes": 64,
+    "electors": 31
+   }
+  }
+ ],
+ "national": {
+  "registered": 1572485,
+  "voters": 624177,
+  "cast": 624177,
+  "valid": 621919,
+  "invalid": 2258,
+  "votes": {
+   "sdp": 165091,
+   "kok": 141240,
+   "ml": 123932,
+   "rkp": 78422,
+   "edistys": 71199,
+   "stpv": 41213,
+   "other": 822
+  },
+  "electors": {
+   "sdp": 79,
+   "ml": 69,
+   "kok": 68,
+   "rkp": 35,
+   "edistys": 33,
+   "stpv": 16
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 9,
+   "votes": 50,
+   "electors": 31
+  }
+ },
+ "notes": [
+  "Sources: registered voters by constituency from the text table on PDF page 9 (1925 electors' election, total column); voters by constituency from the text table on PDF page 14 (national voters 624 177 from the text table on page 12). 'pages.turnout' gives the registered-voters page (9); voters are on page 14.",
+  "Votes are the constituency total rows of Table IV (by commune, PDF pages 51-64), which include ballots sent from other constituencies; the national row is the 'Koko maa' row of Table III (PDF page 50). Electors elected by party come from the text table 'Nombre des élus en 1925' on PDF page 31 (section 12, no separate 'a) vaalipiireittäin' part in this volume); its order of columns is sdp, ml, kok, rkp, edistys, communist.",
+  "Party key stpv: the votes table column 'Työväen ja pienviljelijäin vaaliliitto / Arbetar- och småbrukarpartiet' (communist-led workers' and smallholders' electoral alliance); the electors table names the same column 'Kommunistinen työväenpuolue / Kommunistiska arbetarpartiet / Parti ouvrier communiste'.",
+  "Constituencies are the 16 parliamentary constituencies of the time; Åland had no constituency of its own and was part of the Turku-Pori southern constituency. Polling days were 15 and 16 January 1925.",
+  "Footnotes of Table IV: Uusimaa: one list outside the Agrarian League's electoral alliance received 66 votes (included in ml). Turku-Pori south, Turku-Pori north, Häme north, Vaasa north: the National Coalition and the Agrarian League had a joint electoral alliance. Häme south: 4 lists outside the Social Democratic alliance received 1 220 votes (included in sdp); one list outside the Progressive Party's alliance received 56 votes (included in edistys). Viipuri west: one list outside the Social Democratic alliance received 249 votes (included in sdp). Mikkeli, Vaasa south: the National Coalition, the Agrarian League and the National Progressive Party had a joint electoral alliance. Kuopio west: 4 lists outside the Social Democratic alliance received 636 votes; the Agrarian League and the Progressive Party had a joint alliance; the workers' and smallholders' lists were not in an alliance with each other. Kuopio east: one list outside the Agrarian League's alliance received 60 votes. Vaasa east: the Agrarian League and the Progressive Party had a joint alliance. Vaasa north: one list outside the Social Democratic alliance received 119 votes. Oulu south: one list outside the workers' and smallholders' alliance received 19 votes. Oulu north: the National Coalition and the Progressive Party had a joint alliance; one list outside the workers' and smallholders' alliance received 54 votes.",
+  "Women among electors elected: 19 of 300 (sdp 12, kok 3, rkp 1, edistys 1, stpv 2)."
+ ],
+ "misprints": []
+}

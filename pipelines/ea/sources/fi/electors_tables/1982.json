@@ -1,0 +1,648 @@
+{
+ "year": 1982,
+ "date_from": "1982-01-17",
+ "date_to": "1982-01-18",
+ "electors": 301,
+ "parties": [
+  {
+   "key": "sdp",
+   "fi": "Suomen Sosialidemokraattinen Puolue",
+   "sv": "Finlands Socialdemokratiska Parti",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen Kokoomus",
+   "sv": "Nationella Samlingspartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "ml",
+   "fi": "Keskustapuolue",
+   "sv": "Centerpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "skdl",
+   "fi": "Suomen Kansan Demokraattinen Liitto",
+   "sv": "Demokratiska Förbundet för Finlands Folk",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen Kansanpuolue",
+   "sv": "Svenska Folkpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "smp",
+   "fi": "Suomen Maaseudun Puolue",
+   "sv": "Finlands Landsbygdsparti",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "skl",
+   "fi": "Suomen Kristillinen Liitto",
+   "sv": "Finlands Kristliga Förbund",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "lkp",
+   "fi": "Liberaalinen Kansanpuolue",
+   "sv": "Liberala Folkpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "pop",
+   "fi": "Perustuslaillinen Oikeistopuolue",
+   "sv": "Konstitutionella Högerpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "skyp",
+   "fi": "Suomen Kansan Yhtenäisyyden Puolue",
+   "sv": "Finlands Folks Enhetsparti",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "al_samling",
+   "fi": "Åländsk Samling",
+   "sv": "Åländsk Samling",
+   "fr": null,
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Helsingin kaupungin vaalipiiri",
+   "sv": "Helsingfors stads valkrets",
+   "registered": 440179,
+   "voters": 338709,
+   "cast": 338709,
+   "valid": 337613,
+   "invalid": 1096,
+   "votes": {
+    "sdp": 169221,
+    "kok": 74715,
+    "ml": 16338,
+    "skdl": 31771,
+    "rkp": 23248,
+    "smp": 4555,
+    "skl": 5635,
+    "lkp": 8083,
+    "pop": 3959,
+    "skyp": 88
+   },
+   "electors": {
+    "sdp": 17,
+    "kok": 7,
+    "ml": 1,
+    "skdl": 3,
+    "rkp": 2
+   },
+   "seats": 30,
+   "pages": {
+    "turnout": 12,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 12
+   }
+  },
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 495937,
+   "voters": 417251,
+   "cast": 417251,
+   "valid": 415895,
+   "invalid": 1356,
+   "votes": {
+    "sdp": 206896,
+    "kok": 78396,
+    "ml": 31332,
+    "skdl": 37050,
+    "rkp": 37292,
+    "smp": 7025,
+    "skl": 5371,
+    "lkp": 10061,
+    "pop": 2320,
+    "skyp": 152
+   },
+   "electors": {
+    "sdp": 22,
+    "kok": 8,
+    "ml": 3,
+    "skdl": 3,
+    "rkp": 4,
+    "lkp": 1
+   },
+   "seats": 41,
+   "pages": {
+    "turnout": 12,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 12
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 323452,
+   "voters": 268570,
+   "cast": 268570,
+   "valid": 267860,
+   "invalid": 710,
+   "votes": {
+    "sdp": 116803,
+    "kok": 54546,
+    "ml": 34668,
+    "skdl": 32172,
+    "rkp": 10904,
+    "smp": 9327,
+    "skl": 4221,
+    "lkp": 4440,
+    "pop": 717,
+    "skyp": 62
+   },
+   "electors": {
+    "sdp": 12,
+    "kok": 5,
+    "ml": 3,
+    "skdl": 3,
+    "rkp": 1,
+    "smp": 1
+   },
+   "seats": 25,
+   "pages": {
+    "turnout": 12,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 12
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 245922,
+   "voters": 205141,
+   "cast": 205141,
+   "valid": 204239,
+   "invalid": 902,
+   "votes": {
+    "sdp": 86431,
+    "kok": 41625,
+    "ml": 34165,
+    "skdl": 28020,
+    "rkp": 922,
+    "smp": 5860,
+    "skl": 3801,
+    "lkp": 3370,
+    "skyp": 45
+   },
+   "electors": {
+    "sdp": 9,
+    "kok": 4,
+    "ml": 3,
+    "skdl": 3
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Ahvenanmaan maakunnan vaalipiiri",
+   "sv": "Landskapet Ålands valkrets",
+   "registered": 24545,
+   "voters": 11264,
+   "cast": 11264,
+   "valid": 11210,
+   "invalid": 54,
+   "votes": {
+    "skdl": 91,
+    "al_samling": 11119
+   },
+   "electors": {
+    "al_samling": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 284095,
+   "voters": 238121,
+   "cast": 238121,
+   "valid": 237313,
+   "invalid": 808,
+   "votes": {
+    "sdp": 117225,
+    "kok": 55146,
+    "ml": 28140,
+    "skdl": 21840,
+    "rkp": 900,
+    "smp": 4340,
+    "skl": 5251,
+    "lkp": 3798,
+    "pop": 673
+   },
+   "electors": {
+    "sdp": 12,
+    "kok": 6,
+    "ml": 3,
+    "skdl": 2
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 251915,
+   "voters": 209977,
+   "cast": 209977,
+   "valid": 209321,
+   "invalid": 656,
+   "votes": {
+    "sdp": 99664,
+    "kok": 49081,
+    "ml": 17027,
+    "skdl": 30920,
+    "rkp": 1366,
+    "smp": 3220,
+    "skl": 4778,
+    "lkp": 2889,
+    "pop": 376
+   },
+   "electors": {
+    "sdp": 10,
+    "kok": 5,
+    "ml": 2,
+    "skdl": 3
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Kymen läänin vaalipiiri",
+   "sv": "Kymmene läns valkrets",
+   "registered": 279354,
+   "voters": 232278,
+   "cast": 232278,
+   "valid": 231591,
+   "invalid": 687,
+   "votes": {
+    "sdp": 120815,
+    "kok": 44107,
+    "ml": 38522,
+    "skdl": 11386,
+    "rkp": 1405,
+    "smp": 5527,
+    "skl": 5963,
+    "lkp": 3776,
+    "skyp": 90
+   },
+   "electors": {
+    "sdp": 13,
+    "kok": 4,
+    "ml": 4,
+    "skdl": 1
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 165596,
+   "voters": 137081,
+   "cast": 137081,
+   "valid": 136639,
+   "invalid": 442,
+   "votes": {
+    "sdp": 63805,
+    "kok": 25472,
+    "ml": 31048,
+    "skdl": 7248,
+    "rkp": 274,
+    "smp": 3029,
+    "skl": 3702,
+    "lkp": 2023,
+    "skyp": 38
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 3,
+    "ml": 3
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Pohjois-Karjalan läänin vaalipiiri",
+   "sv": "Norra Karelens läns valkrets",
+   "registered": 140260,
+   "voters": 115466,
+   "cast": 115466,
+   "valid": 115023,
+   "invalid": 443,
+   "votes": {
+    "sdp": 54664,
+    "kok": 18454,
+    "ml": 26292,
+    "skdl": 6668,
+    "rkp": 196,
+    "smp": 3656,
+    "skl": 2858,
+    "lkp": 2055,
+    "skyp": 180
+   },
+   "electors": {
+    "sdp": 6,
+    "kok": 2,
+    "ml": 3
+   },
+   "seats": 11,
+   "pages": {
+    "turnout": 13,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 13
+   }
+  },
+  {
+   "fi": "Kuopion läänin vaalipiiri",
+   "sv": "Kuopio läns valkrets",
+   "registered": 199324,
+   "voters": 164338,
+   "cast": 164338,
+   "valid": 163836,
+   "invalid": 502,
+   "votes": {
+    "sdp": 60768,
+    "kok": 24345,
+    "ml": 43770,
+    "skdl": 22460,
+    "rkp": 533,
+    "smp": 6888,
+    "skl": 2285,
+    "lkp": 2742,
+    "skyp": 45
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 2,
+    "ml": 5,
+    "skdl": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 14,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 14
+   }
+  },
+  {
+   "fi": "Keski-Suomen läänin vaalipiiri",
+   "sv": "Mellersta Finlands läns valkrets",
+   "registered": 196939,
+   "voters": 162292,
+   "cast": 162292,
+   "valid": 161563,
+   "invalid": 729,
+   "votes": {
+    "sdp": 70588,
+    "kok": 25633,
+    "ml": 33215,
+    "skdl": 21547,
+    "rkp": 774,
+    "smp": 2805,
+    "skl": 4456,
+    "lkp": 2371,
+    "pop": 128,
+    "skyp": 46
+   },
+   "electors": {
+    "sdp": 8,
+    "kok": 2,
+    "ml": 3,
+    "skdl": 2
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 14,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 14
+   }
+  },
+  {
+   "fi": "Vaasan läänin vaalipiiri",
+   "sv": "Vasa läns valkrets",
+   "registered": 375058,
+   "voters": 286483,
+   "cast": 286483,
+   "valid": 285827,
+   "invalid": 656,
+   "votes": {
+    "sdp": 84475,
+    "kok": 46980,
+    "ml": 72776,
+    "skdl": 21281,
+    "rkp": 42510,
+    "smp": 6232,
+    "skl": 6635,
+    "lkp": 3517,
+    "pop": 1359,
+    "skyp": 62
+   },
+   "electors": {
+    "sdp": 9,
+    "kok": 5,
+    "ml": 7,
+    "skdl": 2,
+    "rkp": 4
+   },
+   "seats": 27,
+   "pages": {
+    "turnout": 14,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 14
+   }
+  },
+  {
+   "fi": "Oulun läänin vaalipiiri",
+   "sv": "Uleåborgs läns valkrets",
+   "registered": 330759,
+   "voters": 267653,
+   "cast": 267653,
+   "valid": 266741,
+   "invalid": 912,
+   "votes": {
+    "sdp": 79407,
+    "kok": 38153,
+    "ml": 84659,
+    "skdl": 46695,
+    "rkp": 901,
+    "smp": 8134,
+    "skl": 3901,
+    "lkp": 4822,
+    "skyp": 69
+   },
+   "electors": {
+    "sdp": 8,
+    "kok": 4,
+    "ml": 9,
+    "skdl": 5
+   },
+   "seats": 26,
+   "pages": {
+    "turnout": 14,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 14
+   }
+  },
+  {
+   "fi": "Lapin läänin vaalipiiri",
+   "sv": "Lapplands läns valkrets",
+   "registered": 167670,
+   "voters": 133432,
+   "cast": 133432,
+   "valid": 132854,
+   "invalid": 578,
+   "votes": {
+    "sdp": 39552,
+    "kok": 16618,
+    "ml": 42563,
+    "skdl": 29210,
+    "rkp": 294,
+    "smp": 1349,
+    "skl": 1028,
+    "lkp": 2123,
+    "skyp": 117
+   },
+   "electors": {
+    "sdp": 4,
+    "kok": 1,
+    "ml": 4,
+    "skdl": 3
+   },
+   "seats": 12,
+   "pages": {
+    "turnout": 14,
+    "votes": 17,
+    "electors": 82,
+    "invalid": 81,
+    "cast": 14
+   }
+  }
+ ],
+ "national": {
+  "registered": 3921005,
+  "voters": 3188056,
+  "cast": 3188056,
+  "valid": 3177525,
+  "invalid": 10531,
+  "votes": {
+   "sdp": 1370314,
+   "kok": 593271,
+   "ml": 534515,
+   "skdl": 348359,
+   "rkp": 121519,
+   "smp": 71947,
+   "skl": 59885,
+   "lkp": 56070,
+   "pop": 9532,
+   "skyp": 994,
+   "al_samling": 11119
+  },
+  "electors": {
+   "sdp": 144,
+   "kok": 58,
+   "ml": 53,
+   "skdl": 32,
+   "rkp": 11,
+   "smp": 1,
+   "lkp": 1,
+   "al_samling": 1
+  },
+  "seats": 301,
+  "pages": {
+   "turnout": 12,
+   "votes": 17,
+   "electors": 82,
+   "invalid": 81,
+   "cast": 12
+  }
+ },
+ "notes": [
+  "Source tables: registered and voters from summary table A (Äänioikeutetut ja äänestäneet sukupuolen mukaan vaalipiireittäin, pdf pages 12-14, YHTEENSÄ/total row of each constituency, which includes persons not in the domicile register in Finland); party votes from summary table C (row c, pdf page 17); rejected ballots from Table 2 (Hylätyt äänestysliput syyn mukaan vaalipiireittäin, pdf page 81, total column); electors and seats from Table 3 (Valituiksi tulleiden lukumäärä sukupuolen mukaan puolueittain ja vaalipiireittäin, pdf page 82), which agree with table C row b.",
+  "Valid ballots equal the party sum in every constituency and nationally (3 177 525, as printed in Table 1 and table D); valid + rejected equals the voters total of table A in every constituency, so cast = voters (3 188 056 nationally).",
+  "Electoral college of 301: by the amendment of 13.11.1981 to section 23 of the Form of Government the number of electors was raised from 300 to 301; Åland elects one elector and the other 300 are apportioned among the remaining 14 constituencies by population. Seat changes from 1978: Helsinki 31->30, Uusimaa 39->41, Turku north 20->19, Häme north 19->20.",
+  "Party key ml = Keskustapuolue (KESK). Keys added: pop = Perustuslaillinen Oikeistopuolue (Konstitutionella Högerpartiet), skyp = Suomen Kansan Yhtenäisyyden Puolue (Finlands Folks Enhetsparti), al_samling = Åländsk Samling (Åland constituency only).",
+  "Presidential candidates (volume text, pdf pages 8 and 18): SDP Mauno Koivisto, KOK Harri Holkeri, KESK Johannes Virolainen, SKDL Kalevi Kivistö, RKP Jan-Magnus Jansson, SMP Veikko Vennamo, SKL Raino Westerholm, LKP Helvi Sipilä. POP had no candidate but supported Mauno Koivisto; SKYP had no candidate; Åländsk Samling had no candidate but its elected elector supported Koivisto.",
+  "Electoral alliances (pdf page 9): SKL+SKYP in most constituencies; SKL+SKYP+RKP in Turku north; KESK+RKP in Häme north, Kymi and Keski-Suomi; KESK+LKP in Pohjois-Karjala; KESK+SKL+RKP in Kuopio; LKP+RKP in Oulu and Lappi.",
+  "Table 1 footnote: the distribution by party of votes cast in Sweden was not obtained for the Keski-Suomi and Vaasa constituencies (this affects only the municipality-level party breakdown of Table 1, not the constituency totals). The voters total includes 4 319 persons who voted at post offices in Finland while resident in Sweden (Helsinki 1 430, Turku south 438, Kymi 375, Oulu 579, Lappi 1 497).",
+  "Polling days 17 and 18 January 1982. The electoral college met on 26 January 1982 and elected Mauno Koivisto on the first ballot with 167 votes."
+ ],
+ "misprints": [],
+ "unprinted": [
+  "valid"
+ ]
+}

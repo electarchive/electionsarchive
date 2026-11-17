@@ -1,0 +1,612 @@
+{
+ "year": 1956,
+ "date_from": "1956-01-16",
+ "date_to": "1956-01-17",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "kekkonen_group",
+   "fi": "U. K. Kekkosen kannattajat",
+   "sv": "Anhängare av U. K. Kekkonen",
+   "fr": null,
+   "supports": "U. K. Kekkonen"
+  },
+  {
+   "key": "fagerholm_group",
+   "fi": "K. A. Fagerholmin kannattajat",
+   "sv": "Anhängare av K. A. Fagerholm",
+   "fr": null,
+   "supports": "K. A. Fagerholm"
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen kokoomus",
+   "sv": "Nationella samlingspartiet",
+   "fr": null,
+   "supports": "S. Tuomioja"
+  },
+  {
+   "key": "vapaamieliset",
+   "fi": "Vapaamielisten liitto",
+   "sv": "De frisinnades förbund",
+   "fr": null,
+   "supports": "S. Tuomioja"
+  },
+  {
+   "key": "kilpi_group",
+   "fi": "E. Kilven kannattajat",
+   "sv": "Anhängare av E. Kilpi",
+   "fr": null,
+   "supports": "E. Kilpi"
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "rydman_group",
+   "fi": "E. Rydmanin kannattajat",
+   "sv": "Anhängare av E. Rydman",
+   "fr": null,
+   "supports": "E. Rydman"
+  },
+  {
+   "key": "written",
+   "fi": "Kirjoitettuja ehdokaslistoja",
+   "sv": "Skrivna kandidatlistor",
+   "fr": null,
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Helsingin kaupungin vaalipiiri",
+   "sv": "Helsingfors stads valkrets",
+   "registered": 279525,
+   "voters": 210603,
+   "cast": 210603,
+   "valid": 209969,
+   "invalid": 634,
+   "votes": {
+    "kekkonen_group": 4236,
+    "fagerholm_group": 50131,
+    "kok": 51489,
+    "vapaamieliset": 14062,
+    "kilpi_group": 35312,
+    "rkp": 32802,
+    "rydman_group": 21916,
+    "written": 21
+   },
+   "electors": {
+    "fagerholm_group": 7,
+    "kok": 8,
+    "vapaamieliset": 1,
+    "kilpi_group": 5,
+    "rkp": 4,
+    "rydman_group": 3
+   },
+   "seats": 28,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 203843,
+   "voters": 146961,
+   "cast": 146961,
+   "valid": 146332,
+   "invalid": 629,
+   "votes": {
+    "kekkonen_group": 20032,
+    "fagerholm_group": 40491,
+    "kok": 18985,
+    "vapaamieliset": 4315,
+    "kilpi_group": 23479,
+    "rkp": 33733,
+    "rydman_group": 5296,
+    "written": 1
+   },
+   "electors": {
+    "kekkonen_group": 3,
+    "fagerholm_group": 7,
+    "kok": 4,
+    "kilpi_group": 4,
+    "rkp": 5
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 225626,
+   "voters": 157127,
+   "cast": 157127,
+   "valid": 156456,
+   "invalid": 671,
+   "votes": {
+    "kekkonen_group": 33085,
+    "fagerholm_group": 35255,
+    "kok": 26674,
+    "vapaamieliset": 1323,
+    "kilpi_group": 35329,
+    "rkp": 11802,
+    "rydman_group": 12980,
+    "written": 8
+   },
+   "electors": {
+    "kekkonen_group": 5,
+    "fagerholm_group": 5,
+    "kok": 4,
+    "kilpi_group": 6,
+    "rkp": 2,
+    "rydman_group": 2
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 184906,
+   "voters": 138576,
+   "cast": 138576,
+   "valid": 137929,
+   "invalid": 647,
+   "votes": {
+    "kekkonen_group": 38928,
+    "fagerholm_group": 35412,
+    "kok": 28916,
+    "vapaamieliset": 2274,
+    "kilpi_group": 28801,
+    "rydman_group": 3586,
+    "written": 12
+   },
+   "electors": {
+    "kekkonen_group": 6,
+    "fagerholm_group": 6,
+    "kok": 4,
+    "vapaamieliset": 1,
+    "kilpi_group": 5
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Ahvenanmaan maakunnan vaalipiiri",
+   "sv": "Landskapet Ålands valkrets",
+   "registered": 14317,
+   "voters": 6574,
+   "cast": 6574,
+   "valid": 6525,
+   "invalid": 49,
+   "votes": {
+    "fagerholm_group": 473,
+    "kilpi_group": 209,
+    "rkp": 5843
+   },
+   "electors": {
+    "rkp": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 190840,
+   "voters": 138457,
+   "cast": 138457,
+   "valid": 137845,
+   "invalid": 612,
+   "votes": {
+    "kekkonen_group": 27777,
+    "fagerholm_group": 40992,
+    "kok": 37648,
+    "vapaamieliset": 3174,
+    "kilpi_group": 21798,
+    "rydman_group": 6450,
+    "written": 6
+   },
+   "electors": {
+    "kekkonen_group": 4,
+    "fagerholm_group": 7,
+    "kok": 6,
+    "kilpi_group": 3,
+    "rydman_group": 1
+   },
+   "seats": 21,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 176282,
+   "voters": 131691,
+   "cast": 131691,
+   "valid": 131206,
+   "invalid": 485,
+   "votes": {
+    "kekkonen_group": 19731,
+    "fagerholm_group": 37141,
+    "kok": 34121,
+    "vapaamieliset": 522,
+    "kilpi_group": 34420,
+    "rydman_group": 5268,
+    "written": 3
+   },
+   "electors": {
+    "kekkonen_group": 3,
+    "fagerholm_group": 6,
+    "kok": 6,
+    "kilpi_group": 5
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Kymen läänin vaalipiiri",
+   "sv": "Kymmene läns valkrets",
+   "registered": 204955,
+   "voters": 152174,
+   "cast": 152174,
+   "valid": 151385,
+   "invalid": 789,
+   "votes": {
+    "kekkonen_group": 46039,
+    "fagerholm_group": 48727,
+    "kok": 31872,
+    "vapaamieliset": 2008,
+    "kilpi_group": 16076,
+    "rydman_group": 6660,
+    "written": 3
+   },
+   "electors": {
+    "kekkonen_group": 7,
+    "fagerholm_group": 8,
+    "kok": 5,
+    "kilpi_group": 2,
+    "rydman_group": 1
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 11,
+    "votes": 12,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 149944,
+   "voters": 104826,
+   "cast": 104826,
+   "valid": 104327,
+   "invalid": 499,
+   "votes": {
+    "kekkonen_group": 41877,
+    "fagerholm_group": 31990,
+    "kok": 15302,
+    "vapaamieliset": 2202,
+    "kilpi_group": 10001,
+    "rydman_group": 2948,
+    "written": 7
+   },
+   "electors": {
+    "kekkonen_group": 8,
+    "fagerholm_group": 6,
+    "kok": 2,
+    "vapaamieliset": 1,
+    "kilpi_group": 1
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Kuopion läänin läntinen vaalipiiri",
+   "sv": "Kuopio läns västra valkrets",
+   "registered": 155826,
+   "voters": 113825,
+   "cast": 113825,
+   "valid": 113176,
+   "invalid": 649,
+   "votes": {
+    "kekkonen_group": 46510,
+    "fagerholm_group": 18456,
+    "kok": 14816,
+    "vapaamieliset": 986,
+    "kilpi_group": 28861,
+    "rydman_group": 3547
+   },
+   "electors": {
+    "kekkonen_group": 8,
+    "fagerholm_group": 3,
+    "kok": 3,
+    "kilpi_group": 5
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 27
+   }
+  },
+  {
+   "fi": "Kuopion läänin itäinen vaalipiiri",
+   "sv": "Kuopio läns östra valkrets",
+   "registered": 125470,
+   "voters": 87965,
+   "cast": 87965,
+   "valid": 87393,
+   "invalid": 572,
+   "votes": {
+    "kekkonen_group": 32933,
+    "fagerholm_group": 27607,
+    "kok": 12086,
+    "vapaamieliset": 254,
+    "kilpi_group": 11520,
+    "rydman_group": 2990,
+    "written": 3
+   },
+   "electors": {
+    "kekkonen_group": 7,
+    "fagerholm_group": 5,
+    "kok": 2,
+    "kilpi_group": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  },
+  {
+   "fi": "Vaasan läänin itäinen vaalipiiri",
+   "sv": "Vasa läns östra valkrets",
+   "registered": 148850,
+   "voters": 109769,
+   "cast": 109769,
+   "valid": 109152,
+   "invalid": 617,
+   "votes": {
+    "kekkonen_group": 42193,
+    "fagerholm_group": 29056,
+    "kok": 15061,
+    "vapaamieliset": 369,
+    "kilpi_group": 18446,
+    "rydman_group": 4024,
+    "written": 3
+   },
+   "electors": {
+    "kekkonen_group": 8,
+    "fagerholm_group": 5,
+    "kok": 2,
+    "kilpi_group": 3
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  },
+  {
+   "fi": "Vaasan läänin eteläinen vaalipiiri",
+   "sv": "Vasa läns södra valkrets",
+   "registered": 128670,
+   "voters": 94724,
+   "cast": 94724,
+   "valid": 94378,
+   "invalid": 346,
+   "votes": {
+    "kekkonen_group": 24054,
+    "fagerholm_group": 12482,
+    "kok": 18747,
+    "vapaamieliset": 290,
+    "kilpi_group": 12932,
+    "rkp": 24462,
+    "rydman_group": 1411
+   },
+   "electors": {
+    "kekkonen_group": 4,
+    "fagerholm_group": 2,
+    "kok": 3,
+    "kilpi_group": 2,
+    "rkp": 4
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  },
+  {
+   "fi": "Vaasan läänin pohjoinen vaalipiiri",
+   "sv": "Vasa läns norra valkrets",
+   "registered": 98184,
+   "voters": 76288,
+   "cast": 76288,
+   "valid": 76049,
+   "invalid": 239,
+   "votes": {
+    "kekkonen_group": 23977,
+    "fagerholm_group": 10394,
+    "kok": 9920,
+    "kilpi_group": 9077,
+    "rkp": 21503,
+    "rydman_group": 1174,
+    "written": 4
+   },
+   "electors": {
+    "kekkonen_group": 4,
+    "fagerholm_group": 2,
+    "kok": 1,
+    "kilpi_group": 1,
+    "rkp": 4
+   },
+   "seats": 12,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  },
+  {
+   "fi": "Oulun läänin vaalipiiri",
+   "sv": "Uleåborgs läns valkrets",
+   "registered": 211939,
+   "voters": 159521,
+   "cast": 159521,
+   "valid": 158647,
+   "invalid": 874,
+   "votes": {
+    "kekkonen_group": 75476,
+    "fagerholm_group": 15890,
+    "kok": 16360,
+    "vapaamieliset": 485,
+    "kilpi_group": 45215,
+    "rydman_group": 5215,
+    "written": 6
+   },
+   "electors": {
+    "kekkonen_group": 14,
+    "fagerholm_group": 2,
+    "kok": 3,
+    "kilpi_group": 8
+   },
+   "seats": 27,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  },
+  {
+   "fi": "Lapin läänin vaalipiiri",
+   "sv": "Lapplands läns valkrets",
+   "registered": 98561,
+   "voters": 76368,
+   "cast": 76368,
+   "valid": 75886,
+   "invalid": 482,
+   "votes": {
+    "kekkonen_group": 33935,
+    "fagerholm_group": 7911,
+    "kok": 8314,
+    "vapaamieliset": 398,
+    "kilpi_group": 23099,
+    "rydman_group": 2225,
+    "written": 4
+   },
+   "electors": {
+    "kekkonen_group": 7,
+    "fagerholm_group": 1,
+    "kok": 1,
+    "kilpi_group": 4
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 11,
+    "votes": 13,
+    "electors": 33,
+    "written": 28
+   }
+  }
+ ],
+ "national": {
+  "registered": 2597738,
+  "voters": 1905449,
+  "cast": 1905449,
+  "valid": 1896655,
+  "invalid": 8794,
+  "votes": {
+   "kekkonen_group": 510783,
+   "fagerholm_group": 442408,
+   "kok": 340311,
+   "vapaamieliset": 32662,
+   "kilpi_group": 354575,
+   "rkp": 130145,
+   "rydman_group": 85690,
+   "written": 81
+  },
+  "electors": {
+   "kekkonen_group": 88,
+   "fagerholm_group": 72,
+   "kok": 54,
+   "vapaamieliset": 3,
+   "kilpi_group": 56,
+   "rkp": 20,
+   "rydman_group": 7
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 11,
+   "votes": 13,
+   "electors": 33,
+   "written": 28
+  }
+ },
+ "notes": [
+  "The tables are trilingual Finnish/Swedish/English; there are no French names, so fr is null throughout.",
+  "Table 2 footnote: accepted handwritten candidate lists are counted in the total of valid ballots but not in any party's votes. Their numbers, taken from the 'Kirjoitettuja ehdokaslistoja — Skrivna kandidatlistor' column of table 4 (PDF pages 27-28), are stored under the key 'written' (handwritten candidate lists, not a party); with them the party votes add up to the valid ballots.",
+  "Each electoral alliance named its presidential candidate in advance (introduction): Maalaisliitto U. K. Kekkonen (column kekkonen_group), Suomen sosialidemokraattinen puolue K. A. Fagerholm (fagerholm_group), Suomen kansan demokraattinen liitto Eino Kilpi (kilpi_group), Ruotsalainen kansanpuolue R. Törngren (rkp; the column header does not name him, so supports is null), and Suomen kansanpuolue E. Rydman (rydman_group).",
+  "Kansallinen kokoomus (kok) and Vapaamielisten liitto (key vapaamieliset, the Liberal Union / De frisinnades förbund) were in an electoral alliance in every constituency with Sakari Tuomioja as their common candidate; table 2 and table 9 print them as two sub-columns under the header 'S. Tuomiojan kannattajat'.",
+  "Constituency TOTAL rows are used; they include ballots cast in other constituencies and abroad. The national row of ballots from other constituencies and abroad (77 358) includes 846 votes cast in hospitals (table 2 footnote). Turku north and Kymi have a separate hospital row (Sairaalat) whose votes could not be split by commune.",
+  "Changes of constituencies (introduction): the formerly undivided Uusimaa constituency is split into Helsingin kaupungin vaalipiiri and Uudenmaan läänin vaalipiiri, which together elect two more electors than before; both Turku-Pori constituencies, Kuopio east and Vaasa north each lost one elector, and Oulu and Lappi each gained one, compared with 1950.",
+  "Electors in table 9 are printed under the heading 'Vaalipiireittäin — Valkretsvis — By electoral areas' (the table has no 'a)' label); the printed total column is used as seats.",
+  "Electoral rolls were those of the 1954 parliamentary election plus persons who turned 21 in 1954-1955. Voting in hospitals, at missions abroad and on Finnish ships abroad was possible for the first time (law of 30 June 1955)."
+ ],
+ "misprints": []
+}
