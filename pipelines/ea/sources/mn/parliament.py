@@ -108,3 +108,55 @@ def list_2024(sections: dict[str, polls.Row]) -> Contest:
     if abroad is not None:
         out.append(abroad)
     return Contest(None, 48, candidates, out, declared, [sheets.url(LIST_2024)])
+
+
+DAY_2020 = date(2020, 6, 24)
+RESULTS_2020 = "3c7b2c91"
+TURNOUT_2020 = "4194d7ca"
+
+
+@dataclass
+class Constituency:
+    """A constituency whose results the Commission publishes as one line per candidate, with no finer unit."""
+
+    number: int
+    name: str
+    seats: int
+    registered: int
+    voters: int
+    blank: int
+    candidates: list[tuple[str, str, int]]
+    total: int
+
+
+def constituencies_2020() -> list[Constituency]:
+    seats = {
+        int(row[0]): int(row[3])
+        for row in sheets.sheet_rows(TURNOUT_2020, "22 цаг")
+        if sheets.is_index(row[0]) and sheets.is_index(row[3])
+    }
+    out: list[Constituency] = []
+    rows = sheets.sheet_rows(RESULTS_2020, 0)
+    for row in rows[4:]:
+        if row[2] and sheets.is_index(row[2]):
+            number = int(float(row[2]))
+            out.append(
+                Constituency(
+                    number,
+                    row[1],
+                    seats[number],
+                    sheets.number(row[3]) or 0,
+                    sheets.number(row[4]) or 0,
+                    sheets.number(row[6]) or 0,
+                    [],
+                    0,
+                )
+            )
+        if row[8] and row[10] and out and row[0] != "ДҮН":
+            out[-1].candidates.append((row[8], row[9], sheets.number(row[10]) or 0))
+        if row[0] == "ДҮН" and out:
+            out[-1].total = sheets.number(row[10]) or 0
+    for entry in out:
+        if sum(votes for _, _, votes in entry.candidates) != entry.total:
+            raise ValueError(f"2020 constituency {entry.number}: candidate votes do not sum to the printed total")
+    return out

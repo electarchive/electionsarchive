@@ -109,7 +109,7 @@ def parliament_2024() -> list[parliament.Contest]:
 
 
 def parliament_keys() -> list[str]:
-    return [str(parliament.DAY_2024)]
+    return [str(parliament.DAY_2020), str(parliament.DAY_2024)]
 
 
 PLACE_LIST_2020 = "1fa2007c"
@@ -248,6 +248,7 @@ def parse() -> None:
     registry().write()
     for poll in all_polls():
         election(poll).write()
+    legislature_2020().write()
     legislature_2024().write()
     for election_ in local_elections():
         councils(election_).write()
@@ -294,15 +295,17 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         p.name(id, english, "en", "official")
         p.name(id, name, "mn", "native", False)
-    for contest in parliament_2024():
-        if contest.number is None:
-            continue
-        id = area("mn.constituency", f"{parliament.DAY_2024.year}-{contest.number}")
+    constituencies = [(parliament.DAY_2020.year, entry.number) for entry in parliament.constituencies_2020()]
+    constituencies += [
+        (parliament.DAY_2024.year, contest.number) for contest in parliament_2024() if contest.number is not None
+    ]
+    for year, number in constituencies:
+        id = area("mn.constituency", f"{year}-{number}")
         p.add("area", id=id, scheme_code="mn.constituency")
-        p.add("area_code", area_id=id, code=f"{parliament.DAY_2024.year}-{contest.number}")
+        p.add("area_code", area_id=id, code=f"{year}-{number}")
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
-        p.name(id, f"{parliament.DAY_2024.year} constituency {contest.number}", "en", "official")
-        p.name(id, f"{contest.number}-р тойрог", "mn", "native", False)
+        p.name(id, f"{year} constituency {number}", "en", "official")
+        p.name(id, f"{number}-р тойрог", "mn", "native", False)
     for election_ in local_elections():
         for block in election_.blocks:
             code = f"{election_.key}:{block.council.key}:{block.number}"
@@ -339,6 +342,7 @@ def registry() -> Package:
     )
     files = {url for poll in all_polls() for url in poll.files}
     files |= {url for contest in parliament_2024() for url in contest.files}
+    files |= {sheets.url(parliament.RESULTS_2020), sheets.url(parliament.TURNOUT_2020)}
     files |= {url for election_ in local_elections() for url in election_.files}
     for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
@@ -369,7 +373,7 @@ def registry() -> Package:
         "electoral_system",
         id=BLOCK_2024,
         polity_id=MONGOLIA,
-        valid_from=date(2023, 1, 1),
+        valid_from=date(2019, 1, 1),
         valid_to=None,
         rules={"formula": "block"},
         rules_version=1,
@@ -792,4 +796,110 @@ def councils(spec: LocalElection) -> Package:
             for option, value in zip(options, row.votes, strict=True):
                 if value is not None:
                     _value(p, result_set, units[row.code], option, 1, value)
+    return p
+
+
+def legislature_2020() -> Package:
+    day = parliament.DAY_2020
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "The 2020 Mongolian parliamentary election, 29 constituencies by constituency, from the General Election "
+        "Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {MONGOLIA, TERRITORY}
+    for name in (parliament.RESULTS_2020, parliament.TURNOUT_2020):
+        p.uses(raw.cached(SOURCE, sheets.url(name)))
+    election_id = key("election", str(day))
+    p.add("election", id=election_id, polity_id=MONGOLIA, kind="general", date_from=day, date_to=day, status="held")
+    p.name(election_id, "2020 Mongolian parliamentary election", "en", "official")
+    p.name(election_id, "Улсын Их Хурлын 2020 оны ээлжит сонгууль", "mn", "native", False)
+    path = f"mn/{day}-general"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    for entry in parliament.constituencies_2020():
+        tag = str(entry.number)
+        constituency = area("mn.constituency", f"{day.year}-{entry.number}")
+        contest = key("contest", str(day), tag)
+        english = f"{day.year} Mongolian parliamentary election, constituency {entry.number}"
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=KHURAL,
+            district_area_id=constituency,
+            magnitude=entry.seats,
+            round_number=1,
+            electoral_system_id=BLOCK_2024,
+            default_result_kind="counted",
+        )
+        p.name(contest, english, "en", "official")
+        p.add("slug", path=f"{path}/constituency-{entry.number}", entity_id=contest, is_current=True)
+        result_set = key("result_set", str(day), tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=GEC_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=BLOCK_METHOD
+            + " For this election the Commission published one line per candidate for each constituency, with no "
+            "count for its polling sections, so the constituency is the reporting unit.",
+            lang="en",
+        )
+        unit = key("unit", str(day), tag)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=MONGOLIA,
+            scheme_code="mn.constituency",
+            code=f"{day.year}-{entry.number}",
+            area_relation="equals",
+            area_id=constituency,
+            kind="aggregate",
+        )
+        p.name(unit, entry.name, "mn", "official")
+        for measure, value in ((2, entry.registered), (3, entry.voters), (6, entry.blank)):
+            _value(p, result_set, unit, None, measure, value)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for index, (label, subject, votes) in enumerate(entry.candidates):
+            option = key("option", str(day), tag, index)
+            abbreviation = BY_NAME.get(subject.casefold())
+            independent = subject == "Бие даан нэр дэвшигч"
+            person = key("person", str(day), tag, index)
+            p.add("person", id=person)
+            p.name(person, label, "mn", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party(abbreviation),
+                ballot_position=index + 1,
+                ballot_label=f"{label} ({subject})",
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", str(day), tag, index),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=label,
+                member_of_party_id=party(abbreviation),
+                is_independent=independent,
+            )
+            _value(p, result_set, unit, option, 1, votes)
+            p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=votes)
     return p
