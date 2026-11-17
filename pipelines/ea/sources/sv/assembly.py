@@ -273,7 +273,8 @@ def key(kind: str, *parts: object) -> str:
 
 
 def party(code: str) -> str:
-    return key("party", code)
+    """A party's id: the source-wide id that every sv.tse package uses for the same printed code."""
+    return tse.key("party", code)
 
 
 def codes_in(election: list[Department]) -> list[str]:
@@ -321,7 +322,7 @@ def registry() -> Package:
         SOURCE,
         "The Legislative Assembly of El Salvador, its electoral systems, and the parties and independent candidates on "
         "its departmental lists, 1994 to 2015",
-        depends=["sv.tse/geo"],
+        depends=["sv.tse/geo", "sv.tse/registry"],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     p.add("body", id=BODY, polity_id=tse.EL_SALVADOR, kind="unicameral")
@@ -347,6 +348,8 @@ def registry() -> Package:
         if code in INDEPENDENTS or "/" in code:
             continue
         id = party(code)
+        if code in tse.PARTIES:
+            continue  # sv.tse/registry already declares this party and its code
         p.add("party", id=id, kind="party", polity_id=tse.EL_SALVADOR)
         p.add("external_id", entity_id=id, scheme="sv.tse.party", value=code)
         p.name(id, PARTY_NAMES.get(code, code), "es", "official")
@@ -403,7 +406,7 @@ def assembly(day: date) -> Package:
         SOURCE,
         f"The {day.year} election of deputies to the Legislative Assembly of El Salvador, by municipality, from the "
         "Tribunal Supremo Electoral",
-        depends=["sv.tse/geo", REGISTRY],
+        depends=["sv.tse/geo", "sv.tse/registry", REGISTRY],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     source = key("source", day)
