@@ -615,6 +615,8 @@ def build_day(day: Day) -> Package:
         _labels(contest.recs)
     _write_units(p, token, all_recs, made)
     for contest in day.contests:
+        if not contest.tacit and not contest.recs:
+            raise ValueError(f"{day.day} {contest.ref}: a counted contest without a count")
         c = key("contest", day.day, contest.ref)
         p.add(
             "contest",
@@ -640,10 +642,10 @@ def build_day(day: Day) -> Package:
             contest_id=c,
             stage="certified",
             kind="tacit" if contest.tacit else "counted",
-            source_id=COUNT_SOURCE,
+            source_id=WINNER_SOURCE if contest.tacit else COUNT_SOURCE,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=None if contest.tacit else 1.0,
         )
         p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=METHOD + " " + SEAT_NOTE, lang="en")
         options: list[str] = []
