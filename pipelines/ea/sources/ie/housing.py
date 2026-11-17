@@ -68,7 +68,13 @@ AREAS = {
     "SOUTH": "south",
     "MIDLANDS - NORTH - WEST": "midlands-north-west",
 }
-UNITLESS = ("dublin", "south", "midlands-north-west")
+# The 2024 load minted these three constituencies' reporting units before ids were derived from natural keys, so
+# the archive keeps the ids it first gave them; the other constituencies' units carry derived ids.
+MINTED = {
+    "dublin": "01a13bd3-648e-728b-8d37-9849fb47d507",
+    "midlands-north-west": "01a13bd3-6496-7622-8f3c-84d47e59f81f",
+    "south": "01a13bd3-6497-76a0-b396-ff99eb6181e2",
+}
 PARTIES = {
     "FF": ("Fianna Fáil", "F.F."),
     "FG": ("Fine Gael", "F.G."),
@@ -119,7 +125,7 @@ def contest_id(year: int, code: str) -> str:
 
 
 def unit(code: str) -> str:
-    return existing(f"unit:{SCHEME}@None", code)
+    return MINTED.get(code) or existing(f"unit:{SCHEME}@None", code)
 
 
 def party(label: str) -> str | None:
@@ -154,23 +160,6 @@ def registry() -> Package:
         "European Parliament elections in Ireland, and their electoral system",
     )
     p.external.add(IRELAND)
-    p.external.add(SCHEME)
-    for code in UNITLESS:
-        # production holds these constituencies' areas and contests but no reporting unit for them, so
-        # the registry adds the unit each contest's results hang on
-        area = existing("area:ie.ep_constituency@None", code)
-        p.external.add(area)
-        p.add(
-            "reporting_unit",
-            id=unit(code),
-            polity_id=IRELAND,
-            scheme_code=SCHEME,
-            code=code,
-            area_relation="equals",
-            area_id=area,
-            kind="standard",
-            valid_from=date(1979, 6, 7),
-        )
     id = source()
     p.add(
         "source",
@@ -285,7 +274,7 @@ def ep(year: int) -> Package:
         if ranked[seats].votes[-1] >= ranked[seats - 1].votes[-1] and ranked[seats].votes[-1] > 0:
             raise ValueError(f"{year} {table.constituency}: the elected set is not clear at the last count")
         contest = contest_id(year, code)
-        p.external |= {contest} | ({unit(code)} - {unit(c) for c in UNITLESS})
+        p.external |= {contest, unit(code)}
         result_set = key("result_set", day, code)
         p.add(
             "result_set",
