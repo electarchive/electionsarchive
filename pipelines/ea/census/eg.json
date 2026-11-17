@@ -224,6 +224,34 @@
       "url": "https://sis.gov.eg/ar/%D9%85%D8%B5%D8%B1/%D9%86%D8%B8%D8%A7%D9%85-%D8%A7%D9%84%D8%AD%D9%83%D9%85/%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%8A%D8%A9/%D8%A7%D9%84%D8%A7%D8%AF%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D9%85%D8%AD%D9%84%D9%8A%D8%A9/",
       "kind": "official_body",
       "note": "Local administration: the units of the state (governorates, cities, villages) and the elected local councils of Constitution arts. 175-183, with the governorate council settling disputes between village, markaz, and city councils."
+    },
+    "sis_nawab": {
+      "title": "مجلس النواب",
+      "publisher": "الهيئة العامة للاستعلامات (State Information Service)",
+      "url": "https://sis.gov.eg/ar/%D9%85%D8%B5%D8%B1/%D9%86%D8%B8%D8%A7%D9%85-%D8%A7%D9%84%D8%AD%D9%83%D9%85/%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D8%B4%D8%B1%D9%8A%D8%B9%D9%8A%D8%A9/%D9%85%D8%AC%D9%84%D8%B3-%D8%A7%D9%84%D9%86%D9%88%D8%A7%D8%A8/",
+      "kind": "official_body",
+      "note": "Parliamentary life since 1952 with the dates of the Assemblies and of the 1971, 1976, 1979, 1984, 1987, and 2010-2012 elections and of the April 1979 referendum; for 1990-2005 it gives only the parliamentary terms. Read 17 November 2026."
+    },
+    "sis_shuyukh": {
+      "title": "مجلس الشيوخ",
+      "publisher": "الهيئة العامة للاستعلامات (State Information Service)",
+      "url": "https://sis.gov.eg/ar/%D9%85%D8%B5%D8%B1/%D9%86%D8%B8%D8%A7%D9%85-%D8%A7%D9%84%D8%AD%D9%83%D9%85/%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A9-%D8%A7%D9%84%D8%AA%D8%B4%D8%B1%D9%8A%D8%B9%D9%8A%D8%A9/%D9%85%D8%AC%D9%84%D8%B3-%D8%A7%D9%84%D8%B4%D9%8A%D9%88%D8%AE/",
+      "kind": "official_body",
+      "note": "History of the Shura Council and Senate: the 22 May 1980 referendum on the Shura amendment and the first sitting on 1 November 1980. It lists no renewal elections. Read 17 November 2026."
+    },
+    "sis_africa22": {
+      "title": "مجلة أفريقيا قارتنا، العدد الثاني والعشرون (أكتوبر 2016): تعديلات الدستور",
+      "publisher": "الهيئة العامة للاستعلامات (State Information Service)",
+      "url": "https://sis.gov.eg/media/301287/%D8%A7%D9%84%D8%B9%D8%AF%D8%AF-22-%D9%83%D8%A7%D9%85%D9%84.pdf",
+      "kind": "official_body",
+      "note": "Review of the amendments to the 1971 constitution with the dates of the referendums of 22 May 1980 (98.86 percent), 25 May 2005, and 26 March 2007 (75.9 percent)."
+    },
+    "idsc_2025": {
+      "title": "وصف مصر بالمعلومات، الإصدارة الرابعة عشرة (يناير 2025)",
+      "publisher": "مركز المعلومات ودعم اتخاذ القرار بمجلس الوزراء (Information and Decision Support Center)",
+      "url": "https://idsc.gov.eg/upload/DocumentLibraryIssues/AttachmentA/10194/%D9%82%D9%86%D8%A7%2016%20%D9%8A%D9%86%D8%A7%D9%8A%D8%B1%202025.pdf",
+      "kind": "official_body",
+      "note": "The Cabinet's information center: Egypt has 27 governorates, 189 marakiz, 228 cities, 94 districts, and 1,357 rural local units with 3,374 satellite villages (page 17, and the Egypt table of the governorate profile)."
     }
   },
   "tiers": [
@@ -311,7 +339,17 @@
       "parent": "markaz",
       "polity_kind": "submunicipal",
       "scheme": "eg.qarya",
-      "source": "sis_basic"
+      "source": "sis_basic",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "precision": "month",
+          "value": 1357,
+          "source": "idsc_2025",
+          "locator": "No. of rural local units 1357 (عدد الوحدات المحلية القروية), with 3374 satellite villages (عدد القرى التوابع)"
+        }
+      ],
+      "note": "The IDSC counts 1,357 units with 3,374 satellite villages; the State Information Service's 4,727 villages count the main villages and satellites together."
     },
     {
       "key": "shiakha",
@@ -413,12 +451,90 @@
       ],
       "dates": [
         {
-          "date": "1957-01-01",
-          "precision": "year",
-          "through": "2010-12-31",
-          "note": "The National Assembly elections of 1957, 1964, and 1969 and the People's Assembly elections of 1971-2010 aren't counted yet. The House's history page dates the 1957 and 1969 Assemblies and the 1976 and 1979 elections; no official results by constituency are online.",
+          "date": "1957-07-01",
+          "precision": "month",
+          "note": "National Assembly of 350 elected members, formed 22 July 1957; the page gives the formation date, not polling day. Not counted yet.",
           "source": "parl_1952",
-          "quote": "\"تشكيل مجلس الأمة فى 22 من يوليو 1957 من 350 عضواً منتخباً\"; \"واجريت انتخابات المجلس الجديد فى 20 من يناير 1969\""
+          "quote": "\"تشكيل مجلس الأمة فى 22 من يوليو 1957 من 350 عضواً منتخباً\""
+        },
+        {
+          "date": "1964-03-01",
+          "precision": "month",
+          "note": "National Assembly of 350 elected members plus 10 appointed, formed 26 March 1964; the page gives the formation date, not polling day. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"وفى 26 مارس 1964 تشكل مجلس الأمة الثالث من 350 عضواً\""
+        },
+        {
+          "date": "1969-01-20",
+          "note": "National Assembly election. Not counted yet.",
+          "source": "parl_1952",
+          "quote": "\"واجريت انتخابات المجلس الجديد فى 20 من يناير 1969\""
+        },
+        {
+          "date": "1971-10-27",
+          "note": "First People's Assembly election: 350 elected members and 10 appointed. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"وأجريت أول انتخابات برلمانية فى عصر الرئيس أنور السادات فى 27 اكتوبر 1971\""
+        },
+        {
+          "date": "1976-11-01",
+          "precision": "month",
+          "note": "Election among the three platforms of the Arab Socialist Union and independents; the page gives the month only. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"وخاضت تلك المنابر ومعها المستقلون انتخابات مجلس الشعب نوفمبر 1976\""
+        },
+        {
+          "date": "1979-06-07",
+          "note": "First multiparty election: 176 constituencies and 30 seats for women. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"صدر القانون رقم 21 لسنة 1979 بمناسبة إجراء انتخابات مجلس الشعب (7 يونيو 1979)\""
+        },
+        {
+          "date": "1984-06-23",
+          "note": "Closed party lists in 48 districts (448 members, 31 seats for women). Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"وأجريت أول انتخابات تشريعية فى عهد الرئيس الأسبق مبارك فى 23 يونيو 1984\""
+        },
+        {
+          "date": "1987-04-01",
+          "precision": "month",
+          "note": "Election after the dissolution of February 1987; the page gives the month only. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"أُجريت انتخابات ابريل 1987 طبقاً لنظام القائمة النسبية والنظام الفردى (400 عضو بالقائمة ، 48 بالنظام الفردى )\""
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "note": "First of the five terms of 1990-2010, after the dissolution of 13 October 1990; the page gives the terms, not polling days. Individual candidacy in 222 two-member constituencies. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"الأولى (1990 -1995) والثانية (1995 - 2000)، والثالثة (2000- 2005)، والرابعة (2005 – 2010)\""
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "note": "Second term (1995-2000); the page gives the term, not the polling day. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"الأولى (1990 -1995) والثانية (1995 - 2000)، والثالثة (2000- 2005)، والرابعة (2005 – 2010)\""
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "note": "Third term (2000-2005); the page gives the term, not the polling day. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"الأولى (1990 -1995) والثانية (1995 - 2000)، والثالثة (2000- 2005)، والرابعة (2005 – 2010)\""
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "note": "Fourth term (2005-2010); the page gives the term, not the polling day. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"الأولى (1990 -1995) والثانية (1995 - 2000)، والثالثة (2000- 2005)، والرابعة (2005 – 2010)\""
+        },
+        {
+          "date": "2010-11-28",
+          "note": "Fifth term, ended by the 2011 revolution; polling from 28 November to 4 December 2010. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"جرت الانتخابات فى الفترة من 28 نوفمبر حتى 4 ديسمبر 2010\""
         },
         {
           "date": "2011-11-28",
@@ -601,12 +717,12 @@
       ],
       "dates": [
         {
-          "date": "1980-01-01",
-          "precision": "year",
+          "date": "1980-11-01",
+          "precision": "month",
           "through": "2012-12-31",
-          "note": "The partial renewals of 1980-2010 and the 2012 election aren't counted yet.",
-          "source": "parl_1952",
-          "quote": "\"وفى عام 1980 تم إنشاء مجلس الشورى\""
+          "note": "First sitting on 1 November 1980 after the amendment approved in the referendum of 22 May 1980. The partial renewals of 1983-2010 and the 2012 election aren't counted yet; no official page found dates them.",
+          "source": "sis_shuyukh",
+          "quote": "\"وكان أول اجتماع له في أول نوفمبر 1980\""
         }
       ],
       "disposition": "blocked",
@@ -850,7 +966,7 @@
           "date": "1956-01-01",
           "precision": "year",
           "through": "1999-12-31",
-          "note": "Not counted yet."
+          "note": "Not counted yet; no official page found dates these referendums."
         }
       ],
       "disposition": "blocked",
@@ -926,8 +1042,38 @@
         {
           "date": "1956-01-01",
           "precision": "year",
-          "through": "2007-12-31",
-          "note": "Referendums from the 1956 constitution to the 2007 amendments aren't counted yet; none has official results online."
+          "through": "1978-12-31",
+          "note": "Referendums of 1956-1978 aren't counted yet; no official page found dates them."
+        },
+        {
+          "date": "1979-04-19",
+          "note": "Referendum that created the Shura Council. Not counted yet.",
+          "source": "sis_nawab",
+          "quote": "\"أُجرى استفتاء شعبي فى 19 ابريل 1979 أُنشئ بمقتضاه مجلس الشورى\""
+        },
+        {
+          "date": "1980-05-22",
+          "note": "Referendum on the constitutional amendment that added the Shura Council chapter (98.86 percent in favor per the State Information Service magazine). Not counted yet.",
+          "source": "sis_shuyukh",
+          "quote": "\"ووافق الشعب على هذا التعديل في الاستفتاء الذي جرى يوم 22 مايو 1980\""
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "through": "2004-12-31",
+          "note": "Presidential referendums of 1981-1999 and any other referendum of these years aren't counted yet; no official page found dates them."
+        },
+        {
+          "date": "2005-05-25",
+          "note": "Referendum on art. 76, replacing the presidential referendum with a contested election (about 83 percent in favor). Not counted yet.",
+          "source": "sis_africa22",
+          "quote": "\"طُرحت المادة بشكلها الجديد للاستفتاء الشعبي في 25 مايو 2005\""
+        },
+        {
+          "date": "2007-03-26",
+          "note": "Referendum on 34 constitutional amendments. Not counted yet.",
+          "source": "sis_africa22",
+          "quote": "\"وفى 26 مارس 2007، أُجرى الاستفتاء على هذه التعديلات للمواد الـ 34 ووافق عليها الشعب بنسبة بلغت 75.9%\""
         },
         {
           "date": "2011-03-19",
