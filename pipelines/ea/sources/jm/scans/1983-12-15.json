@@ -1,0 +1,171 @@
+{
+ "day": "1983-12-15",
+ "file": "1983GeneralElectionSummary.pdf",
+ "title": "Table II (electors, ballots cast, rejected) and Table III (votes per candidate), contested constituencies only; Table I summary",
+ "constituencies": [
+  {
+   "number": 1,
+   "name": "Kingston West Central",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 11328,
+   "cast": 4837,
+   "rejected": 362,
+   "accepted": 4475,
+   "candidates": [
+    {
+     "name": "Smith, Derrick C.",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4426,
+     "pct": 98.9
+    },
+    {
+     "name": "Smith, V.G.",
+     "party_printed": "R.P.",
+     "party": "REPUBLICAN",
+     "votes": 49,
+     "pct": 1.09
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "name": "St. Andrew West Rural",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 24024,
+   "cast": 6392,
+   "rejected": 17,
+   "accepted": 6375,
+   "candidates": [
+    {
+     "name": "Gilmour, Mavis",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6167,
+     "pct": 96.74
+    },
+    {
+     "name": "Smith, Clive",
+     "party_printed": "R.P.",
+     "party": "REPUBLICAN",
+     "votes": 208,
+     "pct": 3.26
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "name": "St. Mary Western",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 15985,
+   "cast": 4188,
+   "rejected": 20,
+   "accepted": 4168,
+   "candidates": [
+    {
+     "name": "Farrell, John E.",
+     "party_printed": "C.C.M.",
+     "party": "CCM",
+     "votes": 704,
+     "pct": 16.89
+    },
+    {
+     "name": "Knight, Hyacinth M",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3464,
+     "pct": 83.11
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "name": "St. Ann South Eastern",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 13949,
+   "cast": 3472,
+   "rejected": 24,
+   "accepted": 3448,
+   "candidates": [
+    {
+     "name": "Cammock, Hugh",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 119,
+     "pct": 3.45
+    },
+    {
+     "name": "Johnson, H.C.",
+     "party_printed": "J.U.F.",
+     "party": "JUF",
+     "votes": 144,
+     "pct": 4.18
+    },
+    {
+     "name": "Pink, Patricia",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3185,
+     "pct": 92.37
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "name": "St. James East Central",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 11613,
+   "cast": 3689,
+   "rejected": 41,
+   "accepted": 3648,
+   "candidates": [
+    {
+     "name": "Dawkins, Matelan",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 445,
+     "pct": 12.2
+    },
+    {
+     "name": "Roach, Geoffrey C.",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3203,
+     "pct": 87.8
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "name": "Westmoreland Western",
+   "page": 4,
+   "stats_page": 3,
+   "electors": 13120,
+   "cast": 3965,
+   "rejected": 24,
+   "accepted": 3941,
+   "candidates": [
+    {
+     "name": "Cooke, Buxton W.",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2918,
+     "pct": 74.04
+    },
+    {
+     "name": "Lindsay, William",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 1023,
+     "pct": 25.96
+    }
+   ]
+  }
+ ],
+ "notes": []
+}

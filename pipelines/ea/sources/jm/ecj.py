@@ -6,7 +6,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.jm import pdf
+from ea.sources.jm import pdf, scanned
 
 SOURCE = "jm.ecj"
 BASE = "https://www.ecj.com.jm/wp-content/uploads"
@@ -60,8 +60,12 @@ FILES: dict[str, tuple[str, str | None]] = {
         f"{BASE}/2019/04/PortlandEasternByElection2019ResultsSummary.pdf",
     ),
     "2020-09-03": (
-        f"{BASE}/2020/10/General-Election-2020-Final-Detailed-Result.pdf",
-        f"{BASE}/2020/11/2020GeneralElectionSummaryResult.pdf",
+        f"{BASE}/2020/10/2020GeneralElectionDetailedFinalResult.pdf",
+        f"{BASE}/2020/10/2020GeneralElectionSummaryFinalResult.pdf",
+    ),
+    "2025-09-03": (
+        f"{BASE}/2025/09/2025-General-Election-Box-By-Box-Results-Electoral-Dvns-1.pdf",
+        f"{BASE}/2025/09/2025-General-Election-Summary-Results-1.pdf",
     ),
 }
 FILES = dict(sorted(FILES.items()))
@@ -103,6 +107,7 @@ def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
+GENERAL_REGISTRY = "jm.ecj/registry-general"
 ECJ_SOURCE = key("source", "ecj")
 HOUSE = key("body", "house-of-representatives")
 SYSTEM = key("electoral_system", "house", "fptp")
@@ -111,16 +116,22 @@ SYSTEM = key("electoral_system", "house", "fptp")
 def packages() -> list[str]:
     from ea.sources.jm import local
 
-    return ["jm.ecj/registry", *(f"jm.ecj/{day}" for day in FILES), *local.packages()]
+    return [
+        "jm.ecj/registry",
+        GENERAL_REGISTRY,
+        *(f"jm.ecj/{day}" for day in FILES),
+        *(f"jm.ecj/{day}" for day in scanned.DAYS),
+        *local.packages(),
+    ]
 
 
 def fetch() -> None:
     from ea.sources.jm import local
 
-    for urls in FILES.values():
+    for urls in (*FILES.values(), *scanned.FILES.values()):
         for url in urls:
-            if url:
-                raw.fetch(SOURCE, url, suffix=".pdf")
+            if url and not url.startswith("browser://"):
+                raw.fetch(SOURCE, url, suffix=".pdf")  # a browser:// file is stored in the cache by hand
     local.fetch()
 
 
@@ -128,8 +139,11 @@ def parse() -> None:
     from ea.sources.jm import local
 
     registry().write()
+    general_registry().write()
     for day in FILES:
         build(day).write()
+    for day in scanned.DAYS:
+        build_scanned(day).write()
     local.parse()
 
 
@@ -184,6 +198,35 @@ def registered_parties() -> frozenset[str]:
         for party, _ in constituency.candidates
         if not independent(party)
     )
+
+
+def local_parties() -> frozenset[str]:
+    from ea.sources.jm import local
+
+    return frozenset(local.parties())
+
+
+@functools.cache
+def general_parties() -> dict[str, str]:
+    """The parties of the parliamentary elections the registry package does not list, and the first day each ran."""
+    known = registered_parties() | local_parties()
+    found: dict[str, str] = {}
+    for day in FILES:
+        if day not in LISTED:
+            for constituency in document(day).constituencies:
+                for tag, _ in constituency.candidates:
+                    if not independent(tag) and tag not in known:
+                        found.setdefault(tag, day)
+    for day in scanned.DAYS:
+        for c in scanned.read(day).constituencies:
+            for candidate in c.candidates:
+                if not independent(candidate.party) and candidate.party not in known | scanned.UNAFFILIATED:
+                    found.setdefault(candidate.party, day)
+    return dict(sorted(found.items(), key=lambda item: (item[1], item[0])))
+
+
+def known_parties() -> frozenset[str]:
+    return registered_parties() | local_parties() | frozenset(general_parties())
 
 
 def independent(tag: str) -> bool:
@@ -247,6 +290,27 @@ def registry() -> Package:
     return p
 
 
+def general_registry() -> Package:
+    p = Package(
+        GENERAL_REGISTRY,
+        SOURCE,
+        "The parties of Jamaica's later and earlier parliamentary elections and the constituency scheme of the "
+        "scanned reports, from the Electoral Commission of Jamaica",
+        depends=["jm.ecj/registry"],
+    )
+    p.external.add(JAMAICA)
+    p.add("scheme", code="jm.constituency", polity_id=JAMAICA, kind="electoral_district", rank=2, noun="constituency")
+    for tag in general_parties():
+        id = party_id(tag)
+        p.add("party", id=id, kind="party", polity_id=JAMAICA)
+        if tag in scanned.PARTY_NAMES:
+            p.name(id, scanned.PARTY_NAMES[tag], "en", "official")
+            p.name(id, tag, "en", "abbreviation", False)
+        else:
+            p.name(id, tag, "en", "abbreviation")
+    return p
+
+
 def title(name: str) -> str:
     return name.title().replace("&", "and")
 
@@ -267,6 +331,23 @@ def _put(p: Package, result_set: str, unit: str, option: str | None, measure: in
     )
 
 
+def _depends(day: str) -> list[str]:
+    from ea.sources.jm import local
+
+    tags = {
+        tag
+        for c in (document(day).constituencies if day in FILES else [])
+        for tag, _ in c.candidates
+        if not independent(tag)
+    }
+    depends = ["jm.ecj/registry"]
+    if day not in LISTED and tags & set(general_parties()):
+        depends.append(GENERAL_REGISTRY)
+    if tags & local_parties():
+        depends.append(local.KEY)
+    return depends
+
+
 def build(day: str) -> Package:
     doc = document(day)
     first = date.fromisoformat(day)
@@ -278,7 +359,7 @@ def build(day: str) -> Package:
         SOURCE,
         f"The Jamaican {'general election' if general else 'by-election'} of {first} by polling station, from the "
         "Electoral Commission of Jamaica's reports",
-        depends=["jm.ecj/registry"],
+        depends=_depends(day),
     )
     p.external.add(JAMAICA)
     for url in FILES[day]:
@@ -289,8 +370,8 @@ def build(day: str) -> Package:
                 p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
     for constituency in doc.constituencies:
         for party, _ in constituency.candidates:
-            if day not in LISTED and not independent(party) and party not in registered_parties():
-                raise ValueError(f"{day}: party {party} is not in the registry package")
+            if day not in LISTED and not independent(party) and party not in known_parties():
+                raise ValueError(f"{day}: party {party} is not in a registry package")
     election = key("election", day, "general")
     path = f"jm/{day}-general"
     if general:
@@ -459,7 +540,7 @@ def summary_votes(day: str) -> dict[int, dict[str, int]]:
     rows: dict[int, dict[str, int]] = {}
     for line in text.splitlines():
         if not tags and re.search(r"\bJLP\b", line) and re.search(r"\bPNP\b", line):
-            tags = [t for t in line.split() if t != "TOTAL" and not t.startswith("VOTES")]
+            tags = [t for t in re.findall(r"IND [A-Z]\b|[A-Z]+", line) if t not in ("TOTAL", "VOTES", "INCLUDING")]
             continue
         found = re.search(r"^\s*\((\d+)\)", line)
         if not found or not tags:
@@ -540,3 +621,161 @@ def _caveats(p: Package, doc: pdf.Document) -> None:
             f"{over} polling stations print more ballots cast than electors on the official voters list, mostly "
             "stations designated for election-day workers, police, and the military; stored as printed",
         )
+
+
+def build_scanned(day: str) -> Package:
+    """A general election from the constituency tables of a scanned report, one unit per constituency."""
+    report = scanned.read(day)
+    first = date.fromisoformat(day)
+    if report.day != day:
+        raise ValueError(f"{day}: transcription is of {report.day}")
+    tags = {
+        c.party
+        for k in report.constituencies
+        for c in k.candidates
+        if not independent(c.party) and c.party not in scanned.UNAFFILIATED
+    }
+    depends = ["jm.ecj/registry", GENERAL_REGISTRY]
+    if tags & local_parties():
+        depends.append("jm.ecj/local-registry")
+    p = Package(
+        f"jm.ecj/{day}",
+        SOURCE,
+        f"The Jamaican general election of {first} by constituency, from the Director of Elections' report",
+        depends=depends,
+    )
+    p.external.add(JAMAICA)
+    for url in scanned.FILES[day]:
+        p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
+    unknown = tags - known_parties()
+    if unknown:
+        raise ValueError(f"{day}: parties {sorted(unknown)} are not in a registry package")
+    election = key("election", day, "general")
+    path = f"jm/{day}-general"
+    p.add("election", id=election, polity_id=JAMAICA, kind="general", date_from=first, date_to=first, status="held")
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    p.name(election, f"{first.year} Jamaican general election", "en", "official")
+    flagged: dict[str, list[str]] = {}
+    for k in report.constituencies:
+        name = k.name
+        contest = key("contest", day, k.number)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=HOUSE,
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{name}, House of Representatives", "en", "official")
+        p.add("slug", path=f"{path}/{changeset.slug(name)}", entity_id=contest, is_current=True)
+        result_set = key("result_set", day, k.number)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=ECJ_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        pages = f"page {k.page}" if k.page == k.stats_page else f"pages {k.stats_page} and {k.page}"
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md="Digitized from the constituency tables of the Director of Elections' printed report, "
+            f"{pages} of the scanned file. Electors are those on the lists, ballots cast include rejected ballots, "
+            "and the report prints no result by polling station in these tables. Figures are stored as printed. The "
+            "winner of a constituency is the candidate with the most votes.",
+            lang="en",
+        )
+        options: list[str] = []
+        for position, candidate in enumerate(k.candidates, 1):
+            person = key("person", day, k.number, position)
+            option = key("option", day, k.number, position)
+            label = candidate.name or f"{candidate.party_printed} candidate"
+            options.append(option)
+            p.add("person", id=person)
+            p.name(person, label, "en", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                ballot_position=position,
+                ballot_label=label,
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", day, k.number, position),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=label,
+                member_of_party_id=None
+                if independent(candidate.party) or candidate.party in scanned.UNAFFILIATED
+                else party_id(candidate.party),
+                is_independent=independent(candidate.party),
+            )
+        unit = key("unit", day, k.number)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=JAMAICA,
+            scheme_code="jm.constituency",
+            code=f"{day}:{k.number}",
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        p.name(unit, f"{name} constituency", "en", "official")
+        valid = (
+            k.accepted
+            if k.accepted is not None
+            else (k.cast - k.rejected if k.cast and k.rejected is not None else None)
+        )
+        measures = [(REGISTERED, k.electors), (CAST, k.cast), (INVALID, k.rejected), (VALID, valid)]
+        for measure, value in measures:
+            _put(p, result_set, unit, None, measure, value)
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for option, candidate in zip(options, k.candidates, strict=True):
+            _put(p, result_set, unit, option, VOTES, candidate.votes)
+            if candidate.votes is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=candidate.votes)
+        for code, bad in (
+            ("accounting.votes_valid", valid is not None and None not in votes_of(k) and sum(votes_of(k)) != valid),
+            (
+                "accounting.ballots_sum",
+                None not in (k.cast, k.rejected, valid) and k.cast != (valid or 0) + (k.rejected or 0),
+            ),
+            ("accounting.turnout", None not in (k.cast, k.electors) and (k.cast or 0) > (k.electors or 0)),
+        ):
+            if bad:
+                flagged.setdefault(code, []).append(name)
+        votes = [c.votes for c in k.candidates]
+        if votes and None not in votes:
+            top = max(v for v in votes if v is not None)
+            winners = [o for o, v in zip(options, votes, strict=True) if v == top]
+            if len(winners) == 1:
+                p.add("outcome", result_set_id=result_set, option_id=winners[0], kind="won")
+    reasons = {
+        "accounting.votes_valid": "the candidates' votes do not add up to the accepted ballots the report prints",
+        "accounting.ballots_sum": "the ballots cast the report prints differ from its accepted and rejected ballots",
+        "accounting.turnout": "the report prints more ballots cast than electors on the lists",
+    }
+    for code, names in flagged.items():
+        p.accept(code, f"In {', '.join(names)}, {reasons[code]}; the figures are stored as printed")
+    return p
+
+
+def votes_of(k: scanned.Constituency) -> list[int]:
+    return [c.votes or 0 for c in k.candidates if c.votes is not None]

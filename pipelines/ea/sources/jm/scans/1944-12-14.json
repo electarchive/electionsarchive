@@ -1,0 +1,1302 @@
+{
+ "day": "1944-12-14",
+ "file": "19441214generalsummary.pdf",
+ "title": "General Election 1944, Part I: Table 1 Summary of votes cast; Table 2 Number of electors, ballots cast, rejected ballots and percentages; Table 3 Constituencies: electors, ballots cast, accepted and rejected ballots, votes for each candidate",
+ "constituencies": [
+  {
+   "number": 1,
+   "name": "Kingston Eastern and Port Royal",
+   "page": 3,
+   "stats_page": 3,
+   "electors": 22367,
+   "cast": 13319,
+   "rejected": 1762,
+   "accepted": 11557,
+   "candidates": [
+    {
+     "name": "Campbell, E. E. A.",
+     "party_printed": "Oth. P.",
+     "party": "OTH",
+     "votes": 431,
+     "pct": 3.2
+    },
+    {
+     "name": "Durham, Vivian Francis",
+     "party_printed": "Oth. P.",
+     "party": "OTH",
+     "votes": 74,
+     "pct": 0.6
+    },
+    {
+     "name": "Glasspole, Florizel",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5417,
+     "pct": 40.7
+    },
+    {
+     "name": "Russell, James Nelson",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 1283,
+     "pct": 9.6
+    },
+    {
+     "name": "Valentine, Gilbert Enos",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 4352,
+     "pct": 32.7
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "name": "Kingston Central",
+   "page": 3,
+   "stats_page": 3,
+   "electors": 23200,
+   "cast": 14622,
+   "rejected": 656,
+   "accepted": 13966,
+   "candidates": [
+    {
+     "name": "Chin, Alexander Emanuel",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 272,
+     "pct": 1.9
+    },
+    {
+     "name": "Coombs, Stennett Kerr",
+     "party_printed": "Oth. P.",
+     "party": "OTH",
+     "votes": 116,
+     "pct": 0.8
+    },
+    {
+     "name": "Foster, Frederick Adolphus",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 622,
+     "pct": 4.3
+    },
+    {
+     "name": "Isaacs, Wills O.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4471,
+     "pct": 30.5
+    },
+    {
+     "name": "Pixley, Frank Ainsley",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 8485,
+     "pct": 58.0
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "name": "Kingston Western",
+   "page": 3,
+   "stats_page": 3,
+   "electors": 23763,
+   "cast": 14258,
+   "rejected": 1045,
+   "accepted": 13213,
+   "candidates": [
+    {
+     "name": "Bustamante, William Alexander",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 9663,
+     "pct": 67.8
+    },
+    {
+     "name": "Hill, Kenneth George",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3550,
+     "pct": 24.9
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "name": "St. Andrew Eastern",
+   "page": 4,
+   "stats_page": 4,
+   "electors": 23900,
+   "cast": 14075,
+   "rejected": 560,
+   "accepted": 13515,
+   "candidates": [
+    {
+     "name": "Fagan, Edward H.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5253,
+     "pct": 37.3
+    },
+    {
+     "name": "Knibb, Mary L. Morris",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 269,
+     "pct": 1.9
+    },
+    {
+     "name": "Mair, Gerald A. L.",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 3135,
+     "pct": 22.3
+    },
+    {
+     "name": "Manley, N. W.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4858,
+     "pct": 34.5
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "name": "St. Andrew Central",
+   "page": 4,
+   "stats_page": 4,
+   "electors": 28153,
+   "cast": 16279,
+   "rejected": 1229,
+   "accepted": 15050,
+   "candidates": [
+    {
+     "name": "Anderson, Oswald E.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1002,
+     "pct": 6.2
+    },
+    {
+     "name": "Kelly, Lewis Matthias",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 1103,
+     "pct": 6.8
+    },
+    {
+     "name": "Nethersole, Noel Newton",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4645,
+     "pct": 28.5
+    },
+    {
+     "name": "Newland, Linden",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 8300,
+     "pct": 51.0
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "name": "St. Andrew Western",
+   "page": 4,
+   "stats_page": 4,
+   "electors": 24836,
+   "cast": 13175,
+   "rejected": 578,
+   "accepted": 12597,
+   "candidates": [
+    {
+     "name": "Dalton-James, Edith",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3712,
+     "pct": 28.2
+    },
+    {
+     "name": "Evans, E. R. Dudley",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 6421,
+     "pct": 48.7
+    },
+    {
+     "name": "Hanson, Arthur P.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 333,
+     "pct": 2.5
+    },
+    {
+     "name": "McLaughlin, Eleazer Ezekiel",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 2131,
+     "pct": 16.2
+    }
+   ]
+  },
+  {
+   "number": 7,
+   "name": "Clarendon North-eastern",
+   "page": 4,
+   "stats_page": 4,
+   "electors": 19922,
+   "cast": 11517,
+   "rejected": 2082,
+   "accepted": 9435,
+   "candidates": [
+    {
+     "name": "Atkinson, Harry",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 1694,
+     "pct": 14.7
+    },
+    {
+     "name": "McMorris, Herman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3115,
+     "pct": 27.0
+    },
+    {
+     "name": "Mellad, Emanuel Vivian Wesley",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1014,
+     "pct": 8.8
+    },
+    {
+     "name": "Phillips, Enos Reginald",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3612,
+     "pct": 31.4
+    }
+   ]
+  },
+  {
+   "number": 8,
+   "name": "Clarendon North-western",
+   "page": 4,
+   "stats_page": 4,
+   "electors": 19262,
+   "cast": 12450,
+   "rejected": 841,
+   "accepted": 11609,
+   "candidates": [
+    {
+     "name": "Hall, Desmond Morrenzo",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 372,
+     "pct": 3.0
+    },
+    {
+     "name": "Linton, William Delroy",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3622,
+     "pct": 29.1
+    },
+    {
+     "name": "Malcolm, O. A.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2426,
+     "pct": 19.5
+    },
+    {
+     "name": "Robinson, A. Alexander",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2018,
+     "pct": 16.2
+    },
+    {
+     "name": "Sharp, Howard Roberts",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2329,
+     "pct": 18.6
+    },
+    {
+     "name": "Wright, William Adolphus",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 842,
+     "pct": 6.8
+    }
+   ]
+  },
+  {
+   "number": 9,
+   "name": "Clarendon Southern",
+   "page": 5,
+   "stats_page": 5,
+   "electors": 23154,
+   "cast": 13362,
+   "rejected": 1123,
+   "accepted": 12239,
+   "candidates": [
+    {
+     "name": "Beresford, Stanley George",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1364,
+     "pct": 10.2
+    },
+    {
+     "name": "Cork, Hugh Clive",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5038,
+     "pct": 37.7
+    },
+    {
+     "name": "Lennon, Allan Augustus",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 843,
+     "pct": 6.2
+    },
+    {
+     "name": "Lewin, Richard James Mahoney",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 660,
+     "pct": 4.9
+    },
+    {
+     "name": "Terrier, Rupert Oliver",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3463,
+     "pct": 25.9
+    },
+    {
+     "name": "Tewari, Dewsaran",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 871,
+     "pct": 6.5
+    }
+   ]
+  },
+  {
+   "number": 10,
+   "name": "St. Catherine North-eastern",
+   "page": 5,
+   "stats_page": 5,
+   "electors": 23268,
+   "cast": 8774,
+   "rejected": 816,
+   "accepted": 7958,
+   "candidates": [
+    {
+     "name": "Black, Samuel Augustus",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 4559,
+     "pct": 52.0
+    },
+    {
+     "name": "Leslie, Linden Courtney",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3399,
+     "pct": 38.7
+    }
+   ]
+  },
+  {
+   "number": 11,
+   "name": "St. Catherine South-eastern",
+   "page": 5,
+   "stats_page": 5,
+   "electors": 21061,
+   "cast": 11406,
+   "rejected": 1117,
+   "accepted": 10289,
+   "candidates": [
+    {
+     "name": "Alexander, C. D. (Bobby)",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2702,
+     "pct": 23.7
+    },
+    {
+     "name": "Bovell, M. L.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 207,
+     "pct": 1.8
+    },
+    {
+     "name": "Rose, Leslie Washington",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 7380,
+     "pct": 64.7
+    }
+   ]
+  },
+  {
+   "number": 12,
+   "name": "St. Catherine Western",
+   "page": 5,
+   "stats_page": 5,
+   "electors": 20966,
+   "cast": 9125,
+   "rejected": 520,
+   "accepted": 8605,
+   "candidates": [
+    {
+     "name": "Cawley, Leslie Evan",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 1107,
+     "pct": 12.1
+    },
+    {
+     "name": "Henry, John Regeorge",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 3047,
+     "pct": 33.4
+    },
+    {
+     "name": "Lawson, Bryan",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2761,
+     "pct": 30.3
+    },
+    {
+     "name": "McNeil, Eustace Augustus",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1690,
+     "pct": 18.5
+    }
+   ]
+  },
+  {
+   "number": 13,
+   "name": "St. Elizabeth Northern",
+   "page": 5,
+   "stats_page": 5,
+   "electors": 24807,
+   "cast": 15233,
+   "rejected": 2445,
+   "accepted": 12788,
+   "candidates": [
+    {
+     "name": "Allen, E. Vivian",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3326,
+     "pct": 21.8
+    },
+    {
+     "name": "Lewis, Neville Cleveland",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 6219,
+     "pct": 40.8
+    },
+    {
+     "name": "Lyn, Herbert Victor",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2355,
+     "pct": 15.5
+    },
+    {
+     "name": "McNab, A. H.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 888,
+     "pct": 5.8
+    }
+   ]
+  },
+  {
+   "number": 14,
+   "name": "St. Elizabeth Southern",
+   "page": 6,
+   "stats_page": 6,
+   "electors": 24261,
+   "cast": 15530,
+   "rejected": 3090,
+   "accepted": 12440,
+   "candidates": [
+    {
+     "name": "Coke, Burnett Birthwright",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 3783,
+     "pct": 24.4
+    },
+    {
+     "name": "Hendricks, Malcom Sydney Spencer",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3601,
+     "pct": 23.2
+    },
+    {
+     "name": "Sangster, Donald Burns",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3500,
+     "pct": 22.5
+    },
+    {
+     "name": "Wilson, Charles Augustus",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1556,
+     "pct": 10.0
+    }
+   ]
+  },
+  {
+   "number": 15,
+   "name": "St. Ann Eastern",
+   "page": 6,
+   "stats_page": 6,
+   "electors": 23860,
+   "cast": 15378,
+   "rejected": 934,
+   "accepted": 14444,
+   "candidates": [
+    {
+     "name": "Baird, R. D.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1364,
+     "pct": 8.9
+    },
+    {
+     "name": "Laing, Gilbert C.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 1390,
+     "pct": 9.0
+    },
+    {
+     "name": "Lloyd, Ivan Stewart",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 10635,
+     "pct": 69.2
+    },
+    {
+     "name": "Lyon, John Stanley",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 1055,
+     "pct": 6.8
+    }
+   ]
+  },
+  {
+   "number": 16,
+   "name": "St. Ann Western",
+   "page": 6,
+   "stats_page": 6,
+   "electors": 22423,
+   "cast": 13381,
+   "rejected": 2356,
+   "accepted": 11025,
+   "candidates": [
+    {
+     "name": "Gallimore, Gideon W.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5807,
+     "pct": 43.4
+    },
+    {
+     "name": "Gayle, Anthony M.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3391,
+     "pct": 25.4
+    },
+    {
+     "name": "Rennie, Martin",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 805,
+     "pct": 6.0
+    },
+    {
+     "name": "Wainwright, Nemiah Alexander",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1022,
+     "pct": 7.6
+    }
+   ]
+  },
+  {
+   "number": 17,
+   "name": "Manchester Northern",
+   "page": 6,
+   "stats_page": 6,
+   "electors": 22053,
+   "cast": 11842,
+   "rejected": 1274,
+   "accepted": 10568,
+   "candidates": [
+    {
+     "name": "Anderson, A. John",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2227,
+     "pct": 18.8
+    },
+    {
+     "name": "Sharp, T. H.",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 2081,
+     "pct": 17.6
+    },
+    {
+     "name": "Sinclair, Norman Luther",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6260,
+     "pct": 52.8
+    }
+   ]
+  },
+  {
+   "number": 18,
+   "name": "Manchester Southern",
+   "page": 6,
+   "stats_page": 6,
+   "electors": 23577,
+   "cast": 12425,
+   "rejected": 2318,
+   "accepted": 10107,
+   "candidates": [
+    {
+     "name": "Benjamin, Wendell W.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4274,
+     "pct": 34.4
+    },
+    {
+     "name": "Bloomfield, Lawton C.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 4253,
+     "pct": 34.2
+    },
+    {
+     "name": "Josephs, Tewfik S.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1488,
+     "pct": 12.0
+    },
+    {
+     "name": "Webb-Harris, Clarence G.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 92,
+     "pct": 0.7
+    }
+   ]
+  },
+  {
+   "number": 19,
+   "name": "St. Mary Eastern",
+   "page": 7,
+   "stats_page": 7,
+   "electors": 26047,
+   "cast": 15216,
+   "rejected": 637,
+   "accepted": 14579,
+   "candidates": [
+    {
+     "name": "Bailey, Victor A.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5742,
+     "pct": 37.7
+    },
+    {
+     "name": "Lindo, Roy D.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 6454,
+     "pct": 42.4
+    },
+    {
+     "name": "McKenzie, Cornelius Nathaniel",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2383,
+     "pct": 15.7
+    }
+   ]
+  },
+  {
+   "number": 20,
+   "name": "St. Mary Western",
+   "page": 7,
+   "stats_page": 7,
+   "electors": 23559,
+   "cast": 13852,
+   "rejected": 1495,
+   "accepted": 12357,
+   "candidates": [
+    {
+     "name": "March, Norman Leslie Fitz-M.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2205,
+     "pct": 15.9
+    },
+    {
+     "name": "Robinson, William Stanley",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4424,
+     "pct": 31.9
+    },
+    {
+     "name": "Simmonds, Lester Lascelve",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5728,
+     "pct": 41.4
+    }
+   ]
+  },
+  {
+   "number": 21,
+   "name": "Westmoreland Eastern",
+   "page": 7,
+   "stats_page": 7,
+   "electors": 21477,
+   "cast": 12862,
+   "rejected": 1433,
+   "accepted": 11429,
+   "candidates": [
+    {
+     "name": "Evans, Fred L. B.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3725,
+     "pct": 29.0
+    },
+    {
+     "name": "O'Meally, Walter Malton",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1124,
+     "pct": 8.7
+    },
+    {
+     "name": "Philp, Sidney George",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 422,
+     "pct": 3.3
+    },
+    {
+     "name": "Ramsay, John O.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2998,
+     "pct": 23.3
+    },
+    {
+     "name": "Segre, Maurice Hugh",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1966,
+     "pct": 15.3
+    },
+    {
+     "name": "Yates, Astley S.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1194,
+     "pct": 9.3
+    }
+   ]
+  },
+  {
+   "number": 22,
+   "name": "Westmoreland Western",
+   "page": 7,
+   "stats_page": 7,
+   "electors": 24284,
+   "cast": 15857,
+   "rejected": 1119,
+   "accepted": 14738,
+   "candidates": [
+    {
+     "name": "Campbell, Clarence",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 11664,
+     "pct": 73.5
+    },
+    {
+     "name": "Mitchell, Gilbert E.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 3074,
+     "pct": 19.4
+    }
+   ]
+  },
+  {
+   "number": 23,
+   "name": "St. James North-western",
+   "page": 7,
+   "stats_page": 7,
+   "electors": 18831,
+   "cast": 11099,
+   "rejected": 524,
+   "accepted": 10575,
+   "candidates": [
+    {
+     "name": "Agate, Charles E.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 899,
+     "pct": 8.1
+    },
+    {
+     "name": "Collins, Iris R.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5519,
+     "pct": 49.6
+    },
+    {
+     "name": "Coombs, Allan George St. Claver",
+     "party_printed": "Oth. P.",
+     "party": "OTH",
+     "votes": 1683,
+     "pct": 15.2
+    },
+    {
+     "name": "Fletcher, Walter",
+     "party_printed": "J.D.P.",
+     "party": "JDP",
+     "votes": 1606,
+     "pct": 14.5
+    },
+    {
+     "name": "Green-Spence, William Aubrey",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 806,
+     "pct": 7.3
+    },
+    {
+     "name": "Howard, Gosset",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 62,
+     "pct": null
+    }
+   ]
+  },
+  {
+   "number": 24,
+   "name": "St. James South-eastern",
+   "page": 8,
+   "stats_page": 8,
+   "electors": 15181,
+   "cast": 8762,
+   "rejected": 643,
+   "accepted": 8119,
+   "candidates": [
+    {
+     "name": "Lowe, A. B.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2898,
+     "pct": 33.1
+    },
+    {
+     "name": "McFarlane, R. Cecil",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2938,
+     "pct": 33.5
+    },
+    {
+     "name": "Morris, E. N.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2283,
+     "pct": 26.1
+    }
+   ]
+  },
+  {
+   "number": 25,
+   "name": "Portland Eastern",
+   "page": 8,
+   "stats_page": 8,
+   "electors": 19112,
+   "cast": 13347,
+   "rejected": 1738,
+   "accepted": 11609,
+   "candidates": [
+    {
+     "name": "Allan, H. E.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 7542,
+     "pct": 56.5
+    },
+    {
+     "name": "Gray, T. Adrian",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 4067,
+     "pct": 30.5
+    }
+   ]
+  },
+  {
+   "number": 26,
+   "name": "Portland Western",
+   "page": 8,
+   "stats_page": 8,
+   "electors": 14550,
+   "cast": 9136,
+   "rejected": 1912,
+   "accepted": 7224,
+   "candidates": [
+    {
+     "name": "Abendana, K. V.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1727,
+     "pct": 18.9
+    },
+    {
+     "name": "Bragg, Frederick William",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 295,
+     "pct": 3.2
+    },
+    {
+     "name": "Lowe, R. L.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1007,
+     "pct": 11.0
+    },
+    {
+     "name": "Lynch, Leopold Augustus",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2795,
+     "pct": 30.6
+    },
+    {
+     "name": "Shirley, C. L. A.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 251,
+     "pct": 2.7
+    },
+    {
+     "name": "Thompson, Norman V.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 737,
+     "pct": 8.1
+    },
+    {
+     "name": "Thompson, Walter James",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 412,
+     "pct": 4.6
+    }
+   ]
+  },
+  {
+   "number": 27,
+   "name": "St. Thomas Eastern",
+   "page": 8,
+   "stats_page": 8,
+   "electors": 18172,
+   "cast": 11041,
+   "rejected": 1040,
+   "accepted": 10001,
+   "candidates": [
+    {
+     "name": "Barrant, I. W. A.",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 8461,
+     "pct": 76.6
+    },
+    {
+     "name": "Murray, Clifford H.",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 704,
+     "pct": 6.4
+    },
+    {
+     "name": "Robertson, Albert Henry",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 836,
+     "pct": 7.6
+    }
+   ]
+  },
+  {
+   "number": 28,
+   "name": "St. Thomas Western",
+   "page": 8,
+   "stats_page": 8,
+   "electors": 17436,
+   "cast": 11036,
+   "rejected": 647,
+   "accepted": 10389,
+   "candidates": [
+    {
+     "name": "Burke, Rudolph Augustus",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4044,
+     "pct": null
+    },
+    {
+     "name": "McPherson, Jehoida Augustus",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 5990,
+     "pct": null
+    },
+    {
+     "name": "Norton, Harold Wesley",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 237,
+     "pct": null
+    },
+    {
+     "name": "Reid, Samuel Halliday",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 118,
+     "pct": null
+    }
+   ]
+  },
+  {
+   "number": 29,
+   "name": "Hanover Eastern",
+   "page": 9,
+   "stats_page": 9,
+   "electors": 11418,
+   "cast": 7767,
+   "rejected": 657,
+   "accepted": 7110,
+   "candidates": [
+    {
+     "name": "Atherton, Isaac Nathaniel",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1478,
+     "pct": 19.0
+    },
+    {
+     "name": "Charley, Harold Joce",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 671,
+     "pct": 8.7
+    },
+    {
+     "name": "Hendricks, Astley St. Clair",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 148,
+     "pct": 1.9
+    },
+    {
+     "name": "Levy, Greville Ribton",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2209,
+     "pct": 28.4
+    },
+    {
+     "name": "Malcolm, Joseph Zachariah",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2604,
+     "pct": 33.5
+    }
+   ]
+  },
+  {
+   "number": 30,
+   "name": "Hanover Western",
+   "page": 9,
+   "stats_page": 9,
+   "electors": 14173,
+   "cast": 9247,
+   "rejected": 920,
+   "accepted": 8327,
+   "candidates": [
+    {
+     "name": "Dickson, William Malcolm",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 2421,
+     "pct": 26.2
+    },
+    {
+     "name": "Messam, Henry Uriah",
+     "party_printed": "Oth. P.",
+     "party": "OTH",
+     "votes": 1196,
+     "pct": 12.9
+    },
+    {
+     "name": "Reckord, Octavius Lambert",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 119,
+     "pct": 1.3
+    },
+    {
+     "name": "Tomlinson, Water James",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1273,
+     "pct": 13.8
+    },
+    {
+     "name": "Veitch, Felix Gordon",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 3200,
+     "pct": 34.6
+    },
+    {
+     "name": "Williams, Telford Huskisson",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 118,
+     "pct": 1.3
+    }
+   ]
+  },
+  {
+   "number": 31,
+   "name": "Trelawny Northern",
+   "page": 9,
+   "stats_page": 9,
+   "electors": 12783,
+   "cast": 7603,
+   "rejected": 2100,
+   "accepted": 5503,
+   "candidates": [
+    {
+     "name": "Aitcheson, Clement Mullings",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2759,
+     "pct": 36.3
+    },
+    {
+     "name": "Maxwell, John William",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1848,
+     "pct": 24.3
+    },
+    {
+     "name": "McDonald, Alfred Nelson",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 277,
+     "pct": 3.7
+    },
+    {
+     "name": "Wakeland, Luther Stillman",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 619,
+     "pct": 8.1
+    }
+   ]
+  },
+  {
+   "number": 32,
+   "name": "Trelawny Southern",
+   "page": 9,
+   "stats_page": 9,
+   "electors": 11213,
+   "cast": 6133,
+   "rejected": 371,
+   "accepted": 5762,
+   "candidates": [
+    {
+     "name": "Brissett, Frances Isabelle",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 497,
+     "pct": 8.2
+    },
+    {
+     "name": "Neita, Cecil Alexander",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1860,
+     "pct": 30.3
+    },
+    {
+     "name": "Powell, Sylvester Alexander",
+     "party_printed": "Ind.",
+     "party": "IND",
+     "votes": 1032,
+     "pct": 16.8
+    },
+    {
+     "name": "Thelwell, Matthew Morris",
+     "party_printed": "Lab.",
+     "party": "JLP",
+     "votes": 2373,
+     "pct": 38.7
+    }
+   ]
+  }
+ ],
+ "notes": []
+}
