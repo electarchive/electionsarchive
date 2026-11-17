@@ -488,7 +488,7 @@ export async function coverage(polity: string) {
   if (canonical !== polity) {
     redirect(308, `/coverage/${canonical}`);
   }
-  if (!/^[a-z]{2}$/.test(polity)) {
+  if (!/^[a-z]{2,3}(-[a-z0-9]+)?$/.test(polity)) {
     error(404);
   }
   const goals = await found(call(router.coverage.goals, { polity }));

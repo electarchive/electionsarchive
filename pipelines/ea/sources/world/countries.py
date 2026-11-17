@@ -5,12 +5,13 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "world.countries"
-VERSION = "2"
+VERSION = "3"
 COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "AL": ("Q222", [("sq", "Shqipëria")]),
     "AM": ("Q399", [("hy", "Հայաստան")]),
     "AR": ("Q414", [("es", "Argentina")]),
     "AU": ("Q408", []),
+    "AZ": ("Q227", [("az", "Azərbaycan")]),
     "BA": ("Q225", [("bs", "Bosna i Hercegovina"), ("hr", "Bosna i Hercegovina"), ("sr", "Босна и Херцеговина")]),
     "BO": ("Q750", [("es", "Bolivia")]),
     "BT": ("Q917", [("dz", "འབྲུག་ཡུལ་")]),
@@ -56,6 +57,7 @@ COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "RS": ("Q403", [("sr", "Србија")]),
     "SB": ("Q685", []),
     "SC": ("Q1042", [("fr", "Seychelles"), ("crs", "Sesel")]),
+    "SO": ("Q1045", [("so", "Soomaaliya")]),
     "SV": ("Q792", [("es", "El Salvador")]),
     "TT": ("Q754", []),
     "TW": ("Q865", [("zh", "臺灣")]),
@@ -81,6 +83,177 @@ COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
 }
 
 
+POLITIES: dict[str, tuple[str, str | None, str, list[tuple[str, str]], str, str, str | None]] = {
+    "CY-NC": (
+        "de_facto_state",
+        "CY",
+        "Turkish Republic of Northern Cyprus",
+        [("tr", "Kuzey Kıbrıs Türk Cumhuriyeti")],
+        "1975-02-13",
+        "day",
+        None,
+    ),
+    "SO-SL": (
+        "de_facto_state",
+        "SO",
+        "Republic of Somaliland",
+        [("so", "Jamhuuriyadda Somaliland")],
+        "1991-05-18",
+        "day",
+        None,
+    ),
+    "GE-AB": (
+        "de_facto_state",
+        "GE",
+        "Republic of Abkhazia",
+        [("ru", "Республика Абхазия")],
+        "1992-07-23",
+        "day",
+        None,
+    ),
+    "GE-SO": (
+        "de_facto_state",
+        "GE",
+        "Republic of South Ossetia",
+        [("ru", "Республика Южная Осетия")],
+        "1990-09-20",
+        "day",
+        None,
+    ),
+    "MD-SN": (
+        "de_facto_state",
+        "MD",
+        "Pridnestrovian Moldavian Republic",
+        [("ru", "Приднестровская Молдавская Республика"), ("ro", "Republica Moldovenească Nistreană")],
+        "1990-09-02",
+        "day",
+        None,
+    ),
+    "AZ-NK": (
+        "de_facto_state",
+        "AZ",
+        "Republic of Artsakh",
+        [("hy", "Արցախի Հանրապետություն")],
+        "1991-09-02",
+        "day",
+        "2024-01-01",
+    ),
+    "EH-SR": (
+        "de_facto_state",
+        None,
+        "Sahrawi Arab Democratic Republic",
+        [("ar", "الجمهورية العربية الصحراوية الديمقراطية")],
+        "1976-02-27",
+        "day",
+        None,
+    ),
+    "SUN": (
+        "historical_state",
+        None,
+        "Union of Soviet Socialist Republics",
+        [("ru", "Союз Советских Социалистических Республик")],
+        "1922-12-30",
+        "day",
+        "1991-12-26",
+    ),
+    "YUG": (
+        "historical_state",
+        None,
+        "Yugoslavia",
+        [("sh", "Socijalistička Federativna Republika Jugoslavija")],
+        "1918-12-01",
+        "day",
+        "2003-02-04",
+    ),
+    "CSK": ("historical_state", None, "Czechoslovakia", [("cs", "Československo")], "1918-10-28", "day", "1993-01-01"),
+    "SCG": (
+        "historical_state",
+        None,
+        "Serbia and Montenegro",
+        [("sr", "Србија и Црна Гора")],
+        "2003-02-04",
+        "day",
+        "2006-06-03",
+    ),
+    "DDR": (
+        "historical_state",
+        None,
+        "German Democratic Republic",
+        [("de", "Deutsche Demokratische Republik")],
+        "1949-10-07",
+        "day",
+        "1990-10-03",
+    ),
+    "ANT": (
+        "historical_state",
+        None,
+        "Netherlands Antilles",
+        [("nl", "Nederlandse Antillen")],
+        "1954-12-15",
+        "day",
+        "2010-10-10",
+    ),
+    "YMD": (
+        "historical_state",
+        None,
+        "People's Democratic Republic of Yemen",
+        [("ar", "جمهورية اليمن الديمقراطية الشعبية")],
+        "1967-11-30",
+        "day",
+        "1990-05-22",
+    ),
+    "RHO": ("historical_state", None, "Southern Rhodesia", [], "1923-10-01", "day", "1980-04-18"),
+    "SKM": ("historical_state", None, "Kingdom of Sikkim", [], "1950-12-05", "day", "1975-05-16"),
+    "VDR": (
+        "historical_state",
+        None,
+        "Democratic Republic of Vietnam",
+        [("vi", "Việt Nam Dân chủ Cộng hòa")],
+        "1945-09-02",
+        "day",
+        "1976-07-02",
+    ),
+    "XOT": (
+        "historical_state",
+        None,
+        "Ottoman Empire",
+        [("tr", "Osmanlı Devleti")],
+        "1299-01-01",
+        "year",
+        "1922-11-01",
+    ),
+    "XDZ": (
+        "historical_state",
+        None,
+        "Free City of Danzig",
+        [("de", "Freie Stadt Danzig")],
+        "1920-11-15",
+        "day",
+        "1939-09-01",
+    ),
+    "XSV": (
+        "historical_state",
+        None,
+        "Republic of Vietnam",
+        [("vi", "Việt Nam Cộng hòa")],
+        "1955-10-26",
+        "day",
+        "1975-04-30",
+    ),
+    "XAH": (
+        "historical_state",
+        None,
+        "Austria-Hungary",
+        [("de", "Österreich-Ungarn")],
+        "1867-06-08",
+        "day",
+        "1918-11-12",
+    ),
+    "XWI": ("historical_state", None, "West Indies Federation", [], "1958-01-03", "day", "1962-05-31"),
+    "XFR": ("historical_state", None, "Federation of Rhodesia and Nyasaland", [], "1953-08-01", "day", "1963-12-31"),
+}
+
+
 def emit() -> Path:
     with connect() as conn:
         cs = Changeset(
@@ -88,7 +261,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Countries with no record in the archive yet, each with its English and native names, Wikidata "
-            "item, and Natural Earth outline",
+            "item, and Natural Earth outline; de facto and former states the census world tier covers, each with its "
+            "dates and recognized parent",
             polity=None,
             kind="edit",
         )
@@ -111,4 +285,23 @@ def emit() -> Path:
             cs.add("slug", path=iso.lower(), entity_id=polity)
             cs.add("external_id", entity_id=polity, scheme="wikidata", value=wikidata)
             cs.add("polity_territory", polity_id=polity, area_id=area)
+        for iso, (kind, parent, name, natives, start, precision, end) in POLITIES.items():
+            polity = cs.polity(iso)
+            cs.add("polity", id=polity, kind=kind, iso_code=iso)
+            cs.add(
+                "name",
+                entity_id=polity,
+                text=name,
+                lang="en",
+                kind="official",
+                is_preferred=True,
+                valid_from=start,
+                valid_from_precision=precision,
+                valid_to=end,
+            )
+            for lang, text in natives:
+                cs.add("name", entity_id=polity, text=text, lang=lang, kind="native", is_preferred=False)
+            cs.add("slug", path=iso.lower(), entity_id=polity)
+            if parent is not None:
+                cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(parent), valid_from=start, valid_to=end)
         return cs.write()

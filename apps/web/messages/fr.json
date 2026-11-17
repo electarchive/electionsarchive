@@ -4856,6 +4856,7 @@
   "downloads_level_municipality": "Commune",
   "downloads_level_submunicipal": "Au sein d'une commune",
   "downloads_level_historical_state": "Ancien pays",
+  "downloads_level_de_facto_state": "État de facto",
   "downloads_level_school_district": "District scolaire",
   "downloads_level_judicial_district": "District judiciaire",
   "downloads_level_special_district": "District spécial",

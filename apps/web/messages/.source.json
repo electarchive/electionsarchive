@@ -4083,7 +4083,8 @@
     "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
     "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
     "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
-    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901",
+    "downloads_level_de_facto_state": "0fa89f2f73a2b1ff1bbbea09e0ea8c32"
   },
   "fr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -8169,7 +8170,8 @@
     "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
     "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
     "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
-    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901",
+    "downloads_level_de_facto_state": "0fa89f2f73a2b1ff1bbbea09e0ea8c32"
   },
   "kmr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -12255,7 +12257,8 @@
     "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
     "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
     "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
-    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901",
+    "downloads_level_de_facto_state": "0fa89f2f73a2b1ff1bbbea09e0ea8c32"
   },
   "pt-BR": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -16341,7 +16344,8 @@
     "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
     "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
     "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
-    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901",
+    "downloads_level_de_facto_state": "0fa89f2f73a2b1ff1bbbea09e0ea8c32"
   },
   "tr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -20427,6 +20431,7 @@
     "settings_cancel": "ea4788705e6873b424c65e91c2846b19",
     "coverage_unsurveyed": "5f9533e886d594d5c83c592afd1ca951",
     "coverage_unsurveyed_hint": "83fca019028c4b74033cc54f053a42b7",
-    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901"
+    "coverage_unsurveyed_held": "4a01773f916c9a8d34cbbc3f7d7ca901",
+    "downloads_level_de_facto_state": "0fa89f2f73a2b1ff1bbbea09e0ea8c32"
   }
 }

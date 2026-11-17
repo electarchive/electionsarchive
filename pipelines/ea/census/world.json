@@ -744,6 +744,144 @@
       "publisher": "Electoral Commission of Zambia",
       "url": "https://www.elections.org.zm/",
       "kind": "official_body"
+    },
+    "cy-nc": {
+      "publisher": "Supreme Election Council of the TRNC (Yüksek Seçim Kurulu)",
+      "title": "Yüksek Seçim Kurulu, election results and calendar",
+      "url": "https://www.ysk.gov.ct.tr",
+      "kind": "official_body"
+    },
+    "so-sl": {
+      "publisher": "Parliament of the Republic of Somaliland",
+      "title": "Somaliland election results",
+      "url": "https://somalilandparliament.net/?p=688",
+      "kind": "official_body"
+    },
+    "ge-ab": {
+      "publisher": "AbkhazWorld (Donnacha Ó Beacháin)",
+      "title": "Dynamics of Electoral Politics in Abkhazia",
+      "url": "https://www.abkhazworld.com/aw/Pdf/Dynamics_of_Electoral_Politics_in_Abkhazia_Donnacha_O_Beachain.pdf",
+      "kind": "compendium"
+    },
+    "ge-so": {
+      "publisher": "Caucasian Knot",
+      "title": "CEC: Tibilov was elected President of South Ossetia",
+      "url": "https://amp.eng.kavkaz-uzel.eu/articles/20670",
+      "kind": "compendium"
+    },
+    "md-sn": {
+      "publisher": "Supreme Council of the Pridnestrovian Moldavian Republic",
+      "title": "Supreme Council (official website)",
+      "url": "https://en.vspmr.org",
+      "kind": "official_body"
+    },
+    "az-nk": {
+      "publisher": "Freedom House via Refworld (UNHCR)",
+      "title": "Freedom in the World 2003: Nagorno-Karabakh",
+      "url": "https://www.refworld.org/reference/annualreport/freehou/2002/51272",
+      "kind": "compendium"
+    },
+    "eh-sr": {
+      "publisher": "Country Reports",
+      "title": "Western Sahara embassy page (does not settle the entry)",
+      "url": "https://www.countryreports.org/country/WesternSahara/embassy.htm",
+      "kind": "compendium"
+    },
+    "sun": {
+      "publisher": "Wikidata",
+      "title": "Declaration of the Council of Republics of the Supreme Soviet of the USSR No. 142-N of 26 December 1991",
+      "url": "https://www.wikidata.org/wiki/Q11836865",
+      "kind": "compendium"
+    },
+    "yug": {
+      "publisher": "United Nations",
+      "title": "Yugoslavia and Successor States",
+      "url": "https://www.un.org/en/about-us/member-states/yugoslavia",
+      "kind": "official_body"
+    },
+    "csk": {
+      "publisher": "Sociological Review, Czech Academy of Sciences",
+      "title": "The Dissolution of Czechoslovakia: A Chronology of Events in 1992",
+      "url": "https://sreview.soc.cas.cz/pdfs/csr/1993/11/33.pdf",
+      "kind": "compendium"
+    },
+    "scg": {
+      "publisher": "Council of Europe, Parliamentary Assembly",
+      "title": "Consequences of the referendum in Montenegro",
+      "url": "https://pace.coe.int/files/11480/html",
+      "kind": "official_body"
+    },
+    "ddr": {
+      "publisher": "Deutscher Bundestag",
+      "title": "The German Democratic Republic (1949-1990)",
+      "url": "https://www.bundestag.de/en/parliament/history/parliamentarism/gdr/gdr-200348",
+      "kind": "official_body"
+    },
+    "ant": {
+      "publisher": "Encyclopaedia Britannica",
+      "title": "Netherlands Antilles",
+      "url": "https://www.britannica.com/place/Netherlands-Antilles",
+      "kind": "compendium"
+    },
+    "ymd": {
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "title": "Democratic Yemen: Dates of Elections, 28 to 30 October 1986",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF",
+      "kind": "compendium"
+    },
+    "rho": {
+      "publisher": "Wikibooks",
+      "title": "The Story of Rhodesia: Colony of Southern Rhodesia before WWII",
+      "url": "https://en.wikibooks.org/wiki/The_Story_of_Rhodesia/Colony_of_Southern_Rhodesia_before_WWII",
+      "kind": "compendium"
+    },
+    "skm": {
+      "publisher": "PolSci Institute",
+      "title": "Sikkim's Integration into Northeast India: From Protectorate to State",
+      "url": "https://polsci.institute/democracy-and-development-northeast-india/sikkim-integration-northeast-india/",
+      "kind": "compendium"
+    },
+    "vdr": {
+      "publisher": "Voice of Vietnam (VOV)",
+      "title": "History of National Assembly elections in Vietnam",
+      "url": "https://english.vov.vn/en/politics/history-of-national-assembly-elections-in-vietnam-post1273487.vov",
+      "kind": "compendium"
+    },
+    "xot": {
+      "publisher": "Istanbul Tarihi",
+      "title": "The History of Elections in Istanbul, 1876-1950",
+      "url": "https://istanbultarihi.ist/453-the-history-of-elections-in-istanbul-18761950",
+      "kind": "compendium"
+    },
+    "xdz": {
+      "publisher": "Oxford Public International Law",
+      "title": "Danzig, Free City of",
+      "url": "https://opil.ouplaw.com/display/10.1093/law:epil/9780199231690/law-9780199231690-e1275",
+      "kind": "compendium"
+    },
+    "xsv": {
+      "publisher": "University of New South Wales, Canberra (ADFA)",
+      "title": "Political legitimacy: The 1971 Vietnamese Presidential election",
+      "url": "https://vietnam.unsw.adfa.edu.au/political-legitimacy-the-1971-vietnamese-presidential-election/",
+      "kind": "compendium"
+    },
+    "xah": {
+      "publisher": "Czoernig election datasets",
+      "title": "Parliamentary elections: Reichsrat 1911",
+      "url": "https://www.czoernig.com/datasets-1/parliamentary-elections:-reichsrat-1911",
+      "kind": "compendium"
+    },
+    "xwi": {
+      "publisher": "Encyclopedia.com",
+      "title": "West Indies Federation",
+      "url": "https://www.encyclopedia.com/history/encyclopedias-almanacs-transcripts-and-maps/west-indies-federation",
+      "kind": "compendium"
+    },
+    "xfr": {
+      "publisher": "University of Pretoria repository",
+      "title": "The Federation of Rhodesia and Nyasaland 1953-1963: A Retrospective",
+      "url": "https://repository.up.ac.za/server/api/core/bitstreams/42c7e524-5f70-4780-bae5-ce135bb96bf2/content",
+      "kind": "compendium"
     }
   },
   "countries": [
@@ -3038,6 +3176,197 @@
       "status": "own",
       "source": "ipu-parline",
       "locator": "https://data.ipu.org/parliament/ZW/"
+    },
+    {
+      "iso": "CY-NC",
+      "name_en": "Northern Cyprus",
+      "status": "de_facto",
+      "recognized_within": "CY",
+      "reason": "Assembly of the Republic, presidential, and local elections since 1985.",
+      "source": "cy-nc",
+      "locator": "https://www.ysk.gov.ct.tr"
+    },
+    {
+      "iso": "SO-SL",
+      "name_en": "Somaliland",
+      "status": "de_facto",
+      "recognized_within": "SO",
+      "reason": "House of Representatives, presidential, and local council elections since 2002.",
+      "source": "so-sl",
+      "locator": "https://somalilandparliament.net/?p=688"
+    },
+    {
+      "iso": "GE-AB",
+      "name_en": "Abkhazia",
+      "status": "de_facto",
+      "recognized_within": "GE",
+      "reason": "People's Assembly and presidential elections, including 2012, 2014, and 2017.",
+      "source": "ge-ab",
+      "locator": "https://www.abkhazworld.com/aw/Pdf/Dynamics_of_Electoral_Politics_in_Abkhazia_Donnacha_O_Beachain.pdf"
+    },
+    {
+      "iso": "GE-SO",
+      "name_en": "South Ossetia",
+      "status": "de_facto",
+      "recognized_within": "GE",
+      "reason": "Parliament and presidential elections, including 2012, 2014, and 2017.",
+      "source": "ge-so",
+      "locator": "https://amp.eng.kavkaz-uzel.eu/articles/20670"
+    },
+    {
+      "iso": "MD-SN",
+      "name_en": "Transnistria",
+      "status": "de_facto",
+      "recognized_within": "MD",
+      "reason": "Supreme Council elections since 1990 and presidential elections since 1991.",
+      "source": "md-sn",
+      "locator": "https://en.vspmr.org"
+    },
+    {
+      "iso": "AZ-NK",
+      "name_en": "Artsakh",
+      "status": "de_facto",
+      "recognized_within": "AZ",
+      "reason": "National Assembly and presidential elections from 1991 to 2020.",
+      "source": "az-nk",
+      "locator": "https://www.refworld.org/reference/annualreport/freehou/2002/51272"
+    },
+    {
+      "iso": "EH-SR",
+      "name_en": "Sahrawi Republic",
+      "status": "de_facto",
+      "recognized_within": "EH",
+      "reason": "Sahrawi National Council elections, including 2012, 2020, and 2023.",
+      "source": "eh-sr",
+      "locator": "https://www.countryreports.org/country/WesternSahara/embassy.htm"
+    },
+    {
+      "iso": "SUN",
+      "name_en": "Soviet Union",
+      "status": "former",
+      "reason": "Supreme Soviet of the USSR elections from 1937 to 1989.",
+      "source": "sun",
+      "locator": "https://www.wikidata.org/wiki/Q11836865"
+    },
+    {
+      "iso": "YUG",
+      "name_en": "Yugoslavia",
+      "status": "former",
+      "reason": "Federal Assembly elections from 1945 to 2003.",
+      "source": "yug",
+      "locator": "https://www.un.org/en/about-us/member-states/yugoslavia"
+    },
+    {
+      "iso": "CSK",
+      "name_en": "Czechoslovakia",
+      "status": "former",
+      "reason": "Chamber of Deputies, Senate, and Federal Assembly elections from 1920 to 1992.",
+      "source": "csk",
+      "locator": "https://sreview.soc.cas.cz/pdfs/csr/1993/11/33.pdf"
+    },
+    {
+      "iso": "SCG",
+      "name_en": "Serbia and Montenegro",
+      "status": "former",
+      "reason": "State Union Assembly seats filled from 2003 to 2006.",
+      "source": "scg",
+      "locator": "https://pace.coe.int/files/11480/html"
+    },
+    {
+      "iso": "DDR",
+      "name_en": "East Germany",
+      "status": "former",
+      "reason": "Volkskammer elections from 1950 to 1990.",
+      "source": "ddr",
+      "locator": "https://www.bundestag.de/en/parliament/history/parliamentarism/gdr/gdr-200348"
+    },
+    {
+      "iso": "ANT",
+      "name_en": "Netherlands Antilles",
+      "status": "former",
+      "reason": "Staten of the Netherlands Antilles elections from 1954 to 2010.",
+      "source": "ant",
+      "locator": "https://www.britannica.com/place/Netherlands-Antilles"
+    },
+    {
+      "iso": "YMD",
+      "name_en": "South Yemen",
+      "status": "former",
+      "reason": "Supreme People's Council elections from 1978 to 1986.",
+      "source": "ymd",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF"
+    },
+    {
+      "iso": "RHO",
+      "name_en": "Southern Rhodesia",
+      "status": "former",
+      "reason": "Legislative Assembly elections from 1924 to 1979.",
+      "source": "rho",
+      "locator": "https://en.wikibooks.org/wiki/The_Story_of_Rhodesia/Colony_of_Southern_Rhodesia_before_WWII"
+    },
+    {
+      "iso": "SKM",
+      "name_en": "Sikkim",
+      "status": "former",
+      "reason": "State Council elections from 1953 to 1974.",
+      "source": "skm",
+      "locator": "https://polsci.institute/democracy-and-development-northeast-india/sikkim-integration-northeast-india/"
+    },
+    {
+      "iso": "VDR",
+      "name_en": "North Vietnam",
+      "status": "former",
+      "reason": "National Assembly elections from 1946 to 1971.",
+      "source": "vdr",
+      "locator": "https://english.vov.vn/en/politics/history-of-national-assembly-elections-in-vietnam-post1273487.vov"
+    },
+    {
+      "iso": "XOT",
+      "name_en": "Ottoman Empire",
+      "status": "former",
+      "reason": "Chamber of Deputies (Meclis-i Mebusan) elections from 1877 to 1914.",
+      "source": "xot",
+      "locator": "https://istanbultarihi.ist/453-the-history-of-elections-in-istanbul-18761950"
+    },
+    {
+      "iso": "XDZ",
+      "name_en": "Free City of Danzig",
+      "status": "former",
+      "reason": "Volkstag elections from 1920 to 1935.",
+      "source": "xdz",
+      "locator": "https://opil.ouplaw.com/display/10.1093/law:epil/9780199231690/law-9780199231690-e1275"
+    },
+    {
+      "iso": "XSV",
+      "name_en": "South Vietnam",
+      "status": "former",
+      "reason": "National Assembly and presidential elections from 1967 to 1971.",
+      "source": "xsv",
+      "locator": "https://vietnam.unsw.adfa.edu.au/political-legitimacy-the-1971-vietnamese-presidential-election/"
+    },
+    {
+      "iso": "XAH",
+      "name_en": "Austria-Hungary",
+      "status": "former",
+      "reason": "Reichsrat and Hungarian Diet elections from 1873 to 1911.",
+      "source": "xah",
+      "locator": "https://www.czoernig.com/datasets-1/parliamentary-elections:-reichsrat-1911"
+    },
+    {
+      "iso": "XWI",
+      "name_en": "West Indies Federation",
+      "status": "former",
+      "reason": "Federal House of Representatives elections in 1958.",
+      "source": "xwi",
+      "locator": "https://www.encyclopedia.com/history/encyclopedias-almanacs-transcripts-and-maps/west-indies-federation"
+    },
+    {
+      "iso": "XFR",
+      "name_en": "Federation of Rhodesia and Nyasaland",
+      "status": "former",
+      "reason": "Federal Assembly elections in 1953, 1958, and 1962.",
+      "source": "xfr",
+      "locator": "https://repository.up.ac.za/server/api/core/bitstreams/42c7e524-5f70-4780-bae5-ce135bb96bf2/content"
     }
   ]
 }

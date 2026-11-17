@@ -4,8 +4,8 @@ from ea.changeset import Changeset
 from ea.sources import census
 from ea.store import connect
 
-VERSION = "1"
-STATUSES = ("own", "within", "none")
+VERSION = "2"
+STATUSES = ("own", "within", "none", "de_facto", "former")
 
 
 def rows(spec: dict) -> list[dict]:
@@ -21,6 +21,12 @@ def rows(spec: dict) -> list[dict]:
             raise ValueError(f"census.world {iso}: a within row, and only a within row, names its parent")
         if status == "within" and row["within"] not in codes:
             raise ValueError(f"census.world {iso}: parent {row['within']} is not listed")
+        if (status == "de_facto") != bool(row.get("recognized_within")):
+            raise ValueError(
+                f"census.world {iso}: a de_facto row, and only a de_facto row, names its recognized parent"
+            )
+        if status == "de_facto" and row["recognized_within"] not in codes:
+            raise ValueError(f"census.world {iso}: recognized parent {row['recognized_within']} is not listed")
         if status != "own" and not (row.get("reason") or "").strip():
             raise ValueError(f"census.world {iso}: a {status} row gives its reason")
         if row["source"] not in spec["sources"]:
@@ -39,9 +45,9 @@ def emit(spec: dict | None = None) -> str:
             conn,
             pipeline="census.world",
             version=VERSION,
-            summary="World tier of the election census: one row for each ISO 3166-1 code and Kosovo, saying whether it "
-            "holds elections of its own, holds them within another polity, or holds none, each cited to an official "
-            "or parliamentary source",
+            summary="World tier of the election census: one row for each ISO 3166-1 code, Kosovo, and each de facto or "
+            "former state, saying whether it holds elections of its own, holds them within another polity, holds none, "
+            "or is a de facto state recognized within another polity, each cited to an official or parliamentary source",
             polity=None,
         )
         sources = {}
@@ -67,6 +73,7 @@ def emit(spec: dict | None = None) -> str:
                 name_en=row["name_en"],
                 status=row["status"],
                 within_iso=row.get("within"),
+                recognized_within=row.get("recognized_within"),
                 reason=row.get("reason"),
                 electorate=electorate.get("value"),
                 electorate_date=electorate.get("date"),

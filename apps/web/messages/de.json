@@ -4788,6 +4788,7 @@
   "downloads_level_municipality": "Gemeinde",
   "downloads_level_submunicipal": "Innerhalb einer Gemeinde",
   "downloads_level_historical_state": "Ehemaliger Staat",
+  "downloads_level_de_facto_state": "De-facto-Staat",
   "downloads_level_school_district": "Schuldistrikt",
   "downloads_level_judicial_district": "Gerichtsdistrikt",
   "downloads_level_special_district": "Sonderdistrikt",

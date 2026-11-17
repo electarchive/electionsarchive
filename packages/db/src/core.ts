@@ -41,7 +41,7 @@ export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group"
 export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
 export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for", "closed_by_government"])
 export const payloadKind = pgEnum("payload_kind", ["ops", "artifacts"])
-export const polityKind = pgEnum("polity_kind", ["sovereign_state", "supranational", "federal_unit", "region", "county", "municipality", "submunicipal", "historical_state", "school_district", "judicial_district", "special_district", "tribal_nation"])
+export const polityKind = pgEnum("polity_kind", ["sovereign_state", "supranational", "federal_unit", "region", "county", "municipality", "submunicipal", "historical_state", "school_district", "judicial_district", "special_district", "tribal_nation", "de_facto_state"])
 export const polityPeriodKind = pgEnum("polity_period_kind", ["constitutional_order", "military_rule", "occupation", "transitional"])
 export const polityRelationKind = pgEnum("polity_relation_kind", ["succeeded_by", "merged_into", "split_into", "annexed_by", "reunified_into", "seceded_from", "consolidated_with"])
 export const reportingUnitKind = pgEnum("reporting_unit_kind", ["standard", "abroad_mission", "customs_gate", "prison", "mobile", "postal_district", "aggregate"])
@@ -64,7 +64,7 @@ export const areaFigureKind = pgEnum("area_figure_kind", ["population"])
 export const censusCategory = pgEnum("census_category", ["legislature", "executive", "council", "special_purpose", "judicial", "law_enforcement", "non_territorial", "indirect", "direct_democracy", "nominating"])
 export const censusDisposition = pgEnum("census_disposition", ["blocked", "out_of_scope"])
 export const censusAccessRole = pgEnum("census_access_role", ["administers", "publishes"])
-export const censusWorldStatus = pgEnum("census_world_status", ["own", "within", "none"])
+export const censusWorldStatus = pgEnum("census_world_status", ["own", "within", "none", "de_facto", "former"])
 export const bodyControl = pgEnum("body_control", ["majority", "minority", "coalition", "noc", "mayor"])
 export const compositionBucket = pgEnum("composition_bucket", ["independent", "other", "vacant"])
 
@@ -989,6 +989,7 @@ export const censusWorld = pgTable("census_world", {
 	nameEn: text("name_en").notNull(),
 	status: censusWorldStatus().notNull(),
 	withinIso: text("within_iso"),
+	recognizedWithin: text("recognized_within"),
 	reason: text(),
 	electorate: bigint({ mode: 'number' }),
 	electorateDate: date("electorate_date"),
@@ -1020,8 +1021,13 @@ export const censusWorld = pgTable("census_world", {
 		foreignColumns: [table.isoCode],
 		name: "census_world_within_iso_fkey"
 	}),
+	foreignKey({
+		columns: [table.recognizedWithin],
+		foreignColumns: [table.isoCode],
+		name: "census_world_recognized_within_fkey"
+	}),
 	index("census_world_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
-check("census_world_check", sql`((status = 'within'::census_world_status) = (within_iso IS NOT NULL))`),check("census_world_check1", sql`(within_iso IS DISTINCT FROM iso_code)`),check("census_world_check2", sql`((status = 'own'::census_world_status) OR (btrim(COALESCE(reason, ''::text)) <> ''::text))`),check("census_world_check3", sql`((electorate IS NULL) = (electorate_date IS NULL))`),check("census_world_check4", sql`((electorate IS NULL) OR ((electorate_source_id IS NOT NULL) AND (btrim(COALESCE(electorate_locator, ''::text)) <> ''::text)))`),check("census_world_electorate_check", sql`(electorate >= 0)`),check("census_world_iso_code_check", sql`(iso_code ~ '^[A-Z]{2}$'::text)`),check("census_world_locator_check", sql`(btrim(locator) <> ''::text)`),check("census_world_name_en_check", sql`(btrim(name_en) <> ''::text)`),]);
+check("census_world_check", sql`((status = 'within'::census_world_status) = (within_iso IS NOT NULL))`),check("census_world_check1", sql`(within_iso IS DISTINCT FROM iso_code)`),check("census_world_check2", sql`((status = 'own'::census_world_status) OR (btrim(COALESCE(reason, ''::text)) <> ''::text))`),check("census_world_check3", sql`((electorate IS NULL) = (electorate_date IS NULL))`),check("census_world_check4", sql`((electorate IS NULL) OR ((electorate_source_id IS NOT NULL) AND (btrim(COALESCE(electorate_locator, ''::text)) <> ''::text)))`),check("census_world_electorate_check", sql`(electorate >= 0)`),check("census_world_iso_code_check", sql`(iso_code ~ '^[A-Z]{2,3}(-[A-Z0-9]{2,3})?$'::text)`),check("census_world_recognized_within_check", sql`((status::text = 'de_facto'::text) = (recognized_within IS NOT NULL))`),check("census_world_recognized_within_distinct_check", sql`(recognized_within IS DISTINCT FROM iso_code)`),check("census_world_locator_check", sql`(btrim(locator) <> ''::text)`),check("census_world_name_en_check", sql`(btrim(name_en) <> ''::text)`),]);
 
 export const censusTier = pgTable("census_tier", {
 	id: uuid().primaryKey(),

@@ -296,14 +296,15 @@ def page(conn, cc: str, queued: set[tuple[str, str]] | None = None) -> Path:
 
 WORLD_SQL = """
 select w.iso_code, w.name_en, w.status::text, w.within_iso, w.reason, w.electorate, w.electorate_date, w.locator,
-    s.publisher, s.title
+    s.publisher, s.title, w.recognized_within
 from census_world w
 join source s on s.id = w.source_id
 order by w.iso_code
 """
 
 HELD_SQL = """
-select split_part(p.iso_code, '-', 1), count(distinct e.id), min(extract(year from e.date_from))::int,
+select case when p.kind = 'de_facto_state' then p.iso_code else split_part(p.iso_code, '-', 1) end,
+    count(distinct e.id), min(extract(year from e.date_from))::int,
     max(extract(year from e.date_from))::int
 from election e
 join polity p on p.id = e.polity_id
@@ -326,7 +327,9 @@ def render_world(conn) -> str:
     rows = conn.execute(WORLD_SQL).fetchall()
     held = {iso: (count, first, last) for iso, count, first, last in conn.execute(HELD_SQL)}
     published = {iso for (iso,) in conn.execute(PUBLISHED_SQL)}
-    statuses = {status: sum(row[2] == status for row in rows) for status in ("own", "within", "none")}
+    statuses = {
+        status: sum(row[2] == status for row in rows) for status in ("own", "within", "none", "de_facto", "former")
+    }
     own = [row for row in rows if row[2] == "own"]
     states = {row[0]: census_state(row[0], published) for row in own}
     tally = {state: sum(value == state for value in states.values()) for state in ("published", "in progress", "none")}
@@ -339,8 +342,10 @@ def render_world(conn) -> str:
         ),
         "",
         (
-            f"{len(rows)} rows, one per ISO 3166-1 code and Kosovo: {statuses['own']} hold elections of their own,"
-            f" {statuses['within']} hold them within another polity, and {statuses['none']} hold none. Of the"
+            f"{len(rows)} rows, one per ISO 3166-1 code, Kosovo, and each de facto or former state: {statuses['own']}"
+            f" hold elections of their own, {statuses['within']} hold them within another polity, {statuses['none']}"
+            f" hold none, {statuses['de_facto']} are de facto states recognized within another polity, and"
+            f" {statuses['former']} are former states. Of the"
             f" {statuses['own']} with elections of their own, {tally['published']} have a published census,"
             f" {tally['in progress']} have one in progress, and {tally['none']} have none yet."
         ),
@@ -367,7 +372,7 @@ def render_world(conn) -> str:
                 f"{electorate:,} ({when})" if electorate is not None else "",
                 cite(publisher, title, locator),
             ]
-            for iso, name, _, _, _, electorate, when, locator, publisher, title in own
+            for iso, name, _, _, _, electorate, when, locator, publisher, title, _ in own
         ],
     )
     out += ["## Within another polity", ""]
@@ -375,8 +380,26 @@ def render_world(conn) -> str:
         ["Code", "Country", "Within", "Held elections", "Reason", "Cite"],
         [
             [iso, name, within, elections(iso), reason, cite(publisher, title, locator)]
-            for iso, name, status, within, reason, _, _, locator, publisher, title in rows
+            for iso, name, status, within, reason, _, _, locator, publisher, title, _ in rows
             if status == "within"
+        ],
+    )
+    out += ["## De facto states", ""]
+    out += table(
+        ["Code", "Country", "Recognized within", "Held elections", "Reason", "Cite"],
+        [
+            [iso, name, recognized, elections(iso), reason, cite(publisher, title, locator)]
+            for iso, name, status, _, reason, _, _, locator, publisher, title, recognized in rows
+            if status == "de_facto"
+        ],
+    )
+    out += ["## Former states", ""]
+    out += table(
+        ["Code", "Country", "Held elections", "Reason", "Cite"],
+        [
+            [iso, name, elections(iso), reason, cite(publisher, title, locator)]
+            for iso, name, status, _, reason, _, _, locator, publisher, title, _ in rows
+            if status == "former"
         ],
     )
     out += ["## No elections", ""]
@@ -384,7 +407,7 @@ def render_world(conn) -> str:
         ["Code", "Country", "Reason", "Cite"],
         [
             [iso, name, reason, cite(publisher, title, locator)]
-            for iso, name, status, _, reason, _, _, locator, publisher, title in rows
+            for iso, name, status, _, reason, _, _, locator, publisher, title, _ in rows
             if status == "none"
         ],
     )

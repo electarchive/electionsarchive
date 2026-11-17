@@ -54,7 +54,7 @@ const counts = {
   populationEstimated: v.number(),
 };
 type Counts = Record<keyof typeof counts, number>;
-const Code = v.pipeAsync(PolityPath, v.regex(/^[a-z]{2}$/));
+const Code = v.pipeAsync(PolityPath, v.regex(/^[a-z]{2,3}(-[a-z0-9]+)?$/));
 const SUMS = sql.raw(
   Object.keys(counts)
     .map((key) => {

@@ -7,7 +7,7 @@ const ROOT = path.resolve("../../data/pages");
 
 export const GET: RequestHandler = async ({ params }) => {
   if (
-    !/^[a-z]{2}\.[a-z0-9_]+$/u.test(params.scheme) ||
+    !/^[a-z]{2,3}(-[a-z0-9]+)?\.[a-z0-9_]+$/u.test(params.scheme) ||
     !/^[\w-]+\.png$/u.test(params.file)
   ) {
     error(404);

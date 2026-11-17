@@ -253,6 +253,7 @@ const LEVELS: Record<string, () => string> = {
   judicial_district: m.downloads_level_judicial_district,
   special_district: m.downloads_level_special_district,
   tribal_nation: m.downloads_level_tribal_nation,
+  de_facto_state: m.downloads_level_de_facto_state,
 };
 
 const ELECTIONS: Record<string, () => string> = {

@@ -4788,6 +4788,7 @@
   "downloads_level_municipality": "Belediye",
   "downloads_level_submunicipal": "Belediye içi birim",
   "downloads_level_historical_state": "Eski ülke",
+  "downloads_level_de_facto_state": "Fiilî devlet",
   "downloads_level_school_district": "Okul bölgesi",
   "downloads_level_judicial_district": "Yargı çevresi",
   "downloads_level_special_district": "Özel hizmet bölgesi",
