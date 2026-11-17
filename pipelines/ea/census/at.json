@@ -1099,8 +1099,8 @@
      "at.gemeinde"
     ]
    },
-   "finest_note": "The BMI publishes the signatures per municipality and Land for each initiative.",
-   "note": "An initiative signed by 100,000 voters (or a sixth of the voters in each of three Länder) must be dealt with by the National Council (Art. 41 Abs. 2 B-VG). Each one counts once; registrations still collecting supporting declarations without a set signing period are not counted. Not yet loaded: a loader must add a body, office, or name selector here so that its contests do not fall to volksabstimmung.",
+   "finest_note": "The BMI publishes the signatures per municipality for initiatives since 2018, per political district for 1996 to 2017 (per state for four of them), and only the national count for 1964 to 1995.",
+   "note": "An initiative signed by 100,000 voters (or a sixth of the voters in each of three Länder) must be dealt with by the National Council (Art. 41 Abs. 2 B-VG). Each one counts once; registrations still collecting supporting declarations without a set signing period are not counted. The loader gives each initiative the office \"Citizens' initiative (Volksbegehren)\", which the name selector matches, so these contests do not fall to the volksabstimmung class.",
    "source": "bmi-vbg",
    "valid_from": "1963-01-01",
    "first_held": "1964-10-05",
@@ -1119,6 +1119,18 @@
      "url": "https://www.bmi.gv.at/411/alle_volksbegehren_der_zweiten_republik.html",
      "source": "bmi-vbg-start",
      "evidence": "114 initiatives with a signing period, 1964 to June 2026, with valid signatures and turnout."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "AT",
+     "name_pattern": "Volksbegehren"
     }
    ],
    "dates": [
