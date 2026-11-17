@@ -5,10 +5,13 @@ The CIK publishes, for each election since 2013, a bundle of semicolon-separated
 Assembly, the 2007 European Parliament, and the 2011 presidential rounds) come as differently shaped text files, and
 the National Assembly and presidential elections of 1991 to 2001 come from the CIK's archive of block-structured text
 files. This module reads each bundle from the raw cache and builds one package per election.
+The `geo` package holds the provinces, municipalities, and settlements of the National Statistical Institute's
+register (EKATTE), and each polling section is placed in its settlement, so results roll up to the municipality.
 """
 
 import functools
 import html
+import json
 import re
 import zipfile
 from collections import defaultdict
@@ -21,6 +24,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.bg import cik_local
 
 SOURCE = "bg.cik"
 BULGARIA = str(uuid5(package.NAMESPACE, "polity\x1fBG"))
@@ -143,6 +147,22 @@ LISTS_2009 = "https://pi2009.cik.bg/results/proportional/index.html"
 # each of the 32 constituencies, which the bulk exports and national pages do not carry.
 BLOCKED = [
     "https://pi2009.cik.bg/listi/index.html",
+    # The results pages that carry the CIK's decisions on the elected members; the bulk exports hold no seats from
+    # 2014 on, and these pages answered with a 403 to automated requests.
+    *(
+        f"{Z}{name}/rezultati/index.html"
+        for name in (
+            "ep2014",
+            "pi2014",
+            "pi2017",
+            "pi2021_07",
+            "ns2022",
+            "ns2023",
+            "europe2024",
+            "pe202410",
+            "pe202604",
+        )
+    ),
     *(f"https://pvr2006.cik.bg/results_{round}/rik_{n}.html" for round in (1, 2) for n in range(1, 33)),
 ]
 
@@ -366,15 +386,20 @@ LAYOUTS: dict[str, Layout] = {
 }
 
 
+# The National Statistical Institute's register of places (EKATTE), in its 2025 edition: the provinces, the
+# municipalities, and every settlement with the municipality it lies in.
+EKATTE_URL = "https://www.nsi.bg/nrnm/ekatte/archive/json/Ekatte-2025-json.zip/download"
+
+
 def url_of(name: str) -> str:
     return f"{BASE}/{name}"
 
 
 def fetch() -> None:
     early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS)]
-    for url in dict.fromkeys([*(e.url for e in ELECTIONS), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early]):
+    for url in dict.fromkeys([*(e.url for e in ELECTIONS), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early, EKATTE_URL]):
         try:
-            raw.fetch(SOURCE, url, suffix=".zip" if url.endswith(".zip") else ".html")
+            raw.fetch(SOURCE, url, suffix=".zip" if url.endswith((".zip", "/download")) else ".html")
         except httpx.HTTPError as failure:
             print(f"{url}: {failure}", flush=True)
 
@@ -384,6 +409,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 CIK_SOURCE = key("source", SOURCE)
+NSI_SOURCE = key("source", "nsi")
 NATION = key("area", "bg.country", "BG")
 PRESIDENCY = key("office", "president")
 ASSEMBLY = key("body", "national-assembly")
@@ -725,17 +751,64 @@ def registry() -> Package:
     return p
 
 
+class Ekatte(NamedTuple):
+    oblasts: dict[str, dict[str, object]]  # NSI province code -> row
+    municipalities: dict[str, dict[str, object]]  # NSI municipality code -> row
+    settlements: dict[str, dict[str, object]]  # five-digit EKATTE code -> row
+
+
+@functools.cache
+def ekatte() -> Ekatte:
+    """The province, municipality, and settlement tables of the 2025 EKATTE edition (the last row of each file is
+    a note on when the file was made)."""
+    archive = zipfile.ZipFile(raw.cached(SOURCE, EKATTE_URL).path)
+
+    def table(name: str, field: str) -> list[dict[str, object]]:
+        return [row for row in json.loads(archive.read(name)) if field in row]
+
+    return Ekatte(
+        {str(r["oblast"]): r for r in table("ek_obl.json", "oblast")},
+        {str(r["obshtina"]): r for r in table("ek_obst.json", "obshtina")},
+        {str(r["ekatte"]): r for r in table("ek_atte.json", "ekatte")},
+    )
+
+
+def settlement(code: str) -> str:
+    return key("area", "bg.ekatte", code)
+
+
+def ekatte_code(text: str) -> str:
+    """The five-digit code of a section's settlement, or an empty string when the CIK gives none."""
+    return text.strip().zfill(5) if text.strip().isdigit() and int(text) else ""
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Bulgaria's country area, its 31 multi-member constituencies, and the scheme of polling sections",
+        "Bulgaria's country area, its 31 multi-member constituencies, its provinces, municipalities, and settlements, "
+        "and the scheme of polling sections",
     )
     p.external.add(BULGARIA)
+    p.add(
+        "source",
+        id=NSI_SOURCE,
+        kind="official_body",
+        publisher="Национален статистически институт",
+        title="Единен класификатор на административно-териториалните и териториалните единици (ЕКАТТЕ)",
+        url="https://www.nsi.bg/nrnm/ekatte/",
+        license="Published under the National Statistical Institute's license for the statistical information it produces and distributes",
+        license_url="https://www.nsi.bg/nrnm/ekatte/index",
+        attribution="Национален статистически институт (National Statistical Institute of Bulgaria)",
+    )
+    p.artifact(raw.cached(SOURCE, EKATTE_URL), NSI_SOURCE)
     for code, rank, kind, noun in (
         ("bg.country", 0, "administrative", "country"),
         ("bg.mir", 1, "electoral_district", "multi-member constituency"),
-        ("bg.sik", 2, "precinct", "polling section"),
+        ("bg.oblast", 1, "administrative", "province"),
+        ("bg.obshtina", 2, "administrative", "municipality"),
+        ("bg.ekatte", 3, "administrative", "settlement"),
+        ("bg.sik", 4, "precinct", "polling section"),
     ):
         p.add("scheme", code=code, polity_id=BULGARIA, kind=kind, rank=rank, noun=noun, code_system=None)
     p.add("area", id=NATION, scheme_code="bg.country")
@@ -749,6 +822,33 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=NATION)
         p.name(id, f"{code:02d}. {english}", "en", "official")
         p.name(id, f"{code:02d}. {native}", "bg", "native", False)
+    # The provinces, municipalities, and settlements. The ids of the first two are the ones the local-election
+    # packages use, so that both families of elections roll up to the same areas.
+    where = ekatte()
+    for number, (nsi_code, english, native) in cik_local.OBLASTS.items():
+        id = cik_local.oblast(number)
+        p.add("area", id=id, scheme_code="bg.oblast")
+        p.add("area_code", area_id=id, code=nsi_code)
+        p.add("area_parent", area_id=id, parent_id=NATION)
+        p.add("external_id", entity_id=id, scheme="bg.cik.oblast", value=f"{number:02d}")
+        p.name(id, english, "en", "official")
+        p.name(id, native, "bg", "native", False)
+    for nsi_code, row in sorted(where.municipalities.items()):
+        code = cik_local.cik_code(nsi_code)
+        id = cik_local.obshtina(code)
+        p.add("area", id=id, scheme_code="bg.obshtina")
+        p.add("area_code", area_id=id, code=nsi_code)
+        p.add("area_parent", area_id=id, parent_id=cik_local.oblast(int(code[:2])))
+        p.add("external_id", entity_id=id, scheme="bg.cik.obshtina", value=code)
+        p.name(id, str(row["name_en"]), "en", "official")
+        p.name(id, str(row["name"]), "bg", "native", False)
+    for code, row in sorted(where.settlements.items()):
+        id = settlement(code)
+        p.add("area", id=id, scheme_code="bg.ekatte")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=cik_local.obshtina(cik_local.cik_code(str(row["obshtina"]))))
+        p.name(id, str(row["name_en"]), "en", "official")
+        p.name(id, str(row["name"]), "bg", "native", False)
     return p
 
 
@@ -839,6 +939,39 @@ def values_frame(
     columns: dict[str, list[object]],
 ) -> pl.DataFrame:
     return pl.DataFrame(columns, schema_overrides={"channel": pl.Int16, "measure": pl.Int16}, strict=False)
+
+
+def link_units(p: Package, e: Election, unit_of: dict[str, str], secs: dict[str, Section]) -> dict[str, int]:
+    """Place each polling section in its settlement, so that results roll up to the municipality and the province.
+
+    The sections files give the EKATTE code of the settlement a section lies in. A section whose code the register
+    does not list (a city neighborhood or resort the CIK numbers itself, or a settlement since abolished) is placed
+    in its municipality instead, when every other section that shares its first four digits, the CIK's code for the
+    municipality, lies in one municipality. Returns how many sections took each route."""
+    where = ekatte()
+    municipality: dict[str, set[str]] = defaultdict(set)
+    chosen: dict[str, str] = {}
+    for code in unit_of:
+        known = ekatte_code(secs[code].ekatte) if code in secs and not abroad(e, code) else ""
+        if known in where.settlements:
+            chosen[code] = known
+            municipality[code[:4]].add(str(where.settlements[known]["obshtina"]))
+    counts = {"settlement": 0, "municipality": 0, "unplaced": 0}
+    for code, unit in unit_of.items():
+        if abroad(e, code):
+            continue
+        if code in chosen:
+            area_id, method = settlement(chosen[code]), "source_code"
+            counts["settlement"] += 1
+        elif len(municipality[code[:4]]) == 1:
+            nsi_code = next(iter(municipality[code[:4]]))
+            area_id, method = cik_local.obshtina(cik_local.cik_code(nsi_code)), "source_code"
+            counts["municipality"] += 1
+        else:
+            counts["unplaced"] += 1
+            continue
+        p.add("reporting_unit_area", unit_id=unit, area_id=area_id, approximate=False, partial=False, method=method)
+    return counts
 
 
 def build(e: Election) -> Package:
@@ -1162,6 +1295,7 @@ def build(e: Election) -> Package:
             )
     p.frame("reporting_unit", pl.DataFrame(unit_rows))
     p.frame("name", pl.DataFrame(unit_names))
+    link_units(p, e, unit_of, secs)
     cols: dict[str, list[object]] = {c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "value")}
 
     def put(rs: str, unit: str, option: str | None, measure: int, value: int) -> None:

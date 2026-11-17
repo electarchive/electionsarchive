@@ -651,15 +651,14 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Bulgaria's 28 provinces, 265 municipalities, city districts, and mayoralties, from the EKATTE register",
-        depends=[f"{SOURCE}/registry"],
+        "Bulgaria's city districts and mayoralties, from the EKATTE register; the provinces and municipalities they "
+        "lie in are in the `bg.cik` geo package",
+        depends=[f"{SOURCE}/registry", "bg.cik/geo"],
     )
     p.external.add(BULGARIA)
     for artifact in (raw.cached(SOURCE, url) for url in NSI_URLS.values()):
         p.artifact(artifact, NSI_SOURCE)
     for code, rank, noun in (
-        ("bg.oblast", 1, "province"),
-        ("bg.obshtina", 2, "municipality"),
         ("bg.rayon", 3, "city district"),
         ("bg.kmetstvo", 3, "mayoralty"),
         (SIK_SCHEME, 4, "polling section"),
@@ -667,22 +666,6 @@ def geo() -> Package:
         kind = "precinct" if code == SIK_SCHEME else "administrative"
         p.add("scheme", code=code, polity_id=BULGARIA, kind=kind, rank=rank, noun=noun, code_system=None)
     where = places()
-    for number, (nsi_code, english, native) in OBLASTS.items():
-        id = oblast(number)
-        p.add("area", id=id, scheme_code="bg.oblast")
-        p.add("area_code", area_id=id, code=nsi_code)
-        p.add("external_id", entity_id=id, scheme="bg.cik.oblast", value=f"{number:02d}")
-        p.name(id, english, "en", "official")
-        p.name(id, native, "bg", "native", False)
-    for code, row in sorted(where.municipalities.items()):
-        id = obshtina(code)
-        english, native = municipality_names(code)
-        p.add("area", id=id, scheme_code="bg.obshtina")
-        p.add("area_code", area_id=id, code=str(row["obshtina"]))
-        p.add("area_parent", area_id=id, parent_id=oblast(int(code[:2])))
-        p.add("external_id", entity_id=id, scheme="bg.cik.obshtina", value=code)
-        p.name(id, english, "en", "official")
-        p.name(id, native, "bg", "native", False)
     for unit, row in sorted(where.districts.items(), key=lambda kv: int(kv[0])):
         id = rayon(str(row["raion"]))
         english, native = district_names(unit)
