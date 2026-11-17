@@ -8,6 +8,7 @@ the same `Page` and `Candidate` rows, and one builder writes every election.
 
 import functools
 import io
+import itertools
 import re
 import unicodedata
 import zipfile
@@ -76,11 +77,14 @@ class Entities:
 
 
 def cells(row: str) -> list[str]:
-    return [unescape(re.sub(r"<[^>]+>", "", c)).replace("\xa0", " ").strip() for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S | re.I)]
+    return [
+        unescape(re.sub(r"<[^>]+>", "", c)).replace("\xa0", " ").strip()
+        for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.DOTALL | re.IGNORECASE)
+    ]
 
 
 def rows_of(html: str) -> list[list[str]]:
-    return [cells(r) for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, flags=re.S | re.I)]
+    return [cells(r) for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, flags=re.DOTALL | re.IGNORECASE)]
 
 
 def number(text: str) -> int | None:
@@ -107,7 +111,9 @@ def u18(page: str, **params: str) -> str:
 def index18() -> Entities:
     found = Entities()
     council = read(SOURCE, u18("election", el="CG"))
-    for code, name in re.findall(r"resultats-chiffres%EF%B9%96el=CG&amp;id=(CGM\d+)\.html'>.*?<dt class=\"definition__header\">([^<]*)", council):
+    for code, name in re.findall(
+        r"resultats-chiffres%EF%B9%96el=CG&amp;id=(CGM\d+)\.html'>.*?<dt class=\"definition__header\">([^<]*)", council
+    ):
         found.communes[code] = unescape(name).strip()
     province = read(SOURCE, u18("election", el="PR"))
     for block in province.split('<h3 class="definition__title">')[1:]:
@@ -134,7 +140,9 @@ def fetch18() -> None:
     lists = []
     for code in found.communes:
         html = read(SOURCE, u18("resultats-chiffres", el="CG", id=code))
-        for party in dict.fromkeys(re.findall(rf"votes-nominatifs%EF%B9%96el=CG&amp;id={code}&amp;party=(\d+)\.html", html)):
+        for party in dict.fromkeys(
+            re.findall(rf"votes-nominatifs%EF%B9%96el=CG&amp;id={code}&amp;party=(\d+)\.html", html)
+        ):
             lists.append(u18("votes-nominatifs", el="CG", id=code, party=party))
     raw.fetch_many(SOURCE, lists, suffix=".html")
 
@@ -145,8 +153,13 @@ def seats_of(text: str) -> int | None:
 
 
 def totals(table: list[list[str]], page: Page) -> None:
-    labels = {"Inscrits": "registered", "Bulletins déposés": "cast", "Blancs et nuls": "blank", "Votes valables": "valid"}
-    for first, second in zip(table, table[1:], strict=False):
+    labels = {
+        "Inscrits": "registered",
+        "Bulletins déposés": "cast",
+        "Blancs et nuls": "blank",
+        "Votes valables": "valid",
+    }
+    for first, second in itertools.pairwise(table):
         if first and first[0] in labels and second and second[0] == "Total":
             setattr(page, labels[first[0]], number(second[1]))
 
@@ -200,7 +213,9 @@ def load18() -> Year:
     for code, name in found.communes.items():
         html = read(SOURCE, u18("resultats-chiffres", el="CG", id=code))
         council = Council(code[3:], name, page18(code, name, html))
-        for party in dict.fromkeys(re.findall(rf"votes-nominatifs%EF%B9%96el=CG&amp;id={code}&amp;party=(\d+)\.html", html)):
+        for party in dict.fromkeys(
+            re.findall(rf"votes-nominatifs%EF%B9%96el=CG&amp;id={code}&amp;party=(\d+)\.html", html)
+        ):
             council.candidates += candidates18(read(SOURCE, u18("votes-nominatifs", el="CG", id=code, party=party)))
         communes.append(council)
     districts = []
@@ -210,10 +225,272 @@ def load18() -> Year:
         for canton, canton_name in found.cantons.items():
             if found.district_of[canton].removeprefix("Cantons - District de ") == name and canton[3] == code[3]:
                 council.units.append(
-                    (canton[3:], canton_name, page18(canton, canton_name, read(SOURCE, u18("resultats-chiffres", el="PR", id=canton))))
+                    (
+                        canton[3:],
+                        canton_name,
+                        page18(canton, canton_name, read(SOURCE, u18("resultats-chiffres", el="PR", id=canton))),
+                    )
                 )
         districts.append(council)
     return Year(DAYS[2018], communes, districts, list(dict.fromkeys(SEEN)))
+
+
+# ---- 2012 -------------------------------------------------------------------------------------------------------
+
+SMALL = {"de", "du", "des", "la", "le", "les", "en", "sur", "lez", "d", "l", "et", "aux", "au"}
+
+
+def proper(text: str) -> str:
+    """Title-case the upper-case place names of the 2012 and 2006 sites."""
+    if not text.isupper():
+        return text
+
+    def word(match: re.Match[str]) -> str:
+        found = match.group(0)
+        return found.lower() if found.lower() in SMALL and match.start() else found.capitalize()
+
+    return re.sub(r"[^\W\d_]+", word, text)
+
+
+def u12(part: str, name: str) -> str:
+    return (
+        f"{HOST}/2012/fr/{part}/results/{name}.html"
+        if name.startswith("results")
+        else f"{HOST}/2012/fr/{part}/{name}.html"
+    )
+
+
+def page12(code: str, name: str, html: str) -> Page:
+    page = Page(code, name, [])
+    figures: list[int | None] = []
+    waiting = False
+    for cell in rows_of(html):
+        cell = [c for c in cell if c]
+        if len(cell) >= 7 and re.fullmatch(r"\d+", cell[0]) and not re.fullmatch(r"[\d.]+", cell[1]):
+            votes = number(cell[2])
+            if votes is not None:
+                page.rows.append(Row(cell[0], cell[1], votes, seats_of(cell[7]) if len(cell) >= 8 else None))
+        elif cell[:1] == ["2012"] and len(cell) in (2, 4):
+            waiting = True
+        elif waiting and cell and re.fullmatch(r"[\d.]+", cell[0]):
+            figures.append(number(cell[0]))
+            waiting = False
+    if len(figures) >= 4:
+        page.registered, page.cast, page.blank, page.valid = figures[:4]
+    return page
+
+
+def candidates12(rows: list[Row], html: str) -> list[Candidate]:
+    label = ""
+    found: list[Candidate] = []
+    by_label = {folded(r.label): r for r in rows}
+    for cell in rows_of(html):
+        if len(cell) >= 3 and cell[2].startswith("Choisissez une liste"):
+            label = cell[1]
+        elif (
+            len(cell) >= 9
+            and cell[0] == ""
+            and re.fullmatch(r"\d+", cell[1])
+            and (votes := number(cell[3])) is not None
+        ):
+            row = by_label.get(folded(label))
+            if row is not None and row.number is not None:
+                rank = number(cell[8])
+                found.append(
+                    Candidate(
+                        row.number,
+                        row.label,
+                        int(cell[1]),
+                        cell[2],
+                        votes,
+                        rank is not None and rank <= (row.seats or 0),
+                    )
+                )
+    return found
+
+
+def index12() -> Entities:
+    found = Entities()
+    council = read(SOURCE, u12("com", "results_start"))
+    for code, name in re.findall(r'results_graph_(CGM\d+)\.html" >([^<]*)', council):
+        found.communes[code] = proper(unescape(name).strip())
+    province = read(SOURCE, u12("pro", "results_start"))
+    for block in province.split("<strong>Cantons - District de ")[1:]:
+        title = unescape(block.split("<", 1)[0]).strip()
+        for code, name in re.findall(r'results_graph_(PRK\d+)\.html" >([^<]*)', block):
+            found.cantons[code] = proper(unescape(name).strip())
+            found.district_of[code] = title
+    for code, name in re.findall(r'results_graph_(PRD\d+)\.html" >([^<]*)', province):
+        found.districts[code] = proper(unescape(name).strip())
+    return found
+
+
+def tab12(part: str, code: str) -> str:
+    return f"{HOST}/2012/fr/{part}/results/results_tab_{code}.html"
+
+
+def fetch12() -> None:
+    raw.fetch(SOURCE, f"{HOST}/2012/fr/com/results/results_start.html", suffix=".html")
+    raw.fetch(SOURCE, f"{HOST}/2012/fr/pro/results/results_start.html", suffix=".html")
+    raw.fetch(SOURCE, f"{HOST}/2012/fr/com/preferred/preferred_top.html", suffix=".html")
+    found = index12()
+    pages = [tab12("com", c) for c in found.communes]
+    pages += [tab12("pro", c) for c in [*found.districts, *found.cantons]]
+    raw.fetch_many(SOURCE, pages, suffix=".html")
+    top = read(SOURCE, f"{HOST}/2012/fr/com/preferred/preferred_top.html")
+    first = [
+        f"{HOST}/2012/fr/com/preferred/preferred_{c}_{party}.html"
+        for c, party in re.findall(r"preferred_(CGM\d+)_(\d+)\.html", top)
+    ]
+    raw.fetch_many(SOURCE, first, suffix=".html")
+    rest = []
+    for url in first:
+        code = url.split("preferred_")[1].split("_")[0]
+        for link in re.findall(rf'value="(preferred_{code}_\d+\.html)"', read(SOURCE, url)):
+            rest.append(f"{HOST}/2012/fr/com/preferred/{link}")
+    raw.fetch_many(SOURCE, list(dict.fromkeys(rest)), suffix=".html")
+
+
+def load12() -> Year:
+    SEEN.clear()
+    found = index12()
+    top = read(SOURCE, f"{HOST}/2012/fr/com/preferred/preferred_top.html")
+    starts = dict(re.findall(r"preferred_(CGM\d+)_(\d+)\.html", top))
+    communes = []
+    for code, name in found.communes.items():
+        page = page12(code, name, read(SOURCE, tab12("com", code)))
+        council = Council(code[3:], name, page)
+        if code in starts:
+            first = f"{HOST}/2012/fr/com/preferred/preferred_{code}_{starts[code]}.html"
+            html = read(SOURCE, first)
+            for link in dict.fromkeys(re.findall(rf'value="(preferred_{code}_\d+\.html)"', html)):
+                council.candidates += candidates12(page.rows, read(SOURCE, f"{HOST}/2012/fr/com/preferred/{link}"))
+        communes.append(council)
+    districts = []
+    for code, name in found.districts.items():
+        page = page12(code, name, read(SOURCE, tab12("pro", code)))
+        council = Council(code[3:], name, page, group=code[3])
+        for canton, canton_name in found.cantons.items():
+            if proper(found.district_of[canton]) == name and canton[3] == code[3]:
+                council.units.append(
+                    (canton[3:], canton_name, page12(canton, canton_name, read(SOURCE, tab12("pro", canton))))
+                )
+        districts.append(council)
+    return Year(DAYS[2012], communes, districts, list(dict.fromkeys(SEEN)))
+
+
+# ---- 2006 -------------------------------------------------------------------------------------------------------
+
+LATIN = "latin-1"
+
+
+def u06(part: str, folder: str, name: str) -> str:
+    return f"{HOST}/2006/fr/{part}/{folder}/{name}.html"
+
+
+def entities06(part: str, start: str) -> dict[str, str]:
+    html = read(SOURCE, u06(part, "listvotes", start), LATIN)
+    block = re.search(r'<SELECT name="entities".*?</SELECT>', html, flags=re.DOTALL | re.IGNORECASE)
+    if block is None:
+        raise LookupError(f"{start} has no entity list")
+    found = {}
+    for value, name in re.findall(
+        r'OPTION value="nav(\d+)i\.html"[^>]*>\s*([^<]*)', block.group(0), flags=re.IGNORECASE
+    ):
+        found[value] = unescape(name).strip()
+    return found
+
+
+def seats06(text: str) -> int | None:
+    return int(text) if re.fullmatch(r"\d+", text) else None
+
+
+def page06(code: str, name: str, html: str) -> Page:
+    page = Page(code, name, [])
+    votes_at, seats_at = 8, 5
+    for cell in rows_of(html):
+        if "Voix 2006" in cell and "Sièges 2006" in cell:
+            votes_at, seats_at = cell.index("Voix 2006") + 1, cell.index("Sièges 2006") + 1
+        elif len(cell) > votes_at and cell[1] and cell[0] != "Total" and (votes := number(cell[votes_at])) is not None:
+            page.rows.append(Row(cell[0] or None, cell[1], votes, seats06(cell[seats_at])))
+        elif cell and len(cell) >= 4:
+            attribute = {
+                "Participation": "cast",
+                "Blancs ou nuls": "blank",
+                "Valables": "valid",
+                "Inscrits": "registered",
+            }.get(cell[0])
+            if attribute:
+                setattr(page, attribute, number(cell[3]))
+    return page
+
+
+def candidates06(html: str) -> list[Candidate]:
+    found: list[Candidate] = []
+    head = ""
+    titulars = False
+    for cell in rows_of(html):
+        if cell and (match := re.fullmatch(r"(\d+) - (.+)", cell[0])):
+            head = match.group(1)
+            label = match.group(2)
+        elif cell and cell[0] == "Elus titulaires":
+            titulars = True
+        elif cell and cell[0] == "Elus suppléants":
+            titulars = False
+        elif titulars and len(cell) >= 7 and re.fullmatch(r"\d+", cell[0]) and (votes := number(cell[2])) is not None:
+            found.append(Candidate(head, label, int(cell[0]), cell[1], votes, True))
+    return found
+
+
+def fold_name(text: str) -> str:
+    return folded(re.sub(r"\bsaint\b", "st", re.sub(r"\s*\(.*?\)", "", text.lower())))
+
+
+def fetch06() -> None:
+    for part in ("local_wallonia", "province_wallonia"):
+        raw.fetch(
+            SOURCE, u06(part, "listvotes", "nav01423i" if part == "local_wallonia" else "nav03066i"), suffix=".html"
+        )
+    towns = entities06("local_wallonia", "nav01423i")
+    districts = entities06("province_wallonia", "nav03066i")
+    raw.fetch_many(SOURCE, [u06("local_wallonia", "listvotes", f"res{c}i") for c in towns], suffix=".html")
+    raw.fetch_many(SOURCE, [u06("province_wallonia", "listvotes", f"res{c}i") for c in districts], suffix=".html")
+    raw.fetch_many(SOURCE, [u06("local_wallonia", "preferencevotes", f"nav{c}") for c in towns], suffix=".html")
+    pages = []
+    for c in towns:
+        html = read(SOURCE, u06("local_wallonia", "preferencevotes", f"nav{c}"), LATIN)
+        pages += [
+            u06("local_wallonia", "preferencevotes", v.removesuffix(".html"))
+            for v in re.findall(rf'OPTION value="(res{c}x\d+\.html)"', html, flags=re.IGNORECASE)
+        ]
+    raw.fetch_many(SOURCE, list(dict.fromkeys(pages)), suffix=".html")
+
+
+def load06() -> Year:
+    nis = {fold_name(c.name): c.code for c in year(2012).communes}
+    nis |= {fold_name(c.name): c.code for c in year(2018).communes}
+    SEEN.clear()
+    towns = entities06("local_wallonia", "nav01423i")
+    communes = []
+    for site, name in towns.items():
+        code = nis.get(fold_name(name))
+        if code is None:
+            raise LookupError(f"2006 commune {name} has no code")
+        page = page06(site, name, read(SOURCE, u06("local_wallonia", "listvotes", f"res{site}i"), LATIN))
+        council = Council(code, name, page)
+        html = read(SOURCE, u06("local_wallonia", "preferencevotes", f"nav{site}"), LATIN)
+        for link in dict.fromkeys(re.findall(rf'OPTION value="(res{site}x\d+)\.html"', html, flags=re.IGNORECASE)):
+            council.candidates += candidates06(read(SOURCE, u06("local_wallonia", "preferencevotes", link), LATIN))
+        communes.append(council)
+    seats = {fold_name(c.name): c.code for c in communes}
+    districts = []
+    for site, name in entities06("province_wallonia", "nav03066i").items():
+        page = page06(site, name, read(SOURCE, u06("province_wallonia", "listvotes", f"res{site}i"), LATIN))
+        seat = seats.get(fold_name(name)) or seats.get(fold_name(re.sub(r"\s*\(.*\)", "", name)))
+        if seat is None:
+            raise LookupError(f"2006 district {name} has no province")
+        districts.append(Council(f"06{site}", name, page, units=[(f"06{site}", name, page)], group=seat[0]))
+    return Year(DAYS[2006], communes, districts, list(dict.fromkeys(SEEN)))
 
 
 # ---- identifiers ------------------------------------------------------------------------------------------------
@@ -292,6 +569,8 @@ def sectors() -> list[Sector]:
     )
     found = []
     for record in reader.iterShapeRecords():
+        if record.record is None or record.shape is None:
+            continue
         row = record.record.as_dict()
         if row["CNIS_REGIO"] != WALLONIA:
             continue
@@ -366,7 +645,13 @@ def geo() -> Package:
             as_of=date(2023, 1, 1),
         )
     p.add(
-        "scheme", code=UNIT, polity_id=BELGIUM, kind="electoral_district", rank=3, noun="reporting unit", code_system=None
+        "scheme",
+        code=UNIT,
+        polity_id=BELGIUM,
+        kind="electoral_district",
+        rank=3,
+        noun="reporting unit",
+        code_system=None,
     )
     by_town: dict[str, list[Sector]] = {}
     for sector in sectors():
@@ -409,11 +694,14 @@ def geo() -> Package:
 METHOD = (
     "Published by the Walloon Region on its results site for each election: list votes and seats per commune, "
     "per province district, and per judicial canton, with the registered voters, the ballots cast, the blank and "
-    "invalid ballots, and the valid votes. Seats and elected candidates are as the Region declared them; the "
-    "archive stores them and does not recompute them. Valid votes are the votes for lists. Where a commune page "
-    "or a district page prints a list under a different label in another year, each year's label is kept."
+    "invalid ballots, and the valid votes. The Region publishes blank and invalid ballots as one figure, which is "
+    "stored as invalid ballots. Seats and elected candidates are as the Region declared them; the archive stores "
+    "them and does not recompute them. Valid votes are the votes for lists. Where a page prints a list under a "
+    "different label in another year, each year's label is kept. Each candidate's votes are the personal votes "
+    "the page prints, before the Region moves list-head votes to candidates."
 )
-LOADERS: dict[int, Callable[[], Year]] = {2018: load18}
+LOADERS: dict[int, Callable[[], Year]] = {2006: load06, 2012: load12, 2018: load18}
+FETCHERS: dict[int, Callable[[], None]] = {2006: fetch06, 2012: fetch12, 2018: fetch18}
 
 
 @functools.cache
@@ -442,7 +730,12 @@ def known_parties() -> dict[str, str]:
 
 
 def registry() -> Package:
-    p = Package(f"{SOURCE}/registry", SOURCE, "Walloon parties, municipal and provincial councils, and their electoral system", depends=[f"{SOURCE}/geo"])
+    p = Package(
+        f"{SOURCE}/registry",
+        SOURCE,
+        "Walloon parties, municipal and provincial councils, and their electoral system",
+        depends=[f"{SOURCE}/geo"],
+    )
     p.external.add(BELGIUM)
     p.add(
         "source",
@@ -463,7 +756,15 @@ def registry() -> Package:
         p.add("body", id=id, polity_id=BELGIUM, kind="council")
         p.name(id, english, "en", "official")
         p.name(id, french, "fr", "native", False)
-    p.add("electoral_system", id=SYSTEM, polity_id=BELGIUM, valid_from=date(2006, 1, 1), valid_to=None, rules=RULES, rules_version=1)
+    p.add(
+        "electoral_system",
+        id=SYSTEM,
+        polity_id=BELGIUM,
+        valid_from=date(2006, 1, 1),
+        valid_to=None,
+        rules=RULES,
+        rules_version=1,
+    )
     p.add(
         "note",
         id=key("note", SYSTEM),
@@ -504,8 +805,30 @@ def accounting(p: Package, result_set: str, unit: str, page: Page) -> None:
             )
 
 
+@functools.cache
+def names() -> dict[str, str]:
+    old = {new: o for o, new in RENUMBERED.items()}
+    found = {old.get(s.municipality, s.municipality): s.names["fr"] for s in sectors()}
+    for council in year(2018).districts:
+        found[f"PRD{council.code}"] = council.name
+    return found
+
+
+NOTES = {
+    2006: (
+        " The 2006 site names only the elected candidates, so each list's candidates here are its elected "
+        "titular members, and its province districts are one reporting unit each, because the site does not say which "
+        "cantons belong to which district."
+    ),
+}
+
+
 def election(number: int) -> Package:
     data = year(number)
+    for council in data.communes:
+        council.name = names().get(council.code, council.name)
+    for council in data.districts:
+        council.name = names().get(f"PRD{council.code}", council.name)
     day = data.day
     p = Package(
         f"{SOURCE}/{day}",
@@ -562,7 +885,14 @@ def election(number: int) -> Package:
             is_default=True,
             completeness=1.0,
         )
-        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=METHOD + NOTES.get(day.year, ""),
+            lang="en",
+        )
         options: dict[str, str] = {}
         for row in council.page.rows:
             option = options[row.number or ""] = key("option", day, tag, row.number)
@@ -652,7 +982,9 @@ def election(number: int) -> Package:
                 value=cand.votes,
             )
             if cand.elected:
-                p.add("outcome", result_set_id=result_set, option_id=list_option, candidacy_id=candidacy, kind="elected")
+                p.add(
+                    "outcome", result_set_id=result_set, option_id=list_option, candidacy_id=candidacy, kind="elected"
+                )
     for council in data.districts:
         province = area(PROVINCE, PROVINCES[council.group])
         c, result_set, options = contest(
@@ -695,3 +1027,27 @@ def election(number: int) -> Package:
         for row in council.page.rows:
             p.add("declared", result_set_id=result_set, option_id=options[row.number or ""], measure=1, value=row.votes)
     return p
+
+
+# ---- pipeline entry points --------------------------------------------------------------------------------------
+
+
+def fetch() -> None:
+    raw.fetch(SOURCE, STATBEL, suffix=".zip")
+    for number in sorted(FETCHERS):
+        FETCHERS[number]()
+
+
+def packages() -> list[str]:
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{DAYS[n]}" for n in sorted(LOADERS))]
+
+
+def parse() -> None:
+    geo().write()
+    registry().write()
+    for number in sorted(LOADERS):
+        election(number).write()
+
+
+def emit() -> None:
+    package.run("load", packages())
