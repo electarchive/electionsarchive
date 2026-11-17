@@ -502,7 +502,7 @@ def _load(d: dict) -> Sheet:
 THRESHOLD = 130
 
 
-def ink(image: Image.Image, opened: bool = False) -> np.ndarray:
+def ink(image: Image.Image, opened: int = 0) -> np.ndarray:
     """The printed strokes of a page set over screens: what is clearly darker than its surroundings."""
     sharp = np.asarray(image.filter(ImageFilter.GaussianBlur(0.8))).astype(np.int16)
     smooth = np.asarray(image.filter(ImageFilter.GaussianBlur(2))).astype(np.int16)
@@ -512,7 +512,7 @@ def ink(image: Image.Image, opened: bool = False) -> np.ndarray:
     if not opened:
         return contrast
     # The screen's dots are smaller than a stroke of the bold type set over it, so an opening clears them.
-    screened = ndimage.binary_opening(np.asarray(image) < THRESHOLD, np.ones((3, 3)))
+    screened = ndimage.binary_opening(np.asarray(image) < THRESHOLD, np.ones((opened, opened)))
     return np.where(white, contrast, screened)
 
 
@@ -609,11 +609,13 @@ def read_1999(pdf: Path, number: int) -> Sheet:
                 shapes[(r, c)] = count
     cleaned = Image.fromarray(np.where(strokes, 0, 255).astype(np.uint8))
     readings = _readings(cleaned, jobs, shapes)
-    # The same cells with the screens cleared another way, read again.
-    other = Image.fromarray(np.where(ink(image, opened=True), 0, 255).astype(np.uint8))
+    # The same cells with the screens cleared two other ways, read again.
     keys = list(jobs)
-    for k, more in zip(keys, read_cells(other, [jobs[k] for k in keys]), strict=True):
-        readings[k] = readings[k] + more
+    dark = np.asarray(image.filter(ImageFilter.GaussianBlur(1.5))) < 110
+    for strokes_ in (ink(image, opened=3), dark):
+        other = Image.fromarray(np.where(strokes_, 0, 255).astype(np.uint8))
+        for k, more in zip(keys, read_cells(other, [jobs[k] for k in keys]), strict=True):
+            readings[k] = readings[k] + more
     used = sorted({r for r, _ in jobs})
     boxes = [(left + 3, lines[r][0] - 3, columns[0] - 7, lines[r][1] + 3) for r in used]
     labels = _labels(cleaned, boxes, used)
@@ -916,11 +918,7 @@ def organization(year: int, text: str) -> tuple[str, bool]:
 
 def sheets(year: int) -> list[Sheet]:
     """The year's results pages, in the memoria's order."""
-    found = [s for s in read_all(year) if s.rows and not s.problem]
-    if year == 1999:
-        # Pages with a table that are not a place's results, such as the district summaries, have no such heading.
-        found = [s for s in found if re.search(r"MUNICIPIO|DEPARTAMENTO|DISTRITO", fold(s.title).split("|")[-1])]
-    return found
+    return [s for s in read_all(year) if s.rows and not s.problem]
 
 
 def _is_department(year: int, s: Sheet) -> bool:
@@ -980,9 +978,12 @@ def places(year: int) -> list[tuple[Sheet, str, int, str]]:
     score = np.zeros((len(groups), len(order)))
     for g, (head, towns) in enumerate(groups):
         for d, dep in enumerate(order):
-            score[g, d] = 3 * _similarity(fold(names[dep]), fold(head.title)) + sum(
-                max(_similarity(t, fold(_name_of(year, s))) for t in towns_of[dep]) for s in towns
-            ) / max(len(towns), 1) * 5
+            score[g, d] = (
+                3 * _similarity(fold(names[dep]), fold(head.title))
+                + sum(max(_similarity(t, fold(_name_of(year, s))) for t in towns_of[dep]) for s in towns)
+                / max(len(towns), 1)
+                * 5
+            )
     chosen = dict(zip(*linear_sum_assignment(-score), strict=True))
     for g, (head, towns) in enumerate(groups):
         dep = order[chosen[g]]
@@ -1109,20 +1110,34 @@ def columns(year: int) -> list[Column]:
 
 
 def _fill(labels: list[tuple[str, bool]], order: list[str], rows: list[Row], width: int) -> list[tuple[str, bool]]:
-    """Rows whose label could not be read, named by their place: national organizations print in a fixed order, so a
-    row between the organizations one apart from each other in that order is the one between them."""
+    """Rows whose label could not be read, named by their place. National organizations print in a fixed order, so a
+    run of unread rows that fills exactly the gap between the organizations around it in that order is those
+    organizations, in order. Rows with votes only for the municipal corporation are civic committees and stay apart."""
     out = list(labels)
-    for i, ((_, national), row) in enumerate(zip(labels, rows, strict=True)):
-        if national or all(c is None for c in row.cells[: width - 1 if width == 6 else width]):
+    municipal = width == 6
+
+    def unread(i: int) -> bool:
+        national_cells = rows[i].cells[: width - 1] if municipal else rows[i].cells
+        return not out[i][1] and any(c is not None for c in national_cells)
+
+    i = 0
+    while i < len(out):
+        if not unread(i):
+            i += 1
             continue
-        before = next((out[j][0] for j in range(i - 1, -1, -1) if out[j][0] in order), None)
-        after = next((out[j][0] for j in range(i + 1, len(out)) if out[j][0] in order), None)
-        if before is None:
-            continue
-        between = after is not None and order.index(after) - order.index(before) == 2
-        last = after is None and order.index(before) + 1 < len(order) and i == len(out) - 1
-        if between or last:
-            out[i] = (order[order.index(before) + 1], True)
+        j = i
+        while j < len(out) and unread(j):
+            j += 1
+        before = next((out[k][0] for k in range(i - 1, -1, -1) if out[k][0] in order), None)
+        after = out[j][0] if j < len(out) and out[j][0] in order else None
+        start = order.index(before) + 1 if before is not None else 0
+        end = order.index(after) if after is not None else None
+        if (end is not None and end - start == j - i) or (
+            end is None and before is not None and start + j - i <= len(order)
+        ):
+            for k in range(i, j):
+                out[k] = (order[start + k - i], True)
+        i = j
     return out
 
 
@@ -1161,6 +1176,13 @@ def read(year: int) -> dict[str, base.Contest]:
             if i not in settled and (result := _settle(column, reader)) is not None:
                 settled[i] = result
     for i, column in enumerate(found):
+        if i in settled:
+            named = [text for (text, _), v in zip(column.labels, settled[i].values, strict=True) if v is not None]
+            if len(named) != len(set(named)):
+                # Two rows read as one organization: one of their labels is misread.
+                print(f"{year} page {column.sheet.page} {column.what}: two rows read as one organization", flush=True)
+                del settled[i]
+    for i, column in enumerate(found):
         if i in settled and column.what != "municipal":
             values = settled[i].values
             if any(not national and v for (_, national), v in zip(column.labels, values, strict=True)):
@@ -1179,8 +1201,9 @@ def read(year: int) -> dict[str, base.Contest]:
             continue
         result = settled[i]
         district = "district:00" if column.code == "0101" else f"district:{column.department:02d}"
-        # The department's page counts the Distrito Central in its national totals: only the district apart.
-        kind = "municipality" if column.kind == "central" and column.what != "district" else column.kind
+        # The 1995 department's page counts the Distrito Central in its national totals, and only its district apart.
+        apart = year != 1995 or column.what == "district"
+        kind = "municipality" if column.kind == "central" and not apart else column.kind
         put = base._router(grids, kind, column.code, district, column.department)
         for (text, national), cell, value in zip(column.labels, column.parties, result.values, strict=True):
             if value is None or cell is None:
@@ -1198,8 +1221,15 @@ def read(year: int) -> dict[str, base.Contest]:
                 put(column.what, name, _word(s, cell, value))
     LEFT[year] = left
     for key_, grid in grids.items():
-        if key_.startswith("district:") and MISSING.get(year, {}).get(key_) and grid.declared:
-            # The department's printed total covers municipalities left out here; compare it in the report only.
+        if not key_.startswith("district:") or not grid.declared:
+            continue
+        sums = Counter[str]()
+        for cells in grid.cells.values():
+            for column, w in cells.items():
+                sums[column] += base.number(w)
+        if any(sums[column] != base.number(w) for column, w in grid.declared.items()):
+            # The department's printed total covers municipalities left out here: it is compared in the report only.
+            print(f"{year} {key_}: the department's printed total is not stored, as municipalities are left out")
             grid.declared = {}
     print(f"{year}: {len(found)} columns, {first} settled by the OCR passes, {len(settled)} with the second reader")
     for what, pages in unsettled.items():
