@@ -100,6 +100,11 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         ("id",),
         {"id": U, "scheme_code": U, "vintage": U, "valid_from": D, "valid_to": D, "as_of": D},
     ),
+    "area_event": (
+        ("id",),
+        {"id": U, "kind": U, "date": D, "date_precision": U, "source_id": U, "notes": U},
+    ),
+    "area_event_member": (None, {"event_id": U, "area_id": U, "role": U}),
     "body": (("id",), {"id": U, "polity_id": U, "kind": U}),
     "office": (("id",), {"id": U, "polity_id": U, "body_id": U, "kind": U}),
     "electoral_system": (
@@ -505,6 +510,9 @@ REFERENCES = [
     ("area_parent", "parent_id", "area"),
     ("area_geometry", "area_id", "area"),
     ("area_geometry", "source_id", "source"),
+    ("area_event", "source_id", "source"),
+    ("area_event_member", "event_id", "area_event"),
+    ("area_event_member", "area_id", "area"),
     ("boundary_set", "scheme_code", "scheme"),
     ("body", "polity_id", "polity"),
     ("office", "body_id", "body"),
