@@ -1,0 +1,1393 @@
+{
+  "polity": "MN",
+  "name": "Mongolia",
+  "region_schemes": [
+    "mn.aimag"
+  ],
+  "sources": {
+    "constitution": {
+      "title": "Монгол Улсын Үндсэн хууль (1992 оны 1 дүгээр сарын 13), 2019 болон 2023 оны нэмэлт, өөрчлөлтийн хамт",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/367",
+      "kind": "official_body",
+      "note": "Consolidated text. Art. 21: the State Great Khural is unicameral with 126 members elected for four years by a mixed system, 78 by majority and 48 by proportional representation (2023 amendment); art. 25(1)(16) and art. 68(2): referendums; art. 30-31: the President is elected for one six-year term in a two-round direct election (2019 amendment); art. 39: the Prime Minister is appointed by the State Great Khural; art. 51: judges are appointed; art. 57: aimags and the capital, soums within aimags and bags within soums, districts within the capital and khoroos within districts; art. 59: Citizens' Representatives Khurals in aimags, the capital, soums and districts and Citizens' General Khurals in bags and khoroos, aimag and capital khurals elected for four years; art. 60: governors nominated by the khural and appointed by the Prime Minister or the higher governor."
+    },
+    "constitution_1924": {
+      "title": "1924 оны Монгол Улсын Үндсэн хууль",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/api/front/cons-detail-1924.html",
+      "kind": "official_body",
+      "note": "First constitution of the Mongolian People's Republic. Ch. 3: the State Great Khural of delegates of the aimags, cities, and the army, convened yearly, and the State Little Khural it elects."
+    },
+    "constitution_1960": {
+      "title": "1960 оны Монгол Улсын Үндсэн хууль (БНМАУ-ын Үндсэн хууль)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/api/front/cons-detail-1960.html",
+      "kind": "official_body",
+      "note": "Third constitution, adopted 6 July 1960. Art. 4: khurals of people's deputies at every level are elected by universal, equal, direct, secret suffrage; arts. 15-16: one People's Great Khural deputy per 4,000 inhabitants, elected for three years; art. 57: aimag, city, soum, and khoroo khurals of people's deputies elected for two years; art. 74: the Supreme Court is elected by the People's Great Khural."
+    },
+    "sgkh_law": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тухай хууль (2019 оны 12 дугаар сарын 20), нэмэлт, өөрчлөлтийн хамт",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/14869",
+      "kind": "official_body",
+      "note": "Art. 4.2-4.3: 78 members by majority in constituencies (the candidates with the most votes, as many as the constituency's mandates) and 48 by party list in one nationwide constituency (art. 11.4); art. 9.1-9.2: the State Great Khural calls the regular election before 1 February and voting falls on a working day in the second half of June of the election year; art. 9.9-9.10: extraordinary elections and by-elections; art. 12.1: constituencies are set before 1 February; art. 30.1: a party nominates up to 78 constituency candidates and up to 48 list candidates."
+    },
+    "pres_law": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгуулийн тухай хууль /Шинэчилсэн найруулга/ (2020 оны 12 дугаар сарын 24)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/16106891958781",
+      "kind": "official_body",
+      "note": "Art. 4.2.1: the regular election every six years (Constitution art. 30(2)); art. 8.2: voting on a working day in the first half of June of the election year; art. 76: a second vote (дахин санал хураалт) when no candidate wins a majority."
+    },
+    "pres_law_1993": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгуулийн хууль (1993); 2012 оны 12 дугаар сарын 21-ний хуулиар хүчингүй болсон",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/337",
+      "kind": "official_body",
+      "note": "The first presidential election law, under which the 1993 to 2009 elections were held; repealed in 2012."
+    },
+    "local_law": {
+      "title": "Аймаг, нийслэл, сум, дүүргийн иргэдийн Төлөөлөгчдийн Хурлын сонгуулийн тухай хууль (2020 оны 1 дүгээр сарын 30), нэмэлт, өөрчлөлтийн хамт",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/15125",
+      "kind": "official_body",
+      "note": "Art. 9.2: the regular local election falls on a working day in the first half of October of the election year; art. 12.1: each khural sets its constituencies before 1 May; art. 29.1: parties nominate up to the constituency's mandates; art. 73.2: the candidates with the most votes, as many as the constituency's mandates, are elected; art. 76: by-elections (нөхөн сонгууль) in the same constituency."
+    },
+    "election_law_2015": {
+      "title": "Сонгуулийн тухай хууль (2015 оны 12 дугаар сарын 25)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/12178",
+      "kind": "official_body",
+      "note": "The single election law for the State Great Khural, President, and local khurals used for the 2016 and 2017 elections and the 2016 local elections; its parts were repealed by the 2019 and 2020 laws."
+    },
+    "referendum_law": {
+      "title": "Ард нийтийн санал асуулгын тухай хууль (2016 оны 2 дугаар сарын 05)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/11704",
+      "kind": "official_body",
+      "note": "National referendums may be initiated by the President, the Government, or at least a third of State Great Khural members; a referendum is valid when a majority of eligible voters take part, and the question is decided by a majority of those voting. The General Election Commission organizes it."
+    },
+    "deliberative_law": {
+      "title": "Зөвлөлдөх санал асуулгын тухай хууль (2017 оны 2 дугаар сарын 09)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/12492",
+      "kind": "official_body",
+      "note": "Deliberative polls of randomly selected citizens, required before amending the Constitution, run by the State Great Khural's secretariat or a local khural, not by the General Election Commission."
+    },
+    "atu_law": {
+      "title": "Монгол Улсын засаг захиргаа, нутаг дэвсгэрийн нэгж, түүний удирдлагын тухай хууль /Шинэчилсэн найруулга/ (2020 оны 12 дугаар сарын 24)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/16106891904801",
+      "kind": "official_body",
+      "note": "Art. 32: the Citizens' General Khural of each bag and khoroo is an assembly of every eligible resident that elects the chair of its sitting and nominates the bag or khoroo governor (32.8.4); art. 37: aimag khurals have 25 to 41 representatives, soum khurals 15 to 29, the capital khural 45, and district khurals 25 to 43, by population, from the 2024 regular election; art. 53.1: each khural elects its chair at its first sitting for four years; art. 56.5: governors are nominated by a majority vote of the khural or general khural."
+    },
+    "gec_body_law": {
+      "title": "Сонгуулийн төв байгууллагын тухай хууль (2006 оны 1 дүгээр сарын 12)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/459",
+      "kind": "official_body",
+      "note": "The General Election Commission is the state body that organizes State Great Khural and presidential elections and referendums, and directs local khural elections through the election committees."
+    },
+    "nso_units": {
+      "title": "DT_NSO_0100_001V1: Монгол Улсын засаг захиргаа, нутаг дэвсгэрийн нэгж, бүс, аймаг, нийслэл, жилээр",
+      "publisher": "Үндэсний статистикийн хороо (Монгол Улсын үндэсний статистикийн хороо)",
+      "url": "https://data.1212.mn/api/v1/mn/NSO/Regional%20development/Territory,%20administrative%20units/DT_NSO_0100_001V1.px",
+      "kind": "official_body",
+      "license": "none stated",
+      "note": "Number of soums and districts (Сум, дүүргийн тоо) and of bags and khoroos (Баг, хорооны тоо) by aimag and the capital, 2014 to 2024; table updated 15 September 2025, read through the NSO's PX-Web API."
+    },
+    "nso_president": {
+      "title": "DT_NSO_0200_001V1: Монгол Улсын Ерөнхийлөгчийн сонгуулийн дүн, сонгуулийн жилээр",
+      "publisher": "Үндэсний статистикийн хороо (Монгол Улсын үндэсний статистикийн хороо)",
+      "url": "https://data.1212.mn/api/v1/mn/NSO/Society,%20development/Election/DT_NSO_0200_001V1.px",
+      "kind": "official_body",
+      "license": "none stated",
+      "note": "Valid votes for each presidential candidate, 1993 to 2021, with the two rounds of 2017."
+    },
+    "nso_seats": {
+      "title": "DT_NSO_0200_002V1: Улсын Их Хурлын гишүүд, Иргэдийн Хурлын төлөөлөгчид, намаар (сонгуулийн жилээр)",
+      "publisher": "Үндэсний статистикийн хороо (Монгол Улсын үндэсний статистикийн хороо)",
+      "url": "https://data.1212.mn/api/v1/mn/NSO/Society,%20development/Election/DT_NSO_0200_002V1.px",
+      "kind": "official_body",
+      "license": "none stated",
+      "note": "Members elected to the State Great Khural (1992 to 2024) and to the aimag and capital Citizens' Representatives Khurals (1996 to 2024), by party, in each election year."
+    },
+    "nso_turnout": {
+      "title": "DT_NSO_0200_003V1: Сонгогчдын оролцоо (сонгуулийн жилээр)",
+      "publisher": "Үндэсний статистикийн хороо (Монгол Улсын үндэсний статистикийн хороо)",
+      "url": "https://data.1212.mn/api/v1/mn/NSO/Society,%20development/Election/DT_NSO_0200_003V1.px",
+      "kind": "official_body",
+      "license": "none stated",
+      "note": "Registered voters, voters, and turnout for the State Great Khural (1992 to 2024) and the Citizens' Representatives Khurals (1996 to 2024), by election year."
+    },
+    "gec_portal": {
+      "title": "Сонгуулийн дүн (m-election.mn/electionresult)",
+      "publisher": "Монгол Улсын Сонгуулийн ерөнхий хороо",
+      "url": "https://m-election.mn/electionresult",
+      "kind": "official_body",
+      "license": "none stated",
+      "note": "The Commission's results portal, a script-driven page whose workbooks (polling-section results of the 2013 to 2021 presidential, 2020 and 2024 State Great Khural, 2021 by-, and 2020 and 2024 local elections) open only in a browser. The Commission's former site, gec.gov.mn, shows a hosting suspension page."
+    },
+    "a1992_call": {
+      "title": "Монгол Улсын Их Хурлын сонгууль товлон зарлах тухай (Улсын Бага Хурлын 1992 оны 19 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6241",
+      "kind": "official_body",
+      "note": "Sets the first State Great Khural election for 28 June 1992."
+    },
+    "a1992_districts": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тойрог байгуулах, мандат хуваарилах тухай (Улсын Бага Хурлын 1992 оны 20 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6240",
+      "kind": "official_body",
+      "note": "26 multi-member constituencies: one per aimag, Darkhan, and Erdenet, and six in the capital."
+    },
+    "a1992_members": {
+      "title": "Монгол Улсын Их Хурлын гишүүдийн бүрэн эрхийг хүлээн зөвшөөрөх тухай (Улсын Их Хурлын 1992 оны 01 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6234",
+      "kind": "official_body",
+      "note": "Recognizes the 76 members elected in 26 constituencies."
+    },
+    "a1992_local": {
+      "title": "Монгол Улсын засаг захиргаа, нутаг дэвсгэрийн нэгж, түүний удирдлагын тухай хуулийг хэрэгжүүлэх зарим арга хэмжээний тухай (Улсын Их Хурлын 1992 оны 23 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6114",
+      "kind": "official_body",
+      "note": "Orders the local khurals to be constituted anew and governors appointed in November 1992."
+    },
+    "a1993_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгууль товлон зарлах тухай (Улсын Их Хурлын 1993 оны 25 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6115",
+      "kind": "official_body",
+      "note": "Sets the presidential vote for 6 June 1993."
+    },
+    "a1994_local": {
+      "title": "Засаг захиргаа, нутаг дэвсгэрийн нэгж түүний удирдлагын тухай хуульд нэмэлт, өөрчлөлт оруулсантай холбогдуулан авах зарим арга хэмжээний тухай (Улсын Их Хурлын 1994 оны 53 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6061",
+      "kind": "official_body",
+      "note": "Soum and district khurals' two-year term ends, so their representatives are elected again in 1994, as are added aimag representatives and the khurals of the new Darkhan-Uul, Orkhon, and Govisümber aimags."
+    },
+    "a1996_districts": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тойрог байгуулах тухай (Улсын Их Хурлын 1996 оны 17 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6310",
+      "kind": "official_body",
+      "note": "Establishes 76 State Great Khural constituencies."
+    },
+    "a2000_call": {
+      "title": "Монгол Улсын Их Хурлын ээлжит сонгууль товлон зарлах тухай (Улсын Их Хурлын 2000 оны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6153",
+      "kind": "official_body",
+      "note": "Sets the regular State Great Khural election for 2 July 2000."
+    },
+    "a2001_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгууль товлон зарлах тухай (Улсын Их Хурлын 2001 оны 22 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6116",
+      "kind": "official_body",
+      "note": "Sets the first-round presidential vote for 20 May 2001."
+    },
+    "a2002_by": {
+      "title": "Нөхөн сонгууль зарлах тухай (Улсын Их Хурлын 2002 оны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6397",
+      "kind": "official_body",
+      "note": "By-election in State Great Khural constituency 36 on 8 September 2002."
+    },
+    "a2004_member": {
+      "title": "Монгол Улсын Их Хурлын гишүүний бүрэн эрхийг хүлээн зөвшөөрөх тухай (Улсын Их Хурлын 2005 оны 10 сарын 03-ны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6248",
+      "kind": "official_body",
+      "note": "Recognizes a member elected in constituency 24 at the regular election of 27 June 2004."
+    },
+    "a2005_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгуулийг товлон зарлах тухай (Улсын Их Хурлын 2005 оны 12 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6118",
+      "kind": "official_body",
+      "note": "Sets the first-round presidential vote for 22 May 2005."
+    },
+    "a2005_by": {
+      "title": "Улсын Их Хурлын 65 дугаар тойрогт нөхөн сонгууль товлон зарлах тухай (Улсын Их Хурлын 2005 оны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6755",
+      "kind": "official_body",
+      "note": "By-election in constituency 65 on 28 August 2005."
+    },
+    "a2006_by": {
+      "title": "Нөхөн сонгууль товлон зарлах тухай (Улсын Их Хурлын 2006 оны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6376",
+      "kind": "official_body",
+      "note": "By-election in constituency 46 on 3 September 2006."
+    },
+    "a2007_districts": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тойрог байгуулах, мандат хуваарилах тухай (Улсын Их Хурлын 2007 оны 98 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6322",
+      "kind": "official_body",
+      "note": "26 multi-member constituencies for the 2008 election."
+    },
+    "a2008_call": {
+      "title": "Монгол Улсын Их Хурлын ээлжит сонгууль товлон зарлах тухай (Улсын Их Хурлын 2008 оны 29 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6321",
+      "kind": "official_body",
+      "note": "Sets the regular State Great Khural vote for Sunday 29 June 2008."
+    },
+    "a2008_local": {
+      "title": "Орон нутгийн хурлын ээлжит сонгууль товлон зарлах тухай (Улсын Их Хурлын 2008 оны 11 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6409",
+      "kind": "official_body",
+      "note": "Sets the regular local khural election for Sunday 12 October 2008."
+    },
+    "a2009_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн сонгуулийг товлон зарлах тухай (Улсын Их Хурлын 2009 оны 09 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6182",
+      "kind": "official_body",
+      "note": "Sets the first-round presidential vote for 24 May 2009."
+    },
+    "a2009_by": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн 24 дүгээр тойрогт нөхөн сонгууль товлон зарлах тухай (Улсын Их Хурлын 2009 оны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6173",
+      "kind": "official_body",
+      "note": "By-election in constituency 24 on Sunday 18 October 2009."
+    },
+    "a2011_districts": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тойрог байгуулах, тойргийн мандатын тоо, дугаар, нутаг дэвсгэр, төвийг тогтоох тухай (Улсын Их Хурлын 2011 оны 67 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/6155",
+      "kind": "official_body",
+      "note": "26 constituencies for the 2012 election."
+    },
+    "a2012_members": {
+      "title": "Монгол Улсын Их Хурлын гишүүдийн бүрэн эрхийг хүлээн зөвшөөрөх тухай (Улсын Их Хурлын 2012 оны 04 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/8952",
+      "kind": "official_body",
+      "note": "Recognizes members elected at the regular election of 28 June 2012."
+    },
+    "a2012_local": {
+      "title": "Аймаг, сум, дүүргийн иргэдийн Төлөөлөгчдийн Хурлын 2012 оны ээлжит сонгуульд техник хэрэгсэл хэрэглэх тухай (Улсын Иx Хурлын 2012 оны 09 сарын 18-ны тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/8979",
+      "kind": "official_body",
+      "note": "Orders counting machines for the 2012 regular local khural election."
+    },
+    "a2013_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн ээлжит сонгуулийг товлон зарлах тухай (Улсын Их Хурлын 2013 оны 25 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/9215",
+      "kind": "official_body",
+      "note": "Sets the first-round presidential vote for 26 June 2013."
+    },
+    "a2020_local": {
+      "title": "Аймаг, нийслэл, сум, дүүргийн иргэдийн Төлөөлөгчдийн Хурлын 2020 оны ээлжит сонгуулийг товлон зарлах, санал авах өдрийг тогтоох тухай (Улсын Их Хурлын 2020 оны 23 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/15281",
+      "kind": "official_body",
+      "note": "Sets the regular local khural vote for 15 October 2020."
+    },
+    "a2021_pres": {
+      "title": "Монгол Улсын Ерөнхийлөгчийн 2021 оны ээлжит сонгуулийг товлон зарлах, санал авах өдрийг тогтоох тухай (Улсын Их Хурлын 2021 оны 07 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/16106891842531",
+      "kind": "official_body",
+      "note": "Sets the first-round presidential vote for 9 June 2021."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Монгол Улс",
+      "name_en": "Mongolia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "constitution"
+    },
+    {
+      "key": "aimag",
+      "name": "Аймаг, нийслэл",
+      "name_en": "Aimags (provinces) and the capital, Ulaanbaatar, each with a Citizens' Representatives Khural",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "mn.aimag",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "precision": "year",
+          "value": 22,
+          "source": "nso_units",
+          "locator": "https://data.1212.mn/api/v1/mn/NSO/Regional%20development/Territory,%20administrative%20units/DT_NSO_0100_001V1.px: the Бүс variable lists 21 aimags (Архангай to Дундговь) and Улаанбаатар"
+        }
+      ]
+    },
+    {
+      "key": "soum",
+      "name": "Сум, дүүрэг",
+      "name_en": "Soums of the aimags and districts (düüreg) of the capital, each with a Citizens' Representatives Khural",
+      "parent": "aimag",
+      "polity_kind": "municipality",
+      "scheme": "mn.soum",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "precision": "year",
+          "value": 339,
+          "source": "nso_units",
+          "locator": "DT_NSO_0100_001V1, 2024, Сум, дүүргийн тоо: Улсын дүн 339, of which Аймгийн дүн 330 soums and 9 districts of the capital"
+        }
+      ]
+    },
+    {
+      "key": "bag",
+      "name": "Баг, хороо",
+      "name_en": "Bags of the soums and khoroos of the districts, each with a Citizens' General Khural (an assembly of all eligible residents)",
+      "parent": "soum",
+      "polity_kind": "submunicipal",
+      "source": "atu_law",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "precision": "year",
+          "value": 1851,
+          "source": "nso_units",
+          "locator": "DT_NSO_0100_001V1, 2024, Баг, хорооны тоо: Улсын дүн 1851, of which Аймгийн дүн 1624 bags and Улаанбаатар 227 khoroos"
+        },
+        {
+          "date": "2014-12-31",
+          "precision": "year",
+          "value": 1754,
+          "source": "nso_units",
+          "locator": "DT_NSO_0100_001V1, 2014, Баг, хорооны тоо: Улсын дүн 1754 (Аймгийн дүн 1579, Улаанбаатар 175)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Монгол Улсын Ерөнхийлөгчийн сонгууль",
+      "name_en": "Presidential elections by direct vote",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1993-06-06",
+      "earliest_record": "1993-06-06",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mn.aimag"
+        ],
+        "fine": [
+          "mn.soum",
+          "mn.hesg"
+        ]
+      },
+      "finest_note": "Candidate votes by polling section (хэсгийн хороо) in the Commission's workbooks from 2013; national candidate totals for 1993 to 2009 in the NSO's election table",
+      "note": "Elected directly since 1993 (Constitution arts. 30-31). Until 2019 a four-year term, renewable once; since the 2019 amendment a single six-year term, first served by the President elected on 9 June 2021. Candidates are nominated by the parties seated in the State Great Khural. A candidate needs a majority of those voting in the first round, else the top two meet in a second vote (2017); the State Great Khural then recognizes the winner by law. The 1993 to 2009 elections were held under the 1993 presidential election law.",
+      "source": "constitution",
+      "locator": "https://legalinfo.mn/mn/detail/367 (arts. 30-31)",
+      "est_votes": 1250000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MN"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "pres_law_1993",
+          "period_years": 4,
+          "phase": 1,
+          "month": 5,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "A majority of those voting elects; otherwise the two leading candidates meet again.",
+          "administered_by": "General Election Commission (Сонгуулийн ерөнхий хороо)",
+          "valid_from": "1992-02-12",
+          "valid_to": "2019-11-14"
+        },
+        {
+          "source": "pres_law",
+          "locator": "https://legalinfo.mn/mn/detail/16106891958781 (art. 4.2.1: \"ЗУРГААН ЖИЛ ТУТАМ\"; art. 8.2: \"06 ДУГААР САРЫН ЭХНИЙ ХАГАСЫН АЛЬ НЭГ АЖЛЫН ӨДӨР\")",
+          "period_years": 6,
+          "phase": 5,
+          "month": 6,
+          "term_years": 6,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "A majority of all who voted elects; otherwise the two leading candidates meet in a second vote, and if that fails a new election is held (Constitution art. 31(4)-(5); law art. 76).",
+          "administered_by": "General Election Commission (Сонгуулийн ерөнхий хороо)",
+          "vacancy_rule": "The Chair of the State Great Khural acts as President until a new President is elected (Constitution art. 34).",
+          "valid_from": "2019-11-14"
+        }
+      ],
+      "access": [
+        {
+          "platform": "General Election Commission results portal (m-election.mn/electionresult)",
+          "url": "https://m-election.mn/electionresult",
+          "format": "xlsx",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2013-06-26",
+          "last_date": "2021-06-09",
+          "finest": "mn.hesg",
+          "source": "gec_portal",
+          "evidence": "Script-driven page; the workbooks by polling section open only in a browser"
+        },
+        {
+          "platform": "NSO PX-Web (data.1212.mn), table DT_NSO_0200_001V1",
+          "url": "https://data.1212.mn/api/v1/mn/NSO/Society,%20development/Election/DT_NSO_0200_001V1.px",
+          "format": "json, px",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "1993-06-06",
+          "last_date": "2021-06-09",
+          "source": "nso_president",
+          "evidence": "National valid votes per candidate in each election, both 2017 rounds"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-06-06",
+          "contests": 1,
+          "source": "a1993_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 1993 ОНЫ 6 ДУГААР САРЫН 6-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "source": "nso_president",
+          "quote": "1997 оны дүн: Н. Багабанди / МАХН, П. Очирбат / МҮАН, МСДН-ын Ардчилсан холбоо эвсэл, Ж. Гомбожав / МУНН",
+          "contests": 1,
+          "note": "Held in May 1997; the voting day awaits the State Great Khural resolution that called it."
+        },
+        {
+          "date": "2001-05-20",
+          "contests": 1,
+          "source": "a2001_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН АНХНЫ ШАТНЫ СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2001 ОНЫ 5 ДУГААР САРЫН 20-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2005-05-22",
+          "contests": 1,
+          "source": "a2005_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН АНХНЫ ШАТНЫ СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2005 ОНЫ 5 ДУГААР САРЫН 22-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2009-05-24",
+          "contests": 1,
+          "source": "a2009_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН АНХАН ШАТНЫ СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2009 ОНЫ 05 ДУГААР САРЫН 24-НИЙ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2013-06-26",
+          "contests": 1,
+          "source": "a2013_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН АНХАН ШАТНЫ СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2013 ОНЫ 6 ДУГААР САРЫН 26-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "source": "nso_president",
+          "quote": "2017 оны эхний санал хураалтын дүн; 2017 оны хоёрдахь санал хураалтын дүн",
+          "contests": 2,
+          "election_kind": "general",
+          "note": "First round on 26 June and second vote on 7 July 2017, as dated in the Commission's workbooks."
+        },
+        {
+          "date": "2021-06-09",
+          "contests": 1,
+          "source": "a2021_pres",
+          "quote": "МОНГОЛ УЛСЫН ЕРӨНХИЙЛӨГЧИЙН АНХАН ШАТНЫ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2021 ОНЫ 6 ДУГААР САРЫН 09-НИЙ ӨДӨР БАЙХААР ТОГТООСУГАЙ"
+        }
+      ]
+    },
+    {
+      "key": "state_great_khural",
+      "tier": "national",
+      "name": "Монгол Улсын Их Хурлын ээлжит сонгууль",
+      "name_en": "State Great Khural (parliament) regular elections",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1992-06-28",
+      "earliest_record": "1992-06-28",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mn.constituency"
+        ],
+        "fine": [
+          "mn.soum",
+          "mn.hesg"
+        ]
+      },
+      "finest_note": "Polling-section results for 2024 (13 constituencies and the national list) in the Commission's workbooks; constituency candidate totals for 2020; seats by party for every election from 1992 in the NSO's election table",
+      "note": "Unicameral, elected for four years (Constitution art. 21). Systems: 76 seats by block vote in 26 multi-member constituencies (1992, 2008); 76 single-member constituencies with a 25 percent threshold (1996, 2000, 2004, 2016); 48 seats in 26 multi-member constituencies plus 28 by national party list (2012); 76 seats in 29 multi-member constituencies (2020); since the 2023 amendment 126 seats, 78 by block vote in 13 multi-member constituencies and 48 by national party list (2024). An early election follows self-dissolution or a failure to appoint a Prime Minister (Constitution arts. 22 and 33).",
+      "source": "constitution",
+      "locator": "https://legalinfo.mn/mn/detail/367 (art. 21)",
+      "est_votes": 1450000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MN",
+          "valid_from": "1992-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "sgkh_law",
+          "locator": "https://legalinfo.mn/mn/detail/14869 (art. 9.2: \"ЭЭЛЖИТ СОНГУУЛИЙН ЖИЛИЙН 06 ДУГААР САРЫН СҮҮЛИЙН ХАГАСЫН АЛЬ НЭГ АЖЛЫН ӨДӨР\")",
+          "period_years": 4,
+          "phase": 0,
+          "month": 6,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "General Election Commission (Сонгуулийн ерөнхий хороо)",
+          "vacancy_rule": "A by-election is called by the State Great Khural in the vacated constituency (art. 9.10); no by-election in the final year of the term.",
+          "valid_from": "2019-12-20"
+        }
+      ],
+      "access": [
+        {
+          "platform": "General Election Commission results portal (m-election.mn/electionresult)",
+          "url": "https://m-election.mn/electionresult",
+          "format": "xlsx",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-06-24",
+          "last_date": "2024-06-28",
+          "finest": "mn.hesg",
+          "source": "gec_portal",
+          "evidence": "2024 polling-section workbooks for 13 constituencies and the party list; 2020 constituency totals"
+        },
+        {
+          "platform": "NSO PX-Web (data.1212.mn), tables DT_NSO_0200_002V1 and DT_NSO_0200_003V1",
+          "url": "https://data.1212.mn/api/v1/mn/NSO/Society,%20development/Election/DT_NSO_0200_002V1.px",
+          "format": "json, px",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "1992-06-28",
+          "last_date": "2024-06-28",
+          "source": "nso_seats",
+          "evidence": "Seats by party and national turnout for every election 1992 to 2024; no votes by party"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-06-28",
+          "contests": 26,
+          "seats": 76,
+          "source": "a1992_members",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 26 ТОЙРОГТ СОНГОГДСОН 76 ГИШҮҮНИЙ БҮРЭН ЭРХИЙГ ... ХҮЛЭЭН ЗӨВШӨӨР[СҮГЭЙ]; resolution 19 of the State Little Khural: \"1992 ОНЫ 6 ДУГААР САРЫН 28-НЫ ӨДӨР\""
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "source": "a1996_districts",
+          "quote": "1.УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 76 ТОЙРОГ БАЙГУУЛСУГАЙ.",
+          "contests": 76,
+          "seats": 76,
+          "note": "Held in June 1996; NSO DT_NSO_0200_002V1 gives 76 members for 1996."
+        },
+        {
+          "date": "2000-07-02",
+          "contests": 76,
+          "seats": 76,
+          "source": "a2000_call",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙГ 2000 ОНЫ 7 ДУГААР САРЫН 2-НЫ ӨДӨР ЯВУУЛАХААР ТОВЛОН ЗАРЛАСУГАЙ",
+          "note": "In the 76 single-member constituencies of the 1996 resolution, as amended in April and May 2000."
+        },
+        {
+          "date": "2004-06-27",
+          "seats": 76,
+          "source": "a2004_member",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 24 ДҮГЭЭР ТОЙРОГТ 2004 ОНЫ 6 ДУГААР САРЫН 27-НЫ ӨДӨР ЯВУУЛСАН ЭЭЛЖИТ СОНГУУЛИЙН ДҮНГ ҮНДЭСЛЭН",
+          "note": "Single-member constituencies; their count awaits the 2004 constituency resolution."
+        },
+        {
+          "date": "2008-06-29",
+          "contests": 26,
+          "seats": 76,
+          "source": "a2008_call",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2008 ОНЫ 6 ДУГААР САРЫН 29-НИЙ НЯМ ГАРИГТ ЯВУУЛАХААР ТОГТООСУГАЙ; resolution 98 of 2007: \"НИЙТ 26 ТОЙРОГ БАЙГУУЛСУГАЙ\""
+        },
+        {
+          "date": "2012-06-28",
+          "contests": 27,
+          "seats": 76,
+          "source": "a2012_members",
+          "quote": "2012 ОНЫ 6 ДУГААР САРЫН 28-НЫ ӨДӨР ЯВУУЛСАН МОНГОЛ УЛСЫН ИХ ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН ДҮН; resolution 67 of 2011: \"УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН НИЙТ 26 ТОЙРОГ\"",
+          "note": "26 constituencies for 48 seats and one national party list for 28 seats."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "nso_seats",
+          "quote": "Улсын Их Хурлын гишүүд, 2016: Дүн 76 (МАН 65, АН 9)",
+          "seats": 76,
+          "note": "Held in June 2016 under the 2015 Election Law in 76 single-member constituencies."
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "source": "nso_seats",
+          "quote": "Улсын Их Хурлын гишүүд, 2020: Дүн 76 (МАН 63, АН 10)",
+          "seats": 76,
+          "note": "Held on 24 June 2020 in multi-member constituencies, as dated in the Commission's workbooks."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "source": "nso_seats",
+          "quote": "Улсын Их Хурлын гишүүд, 2024: Дүн 126 (МАН 68, АН 42)",
+          "contests": 14,
+          "seats": 126,
+          "note": "Held on 28 June 2024: 13 multi-member constituencies for 78 seats and one national list for 48 seats, as the Commission's workbooks give them."
+        }
+      ]
+    },
+    {
+      "key": "state_great_khural_by",
+      "tier": "national",
+      "name": "Монгол Улсын Их Хурлын нөхөн сонгууль",
+      "name_en": "State Great Khural by-elections in single constituencies",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "2002-09-08",
+      "earliest_record": "2002-09-08",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mn.constituency"
+        ],
+        "fine": [
+          "mn.hesg"
+        ]
+      },
+      "finest_note": "Polling-section results for the 2021 by-elections in the Commission's workbooks",
+      "note": "Called by the State Great Khural when a constituency seat falls vacant (SGKh election law art. 9.10). The resolutions found so far call by-elections in 2002, 2005, 2006, 2009, and 2021; earlier and 2010 to 2020 by-elections await a full listing of the resolutions.",
+      "source": "sgkh_law",
+      "locator": "https://legalinfo.mn/mn/detail/14869 (art. 9.10)",
+      "est_votes": 40000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MN",
+          "valid_from": "1992-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "sgkh_law",
+          "locator": "https://legalinfo.mn/mn/detail/14869 (art. 9.10)",
+          "called": true,
+          "runoff": "none",
+          "administered_by": "General Election Commission (Сонгуулийн ерөнхий хороо)",
+          "valid_from": "2019-12-20"
+        }
+      ],
+      "access": [
+        {
+          "platform": "General Election Commission results portal (m-election.mn/electionresult)",
+          "url": "https://m-election.mn/electionresult",
+          "format": "xlsx",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2021-10-16",
+          "last_date": "2021-10-16",
+          "finest": "mn.hesg",
+          "source": "gec_portal",
+          "evidence": "Polling-section workbooks for constituencies 18 and 28"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2002-09-08",
+          "contests": 1,
+          "source": "a2002_by",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 36 ДУГААР ТОЙРОГ ДАХЬ НӨХӨН СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2002 ОНЫ 9 ДҮГЭЭР САРЫН 8-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2005-08-28",
+          "contests": 1,
+          "source": "a2005_by",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 65 ДУГААР ТОЙРОГТ ЯВУУЛАХ НӨХӨН СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2005 ОНЫ 8 ДУГААР САРЫН 28-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2006-09-03",
+          "contests": 1,
+          "source": "a2006_by",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 46 ДУГААР ТОЙРОГ ДАХЬ НӨХӨН СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2006 ОНЫ 9 ДҮГЭЭР САРЫН 3-НЫ ӨДӨР ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2009-10-18",
+          "contests": 1,
+          "source": "a2009_by",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 24 ДҮГЭЭР ТОЙРОГТ ЯВУУЛАХ НӨХӨН СОНГУУЛИЙН САНАЛ ХУРААЛТЫГ 2009 ОНЫ 10 ДУГААР САРЫН 18-НЫ НЯМ ГАРИГТ ЯВУУЛАХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "through": "2020-12-31",
+          "note": "By-elections of 2010 to 2020 are not yet listed from the State Great Khural's resolutions."
+        },
+        {
+          "date": "2021-10-16",
+          "contests": 2,
+          "source": "gec_portal",
+          "note": "By-elections in constituencies 18 and 28, as dated in the Commission's workbooks."
+        }
+      ]
+    },
+    {
+      "key": "aimag_khural",
+      "tier": "aimag",
+      "name": "Аймаг, нийслэлийн иргэдийн Төлөөлөгчдийн Хурлын сонгууль",
+      "name_en": "Aimag and capital Citizens' Representatives Khural elections",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1992-11-01",
+      "earliest_record": "2020-10-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mn.council_constituency"
+        ],
+        "fine": [
+          "mn.hesg"
+        ]
+      },
+      "finest_note": "Candidate votes by polling section and council constituency in the Commission's workbooks for 2020 and 2024; members by party for 1996 to 2024 in the NSO's election table",
+      "note": "Block vote in multi-member constituencies: each voter marks up to as many candidates as the constituency has mandates and the candidates with the most votes win (local law arts. 71.1 and 73.2). 21 aimag khurals of 25 to 41 representatives and the capital's khural of 45 (ATU law art. 37). A four-year term (Constitution art. 59(3)), elected on the same day as the soum and district khurals.",
+      "source": "constitution",
+      "locator": "https://legalinfo.mn/mn/detail/367 (art. 59)",
+      "est_votes": 1100000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(\\mAimag Citizens|\\mUlaanbaatar Citizens|аймгийн Иргэдийн|^Нийслэлийн Иргэдийн)",
+          "iso_pattern": "MN",
+          "valid_from": "1992-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "local_law",
+          "locator": "https://legalinfo.mn/mn/detail/15125 (art. 9.2: \"ЭЭЛЖИТ СОНГУУЛИЙН ЖИЛИЙН 10 ДУГААР САРЫН ЭХНИЙ ХАГАСЫН АЛЬ НЭГ АЖЛЫН ӨДӨР\")",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Aimag, capital, soum, and district election committees under the General Election Commission",
+          "vacancy_rule": "A by-election in the same constituency (local law art. 76).",
+          "valid_from": "2020-01-30"
+        }
+      ],
+      "access": [
+        {
+          "platform": "General Election Commission results portal (m-election.mn/electionresult)",
+          "url": "https://m-election.mn/electionresult",
+          "format": "xlsx",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-10-15",
+          "last_date": "2025-06-28",
+          "finest": "mn.hesg",
+          "source": "gec_portal",
+          "evidence": "Workbooks of candidate votes by polling section and council constituency for 2020, 2024, and the 2025 by-elections"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-11-01",
+          "precision": "month",
+          "source": "a1992_local",
+          "quote": "ОРОН НУТГИЙН ХУРЛЫГ ШИНЭЧЛЭН БАЙГУУЛАХ, ЗАСАГ ДАРГА НАРЫГ ТОМИЛОХ ... АЖЛЫГ ЭНЭ ОНЫ 11 ДҮГЭЭР САРД БАГТААН ЗОХИОН БАЙГУУЛА[Х]",
+          "note": "The khurals of the 1992 Constitution were first elected in late 1992."
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 1996: санал өгсөн 765.4 мянган хүн, оролцоо 72.1%",
+          "seats": 682
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2000: санал өгсөн 728.8 мянган хүн, оролцоо 65.9%",
+          "seats": 693
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2004: санал өгсөн 732.2 мянган хүн, оролцоо 67.2%",
+          "seats": 690
+        },
+        {
+          "date": "2008-10-12",
+          "source": "a2008_local",
+          "quote": "ОРОН НУТГИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙГ 2008 ОНЫ 10 ДУГААР САРЫН 12-НЫ ӨДРИЙН НЯМ ГАРИГТ ЯВУУЛАХААР",
+          "seats": 698
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "source": "a2012_local",
+          "quote": "АЙМАГ, СУМ, ДҮҮРГИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН 2012 ОНЫ ЭЭЛЖИТ СОНГУУЛЬ",
+          "seats": 1040,
+          "note": "Held in October 2012; NSO turnout table: 979.8 thousand voted, 52.9%."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2016: санал өгсөн 1161.1 мянган хүн, оролцоо 60.4%",
+          "seats": 809,
+          "note": "Held under the 2015 Election Law; the voting days await the calling resolution."
+        },
+        {
+          "date": "2020-10-15",
+          "source": "a2020_local",
+          "quote": "ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2020 ОНЫ 10 ДУГААР САРЫН 15-НЫ ӨДӨР БАЙХААР ТОГТООСУГАЙ",
+          "seats": 816
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2024: санал өгсөн 1124.1 мянган хүн, оролцоо 50.0%",
+          "seats": 796,
+          "note": "Held on 11 October 2024, as dated in the Commission's workbooks."
+        },
+        {
+          "date": "2025-06-24",
+          "precision": "day",
+          "through": "2025-06-28",
+          "note": "By-elections (нөхөн сонгууль) in vacated council constituencies and a supplementary vote four days later; their split between aimag, capital, soum, and district khurals is not yet counted."
+        }
+      ]
+    },
+    {
+      "key": "soum_khural",
+      "tier": "soum",
+      "name": "Сум, дүүргийн иргэдийн Төлөөлөгчдийн Хурлын сонгууль",
+      "name_en": "Soum and district Citizens' Representatives Khural elections",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1992-11-01",
+      "earliest_record": "2020-10-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mn.council_constituency"
+        ],
+        "fine": [
+          "mn.hesg"
+        ]
+      },
+      "finest_note": "Candidate votes by polling section and council constituency in the Commission's workbooks for 2020 and 2024",
+      "note": "Block vote in multi-member constituencies: each voter marks up to as many candidates as the constituency has mandates and the candidates with the most votes win (local law arts. 71.1 and 73.2). 330 soum khurals of 15 to 29 representatives and 9 district khurals of 25 to 43 (ATU law art. 37). Two-year terms until 1996, four years since.",
+      "source": "local_law",
+      "locator": "https://legalinfo.mn/mn/detail/15125",
+      "est_votes": 1100000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(сумын Иргэдийн|дүүргийн Иргэдийн|\\mSoum Citizens|\\mDistrict Citizens)",
+          "iso_pattern": "MN",
+          "valid_from": "1992-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "local_law",
+          "locator": "https://legalinfo.mn/mn/detail/15125 (art. 9.2: \"ЭЭЛЖИТ СОНГУУЛИЙН ЖИЛИЙН 10 ДУГААР САРЫН ЭХНИЙ ХАГАСЫН АЛЬ НЭГ АЖЛЫН ӨДӨР\")",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Aimag, capital, soum, and district election committees under the General Election Commission",
+          "vacancy_rule": "A by-election in the same constituency (local law art. 76).",
+          "valid_from": "2020-01-30"
+        }
+      ],
+      "access": [
+        {
+          "platform": "General Election Commission results portal (m-election.mn/electionresult)",
+          "url": "https://m-election.mn/electionresult",
+          "format": "xlsx",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-10-15",
+          "last_date": "2025-06-28",
+          "finest": "mn.hesg",
+          "source": "gec_portal",
+          "evidence": "Workbooks of candidate votes by polling section and council constituency for 2020, 2024, and the 2025 by-elections"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-11-01",
+          "precision": "month",
+          "source": "a1992_local",
+          "quote": "ОРОН НУТГИЙН ХУРЛЫГ ШИНЭЧЛЭН БАЙГУУЛАХ, ЗАСАГ ДАРГА НАРЫГ ТОМИЛОХ ... АЖЛЫГ ЭНЭ ОНЫ 11 ДҮГЭЭР САРД БАГТААН ЗОХИОН БАЙГУУЛА[Х]",
+          "note": "The khurals of the 1992 Constitution were first elected in late 1992."
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "source": "a1994_local",
+          "quote": "СУМ, ДҮҮРГИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН БҮРЭН ЭРХИЙН ХУГАЦАА 2 ЖИЛ БОЛСОНТОЙ ХОЛБОГДУУЛАН СУМ, ДҮҮРГИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ТӨЛӨӨЛӨГЧ СОНГОХ",
+          "note": "Soum and district khurals served two-year terms until 1996."
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 1996: санал өгсөн 765.4 мянган хүн, оролцоо 72.1%"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2000: санал өгсөн 728.8 мянган хүн, оролцоо 65.9%"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2004: санал өгсөн 732.2 мянган хүн, оролцоо 67.2%"
+        },
+        {
+          "date": "2008-10-12",
+          "source": "a2008_local",
+          "quote": "ОРОН НУТГИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙГ 2008 ОНЫ 10 ДУГААР САРЫН 12-НЫ ӨДРИЙН НЯМ ГАРИГТ ЯВУУЛАХААР"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "source": "a2012_local",
+          "quote": "АЙМАГ, СУМ, ДҮҮРГИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН 2012 ОНЫ ЭЭЛЖИТ СОНГУУЛЬ",
+          "note": "Held in October 2012; NSO turnout table: 979.8 thousand voted, 52.9%."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2016: санал өгсөн 1161.1 мянган хүн, оролцоо 60.4%",
+          "note": "Held under the 2015 Election Law; the voting days await the calling resolution."
+        },
+        {
+          "date": "2020-10-15",
+          "source": "a2020_local",
+          "quote": "ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2020 ОНЫ 10 ДУГААР САРЫН 15-НЫ ӨДӨР БАЙХААР ТОГТООСУГАЙ"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "source": "nso_turnout",
+          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2024: санал өгсөн 1124.1 мянган хүн, оролцоо 50.0%",
+          "note": "Held on 11 October 2024, as dated in the Commission's workbooks."
+        },
+        {
+          "date": "2025-06-24",
+          "precision": "day",
+          "through": "2025-06-28",
+          "note": "By-elections (нөхөн сонгууль) in vacated council constituencies and a supplementary vote four days later; their split between aimag, capital, soum, and district khurals is not yet counted."
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Ард нийтийн санал асуулга",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1945-10-20",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "The Constitution lets the State Great Khural call a referendum (art. 25(1)(16)), including on constitutional amendments by a two-thirds vote (art. 68(2)); the 2016 law requires a majority of voters to take part. No national referendum has been held under the 1992 Constitution. The only national vote of this kind is the independence plebiscite of 20 October 1945, held by the Mongolian People's Republic.",
+      "source": "referendum_law",
+      "est_votes": 490000,
+      "effort": 4,
+      "disposition": "blocked",
+      "disposition_reason": "Nothing has been held since 1992; the only vote, the 1945 independence plebiscite, has no official result publication online.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "MN"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-10-20",
+          "note": "Independence plebiscite of the Mongolian People's Republic; no official publication online."
+        }
+      ]
+    },
+    {
+      "key": "peoples_great_khural_1990",
+      "tier": "national",
+      "name": "Ардын Их Хурал, Улсын Бага Хурлын 1990 оны сонгууль",
+      "name_en": "People's Great Khural and State Little Khural, the multiparty elections of 1990 (abolished)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1990-07-29",
+      "valid_to": "1992-06-28",
+      "first_held": "1990-07-29",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The first multiparty election, on 29 July 1990 with later rounds, filled the 430-seat People's Great Khural from constituencies and the 50-seat State Little Khural, its standing body, by party vote. Both were replaced by the State Great Khural elected in June 1992.",
+      "source": "constitution_1960",
+      "est_votes": 1000000,
+      "effort": 4,
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of the 1990 results by constituency is online; the Commission's portal starts in 2013 and the NSO's election tables in 1992.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "MN",
+          "valid_from": "1990-01-01",
+          "valid_to": "1992-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-07-29",
+          "note": "First round; constituency and seat counts await an official source."
+        }
+      ]
+    },
+    {
+      "key": "mpr_great_khural",
+      "tier": "national",
+      "name": "Улсын Их Хурал, Ардын Их Хурал (1924-1986)",
+      "name_en": "State Great Khural (1924-1949) and People's Great Khural (1951-1986) of the Mongolian People's Republic (abolished)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1924-11-08",
+      "valid_to": "1990-07-29",
+      "first_held": "1924-11-08",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Under the 1924 Constitution, delegates of the aimags, cities, and army formed the State Great Khural, which elected the State Little Khural; under the 1960 Constitution the People's Great Khural was elected directly for three years, one deputy per 4,000 inhabitants, from a single list of candidates.",
+      "source": "constitution_1924",
+      "disposition": "blocked",
+      "disposition_reason": "Single-list elections with no official result publication online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "appointed_assembly"
+          ],
+          "iso_pattern": "MN",
+          "valid_to": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "through": "1986-12-31",
+          "note": "Khurals of 1924 to 1986; dates and counts await an official listing."
+        }
+      ]
+    },
+    {
+      "key": "mpr_local_khurals",
+      "tier": "aimag",
+      "name": "Ардын депутатуудын аймаг, хот, сум, хорооны хурал (1990 он хүртэл)",
+      "name_en": "Aimag, city, soum, and khoroo khurals of people's deputies of the Mongolian People's Republic (abolished)",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1992-11-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Elected for two years by direct vote under the 1960 Constitution (art. 57), from single lists until the multiparty local elections of 1990; replaced by the Citizens' Representatives Khurals in 1992.",
+      "source": "constitution_1960",
+      "disposition": "blocked",
+      "disposition_reason": "No official result publication online.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MN",
+          "valid_to": "1992-01-01"
+        }
+      ]
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Ерөнхий сайдыг томилох",
+      "name_en": "Prime Minister, appointed by the State Great Khural",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "note": "The State Great Khural appoints the Prime Minister on the nomination of the majority party or, failing that, of a coalition (Constitution art. 39).",
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by a vote of the State Great Khural, not by the electorate.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "MN"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/367 (art. 39)"
+    },
+    {
+      "key": "khural_chairs",
+      "tier": "national",
+      "name": "Хурлын даргыг сонгох",
+      "name_en": "Chairs of the State Great Khural and of the Citizens' Representatives Khurals, elected by their members",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "note": "The State Great Khural elects its Chair from its members; each aimag, capital, soum, and district khural elects its chair at its first sitting for four years (ATU law art. 53.1).",
+      "source": "atu_law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the members of each khural, not by the electorate.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker",
+            "other"
+          ],
+          "iso_pattern": "MN",
+          "name_pattern": "(Хурлын дарга|\\mChair|\\mSpeaker)"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/16106891904801 (art. 53.1)"
+    },
+    {
+      "key": "governors",
+      "tier": "aimag",
+      "name": "Засаг дарга",
+      "name_en": "Governors of aimags, the capital, soums, districts, bags, and khoroos",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {},
+      "note": "Each governor is nominated by the khural of the unit (the general khural in a bag or khoroo) and appointed for four years: aimag and capital governors by the Prime Minister, soum and district governors by the aimag or capital governor, bag and khoroo governors by the soum or district governor (Constitution art. 60; ATU law art. 56.5). The capital's governor is also Mayor of Ulaanbaatar.",
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Nominated by a vote of the khural or general khural and appointed by the Prime Minister or the higher governor, so no public ballot elects them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor",
+            "mayor"
+          ],
+          "iso_pattern": "MN"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/367 (art. 60)"
+    },
+    {
+      "key": "general_khurals",
+      "tier": "bag",
+      "name": "Баг, хорооны иргэдийн нийтийн хурал",
+      "name_en": "Citizens' General Khurals of bags and khoroos",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {},
+      "note": "Every eligible resident may attend and vote; the assembly elects the chair of its sitting and nominates the bag or khoroo governor (ATU law arts. 32.3-32.8).",
+      "source": "atu_law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Open assemblies of residents that decide by show of votes at a sitting; no ballot is counted or published.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MN",
+          "name_pattern": "(нийтийн хурал|General Khural)"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/16106891904801 (art. 32)"
+    },
+    {
+      "key": "deliberative_polls",
+      "tier": "national",
+      "name": "Зөвлөлдөх санал асуулга",
+      "name_en": "Deliberative polls",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {},
+      "note": "Required before amending the Constitution under the 2017 law.",
+      "source": "deliberative_law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A consultation of a random sample of citizens run by the State Great Khural's or a khural's secretariat, not a vote of the electorate (the first was held on 29-30 April 2017 on constitutional amendments).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "MN",
+          "name_pattern": "(зөвлөлдөх|deliberative)"
+        }
+      ]
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Шүүгч томилох",
+      "name_en": "Judges and members of the Constitutional Court",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {},
+      "note": "Constitution arts. 51 and 65.",
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed by the President on the proposal of the Judicial General Council, and the nine members of the Constitutional Court are named by the State Great Khural, the President, and the Supreme Court; none is elected by the public.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "iso_pattern": "MN",
+          "name_pattern": "(шүүгч|шүүх|цэц|judge|court)"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/367 (arts. 51, 65)"
+    },
+    {
+      "key": "party_nominations",
+      "tier": "national",
+      "name": "Нам, эвслийн нэр дэвшүүлэлт",
+      "name_en": "Party and coalition candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {},
+      "note": "A party or coalition nominates up to 78 constituency and 48 list candidates by decision of its own governing meeting (SGKh election law arts. 30-32); local nominations work the same way (local law art. 29).",
+      "source": "sgkh_law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties and coalitions choose their candidates at their own meetings; the State runs no primary.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "MN"
+        }
+      ],
+      "locator": "https://legalinfo.mn/mn/detail/14869 (arts. 30-32)"
+    }
+  ]
+}
