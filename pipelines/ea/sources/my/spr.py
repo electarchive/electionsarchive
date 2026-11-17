@@ -13,6 +13,13 @@ SOURCE = "my.spr"
 PORTAL = "https://opendata.spr.gov.my"
 CATALOG = f"{PORTAL}/data/_index.json"
 FILES = {"pru": "keputusan-pru", "dun": "keputusan-pru-dun", "prk": "keputusan-prk"}
+ROLL = "daftar-pemilih-induk-2012-2025"
+CENTRES = "dppr-pru-prn-prk-2008-keatas"
+# The 2013 and 2018 general election files print no electorate. The master roll gives one for each polling district,
+# and summing a constituency's districts fills the gap. The 2012 roll is the one under the constituencies of 2013, and
+# the 2018 roll the one under the constituencies redrawn for 2018; each reproduces the printed turnout of its
+# election to within a fraction of a point, where the neighboring year's roll does not.
+ROLL_YEARS = {"2013-05-05": 2012, "2018-05-09": 2018}
 MALAYSIA = str(uuid5(package.NAMESPACE, "polity\x1fMY"))
 VOTES, REGISTERED, INVALID = 1, 2, 5
 
@@ -140,10 +147,36 @@ SYSTEM = key("electoral_system", "fptp")
 
 def fetch() -> None:
     raw.fetch(SOURCE, CATALOG, suffix=".json")
-    for slug in FILES.values():
+    for slug in [*FILES.values(), ROLL, CENTRES]:
         raw.fetch(SOURCE, data_url(slug), suffix=".json")
     for _, url in BY_DAYS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+
+
+@functools.cache
+def roll() -> dict[tuple[int, str, str], int]:
+    """Registered voters in the master roll, summed to each (year, state, seat code) of both chambers."""
+    out: dict[tuple[int, str, str], int] = defaultdict(int)
+    for r in json.loads(raw.cached(SOURCE, data_url(ROLL)).path.read_text()):
+        year, state = int(r["TAHUN"]), re.sub(r"^WP\b", "W.P", clean(r["Negeri"]))
+        voters = int(r["PEMILIH BERDAFTAR"] or 0)
+        for column in ("PARLIMEN", "DUN"):
+            found = place(r[column])
+            if found is not None:
+                out[(year, state, found[0])] += voters
+    return dict(out)
+
+
+@functools.cache
+def centres() -> dict[tuple[str, str, str], int]:
+    """Registered voters at the 2026 polling centres, summed to each (election name, state, seat code)."""
+    out: dict[tuple[str, str, str], int] = defaultdict(int)
+    for r in json.loads(raw.cached(SOURCE, data_url(CENTRES)).path.read_text()):
+        for column in ("PARLIMEN", "DEWAN UNDANGAN NEGERI"):
+            found = place(r[column])
+            if found is not None:
+                out[(clean(r["NamaPilihanraya"]), clean(r["Negeri"]), found[0])] += int(r["JumlahPemilih"] or 0)
+    return dict(out)
 
 
 def clean(text: str | None) -> str:
@@ -594,6 +627,15 @@ def _one(values: list[int | float | None]) -> int | float | None:
     return found.pop() if found else None
 
 
+def electorate(event: Event, contest: Contest) -> tuple[int | None, int | None]:
+    """The constituency's registered voters as printed, and where it prints none, the master roll's sum."""
+    printed = _one([row.registered for row in contest.rows])
+    year = ROLL_YEARS.get(event.id)
+    if printed or contest.tacit or year is None:
+        return (None if printed is None else int(printed)), None
+    return None, roll().get((year, contest.state, contest.seat[0]))
+
+
 @dataclass
 class Audit:
     contests: int = 0
@@ -602,6 +644,9 @@ class Audit:
     turnout_ok: int = 0
     turnout_bad: list[str] = field(default_factory=list)
     turnout_unchecked: int = 0
+    roll_filled: int = 0
+    roll_ok: int = 0
+    roll_bad: list[str] = field(default_factory=list)
     caveats: dict[str, list[str]] = field(default_factory=lambda: defaultdict(list))
 
 
@@ -624,14 +669,27 @@ def audit(event: Event) -> Audit:
                     f"The printed majority of {majority:,} differs from the {ranked[0] - ranked[1]:,} that the printed "
                     "candidate votes give. Both are as the Election Commission published them."
                 )
-        registered, turnout = _one([row.registered for row in rows_]), _one([row.turnout for row in rows_])
+        printed, from_roll = electorate(event, contest)
+        registered, turnout = printed or from_roll, _one([row.turnout for row in rows_])
+        found.roll_filled += from_roll is not None
         rejected, unreturned = _one([row.rejected for row in rows_]), _one([row.unreturned for row in rows_])
         if contest.tacit or not registered or turnout is None or rejected is None:
             found.turnout_unchecked += 1
             continue
         cast = sum(row.votes or 0 for row in rows_) + rejected + (unreturned or 0)
         tolerance = 0.51 if turnout == int(turnout) else 0.051 if round(turnout, 1) == turnout else 0.011
-        if abs(cast * 100 / registered - turnout) <= tolerance:
+        if from_roll is not None:
+            # The roll is a snapshot of its year, not of polling day, and the 2018 roll runs a point or two above the
+            # electorate of polling day in the states that grew most, so only a gap of two points is noted.
+            if abs(cast * 100 / registered - turnout) <= 2.0:
+                found.roll_ok += 1
+            else:
+                found.roll_bad.append(f"{label}: printed {turnout}%, counts give {cast * 100 / registered:.2f}%")
+                found.caveats[contest.id].append(
+                    f"The printed turnout of {turnout}% differs from the {cast * 100 / registered:.2f}% that the "
+                    "printed votes, rejected ballots, unreturned ballots, and the master roll's electorate give."
+                )
+        elif abs(cast * 100 / registered - turnout) <= tolerance:
             found.turnout_ok += 1
         else:
             found.turnout_bad.append(f"{label}: printed {turnout}%, counts give {cast * 100 / registered:.2f}%")
@@ -652,6 +710,8 @@ def election(event: Event, checked: Audit) -> Package:
     p.external.add(MALAYSIA)
     for url in [data_url(slug) for slug in FILES.values()]:
         p.uses(raw.cached(SOURCE, url))
+    if event.id in ROLL_YEARS:
+        p.uses(raw.cached(SOURCE, data_url(ROLL)))
     if event.statement is not None:
         p.uses(raw.cached(SOURCE, event.statement))
     id = key("election", event.anchor)
@@ -831,8 +891,21 @@ def election(event: Event, checked: Audit) -> Package:
                     value=row.votes,
                 )
         if not contest.tacit:
+            printed, from_roll = electorate(event, contest)
+            if from_roll is not None:
+                p.add(
+                    "note",
+                    id=p.id("note", result_set, "electorate"),
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=f"The Election Commission's results file prints no electorate for this election. The "
+                    f"registered voters here are the sum of this constituency's polling districts in the "
+                    f"Commission's {ROLL_YEARS[event.id]} master roll of voters, a snapshot of that year rather "
+                    "than of polling day.",
+                    lang="en",
+                )
             for measure, value in (
-                (REGISTERED, _one([row.registered for row in contest.rows])),
+                (REGISTERED, printed if from_roll is None else from_roll),
                 (INVALID, _one([row.rejected for row in contest.rows])),
             ):
                 if value is not None:
@@ -856,15 +929,17 @@ def parse() -> None:
     totals = Audit()
     for event in events():
         found = audit(event)
-        for name in ("contests", "majority_ok", "turnout_ok", "turnout_unchecked"):
+        for name in ("contests", "majority_ok", "turnout_ok", "turnout_unchecked", "roll_filled", "roll_ok"):
             setattr(totals, name, getattr(totals, name) + getattr(found, name))
         totals.majority_bad += found.majority_bad
         totals.turnout_bad += found.turnout_bad
+        totals.roll_bad += found.roll_bad
         election(event, found).write()
     print(
         f"audit: {totals.contests} contests; majority ok {totals.majority_ok}, off {len(totals.majority_bad)}; "
-        f"turnout ok {totals.turnout_ok}, off {len(totals.turnout_bad)}, unchecked {totals.turnout_unchecked}",
+        f"turnout ok {totals.turnout_ok}, off {len(totals.turnout_bad)}, unchecked {totals.turnout_unchecked}; "
+        f"electorate from the roll {totals.roll_filled}, turnout ok {totals.roll_ok}, off {len(totals.roll_bad)}",
         flush=True,
     )
-    for line in [*totals.majority_bad, *totals.turnout_bad]:
+    for line in [*totals.majority_bad, *totals.turnout_bad, *totals.roll_bad]:
         print(f"  {line}", flush=True)
