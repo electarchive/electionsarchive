@@ -1,5 +1,7 @@
 """Iraq's Council of Representatives election of 10 October 2021, from the Independent High Electoral Commission.
 
+The 2018 election, published only as PDFs, is read by `ea.sources.iq.ihec_2018` and built here with the rest.
+
 The Commission publishes its final results as a Power BI report embedded on its results page. The report's data model
 holds a table of every candidate's final votes by electoral district, with the seat each candidate stood for and
 whether the candidate won, and a table of every polling station's voters and valid and invalid ballots. The
@@ -141,6 +143,9 @@ def _store(name: str, page: int, body: dict[str, object]) -> raw.Artifact:
 
 
 def fetch() -> None:
+    from ea.sources.iq import ihec_2018
+
+    ihec_2018.fetch()
     raw.fetch(SOURCE, HOME, suffix=".html")
     raw.fetch(SOURCE, GB_GOVERNORATES, suffix=".geojson")
     raw.fetch(SOURCE, GB_META, suffix=".json")
@@ -246,11 +251,13 @@ def arabic(text: str) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/cor-2021"]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/cor-2018", f"{SOURCE}/cor-2021"]
 
 
 def parse() -> None:
-    for build in (geo(), registry(), election()):
+    from ea.sources.iq import ihec_2018
+
+    for build in (geo(), registry(), ihec_2018.election(), election()):
         build.write()
 
 
