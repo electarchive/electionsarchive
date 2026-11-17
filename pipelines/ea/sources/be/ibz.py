@@ -2,9 +2,11 @@
 
 Each file holds one body's election on one date, with the results at every tier the service publishes (country or
 region, electoral college, constituency, province, arrondissement, canton, district, and municipality). The files carry
-no parent links between tiers and no NIS codes, so a body that sits in one contest takes its votes from the finest tier
-that tiles the published total, and bodies whose units are their own districts (municipal and provincial councils, and
-the earliest Chamber elections) take one contest per unit.
+no parent links between tiers and no NIS codes. A body whose seats are allocated in districts (constituencies,
+electoral arrondissements, or electoral colleges) takes one contest per district, and the cantons and municipalities
+join their districts by their votes per list (see `districts`). A body elected in one district takes its votes from
+the finest tier that tiles the published total, and bodies whose units are their own districts (municipal and
+provincial councils, and the earliest Chamber elections) take one contest per unit.
 """
 
 import difflib
@@ -19,7 +21,7 @@ from xml.etree import ElementTree
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.be import nis
+from ea.sources.be import districts, nis
 
 SOURCE = "be.ibz"
 BASE = "https://resultatselection.belgium.be"
@@ -123,7 +125,9 @@ LANGS = {"fr": "fr", "nl": "nl", "de": "de", "en": "en"}
 METHOD = (
     "Counted and published by the Belgian federal election service, as the XML files on its results site. Each file "
     "lists the votes per list for every tier the service publishes. The files do not say which units belong to which "
-    "constituency, so a contest takes its votes from the finest tier that adds up to the published total. Valid votes "
+    "constituency, so each canton or municipality is placed in the district whose printed votes per list its votes "
+    "add up to, and a district whose units do not add up to it within half a percent is its own unit. In the Senate "
+    "and European Parliament colleges, a canton's lists are split among the colleges that print them. Valid votes "
     "are the votes for lists, and blank votes are blank and invalid ballots. The files hold each candidate's "
     "preference votes; they are not stored here yet."
 )
@@ -355,13 +359,24 @@ class Builder:
         self.turnout: Counter[str] = Counter()
         self.ballots: Counter[str] = Counter()
         self.placed: Counter[str] = Counter()
+        self.units: dict[str, str] = {}
+        self.towns: dict[str, str] = {}
+        self.declared_gap = 0
+        self.unplaced: Counter[str] = Counter()
 
     def slug(self, path: str) -> str:
         self.paths[path] += 1
         return path if self.paths[path] == 1 else f"{path}-{self.paths[path]}"
 
     def contest(
-        self, tag: str, body: str, title: dict[str, str], seats: int, slug: str, order: list[tuple[str, str, int]]
+        self,
+        tag: str,
+        body: str,
+        title: dict[str, str],
+        seats: int,
+        slug: str,
+        order: list[tuple[str, str, int]],
+        area: str | None = None,
     ) -> tuple[str, dict[str, str]]:
         p = self.p
         contest = p.id("contest", self.day, tag)
@@ -371,6 +386,7 @@ class Builder:
             election_id=p.id("election", self.day),
             kind="list_allocation",
             body_id=BODY_IDS[body] if BODIES[body][1] else None,
+            district_area_id=area,
             magnitude=seats or None,
             round_number=1,
             default_result_kind="counted",
@@ -427,11 +443,16 @@ class Builder:
         NIS code names, as an approximate membership, because the canton has no shape of its own here."""
         p = self.p
         unit = p.id("unit", code)
+        if code in self.units:
+            return unit
+        self.units[code] = unit
         town, how = (None, "none")
         if level.tier == "Municipality":
             town, how = nis.town_code(self.day, kind, level.tier, level.labels)
         seat = nis.canton_seat(self.day, kind, level.labels) if level.tier == "Canton" else None
         place = nis.link_area(town, self.day) if town else None
+        if town and place:
+            self.towns[unit] = town
         p.add(
             "reporting_unit",
             id=unit,
@@ -573,6 +594,10 @@ def order_of(levels: list[Level], resolve: Resolver | None = None) -> list[tuple
     return list(seen.values())
 
 
+# each built election's notes and its comparison of each contest's units with the published totals
+REPORT: dict[date, tuple[list[str], list[tuple[str, str, str, int, int, int, int]]]] = {}
+
+
 def election(day: date, files: list[str]) -> Package:
     p = Package(
         f"{SOURCE}/{day}",
@@ -612,7 +637,10 @@ def election(day: date, files: list[str]) -> Package:
             constituencies = pick(levels, "Constituency")
             if len(constituencies) == 1 and not tops:
                 single = constituencies
-        if single:
+        alloc = allocation(levels, single[0]) if single else None
+        if alloc:
+            per_district(build, kind, name, slug, title_map, single[0], levels, *alloc)
+        elif single:
             one_contest(build, kind, name, slug, title_map, single[0], levels)
         else:
             per_unit(build, kind, name, slug, levels)
@@ -623,6 +651,14 @@ def election(day: date, files: list[str]) -> Package:
             "accounting.votes_valid",
             "the XML prints a valid-vote total per unit that differs from the sum of the unit's own list votes in "
             f"{sum(build.valid_mismatch.values())} units; both figures are stored as printed",
+        )
+    REPORT[day] = (build.notes, build.compare)
+    if build.declared_gap:
+        p.accept(
+            "accounting.declared",
+            f"in {build.declared_gap} districts the units the service publishes add up to other list or valid votes "
+            "than it prints for the district, because the tiers label and group lists differently and some votes "
+            "appear only in the district's own figures; both are stored as printed",
         )
     if any(build.ballots.values()):
         p.accept(
@@ -721,3 +757,189 @@ def per_unit(build: Builder, kind: str, name: str, slug: str, levels: tuple[Leve
             unit = build.unit(f"{day}:{kind}:{tier}:{index:04d}", level, kind)
             build.values(result_set, unit, level, options, kind)
             build.won(result_set, level, options)
+
+
+# the tiers whose levels are seat-allocation districts, in the order they are tried; the electoral colleges of the
+# Senate and the European Parliament split a Brussels canton between them by list
+ALLOCATION = (("Constituency",), ("ElectoralCollege",), ("Constituency", "ConstituencyProvincial"), ("Arrondissement",))
+FINE = ("Municipality", "Canton")
+# how far the districts' votes may exceed the top level's, from votes the top level leaves out
+SLACK = 0.005
+
+
+def allocation(levels: tuple[Level, ...], top: Level) -> tuple[str, list[Level]] | None:
+    """The tier whose levels each allocate their own seats, if any: two or more levels with seats whose seats add up to
+    the top level's, or whose votes add up to no more than about the top level's (the oldest files lack some districts)."""
+    total = top.votes or 1
+    for tiers in ALLOCATION:
+        found = [level for level in levels if level.tier in tiers]
+        seats = sum(level.seats for level in found)
+        if (
+            len(found) >= 2
+            and seats > 0
+            and (seats == top.seats or sum(level.votes for level in found) <= (1 + SLACK) * total)
+        ):
+            return "+".join(tiers), found
+    return None
+
+
+def piece_of(level: Level, lists: list[int] | None) -> Level:
+    """A unit, or the lists of a unit that stand in one district; a part of a unit keeps no ballot figures."""
+    if lists is None:
+        return level
+    return Level(level.tier, {}, level.labels, [level.lists[j] for j in lists])
+
+
+def as_unit(level: Level, group: str | None = None) -> districts.Unit:
+    return districts.Unit([(nr, folded(label), votes) for nr, label, _, votes in level.lists], group)
+
+
+def arrondissement(day: date, kind: str, level: Level) -> str | None:
+    """The administrative arrondissement of a municipality, the first two digits of its NIS code, when known."""
+    if level.tier != "Municipality":
+        return None
+    code = nis.town_code(day, kind, level.tier, level.labels)[0]
+    return code[:2] if code else None
+
+
+def district_area(build: Builder, units: list[str]) -> str | None:
+    """The province or region whose municipalities are exactly the district's municipal units, if any; units with no
+    municipality, such as the votes cast by mail from abroad, are left aside."""
+    codes = {build.towns[unit] for unit in units if unit in build.towns}
+    if not codes:
+        return None
+    towns = nis.towns(nis.vintage_of(build.day))
+    for scheme, attribute in ((nis.PROVINCE, "province"), (nis.REGION, "region")):
+        groups = {getattr(towns[code], attribute) for code in codes}
+        if len(groups) == 1:
+            group = next(iter(groups))
+            if group and codes == {code for code, town in towns.items() if getattr(town, attribute) == group}:
+                return nis.area(scheme, group)
+    return None
+
+
+def per_district(
+    build: Builder,
+    kind: str,
+    name: str,
+    slug: str,
+    title: dict[str, str],
+    top: Level,
+    levels: tuple[Level, ...],
+    tier: str,
+    found: list[Level],
+) -> None:
+    """One contest per seat-allocation district, holding the units that make up the district."""
+    p, day = build.p, build.day
+    split = tier == "ElectoralCollege"
+    wanted = [as_unit(level) for level in found]
+    total = top.votes or 1
+    fine: dict[str, tuple[list[Level], list[tuple[list[districts.Piece], bool] | None], float]] = {}
+    for unit_tier in FINE:
+        units = pick(levels, unit_tier)
+        if units:
+            share = sum(level.votes for level in units) / total
+            have = [as_unit(level, arrondissement(day, kind, level)) for level in units]
+            fine[unit_tier] = (units, districts.assign(wanted, have, split), share)
+    order = sorted(fine, key=lambda t: (not COVERED <= fine[t][2] <= 2 - COVERED, FINE.index(t)))
+    indexes = {t: {id(level): n for n, level in enumerate(pick(levels, t), 1)} for t in (tier.split("+")[0], *fine)}
+    for t in tier.split("+")[1:]:
+        indexes[tier.split("+")[0]].update({id(level): n for n, level in enumerate(pick(levels, t), 1001)})
+    unit_tier = tier.split("+")[0]
+    lost = 0
+    for k, district in enumerate(found):
+        tag = f"{slug}:{unit_tier}:{indexes[unit_tier][id(district)]:04d}"
+        label = label_of(district)
+        names = {
+            language: f"{body} – {district.labels.get(language) or label}" for language, body in title.items() if body
+        }
+        chosen: list[Level] = []
+        codes: list[str] = []
+        found_k = {t: entry for t in order if (entry := fine[t][1][k]) is not None}
+        primary = next((t for t, (_, exact) in found_k.items() if exact), next(iter(found_k), None))
+        extras = [t for t in found_k if t != primary]
+        primary_pieces = found_k[primary][0] if primary else None
+        if primary and primary_pieces is not None:
+            units = fine[primary][0]
+            chosen = [piece_of(units[piece.unit], piece.lists) for piece in primary_pieces]
+            codes = [
+                f"{day}:{kind}:{primary}:{indexes[primary][id(units[piece.unit])]:04d}" for piece in primary_pieces
+            ]
+        else:
+            lost += 1
+            chosen = [district]
+            codes = [f"{day}:{kind}:{unit_tier}:{indexes[unit_tier][id(district)]:04d}"]
+        resolve = min(
+            (resolver(district, by_number) for by_number in (False, True)),
+            key=lambda r: mismatched(district, chosen, r),
+        )
+        pool = [district, *chosen]
+        for t in extras:
+            pieces = found_k[t][0]
+            if pieces:
+                pool += [piece_of(fine[t][0][piece.unit], piece.lists) for piece in pieces]
+        unit_ids = [build.unit(code, level, kind) for code, level in zip(codes, chosen, strict=True)]
+        extra_sets: list[tuple[str, list[str], list[Level]]] = []
+        for t in extras:
+            pieces = found_k[t][0]
+            units = fine[t][0]
+            levels_t = [piece_of(units[piece.unit], piece.lists) for piece in pieces]
+            ids = [
+                build.unit(f"{day}:{kind}:{t}:{indexes[t][id(units[piece.unit])]:04d}", units[piece.unit], kind)
+                for piece in pieces
+            ]
+            extra_sets.append((t, ids, levels_t))
+        area = next(
+            (
+                found_area
+                for ids in [unit_ids, *(ids for _, ids, _ in extra_sets)]
+                if (found_area := district_area(build, ids))
+            ),
+            None,
+        )
+        contest, options = build.contest(
+            tag,
+            kind,
+            names,
+            district.seats,
+            f"{build.base}/{slug}/{changeset.slug(label)}",
+            order_of(pool, resolve),
+            area,
+        )
+        valid_district = accounting(district.attrs, district.votes)[4]
+        valid_summed = sum(accounting(level.attrs, level.votes)[4] for level in chosen)
+        result_set = build.result_set(tag, contest, True, valid_summed / (valid_district or 1))
+        for unit, level in zip(unit_ids, chosen, strict=True):
+            build.values(result_set, unit, level, options, kind, resolve)
+        build.won(result_set, district, options)
+        declared: Counter[str] = Counter()
+        for _, list_label, _, count in district.lists:
+            declared[folded(list_label)] += count
+        for list_label, count in declared.items():
+            p.add("declared", result_set_id=result_set, option_id=options[list_label], measure=1, value=count)
+        whole = all(level.attrs for level in chosen)
+        blanks = whole and all(number(level.attrs.get("blank-votes")) is not None for level in chosen)
+        for measure, value in accounting(district.attrs, district.votes).items():
+            if measure in (2, 3) or (measure == 6 and not blanks):
+                continue
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        wrong = mismatched(district, chosen, resolve)
+        build.compare.append((name, district.tier, primary or district.tier, valid_district, valid_summed, wrong, 0))
+        if (
+            wrong
+            or valid_summed != valid_district
+            or (
+                blanks
+                and sum(number(level.attrs.get("blank-votes")) or 0 for level in chosen)
+                != (number(district.attrs.get("blank-votes")) or 0)
+            )
+        ):
+            build.declared_gap += 1
+        for t, ids, levels_t in extra_sets:
+            share = sum(accounting(level.attrs, level.votes)[4] for level in levels_t) / (valid_district or 1)
+            extra = build.result_set(f"{tag}:{t}", contest, False, share)
+            for unit, level in zip(ids, levels_t, strict=True):
+                build.values(extra, unit, level, options, f"{kind}:{t}", resolve)
+    if lost:
+        build.notes.append(f"{name}: {lost} of {len(found)} districts are their own unit")
+    build.unplaced[kind] += lost
