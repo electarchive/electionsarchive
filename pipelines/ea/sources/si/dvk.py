@@ -1,3 +1,4 @@
+import json
 import re
 import unicodedata
 from collections import Counter
@@ -191,9 +192,92 @@ VOTES = [
 ]
 
 
+DOCS = "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve"
+# The commission's records of the National Assembly counts (the seat allocation and the national list totals) and
+# the mandate lists (list number; candidate; electoral unit; district) it publishes beside them.
+REPORTS = {
+    2014: f"{DOCS}/drzavni_zbor_2014/Porocilo-o-izidu---predcasne-volitve-v-DZ-2014--anonimizirano.pdf",
+    2018: f"{DOCS}/drzavni_zbor_2018/011dyenp.pdf",
+    2022: f"{DOCS}/DZ/2022/izidi_volitev/VDZ_2022_Zapisnik_o_ugotovitvi_izida_sprejet_7.5.2022.pdf",
+    # The results site's data file, which gives each list's seats nationally and by electoral unit.
+    2026: f"{ARCHIVE}/dz2026/data/data.json",
+}
+MANDATES = {
+    2018: f"{DOCS}/DZ/2022/navodila_medijem/mandati.csv",
+    2022: "https://www.dvk-rs.si/fileadmin/user_upload/mandati.csv",
+    2026: f"{ARCHIVE}/dz2026/data/mandati.csv",
+}
+# The mandate lists name each list by the number of its list in the file: the ballot position in 2018, and a code
+# the commission assigned to each running list in 2022 and 2026.
+MANDATE_LISTS = {
+    2018: {str(position): position for position in range(1, 26)},
+    2022: {"241141": 4, "241152": 15, "241149": 12, "241154": 17, "241143": 6},
+    2026: {"107753": 1, "107752": 2, "107757": 5, "107760": 6, "107749": 10, "107754": 11, "107755": 15},
+}
+# Seats the commission declared each list at the national level, by ballot position.
+NATIONAL_SEATS = {
+    2014: {13: 36, 10: 21, 1: 10, 9: 6, 4: 6, 6: 5, 16: 4},
+    2018: {15: 25, 9: 13, 20: 10, 18: 10, 8: 9, 12: 7, 23: 5, 2: 5, 17: 4},
+    2022: {4: 41, 15: 27, 12: 8, 17: 7, 6: 5},
+    2026: {11: 29, 5: 28, 10: 9, 1: 6, 15: 6, 2: 5, 6: 5},
+}
+# 2014: the seats of each list in each electoral unit, the first-stage seats plus the national remainder seats the
+# record names unit by unit, by ballot position.
+UNIT_SEATS_2014 = {
+    1: {13: 4, 10: 3, 1: 1, 6: 1, 4: 1, 16: 1},
+    2: {13: 4, 10: 2, 1: 1, 9: 1, 4: 1, 6: 1, 16: 1},
+    3: {13: 5, 10: 2, 4: 1, 1: 1, 6: 1, 16: 1},
+    4: {13: 4, 10: 2, 1: 1, 4: 1, 6: 1, 9: 1, 16: 1},
+    5: {13: 5, 10: 3, 1: 2, 9: 1},
+    6: {13: 5, 10: 3, 1: 1, 9: 1, 4: 1},
+    7: {13: 5, 10: 2, 1: 2, 4: 1, 9: 1},
+    8: {13: 4, 10: 4, 1: 1, 9: 1, 6: 1},
+}
+
+
 def fetch() -> None:
     for vote in VOTES:
         raw.fetch(SOURCE, vote.url, suffix="xlsx" if vote.layout == "izvoz" else vote.path.rsplit(".", 1)[1])
+    for url in (*REPORTS.values(), *MANDATES.values()):
+        raw.fetch(SOURCE, url, suffix=url.rsplit(".", 1)[1])
+
+
+def unit_seats(year: int) -> dict[int, dict[int, int]] | None:
+    """Seats of each list in each electoral unit, by ballot position, checked against the national totals."""
+    if year not in NATIONAL_SEATS:
+        return None
+    if year in MANDATES:
+        found: dict[int, Counter[int]] = {}
+        text = raw.cached(SOURCE, MANDATES[year]).path.read_text(encoding="utf-8-sig")
+        for line in text.splitlines()[1:]:
+            fields = line.strip().split(";")
+            if len(fields) == 4:
+                found.setdefault(int(fields[2]), Counter())[MANDATE_LISTS[year][fields[0]]] += 1
+        seats = {unit: dict(counts) for unit, counts in found.items()}
+    else:
+        seats = UNIT_SEATS_2014
+    if sorted(seats) != list(ELECTORAL_UNITS):
+        raise ValueError(f"{year}: seats are missing for some electoral units")
+    for unit, lists in seats.items():
+        if sum(lists.values()) != 11:
+            raise ValueError(f"{year}: unit {unit} holds {sum(lists.values())} seats, not 11")
+    national: Counter[int] = Counter()
+    for lists in seats.values():
+        national.update(lists)
+    if dict(national) != NATIONAL_SEATS[year]:
+        raise ValueError(f"{year}: unit seats {dict(national)} disagree with the declared totals")
+    if REPORTS.get(year, "").endswith(".json"):
+        # The results site's own figures: each list's seats nationally and in each electoral unit, by list code.
+        positions = MANDATE_LISTS[year]
+        data = json.loads(raw.cached(SOURCE, REPORTS[year]).path.read_text(encoding="utf-8-sig"))["slovenija"]
+        declared = {positions[str(line["st"])]: line["man"] for line in data["rez"]["rez"] if line["man"]}
+        if declared != NATIONAL_SEATS[year]:
+            raise ValueError(f"{year}: the results site declares {declared}")
+        for unit in data["enote"]:
+            lines = {positions[str(line["st"])]: line["man"] for line in unit["rez"]["rez"] if line.get("man")}
+            if lines != seats[unit["st"]]:
+                raise ValueError(f"{year}: unit {unit['st']} seats {lines} disagree with the mandate list")
+    return seats
 
 
 def plain(text: str) -> str:
@@ -506,9 +590,20 @@ METHOD = {
         "970 and above, and the diplomatic and consular missions, are not places: they hold postal votes and votes "
         "cast at any station (OMNIA). They have no roll of their own, so no registered voters are stored for them. "
         "A law is rejected at a legislative referendum when most valid votes are against it and the votes against "
-        "are at least a fifth of all registered voters."
+        "are at least a fifth of all registered voters. The For option wins when the law stands, even where more "
+        "valid votes were against it but fewer than a fifth of the registered voters."
     ),
 }
+METHOD_REF_2012 = (
+    METHOD["ref"].split(" A law is rejected")[0]
+    + " At this referendum a law was rejected when most valid votes were against it: the requirement that the votes "
+    "against be at least a fifth of all registered voters entered the Constitution in 2013."
+)
+SEAT_NOTE = (
+    " Each list's seats in the electoral unit are the commission's declared outcome: the seats it won in the unit "
+    "from the unit allocation and the national remainder allocation. The two seats of the national communities are "
+    "not in these contests."
+)
 SYSTEM_RULES: dict[str, tuple[date, dict[str, object], str, str]] = {
     "dz": (
         date(2011, 1, 1),
@@ -623,7 +718,7 @@ def reconcile(vote: Vote, sheet: Sheet) -> dict[str, object]:
     }
 
 
-RAW_FILES = sorted({vote.url for vote in VOTES})
+RAW_FILES = sorted({vote.url for vote in VOTES} | set(REPORTS.values()) | set(MANDATES.values()))
 PREFERENCE: set[str] = set()
 
 
@@ -829,6 +924,12 @@ def _units(p: Package, vote: Vote, sheet: Sheet) -> list[str]:
     return units
 
 
+def _method(vote: Vote) -> str:
+    if vote.kind == "ref" and vote.day.year < 2013:
+        return METHOD_REF_2012
+    return METHOD[vote.kind] + (SEAT_NOTE if vote.kind == "dz" and vote.day.year in NATIONAL_SEATS else "")
+
+
 def _result_set(p: Package, election_id: str, contest: str, vote: Vote, tag: str) -> str:
     result_set = key("result_set", tag)
     p.add(
@@ -848,7 +949,7 @@ def _result_set(p: Package, election_id: str, contest: str, vote: Vote, tag: str
         id=key("note", result_set),
         entity_id=result_set,
         kind="methodology",
-        body_md=METHOD[vote.kind],
+        body_md=_method(vote),
         lang="en",
     )
     return result_set
@@ -898,6 +999,10 @@ def _package(vote: Vote, summary: str, depends: list[str] | None = None) -> Pack
     p = Package(slug(vote), SOURCE, summary, depends=["si.dvk/geo", "si.dvk/registry", *(depends or [])])
     p.external.add(SLOVENIA)
     p.uses(raw.cached(SOURCE, vote.url))
+    if vote.kind == "dz":
+        for found in (REPORTS.get(vote.day.year), MANDATES.get(vote.day.year)):
+            if found is not None:
+                p.uses(raw.cached(SOURCE, found))
     return p
 
 
@@ -933,6 +1038,7 @@ def assembly(vote: Vote, sheet: Sheet) -> Package:
         by_unit.setdefault(electoral_unit, []).append(row)
     result_sets: dict[int, str] = {}
     options: dict[tuple[int, int], str] = {}
+    seats = unit_seats(vote.day.year)
     for unit in ELECTORAL_UNITS:
         name = title(next(row.ve_name for row in by_unit[unit] if row.ve_name))
         contest = key("contest", vote.day, unit)
@@ -967,6 +1073,16 @@ def assembly(vote: Vote, sheet: Sheet) -> Package:
                 ballot_position=position,
                 ballot_label=full.get(position, label),
             )
+        if seats is not None:
+            by_position = {
+                position: options[(unit, index)]
+                for index, (_, position) in enumerate(lines)
+                if (unit, index) in options
+            }
+            for position, count in sorted(seats[unit].items()):
+                p.add(
+                    "outcome", result_set_id=result_sets[unit], option_id=by_position[position], kind="won", seats=count
+                )
     _facts(p, sheet, result_sets, units, options)
     return p
 
@@ -1135,4 +1251,18 @@ def referendum(vote: Vote, sheet: Sheet) -> Package:
     units = _units(p, vote, sheet)
     _facts(p, sheet, result_set, units, {(0, index): option for index, option in options.items()})
     _declare(p, result_set, sheet, options)
+    _decide(p, vote, sheet, result_set, options)
     return p
+
+
+def _decide(p: Package, vote: Vote, sheet: Sheet, result_set: str, options: dict[int, str]) -> None:
+    """Record whether the law was adopted or rejected under the rule in force on the day of the vote."""
+    total = sheet.total
+    if total is None or total.registered is None or total.options[0] is None or total.options[1] is None:
+        raise ValueError(f"{vote.day}: the printed total lacks what the rule needs")
+    yes, no = total.options[0], total.options[1]
+    # Since 2013 a law is rejected only when the votes against are also at least a fifth of the registered voters.
+    fifth = vote.day.year < 2013 or no * 5 >= total.registered
+    rejected = no > yes and fifth
+    p.add("outcome", result_set_id=result_set, option_id=options[0], kind="lost" if rejected else "won")
+    p.add("outcome", result_set_id=result_set, option_id=options[1], kind="won" if rejected else "lost")
