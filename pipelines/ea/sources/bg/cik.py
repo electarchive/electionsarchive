@@ -2,7 +2,9 @@
 
 The CIK publishes, for each election since 2013, a bundle of semicolon-separated text files (`sections`, `protocols`,
 `votes`, `preferences`, party and candidate lists) that it calls open data. Older elections (the 2005 National
-Assembly and the 2011 presidential rounds) come as differently shaped text files. This module reads each bundle from the raw cache and builds one package per election.
+Assembly, the 2007 European Parliament, and the 2011 presidential rounds) come as differently shaped text files, and
+the National Assembly and presidential elections of 1991 to 2001 come from the CIK's archive of block-structured text
+files. This module reads each bundle from the raw cache and builds one package per election.
 """
 
 import functools
@@ -355,7 +357,8 @@ def url_of(name: str) -> str:
 
 
 def fetch() -> None:
-    for url in dict.fromkeys([*(e.url for e in ELECTIONS), LISTS_2009]):
+    early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS)]
+    for url in dict.fromkeys([*(e.url for e in ELECTIONS), LISTS_2009, *early]):
         try:
             raw.fetch(SOURCE, url, suffix=".zip" if url.endswith(".zip") else ".html")
         except httpx.HTTPError as failure:
@@ -1826,8 +1829,856 @@ def referendum(e: Election) -> Package:
     return p
 
 
+# The elections of 1991 to 2001 come from the CIK's archive of the files that the "Izbori" computing team kept for
+# each election: text files in blocks (`[PROP]`, `[MAJ]`, `[LISTI]`, `[PROT]`, `[AGGR]`), one file per constituency and
+# one for the country, each documented in the archive's README. The 1991-1999 files are in the Bulgarian DOS
+# code page (MIK); the 2001 bundles also carry a Windows (cp1251) copy, which this module reads.
+BEFORE_2003 = BASE + "/before_2003/"
+ARCHIVE_1999 = BEFORE_2003 + "1991_1999.zip"
+ARCHIVE_2001_NS = BEFORE_2003 + "2001_parlament.zip"
+ARCHIVE_2001_PR = BEFORE_2003 + "2001_prezident.zip"
+
+
+class Blocks(NamedTuple):
+    id: str
+    kind: str  # ns or pres
+    day: date
+    round: int
+    url: str
+    folder: str  # folder of the bundle holding the files
+    ext: str  # file extension: the round, then the last two digits of the year
+    mik: bool  # whether the files are in the MIK code page rather than cp1251
+    points: dict[str, tuple[int, ...]]  # measure -> one-based protocol points, summed
+
+
+_NS91: dict[str, tuple[int, ...]] = {"reg": (1,), "voters": (5,), "box": (6,), "inv": (7, 8), "valid": (10,)}
+_PR92: dict[str, tuple[int, ...]] = {"reg": (1,), "voters": (5,), "box": (6,), "inv": (7,), "valid": (8,)}
+_NS94: dict[str, tuple[int, ...]] = {"reg": (1,), "voters": (6,), "box": (7,), "inv": (8,), "valid": (12,)}
+_PR96: dict[str, tuple[int, ...]] = {"reg": (1, 2), "voters": (3,), "box": (5,), "inv": (12,), "valid": (13,)}
+_NS97: dict[str, tuple[int, ...]] = {"reg": (1, 2, 3), "voters": (5,), "box": (7,), "inv": (14,), "valid": (15,)}
+_NS01: dict[str, tuple[int, ...]] = {"reg": (1, 2), "voters": (3,), "box": (4,), "inv": (7,), "valid": (8,)}
+_PR01: dict[str, tuple[int, ...]] = {"reg": (1, 2), "voters": (3,), "box": (4,), "inv": (7,), "valid": (9,)}
+_OLD = "1991-1999/DATA/"
+BLOCKS = [
+    Blocks("ns-1991-10-13", "ns", date(1991, 10, 13), 1, ARCHIVE_1999, _OLD + "1991/", ".191", True, _NS91),
+    Blocks("pr-1992-01-12", "pres", date(1992, 1, 12), 1, ARCHIVE_1999, _OLD + "1992/", ".192", True, _PR92),
+    Blocks("pr-1992-01-19", "pres", date(1992, 1, 19), 2, ARCHIVE_1999, _OLD + "1992/", ".292", True, _PR92),
+    Blocks("ns-1994-12-18", "ns", date(1994, 12, 18), 1, ARCHIVE_1999, _OLD + "1994/", ".194", True, _NS94),
+    Blocks("pr-1996-10-27", "pres", date(1996, 10, 27), 1, ARCHIVE_1999, _OLD + "1996/", ".196", True, _PR96),
+    Blocks("pr-1996-11-03", "pres", date(1996, 11, 3), 2, ARCHIVE_1999, _OLD + "1996/", ".296", True, _PR96),
+    Blocks("ns-1997-04-19", "ns", date(1997, 4, 19), 1, ARCHIVE_1999, _OLD + "1997/", ".197", True, _NS97),
+    Blocks("ns-2001-06-17", "ns", date(2001, 6, 17), 1, ARCHIVE_2001_NS, "DATA/IZB2001_/", ".101", False, _NS01),
+    Blocks(
+        "pr-2001-11-11", "pres", date(2001, 11, 11), 1, ARCHIVE_2001_PR, "DATA/izb01pr_/tur1/", ".201", False, _PR01
+    ),
+    Blocks(
+        "pr-2001-11-18", "pres", date(2001, 11, 18), 2, ARCHIVE_2001_PR, "DATA/izb01pr_/tur2/", ".301", False, _PR01
+    ),
+]
+# The package that holds the artifact row of each bundle; the others that read it depend on that package.
+BUNDLE_HOLDER = {ARCHIVE_1999: "ns-1991-10-13", ARCHIVE_2001_NS: "ns-2001-06-17", ARCHIVE_2001_PR: "pr-2001-11-11"}
+SYSTEM_1991 = key("electoral_system", "ns", 1991)
+SYSTEMS.append(
+    (
+        SYSTEM_1991,
+        date(1991, 1, 1),
+        date(2005, 1, 1),
+        {
+            "formula": "dhondt",
+            "threshold": {"level": "list", "scope": "national", "percent": 4},
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "The 240 seats were allocated by the d'Hondt method among the lists that passed a 4% national threshold, "
+            "and distributed among the 31 multi-member constituencies. Voters chose a list and could not reorder it."
+        ),
+    )
+)
+# MIK, the Bulgarian DOS code page, puts the lowercase letters р to я where cp866 has box-drawing characters.
+_MIK = str.maketrans({bytes([b]).decode("cp866"): chr(0x440 + b - 0xB0) for b in range(0xB0, 0xC0)})
+
+
+def blocks_text(data: bytes, mik: bool) -> dict[str, list[list[str]]]:
+    """The blocks of one archive file: block name -> records, each split into fields."""
+    text = data.decode("cp866").translate(_MIK) if mik else data.decode("cp1251")
+    out: dict[str, list[list[str]]] = {}
+    current: list[list[str]] | None = None
+    for line in text.replace("\r", "").split("\n"):
+        line = line.rstrip()
+        if line.startswith("[") and line.endswith("]"):
+            name = line[1:-1]
+            current = None if name == "END" else out.setdefault(name, [])
+        elif current is not None and line and not line.startswith("%"):
+            current.append(line.split(";"))
+    return out
+
+
+def block_files(b: Blocks) -> dict[int, dict[str, list[list[str]]]]:
+    """Constituency number (0 for the country) -> the blocks of its file."""
+    return _block_files(b.url, b.folder, b.ext, b.mik)
+
+
+@functools.cache
+def _block_files(url: str, at: str, ext: str, mik: bool) -> dict[int, dict[str, list[list[str]]]]:
+    archive = _archive(url)
+    out: dict[int, dict[str, list[list[str]]]] = {}
+    for name in archive.namelist():
+        folder, _, base = name.rpartition("/")
+        found = re.fullmatch(r"(\d\d)0000Z0" + re.escape(ext), base, re.IGNORECASE)
+        if folder + "/" == at and found:
+            out[int(found[1])] = blocks_text(archive.read(name), mik)
+    assert 0 in out and len(out) >= 32, (at, ext, sorted(out))
+    return out
+
+
+# Seat counts the constituency files print wrong, with the count the national file and the constituency's own
+# magnitude prove, and the note that discloses the correction.
+SEAT_FIXES: dict[tuple[str, int, str], tuple[int, str]] = {
+    ("ns-1991-10-13", 12, "01"): (
+        3,
+        (
+            "The constituency file gives the Union of Democratic Forces 4 of Montana's 6 seats, which with the 3 of "
+            "the Socialist pre-election union makes 7. The national file gives the Union 110 seats in all, which "
+            "holds only with 3 here, so 3 is stored."
+        ),
+    ),
+}
+INDEPENDENT = "00"  # the ballot number the files give a candidate no party nominated
+
+
+def ballot(r: list[str]) -> str:
+    """The ballot number of a [PROP] record: the third field, or the fifth where the third is blank (2001)."""
+    return r[2].strip() or r[4].strip()
+
+
+def plus(field: str) -> list[int | None]:
+    return [int(x) if x.strip().lstrip("-").isdigit() else None for x in field.split("+")]
+
+
+class Old(NamedTuple):
+    code: str
+    mir: int
+    place: str
+    points: list[int | None]
+    votes: list[int | None]
+
+
+def section_code(mir: str, municipality: str, section: str) -> str:
+    """Constituency (2 digits), municipality (2, or 4 with the city district in 2001), and section (3)."""
+    town = municipality.strip()
+    return f"{int(mir):02d}{town if len(town) == 4 else town.zfill(2)}{int(section):03d}"
+
+
+def old_sections(b: Blocks) -> list[Old]:
+    out: list[Old] = []
+    for mir, file in sorted(block_files(b).items()):
+        if not mir:
+            continue
+        places = {(r[0].strip(), r[1].strip()): r[2].strip() for r in file.get("NM", []) if len(r) > 2}
+        where: dict[str, str] = {}
+        for r in file.get("SEC", []):
+            code = section_code(r[0], r[1], r[2])
+            names = [places.get((code[:4], n.strip()), "") for n in r[4].split("+")]
+            where[code] = ", ".join(dict.fromkeys(n for n in names if n))
+        for r in file.get("PROT", []):
+            assert int(r[1]) == mir, (b.id, r)
+            code = section_code(r[1], r[2], r[3])
+            out.append(Old(code, mir, where.get(code, ""), plus(r[4]), plus(r[5]) if len(r) > 5 else []))
+    return out
+
+
+def old_figures(b: Blocks, s: Old) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for name, points in b.points.items():
+        found = [s.points[i - 1] for i in points if i <= len(s.points) and s.points[i - 1] is not None]
+        if found:
+            out[name] = sum(v for v in found if v is not None)
+    return out
+
+
+def _ticket_people(label_text: str) -> list[tuple[str, str]]:
+    """The role and name of each person on a printed ticket whose name is written out in full; abbreviated names
+    (with initials) are skipped."""
+    parts = [x.strip() for x in re.split(r",| и ", label_text) if x.strip()]
+    roles = ("head", "running_mate")
+    return [(role, x) for role, x in zip(roles, parts, strict=False) if "." not in x and len(x.split()) >= 2]
+
+
+OLD_METHOD = (
+    "Counted by the polling section commissions and kept, with the protocols of every section, in the files of the "
+    "elections of {years} that the Central Election Commission (CIK) publishes in its archive. Registered voters are "
+    "the voters on the rolls{extra}, voters are the signatures on the rolls, ballots cast are the envelopes found in "
+    "the box, and invalid and valid votes are the protocol's own counts. Polling sections are placed in the "
+    "multi-member constituency (or, for presidential elections, the constituency of the regional commission) that "
+    "counted them; their boundaries differed from today's."
+)
+
+
+def old_build(b: Blocks) -> Package:
+    files = block_files(b)
+    nation = files[0]
+    first = next((x for x in BLOCKS if x.kind == "pres" and x.day.year == b.day.year and x.round == 1), None)
+    holder = BUNDLE_HOLDER[b.url]
+    depends = [f"{SOURCE}/geo", f"{SOURCE}/registry"]
+    if b.round == 2 and first is not None:
+        depends.append(f"{SOURCE}/{first.id}")
+    if holder != b.id and f"{SOURCE}/{holder}" not in depends:
+        depends.append(f"{SOURCE}/{holder}")
+    what = "parliamentary" if b.kind == "ns" else "presidential"
+    p = Package(
+        f"{SOURCE}/{b.id}",
+        SOURCE,
+        f"The {b.day:%d %B %Y} Bulgarian {what} election by polling section from the CIK's archive of 1991 to 2001",
+        depends=depends,
+    )
+    p.external.add(BULGARIA)
+    artifact = raw.cached(SOURCE, b.url)
+    if holder == b.id:
+        p.artifact(artifact, CIK_SOURCE)
+    else:
+        p.uses(artifact)
+    e = Election(b.id, b.kind, b.day, b.url, "blocks", None, b.round)
+    english, native = label(e, b.day)
+    election = key("election", b.id)
+    p.add(
+        "election",
+        id=election,
+        polity_id=BULGARIA,
+        kind="runoff" if b.round == 2 else "general",
+        date_from=b.day,
+        date_to=b.day,
+        status="held",
+    )
+    p.name(election, english, "en", "official")
+    p.name(election, native, "bg", "native", False)
+    path = f"bg/{b.day}-{'general' if b.kind == 'ns' else 'presidential'}"
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    stated = re.sub(r"\b(\d)\.", r"0\1.", nation["IZB"][0][4].strip())
+    assert stated == f"{b.day:%d.%m.%Y}", (b.id, stated)
+
+    sections = old_sections(b)
+    mirs = sorted({s.mir for s in sections})
+    sets: dict[int, str] = {}
+    order: dict[int, list[str]] = {}  # constituency -> ballot numbers in the order of the protocol's vote fields
+    options: dict[tuple[int, str], str] = {}
+    declared_votes: dict[tuple[int, str], int] = {}
+    seats: dict[tuple[int, str], int] = {}
+    if b.kind == "ns":
+        national = {ballot(r): r for r in nation["PROP"] if ballot(r) != INDEPENDENT}
+        party_id = {n: p.id("party", b.id, n) for n in national}
+        for n, r in national.items():
+            name = " ".join(r[3].split())
+            p.add("party", id=party_id[n], kind=party_kind(name), polity_id=BULGARIA)
+            p.add("external_id", entity_id=party_id[n], scheme="bg.cik.party", value=f"{b.id}:{n}")
+            p.name(party_id[n], name, "bg", "official")
+            if r[5].strip() and r[5].strip() != name:
+                p.name(party_id[n], r[5].strip(), "bg", "short", False)
+        for m in mirs:
+            file = files[m]
+            en, bg = MIR.get(m, ABROAD)
+            contest = key("contest", b.id, f"{m:02d}")
+            p.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="list_allocation",
+                body_id=ASSEMBLY,
+                district_area_id=area(m),
+                magnitude=int(file["IZB"][0][5]),
+                round_number=1,
+                electoral_system_id=SYSTEM_1991,
+                default_result_kind="counted",
+            )
+            p.name(contest, f"{m:02d}. {en}", "en", "official")
+            p.name(contest, f"{m:02d}. {bg}", "bg", "native", False)
+            p.add("slug", path=f"{path}/{m:02d}-{changeset.slug(en)}", entity_id=contest, is_current=True)
+            order[m] = []
+            for index, r in enumerate(file["PROP"], start=1):
+                assert not r[10].strip() or int(r[10]) == index, (b.id, m, r)
+                n = ballot(r)
+                independent = n not in national
+                tag = f"{n}-{index}" if independent else n
+                order[m].append(tag)
+                option = options[(m, tag)] = key("option", b.id, f"{m:02d}", tag)
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate" if independent else "list",
+                    party_id=None if independent else party_id[n],
+                    ballot_position=int(n) if int(n) else None,
+                    ballot_label=" ".join((r[3] if independent else national[n][3]).split()),
+                )
+                declared_votes[(m, tag)] = int(r[8])
+                won = SEAT_FIXES.get((b.id, m, tag), (int(r[9]) if r[9].strip() else 0, ""))[0]
+                if won:
+                    seats[(m, tag)] = won
+            sets[m] = key("result_set", b.id, f"{m:02d}")
+        # candidate lists, tied to their list by its place in the constituency's [PROP] block
+        people: list[dict[str, object]] = []
+        named: list[dict[str, object]] = []
+        runs: list[dict[str, object]] = []
+        for m in mirs:
+            listed: list[list[str]] = []
+            for r in files[m].get("LISTI", []):
+                if r[5].strip().isdigit():
+                    listed.append(list(r))
+                else:  # a long name carried over to a record of its own (1997)
+                    listed[-1][6] = listed[-1][6].strip() + r[5].strip()
+            for r in listed:
+                tag = order[m][int(r[8]) - 1]
+                position, who = int(r[5]), " ".join(r[6].split())
+                assert not r[2].strip() or int(tag.split("-")[0]) == int(r[2]), (b.id, m, r, tag)
+                if not who:
+                    continue
+                run = f"{m}:{tag}:{position}"
+                person = p.id("person", b.id, run)
+                people.append({"id": person})
+                named.append(
+                    {
+                        "id": p.id("name", person),
+                        "entity_id": person,
+                        "text": who,
+                        "lang": "bg",
+                        "kind": "official",
+                        "is_preferred": True,
+                    }
+                )
+                runs.append(
+                    {
+                        "id": p.id("candidacy", b.id, run),
+                        "person_id": person,
+                        "option_id": options[(m, tag)],
+                        "role": "list_member",
+                        "list_position": position,
+                        "ballot_name": who,
+                    }
+                )
+        if people:
+            p.frame("person", pl.DataFrame(people))
+            p.frame("name", pl.DataFrame(named))
+            p.frame("candidacy", pl.DataFrame(runs))
+        assert sum(seats.values()) == 240, (b.id, sum(seats.values()))
+    else:
+        contest = key("contest", b.id, "president")
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="office",
+            office_id=PRESIDENCY,
+            district_area_id=NATION,
+            magnitude=1,
+            round_number=b.round,
+            previous_round_id=key("contest", first.id, "president") if b.round == 2 and first else None,
+            electoral_system_id=SYSTEM_PRES,
+            default_result_kind="counted",
+        )
+        p.name(contest, english, "en", "official")
+        p.name(contest, native, "bg", "native", False)
+        p.add("slug", path=f"{path}/president", entity_id=contest, is_current=True)
+        for m in [0, *mirs]:
+            sets[m] = key("result_set", b.id, "president")
+            order[m] = [r[3].strip() for r in files[m]["MAJ"]] if m else []
+        for r in nation["MAJ"]:
+            n, printed = r[3].strip(), " ".join(r[6].split())
+            option = options[(0, n)] = key("option", b.id, "president", n)
+            for m in mirs:
+                options[(m, n)] = option
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="ticket",
+                ballot_position=int(n),
+                ballot_label=printed,
+            )
+            declared_votes[(0, n)] = int(r[9])
+            for role, who in _ticket_people(printed):
+                person = p.id("person", b.id, n, role)
+                p.add("person", id=person)
+                p.add(
+                    "name",
+                    id=p.id("name", person),
+                    entity_id=person,
+                    text=who,
+                    lang="bg",
+                    kind="official",
+                    is_preferred=True,
+                )
+                p.add(
+                    "candidacy",
+                    id=p.id("candidacy", b.id, n, role),
+                    person_id=person,
+                    option_id=option,
+                    role=role,
+                    ballot_name=who,
+                )
+            result = r[10].strip()
+            kind = (
+                "elected"
+                if result == "1"
+                else "advanced"
+                if result == "2"
+                else "lost"
+                if b.round == 2
+                else "eliminated"
+            )
+            p.add("outcome", result_set_id=sets[0], option_id=option, kind=kind)
+
+    years = "1991 to 1999" if b.url == ARCHIVE_1999 else "2001"
+    extra = " (main and additional, with those voting on a certificate)" if len(b.points["reg"]) > 1 else ""
+    method = OLD_METHOD.format(years=years, extra=extra)
+    if b.kind == "ns" and b.url == ARCHIVE_1999:
+        method += (
+            " The files give the candidate lists of the lists that won seats in the constituency and of a few others, "
+            "so the other lists are stored without their candidates."
+        )
+    if b.id == "ns-1991-10-13":
+        method += (
+            " The national file's totals for seven small lists differ from the sum of the constituency files, by "
+            "1,919 votes for the Preobrazhenie political forum and by 6 or fewer for the others; the section counts "
+            "here add up to the constituency files."
+        )
+    if b.kind == "pres" and b.url == ARCHIVE_1999:
+        method += (
+            " The national file prints each ticket with names often shortened to initials; a candidate is stored as a "
+            "person only where the file writes the name out in full."
+        )
+    if b.id == "ns-1991-10-13":
+        method += (
+            " Invalid votes are the invalid ballots plus the empty envelopes of the protocol's inventory; the "
+            "ballots destroyed under article 76 are not counted."
+        )
+    if b.id == "pr-1992-01-19":
+        method += (
+            " The files include section 32-25-003 (St. John's, Canada), whose protocol arrived too late to be counted "
+            "in the official results."
+        )
+    notes: dict[str, str] = {}
+    for m in sorted(set(sets) if b.kind == "ns" else {0}):
+        rs = sets[m]
+        contest = key("contest", b.id, f"{m:02d}") if b.kind == "ns" else key("contest", b.id, "president")
+        p.add(
+            "result_set",
+            id=rs,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CIK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        notes[rs] = method
+    for (id, m, _), (_, why) in SEAT_FIXES.items():
+        if id == b.id:
+            notes[sets[m]] += " " + why
+    for rs, body in notes.items():
+        p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=body, lang="en")
+    for (m, n), count in declared_votes.items():
+        p.add("declared", result_set_id=sets[m], option_id=options[(m, n)], measure=VOTES, value=count)
+    for (m, n), won in seats.items():
+        p.add("outcome", result_set_id=sets[m], option_id=options[(m, n)], kind="won", seats=won)
+
+    unit_rows: list[dict[str, object]] = []
+    unit_names: list[dict[str, object]] = []
+    cols: dict[str, list[object]] = {c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "value")}
+    seen: set[str] = set()
+    over = short = above = 0
+    for s in sections:
+        assert s.code not in seen, (b.id, s.code)
+        seen.add(s.code)
+        unit = p.id("unit", b.id, s.code)
+        out = s.mir not in MIR
+        unit_rows.append(
+            {
+                "id": unit,
+                "polity_id": BULGARIA,
+                "scheme_code": "bg.sik",
+                "code": f"{b.id}:{s.code}",
+                "area_relation": "unlocated" if out else "within",
+                "area_id": None if out else area(s.mir),
+                "kind": "abroad_mission" if out else "standard",
+            }
+        )
+        if s.place:
+            unit_names.append(
+                {
+                    "id": p.id("name", unit),
+                    "entity_id": unit,
+                    "text": f"{s.place}, {s.code}",
+                    "lang": "bg",
+                    "kind": "official",
+                    "is_preferred": True,
+                }
+            )
+        rs = sets[s.mir]
+        f = old_figures(b, s)
+        for name, measure in MEASURES.items():
+            if name not in f:
+                continue
+            if name == "reg" and not f[name] and (f.get("voters") or f.get("box")):
+                continue  # a mission abroad has no roll; its voters register on the day
+            cols["result_set_id"].append(rs)
+            cols["unit_id"].append(unit)
+            cols["option_id"].append(None)
+            cols["measure"].append(measure)
+            cols["value"].append(f[name])
+        numbers = order[s.mir]
+        assert len(s.votes) <= len(numbers), (b.id, s.code, len(s.votes), len(numbers))
+        total = 0
+        for n, count in zip(numbers, s.votes, strict=False):
+            if count is None:
+                continue
+            total += count
+            cols["result_set_id"].append(rs)
+            cols["unit_id"].append(unit)
+            cols["option_id"].append(options[(s.mir, n)])
+            cols["measure"].append(VOTES)
+            cols["value"].append(count)
+        if "box" in f and "valid" in f and f["box"] != f.get("inv", 0) + f["valid"]:
+            over += 1
+        if "valid" in f and total != f["valid"]:
+            short += 1
+        if f.get("reg") and max(f.get("voters", 0), f.get("box", 0)) > f["reg"]:
+            above += 1
+    p.frame("reporting_unit", pl.DataFrame(unit_rows))
+    p.frame("name", pl.DataFrame(unit_names))
+    frame = values_frame(cols).with_columns(
+        channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+    )
+    p.frame("result_value", frame)
+    if over:
+        p.accept(
+            "accounting.ballots_sum",
+            f"the protocols of {over:,} sections print envelopes in the box that differ from invalid plus valid "
+            "votes; stored as printed",
+        )
+    if short:
+        p.accept(
+            "accounting.votes_valid",
+            f"in {short:,} sections the votes printed for the {'lists' if b.kind == 'ns' else 'tickets'} do not add "
+            "up to the valid votes printed in the protocol; stored as printed",
+        )
+    if above:
+        p.accept(
+            "accounting.turnout",
+            "some sections report more voters or envelopes than the roll holds, from voters added on the day "
+            "or voting on a certificate; stored as printed",
+        )
+    return p
+
+
+def old_totals(b: Blocks) -> dict[str, tuple[int, int]]:
+    """Each ballot number's votes summed over the sections, against the national file's own total."""
+    files = block_files(b)
+    block = "PROP" if b.kind == "ns" else "MAJ"
+    number = ballot if b.kind == "ns" else (lambda r: r[3].strip())
+    column = 8 if b.kind == "ns" else 9
+    listed = {number(r) for r in files[0][block]}
+    sums: dict[str, int] = defaultdict(int)
+    for s in old_sections(b):
+        for r, count in zip(files[s.mir][block], s.votes, strict=False):
+            sums[number(r) if number(r) in listed else INDEPENDENT] += count or 0
+    return {number(r): (sums.get(number(r), 0), int(r[column])) for r in files[0][block]}
+
+
+# The European Parliament election of 20 May 2007: the CIK's export of section protocols and preference counts, and
+# its national results page, which names the lists, their votes, and the candidates of each list with their
+# preference votes (in alphabetical order, not list order).
+EP2007 = Election("ep-2007-05-20", "ep", date(2007, 5, 20), "https://ep2007.cik.bg/results/export.zip", "ep2007")
+EP2007_PAGE = "https://ep2007.cik.bg/results/"
+EP2007_INDEPENDENT = {3, 13}  # the two ballot numbers that the readme and the results page name as people, not lists
+EP2007_POINTS = {"reg": 2, "voters": 14, "box": 15, "inv": 19, "valid": 23}
+EP2007_VOTES = 24  # one-based column of the first list's votes in the protocols file
+EP2007_SEATS = 18
+
+
+def ep2007_page() -> tuple[dict[int, tuple[str, int]], dict[str, list[tuple[str, int]]], dict[int, int]]:
+    """The lists (number -> name, votes), each list's candidates with their preference votes, and the national
+    protocol points from the CIK's results page."""
+    text = raw.cached(SOURCE, EP2007_PAGE).path.read_text(encoding="utf-8")
+    lists = {
+        int(m[1]): (html.unescape(m[2]).strip(), int(m[3]))
+        for m in re.finditer(
+            r'<tr><td class="int">(\d+)</td><td>([^<]*)</td><td class="int">(\d+)</td><td class="int">[\d.]+%</td>',
+            text,
+        )
+    }
+    points = {
+        int(m[1]): int(m[2])
+        for m in re.finditer(
+            r'<tr><td class="int">(\d+)</td><td>Брой(?:[^<]|<br />)*</td><td class="int">(\d+)</td></tr>', text
+        )
+    }
+    candidates: dict[str, list[tuple[str, int]]] = {}
+    for table in re.finditer(r'<th colspan="2">([^<]*)</th>.*?</thead>\s*<tbody>(.*?)</tbody>', text, re.DOTALL):
+        candidates[html.unescape(table[1]).strip()] = [
+            (" ".join(html.unescape(m[1]).split()), int(m[2]))
+            for m in re.finditer(r'<tr><td>([^<]*)</td><td class="int">(\d+)</td></tr>', table[2])
+        ]
+    return lists, candidates, points
+
+
+def ep2007_members(text: str) -> list[list[str]]:
+    return [line.split(";") for line in text.replace("\r", "").split("\n") if line.strip()]
+
+
+def ep2007_positions(
+    lists: dict[int, tuple[str, int]], candidates: dict[str, list[tuple[str, int]]], columns: list[int]
+) -> dict[int, list[tuple[str, int | None]]]:
+    """Each list's candidates with their place on the list where it is certain.
+
+    The preferences file gives each candidate's count in list order, the page gives the same counts by name in
+    alphabetical order. A candidate is placed when no one else on the list has the same national count."""
+    out: dict[int, list[tuple[str, int | None]]] = {}
+    at = 0
+    for number, (name, _) in sorted(lists.items()):
+        if number in EP2007_INDEPENDENT:
+            continue
+        people = candidates[name]
+        totals = columns[at : at + len(people)]
+        at += len(people)
+        assert sorted(totals) == sorted(v for _, v in people), (name, totals)
+        placed: list[tuple[str, int | None]] = []
+        for who, count in people:
+            same = [i for i, v in enumerate(totals) if v == count]
+            placed.append((who, same[0] + 1 if len(same) == 1 else None))
+        out[number] = placed
+    assert at == len(columns), (at, len(columns))
+    return out
+
+
+def ep2007() -> Package:
+    e = EP2007
+    p = Package(
+        f"{SOURCE}/{e.id}",
+        SOURCE,
+        "The 20 May 2007 Bulgarian European Parliament election by polling section from the CIK's open data",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external.add(BULGARIA)
+    archive = _archive(e.url)
+    p.artifact(raw.cached(SOURCE, e.url), CIK_SOURCE)
+    p.artifact(raw.cached(SOURCE, EP2007_PAGE), CIK_SOURCE)
+    lists, candidates, points = ep2007_page()
+    readme = _decode(archive.read("Readme.txt"))
+    named = {
+        int(m[1]): m[2]
+        for m in (re.match(r"\s*\d+\)\s*Гласове за:\s*(\d+)\.\s*(.+?)\s*$", line) for line in readme.splitlines())
+        if m
+    }
+    assert {n: x for n, (x, _) in lists.items()} == named, (lists, named)
+    secs = {r[0]: r[1].strip() for r in ep2007_members(_decode(archive.read("euro2007_sections.txt")))}
+    protocols = ep2007_members(_decode(archive.read("euro2007_protocols.txt")))
+    preferences = ep2007_members(_decode(archive.read("euro2007_prefereces.txt")))
+    width = len(preferences[0]) - 2
+    columns = [sum(int(r[1 + i]) for r in preferences) for i in range(width)]
+    placed = ep2007_positions(lists, candidates, columns)
+
+    english, native = label(e, e.day)
+    election = key("election", e.id)
+    p.add("election", id=election, polity_id=BULGARIA, kind="general", date_from=e.day, date_to=e.day, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "bg", "native", False)
+    path = f"bg/{e.day}-european-parliament"
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    contest = key("contest", e.id, "national")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="list_allocation",
+        district_area_id=NATION,
+        magnitude=EP2007_SEATS,
+        round_number=1,
+        electoral_system_id=SYSTEM_EP,
+        default_result_kind="counted",
+    )
+    p.name(contest, english.replace("Bulgarian ", "Bulgaria's "), "en", "official")
+    p.name(contest, native, "bg", "native", False)
+    p.add("slug", path=f"{path}/national", entity_id=contest, is_current=True)
+    result_set = key("result_set", e.id, "national")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=CIK_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "Counted by the polling section commissions and published by the Central Election Commission (CIK) as "
+            "section protocols in its open data. Registered voters are the voters on the main and additional rolls, "
+            "voters are the signatures on the rolls, ballots cast are the envelopes found in the box, and invalid and "
+            "valid votes are the protocol's own counts. The names of the lists and candidates come from the CIK's "
+            "national results page, which lists each list's candidates alphabetically; a candidate's place on the "
+            "list is taken from the order of the section preference counts where the candidate's national preference "
+            "total is unique on the list, and is left blank otherwise. Preference votes are not stored here yet."
+        ),
+        lang="en",
+    )
+    options: dict[int, str] = {}
+    for number, (name, votes) in sorted(lists.items()):
+        option = options[number] = key("option", e.id, "national", number)
+        if number in EP2007_INDEPENDENT:
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                ballot_position=number,
+                ballot_label=name,
+            )
+            person = p.id("person", e.id, number)
+            p.add("person", id=person)
+            p.name(person, name, "bg", "official")
+            p.add(
+                "candidacy",
+                id=p.id("candidacy", e.id, number),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=name,
+            )
+        else:
+            party = p.id("party", e.id, number)
+            p.add("party", id=party, kind=party_kind(name), polity_id=BULGARIA)
+            p.add("external_id", entity_id=party, scheme="bg.cik.party", value=f"{e.id}:{number}")
+            p.name(party, name, "bg", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party,
+                ballot_position=number,
+                ballot_label=name,
+            )
+            for who, position in placed[number]:
+                tag = f"{number}:{who}"
+                person = p.id("person", e.id, tag)
+                p.add("person", id=person)
+                p.name(person, who, "bg", "official")
+                p.add(
+                    "candidacy",
+                    id=p.id("candidacy", e.id, tag),
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=position,
+                    ballot_name=who,
+                )
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+    for measure, point in ((REGISTERED, 3), (VOTERS, 7), (BALLOTS, 8), (INVALID, 12), (VALID, 16)):
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=points[point])
+
+    unit_rows: list[dict[str, object]] = []
+    unit_names: list[dict[str, object]] = []
+    cols: dict[str, list[object]] = {c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "value")}
+    over = short = above = 0
+    for r in protocols:
+        code = r[0]
+        m = int(code[:2])
+        out = m not in MIR
+        unit = p.id("unit", e.id, code)
+        unit_rows.append(
+            {
+                "id": unit,
+                "polity_id": BULGARIA,
+                "scheme_code": "bg.sik",
+                "code": f"{e.id}:{code}",
+                "area_relation": "unlocated" if out else "within",
+                "area_id": None if out else area(m),
+                "kind": "abroad_mission" if out else "standard",
+            }
+        )
+        if secs.get(code):
+            unit_names.append(
+                {
+                    "id": p.id("name", unit),
+                    "entity_id": unit,
+                    "text": f"{secs[code]}, {code}",
+                    "lang": "bg",
+                    "kind": "official",
+                    "is_preferred": True,
+                }
+            )
+        f = {name: num(r, column) for name, column in EP2007_POINTS.items()}
+        for name, measure in MEASURES.items():
+            value = f.get(name)
+            if value is None or (name == "reg" and not value and (f.get("voters") or f.get("box"))):
+                continue
+            cols["result_set_id"].append(result_set)
+            cols["unit_id"].append(unit)
+            cols["option_id"].append(None)
+            cols["measure"].append(measure)
+            cols["value"].append(value)
+        total = 0
+        for number in sorted(lists):
+            count = num(r, EP2007_VOTES + number - 1)
+            if count is None:
+                continue
+            total += count
+            cols["result_set_id"].append(result_set)
+            cols["unit_id"].append(unit)
+            cols["option_id"].append(options[number])
+            cols["measure"].append(VOTES)
+            cols["value"].append(count)
+        box, inv, valid, reg, voters = (f.get(x) for x in ("box", "inv", "valid", "reg", "voters"))
+        if box is not None and valid is not None and box != (inv or 0) + valid:
+            over += 1
+        if valid is not None and total != valid:
+            short += 1
+        if reg and max(voters or 0, box or 0) > reg:
+            above += 1
+    p.frame("reporting_unit", pl.DataFrame(unit_rows))
+    p.frame("name", pl.DataFrame(unit_names))
+    frame = values_frame(cols).with_columns(
+        channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+    )
+    p.frame("result_value", frame)
+    if over:
+        p.accept(
+            "accounting.ballots_sum",
+            f"the protocols of {over:,} sections print envelopes in the box that differ from invalid plus valid "
+            "votes; stored as printed",
+        )
+    if short:
+        p.accept(
+            "accounting.votes_valid",
+            f"in {short:,} sections the votes printed for the lists do not add up to the valid votes printed in the "
+            "protocol; stored as printed",
+        )
+    if above:
+        p.accept(
+            "accounting.turnout",
+            "some sections report more voters or envelopes than the roll holds, from voters added on the day "
+            "or voting on a certificate; stored as printed",
+        )
+    return p
+
+
+EARLY = [EP2007.id, *(b.id for b in BLOCKS)]
+
+
+def build_early(id: str) -> Package:
+    return ep2007() if id == EP2007.id else old_build(next(b for b in BLOCKS if b.id == id))
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.id}" for e in ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{x}" for x in [*(e.id for e in ELECTIONS), *EARLY])]
 
 
 def parse() -> None:
@@ -1835,6 +2686,8 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         build(e).write()
+    for id in EARLY:
+        build_early(id).write()
 
 
 def emit() -> None:
