@@ -3,7 +3,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from uuid import uuid5
 
@@ -16,6 +16,7 @@ from ea.package import Package
 SOURCE = "si.dvk"
 BASE = "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve"
 ARCHIVE = "https://www.dvk-rs.si/arhivi"
+VOLITVE = "https://volitve.dvk-rs.si"
 SLOVENIA = str(uuid5(package.NAMESPACE, "polity\x1fSI"))
 ELECTORAL_UNITS = range(1, 9)
 DISTRICTS = range(1, 12)
@@ -34,6 +35,8 @@ class Vote:
     round: int = 1
     note: str = ""
     layout: str = "table"
+    question: str = ""
+    advisory: bool = False
 
     @property
     def url(self) -> str:
@@ -189,8 +192,156 @@ VOTES = [
         "Zakonodajni referendum o Zakonu o spremembah in dopolnitvah Zakona o vodah (ZV-1G) 2021",
         note="Act amending the Waters Act (ZV-1G)",
     ),
+    Vote(
+        "ref",
+        date(2022, 11, 27),
+        f"{ARCHIVE}/volitve2022/referendum-oskrba/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2022 Slovenian referendum on the Long-Term Care Act amendment",
+        "Referendum o noveli Zakona o dolgotrajni oskrbi (ZDOsk-A)",
+        note="Act amending the Long-Term Care Act (ZDOsk-A)",
+        layout="izvoz",
+        question="oskrba",
+    ),
+    Vote(
+        "ref",
+        date(2022, 11, 27),
+        f"{ARCHIVE}/volitve2022/referendum-rtv/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2022 Slovenian referendum on the Radiotelevizija Slovenija Act amendment",
+        "Referendum o noveli Zakona o Radioteleviziji Slovenija (ZRTVS-1B)",
+        note="Act amending the Radiotelevizija Slovenija Act (ZRTVS-1B)",
+        layout="izvoz",
+        question="rtv",
+    ),
+    Vote(
+        "ref",
+        date(2022, 11, 27),
+        f"{ARCHIVE}/volitve2022/referendum-vlada/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2022 Slovenian referendum on the Government Act amendment",
+        "Referendum o noveli Zakona o vladi (ZVRS-J)",
+        note="Act amending the Government Act (ZVRS-J)",
+        layout="izvoz",
+        question="vlada",
+    ),
+    Vote(
+        "ref",
+        date(2024, 6, 9),
+        f"{ARCHIVE}/referendum-evtanazija-2024/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2024 Slovenian advisory referendum on assisted dying",
+        "Posvetovalni referendum o ureditvi pravice do pomoči pri prostovoljnem končanju življenja",
+        note="Whether the right to assistance in voluntarily ending life should be regulated",
+        layout="izvoz",
+        question="evtanazija",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2024, 6, 9),
+        f"{ARCHIVE}/referendum-konoplja-medicina-2024/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2024 Slovenian advisory referendum on growing cannabis for medical use",
+        "Posvetovalni referendum o gojenju in predelovanju konoplje v medicinske namene",
+        note="Whether growing and processing cannabis for medical purposes should be allowed",
+        layout="izvoz",
+        question="konoplja-medicina",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2024, 6, 9),
+        f"{ARCHIVE}/referendum-konoplja-raba-2024/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2024 Slovenian advisory referendum on growing cannabis for personal use",
+        "Posvetovalni referendum o gojenju in posedovanju konoplje za omejeno osebno rabo",
+        note="Whether growing and possessing cannabis for limited personal use should be allowed",
+        layout="izvoz",
+        question="konoplja-raba",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2024, 6, 9),
+        f"{ARCHIVE}/referendum-preferencni-glas-2024/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2024 Slovenian advisory referendum on preference voting",
+        "Posvetovalni referendum o uvedbi preferenčnega glasu za volitve v državni zbor",
+        note="Whether preference voting should be introduced for National Assembly elections",
+        layout="izvoz",
+        question="preferencni-glas",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2025, 5, 11),
+        f"{ARCHIVE}/referendum-zdpidu/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2025 Slovenian referendum on the Pension Supplement for Exceptional Achievements in Art Act",
+        "Zakonodajni referendum o Zakonu o dodatku k pokojnini za izjemne dosežke na področju umetnosti (ZDPIDU)",
+        note="Act on the Pension Supplement for Exceptional Achievements in the Field of Art (ZDPIDU)",
+        layout="izvoz",
+    ),
+    Vote(
+        "ref",
+        date(2025, 11, 23),
+        f"{ARCHIVE}/referendum-zppkz/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2025 Slovenian referendum on the Assisted Voluntary End of Life Act",
+        "Zakonodajni referendum o Zakonu o pomoči pri prostovoljnem končanju življenja (ZPPKŽ)",
+        note="Act on Assistance in the Voluntary Ending of Life (ZPPKŽ)",
+        layout="izvoz",
+    ),
+    Vote(
+        "ref",
+        date(2026, 10, 11),
+        f"{VOLITVE}/referendum-rtv-prispevek/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2026 Slovenian advisory referendum on the RTV Slovenija contribution",
+        "Posvetovalni referendum o ukinitvi obveznega plačevanja prispevka za programe RTV Slovenija",
+        note="Whether the mandatory contribution for RTV Slovenija programs should be abolished",
+        layout="izvoz",
+        question="rtv-prispevek",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2026, 10, 11),
+        f"{VOLITVE}/referendum-socialna-pomoc/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2026 Slovenian advisory referendum on conditioning social assistance on community work",
+        "Posvetovalni referendum o pogojevanju pravice do denarne socialne pomoči z aktivnim vključevanjem "
+        "delovno sposobnih upravičencev v družbeno koristna dela",
+        note="Whether cash social assistance should require able-bodied recipients to do community work",
+        layout="izvoz",
+        question="socialna-pomoc",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2026, 10, 11),
+        f"{VOLITVE}/referendum-volilna-pravica-tujcev/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2026 Slovenian advisory referendum on foreigners' voting rights in local elections",
+        "Posvetovalni referendum o volilni pravici na lokalnih volitvah v Republiki Sloveniji",
+        note="Whether foreigners should vote in local elections",
+        layout="izvoz",
+        question="volilna-pravica-tujcev",
+        advisory=True,
+    ),
+    Vote(
+        "ref",
+        date(2026, 10, 11),
+        f"{VOLITVE}/referendum-preiskava/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2026 Slovenian referendum on the Parliamentary Inquiry Act amendment",
+        "Zakonodajni referendum o Zakonu o spremembah in dopolnitvah Zakona o parlamentarni preiskavi (ZPPre-B)",
+        note="Act amending the Parliamentary Inquiry Act (ZPPre-B)",
+        layout="izvoz",
+        question="preiskava",
+    ),
 ]
-
 
 DOCS = "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve"
 # The commission's records of the National Assembly counts (the seat allocation and the national list totals) and
@@ -415,6 +566,7 @@ IZVOZ_COLUMNS = (
 )
 AREA_CELL = re.compile(r"^(?:VE|VO)\s+(\d+)\s*-\s*(.*)$")
 VOTES_CELL = re.compile(r"\s*-\s*št\. glasov$")
+ANSWER_CELL = re.compile(r"^Glasovi\s+(.+)$")
 PREFERENCES_CELL = re.compile(r"\s*-\s*št\. pref\. glasov$")
 
 
@@ -473,6 +625,12 @@ def load_izvoz(vote: Vote) -> Sheet:
             names.append(PREFERENCES_CELL.sub("", cell))
             positions.append(position)
     if not names:
+        for position in range(len(IZVOZ_COLUMNS), len(header)):
+            answer = ANSWER_CELL.match(header[position])
+            if answer:
+                names.append(answer.group(1))
+                positions.append(position)
+    if not names:
         raise LookupError(f"{vote.url} has no ballot columns")
     rows: list[Row] = []
     for line in stations[top + 1 :]:
@@ -512,6 +670,10 @@ def izvoz_total(vote: Vote, book: fastexcel.ExcelReader, names: list[str]) -> Ro
         for position, head in enumerate(heads)
         if VOTES_CELL.search(head)
     }
+    for position, head in enumerate(heads):
+        answer = ANSWER_CELL.match(head)
+        if answer:
+            by_name[bare(answer.group(1))] = count(line[position])
     candidates: dict[str, list[int | None]] = {}
     if any(PREFERENCES_CELL.search(name) for name in names) or any(re.match(r"\d+\.", name) for name in names):
         sheet = grid(book, "Kandidati")
@@ -599,6 +761,25 @@ METHOD_REF_2012 = (
     + " At this referendum a law was rejected when most valid votes were against it: the requirement that the votes "
     "against be at least a fifth of all registered voters entered the Constitution in 2013."
 )
+METHOD_ADVISORY = (
+    METHOD["ref"].split(" A law is rejected")[0]
+    + " This was an advisory referendum: the National Assembly asked the voters a question, and the result does not "
+    "bind it, so no outcome is declared."
+)
+DAY_TITLES = {
+    date(2022, 11, 27): (
+        "2022 Slovenian referendums on three amended acts",
+        "Referendumi o noveli Zakona o dolgotrajni oskrbi, Zakona o Radioteleviziji Slovenija in Zakona o vladi 2022",
+    ),
+    date(2024, 6, 9): (
+        "2024 Slovenian advisory referendums",
+        "Posvetovalni referendumi 2024",
+    ),
+    date(2026, 10, 11): (
+        "2026 Slovenian referendums",
+        "Referendumi 2026",
+    ),
+}
 SEAT_NOTE = (
     " Each list's seats in the electoral unit are the commission's declared outcome: the seats it won in the unit "
     "from the unit allocation and the national remainder allocation. The two seats of the national communities are "
@@ -668,7 +849,7 @@ def station_kind(place: str) -> str:
 
 
 def packages() -> list[str]:
-    return ["si.dvk/geo", "si.dvk/registry", *(slug(vote) for vote in VOTES)]
+    return ["si.dvk/geo", "si.dvk/registry", *dict.fromkeys(slug(vote) for vote in VOTES)]
 
 
 def slug(vote: Vote) -> str:
@@ -686,8 +867,15 @@ def parse() -> None:
     sheets = {vote: load(vote) for vote in VOTES}
     report: dict[str, dict[str, object]] = {}
     for vote, sheet in sheets.items():
-        report[slug(vote)] = reconcile(vote, sheet)
-        election(vote, sheet).write()
+        report[vote.url if vote.question else slug(vote)] = reconcile(vote, sheet)
+        if vote.kind != "ref":
+            election(vote, sheet).write()
+    days: dict[date, list[tuple[Vote, Sheet]]] = {}
+    for vote, sheet in sheets.items():
+        if vote.kind == "ref":
+            days.setdefault(vote.day, []).append((vote, sheet))
+    for held in days.values():
+        referendum(held).write()
     for slugged, found in report.items():
         print(f"{slugged}: totals {found}", flush=True)
 
@@ -883,7 +1071,7 @@ def _facts(
     _overfull(p, sheet)
 
 
-def _units(p: Package, vote: Vote, sheet: Sheet) -> list[str]:
+def _units(p: Package, vote: Vote, sheet: Sheet, added: set[str] | None = None) -> list[str]:
     counts = Counter((row.ve, row.vo, row.stv) for row in sheet.rows)
     named = Counter((row.ve, row.vo, row.stv, changeset.slug(row.place)) for row in sheet.rows)
     seen: Counter[tuple[str, str, str, str]] = Counter()
@@ -899,6 +1087,10 @@ def _units(p: Package, vote: Vote, sheet: Sheet) -> list[str]:
                 code += f":{seen[same]}"
         unit = key("unit", code)
         units.append(unit)
+        if added is not None:
+            if unit in added:
+                continue
+            added.add(unit)
         electoral_unit, seat = district(row.ve, row.vo)
         if electoral_unit is None:
             relation, place = "unlocated", None
@@ -925,6 +1117,8 @@ def _units(p: Package, vote: Vote, sheet: Sheet) -> list[str]:
 
 
 def _method(vote: Vote) -> str:
+    if vote.advisory:
+        return METHOD_ADVISORY
     if vote.kind == "ref" and vote.day.year < 2013:
         return METHOD_REF_2012
     return METHOD[vote.kind] + (SEAT_NOTE if vote.kind == "dz" and vote.day.year in NATIONAL_SEATS else "")
@@ -991,7 +1185,7 @@ def _election(p: Package, vote: Vote, kind: str, slug_path: str) -> str:
 
 
 def election(vote: Vote, sheet: Sheet) -> Package:
-    build = {"dz": assembly, "pres": president, "ep": european, "ref": referendum}[vote.kind]
+    build = {"dz": assembly, "pres": president, "ep": european}[vote.kind]
     return build(vote, sheet)
 
 
@@ -1218,40 +1412,62 @@ def european(vote: Vote, sheet: Sheet) -> Package:
     return p
 
 
-def referendum(vote: Vote, sheet: Sheet) -> Package:
-    p = _package(vote, f"The {vote.day} Slovenian referendum, {vote.note}, by polling station")
-    election_id = _election(p, vote, "referendum", f"si/{vote.day}-referendum")
-    contest = key("contest", vote.day)
-    p.add(
-        "contest",
-        id=contest,
-        election_id=election_id,
-        kind="ballot_question",
-        round_number=1,
-        electoral_system_id=SYSTEMS["ref"],
-        default_result_kind="counted",
-    )
-    p.add("ballot_question", contest_id=contest, type="referendum")
-    p.name(contest, vote.note, "en", "official")
-    p.add("slug", path=f"si/{vote.day}-referendum/law", entity_id=contest, is_current=True)
-    result_set = _result_set(p, election_id, contest, vote, str(vote.day))
-    if [plain(name) for name in sheet.options] != ["za", "proti"]:
-        raise ValueError(f"{vote.day}: expected ZA and PROTI columns, found {sheet.options}")
-    options: dict[int, str] = {}
-    for index, (label, position) in enumerate((("For", 1), ("Against", 2))):
-        option = options[index] = key("option", vote.day, label)
+def referendum(held: list[tuple[Vote, Sheet]]) -> Package:
+    """One package for the referendum day: one contest for each question put to the voters that day."""
+    first = held[0][0]
+    if len(held) == 1:
+        p = _package(first, f"The {first.day} Slovenian referendum, {first.note}, by polling station")
+        vote = first
+    else:
+        title, native = DAY_TITLES[first.day]
+        vote = replace(first, title=title, native=native)
+        p = _package(vote, f"The {first.day} Slovenian referendums, {len(held)} questions, by polling station")
+        for other, _ in held[1:]:
+            p.uses(raw.cached(SOURCE, other.url))
+    election_id = _election(p, vote, "referendum", f"si/{first.day}-referendum")
+    added: set[str] = set()
+    for question, sheet in held:
+        units = _units(p, question, sheet, added)
+        tag = f"{question.day}:{question.question}" if question.question else str(question.day)
+        contest = key("contest", question.day, question.question) if question.question else key("contest", question.day)
         p.add(
-            "contest_option",
-            id=option,
-            contest_id=contest,
-            kind="answer",
-            ballot_position=position,
-            ballot_label=label,
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="ballot_question",
+            round_number=1,
+            electoral_system_id=SYSTEMS["ref"],
+            default_result_kind="counted",
         )
-    units = _units(p, vote, sheet)
-    _facts(p, sheet, result_set, units, {(0, index): option for index, option in options.items()})
-    _declare(p, result_set, sheet, options)
-    _decide(p, vote, sheet, result_set, options)
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.name(contest, question.note, "en", "official")
+        p.name(contest, question.native, "sl", "native", False)
+        p.add(
+            "slug",
+            path=f"si/{question.day}-referendum/{question.question or 'law'}",
+            entity_id=contest,
+            is_current=True,
+        )
+        result_set = _result_set(p, election_id, contest, question, tag)
+        if [plain(name) for name in sheet.options] != ["za", "proti"]:
+            raise ValueError(f"{tag}: expected ZA and PROTI columns, found {sheet.options}")
+        options: dict[int, str] = {}
+        for index, (label, position) in enumerate((("For", 1), ("Against", 2))):
+            option = options[index] = (
+                key("option", tag, label) if question.question else key("option", question.day, label)
+            )
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        _facts(p, sheet, result_set, units, {(0, index): option for index, option in options.items()})
+        _declare(p, result_set, sheet, options)
+        if not question.advisory:
+            _decide(p, question, sheet, result_set, options)
     return p
 
 
