@@ -1,0 +1,2265 @@
+{
+ "polity": "SK",
+ "name": "Slovakia",
+ "sources": {
+  "ustava": {
+   "title": "Ústavný zákon č. 460/1992 Zb., Ústava Slovenskej republiky",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1992/460/",
+   "kind": "official_body"
+  },
+  "uz9_1999": {
+   "title": "Ústavný zákon č. 9/1999 Z. z., ktorým sa mení a dopĺňa Ústava Slovenskej republiky (priama voľba prezidenta)",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1999/9/",
+   "kind": "official_body"
+  },
+  "zvp": {
+   "title": "Zákon č. 180/2014 Z. z. o podmienkach výkonu volebného práva",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/",
+   "kind": "official_body"
+  },
+  "zsnr": {
+   "title": "Zákon č. 80/1990 Zb. o voľbách do Slovenskej národnej rady",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/80/",
+   "kind": "official_body"
+  },
+  "zep": {
+   "title": "Zákon č. 331/2003 Z. z. o voľbách do Európskeho parlamentu",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2003/331/",
+   "kind": "official_body"
+  },
+  "zprez": {
+   "title": "Zákon č. 46/1999 Z. z. o spôsobe voľby prezidenta Slovenskej republiky, o ľudovom hlasovaní o jeho odvolaní",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1999/46/",
+   "kind": "official_body"
+  },
+  "zvuc": {
+   "title": "Zákon č. 302/2001 Z. z. o samospráve vyšších územných celkov (zákon o samosprávnych krajoch)",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/302/",
+   "kind": "official_body"
+  },
+  "zvucvolby": {
+   "title": "Zákon č. 303/2001 Z. z. o voľbách do orgánov samosprávnych krajov",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/303/",
+   "kind": "official_body"
+  },
+  "zobce": {
+   "title": "Zákon č. 369/1990 Zb. o obecnom zriadení",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/369/",
+   "kind": "official_body"
+  },
+  "zoso": {
+   "title": "Zákon č. 346/1990 Zb. o voľbách do orgánov samosprávy obcí",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/346/",
+   "kind": "official_body"
+  },
+  "zba": {
+   "title": "Zákon č. 377/1990 Zb. o hlavnom meste Slovenskej republiky Bratislave",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/377/",
+   "kind": "official_body"
+  },
+  "zke": {
+   "title": "Zákon č. 401/1990 Zb. o meste Košice",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/401/",
+   "kind": "official_body"
+  },
+  "zuzemie": {
+   "title": "Zákon č. 221/1996 Z. z. o územnom a správnom usporiadaní Slovenskej republiky",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1996/221/",
+   "kind": "official_body"
+  },
+  "zfed": {
+   "title": "Ústavný zákon č. 143/1968 Zb. o československej federácii",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1968/143/",
+   "kind": "official_body"
+  },
+  "zfs": {
+   "title": "Zákon č. 47/1990 Zb. o voľbách do Federálneho zhromaždenia",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/47/",
+   "kind": "official_body"
+  },
+  "zskoly": {
+   "title": "Zákon č. 596/2003 Z. z. o štátnej správe v školstve a školskej samospráve",
+   "publisher": "Zbierka zákonov Slovenskej republiky (Slov-Lex)",
+   "url": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2003/596/",
+   "kind": "official_body"
+  },
+  "volby_od": {
+   "title": "Voľby a referendá: údaje na stiahnutie (open data)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/tree.html",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "minv_var": {
+   "title": "Voľby a referendum od roku 1990",
+   "publisher": "Ministerstvo vnútra Slovenskej republiky",
+   "url": "https://www.minv.sk/swift_data/source/verejna_sprava/volby_a_referendum/500_universal/WEB_VaR.pdf",
+   "kind": "official_body"
+  },
+  "snr1990": {
+   "title": "Výsledky volieb do Slovenskej národnej rady 1990: zoznam volebných krajov",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/nrsr/snr1990/volby90_s/zvk90.htm",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "snr1992": {
+   "title": "Výsledky volieb do Slovenskej národnej rady 1992: zoznam volebných krajov",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/nrsr/snr1992/volby92s/zvk92.htm",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "nrsr1994": {
+   "title": "Prehľad výsledkov volieb do NR SR v roku 1994: zoznam volebných krajov",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/nrsr/nrsr1994/slov/volby12.htm",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "prez1999": {
+   "title": "Voľba prezidenta SR 1999",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/prez/prez1999/prezid99/home.jsp.htm",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "ref2000": {
+   "title": "Referendum 2000",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/ref/ref2000/",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso_nove": {
+   "title": "Nové voľby do orgánov samosprávy obcí 2022 – 2026",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/oso/doplnkove2022/sk/",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2001": {
+   "title": "Voľby do orgánov samosprávnych krajov 2001, 1. kolo: výsledky podľa volebných obvodov (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2001/1.kolo/OSK_2001_1kolo_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2001r": {
+   "title": "Voľby do orgánov samosprávnych krajov 2001, 2. kolo (tab08)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2001/2.kolo/OSK_2001_2kolo_tab08.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2005": {
+   "title": "Voľby do orgánov samosprávnych krajov 2005, 1. kolo: výsledky za kraje (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2005/1.kolo/OSK_2005_1kolo_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2005r": {
+   "title": "Voľby do orgánov samosprávnych krajov 2005, 2. kolo (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2005/2.kolo/OSK_2005_2kolo_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2009": {
+   "title": "Voľby do orgánov samosprávnych krajov 2009, 1. kolo: výsledky podľa volebných obvodov (tab02)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2009/1.kolo/OSK_2009_1kolo_tab02.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2009r": {
+   "title": "Voľby do orgánov samosprávnych krajov 2009, 2. kolo (tab06)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2009/2.kolo/OSK_2009_2kolo_tab06.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2013": {
+   "title": "Voľby do orgánov samosprávnych krajov 2013, 1. kolo: výsledky podľa volebných obvodov (tab02)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2013/1.kolo/OSK_2013_1kolo_tab02.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2013r": {
+   "title": "Voľby do orgánov samosprávnych krajov 2013, 2. kolo (tab06)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2013/2.kolo/OSK_2013_2kolo_tab06.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2017": {
+   "title": "Voľby do orgánov samosprávnych krajov 2017: volebné obvody a počet volených poslancov (tab0db)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2017/OSK_2017_tab0db.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2022": {
+   "title": "Voľby do orgánov samosprávnych krajov 2022: volebné obvody a počet volených poslancov (tab0db)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2022/OSK2022_SK_tab0db.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "osk2026": {
+   "title": "Voľby do orgánov samosprávnych krajov 2026: volebné obvody a počet volených poslancov (tab0db)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/osk/2026/OSK2026_SK_tab0db.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2006": {
+   "title": "Voľby do orgánov samosprávy obcí 2006: súhrnné výsledky podľa obvodov (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2006/OSO_2006_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2010": {
+   "title": "Voľby do orgánov samosprávy obcí 2010: súhrnné výsledky podľa obvodov (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2010/OSO_2010_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2014": {
+   "title": "Voľby do orgánov samosprávy obcí 2014: súhrnné výsledky podľa obvodov (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2014/OSO_2014_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2018": {
+   "title": "Voľby do orgánov samosprávy obcí 2018: súhrnné výsledky za SR (tab01)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2018/OSO_2018_tab01.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2022": {
+   "title": "Voľby do orgánov samosprávy obcí 2022: územné členenie (tab0dd)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2022/OSO2022_SK_tab0dd.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2026": {
+   "title": "Voľby do orgánov samosprávy obcí 2026: územné členenie (tab0dd)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2026/OSO2026_SK_tab0dd.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "ns1920": {
+   "title": "Volby do Národního shromáždění 1920 až 1935",
+   "publisher": "Český statistický úřad",
+   "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+   "kind": "official_body",
+   "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Slovenská republika",
+   "name_en": "Slovak Republic",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "valid_from": "1993-01-01",
+   "source": "ustava"
+  },
+  {
+   "key": "kraj",
+   "name": "Samosprávne kraje (vyššie územné celky)",
+   "name_en": "Self-governing regions (kraje)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "sk.kraj",
+   "valid_from": "1996-07-24",
+   "source": "zuzemie",
+   "counts": [
+    {
+     "date": "2026-10-24",
+     "value": 8,
+     "source": "oso2026",
+     "locator": "https://volby.statistics.sk/opendata/oso/2026/OSO2026_SK_tab0dd.csv (8 distinct Kód kraja, 1–8, in the territorial table for the 24 October 2026 elections)"
+    }
+   ]
+  },
+  {
+   "key": "okres",
+   "name": "Okresy",
+   "name_en": "Districts (okresy)",
+   "parent": "kraj",
+   "polity_kind": "county",
+   "scheme": "sk.okres",
+   "elects": false,
+   "valid_from": "1996-07-24",
+   "source": "zuzemie",
+   "counts": [
+    {
+     "date": "2026-10-24",
+     "value": 79,
+     "source": "oso2026",
+     "locator": "https://volby.statistics.sk/opendata/oso/2026/OSO2026_SK_tab0dd.csv (79 distinct Kód okresu, Bratislava I–V and Košice I–IV among them)"
+    }
+   ]
+  },
+  {
+   "key": "obec",
+   "name": "Obce a mestá",
+   "name_en": "Municipalities (obce and towns)",
+   "parent": "okres",
+   "polity_kind": "municipality",
+   "scheme": "sk.obec",
+   "source": "zobce",
+   "counts": [
+    {
+     "date": "2026-10-24",
+     "value": 2887,
+     "source": "oso2026",
+     "locator": "https://volby.statistics.sk/opendata/oso/2026/OSO2026_SK_tab0dd.csv (2,924 rows: 2,885 obce plus the 39 boroughs of Bratislava and Košice; with the two cities, listed in tab0dx, 2,887 municipalities. The military districts Záhorie and Lešť are not municipalities and hold no municipal election.)"
+    },
+    {
+     "date": "2022-10-29",
+     "value": 2887,
+     "source": "oso2022",
+     "locator": "https://volby.statistics.sk/opendata/oso/2022/OSO2022_SK_tab0dd.csv (2,924 rows: 2,885 obce plus 39 boroughs; with Bratislava and Košice, 2,887 municipalities)"
+    }
+   ]
+  },
+  {
+   "key": "mestska_cast",
+   "name": "Mestské časti Bratislavy a Košíc",
+   "name_en": "Boroughs of Bratislava and Košice (mestské časti)",
+   "parent": "obec",
+   "polity_kind": "submunicipal",
+   "source": "zba",
+   "counts": [
+    {
+     "date": "2026-10-24",
+     "value": 39,
+     "source": "oso2026",
+     "locator": "https://volby.statistics.sk/opendata/oso/2026/OSO2026_SK_tab0dd.csv (17 rows Bratislava - … and 22 rows Košice - …, each electing a starosta and council)"
+    }
+   ]
+  },
+  {
+   "key": "ceskoslovensko",
+   "name": "Československo",
+   "name_en": "Czechoslovakia (1918–1992), in Slovakia",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1918-10-28",
+   "valid_to": "1993-01-01",
+   "source": "zfed"
+  }
+ ],
+ "classes": [
+  {
+   "key": "nrsr",
+   "tier": "national",
+   "name": "Voľby do Národnej rady Slovenskej republiky",
+   "name_en": "National Council elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 1994 (by district for 1998) and by polling district (okrsok) from 2016; okrsky are lists of streets and are drawn from no published boundary file.",
+   "note": "150 seats by list PR (Hagenbach-Bischoff quota and largest remainders), 5% threshold for a party and higher thresholds for coalitions. 1994: four electoral regions (Bratislava and the West, Central, and East Slovak regions) with seats first allocated in each region; one national constituency since 1998 (Act 187/1998, then Act 333/2004 and Act 180/2014). The Slovak National Council elected in 1992 became the National Council on 1 October 1992 under the Constitution. Early elections in 1994, 2006, 2012, 2020 (by date), and 2023 (after the constitutional amendment 91/2023 allowing a shortened term).",
+   "source": "zvp",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 42–§ 75)",
+   "valid_from": "1993-01-01",
+   "first_held": "1994-09-30",
+   "earliest_record": "1994-09-30",
+   "est_votes": 25000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "ustava",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1992/460/ (čl. 73, čl. 82)",
+     "vacancy_rule": "A seat falls to the next substitute (náhradník) on the same list by preference order."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-09-30",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for 1994–2023: by municipality to 2012 (by district in 1998), by polling district from 2016."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1993-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-09-30",
+     "contests": 4,
+     "seats": 150,
+     "source": "nrsr1994",
+     "quote": "ZOZNAM VOLEBNÝCH KRAJOV: Hl. m. SR Bratislava; Západoslovenský kraj; Stredoslovenský kraj; Východoslovenský kraj",
+     "note": "The archive holds the 1994 vote as one national contest; the regional first scrutiny is not yet split out."
+    },
+    {
+     "date": "1998-09-25",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 1998"
+    },
+    {
+     "date": "2002-09-20",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2002"
+    },
+    {
+     "date": "2006-06-17",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2006"
+    },
+    {
+     "date": "2010-06-12",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2010"
+    },
+    {
+     "date": "2012-03-10",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2012"
+    },
+    {
+     "date": "2016-03-05",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2016"
+    },
+    {
+     "date": "2020-02-29",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2020"
+    },
+    {
+     "date": "2023-09-30",
+     "contests": 1,
+     "seats": 150,
+     "source": "minv_var",
+     "quote": "Voľby do Národnej rady Slovenskej republiky … 2023"
+    }
+   ]
+  },
+  {
+   "key": "prezident",
+   "tier": "national",
+   "name": "Voľba prezidenta Slovenskej republiky",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 2004 and by polling district from 2019; 1999 as HTML tables on the office's site.",
+   "note": "Direct election since the constitutional act 9/1999: a candidate needs a majority of all registered voters in the first round; otherwise the two leading candidates meet in a runoff 14 days later, decided by a plurality of valid votes. Five-year term, at most two consecutive terms. Every direct election so far has gone to a runoff.",
+   "source": "uz9_1999",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1999/9/ (čl. 101)",
+   "valid_from": "1999-01-27",
+   "first_held": "1999-05-15",
+   "earliest_record": "1999-05-15",
+   "est_votes": 26000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": false,
+     "month": 3,
+     "runoff": "majority",
+     "runoff_rule": "A candidate needs a majority of all registered voters; otherwise the top two meet 14 days later, decided by plurality.",
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "ustava",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1992/460/ (čl. 101, čl. 103)",
+     "vacancy_rule": "A new election is called within seven days and held within 60 days (čl. 101)."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-04-03",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for both rounds of 2004–2024."
+    },
+    {
+     "source": "prez1999",
+     "platform": "Volby.statistics.sk archív (ŠÚ SR)",
+     "url": "http://volby.statistics.sk/prez/prez1999/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-05-15",
+     "finest": "sk.obec",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "HTML pages of the 1999 election, both rounds.",
+     "last_date": "1999-05-29"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "SK"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-05-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "1999: voľba prezidenta"
+    },
+    {
+     "date": "1999-05-29",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "1999: druhé kolo voľby prezidenta"
+    },
+    {
+     "date": "2004-04-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "2004: voľba prezidenta"
+    },
+    {
+     "date": "2004-04-17",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "2004: druhé kolo voľby prezidenta"
+    },
+    {
+     "date": "2009-03-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "2009: voľba prezidenta"
+    },
+    {
+     "date": "2009-04-04",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "2009: druhé kolo voľby prezidenta"
+    },
+    {
+     "date": "2014-03-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "2014: voľba prezidenta"
+    },
+    {
+     "date": "2014-03-29",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "2014: druhé kolo voľby prezidenta"
+    },
+    {
+     "date": "2019-03-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "2019: voľba prezidenta"
+    },
+    {
+     "date": "2019-03-30",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "2019: druhé kolo voľby prezidenta"
+    },
+    {
+     "date": "2024-03-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "minv_var",
+     "quote": "2024: voľba prezidenta"
+    },
+    {
+     "date": "2024-04-06",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "2024: druhé kolo voľby prezidenta"
+    }
+   ]
+  },
+  {
+   "key": "prezident_nrsr",
+   "tier": "national",
+   "name": "Voľba prezidenta Národnou radou Slovenskej republiky",
+   "name_en": "Presidential elections by the National Council",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the original čl. 101 of the Constitution the National Council elected the president by a three-fifths majority by secret ballot: Michal Kováč on 15 February 1993; the 1998 rounds (January to July) elected no one, which led to the direct election of 1999. Ballot counts are in the National Council's records.",
+   "source": "ustava",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1992/460/ (čl. 101, original wording)",
+   "valid_from": "1993-01-01",
+   "valid_to": "1999-01-27",
+   "first_held": "1993-02-15",
+   "est_votes": 2000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "SK"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Voľby do Európskeho parlamentu na území Slovenskej republiky",
+   "name_en": "European Parliament elections in Slovakia",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 2004 and by polling district from 2019.",
+   "note": "One national constituency, Hagenbach-Bischoff quota and largest remainders, 5% threshold. 14 seats in 2004, 13 in 2009 and 2014, 14 in 2019, and 15 in 2024.",
+   "source": "zvp",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 132–§ 151)",
+   "valid_from": "2004-05-01",
+   "first_held": "2004-06-13",
+   "earliest_record": "2004-06-13",
+   "est_votes": 4600000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "zep",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2003/331/"
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-06-13",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for 2004–2024, with preference votes."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "2004-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-13",
+     "contests": 1,
+     "seats": 14,
+     "source": "minv_var",
+     "quote": "Voľby do Európskeho parlamentu … 2004"
+    },
+    {
+     "date": "2009-06-06",
+     "contests": 1,
+     "seats": 13,
+     "source": "minv_var",
+     "quote": "Voľby do Európskeho parlamentu … 2009"
+    },
+    {
+     "date": "2014-05-24",
+     "contests": 1,
+     "seats": 13,
+     "source": "minv_var",
+     "quote": "Voľby do Európskeho parlamentu … 2014"
+    },
+    {
+     "date": "2019-05-25",
+     "contests": 1,
+     "seats": 14,
+     "source": "minv_var",
+     "quote": "Voľby do Európskeho parlamentu … 2019"
+    },
+    {
+     "date": "2024-06-08",
+     "contests": 1,
+     "seats": 15,
+     "source": "minv_var",
+     "quote": "Voľby do Európskeho parlamentu … 2024"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referendum",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 2003 and by polling district from 2010; 2000 as HTML; 1994–1998 only in printed reports.",
+   "note": "Called by the President on a petition of 350,000 citizens or a National Council resolution (čl. 95); valid only with a turnout above half of the registered voters (čl. 98). Only the 2003 EU accession referendum was valid. Ten referendums with 21 questions from 1994 to 2026.",
+   "source": "ustava",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1992/460/ (čl. 93–100)",
+   "first_held": "1994-10-22",
+   "earliest_record": "2000-11-11",
+   "est_votes": 11000000,
+   "effort": 2,
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2003-05-16",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for 2003–2026."
+    },
+    {
+     "source": "ref2000",
+     "platform": "Volby.statistics.sk archív (ŠÚ SR)",
+     "url": "http://volby.statistics.sk/ref/ref2000/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-11-11",
+     "finest": "sk.obec",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "HTML pages of the 2000 referendum.",
+     "last_date": "2000-11-11"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "sovereign_state"
+     ],
+     "iso_pattern": "SK"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-10-22",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 22. októbra 1994 s otázkou"
+    },
+    {
+     "date": "1997-05-23",
+     "contests": 4,
+     "source": "minv_var",
+     "quote": "Referendum 23. - 24. mája 1997 s otázkami: 1. … NATO? 2. … jadrových zbraní … 3. … vojenských základní … 4. Súhlasíte, aby prezidenta volili občania …",
+     "note": "The fourth question, on direct presidential election, was left off the ballots by the Ministry of Interior; the referendum was declared frustrated (zmarené)."
+    },
+    {
+     "date": "1998-09-25",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 25. - 26. septembra 1998 s otázkou"
+    },
+    {
+     "date": "2000-11-11",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 11. novembra 2000 s otázkou"
+    },
+    {
+     "date": "2003-05-16",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 16. - 17. mája 2003 s otázkou"
+    },
+    {
+     "date": "2004-04-03",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 3. apríla 2004 s otázkou"
+    },
+    {
+     "date": "2010-09-18",
+     "contests": 6,
+     "source": "minv_var",
+     "quote": "Referendum 18. septembra 2010 s otázkami: 1. … 6."
+    },
+    {
+     "date": "2015-02-07",
+     "contests": 3,
+     "source": "minv_var",
+     "quote": "Referendum 7. februára 2015 s otázkami: 1. … 3."
+    },
+    {
+     "date": "2023-01-21",
+     "contests": 1,
+     "source": "minv_var",
+     "quote": "Referendum 21. januára 2023 s otázkou"
+    },
+    {
+     "date": "2026-07-04",
+     "contests": 2,
+     "source": "minv_var",
+     "quote": "Referendum 4. júla 2026 s otázkami: 1. … 2."
+    }
+   ]
+  },
+  {
+   "key": "odvolanie_prezidenta",
+   "tier": "national",
+   "name": "Ľudové hlasovanie o odvolaní prezidenta",
+   "name_en": "Popular vote on recalling the President",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A recall vote is called when three-fifths of the National Council propose it (čl. 106); it removes the President by a majority of all registered voters. None has been held.",
+   "source": "zprez",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1999/46/",
+   "valid_from": "1999-01-27",
+   "est_votes": 0,
+   "effort": 1
+  },
+  {
+   "key": "snr",
+   "tier": "national",
+   "name": "Voľby do Slovenskej národnej rady",
+   "name_en": "Slovak National Council elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "sk.obec"
+    ]
+   },
+   "finest_note": "1990 and 1992: the office's HTML pages give list votes and seats by electoral region (volebný kraj).",
+   "note": "Legislature of the Slovak Socialist (from 1990 Slovak) Republic within the federation. Single-list elections of the National Front in 1971, 1976, 1981, and 1986; in 1990 and 1992 150 seats by list PR in four electoral regions (Act 80/1990), with a 3% threshold in 1990 and 5% in 1992. The council elected in 1992 adopted the Constitution and became the National Council.",
+   "source": "zsnr",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/80/",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "earliest_record": "1990-06-08",
+   "est_votes": 19000000,
+   "effort": 2,
+   "access": [
+    {
+     "source": "snr1990",
+     "platform": "Volby.statistics.sk archív (ŠÚ SR)",
+     "url": "http://volby.statistics.sk/nrsr/snr1990/volby90_s/uvod90.htm",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1990-06-08",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "HTML tables for 1990 and 1992: parties, seats, vote shares, and valid votes by electoral region.",
+     "last_date": "1992-06-05"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1971-11-26",
+     "note": "Single-list election."
+    },
+    {
+     "date": "1976-10-22",
+     "note": "Single-list election."
+    },
+    {
+     "date": "1981-06-05",
+     "note": "Single-list election."
+    },
+    {
+     "date": "1986-05-23",
+     "note": "Single-list election."
+    },
+    {
+     "date": "1990-06-08",
+     "contests": 4,
+     "seats": 150,
+     "source": "snr1990",
+     "quote": "ZOZNAM VOLEBNÝCH KRAJOV: Hl. m. SR Bratislava 379; Západoslovenský kraj 1 699; Stredoslovenský kraj 1 813; Východoslovenský kraj 1 771"
+    },
+    {
+     "date": "1992-06-05",
+     "contests": 4,
+     "seats": 150,
+     "source": "snr1992",
+     "quote": "ZOZNAM VOLEBNÝCH KRAJOV: Hl. m. SR Bratislava 362; Západoslovenský kraj 1 725; Stredoslovenský kraj 1 858; Východoslovenský kraj 1 793"
+    }
+   ]
+  },
+  {
+   "key": "snr_1948",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Slovenskej národnej rady 1948–1964",
+   "name_en": "Slovak National Council elections, 1948–1964",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-list elections of the National Front in 1948, 1954, 1960, and 1964, before the federation.",
+   "source": "zfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found on volby.statistics.sk or minv.sk; the figures exist only in printed statistical yearbooks and the gazettes of the time.",
+   "valid_from": "1948-05-30",
+   "valid_to": "1969-01-01",
+   "first_held": "1948-05-30",
+   "est_votes": 12000000,
+   "effort": 5
+  },
+  {
+   "key": "fs_sl",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Snemovne ľudu Federálneho zhromaždenia (na Slovensku)",
+   "name_en": "Federal Assembly House of the People elections, in Slovakia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Chamber of the Czechoslovak Federal Assembly elected by population. Single lists from 1971 to 1986; in 1990 and 1992 list PR in the four Slovak electoral regions for the Slovak share of its 150 seats (Act 47/1990).",
+   "source": "zfs",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/47/",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "est_votes": 14000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1971-11-26"
+    },
+    {
+     "date": "1976-10-22"
+    },
+    {
+     "date": "1981-06-05"
+    },
+    {
+     "date": "1986-05-23"
+    },
+    {
+     "date": "1990-06-08"
+    },
+    {
+     "date": "1992-06-05"
+    }
+   ]
+  },
+  {
+   "key": "fs_sn",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Snemovne národov Federálneho zhromaždenia (na Slovensku)",
+   "name_en": "Federal Assembly House of the Nations elections, in Slovakia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Chamber of the Federal Assembly with 75 members from each republic (ústavný zákon 143/1968). Single lists from 1971 to 1986; list PR in the four Slovak electoral regions in 1990 and 1992.",
+   "source": "zfed",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1968/143/ (čl. 31)",
+   "valid_from": "1969-01-01",
+   "valid_to": "1993-01-01",
+   "first_held": "1971-11-26",
+   "est_votes": 14000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1969-01-01",
+     "valid_to": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1971-11-26"
+    },
+    {
+     "date": "1976-10-22"
+    },
+    {
+     "date": "1981-06-05"
+    },
+    {
+     "date": "1986-05-23"
+    },
+    {
+     "date": "1990-06-08"
+    },
+    {
+     "date": "1992-06-05"
+    }
+   ]
+  },
+  {
+   "key": "ns_1920",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Národného zhromaždenia 1920–1935 (na Slovensku)",
+   "name_en": "Czechoslovak National Assembly elections, 1920–1935, in Slovakia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Chamber of Deputies and Senate of the First Republic, list PR in electoral regions, five of them in Slovakia (Bratislava, Nitra, Turčiansky Svätý Martin, Banská Bystrica, Košice). Elections in 1920, 1925, 1929, and 1935; 1920 voting in the Slovak regions began on 18 April.",
+   "source": "ns1920",
+   "valid_from": "1920-01-01",
+   "valid_to": "1939-03-14",
+   "first_held": "1920-04-18",
+   "est_votes": 12000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1918-01-01",
+     "valid_to": "1946-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-04-18"
+    },
+    {
+     "date": "1925-11-15"
+    },
+    {
+     "date": "1929-10-27"
+    },
+    {
+     "date": "1935-05-19"
+    }
+   ]
+  },
+  {
+   "key": "ns_1946",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Ústavodarného a Národného zhromaždenia 1946–1964 (na Slovensku)",
+   "name_en": "Czechoslovak Constituent and National Assembly elections, 1946–1964, in Slovakia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The competitive 1946 Constituent Assembly election, then single-list elections in 1948, 1954, 1960, and 1964.",
+   "source": "zfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns for Slovakia was found on volby.statistics.sk or minv.sk; the figures exist only in printed statistical yearbooks and the gazettes of the time.",
+   "valid_from": "1945-10-28",
+   "valid_to": "1969-01-01",
+   "first_held": "1946-05-26",
+   "est_votes": 12000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1945-01-01",
+     "valid_to": "1969-01-01"
+    }
+   ]
+  },
+  {
+   "key": "snem_1938",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Snemu Slovenskej krajiny 1938",
+   "name_en": "Diet of the Slovak Land election, 1938",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The autonomous Slovak Land's diet (63 seats) was elected on 18 December 1938 on a single list; it proclaimed the Slovak State on 14 March 1939 and sat until 1945 without a further election.",
+   "source": "zfed",
+   "valid_from": "1938-11-22",
+   "valid_to": "1945-04-04",
+   "first_held": "1938-12-18",
+   "est_votes": 1500000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1938-11-01",
+     "valid_to": "1945-05-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1938-12-18"
+    }
+   ]
+  },
+  {
+   "key": "krajinske_zastupitelstvo",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do Krajinského zastupiteľstva pre Slovensko",
+   "name_en": "Provincial Assembly of Slovakia elections, 1928 and 1935",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Two-thirds of the provincial assembly of the Slovak Land were elected by list PR on 2 December 1928 and 26 May 1935, one-third appointed by the government.",
+   "source": "zfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found; they are in printed State Statistical Office volumes of the time.",
+   "valid_from": "1928-07-01",
+   "valid_to": "1939-03-14",
+   "first_held": "1928-12-02",
+   "est_votes": 3000000,
+   "effort": 5
+  },
+  {
+   "key": "uhorsko",
+   "tier": "national",
+   "name": "Voľby do Uhorského snemu",
+   "name_en": "Hungarian Diet elections before 1918",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "zfed",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of the Kingdom of Hungary before Czechoslovakia existed; they belong to Hungary's history, not to a Slovak or Czechoslovak electoral authority.",
+   "valid_to": "1918-10-28"
+  },
+  {
+   "key": "vuc_zastupitelstvo",
+   "tier": "kraj",
+   "name": "Voľby do zastupiteľstiev samosprávnych krajov",
+   "name_en": "Regional council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "sk.vuc_obvod"
+    ],
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 2001 and by polling district from 2017; votes per candidate in 2001–2013 are published only for the elected in some years.",
+   "note": "Councillors elected for each electoral district (volebný obvod) by plurality block vote, each voter marking up to as many candidates as the district elects. Four-year terms from 2001; the 2017 councils served five years so that regional and municipal elections are held together from 2022.",
+   "source": "zvucvolby",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/303/",
+   "valid_from": "2001-12-01",
+   "first_held": "2001-12-01",
+   "earliest_record": "2001-12-01",
+   "est_votes": 8700000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "valid_from": "2001-01-01",
+     "valid_to": "2018-01-01",
+     "source": "zvucvolby",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/303/",
+     "vacancy_rule": "A vacant seat falls to the substitute with the most votes in the district."
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "valid_from": "2022-01-01",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 152–§ 167)",
+     "vacancy_rule": "A vacant seat falls to the substitute with the most votes in the district."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-12-01",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for 2001–2026: by district and municipality to 2013, by polling district from 2017."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "sk.vuc_obvod"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "2001-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2001-12-01",
+     "election_kind": "local",
+     "contests": 79,
+     "seats": 401,
+     "source": "osk2001",
+     "quote": "SR spolu … 401; 401 (79 volebných obvodov)"
+    },
+    {
+     "date": "2005-11-26",
+     "election_kind": "local",
+     "contests": 79,
+     "seats": 412,
+     "source": "osk2005",
+     "quote": "Spolu za SR;79; … ;412;412"
+    },
+    {
+     "date": "2009-11-14",
+     "election_kind": "local",
+     "contests": 90,
+     "seats": 408,
+     "source": "osk2009",
+     "quote": "Spolu za SR … 408;408 (90 volebných obvodov)"
+    },
+    {
+     "date": "2013-11-09",
+     "election_kind": "local",
+     "contests": 90,
+     "seats": 408,
+     "source": "osk2013",
+     "quote": "Spolu za SR … 408;408 (90 volebných obvodov)"
+    },
+    {
+     "date": "2017-11-04",
+     "election_kind": "local",
+     "contests": 96,
+     "seats": 416,
+     "source": "osk2017",
+     "quote": "96 volebných obvodov, Počet volených poslancov spolu 416"
+    },
+    {
+     "date": "2022-10-29",
+     "election_kind": "local",
+     "contests": 96,
+     "seats": 419,
+     "source": "osk2022",
+     "quote": "96 volebných obvodov, Počet volených poslancov spolu 419"
+    },
+    {
+     "date": "2026-10-24",
+     "election_kind": "local",
+     "contests": 96,
+     "seats": 427,
+     "source": "osk2026",
+     "quote": "96 volebných obvodov, Počet volených poslancov spolu 427"
+    }
+   ]
+  },
+  {
+   "key": "vuc_predseda",
+   "tier": "kraj",
+   "name": "Voľby predsedov samosprávnych krajov",
+   "name_en": "Regional president (predseda, župan) elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "sk.kraj"
+    ],
+    "fine": [
+     "sk.obec",
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Open data by municipality from 2001 and by polling district from 2017.",
+   "note": "Elected directly. 2001–2013: a majority of valid votes in the first round, else a runoff of the top two two weeks later; since 2017 (Act 180/2014 as amended by Act 72/2017) one round by plurality.",
+   "source": "zvucvolby",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/303/",
+   "valid_from": "2001-12-01",
+   "first_held": "2001-12-01",
+   "earliest_record": "2001-12-01",
+   "est_votes": 11000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "runoff": "majority",
+     "runoff_rule": "A candidate with a majority of the valid votes is elected; otherwise the top two meet 14 days later.",
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "valid_from": "2001-01-01",
+     "valid_to": "2018-01-01",
+     "source": "zvucvolby",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2001/303/"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "valid_from": "2022-01-01",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/",
+     "vacancy_rule": "A new election (nové voľby) is called for the rest of the term."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-12-01",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data for both rounds of 2001–2013 and the single round of 2017–2026."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "governor"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "2001-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2001-12-01",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2001",
+     "quote": "Výsledky 1. kola za 8 samosprávnych krajov"
+    },
+    {
+     "date": "2001-12-15",
+     "election_kind": "runoff",
+     "contests": 7,
+     "source": "osk2001r",
+     "quote": "2. kolo: 7 samosprávnych krajov"
+    },
+    {
+     "date": "2005-11-26",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2005",
+     "quote": "8 samosprávnych krajov; Zvolený predseda: - (none in the first round)"
+    },
+    {
+     "date": "2005-12-10",
+     "election_kind": "runoff",
+     "contests": 8,
+     "source": "osk2005r",
+     "quote": "2. kolo: 8 samosprávnych krajov"
+    },
+    {
+     "date": "2009-11-14",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2009",
+     "quote": "Výsledky 1. kola za 8 samosprávnych krajov"
+    },
+    {
+     "date": "2009-11-28",
+     "election_kind": "runoff",
+     "contests": 4,
+     "source": "osk2009r",
+     "quote": "2. kolo: Bratislavský, Trenčiansky, Banskobystrický, Prešovský kraj"
+    },
+    {
+     "date": "2013-11-09",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2013",
+     "quote": "Výsledky 1. kola za 8 samosprávnych krajov"
+    },
+    {
+     "date": "2013-11-23",
+     "election_kind": "runoff",
+     "contests": 5,
+     "source": "osk2013r",
+     "quote": "2. kolo: Bratislavský, Trnavský, Nitriansky, Banskobystrický, Košický kraj"
+    },
+    {
+     "date": "2017-11-04",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2017",
+     "quote": "8 samosprávnych krajov, jedno kolo"
+    },
+    {
+     "date": "2022-10-29",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2022",
+     "quote": "8 samosprávnych krajov, jedno kolo"
+    },
+    {
+     "date": "2026-10-24",
+     "election_kind": "local",
+     "contests": 8,
+     "seats": 8,
+     "source": "osk2026",
+     "quote": "8 samosprávnych krajov, jedno kolo"
+    }
+   ]
+  },
+  {
+   "key": "regionalne_referendum",
+   "tier": "kraj",
+   "name": "Referendum na území samosprávneho kraja",
+   "name_en": "Regional referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "zvuc",
+   "disposition": "blocked",
+   "disposition_reason": "A regional council calls a referendum on merging or dividing the region, on recalling its president, or on a petition of 30% of voters (Act 302/2001); each region announces its own results and no national register lists them.",
+   "valid_from": "2002-01-01",
+   "est_votes": 300000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "obec_zastupitelstvo",
+   "tier": "obec",
+   "name": "Voľby do obecných a mestských zastupiteľstiev",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "sk.obec"
+    ],
+    "fine": [
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Candidates' votes by municipality and electoral district are in the open data for 2022 and 2026; 2002–2018 tables give turnout and the elected only; 1990–1998 are not on the office's site.",
+   "note": "Councillors elected for one or more multi-member electoral districts (volebné obvody) per municipality by plurality block vote; four-year terms. Bratislava and Košice also elect city councils over their boroughs (district counts in tab0dx). Contest counts below are electoral districts.",
+   "source": "zoso",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/346/",
+   "valid_from": "1990-11-01",
+   "first_held": "1990-11-23",
+   "earliest_record": "2022-10-29",
+   "est_votes": 21000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 168–§ 189)",
+     "vacancy_rule": "A vacant seat falls to the substitute with the most votes; with none, new elections (nové voľby) are called."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2002-12-06",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data: candidates' votes for 2022 and 2026; turnout and the elected for 2002–2018."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "sk.obec"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1990-11-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-23",
+     "source": "minv_var",
+     "quote": "23. - 24. novembra 1990"
+    },
+    {
+     "date": "1994-11-18",
+     "source": "minv_var",
+     "quote": "18. - 19. novembra 1994"
+    },
+    {
+     "date": "1998-12-18",
+     "source": "minv_var",
+     "quote": "18. - 19. decembra 1998"
+    },
+    {
+     "date": "2002-12-06",
+     "source": "minv_var",
+     "quote": "6. - 7. decembra 2002"
+    },
+    {
+     "date": "2006-12-02",
+     "source": "oso2006",
+     "quote": "Spolu za SR;2 924;2 904;2 903; … ;21 337;21 272 (including the boroughs)"
+    },
+    {
+     "date": "2010-11-27",
+     "source": "oso2010",
+     "quote": "Spolu za SR;2 924;2 915;2 907; … ;21 032;21 020 (including the boroughs)"
+    },
+    {
+     "date": "2014-11-15",
+     "source": "oso2014",
+     "quote": "Spolu za SR;2 921;2 906;2 909; … ;20 786;20 753 (including the boroughs)"
+    },
+    {
+     "date": "2018-11-10",
+     "source": "oso2018",
+     "quote": "Celkový počet obcí, v ktorých sa konali voľby: 2919"
+    },
+    {
+     "date": "2022-10-29",
+     "contests": 3410,
+     "seats": 20185,
+     "source": "oso2022",
+     "quote": "tab0dd: 3 379 volebných obvodov and 20 099 volených poslancov in the 2 885 obce outside the boroughs; tab0dx: Bratislava 17 obvodov, 45 poslancov; Košice 14 obvodov, 41 poslancov"
+    },
+    {
+     "date": "2026-10-24",
+     "contests": 3298,
+     "seats": 19956,
+     "source": "oso2026",
+     "quote": "tab0dd: 3 273 volebných obvodov and 19 860 volených poslancov in the 2 885 obce outside the boroughs; tab0dx: Bratislava 11 obvodov, 45 poslancov; Košice 14 obvodov, 51 poslancov"
+    }
+   ]
+  },
+  {
+   "key": "starosta",
+   "tier": "obec",
+   "name": "Voľby starostov obcí a primátorov miest",
+   "name_en": "Mayoral elections (starosta, primátor)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "sk.obec"
+    ],
+    "fine": [
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Candidates' votes by municipality in the open data for 2014 and 2018 and by polling district for 2022 and 2026; 2002–2010 tables list the elected only.",
+   "note": "Elected directly in one round by plurality for four-year terms, together with the council.",
+   "source": "zoso",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/346/",
+   "valid_from": "1990-11-01",
+   "first_held": "1990-11-23",
+   "earliest_record": "2014-11-15",
+   "est_votes": 21000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 168–§ 189)",
+     "vacancy_rule": "New elections (nové voľby) are called for the rest of the term."
+    }
+   ],
+   "access": [
+    {
+     "source": "volby_od",
+     "platform": "Volby.statistics.sk otvorené dáta (ŠÚ SR)",
+     "url": "https://volby.statistics.sk/tree.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2002-12-06",
+     "finest": "sk.okrsok",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Open data: candidates' votes for 2014–2026; the elected for 2002–2010."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1990-11-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-11-23",
+     "source": "minv_var",
+     "quote": "23. - 24. novembra 1990"
+    },
+    {
+     "date": "1994-11-18",
+     "source": "minv_var",
+     "quote": "18. - 19. novembra 1994"
+    },
+    {
+     "date": "1998-12-18",
+     "source": "minv_var",
+     "quote": "18. - 19. decembra 1998"
+    },
+    {
+     "date": "2002-12-06",
+     "source": "minv_var",
+     "quote": "6. - 7. decembra 2002"
+    },
+    {
+     "date": "2006-12-02",
+     "source": "oso2006",
+     "quote": "Spolu za SR;2 924;2 904;2 903 (including the boroughs)"
+    },
+    {
+     "date": "2010-11-27",
+     "source": "oso2010",
+     "quote": "Spolu za SR;2 924;2 915;2 907 (including the boroughs)"
+    },
+    {
+     "date": "2014-11-15",
+     "source": "oso2014",
+     "quote": "Spolu za SR;2 921;2 906;2 909 (including the boroughs)"
+    },
+    {
+     "date": "2018-11-10",
+     "source": "oso2018",
+     "quote": "Celkový počet obcí, v ktorých sa konali voľby: 2919"
+    },
+    {
+     "date": "2022-10-29",
+     "contests": 2875,
+     "seats": 2875,
+     "source": "oso2022",
+     "quote": "tab0dd: 2 873 obce outside the boroughs with Typ volieb Starosta a zastupiteľstvo; tab0dx: Bratislava and Košice, Starosta a zastupiteľstvo"
+    },
+    {
+     "date": "2026-10-24",
+     "contests": 2881,
+     "seats": 2881,
+     "source": "oso2026",
+     "quote": "tab0dd: 2 879 obce outside the boroughs with Typ volieb Starosta a zastupiteľstvo; tab0dx: Bratislava and Košice, Starosta a zastupiteľstvo"
+    }
+   ]
+  },
+  {
+   "key": "mc_zastupitelstvo",
+   "tier": "mestska_cast",
+   "name": "Voľby do miestnych zastupiteľstiev mestských častí",
+   "name_en": "Borough council elections in Bratislava and Košice",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "sk.obec"
+    ],
+    "fine": [
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "The office codes each borough as a municipality; candidates' votes by polling district for 2022 and 2026.",
+   "note": "The 17 boroughs of Bratislava (Act 377/1990) and 22 of Košice (Act 401/1990) elect a local council (miestne zastupiteľstvo) with the municipal elections, by the same plurality block vote.",
+   "source": "zba",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/377/; https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/401/",
+   "valid_from": "1990-11-01",
+   "first_held": "1990-11-23",
+   "earliest_record": "2022-10-29",
+   "est_votes": 1800000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "^Zastupiteľstvo, (Bratislava|Košice) - ",
+     "iso_pattern": "SK",
+     "valid_from": "1990-11-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-10-29",
+     "contests": 91,
+     "seats": 450,
+     "source": "oso2022",
+     "quote": "tab0dd: 39 rows Bratislava - … and Košice - …: 91 volebných obvodov, 450 poslancov"
+    },
+    {
+     "date": "2026-10-24",
+     "contests": 84,
+     "seats": 449,
+     "source": "oso2026",
+     "quote": "tab0dd: 39 rows Bratislava - … and Košice - …: 84 volebných obvodov, 449 poslancov"
+    }
+   ]
+  },
+  {
+   "key": "mc_starosta",
+   "tier": "mestska_cast",
+   "name": "Voľby starostov mestských častí",
+   "name_en": "Borough mayor elections in Bratislava and Košice",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "sk.obec"
+    ],
+    "fine": [
+     "sk.okrsok"
+    ]
+   },
+   "finest_note": "Candidates' votes by borough for 2014 and 2018 and by polling district for 2022 and 2026.",
+   "note": "Each of the 39 boroughs elects a starosta in one round by plurality, with the municipal elections.",
+   "source": "zke",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/401/; https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/377/",
+   "valid_from": "1990-11-01",
+   "first_held": "1990-11-23",
+   "earliest_record": "2014-11-15",
+   "est_votes": 1800000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnútra SR (Štátna komisia pre voľby a kontrolu financovania politických strán); results by the Štatistický úrad SR",
+     "source": "zvp",
+     "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "^Starosta, (Bratislava|Košice) - ",
+     "iso_pattern": "SK",
+     "valid_from": "1990-11-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-10-29",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2022",
+     "quote": "tab0dd: 39 rows Bratislava - … and Košice - …, Typ volieb Starosta a zastupiteľstvo"
+    },
+    {
+     "date": "2026-10-24",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2026",
+     "quote": "tab0dd: 39 rows Bratislava - … and Košice - …, Typ volieb Starosta a zastupiteľstvo"
+    }
+   ]
+  },
+  {
+   "key": "nove_volby",
+   "tier": "obec",
+   "name": "Nové voľby do orgánov samosprávy obcí",
+   "name_en": "Municipal by-elections (nové voľby)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "sk.obec"
+    ],
+    "unit": "contest"
+   },
+   "finest_note": "The office publishes each by-election day by municipality, as open data (2015) and as web pages for each term from 2014.",
+   "note": "Called by the Speaker of the National Council when a mayor's office falls vacant or a council cannot be completed from substitutes, or where no election was held at the regular date; several days a year.",
+   "source": "zvp",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 191)",
+   "valid_from": "1990-11-01",
+   "earliest_record": "2015-03-07",
+   "est_votes": 600000,
+   "effort": 2,
+   "access": [
+    {
+     "source": "oso_nove",
+     "platform": "Volby.statistics.sk, nové voľby (ŠÚ SR)",
+     "url": "http://volby.statistics.sk/oso/doplnkove2022/sk/",
+     "format": "html, csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-03-07",
+     "finest": "sk.obec",
+     "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
+     "evidence": "Pages for the terms 2014–2018, 2018–2022, and 2022–2026, each listing its days and results by municipality."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "sk.obec"
+     ],
+     "iso_pattern": "SK"
+    },
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "SK"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "through": "2026-10-23",
+     "note": "By-election days between regular elections, not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "miestne_referendum",
+   "tier": "obec",
+   "name": "Miestne referendum",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "zobce",
+   "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/369/ (§ 11a)",
+   "disposition": "blocked",
+   "disposition_reason": "Called by municipal councils on mergers, recalling the mayor, or a petition of 30% of voters (§ 11a of Act 369/1990); each municipality announces its own result and no national register of results exists.",
+   "valid_from": "1990-09-01",
+   "est_votes": 400000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "narodne_vybory",
+   "tier": "ceskoslovensko",
+   "name": "Voľby do národných výborov",
+   "name_en": "National committee elections (local, district, and regional), 1954–1986, in Slovakia",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Single-list elections to the local, town, district, and regional national committees in 1954, 1957, 1960, 1964, 1971, 1976, 1981, and 1986.",
+   "source": "zfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found on volby.statistics.sk or minv.sk; only national totals were printed at the time.",
+   "valid_from": "1954-05-16",
+   "valid_to": "1990-11-23",
+   "first_held": "1954-05-16",
+   "est_votes": 30000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "SK",
+     "valid_from": "1950-01-01",
+     "valid_to": "1990-11-01"
+    }
+   ]
+  },
+  {
+   "key": "samosprava_1919",
+   "tier": "ceskoslovensko",
+   "name": "Obecné a župné voľby 1919–1938",
+   "name_en": "Municipal and county (župa) elections, 1919–1938, in Slovakia",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Municipal elections of the First Republic in Slovakia and the elections to the county (župa) assemblies that existed from 1923 to 1928.",
+   "source": "zfed",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the returns was found; they are in printed State Statistical Office volumes and municipal records.",
+   "valid_from": "1919-01-01",
+   "valid_to": "1939-03-14",
+   "est_votes": 8000000,
+   "effort": 5
+  },
+  {
+   "key": "neprime_volby",
+   "tier": "national",
+   "name": "Nepriame voľby orgánov",
+   "name_en": "Indirect elections by councils and the National Council",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "zobce",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers chosen by elected bodies, not by voters: deputy mayors and boards by municipal councils, deputy regional presidents by regional councils, the Speaker by the National Council, and candidates for the Constitutional Court and the Judicial Council; no electorate votes.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "deputy_mayor",
+      "governor",
+      "head_of_government",
+      "speaker",
+      "other"
+     ],
+     "iso_pattern": "SK"
+    }
+   ]
+  },
+  {
+   "key": "sudcovia",
+   "tier": "national",
+   "name": "Sudcovia",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed by the President on the proposal of the Judicial Council (čl. 145), and Constitutional Court judges by the President from candidates the National Council proposes (čl. 134); none is elected by voters."
+  },
+  {
+   "key": "rady_skol",
+   "tier": "obec",
+   "name": "Rady škôl a školské samosprávne orgány",
+   "name_en": "School councils",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "source": "zskoly",
+   "disposition": "out_of_scope",
+   "disposition_reason": "School councils are made up of delegates of the founder and of members elected by staff and parents within each school (Act 596/2003); the state runs no public election for them."
+  },
+  {
+   "key": "vybory_mestskych_casti",
+   "tier": "obec",
+   "name": "Výbory v mestských častiach",
+   "name_en": "Town-part committees outside Bratislava and Košice",
+   "category": "council",
+   "goal": "local",
+   "measure": {},
+   "source": "zobce",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Committees for parts of other towns are set up by the municipal council from councillors elected there and residents it chooses (Act 369/1990); residents do not vote for them."
+  },
+  {
+   "key": "vnutorne_volby",
+   "tier": "national",
+   "name": "Voľby v profesijných komorách a iných samosprávach",
+   "name_en": "Elections inside professional chambers, universities, and works councils",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the bodies themselves for their members: professional chambers, university academic senates, and works councils. Slovakia has no elected national minority or other non-territorial public body."
+  },
+  {
+   "key": "vyber_kandidatov",
+   "tier": "national",
+   "name": "Výber kandidátov",
+   "name_en": "Candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "zvp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties draw up their lists under their own statutes, and independent candidates are nominated by petition; the state runs no primary and publishes no nominating vote."
+  }
+ ]
+}
