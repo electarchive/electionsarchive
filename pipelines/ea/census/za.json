@@ -1,0 +1,1832 @@
+{
+ "polity": "ZA",
+ "name": "South Africa",
+ "sources": {
+  "constitution": {
+   "title": "Constitution of the Republic of South Africa, 1996 (as amended)",
+   "publisher": "Department of Justice and Constitutional Development",
+   "url": "https://www.justice.gov.za/legislation/constitution/SAConstitution-web-eng.pdf",
+   "kind": "official_body"
+  },
+  "interim_constitution": {
+   "title": "Constitution of the Republic of South Africa Act 200 of 1993",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/documents/constitution/constitution-republic-south-africa-act-200-1993-repealed-28-jan-1994",
+   "kind": "official_body"
+  },
+  "constitution_1983": {
+   "title": "Republic of South Africa Constitution Act 110 of 1983",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/documents/republic-south-africa-constitution-act-110-1983",
+   "kind": "official_body"
+  },
+  "sa_act_1909": {
+   "title": "South Africa Act 1909 (9 Edw. 7 c. 9), as enacted",
+   "publisher": "The National Archives (legislation.gov.uk)",
+   "url": "https://www.legislation.gov.uk/ukpga/Edw7/9/9/enacted",
+   "kind": "official_body"
+  },
+  "electoral_act": {
+   "title": "Electoral Act 73 of 1998",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/sites/default/files/gcis_document/201409/a73-98.pdf",
+   "kind": "official_body"
+  },
+  "electoral_commission_act": {
+   "title": "Electoral Commission Act 51 of 1996",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/documents/electoral-commission-act",
+   "kind": "official_body"
+  },
+  "structures_act": {
+   "title": "Local Government: Municipal Structures Act 117 of 1998",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/documents/local-government-municipal-structures-act",
+   "kind": "official_body"
+  },
+  "schools_act": {
+   "title": "South African Schools Act 84 of 1996",
+   "publisher": "South African Government (gov.za)",
+   "url": "https://www.gov.za/documents/south-african-schools-act",
+   "kind": "official_body"
+  },
+  "parliament_about": {
+   "title": "About Parliament",
+   "publisher": "Parliament of the Republic of South Africa",
+   "url": "https://www.parliament.gov.za/about-parliament",
+   "kind": "official_body"
+  },
+  "iec_npe": {
+   "title": "Election results downloads: national and provincial elections",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/Downloads/NPE-Results",
+   "kind": "official_body",
+   "note": "Lists the national and provincial elections of 1994, 1999, 2004, 2009, 2014, 2019, and 2024; the Detailed Results report goes to province, municipality, and voting district for 1999 to 2024."
+  },
+  "iec_me": {
+   "title": "Election results downloads: municipal elections",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/Downloads/ME-Results",
+   "kind": "official_body",
+   "note": "Lists the local government elections of 2000, 2006, 2011, 2016, 2021, and 2026, with Detailed Results by province, municipality, ward, ballot, and voting district."
+  },
+  "iec_mbe": {
+   "title": "Election results downloads: municipal by-elections",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/Downloads/MBE-Results",
+   "kind": "official_body",
+   "note": "By-election results chosen by municipal term (2000 to 2026), date, and by-election type."
+  },
+  "iec_npe2014": {
+   "title": "2014 National Election: Results Report, Detailed Results (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/291/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2019_na": {
+   "title": "2019 National Election, national ballot: Results Report (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/699/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2019_pl": {
+   "title": "2019 Provincial Election: Results Report (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/827/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2024_na": {
+   "title": "2024 National Election, national ballot: Results Report (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/1334/National%20Ballot/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2024_reg": {
+   "title": "2024 National Election, regional ballot: Results Report (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/1334/Regional%20Ballot/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2024_pl": {
+   "title": "2024 Provincial Election: Results Report (National.xls)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/1335/Results%20Report/National.xls",
+   "kind": "official_body"
+  },
+  "iec_npe2019_vd": {
+   "title": "2019 National Election, national ballot: downloadable results by voting district (National.zip)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/699/Downloadable%20Results/National.zip",
+   "kind": "official_body"
+  },
+  "iec_npe2024_vd": {
+   "title": "2024 National Election, national ballot: downloadable results by voting district (National.zip)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/NPEPublicReports/1334/National%20Ballot/Downloadable%20Results/National.zip",
+   "kind": "official_body"
+  },
+  "iec_bulk": {
+   "title": "Downloadable results files (uploaded files)",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://www.elections.org.za/content/uploadedfiles/",
+   "kind": "official_body",
+   "note": "Bulk files the results site links for older elections: NPE 1994.pdf, 2004 NPE.zip, 2009 NPE.zip, 2000 LGE.zip, 2006 LGE.zip, and 2011 LGE.zip; the 2014 national file is under /content/Elections/Downloadable-results/."
+  },
+  "iec_lge2011": {
+   "title": "Local Government Elections 2011: downloadable party results by voting district, one CSV per province",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/EC.csv",
+   "kind": "official_body",
+   "note": "Nine files, https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/<EC|FS|GP|KN|MP|NC|NP|NW|WP>.csv, one row per party, ballot (Ward, PR, DC 40%), and voting district."
+  },
+  "iec_lge2016": {
+   "title": "Local Government Elections 2016: downloadable party results by voting district, one CSV per province",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/EC.csv",
+   "kind": "official_body",
+   "note": "Nine files, https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/<EC|FS|GP|KN|MP|NC|NP|NW|WP>.csv, one row per party, ballot (Ward, PR, DC 40%), and voting district."
+  },
+  "iec_lge2021": {
+   "title": "Local Government Elections 2021: downloadable party results by voting district, one CSV per province",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/EC.csv",
+   "kind": "official_body",
+   "note": "Nine files, https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/<EC|FS|GP|KN|MP|NC|NP|NW|WP>.csv, one row per party, ballot (Ward, PR, DC 40%), and voting district."
+  },
+  "iec_lge2026": {
+   "title": "Local Government Elections 2026: downloadable party results by voting district, one CSV per province",
+   "publisher": "Electoral Commission of South Africa (IEC)",
+   "url": "https://results.elections.org.za/home/LGEPublicReports/1887/Downloadable%20Party%20Results/EC.csv",
+   "kind": "official_body",
+   "note": "Nine files, https://results.elections.org.za/home/LGEPublicReports/1887/Downloadable%20Party%20Results/<EC|FS|GP|KN|MP|NC|NP|NW|WP>.csv, one row per party, ballot (Ward, PR, DC 40%), and voting district."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republic of South Africa",
+   "name_en": "South Africa",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "province",
+   "name": "Provinces",
+   "name_en": "Provinces",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "za.province",
+   "source": "constitution",
+   "valid_from": "1994-04-27",
+   "counts": [
+    {
+     "date": "1997-02-04",
+     "value": 9,
+     "source": "constitution",
+     "locator": "Constitution of the Republic of South Africa, 1996, s. 103(1): The Republic has the following provinces: Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, and Western Cape"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "District municipalities (category C)",
+   "name_en": "District municipalities",
+   "parent": "province",
+   "polity_kind": "county",
+   "scheme": "za.district",
+   "source": "structures_act",
+   "valid_from": "2000-12-05",
+   "counts": [
+    {
+     "date": "2000-12-05",
+     "value": 47,
+     "source": "iec_me",
+     "locator": "ME-Results, Local Government Elections 2000, Detailed Results, municipality list of each province: 42 district councils coded DC and 5 cross-boundary district councils coded CBDC1 to CBDC4 and CBDC8"
+    },
+    {
+     "date": "2006-03-01",
+     "value": 46,
+     "source": "iec_me",
+     "locator": "ME-Results, Local Government Elections 2006, Detailed Results, municipality list of each province: 46 district councils coded DC"
+    },
+    {
+     "date": "2011-05-18",
+     "value": 44,
+     "source": "iec_lge2011",
+     "locator": "DC 40% ballot rows of the nine provincial files name local municipalities in 44 districts (DC1 to DC48 by the Municipal Demarcation Board's codes), 2011"
+    },
+    {
+     "date": "2016-08-03",
+     "value": 44,
+     "source": "iec_lge2016",
+     "locator": "DC 40% ballot rows of the nine provincial files name local municipalities in 44 districts (DC1 to DC48 by the Municipal Demarcation Board's codes), 2016"
+    },
+    {
+     "date": "2021-11-01",
+     "value": 44,
+     "source": "iec_lge2021",
+     "locator": "DC 40% ballot rows of the nine provincial files name local municipalities in 44 districts (DC1 to DC48 by the Municipal Demarcation Board's codes), 2021"
+    },
+    {
+     "date": "2026-11-04",
+     "value": 44,
+     "source": "iec_lge2026",
+     "locator": "DC 40% ballot rows of the nine provincial files name local municipalities in 44 districts (DC1 to DC48 by the Municipal Demarcation Board's codes), 2026"
+    }
+   ]
+  },
+  {
+   "key": "municipality",
+   "name": "Metropolitan and local municipalities (categories A and B)",
+   "name_en": "Metropolitan and local municipalities",
+   "parent": "province",
+   "polity_kind": "municipality",
+   "scheme": "za.municipality",
+   "source": "structures_act",
+   "valid_from": "2000-12-05",
+   "counts": [
+    {
+     "date": "2000-12-05",
+     "value": 237,
+     "source": "iec_me",
+     "locator": "ME-Results, Local Government Elections 2000, Detailed Results, municipality list of each province: 6 metropolitan and 231 local municipalities (284 entries less 47 district councils)"
+    },
+    {
+     "date": "2006-03-01",
+     "value": 237,
+     "source": "iec_me",
+     "locator": "ME-Results, Local Government Elections 2006, Detailed Results, municipality list of each province: 6 metropolitan and 231 local municipalities (283 entries less 46 district councils)"
+    },
+    {
+     "date": "2011-05-18",
+     "value": 234,
+     "source": "iec_lge2011",
+     "locator": "PR ballot rows of the nine provincial files: 234 municipality codes, 8 metropolitan and 226 local"
+    },
+    {
+     "date": "2016-08-03",
+     "value": 213,
+     "source": "iec_lge2016",
+     "locator": "PR ballot rows of the nine provincial files: 213 municipality codes, 8 metropolitan and 205 local"
+    },
+    {
+     "date": "2021-11-01",
+     "value": 213,
+     "source": "iec_lge2021",
+     "locator": "PR ballot rows of the nine provincial files: 213 municipality codes, 8 metropolitan and 205 local"
+    },
+    {
+     "date": "2026-11-04",
+     "value": 213,
+     "source": "iec_lge2026",
+     "locator": "PR ballot rows of the nine provincial files: 213 municipality codes, 8 metropolitan and 205 local"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "Wards",
+   "name_en": "Municipal wards",
+   "parent": "municipality",
+   "scheme": "za.ward",
+   "source": "structures_act",
+   "valid_from": "2000-12-05",
+   "counts": [
+    {
+     "date": "2011-05-18",
+     "value": 4277,
+     "source": "iec_lge2011",
+     "locator": "Ward ballot rows of the nine provincial files: 4,277 distinct ward codes"
+    },
+    {
+     "date": "2016-08-03",
+     "value": 4392,
+     "source": "iec_lge2016",
+     "locator": "Ward ballot rows of the nine provincial files: 4,392 distinct ward codes"
+    },
+    {
+     "date": "2021-11-01",
+     "value": 4468,
+     "source": "iec_lge2021",
+     "locator": "Ward ballot rows of the nine provincial files: 4,468 distinct ward codes"
+    },
+    {
+     "date": "2026-11-04",
+     "value": 4485,
+     "source": "iec_lge2026",
+     "locator": "Ward ballot rows of the nine provincial files: 4,485 distinct ward codes"
+    }
+   ]
+  },
+  {
+   "key": "voting_district",
+   "name": "Voting districts",
+   "name_en": "Voting districts",
+   "parent": "ward",
+   "scheme": "za.vd",
+   "elects": false,
+   "source": "electoral_act",
+   "counts": [
+    {
+     "date": "2011-05-18",
+     "value": 20857,
+     "source": "iec_lge2011",
+     "locator": "Distinct VotingDistrict codes in the nine provincial files"
+    },
+    {
+     "date": "2016-08-03",
+     "value": 22612,
+     "source": "iec_lge2016",
+     "locator": "Distinct VotingDistrict codes in the nine provincial files"
+    },
+    {
+     "date": "2019-05-08",
+     "value": 22923,
+     "source": "iec_npe2019_vd",
+     "locator": "Distinct voting district codes in National.zip, out-of-country missions excluded"
+    },
+    {
+     "date": "2021-11-01",
+     "value": 23147,
+     "source": "iec_lge2021",
+     "locator": "Distinct VotingDistrict codes in the nine provincial files"
+    },
+    {
+     "date": "2024-05-29",
+     "value": 23291,
+     "source": "iec_npe2024_vd",
+     "locator": "Distinct voting district codes in National.zip, out-of-country missions excluded"
+    },
+    {
+     "date": "2026-11-04",
+     "value": 23695,
+     "source": "iec_lge2026",
+     "locator": "Distinct VotingDistrict codes in the nine provincial files"
+    }
+   ]
+  },
+  {
+   "key": "province_1910",
+   "name": "Provinces of the Union and the Republic (Cape of Good Hope, Natal, Transvaal, Orange Free State)",
+   "name_en": "Provinces, 1910-1994",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "sa_act_1909",
+   "valid_from": "1910-05-31",
+   "valid_to": "1994-04-27",
+   "counts": [
+    {
+     "date": "1910-05-31",
+     "value": 4,
+     "source": "sa_act_1909",
+     "locator": "South Africa Act 1909, s. 6: the colonies of the Cape of Good Hope, Natal, the Transvaal, and the Orange River Colony become original provinces of the Union"
+    }
+   ]
+  },
+  {
+   "key": "homeland",
+   "name": "Homelands (self-governing territories and the TBVC states)",
+   "name_en": "Homelands, 1963-1994",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "interim_constitution",
+   "valid_from": "1963-05-30",
+   "valid_to": "1994-04-27"
+  }
+ ],
+ "classes": [
+  {
+   "key": "national_assembly",
+   "tier": "national",
+   "name": "National Assembly election (national ballot)",
+   "name_en": "National Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "za.province",
+     "za.municipality",
+     "za.vd"
+    ]
+   },
+   "source": "constitution",
+   "locator": "Constitution of the Republic of South Africa, 1996, s. 46 (350 to 400 members, proportional representation, national common voters roll) and s. 49 (five-year term)",
+   "valid_from": "1994-04-27",
+   "first_held": "1994-04-27",
+   "earliest_record": "1994-04-27",
+   "finest_note": "Voting district for 1999 to 2024 (IEC Detailed Results and downloadable files); 1994 only as a PDF of provincial totals. Votes cast abroad are reported per mission.",
+   "note": "400 members by closed-list proportional representation (Droop quota, largest remainders) over the whole country. From 1994 to 2019 one national ballot filled 200 seats from national lists and 200 from regional (provincial) lists; from 2024 (Electoral Amendment Act 1 of 2023) the national ballot fills the 200 compensatory seats so that the whole Assembly is proportional to it, and a separate regional ballot (class na_regional) fills the other 200. The 1994 election was held under the interim Constitution (Act 200 of 1993) over 26 to 29 April, with 27 April the main polling day.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "ZA",
+     "valid_from": "1994-04-26"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "1994-04-27",
+     "administered_by": "Electoral Commission (Independent Electoral Commission in 1994)",
+     "certify_days": 7,
+     "source": "constitution",
+     "locator": "Constitution, s. 49(1) (five-year term) and (2) (election within 90 days of expiry or dissolution); Electoral Act 73 of 1998, s. 57 (result declared within seven days)",
+     "vacancy_rule": "A vacant seat is filled from the party's candidate list (Constitution, Schedule 6, and Electoral Act, Schedule 1A); there are no by-elections"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/NPE-Results",
+     "format": "xls, csv in zip, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-06-02",
+     "last_date": "2024-05-29",
+     "finest": "za.vd",
+     "source": "iec_npe",
+     "evidence": "ASP.NET downloads page: Detailed Results by province, municipality, and voting district for 1999 to 2024; results-report and voting-district files for 2014 (report), 2019, and 2024 answer 200 at /home/NPEPublicReports/<event>/..."
+    },
+    {
+     "platform": "IEC website, uploaded files (www.elections.org.za)",
+     "url": "https://www.elections.org.za/content/uploadedfiles/",
+     "format": "pdf (1994), csv in zip (2004-2014)",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-04-27",
+     "last_date": "2014-05-07",
+     "finest": "za.vd",
+     "source": "iec_bulk",
+     "evidence": "The results site links NPE 1994.pdf, 2004 NPE.zip, 2009 NPE.zip, and the 2014 voting-district zip here; www.elections.org.za answered 403 to automated requests on 2026-11-17."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-04-27",
+     "election_kind": "general",
+     "note": "Under the interim Constitution; polling 26 to 29 April 1994. The IEC publishes the result only as a PDF (NPE 1994.pdf)."
+    },
+    {
+     "date": "1999-06-02",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site; the bulk file sits on www.elections.org.za."
+    },
+    {
+     "date": "2004-04-14",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site; bulk file 2004 NPE.zip."
+    },
+    {
+     "date": "2009-04-22",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site; bulk file 2009 NPE.zip."
+    },
+    {
+     "date": "2014-05-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "iec_npe2014",
+     "quote": "Electoral Event: 2014 NATIONAL ELECTION; Province: All Provinces; votes for each party in Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, Western Cape, Out of Country, Total"
+    },
+    {
+     "date": "2019-05-08",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "iec_npe2019_na",
+     "quote": "Results Reports, Detailed Results, Results as at: 10/12/2019: the national ballot's votes for each party by province, out of country, and total"
+    },
+    {
+     "date": "2024-05-29",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "iec_npe2024_na",
+     "quote": "Results Reports, Detailed Results, Results as at: 21/06/2024: the national ballot's votes for each party by province, out of country, and total"
+    }
+   ],
+   "est_votes": 88000000,
+   "effort": 3
+  },
+  {
+   "key": "na_regional",
+   "tier": "province",
+   "name": "National Assembly election (regional ballot)",
+   "name_en": "National Assembly, regional ballot",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.province"
+    ],
+    "fine": [
+     "za.municipality",
+     "za.vd"
+    ]
+   },
+   "source": "electoral_act",
+   "locator": "Electoral Act 73 of 1998 as amended by the Electoral Amendment Act 1 of 2023, Schedule 1A (200 regional seats, filled from a regional ballot in each province open to parties and independent candidates)",
+   "valid_from": "2024-05-29",
+   "first_held": "2024-05-29",
+   "earliest_record": "2024-05-29",
+   "finest_note": "Voting district (IEC downloadable regional ballot results).",
+   "note": "Nine regional contests, one per province, with the province's share of the 200 regional seats (5 in Northern Cape to 47 in Gauteng in 2024). Before 2024 the regional seats were allocated from the national ballot, not a separate ballot.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "ZA",
+     "schemes": [
+      "za.province"
+     ],
+     "valid_from": "2024-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "2024-05-29",
+     "administered_by": "Electoral Commission",
+     "certify_days": 7,
+     "source": "electoral_act",
+     "locator": "Electoral Act 73 of 1998, Schedule 1A, as amended in 2023"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/NPE-Results",
+     "format": "xls, csv in zip, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2024-05-29",
+     "last_date": "2024-05-29",
+     "finest": "za.vd",
+     "source": "iec_npe",
+     "evidence": "ASP.NET downloads page: Detailed Results by province, municipality, and voting district for 1999 to 2024; results-report and voting-district files for 2014 (report), 2019, and 2024 answer 200 at /home/NPEPublicReports/<event>/..."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2024-05-29",
+     "election_kind": "general",
+     "contests": 9,
+     "source": "iec_npe2024_reg",
+     "quote": "Results Reports, Detailed Results, Results as at: 21/06/2024: the regional ballot's votes for each party and independent candidate in Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, and Western Cape"
+    }
+   ],
+   "est_votes": 16000000,
+   "effort": 1
+  },
+  {
+   "key": "provincial_legislature",
+   "tier": "province",
+   "name": "Provincial legislature elections",
+   "name_en": "Provincial legislatures",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.province"
+    ],
+    "fine": [
+     "za.municipality",
+     "za.vd"
+    ]
+   },
+   "source": "constitution",
+   "locator": "Constitution, s. 105 (30 to 80 members elected by proportional representation on the province's segment of the voters roll) and s. 108 (five-year term)",
+   "valid_from": "1994-04-27",
+   "first_held": "1994-04-27",
+   "earliest_record": "1994-04-27",
+   "finest_note": "Voting district for 1999 to 2024; 1994 provincial totals only in the IEC PDF.",
+   "note": "Nine legislatures elected on the same day as the National Assembly on a separate ballot, by closed-list proportional representation province-wide. Seats: 425 in 1994, 430 from 1999 to 2019, and 487 in 2024 (determined by the Commission from population, Electoral Act Schedule 3).",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "1994-04-26"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "1994-04-27",
+     "administered_by": "Electoral Commission (Independent Electoral Commission in 1994)",
+     "certify_days": 7,
+     "source": "constitution",
+     "locator": "Constitution, s. 108 (five-year term; election within 90 days)",
+     "vacancy_rule": "Filled from the party's candidate list; no by-elections"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/NPE-Results",
+     "format": "xls, csv in zip, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-06-02",
+     "last_date": "2024-05-29",
+     "finest": "za.vd",
+     "source": "iec_npe",
+     "evidence": "ASP.NET downloads page: Detailed Results by province, municipality, and voting district for 1999 to 2024; results-report and voting-district files for 2014 (report), 2019, and 2024 answer 200 at /home/NPEPublicReports/<event>/..."
+    },
+    {
+     "platform": "IEC website, uploaded files (www.elections.org.za)",
+     "url": "https://www.elections.org.za/content/uploadedfiles/",
+     "format": "pdf (1994), csv in zip (2004-2014)",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-04-27",
+     "last_date": "2014-05-07",
+     "finest": "za.vd",
+     "source": "iec_bulk",
+     "evidence": "The results site links NPE 1994.pdf, 2004 NPE.zip, 2009 NPE.zip, and the 2014 voting-district zip here; www.elections.org.za answered 403 to automated requests on 2026-11-17."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-04-27",
+     "election_kind": "general",
+     "note": "Nine provinces under the interim Constitution; result only in the IEC PDF."
+    },
+    {
+     "date": "1999-06-02",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site."
+    },
+    {
+     "date": "2004-04-14",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site."
+    },
+    {
+     "date": "2009-04-22",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site."
+    },
+    {
+     "date": "2014-05-07",
+     "election_kind": "general",
+     "note": "Detailed Results to voting district on the IEC results site; bulk file on www.elections.org.za."
+    },
+    {
+     "date": "2019-05-08",
+     "election_kind": "general",
+     "contests": 9,
+     "source": "iec_npe2019_pl",
+     "quote": "Results Reports, Detailed Results, Results as at: 13/05/2019: the provincial ballot's votes for each party in Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, and Western Cape"
+    },
+    {
+     "date": "2024-05-29",
+     "election_kind": "general",
+     "contests": 9,
+     "source": "iec_npe2024_pl",
+     "quote": "Results Reports, Detailed Results, Results as at: 21/06/2024: the provincial ballot's votes for each party in Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, Northern Cape, and Western Cape"
+    }
+   ],
+   "est_votes": 88000000,
+   "effort": 3
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Election of the President by the National Assembly",
+   "name_en": "President",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "Constitution, s. 86 (the National Assembly elects the President from among its members at its first sitting and to fill a vacancy) and Schedule 3, Part A (secret ballot presided over by a judge designated by the Chief Justice)",
+   "valid_from": "1994-05-09",
+   "first_held": "1994-05-09",
+   "note": "A secret ballot of the 400 members with the Chief Justice or a designated judge presiding, held again in rounds if no candidate has a majority. Contested ballots so far: 2008 (Motlanthe), 2009, 2014, 2019, and 2024; Mandela (1994) and Mbeki (1999, 2004) and Ramaphosa (2018) were elected unopposed.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "ZA",
+     "valid_from": "1994-05-09"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "majority",
+     "runoff_rule": "Further rounds, the lowest candidate eliminated, until one has a majority of votes cast (Schedule 3, Part A)",
+     "valid_from": "1994-05-09",
+     "source": "constitution",
+     "locator": "Constitution, s. 86 and Schedule 3, Part A",
+     "vacancy_rule": "The National Assembly elects a new President within 30 days of a vacancy (s. 86(3))"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-05-09",
+     "election_kind": "indirect",
+     "note": "First sitting of the National Assembly; Nelson Mandela unopposed."
+    },
+    {
+     "date": "1999-06-14",
+     "election_kind": "indirect",
+     "note": "Thabo Mbeki unopposed."
+    },
+    {
+     "date": "2004-04-23",
+     "election_kind": "indirect",
+     "note": "Thabo Mbeki unopposed."
+    },
+    {
+     "date": "2008-09-25",
+     "election_kind": "indirect",
+     "note": "Vacancy after Mbeki's resignation; Kgalema Motlanthe."
+    },
+    {
+     "date": "2009-05-06",
+     "election_kind": "indirect",
+     "note": "Jacob Zuma."
+    },
+    {
+     "date": "2014-05-21",
+     "election_kind": "indirect",
+     "note": "Jacob Zuma."
+    },
+    {
+     "date": "2018-02-15",
+     "election_kind": "indirect",
+     "note": "Vacancy after Zuma's resignation; Cyril Ramaphosa unopposed."
+    },
+    {
+     "date": "2019-05-22",
+     "election_kind": "indirect",
+     "note": "Cyril Ramaphosa."
+    },
+    {
+     "date": "2024-06-14",
+     "election_kind": "indirect",
+     "note": "Cyril Ramaphosa."
+    }
+   ],
+   "est_votes": 3600,
+   "effort": 2
+  },
+  {
+   "key": "premier",
+   "tier": "province",
+   "name": "Election of the Premier by the provincial legislature",
+   "name_en": "Premiers",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "Constitution, s. 128 (the provincial legislature elects the Premier from among its members at its first sitting and to fill a vacancy) and Schedule 3",
+   "valid_from": "1994-05-06",
+   "first_held": "1994-05-06",
+   "note": "Same procedure as the President's election, in each of the nine legislatures; the votes are announced at the sitting and recorded in the legislature's Hansard, not published by the IEC.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_government"
+     ],
+     "iso_pattern": "ZA*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "majority",
+     "valid_from": "1994-05-06",
+     "source": "constitution",
+     "locator": "Constitution, s. 128 and Schedule 3",
+     "vacancy_rule": "The legislature elects a new Premier within 30 days of a vacancy (s. 128(3))"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-05-06",
+     "through": "2026-11-17",
+     "election_kind": "indirect",
+     "note": "Nine elections after each general election (1994, 1999, 2004, 2009, 2014, 2019, 2024) and on vacancies; not yet counted from the legislatures' records."
+    }
+   ],
+   "est_votes": 3800,
+   "effort": 4
+  },
+  {
+   "key": "ncop",
+   "tier": "province",
+   "name": "National Council of Provinces delegations",
+   "name_en": "National Council of Provinces",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "locator": "Constitution, ss. 60-61 and Schedule 3, Part B (ten delegates per province, six permanent and four special, allocated to parties in proportion to their seats in the legislature)",
+   "valid_from": "1997-02-06",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No vote is cast: each provincial legislature appoints its party-nominated delegates by the Schedule 3 formula from its own seat shares, and special delegates are designated from its members.",
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "ZA",
+     "valid_from": "1997-02-04"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "senate_1994",
+   "tier": "province",
+   "name": "Senate (interim Constitution)",
+   "name_en": "Senate, 1994-1997",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "interim_constitution",
+   "locator": "Constitution of the Republic of South Africa Act 200 of 1993, ss. 48-49 (ten senators per province, nominated by the parties in each provincial legislature in proportion to their seats)",
+   "valid_from": "1994-05-06",
+   "valid_to": "1997-02-04",
+   "first_held": "1994-05-06",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Senators were nominated by the parties in each provincial legislature in proportion to their seats; no ballot was cast. The Senate gave way to the National Council of Provinces in February 1997.",
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "ZA",
+     "valid_from": "1994-04-26",
+     "valid_to": "1997-02-04"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "speakers",
+   "tier": "national",
+   "name": "Presiding officers of Parliament, the legislatures, and councils",
+   "name_en": "Speakers, chairpersons, and other officers",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "locator": "Constitution, s. 52 (Speaker of the National Assembly), s. 64 (Chairperson of the NCOP), s. 111 (Speakers of the provincial legislatures), s. 160(1)(b) (municipal council chairpersons)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Internal votes of each house or council at its first sitting, recorded in its minutes or Hansard rather than run or published as elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "speaker",
+      "other"
+     ],
+     "iso_pattern": "ZA*"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "National and provincial referendums",
+   "name_en": "Referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "za.vd"
+    ]
+   },
+   "source": "constitution",
+   "locator": "Constitution, s. 84(2)(g) (the President calls a national referendum in terms of an Act of Parliament) and s. 127(2)(f) (the Premier calls a provincial referendum in accordance with national legislation)",
+   "valid_from": "1997-02-04",
+   "note": "None has been held since 1994. Results would come from the Electoral Commission, which runs referendums (Electoral Commission Act 51 of 1996, s. 5).",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "1994-04-27"
+    }
+   ],
+   "cadence": [
+    {
+     "called": true,
+     "partisan": false,
+     "runoff": "none",
+     "valid_from": "1997-02-04",
+     "administered_by": "Electoral Commission",
+     "source": "electoral_commission_act",
+     "locator": "Electoral Commission Act 51 of 1996, s. 5(1)(a) (the Commission manages elections and referendums)"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "municipal_council",
+   "tier": "municipality",
+   "name": "Municipal council elections, proportional ballot",
+   "name_en": "Metropolitan and local councils (PR ballot)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.municipality"
+    ],
+    "fine": [
+     "za.ward",
+     "za.vd"
+    ]
+   },
+   "source": "structures_act",
+   "locator": "Local Government: Municipal Structures Act 117 of 1998, s. 22 and Schedule 1 (metropolitan and local councils with wards: half the councillors elected from party lists on a proportional ballot, compensating for ward seats); Constitution, s. 157",
+   "valid_from": "2000-12-05",
+   "first_held": "2000-12-05",
+   "earliest_record": "2000-12-05",
+   "finest_note": "Voting district (IEC downloadable party results and Detailed Results).",
+   "note": "Each metropolitan (category A) and local (category B) council is half ward councillors and half list councillors; the PR ballot sets each party's total seats, less the wards it won.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "za.municipality"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "2000-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "2006-01-01",
+     "administered_by": "Electoral Commission",
+     "source": "constitution",
+     "locator": "Constitution, s. 159 (term of no more than five years; election within 90 days of the term's expiry), as amended in 2003",
+     "vacancy_rule": "A list seat is filled from the party's list; a dissolved council is re-elected in a by-election (Structures Act, s. 25)"
+    },
+    {
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "2000-01-01",
+     "valid_to": "2006-01-01",
+     "administered_by": "Electoral Commission",
+     "source": "constitution",
+     "locator": "Constitution, s. 159; first elections of the new municipalities on 5 December 2000"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/ME-Results",
+     "format": "csv, xls, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2026-11-04",
+     "finest": "za.vd",
+     "source": "iec_me",
+     "evidence": "Downloadable party results by voting district, one CSV per province, for 2011, 2016, 2021, and 2026 at /home/LGEPublicReports/<event>/Downloadable%20Party%20Results/<province>.csv (all answered 200 on 2026-11-17); Detailed Results reports by ward and voting district for 2000 and 2006 through the ASP.NET form."
+    },
+    {
+     "platform": "IEC website, uploaded files (www.elections.org.za)",
+     "url": "https://www.elections.org.za/content/uploadedfiles/",
+     "format": "csv in zip",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2011-05-18",
+     "finest": "za.vd",
+     "source": "iec_bulk",
+     "evidence": "2000 LGE.zip, 2006 LGE.zip, and 2011 LGE.zip; www.elections.org.za answered 403 to automated requests on 2026-11-17."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-12-05",
+     "election_kind": "local",
+     "note": "Local Government Elections 2000: Detailed Results by voting district on the IEC results site; bulk file on www.elections.org.za.",
+     "contests": 237,
+     "source": "iec_me",
+     "quote": "Local Government Elections 2000, Detailed Results, municipality lists: 6 metropolitan and 231 local municipalities"
+    },
+    {
+     "date": "2006-03-01",
+     "election_kind": "local",
+     "note": "Local Government Elections 2006: Detailed Results by voting district on the IEC results site; bulk file on www.elections.org.za.",
+     "contests": 237,
+     "source": "iec_me",
+     "quote": "Local Government Elections 2006, Detailed Results, municipality lists: 6 metropolitan and 231 local municipalities"
+    },
+    {
+     "date": "2011-05-18",
+     "election_kind": "local",
+     "contests": 234,
+     "source": "iec_lge2011",
+     "quote": "PR ballot rows for 234 municipality codes (8 metropolitan, 226 local)"
+    },
+    {
+     "date": "2016-08-03",
+     "election_kind": "local",
+     "contests": 213,
+     "source": "iec_lge2016",
+     "quote": "PR ballot rows for 213 municipality codes (8 metropolitan, 205 local)"
+    },
+    {
+     "date": "2021-11-01",
+     "election_kind": "local",
+     "contests": 213,
+     "source": "iec_lge2021",
+     "quote": "PR ballot rows for 213 municipality codes (8 metropolitan, 205 local)"
+    },
+    {
+     "date": "2026-11-04",
+     "election_kind": "local",
+     "contests": 213,
+     "source": "iec_lge2026",
+     "quote": "PR ballot rows for 213 municipality codes (8 metropolitan, 205 local)"
+    }
+   ],
+   "est_votes": 19000000,
+   "effort": 3
+  },
+  {
+   "key": "ward_councillor",
+   "tier": "ward",
+   "name": "Ward councillor elections",
+   "name_en": "Ward councillors",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.ward"
+    ],
+    "fine": [
+     "za.vd"
+    ]
+   },
+   "source": "structures_act",
+   "locator": "Local Government: Municipal Structures Act 117 of 1998, s. 22 and Schedule 1, Part 2 (one councillor per ward elected by plurality)",
+   "valid_from": "2000-12-05",
+   "first_held": "2000-12-05",
+   "earliest_record": "2000-12-05",
+   "finest_note": "Voting district (IEC downloadable party results); the files report all independent ward candidates under one INDEPENDENT label.",
+   "note": "Single-member wards by first past the post, delimited by the Municipal Demarcation Board before each election; party and independent candidates.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "schemes": [
+      "za.ward"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "2000-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "2006-01-01",
+     "administered_by": "Electoral Commission",
+     "source": "constitution",
+     "locator": "Constitution, s. 159",
+     "vacancy_rule": "By-election in the ward within 90 days (Structures Act, s. 25)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/ME-Results",
+     "format": "csv, xls, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2026-11-04",
+     "finest": "za.vd",
+     "source": "iec_me",
+     "evidence": "Downloadable party results by voting district, one CSV per province, for 2011, 2016, 2021, and 2026 at /home/LGEPublicReports/<event>/Downloadable%20Party%20Results/<province>.csv (all answered 200 on 2026-11-17); Detailed Results reports by ward and voting district for 2000 and 2006 through the ASP.NET form."
+    },
+    {
+     "platform": "IEC website, uploaded files (www.elections.org.za)",
+     "url": "https://www.elections.org.za/content/uploadedfiles/",
+     "format": "csv in zip",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2011-05-18",
+     "finest": "za.vd",
+     "source": "iec_bulk",
+     "evidence": "2000 LGE.zip, 2006 LGE.zip, and 2011 LGE.zip; www.elections.org.za answered 403 to automated requests on 2026-11-17."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-12-05",
+     "election_kind": "local",
+     "note": "Local Government Elections 2000: ward results by voting district on the IEC results site; ward count not yet taken from it."
+    },
+    {
+     "date": "2006-03-01",
+     "election_kind": "local",
+     "note": "Local Government Elections 2006: ward results by voting district on the IEC results site; ward count not yet taken from it."
+    },
+    {
+     "date": "2011-05-18",
+     "election_kind": "local",
+     "contests": 4277,
+     "source": "iec_lge2011",
+     "quote": "Ward ballot rows for 4,277 ward codes"
+    },
+    {
+     "date": "2016-08-03",
+     "election_kind": "local",
+     "contests": 4392,
+     "source": "iec_lge2016",
+     "quote": "Ward ballot rows for 4,392 ward codes"
+    },
+    {
+     "date": "2021-11-01",
+     "election_kind": "local",
+     "contests": 4468,
+     "source": "iec_lge2021",
+     "quote": "Ward ballot rows for 4,468 ward codes"
+    },
+    {
+     "date": "2026-11-04",
+     "election_kind": "local",
+     "contests": 4485,
+     "source": "iec_lge2026",
+     "quote": "Ward ballot rows for 4,485 ward codes"
+    }
+   ],
+   "est_votes": 19000000,
+   "effort": 3
+  },
+  {
+   "key": "district_council",
+   "tier": "district",
+   "name": "District council elections, district ballot (40%)",
+   "name_en": "District councils (40% PR ballot)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.district"
+    ],
+    "fine": [
+     "za.municipality",
+     "za.ward",
+     "za.vd"
+    ]
+   },
+   "source": "structures_act",
+   "locator": "Local Government: Municipal Structures Act 117 of 1998, s. 23 (40% of a district council elected by the district's voters by proportional representation; 60% appointed by the councils of its local municipalities) and Schedule 2",
+   "valid_from": "2000-12-05",
+   "first_held": "2000-12-05",
+   "earliest_record": "2000-12-05",
+   "finest_note": "Voting district (DC 40% ballot rows of the IEC downloadable files).",
+   "note": "Voters in local municipalities (not metros) cast a third ballot for the district council. In 2000 and 2006 voters in district management areas, which had no local council, also elected their district representatives on this ballot. The appointed 60% is out of scope (class municipal_indirect).",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "za.district"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "2000-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "valid_from": "2006-01-01",
+     "administered_by": "Electoral Commission",
+     "source": "constitution",
+     "locator": "Constitution, s. 159"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/ME-Results",
+     "format": "csv, xls, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2026-11-04",
+     "finest": "za.vd",
+     "source": "iec_me",
+     "evidence": "Downloadable party results by voting district, one CSV per province, for 2011, 2016, 2021, and 2026 at /home/LGEPublicReports/<event>/Downloadable%20Party%20Results/<province>.csv (all answered 200 on 2026-11-17); Detailed Results reports by ward and voting district for 2000 and 2006 through the ASP.NET form."
+    },
+    {
+     "platform": "IEC website, uploaded files (www.elections.org.za)",
+     "url": "https://www.elections.org.za/content/uploadedfiles/",
+     "format": "csv in zip",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2000-12-05",
+     "last_date": "2011-05-18",
+     "finest": "za.vd",
+     "source": "iec_bulk",
+     "evidence": "2000 LGE.zip, 2006 LGE.zip, and 2011 LGE.zip; www.elections.org.za answered 403 to automated requests on 2026-11-17."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-12-05",
+     "election_kind": "local",
+     "note": "Local Government Elections 2000: district ballot results on the IEC results site.",
+     "contests": 47,
+     "source": "iec_me",
+     "quote": "Local Government Elections 2000, Detailed Results, municipality lists: 42 district councils (DC) and 5 cross-boundary district councils (CBDC)"
+    },
+    {
+     "date": "2006-03-01",
+     "election_kind": "local",
+     "note": "Local Government Elections 2006: district ballot results on the IEC results site.",
+     "contests": 46,
+     "source": "iec_me",
+     "quote": "Local Government Elections 2006, Detailed Results, municipality lists: 46 district councils (DC)"
+    },
+    {
+     "date": "2011-05-18",
+     "election_kind": "local",
+     "contests": 44,
+     "source": "iec_lge2011",
+     "quote": "DC 40% ballot rows in 44 districts"
+    },
+    {
+     "date": "2016-08-03",
+     "election_kind": "local",
+     "contests": 44,
+     "source": "iec_lge2016",
+     "quote": "DC 40% ballot rows in 44 districts"
+    },
+    {
+     "date": "2021-11-01",
+     "election_kind": "local",
+     "contests": 44,
+     "source": "iec_lge2021",
+     "quote": "DC 40% ballot rows in 44 districts"
+    },
+    {
+     "date": "2026-11-04",
+     "election_kind": "local",
+     "contests": 44,
+     "source": "iec_lge2026",
+     "quote": "DC 40% ballot rows in 44 districts"
+    }
+   ],
+   "est_votes": 12000000,
+   "effort": 3
+  },
+  {
+   "key": "municipal_by_election",
+   "tier": "ward",
+   "name": "Municipal by-elections",
+   "name_en": "Municipal by-elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "za.ward",
+     "za.municipality"
+    ],
+    "fine": [
+     "za.vd"
+    ]
+   },
+   "source": "structures_act",
+   "locator": "Local Government: Municipal Structures Act 117 of 1998, s. 25 (by-elections within 90 days when a ward seat falls vacant, a council is dissolved, or an election is set aside)",
+   "valid_from": "2001-01-01",
+   "first_held": "2001-01-01",
+   "earliest_record": "2001-01-01",
+   "finest_note": "Voting district (IEC by-election results by term, date, and type).",
+   "note": "Held most months, usually several wards on one day; a dissolved council is re-elected on both ballots.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "2000-12-06"
+    }
+   ],
+   "cadence": [
+    {
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Electoral Commission",
+     "source": "structures_act",
+     "locator": "Municipal Structures Act, s. 25",
+     "vacancy_rule": "By-election within 90 days of the vacancy"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEC election results (results.elections.org.za)",
+     "url": "https://results.elections.org.za/home/Downloads/MBE-Results",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-01-01",
+     "finest": "za.vd",
+     "source": "iec_mbe",
+     "evidence": "ASP.NET downloads page listing by-elections by municipal term (2000 to 2026), date, and type; a by-election dashboard at /dashboards/byelection."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2001-01-01",
+     "through": "2026-11-17",
+     "election_kind": "by_election",
+     "note": "By-elections in every municipal term since 2000; not yet counted from the IEC's by-election lists."
+    }
+   ],
+   "est_votes": 4500000,
+   "effort": 3
+  },
+  {
+   "key": "municipal_indirect",
+   "tier": "municipality",
+   "name": "Mayors, executive committees, and appointed district councillors",
+   "name_en": "Municipal offices chosen by councils",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "structures_act",
+   "locator": "Municipal Structures Act 117 of 1998, ss. 23(1)(b) (district councillors appointed by local councils), 36 and 48 (council speakers), 43 and 55 (executive and executive mayors elected by the council)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the councillors at council meetings (mayors, speakers, executive committees) or appointed by local councils to the district council; no public vote and no IEC result.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "deputy_mayor"
+     ],
+     "iso_pattern": "ZA*"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "ward_committees",
+   "tier": "ward",
+   "name": "Ward committees",
+   "name_en": "Ward committees",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "source": "structures_act",
+   "locator": "Municipal Structures Act 117 of 1998, ss. 72-73 (ward committees of up to ten members chaired by the ward councillor, elected as the municipal council's rules provide)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Advisory bodies chosen at community meetings under each municipality's own rules; no state-run ballot and no published results.",
+   "dates": []
+  },
+  {
+   "key": "traditional_councils",
+   "tier": "province",
+   "name": "Traditional and Khoi-San councils (elected members)",
+   "name_en": "Traditional councils",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "source": "constitution",
+   "locator": "Constitution, ss. 211-212 (recognition of traditional leadership and its role under national legislation); the Traditional and Khoi-San Leadership Act 3 of 2019 provides for a share of each council's members to be elected",
+   "disposition": "blocked",
+   "disposition_reason": "Elections of the elected members are run by provincial departments of traditional affairs under provincial legislation; no official body publishes the results.",
+   "dates": []
+  },
+  {
+   "key": "houses_traditional_leaders",
+   "tier": "province",
+   "name": "National and provincial houses of traditional and Khoi-San leaders",
+   "name_en": "Houses of traditional leaders",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {},
+   "source": "constitution",
+   "locator": "Constitution, s. 212(2) (houses of traditional leaders established by national or provincial legislation)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Members are designated or elected by and from recognized traditional leaders, not by voters.",
+   "dates": []
+  },
+  {
+   "key": "school_governing_bodies",
+   "tier": "municipality",
+   "name": "School governing body elections",
+   "name_en": "School governing bodies",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "source": "schools_act",
+   "locator": "South African Schools Act 84 of 1996, ss. 23-31 (parents, educators, staff, and learners elect a governing body at each public school; three-year term)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held at meetings of each school's parents and staff under provincial regulations; the electorates are not territorial and no results are published.",
+   "dates": []
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Judges",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "locator": "Constitution, s. 174 (judges appointed by the President, on the advice of the Judicial Service Commission)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed, not elected.",
+   "dates": []
+  },
+  {
+   "key": "candidate_selection",
+   "tier": "national",
+   "name": "Party candidate selection",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "electoral_act",
+   "locator": "Electoral Act 73 of 1998, ss. 27 and 31A-31B (parties submit candidate lists; independents qualify by signatures)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties compile their lists under their own constitutions; the state runs no primary and publishes no nominating vote.",
+   "dates": []
+  },
+  {
+   "key": "house_of_assembly",
+   "tier": "national",
+   "name": "House of Assembly",
+   "name_en": "House of Assembly, 1910-1994",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "sa_act_1909",
+   "locator": "South Africa Act 1909, ss. 32-34 and 40 (members elected in single-member electoral divisions); Republic of South Africa Constitution Act 110 of 1983, s. 41 (House of Assembly of the tricameral Parliament)",
+   "valid_from": "1910-05-31",
+   "valid_to": "1994-04-27",
+   "first_held": "1910-09-15",
+   "note": "First-past-the-post in single-member divisions; general elections in 1910, 1915, 1920, 1921, 1924, 1929, 1933, 1938, 1943, 1948, 1953, 1958, 1961, 1966, 1970, 1974, 1977, 1981, 1987, and 1989, with by-elections between. The franchise was white men (and qualified Cape and Natal voters of other races) in 1910, extended to white women in 1930; African voters in the Cape were moved to a separate roll in 1936 (three Native Representatives, 1937-1960) and Coloured voters in 1956 (four members, 1958-1970). From 1984 it was the white house of the tricameral Parliament.",
+   "disposition": "blocked",
+   "disposition_reason": "No official body publishes the results digitally: the constituency returns appeared in the Government Gazette and official yearbooks, which no official host serves as data.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "ZA",
+     "valid_to": "1994-04-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1910-09-15",
+     "through": "1989-09-06",
+     "election_kind": "general",
+     "note": "Twenty general elections (15 September 1910 to 6 September 1989) and by-elections; not yet counted from an official record."
+    }
+   ]
+  },
+  {
+   "key": "tricameral_houses",
+   "tier": "national",
+   "name": "House of Representatives and House of Delegates",
+   "name_en": "Tricameral Parliament: Coloured and Indian houses, 1984-1994",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "constitution_1983",
+   "locator": "Republic of South Africa Constitution Act 110 of 1983, ss. 41-43 (House of Assembly, House of Representatives, and House of Delegates, each elected by its own voters' roll)",
+   "valid_from": "1984-08-22",
+   "valid_to": "1994-04-27",
+   "first_held": "1984-08-22",
+   "note": "Separate chambers elected by Coloured (House of Representatives, 80 elected members) and Indian (House of Delegates, 40 elected members) voters on separate rolls, by plurality in single-member divisions.",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the constituency results; they appeared only in the Government Gazette.",
+   "match": [
+    {
+     "name_pattern": "House of (Representatives|Delegates)",
+     "iso_pattern": "ZA",
+     "valid_to": "1994-04-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1984-08-22",
+     "election_kind": "general",
+     "note": "House of Representatives."
+    },
+    {
+     "date": "1984-08-28",
+     "election_kind": "general",
+     "note": "House of Delegates."
+    },
+    {
+     "date": "1989-09-06",
+     "election_kind": "general",
+     "note": "Both houses, with the House of Assembly."
+    }
+   ]
+  },
+  {
+   "key": "senate_1910",
+   "tier": "national",
+   "name": "Senate",
+   "name_en": "Senate, 1910-1980",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "sa_act_1909",
+   "locator": "South Africa Act 1909, ss. 24-25 (eight senators per province elected by the members of the House of Assembly and the provincial council of each province, and eight nominated)",
+   "valid_from": "1910-05-31",
+   "valid_to": "1981-01-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Senators were elected by electoral colleges of each province's members of the House of Assembly and provincial council, or nominated; no public vote. The Senate was abolished from 1 January 1981.",
+   "dates": []
+  },
+  {
+   "key": "provincial_councils",
+   "tier": "province_1910",
+   "name": "Provincial councils",
+   "name_en": "Provincial councils, 1910-1986",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "sa_act_1909",
+   "locator": "South Africa Act 1909, ss. 70-71 (a provincial council in each province elected by the parliamentary voters of the province)",
+   "valid_from": "1910-05-31",
+   "valid_to": "1986-07-01",
+   "first_held": "1910-09-15",
+   "note": "Elected from the same divisions and voters as the House of Assembly (the larger provinces used the parliamentary divisions), on their own three- to five-year cycle; abolished by the Provincial Government Act 69 of 1986.",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of the results; they appeared only in the provincial gazettes.",
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_to": "1986-07-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1910-09-15",
+     "through": "1981-04-29",
+     "election_kind": "general",
+     "note": "Provincial council elections from 1910 to 1981; not yet counted from an official record."
+    }
+   ]
+  },
+  {
+   "key": "referendum_1960_1992",
+   "tier": "national",
+   "name": "Referendums of white voters",
+   "name_en": "Referendums, 1960-1992",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "constitution_1983",
+   "locator": "Republic of South Africa Constitution Act 110 of 1983 (approved by the referendum of 2 November 1983)",
+   "valid_from": "1960-10-05",
+   "valid_to": "1994-04-27",
+   "first_held": "1960-10-05",
+   "note": "Three referendums of the white electorate: on becoming a republic (5 October 1960), on the 1983 constitution (2 November 1983), and on continuing negotiations (17 March 1992).",
+   "disposition": "blocked",
+   "disposition_reason": "Results by voting region appeared in the Government Gazette; no official body publishes them as data.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "ZA",
+     "valid_to": "1994-04-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1960-10-05",
+     "election_kind": "referendum"
+    },
+    {
+     "date": "1983-11-02",
+     "election_kind": "referendum"
+    },
+    {
+     "date": "1992-03-17",
+     "election_kind": "referendum"
+    }
+   ]
+  },
+  {
+   "key": "separate_councils",
+   "tier": "national",
+   "name": "Separate representative councils",
+   "name_en": "Natives Representative Council, Coloured Persons Representative Council, South African Indian Council",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution_1983",
+   "locator": "Republic of South Africa Constitution Act 110 of 1983 (replaced the race-based councils with the House of Representatives and House of Delegates)",
+   "valid_from": "1937-01-01",
+   "valid_to": "1984-09-03",
+   "note": "Advisory councils elected on racial rolls: the Natives Representative Council (1937-1951, chosen by electoral colleges), the Coloured Persons Representative Council (elected 1969 and 1975, dissolved 1980), and the South African Indian Council (elected 1981).",
+   "disposition": "blocked",
+   "disposition_reason": "No official digital publication of their results.",
+   "dates": []
+  },
+  {
+   "key": "homeland_assemblies",
+   "tier": "homeland",
+   "name": "Homeland legislative assemblies",
+   "name_en": "Homeland legislative assemblies, 1963-1994",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {},
+   "source": "interim_constitution",
+   "locator": "Constitution of the Republic of South Africa Act 200 of 1993, s. 1(2) and Schedule 1 (the national territory includes the former Transkei, Bophuthatswana, Venda, and Ciskei, and the self-governing territories)",
+   "valid_from": "1963-05-30",
+   "valid_to": "1994-04-27",
+   "first_held": "1963-11-20",
+   "note": "Partly elected assemblies of the ten homelands, first Transkei (1963), and of the four (TBVC) declared independent by South African law; reincorporated on 27 April 1994.",
+   "disposition": "blocked",
+   "disposition_reason": "Results were published, if at all, in the homeland governments' own gazettes, which no official host serves.",
+   "dates": [
+    {
+     "date": "1963-11-20",
+     "through": "1993-12-31",
+     "note": "Assembly elections in the ten homelands; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "local_pre1995",
+   "tier": "national",
+   "name": "Municipal, divisional, and black local authority elections before 1995",
+   "name_en": "Local councils, 1910-1994",
+   "category": "council",
+   "goal": "local",
+   "measure": {},
+   "source": "sa_act_1909",
+   "locator": "South Africa Act 1909, s. 85 (provincial councils legislate for municipal institutions and divisional councils)",
+   "valid_from": "1910-05-31",
+   "valid_to": "1995-11-01",
+   "note": "Councils elected under provincial ordinances on racially separate rolls, including black local authorities (1983 and 1988).",
+   "disposition": "blocked",
+   "disposition_reason": "Run by each municipality or province; no official body publishes the results.",
+   "dates": []
+  },
+  {
+   "key": "transitional_local",
+   "tier": "municipality",
+   "name": "Transitional local government elections",
+   "name_en": "Transitional local councils, 1995-1996",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "interim_constitution",
+   "locator": "Constitution of the Republic of South Africa Act 200 of 1993, ss. 174-179 and 245 (local government elections under the Local Government Transition Act 209 of 1993)",
+   "valid_from": "1995-11-01",
+   "valid_to": "2000-12-05",
+   "first_held": "1995-11-01",
+   "note": "The first non-racial local elections, for transitional councils: 1 November 1995 in most of the country, 29 May 1996 in KwaZulu-Natal, and 26 June 1996 in the Cape metropolitan area and parts of the Western Cape. Run by provincial governments, not the IEC.",
+   "disposition": "blocked",
+   "disposition_reason": "The IEC did not run these elections and its results site starts in 2000; no official body publishes the results.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "ZA*",
+     "valid_from": "1995-01-01",
+     "valid_to": "2000-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-11-01",
+     "election_kind": "local"
+    },
+    {
+     "date": "1996-05-29",
+     "election_kind": "local"
+    },
+    {
+     "date": "1996-06-26",
+     "election_kind": "local"
+    }
+   ]
+  }
+ ]
+}
