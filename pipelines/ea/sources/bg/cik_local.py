@@ -106,7 +106,9 @@ DAYS = [
     ),
 ]
 # Files the CIK publishes that this module does not read: the spreadsheets of the 2023 rounds repeat the text files
-# split by ballot type, and the 2015 and 2019 opendata pages did not answer.
+# split by ballot type, and the 2015 and 2019 opendata pages did not answer. results.cik.bg may answer automated
+# requests with a browser challenge (403); `fetch` then prints the refusal and a rebuild reads the raw cache, whose
+# index keeps each bundle's URL and hash.
 BLOCKED: list[str] = []
 
 
