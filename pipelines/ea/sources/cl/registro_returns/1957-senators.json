@@ -1,0 +1,1015 @@
+{
+ "volume": "1957-senators",
+ "chamber": "senators",
+ "year": 1957,
+ "day": "1957-03-03",
+ "day_printed": "Domingo 3 de Marzo de 1957",
+ "contests": [
+  {
+   "number": 2,
+   "title": "2a. Agrupacion Provincial",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": 44424,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 2,
+   "box": [
+    0.86,
+    0.65,
+    0.93,
+    0.69
+   ],
+   "lists": [
+    {
+     "label": "Lista N° 1",
+     "party": "Partidos Socialista Popular y Agrario Laborista",
+     "votes": 10270,
+     "unassigned": 341,
+     "seats": 1,
+     "page": 2,
+     "box": [
+      0.86,
+      0.407,
+      0.93,
+      0.447
+     ],
+     "candidates": [
+      {
+       "name": "Diego Lira Vergara",
+       "party": "A.L.",
+       "votes": 2371,
+       "elected": false,
+       "page": 2,
+       "box": [
+        0.86,
+        0.348,
+        0.93,
+        0.384
+       ]
+      },
+      {
+       "name": "Alejandro Chelén R.",
+       "party": "S.P.",
+       "votes": 6629,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.86,
+        0.367,
+        0.93,
+        0.403
+       ]
+      },
+      {
+       "name": "Alamiro González",
+       "party": "S.",
+       "votes": 929,
+       "elected": false,
+       "page": 2,
+       "box": [
+        0.86,
+        0.384,
+        0.93,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 2",
+     "party": "Partidos Radical, liberal y Falange Nacional",
+     "votes": 34154,
+     "unassigned": 1320,
+     "seats": 4,
+     "page": 2,
+     "box": [
+      0.86,
+      0.598,
+      0.93,
+      0.638
+     ],
+     "candidates": [
+      {
+       "name": "Isauro Torres C.",
+       "party": "A.",
+       "votes": 6102,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.86,
+        0.506,
+        0.93,
+        0.542
+       ]
+      },
+      {
+       "name": "Hernán Videla Lira",
+       "party": "L.",
+       "votes": 8542,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.86,
+        0.524,
+        0.93,
+        0.56
+       ]
+      },
+      {
+       "name": "Raúl Marín Balmaceda",
+       "party": "L.",
+       "votes": 6287,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.86,
+        0.544,
+        0.93,
+        0.58
+       ]
+      },
+      {
+       "name": "Humberto Alvarez S.",
+       "party": "R.",
+       "votes": 7272,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.86,
+        0.563,
+        0.93,
+        0.599
+       ]
+      },
+      {
+       "name": "Javier Lagarrigue A.",
+       "party": "F.N.",
+       "votes": 4631,
+       "elected": false,
+       "page": 2,
+       "box": [
+        0.86,
+        0.583,
+        0.93,
+        0.619
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Province columns Atacama and Coquimbo with 'Total Circuns.', 'Rectif. Tribun.' and final 'Total' columns; figures recorded are the final TOTAL column (after the Tribunal Calificador's rectification). Pre-rectification: list 1 10.245, list 2 33.968, total general 44.213 (+211). 'TOTAL GENERAL' (sum of lists) recorded as valid; no registered, null or blank figures printed. Isauro Torres's party abbreviation is printed with the typeface's A-like glyph '(A.)' though the elected-senators list (p7) and history give him as Radical; kept as printed. Elected names from the list on PDF p7 (ISAURO TORRES CERECEDA, HERNAN VIDELA LIRA, RAUL MARIN BALMACEDA, HUMBERTO ALVAREZ SUAREZ, ALEJANDRO CHELEN ROJAS)."
+  },
+  {
+   "number": 4,
+   "title": "4a Agrupación Senatorial Santiago (handwritten heading)",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": 261140,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 3,
+   "box": [
+    0.86,
+    0.86,
+    0.92,
+    0.895
+   ],
+   "lists": [
+    {
+     "label": "Lista N° 1",
+     "party": "Independientes",
+     "votes": 502,
+     "unassigned": 35,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.86,
+      0.22,
+      0.92,
+      0.26
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Foncea",
+       "party": null,
+       "votes": 338,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.192,
+        0.92,
+        0.228
+       ]
+      },
+      {
+       "name": "Mamerto Figueroa",
+       "party": null,
+       "votes": 129,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.21,
+        0.92,
+        0.246
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 6",
+     "party": "Partido Radical",
+     "votes": 48161,
+     "unassigned": 3358,
+     "seats": 1,
+     "page": 3,
+     "box": [
+      0.86,
+      0.395,
+      0.92,
+      0.435
+     ],
+     "candidates": [
+      {
+       "name": "Angel Faivovich H.",
+       "party": null,
+       "votes": 43165,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.86,
+        0.301,
+        0.92,
+        0.337
+       ]
+      },
+      {
+       "name": "Eliodoro Dominguez Dominguez",
+       "party": null,
+       "votes": 638,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.32,
+        0.92,
+        0.356
+       ]
+      },
+      {
+       "name": "Carlos Valdovinos Valdovinos",
+       "party": null,
+       "votes": 755,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.338,
+        0.92,
+        0.374
+       ]
+      },
+      {
+       "name": "Moises Rojas Silva",
+       "party": null,
+       "votes": 158,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.356,
+        0.92,
+        0.392
+       ]
+      },
+      {
+       "name": "Juan Atala Gonzales",
+       "party": null,
+       "votes": 87,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.374,
+        0.92,
+        0.41
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 7",
+     "party": "Partido Socialista",
+     "votes": 54614,
+     "unassigned": 3203,
+     "seats": 1,
+     "page": 3,
+     "box": [
+      0.86,
+      0.522,
+      0.92,
+      0.562
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Foncea Aedo",
+       "party": null,
+       "votes": 17002,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.465,
+        0.92,
+        0.501
+       ]
+      },
+      {
+       "name": "Luis Quinteros Tricot",
+       "party": null,
+       "votes": 27747,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.86,
+        0.484,
+        0.92,
+        0.52
+       ]
+      },
+      {
+       "name": "Mamerto Figueroa Parot",
+       "party": null,
+       "votes": 6662,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.502,
+        0.92,
+        0.538
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 8",
+     "party": "Partido Movimiento Nacional del Pueblo",
+     "votes": 15,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.86,
+      0.574,
+      0.92,
+      0.614
+     ],
+     "candidates": [
+      {
+       "name": "Ramón Alvarez Goldsack",
+       "party": null,
+       "votes": 15,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.554,
+        0.92,
+        0.59
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 9",
+     "party": "Partidos Falange Nacional y Nacional",
+     "votes": 61148,
+     "unassigned": 5034,
+     "seats": 1,
+     "page": 3,
+     "box": [
+      0.86,
+      0.683,
+      0.92,
+      0.723
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Frei Montalva",
+       "party": "F.N.",
+       "votes": 54945,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.86,
+        0.639,
+        0.92,
+        0.675
+       ]
+      },
+      {
+       "name": "Julio Barrenechea Pino",
+       "party": "N.",
+       "votes": 1169,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.658,
+        0.92,
+        0.694
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 10",
+     "party": "Partidos Conservador Unido, Agrario Laborista y Liberal",
+     "votes": 96700,
+     "unassigned": 4473,
+     "seats": 2,
+     "page": 3,
+     "box": [
+      0.86,
+      0.835,
+      0.92,
+      0.875
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Cruz Coke Lassabe",
+       "party": "C.U.",
+       "votes": 7874,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.74,
+        0.92,
+        0.776
+       ]
+      },
+      {
+       "name": "Orlando Latorre Gonzalez",
+       "party": "A.L.",
+       "votes": 17318,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.759,
+        0.92,
+        0.795
+       ]
+      },
+      {
+       "name": "Julio Fuenzalida Hurtado",
+       "party": "L.",
+       "votes": 192,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.86,
+        0.778,
+        0.92,
+        0.814
+       ]
+      },
+      {
+       "name": "Bernardo Larraín Vial",
+       "party": "C.U.",
+       "votes": 24931,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.86,
+        0.797,
+        0.92,
+        0.833
+       ]
+      },
+      {
+       "name": "Jorge Alessandri Rodriguez",
+       "party": "L.",
+       "votes": 41912,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.86,
+        0.817,
+        0.92,
+        0.853
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Single province (Santiago) printed by distrito/department; the heading '4a Agrupación Senatorial Santiago' is handwritten in the margin. Figures are the final 'TOTAL ESCRUTINIO' column (after 'Rectific. Tribunal'); pre-rectification 'Total Agrupacion' 252.804, rectification +8.336. 'TOTAL PROVINCIA' recorded as valid; no registered, null or blank printed. The cast-vote number rows are printed offset about half a row above the names; assignments verified by row sums. The first name of Eduardo Cruz Coke Lassabe is faintly typed (broken letters) and read as 'Eduardo'. Elected from p7."
+  },
+  {
+   "number": 6,
+   "title": "6a. Agrupacion Provincial",
+   "areas": [
+    "Curicó",
+    "Talca",
+    "Maule",
+    "Linares"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": 84535,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 4,
+   "box": [
+    0.83,
+    0.695,
+    0.9,
+    0.735
+   ],
+   "lists": [
+    {
+     "label": "Lista N° 1",
+     "party": "Partidos Liberal y Conservador Unido",
+     "votes": 30748,
+     "unassigned": 608,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.83,
+      0.348,
+      0.9,
+      0.388
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Alessandri R.",
+       "party": "L.",
+       "votes": 12143,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.83,
+        0.269,
+        0.9,
+        0.305
+       ]
+      },
+      {
+       "name": "L.Felipe Letelier I.",
+       "party": "C.U.",
+       "votes": 11732,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.83,
+        0.297,
+        0.9,
+        0.333
+       ]
+      },
+      {
+       "name": "Pedro Opazo C.",
+       "party": "L.",
+       "votes": 6265,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.83,
+        0.324,
+        0.9,
+        0.36
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 2",
+     "party": "Partido Radical",
+     "votes": 13869,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.83,
+      0.402,
+      0.9,
+      0.442
+     ],
+     "candidates": [
+      {
+       "name": "Ulises Correa Correa",
+       "party": null,
+       "votes": 13869,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.83,
+        0.378,
+        0.9,
+        0.414
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 3",
+     "party": "Partidos Conservador y Nacional",
+     "votes": 23918,
+     "unassigned": 622,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.83,
+      0.515,
+      0.9,
+      0.555
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Vial",
+       "party": "C.",
+       "votes": 15212,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.83,
+        0.469,
+        0.9,
+        0.505
+       ]
+      },
+      {
+       "name": "Alberto del Pedregal A.",
+       "party": "N.",
+       "votes": 8084,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.83,
+        0.488,
+        0.9,
+        0.524
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 4",
+     "party": "Partido Agrario Laborista",
+     "votes": 14894,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.83,
+      0.578,
+      0.9,
+      0.618
+     ],
+     "candidates": [
+      {
+       "name": "Rafael Tarud Siwady",
+       "party": null,
+       "votes": 14894,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.83,
+        0.555,
+        0.9,
+        0.591
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 5",
+     "party": "Partido Democrático",
+     "votes": 1106,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.83,
+      0.648,
+      0.9,
+      0.688
+     ],
+     "candidates": [
+      {
+       "name": "Gustavo Mujica C.",
+       "party": null,
+       "votes": 1106,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.83,
+        0.624,
+        0.9,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Columns by department and province subtotal; figures are the last column 'TOTAL ESC. DEFINITIVO' (no separate rectification column). 'TOTAL GENERAL' recorded as valid; no registered, null or blank printed. Elected from p7."
+  },
+  {
+   "number": 8,
+   "title": "8a. Agrupacion Provincial",
+   "areas": [
+    "Bio Bio",
+    "Malleco",
+    "Cautin"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": 90942,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.85,
+    0.775,
+    0.92,
+    0.82
+   ],
+   "lists": [
+    {
+     "label": "Lista N° 1",
+     "party": "Partidos Liberal, Conservador unido y Nacional Cristiano",
+     "votes": 27949,
+     "unassigned": 1141,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.85,
+      0.358,
+      0.92,
+      0.398
+     ],
+     "candidates": [
+      {
+       "name": "Gregorio Amunategui Jordán",
+       "party": "L.",
+       "votes": 12301,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.28,
+        0.92,
+        0.316
+       ]
+      },
+      {
+       "name": "Venancio Coñuepán",
+       "party": "N.C.",
+       "votes": 4856,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.298,
+        0.92,
+        0.334
+       ]
+      },
+      {
+       "name": "Roberto Gutierrez Prieto",
+       "party": "C.U.",
+       "votes": 266,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.317,
+        0.92,
+        0.353
+       ]
+      },
+      {
+       "name": "Joaquín Prieto Concha",
+       "party": "C.U.",
+       "votes": 9385,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.335,
+        0.92,
+        0.371
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 2",
+     "party": "Partidos Radical y Agrario Laborista",
+     "votes": 31226,
+     "unassigned": 1766,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.85,
+      0.492,
+      0.92,
+      0.532
+     ],
+     "candidates": [
+      {
+       "name": "Julio Durán Neumann",
+       "party": "R.",
+       "votes": 15535,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.429,
+        0.92,
+        0.465
+       ]
+      },
+      {
+       "name": "Raúl Rettig Guissen",
+       "party": "R.",
+       "votes": 5237,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.448,
+        0.92,
+        0.484
+       ]
+      },
+      {
+       "name": "Edgardo Barrueto Reeves",
+       "party": "A.L.",
+       "votes": 8688,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.466,
+        0.92,
+        0.502
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 3",
+     "party": "Partido Nacional",
+     "votes": 14727,
+     "unassigned": 1902,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.85,
+      0.631,
+      0.92,
+      0.671
+     ],
+     "candidates": [
+      {
+       "name": "Julián Echavarri Elorza",
+       "party": null,
+       "votes": 11105,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.542,
+        0.92,
+        0.578
+       ]
+      },
+      {
+       "name": "Jorge Saelzer Balde",
+       "party": null,
+       "votes": 708,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.92,
+        0.596
+       ]
+      },
+      {
+       "name": "Virgilio Morales",
+       "party": null,
+       "votes": 229,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.578,
+        0.92,
+        0.614
+       ]
+      },
+      {
+       "name": "Manuel Eduardo Hübner",
+       "party": null,
+       "votes": 205,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.596,
+        0.92,
+        0.632
+       ]
+      },
+      {
+       "name": "Manuel Montiel Haro",
+       "party": null,
+       "votes": 578,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.615,
+        0.92,
+        0.651
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N° 4",
+     "party": "Partidos Socialista Popular y Democrático",
+     "votes": 17040,
+     "unassigned": 1104,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.85,
+      0.745,
+      0.92,
+      0.785
+     ],
+     "candidates": [
+      {
+       "name": "Ernesto Araneda Rocha",
+       "party": "D.",
+       "votes": 7205,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.704,
+        0.92,
+        0.74
+       ]
+      },
+      {
+       "name": "Galvarino Palacios G.",
+       "party": "S.P.",
+       "votes": 8751,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.722,
+        0.92,
+        0.758
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Printed over two pages: p5 (Bio Bio and Malleco departments, Malleco province total) and p6 (Cautín departments, 'Total Prov. Cautin', 'Total Gral. Agrupacion', 'Rectif. Trib. Calificador', 'Total General'). Figures are the final 'Total General' column; pre-rectification total 90.085, rectification +857. 'TOTAL GENERAL' recorded as valid; no registered, null or blank printed. Source inconsistency: Galvarino Palacios's final figure is printed 8.751, but 8.595 + 136 = 8.731, and the printed list total 17.040 (= 16.869 + 171) agrees with 8.731; kept the printed 8.751, so preferences + unassigned = 17.060 vs list total 17.040. Julio Durán's party is printed '(R.)' with a bracket spanning him and Raúl Rettig. Elected from p7."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": null,
+  "registered": null,
+  "page": null,
+  "parties": {}
+ },
+ "notes": "Volume holds senate results for the four agrupaciones provinciales renewed in 1957 (2, 4, 6, 8) as typewritten tables by department with Tribunal Calificador rectifications (pp. 2-6), and a typewritten list of the elected senators per agrupación (p7). No registered voters, null or blank votes, and no national totals are printed. All list/candidate figures are the final post-rectification columns."
+}

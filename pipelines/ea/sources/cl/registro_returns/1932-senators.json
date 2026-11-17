@@ -1,0 +1,3270 @@
+{
+ "volume": "1932-senators",
+ "chamber": "senators",
+ "year": 1932,
+ "day": "1932-10-30",
+ "day_printed": "30 de Octubre de 1932",
+ "national": {
+  "valid": 317414,
+  "cast": null,
+  "registered": 464870,
+  "page": 15,
+  "box": [
+   0.18,
+   0.58,
+   0.72,
+   0.6
+  ],
+  "parties": {}
+ },
+ "notes": "1932 Senate election (30 Oct 1932): all 45 seats, 5 per each of 9 circunscripciones provinciales (Aysen and Magallanes did not vote). Sources: pp3-14 the Tribunal Calificador's definitive scrutiny per circunscripción (provisional tables followed by complementary/definitive ones for the 2.a, 7.a and 9.a; only a provisional table survives for the 3.a), p15 the national summary (lists, total per circunscripción, inscritos, senators elected), p2 the list of agrupaciones. pp16-20 (population, the Senate's party composition, party-bloc vote tables, and a deputies table) are not transcribed. No null/blank or cast figures are printed: 'valid' is the summary's 'Total en la Circunscripción' of list votes; national.valid is the printed 'Número total de votantes' 317,414 and national.registered 464,870 (p15); the summary's 'Total de votantes en la elección de Senadores' in the Resumen estadístico reads 317,414 too. Contest 3 has valid null because only provisional figures are transcribed. Withdrawn ('Retirada') lists omitted; dashes recorded as 0. The contests' valid totals add to 273,664; the gap to the national 317,414 is mostly the 3.a circunscripción, whose final total (printed on p15 as about 43,65x, illegible) is not recorded.",
+ "contests": [
+  {
+   "number": 1,
+   "title": "1.a Circunscripción Provincial",
+   "areas": [
+    "Tarapacá",
+    "Antofagasta"
+   ],
+   "seats": 5,
+   "registered": 42716,
+   "cast": null,
+   "valid": 21954,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.12,
+    0.72,
+    0.135
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Demócrata",
+     "votes": 1490,
+     "unassigned": 182,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.73,
+      0.442,
+      0.79,
+      0.458
+     ],
+     "candidates": [
+      {
+       "name": "Guillermo M. Bañados Honorato",
+       "party": null,
+       "votes": 707,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.412,
+        0.79,
+        0.458
+       ]
+      },
+      {
+       "name": "Tomás Lawrence Torres",
+       "party": null,
+       "votes": 601,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.412,
+        0.79,
+        0.458
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Independiente",
+     "votes": 2521,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.73,
+      0.507,
+      0.79,
+      0.523
+     ],
+     "candidates": [
+      {
+       "name": "Elías Lafertte Gaviño",
+       "party": null,
+       "votes": 2521,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.507,
+        0.79,
+        0.523
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 9",
+     "party": "Partido Conservador",
+     "votes": 1333,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.73,
+      0.572,
+      0.79,
+      0.588
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Labbé Márquez",
+       "party": null,
+       "votes": 1333,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.572,
+        0.79,
+        0.588
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 10",
+     "party": "Partido Radical Socialista",
+     "votes": 12352,
+     "unassigned": 1656,
+     "seats": 4,
+     "page": 3,
+     "box": [
+      0.73,
+      0.692,
+      0.79,
+      0.708
+     ],
+     "candidates": [
+      {
+       "name": "Aurelio Núñez Morgado",
+       "party": null,
+       "votes": 8643,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.73,
+        0.637,
+        0.79,
+        0.708
+       ]
+      },
+      {
+       "name": "Jorge Wacholtz Araya",
+       "party": null,
+       "votes": 463,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.73,
+        0.637,
+        0.79,
+        0.708
+       ]
+      },
+      {
+       "name": "Luis Bustamante Cordero",
+       "party": null,
+       "votes": 1355,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.73,
+        0.637,
+        0.79,
+        0.708
+       ]
+      },
+      {
+       "name": "Manuel Hidalgo Plaza",
+       "party": null,
+       "votes": 235,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.73,
+        0.637,
+        0.79,
+        0.708
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 12",
+     "party": "Partido Radical",
+     "votes": 2859,
+     "unassigned": 910,
+     "seats": 1,
+     "page": 3,
+     "box": [
+      0.73,
+      0.822,
+      0.79,
+      0.838
+     ],
+     "candidates": [
+      {
+       "name": "Alberto Cabero Díaz",
+       "party": null,
+       "votes": 888,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.838
+       ]
+      },
+      {
+       "name": "José Avilés Avilés",
+       "party": null,
+       "votes": 520,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.838
+       ]
+      },
+      {
+       "name": "Luis Alberto Cuevas Contreras",
+       "party": null,
+       "votes": 440,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.838
+       ]
+      },
+      {
+       "name": "Leonardo Guzmán Cortés",
+       "party": null,
+       "votes": 52,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.838
+       ]
+      },
+      {
+       "name": "Armando Quezada",
+       "party": null,
+       "votes": 49,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.838
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 17",
+     "party": "Partido Liberal",
+     "votes": 1399,
+     "unassigned": 54,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.73,
+      0.932,
+      0.79,
+      0.948
+     ],
+     "candidates": [
+      {
+       "name": "Horacio Silva Adriazola",
+       "party": null,
+       "votes": 24,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.877,
+        0.79,
+        0.948
+       ]
+      },
+      {
+       "name": "Arturo Torres Pinto",
+       "party": null,
+       "votes": 1313,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.877,
+        0.79,
+        0.948
+       ]
+      },
+      {
+       "name": "Jorge Andrés Guerra",
+       "party": null,
+       "votes": 8,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.73,
+        0.877,
+        0.79,
+        0.948
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive scrutiny on p3 (landscape page), totals from the 'Total votos Agrupación' column; all lists add exactly to the summary p15 'Total en la Circunscripción' 21,954. Registered 42,716 (p3 header and p15). Seats per p3: 4 to Lista 10 (all four candidates), 1 to Lista 12 (Cabero Díaz). Candidate preferences in this column are faint; each list's preferences close its printed total."
+  },
+  {
+   "number": 2,
+   "title": "2.a Circunscripción Provincial",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": 24920,
+   "cast": null,
+   "valid": 16515,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.18,
+    0.72,
+    0.2
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Partido Conservador",
+     "votes": 2114,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.73,
+      0.442,
+      0.79,
+      0.458
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Irarrázaval",
+       "party": null,
+       "votes": 2114,
+       "elected": false,
+       "page": 5,
+       "box": [
+        0.73,
+        0.442,
+        0.79,
+        0.458
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": "Partido Radical Socialista",
+     "votes": 1125,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.73,
+      0.507,
+      0.79,
+      0.523
+     ],
+     "candidates": [
+      {
+       "name": "Eliseo Peña Villalón",
+       "party": null,
+       "votes": 1125,
+       "elected": false,
+       "page": 5,
+       "box": [
+        0.73,
+        0.507,
+        0.79,
+        0.523
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Demócrata",
+     "votes": 2291,
+     "unassigned": 761,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.73,
+      0.607,
+      0.79,
+      0.623
+     ],
+     "candidates": [
+      {
+       "name": "Aquiles Concha",
+       "party": null,
+       "votes": 1464,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.73,
+        0.567,
+        0.79,
+        0.623
+       ]
+      },
+      {
+       "name": "Marmaduque Grove V.",
+       "party": null,
+       "votes": 66,
+       "elected": false,
+       "page": 5,
+       "box": [
+        0.73,
+        0.567,
+        0.79,
+        0.623
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": "Partido Liberal",
+     "votes": 4521,
+     "unassigned": 112,
+     "seats": 2,
+     "page": 5,
+     "box": [
+      0.73,
+      0.702,
+      0.79,
+      0.718
+     ],
+     "candidates": [
+      {
+       "name": "Abraham Gatica Silva",
+       "party": null,
+       "votes": 2014,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.73,
+        0.667,
+        0.79,
+        0.718
+       ]
+      },
+      {
+       "name": "Guillermo Portales Vicuña",
+       "party": null,
+       "votes": 2395,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.73,
+        0.667,
+        0.79,
+        0.718
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": "Partido Radical",
+     "votes": 6464,
+     "unassigned": 246,
+     "seats": 2,
+     "page": 5,
+     "box": [
+      0.73,
+      0.792,
+      0.79,
+      0.808
+     ],
+     "candidates": [
+      {
+       "name": "Rodolfo Michels C.",
+       "party": null,
+       "votes": 4363,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.808
+       ]
+      },
+      {
+       "name": "Nicolás Marambio Montt",
+       "party": null,
+       "votes": 1855,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.73,
+        0.757,
+        0.79,
+        0.808
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive table on p5 (landscape), including the complementary election of 5 March 1933 in Chañaral (p4 is the earlier provisional scrutiny without the Potrerillos mesa: Lista 4 = 4,487, Lista 1 = 2,113, Lista 3 = 2,290). Lista 4's circunscripción column is blurred (reads 4,531 / 2,305 / 113); its department columns give 112 / 2,014 / 2,395 = 4,521, which the summary p15 also prints (4,521) and which makes the lists add to the printed 16,515; those values recorded. Seats per p5: Lista 5 two, Lista 4 two, Lista 3 one (Concha, by majority). Registered 24,920."
+  },
+  {
+   "number": 3,
+   "title": "3.a Circunscripción Provincial",
+   "areas": [
+    "Aconcagua",
+    "Valparaíso"
+   ],
+   "seats": 5,
+   "registered": 63616,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.22,
+    0.72,
+    0.27
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Unión Social Republicana",
+     "votes": 1110,
+     "unassigned": 290,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.62,
+      0.237,
+      0.71,
+      0.253
+     ],
+     "candidates": [
+      {
+       "name": "Enrique O. Barboza Baeza",
+       "party": null,
+       "votes": 489,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.217,
+        0.71,
+        0.253
+       ]
+      },
+      {
+       "name": "Ricardo Palacios Palacios",
+       "party": null,
+       "votes": 331,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.217,
+        0.71,
+        0.253
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": "Independientes",
+     "votes": 1111,
+     "unassigned": 555,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.62,
+      0.292,
+      0.71,
+      0.308
+     ],
+     "candidates": [
+      {
+       "name": "Galo González Díaz",
+       "party": null,
+       "votes": 474,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.267,
+        0.71,
+        0.308
+       ]
+      },
+      {
+       "name": "Francisco Díaz Sueo",
+       "party": null,
+       "votes": 35,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.267,
+        0.71,
+        0.308
+       ]
+      },
+      {
+       "name": "Jenaro Valdés Rojas",
+       "party": null,
+       "votes": 47,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.267,
+        0.71,
+        0.308
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": "Nueva Acción Pública",
+     "votes": 6290,
+     "unassigned": 596,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.62,
+      0.412,
+      0.71,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "Prudencio Mena Contreras",
+       "party": null,
+       "votes": 773,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.367,
+        0.71,
+        0.428
+       ]
+      },
+      {
+       "name": "Luis Mayer Ojeda",
+       "party": null,
+       "votes": 294,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.367,
+        0.71,
+        0.428
+       ]
+      },
+      {
+       "name": "Hugo Grove Vallejo",
+       "party": null,
+       "votes": 4106,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.62,
+        0.367,
+        0.71,
+        0.428
+       ]
+      },
+      {
+       "name": "Benjamín Rojas Contreras",
+       "party": null,
+       "votes": 490,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.367,
+        0.71,
+        0.428
+       ]
+      },
+      {
+       "name": "Benilde Vergara Núñez",
+       "party": null,
+       "votes": 41,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.367,
+        0.71,
+        0.428
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Partido Radical",
+     "votes": 9594,
+     "unassigned": 4187,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.62,
+      0.457,
+      0.71,
+      0.473
+     ],
+     "candidates": [
+      {
+       "name": "Octavio Señoret S.",
+       "party": null,
+       "votes": 4544,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.62,
+        0.437,
+        0.71,
+        0.473
+       ]
+      },
+      {
+       "name": "Alfredo Guillermo Bravo",
+       "party": null,
+       "votes": 863,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.437,
+        0.71,
+        0.473
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 7",
+     "party": "Partido Demócrata",
+     "votes": 2770,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.62,
+      0.487,
+      0.71,
+      0.503
+     ],
+     "candidates": [
+      {
+       "name": "Abraham Leckie Allen",
+       "party": null,
+       "votes": 2770,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.487,
+        0.71,
+        0.503
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 8",
+     "party": "Partidos Social Republicano y Demócrata Autonomista",
+     "votes": 6038,
+     "unassigned": 662,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.62,
+      0.53,
+      0.71,
+      0.545
+     ],
+     "candidates": [
+      {
+       "name": "Enrique Bravo Ortiz",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": null,
+       "box": null
+      },
+      {
+       "name": "Ernesto Hübner Fenelón",
+       "party": null,
+       "votes": null,
+       "elected": false,
+       "page": null,
+       "box": null
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 9",
+     "party": "Partido Socialista de Chile",
+     "votes": 2397,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.62,
+      0.577,
+      0.71,
+      0.593
+     ],
+     "candidates": [
+      {
+       "name": "Lautaro Ponce",
+       "party": null,
+       "votes": 2397,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.577,
+        0.71,
+        0.593
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 10",
+     "party": "Agrupación Gremial de Empleados de Chile",
+     "votes": 2260,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.62,
+      0.617,
+      0.71,
+      0.633
+     ],
+     "candidates": [
+      {
+       "name": "Santiago Núñez Rojas",
+       "party": null,
+       "votes": 2260,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.617,
+        0.71,
+        0.633
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 11",
+     "party": "Partidos Liberal y Conservador",
+     "votes": 11625,
+     "unassigned": 5099,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.62,
+      0.682,
+      0.71,
+      0.698
+     ],
+     "candidates": [
+      {
+       "name": "Francisco Montané Urrejola",
+       "party": null,
+       "votes": 1691,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.62,
+        0.652,
+        0.71,
+        0.698
+       ]
+      },
+      {
+       "name": "Alvaro Santa María Cerveró",
+       "party": null,
+       "votes": 3460,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.62,
+        0.652,
+        0.71,
+        0.698
+       ]
+      },
+      {
+       "name": "Arturo Lyon Peña",
+       "party": null,
+       "votes": 1375,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.62,
+        0.652,
+        0.71,
+        0.698
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Only the Tribunal's PROVISIONAL scrutiny is in the volume (p6), with the annulled mesas of San Felipe and Valparaíso deducted pending their repetition; the five were proclaimed 'presuntivamente' elected. The national summary p15 prints different (final, after the complementary election) list totals for this circunscripción (e.g. 1,117 / 1,116 / 6,347 / 8,812 / 2,770 / 6,661 / 2,317 / 2,270 / 11,832, total about 43,65x; illegible), with seats L5 1, L6 1, L8 1, L11 2, but no candidate preferences, so the provisional p6 figures are recorded and 'valid' is null. The p6 scan is very degraded: L1 total read 1,11? (dept totals 8+27+47+69+959 = 1,110) and no-preference 290 (dept sum); L5 total 6,290 from the cuociente (candidate column as printed adds to 6,300); L8 total 6,038 from the cuociente (cuociente/2 = 3,019), its candidate rows are struck through by a printing defect, so Bravo Ortiz and Hübner are recorded without votes (the text says Bravo Ortiz 'alcanza a reunir a su favor 4,062 votos'); L11 no-preference 5,099 from the text (Montané with list votes reaches 6,790 = 5,099 + 1,691), Santa María 3,460 per text, and Lyon read 1,385/1,375 (1,375 closes the list total 11,625). Registered 63,616 (p6 header and p15)."
+  },
+  {
+   "number": 4,
+   "title": "4.a Circunscripción Provincial (Santiago)",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": 112038,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.27,
+    0.72,
+    0.33
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Partido Socialista Constitucional",
+     "votes": 144,
+     "unassigned": 82,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.262,
+      0.48,
+      0.278
+     ],
+     "candidates": [
+      {
+       "name": "Marmaduke Grove Vallejo",
+       "party": null,
+       "votes": 31,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.232,
+        0.48,
+        0.278
+       ]
+      },
+      {
+       "name": "Samuel Alvarez Arriagada",
+       "party": null,
+       "votes": 31,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.232,
+        0.48,
+        0.278
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": "Partido Demócrata",
+     "votes": 3680,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.302,
+      0.48,
+      0.318
+     ],
+     "candidates": [
+      {
+       "name": "Rafael Silva Lastra",
+       "party": null,
+       "votes": 3680,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.302,
+        0.48,
+        0.318
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Laborista de Chile",
+     "votes": 499,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.347,
+      0.48,
+      0.363
+     ],
+     "candidates": [
+      {
+       "name": "Emiliano D'Alencon Gordon",
+       "party": null,
+       "votes": 499,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.347,
+        0.48,
+        0.363
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": "Gremial Socialista",
+     "votes": 80,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.387,
+      0.48,
+      0.403
+     ],
+     "candidates": [
+      {
+       "name": "José Santos Salas Morales",
+       "party": null,
+       "votes": 80,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.387,
+        0.48,
+        0.403
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": "Agrupación Gremial de Empleados de Chile",
+     "votes": 533,
+     "unassigned": 217,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.367,
+      0.48,
+      0.383
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Fernández",
+       "party": null,
+       "votes": 274,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.347,
+        0.48,
+        0.383
+       ]
+      },
+      {
+       "name": "Ernesto Mardones Gaete",
+       "party": null,
+       "votes": 42,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.347,
+        0.48,
+        0.383
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Partido Obrero Socialista",
+     "votes": 19,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.407,
+      0.48,
+      0.423
+     ],
+     "candidates": [
+      {
+       "name": "Francisco Luis Bustamante",
+       "party": null,
+       "votes": 19,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.407,
+        0.48,
+        0.423
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 7",
+     "party": "Partido Liberal Unido",
+     "votes": 4331,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.447,
+      0.48,
+      0.463
+     ],
+     "candidates": [
+      {
+       "name": "Ezequiel Lavanderos Enríquez",
+       "party": null,
+       "votes": 4331,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.447,
+        0.48,
+        0.463
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 8",
+     "party": "Unión Socialista Republicana",
+     "votes": 457,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.482,
+      0.48,
+      0.498
+     ],
+     "candidates": [
+      {
+       "name": "Santiago Aguirre Amenqual",
+       "party": null,
+       "votes": 457,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.482,
+        0.48,
+        0.498
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 9",
+     "party": "Partido Social Republicano",
+     "votes": 6255,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.517,
+      0.48,
+      0.533
+     ],
+     "candidates": [
+      {
+       "name": "Ignacio Hevia Labbé",
+       "party": null,
+       "votes": 6255,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.517,
+        0.48,
+        0.533
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 10",
+     "party": "Sindicato Profesional de Empleados del Comercio Minorista",
+     "votes": 712,
+     "unassigned": 230,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.567,
+      0.48,
+      0.583
+     ],
+     "candidates": [
+      {
+       "name": "Bernabé Brito Pizarro",
+       "party": null,
+       "votes": 201,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.552,
+        0.48,
+        0.583
+       ]
+      },
+      {
+       "name": "Raúl Ossigueau Bucarestro",
+       "party": null,
+       "votes": 280,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.552,
+        0.48,
+        0.583
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 11",
+     "party": "Partido Democrático de Chile",
+     "votes": 7781,
+     "unassigned": 1116,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.4,
+      0.592,
+      0.48,
+      0.608
+     ],
+     "candidates": [
+      {
+       "name": "Luis A. Muñoz Moyano",
+       "party": null,
+       "votes": 2616,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.577,
+        0.48,
+        0.608
+       ]
+      },
+      {
+       "name": "Juan Pradenas Muñoz",
+       "party": null,
+       "votes": 4049,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.4,
+        0.577,
+        0.48,
+        0.608
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 12",
+     "party": "Partido Social Laborista",
+     "votes": 331,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.4,
+      0.612,
+      0.48,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "Manuel J. Navarrete Torres",
+       "party": null,
+       "votes": 331,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.4,
+        0.612,
+        0.48,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 13",
+     "party": "Partido Socialista Unificado",
+     "votes": 2883,
+     "unassigned": 699,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.262,
+      0.95,
+      0.278
+     ],
+     "candidates": [
+      {
+       "name": "Jorge Neut Latour",
+       "party": null,
+       "votes": 1707,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.232,
+        0.95,
+        0.278
+       ]
+      },
+      {
+       "name": "Pedro J. González",
+       "party": null,
+       "votes": 248,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.232,
+        0.95,
+        0.278
+       ]
+      },
+      {
+       "name": "Fernando Bernal Cano",
+       "party": null,
+       "votes": 58,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.232,
+        0.95,
+        0.278
+       ]
+      },
+      {
+       "name": "Abdón Pardo Barra",
+       "party": null,
+       "votes": 171,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.232,
+        0.95,
+        0.278
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 14",
+     "party": "Partido Radical",
+     "votes": 9886,
+     "unassigned": 3574,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.86,
+      0.322,
+      0.95,
+      0.338
+     ],
+     "candidates": [
+      {
+       "name": "Pedro León Ugalde",
+       "party": null,
+       "votes": 4640,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.86,
+        0.302,
+        0.95,
+        0.338
+       ]
+      },
+      {
+       "name": "Pedro Rivas Vicuña",
+       "party": null,
+       "votes": 1672,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.302,
+        0.95,
+        0.338
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 15",
+     "party": "Partido Agrario",
+     "votes": 26,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.362,
+      0.95,
+      0.378
+     ],
+     "candidates": [
+      {
+       "name": "Arturo Matte Larraín",
+       "party": null,
+       "votes": 26,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.362,
+        0.95,
+        0.378
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 17",
+     "party": "Nueva Acción Pública",
+     "votes": 14734,
+     "unassigned": null,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.86,
+      0.412,
+      0.95,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "Eugenio Matte Hurtado",
+       "party": null,
+       "votes": 14734,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.86,
+        0.412,
+        0.95,
+        0.428
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 18",
+     "party": "Socialista Doctrinario",
+     "votes": 305,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.452,
+      0.95,
+      0.468
+     ],
+     "candidates": [
+      {
+       "name": "Guillermo Mac-Innes Mitchell",
+       "party": null,
+       "votes": 305,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.452,
+        0.95,
+        0.468
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 19",
+     "party": "Confederación Nacional de Cooperativas de Chile",
+     "votes": 877,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.492,
+      0.95,
+      0.508
+     ],
+     "candidates": [
+      {
+       "name": "... Vicuña Dueñas",
+       "party": null,
+       "votes": 877,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.492,
+        0.95,
+        0.508
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 20",
+     "party": "Partido Conservador",
+     "votes": 15135,
+     "unassigned": 10739,
+     "seats": 2,
+     "page": 7,
+     "box": [
+      0.86,
+      0.542,
+      0.95,
+      0.558
+     ],
+     "candidates": [
+      {
+       "name": "Rafael Luis Gumucio",
+       "party": null,
+       "votes": 2574,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.86,
+        0.517,
+        0.95,
+        0.558
+       ]
+      },
+      {
+       "name": "Horacio Walker",
+       "party": null,
+       "votes": 1822,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.86,
+        0.517,
+        0.95,
+        0.558
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 21",
+     "party": "Partido Radical Socialista",
+     "votes": 2297,
+     "unassigned": 805,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.582,
+      0.95,
+      0.598
+     ],
+     "candidates": [
+      {
+       "name": "Abel Gutiérrez Aguilera",
+       "party": null,
+       "votes": 1057,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.557,
+        0.95,
+        0.598
+       ]
+      },
+      {
+       "name": "Raimundo Lopetegui Vera",
+       "party": null,
+       "votes": 252,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.557,
+        0.95,
+        0.598
+       ]
+      },
+      {
+       "name": "Aurelio Cruzat Ortega",
+       "party": null,
+       "votes": 88,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.557,
+        0.95,
+        0.598
+       ]
+      },
+      {
+       "name": "Victorino Varela Córdova",
+       "party": null,
+       "votes": 31,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.557,
+        0.95,
+        0.598
+       ]
+      },
+      {
+       "name": "Luis Pino Bravo",
+       "party": null,
+       "votes": 64,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.557,
+        0.95,
+        0.598
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 22",
+     "party": "Partido Liberal",
+     "votes": 6364,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.602,
+      0.95,
+      0.618
+     ],
+     "candidates": [
+      {
+       "name": "Luis Aldunate Echeverría",
+       "party": null,
+       "votes": 6364,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.602,
+        0.95,
+        0.618
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 23",
+     "party": "Independientes",
+     "votes": 1400,
+     "unassigned": 572,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.86,
+      0.642,
+      0.95,
+      0.658
+     ],
+     "candidates": [
+      {
+       "name": "Sofanor Zamorano Bolvarán",
+       "party": null,
+       "votes": 527,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.617,
+        0.95,
+        0.658
+       ]
+      },
+      {
+       "name": "Lino Palominos Rojas",
+       "party": null,
+       "votes": 65,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.617,
+        0.95,
+        0.658
+       ]
+      },
+      {
+       "name": "Amador Pairoa Trujillo",
+       "party": null,
+       "votes": 213,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.617,
+        0.95,
+        0.658
+       ]
+      },
+      {
+       "name": "Antonio San Martín Verdugo",
+       "party": null,
+       "votes": 23,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.86,
+        0.617,
+        0.95,
+        0.658
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive scrutiny on p7 (Santiago's three electoral districts, Melipilla and Maipo), 'Agrupación Provincial' column. Lista 16 (Liberal Doctrinario) 'Retirada', omitted. Seats per p7: Lista 20 two (Gumucio, Walker Larraín), listas 17 (Matte Hurtado), 14 (León Ugalde) and 11 (Pradenas Muñoz, by majority of preferences) one each. The lists printed on p7 add to 78,729, 10 more than the summary p15 'Total en la Circunscripción' 78,719; not resolved (likely one faint list total misread, e.g. Lista 1 144 vs 134, or a source discrepancy). Candidate rows on p7 are very faint: Walker's 1,822 is read as 1,322 but 1,822 closes the printed list total; Lista 5's candidate names and Lista 10's (Brito Pizarro 201, second candidate's 280 makes 711 vs printed 712) are uncertain; Lista 19's candidate's first name is hidden by a fold ('... Vicuña Dueñas'); Lista 10 and 5 boxes approximate. Registered 112,038 (summary p15). The archive leaves out the summary's valid total of 78,719, which the lists on p7 do not reach exactly."
+  },
+  {
+   "number": 5,
+   "title": "5.a Circunscripción Provincial",
+   "areas": [
+    "Colchagua"
+   ],
+   "seats": 5,
+   "registered": 30118,
+   "cast": null,
+   "valid": 20706,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.35,
+    0.72,
+    0.39
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Partido Demócrata Socialista",
+     "votes": 0,
+     "unassigned": 0,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.6,
+      0.312,
+      0.75,
+      0.328
+     ],
+     "candidates": [
+      {
+       "name": "Marmaduque Grove Vallejo",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.272,
+        0.75,
+        0.328
+       ]
+      },
+      {
+       "name": "Jorge Alessandri Rodríguez",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.272,
+        0.75,
+        0.328
+       ]
+      },
+      {
+       "name": "Doctor Francisco Landa",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.272,
+        0.75,
+        0.328
+       ]
+      },
+      {
+       "name": "Pedro A. Fajardo",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.272,
+        0.75,
+        0.328
+       ]
+      },
+      {
+       "name": "Santiago Pérez Peña",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.272,
+        0.75,
+        0.328
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": "Independientes",
+     "votes": 589,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.6,
+      0.462,
+      0.75,
+      0.478
+     ],
+     "candidates": [
+      {
+       "name": "Salvador Ocampo Pastenes",
+       "party": null,
+       "votes": 589,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.462,
+        0.75,
+        0.478
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": "Partido Liberal Unido",
+     "votes": 0,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.6,
+      0.512,
+      0.75,
+      0.528
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Molina",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.512,
+        0.75,
+        0.528
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": "Partidos Conservador, Liberal y Radical",
+     "votes": 15496,
+     "unassigned": 313,
+     "seats": 4,
+     "page": 8,
+     "box": [
+      0.6,
+      0.647,
+      0.75,
+      0.663
+     ],
+     "candidates": [
+      {
+       "name": "Héctor Rodríguez de la Sotta",
+       "party": null,
+       "votes": 4413,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.6,
+        0.567,
+        0.75,
+        0.663
+       ]
+      },
+      {
+       "name": "Oscar Valenzuela Valdés",
+       "party": null,
+       "votes": 3015,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.6,
+        0.567,
+        0.75,
+        0.663
+       ]
+      },
+      {
+       "name": "Exequiel González Cortés",
+       "party": null,
+       "votes": 2578,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.6,
+        0.567,
+        0.75,
+        0.663
+       ]
+      },
+      {
+       "name": "Julio Valenzuela Valenzuela",
+       "party": null,
+       "votes": 1375,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.567,
+        0.75,
+        0.663
+       ]
+      },
+      {
+       "name": "Arturo Dagnino Oliveri",
+       "party": null,
+       "votes": 3805,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.6,
+        0.567,
+        0.75,
+        0.663
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Partidos Demócrata de Chile y Liberal Doctrinario",
+     "votes": 4621,
+     "unassigned": 142,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.6,
+      0.752,
+      0.75,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "Santiago Pérez Peña",
+       "party": null,
+       "votes": 2109,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.6,
+        0.722,
+        0.75,
+        0.768
+       ]
+      },
+      {
+       "name": "Fidel Segundo Estay Cortés",
+       "party": null,
+       "votes": 2370,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.6,
+        0.722,
+        0.75,
+        0.768
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive scrutiny on p8 (departments Rancagua, Caupolicán, Cachapoal, San Fernando, Santa Cruz; 'Total' column). Lista 1 printed only dashes (0) and Lista 2 (Conservador) 'Retirada', omitted; Lista 4 dashes (0). Seats per p8: Lista 5 four (Rodríguez de la Sotta, Valenzuela Valdés, González Cortés, Dagnino Oliveri, by art. 117 rules 5.a/6.a), Lista 6 one (Estay Cortés). Lista 5's printed preferences + no-preference add to 15,499, 3 more than its printed total 15,496 (the text's own figures, e.g. Valenzuela Valdés 3,864 incl. list votes, imply 3,015 + some share); left as printed. Lists add exactly to the summary p15 total 20,706. Registered 30,118."
+  },
+  {
+   "number": 6,
+   "title": "6.a Circunscripción Provincial",
+   "areas": [
+    "Talca",
+    "Maule"
+   ],
+   "seats": 5,
+   "registered": 40294,
+   "cast": null,
+   "valid": 28406,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.39,
+    0.72,
+    0.42
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 2",
+     "party": "Independiente",
+     "votes": 1333,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.76,
+      0.45,
+      0.84,
+      0.466
+     ],
+     "candidates": [
+      {
+       "name": "Juan Saavedra Romero",
+       "party": null,
+       "votes": 1333,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.76,
+        0.45,
+        0.84,
+        0.466
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 7",
+     "party": "Partido Demócrata",
+     "votes": 2334,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.76,
+      0.53,
+      0.84,
+      0.546
+     ],
+     "candidates": [
+      {
+       "name": "Héctor Alvarez Alvarez",
+       "party": null,
+       "votes": 2334,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.76,
+        0.53,
+        0.84,
+        0.546
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 8",
+     "party": "Partido Radical Socialista",
+     "votes": 2143,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.76,
+      0.612,
+      0.84,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "Pedro V. Real",
+       "party": null,
+       "votes": 2143,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.76,
+        0.612,
+        0.84,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 11",
+     "party": "Independiente",
+     "votes": 695,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.76,
+      0.694,
+      0.84,
+      0.71
+     ],
+     "candidates": [
+      {
+       "name": "Enrique Madrid Pérez",
+       "party": null,
+       "votes": 695,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.76,
+        0.694,
+        0.84,
+        0.71
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 16",
+     "party": "Partidos Liberal, Liberal Unido, Radical y Conservador",
+     "votes": 21901,
+     "unassigned": 183,
+     "seats": 5,
+     "page": 9,
+     "box": [
+      0.76,
+      0.857,
+      0.84,
+      0.873
+     ],
+     "candidates": [
+      {
+       "name": "Ernesto Cruz Concha",
+       "party": null,
+       "votes": 2330,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.76,
+        0.782,
+        0.84,
+        0.873
+       ]
+      },
+      {
+       "name": "Pedro Opazo Letelier",
+       "party": null,
+       "votes": 4167,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.76,
+        0.782,
+        0.84,
+        0.873
+       ]
+      },
+      {
+       "name": "Ignacio Urrutia Manzano",
+       "party": null,
+       "votes": 5589,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.76,
+        0.782,
+        0.84,
+        0.873
+       ]
+      },
+      {
+       "name": "Aurelio Meza Rivera",
+       "party": null,
+       "votes": 4579,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.76,
+        0.782,
+        0.84,
+        0.873
+       ]
+      },
+      {
+       "name": "Maximiano Errázuriz",
+       "party": null,
+       "votes": 5053,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.76,
+        0.782,
+        0.84,
+        0.873
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive scrutiny on p9 (landscape), 'Total en la Circunscripción' column. All five seats to Lista 16. Lists add exactly to the summary p15 total 28,406. Registered 40,294."
+  },
+  {
+   "number": 7,
+   "title": "7.a Circunscripción Provincial",
+   "areas": [
+    "Ñuble",
+    "Concepción"
+   ],
+   "seats": 5,
+   "registered": 58490,
+   "cast": null,
+   "valid": 41237,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.44,
+    0.72,
+    0.47
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Radical Socialista",
+     "votes": 5521,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.79,
+      0.347,
+      0.84,
+      0.363
+     ],
+     "candidates": [
+      {
+       "name": "Guillermo Azócar Alvarez",
+       "party": null,
+       "votes": 5521,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.79,
+        0.347,
+        0.84,
+        0.363
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": "Partido Conservador",
+     "votes": 6708,
+     "unassigned": 3543,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.79,
+      0.442,
+      0.84,
+      0.458
+     ],
+     "candidates": [
+      {
+       "name": "Tomás Cox Méndez",
+       "party": null,
+       "votes": 3109,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.79,
+        0.412,
+        0.84,
+        0.458
+       ]
+      },
+      {
+       "name": "Héctor Tapia Cruzat",
+       "party": null,
+       "votes": 56,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.412,
+        0.84,
+        0.458
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Partido Liberal Unido",
+     "votes": 5713,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.79,
+      0.507,
+      0.84,
+      0.523
+     ],
+     "candidates": [
+      {
+       "name": "Alfredo Irarrázaval Zañartu",
+       "party": null,
+       "votes": 5713,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.507,
+        0.84,
+        0.523
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 11",
+     "party": "Partido Democrático de Chile",
+     "votes": 6769,
+     "unassigned": 2214,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.79,
+      0.597,
+      0.84,
+      0.613
+     ],
+     "candidates": [
+      {
+       "name": "Raúl Puga Monsalve",
+       "party": null,
+       "votes": 2707,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.79,
+        0.567,
+        0.84,
+        0.613
+       ]
+      },
+      {
+       "name": "Teófilo Hinojosa Fariña",
+       "party": null,
+       "votes": 1848,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.567,
+        0.84,
+        0.613
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 14",
+     "party": "Partido Radical",
+     "votes": 11976,
+     "unassigned": 6471,
+     "seats": 2,
+     "page": 11,
+     "box": [
+      0.79,
+      0.692,
+      0.84,
+      0.708
+     ],
+     "candidates": [
+      {
+       "name": "Ignacio Martínez Urrutia",
+       "party": null,
+       "votes": 1854,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.79,
+        0.662,
+        0.84,
+        0.708
+       ]
+      },
+      {
+       "name": "Luis Alamos Barros",
+       "party": null,
+       "votes": 3651,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.79,
+        0.662,
+        0.84,
+        0.708
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 18",
+     "party": "Partido Liberal",
+     "votes": 2866,
+     "unassigned": 147,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.79,
+      0.787,
+      0.84,
+      0.803
+     ],
+     "candidates": [
+      {
+       "name": "Miguel Letelier Espínola",
+       "party": null,
+       "votes": 7,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.757,
+        0.84,
+        0.803
+       ]
+      },
+      {
+       "name": "Francisco Schleyer",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.757,
+        0.84,
+        0.803
+       ]
+      },
+      {
+       "name": "Valentín Brandau",
+       "party": null,
+       "votes": 2712,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.757,
+        0.84,
+        0.803
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 19",
+     "party": "Independiente",
+     "votes": 1684,
+     "unassigned": 1508,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.79,
+      0.907,
+      0.84,
+      0.923
+     ],
+     "candidates": [
+      {
+       "name": "José Daniel Araneda Ramos",
+       "party": null,
+       "votes": 157,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.852,
+        0.84,
+        0.923
+       ]
+      },
+      {
+       "name": "Guillermo Crowther Maravoli",
+       "party": null,
+       "votes": 4,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.852,
+        0.84,
+        0.923
+       ]
+      },
+      {
+       "name": "José Cruz Muñoz González",
+       "party": null,
+       "votes": 3,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.852,
+        0.84,
+        0.923
+       ]
+      },
+      {
+       "name": "Armando Arias Contreras",
+       "party": null,
+       "votes": 2,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.852,
+        0.84,
+        0.923
+       ]
+      },
+      {
+       "name": "Luis Rossel Frías",
+       "party": null,
+       "votes": 10,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.79,
+        0.852,
+        0.84,
+        0.923
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "From the 'Resultado general definitivo' column of the Tribunal's complementary table (p11, landscape), which adds the complementary election ordered in Chillán and Yungay (Lista 5 +81/+137 etc.); p10 is the earlier provisional scrutiny. The p11 scan is very blurred: figures were fixed where list arithmetic and the summary p15 agree (L5 3,543 + 3,109 + 56 = 6,708; L11 2,214 + 2,707 + 1,848 = 6,769; L14 6,471 + 1,854 + 3,651 = 11,976; L18 147 + 7 + 2,712 = 2,866; L19 no-preference read 1,528/1,508, 1,508 closes 1,684). Lista 6 (Irarrázaval) reads 5,718/6,719 on p11 and 3,713 in the summary; 5,713 is the only value consistent with the summary's 'Total en la Circunscripción' 41,237 and is recorded, uncertain. Seats per p11: Lista 14 two (Martínez Urrutia, Alamos Barros), one each to listas 11 (Puga Monsalve), 5 (Cox Méndez) and 3 (Azócar Alvarez). Registered 58,490 (summary p15)."
+  },
+  {
+   "number": 8,
+   "title": "8.a Circunscripción Provincial",
+   "areas": [
+    "Bío-Bío",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": 53660,
+   "cast": null,
+   "valid": 37984,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.49,
+    0.72,
+    0.52
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Partido Democrático de Chile",
+     "votes": 4867,
+     "unassigned": 1451,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.84,
+      0.232,
+      0.92,
+      0.248
+     ],
+     "candidates": [
+      {
+       "name": "Artemio Gutiérrez",
+       "party": null,
+       "votes": 3312,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.84,
+        0.207,
+        0.92,
+        0.248
+       ]
+      },
+      {
+       "name": "Julio Cepeda Gallardo",
+       "party": null,
+       "votes": 30,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.207,
+        0.92,
+        0.248
+       ]
+      },
+      {
+       "name": "Luis Mandujano Tobar",
+       "party": null,
+       "votes": 39,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.207,
+        0.92,
+        0.248
+       ]
+      },
+      {
+       "name": "Virgilio Morales",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.207,
+        0.92,
+        0.248
+       ]
+      },
+      {
+       "name": "Armando Merino Oñate",
+       "party": null,
+       "votes": 35,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.207,
+        0.92,
+        0.248
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": "Partido Radical Socialista",
+     "votes": 2185,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.84,
+      0.247,
+      0.92,
+      0.263
+     ],
+     "candidates": [
+      {
+       "name": "Eulogio Rojas Mery",
+       "party": null,
+       "votes": 2185,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.247,
+        0.92,
+        0.263
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Radical",
+     "votes": 11494,
+     "unassigned": 833,
+     "seats": 2,
+     "page": 12,
+     "box": [
+      0.84,
+      0.292,
+      0.92,
+      0.308
+     ],
+     "candidates": [
+      {
+       "name": "Remigio Medina Neira",
+       "party": null,
+       "votes": 2106,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.272,
+        0.92,
+        0.308
+       ]
+      },
+      {
+       "name": "Darío Barrueto Molinet",
+       "party": null,
+       "votes": 3943,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.84,
+        0.272,
+        0.92,
+        0.308
+       ]
+      },
+      {
+       "name": "Hernán Figueroa Anguita",
+       "party": null,
+       "votes": 4612,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.84,
+        0.272,
+        0.92,
+        0.308
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": "Partido Agrario",
+     "votes": 3841,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.84,
+      0.312,
+      0.92,
+      0.328
+     ],
+     "candidates": [
+      {
+       "name": "Braulio Sandoval Muñoz",
+       "party": null,
+       "votes": 3841,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.312,
+        0.92,
+        0.328
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": "Partido Liberal",
+     "votes": 3650,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.84,
+      0.372,
+      0.92,
+      0.388
+     ],
+     "candidates": [
+      {
+       "name": "J. Augusto Smitsmans Rathamel",
+       "party": null,
+       "votes": 3650,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.372,
+        0.92,
+        0.388
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 7",
+     "party": "Partido Liberal Unido",
+     "votes": 2707,
+     "unassigned": 1709,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.84,
+      0.412,
+      0.92,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "Jorge Orrego Puelma",
+       "party": null,
+       "votes": 925,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.392,
+        0.92,
+        0.428
+       ]
+      },
+      {
+       "name": "Genaro Arriagada",
+       "party": null,
+       "votes": 73,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.392,
+        0.92,
+        0.428
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 8",
+     "party": "Partido Demócrata",
+     "votes": 4295,
+     "unassigned": 501,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.84,
+      0.452,
+      0.92,
+      0.468
+     ],
+     "candidates": [
+      {
+       "name": "Virgilio Morales Vivanco",
+       "party": null,
+       "votes": 3794,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.84,
+        0.432,
+        0.92,
+        0.468
+       ]
+      },
+      {
+       "name": "Artemio Gutiérrez",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.432,
+        0.92,
+        0.468
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 9",
+     "party": "Independiente",
+     "votes": 280,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.84,
+      0.472,
+      0.92,
+      0.488
+     ],
+     "candidates": [
+      {
+       "name": "Rodolfo Alarcón Contreras",
+       "party": null,
+       "votes": 280,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.84,
+        0.472,
+        0.92,
+        0.488
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 10",
+     "party": "Partido Conservador",
+     "votes": 4665,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.84,
+      0.492,
+      0.92,
+      0.508
+     ],
+     "candidates": [
+      {
+       "name": "Romualdo Silva Cortés",
+       "party": null,
+       "votes": 4665,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.84,
+        0.492,
+        0.92,
+        0.508
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Tribunal's definitive scrutiny on p12, 'Total en la Agrupación' column (department columns Laja, Mulchén, Angol, Traiguén, Victoria, Lautaro, Nueva Imperial, Temuco, Villarrica). Lista 5 'Retirada', omitted. Totals that are faint in the column are taken from the printed cuocientes on p12: Lista 2 2,185, Lista 4 3,841, Lista 6 3,650 (the summary p15 prints 2,195 and 3,641 for two of these, apparently misprints); with them the lists add exactly to the summary total 37,984. Lista 7's third row (Arriagada, 73) is under a printing smear; 73 closes the list. Lista 8 Morales Vivanco read 3,794 (text: 4,295 with list votes = 501 + 3,794). Lista 8's second candidate Artemio Gutiérrez prints dashes (he is also Lista 1's elected candidate). Seats per p12: Lista 3 two (Figueroa Anguita, Barrueto Molinet), one each to listas 1 (Gutiérrez), 10 (Silva Cortés), 8 (Morales Vivanco). Registered: header total read 53,?60 (departments add to 53,660), 53,660 recorded."
+  },
+  {
+   "number": 9,
+   "title": "9.a Circunscripción Provincial",
+   "areas": [
+    "Valdivia",
+    "Chiloé"
+   ],
+   "seats": 5,
+   "registered": 30128,
+   "cast": null,
+   "valid": 28143,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.18,
+    0.55,
+    0.72,
+    0.58
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": "Partido Democrático de Chile",
+     "votes": 4932,
+     "unassigned": 1100,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.77,
+      0.572,
+      0.85,
+      0.588
+     ],
+     "candidates": [
+      {
+       "name": "Alejandro Rosas Lopetegui",
+       "party": null,
+       "votes": 2053,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.77,
+        0.537,
+        0.85,
+        0.588
+       ]
+      },
+      {
+       "name": "Luis Malaquías Concha S.",
+       "party": null,
+       "votes": 1779,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.77,
+        0.537,
+        0.85,
+        0.588
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": "Partidos Liberal Doctrinario, Conservador y Radical",
+     "votes": 19073,
+     "unassigned": 430,
+     "seats": 4,
+     "page": 14,
+     "box": [
+      0.77,
+      0.722,
+      0.85,
+      0.738
+     ],
+     "candidates": [
+      {
+       "name": "José Maza",
+       "party": null,
+       "votes": 3192,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.77,
+        0.632,
+        0.85,
+        0.738
+       ]
+      },
+      {
+       "name": "Alejo Lira Infante",
+       "party": null,
+       "votes": 4675,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.77,
+        0.632,
+        0.85,
+        0.738
+       ]
+      },
+      {
+       "name": "Carlos Haverbeck",
+       "party": null,
+       "votes": 4456,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.77,
+        0.632,
+        0.85,
+        0.738
+       ]
+      },
+      {
+       "name": "Alfonso Bórquez",
+       "party": null,
+       "votes": 6320,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.77,
+        0.632,
+        0.85,
+        0.738
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": "Partido Liberal Unido",
+     "votes": 4138,
+     "unassigned": 612,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.77,
+      0.847,
+      0.85,
+      0.863
+     ],
+     "candidates": [
+      {
+       "name": "Luis Urrutia Ibáñez",
+       "party": null,
+       "votes": 2315,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.77,
+        0.797,
+        0.85,
+        0.863
+       ]
+      },
+      {
+       "name": "Carlos G. Iribarra",
+       "party": null,
+       "votes": 1211,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.77,
+        0.797,
+        0.85,
+        0.863
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "From the 'Escrutinio General' column of the Tribunal's definitive table on p14 (landscape), which includes the complementary election of 5 March 1933 in Valdivia and Castro (p13 is the earlier provisional scrutiny). Aysen and Magallanes, part of this circunscripción, held no election in 1932 (no electoral register existed there yet). Seats per p14: Lista 2 four, Lista 1 one (Rosas Lopetegui). Lists add exactly to the summary p15 total 28,143. Registered 30,128 (summary p15; the p14 header inscritos are blotted)."
+  }
+ ]
+}

@@ -1,0 +1,5191 @@
+{
+ "volume": "1949-deputies",
+ "chamber": "deputies",
+ "year": 1949,
+ "day": "1949-03-06",
+ "day_printed": "Elección Ordinaria de Congreso Nacional en 6 de Marzo de 1949",
+ "contests": [
+  {
+   "number": 1,
+   "title": "Provincia de Tarapacá, 1.a Agrupación",
+   "areas": [
+    "Iquique",
+    "Arica",
+    "Pisagua"
+   ],
+   "seats": 4,
+   "registered": 13452,
+   "cast": 9942,
+   "valid": 9753,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 189,
+   "page": 33,
+   "box": [
+    0.86,
+    0.239,
+    0.97,
+    0.265
+   ],
+   "lists": [
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1398,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.239,
+      0.296,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2371,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.29,
+      0.239,
+      0.338,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2368,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.239,
+      0.418,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1400,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.239,
+      0.461,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 13,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.239,
+      0.541,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1446,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.239,
+      0.621,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 282,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.239,
+      0.698,
+      0.265
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 475,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.239,
+      0.778,
+      0.265
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 2,
+   "title": "Provincia de Antofagasta, 2.a Agrupación",
+   "areas": [
+    "Antofagasta",
+    "Tocopilla",
+    "El Loa",
+    "Taltal"
+   ],
+   "seats": 7,
+   "registered": 19125,
+   "cast": 12945,
+   "valid": 12625,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 320,
+   "page": 33,
+   "box": [
+    0.86,
+    0.2609,
+    0.97,
+    0.2869
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 811,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.2609,
+      0.175,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1771,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.249,
+      0.2609,
+      0.296,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1932,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.2609,
+      0.338,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3714,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.2609,
+      0.418,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 269,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.2609,
+      0.461,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 1378,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.535,
+      0.2609,
+      0.581,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 704,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.2609,
+      0.621,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 554,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.2609,
+      0.698,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 852,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.2609,
+      0.738,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 536,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.2609,
+      0.778,
+      0.2869
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 104,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.812,
+      0.2609,
+      0.865,
+      0.2869
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 3,
+   "title": "Provincia de Atacama, 3.a Agrupación",
+   "areas": [
+    "Copiapó",
+    "Chañaral",
+    "Huasco",
+    "Freirina"
+   ],
+   "seats": 2,
+   "registered": 9644,
+   "cast": 7374,
+   "valid": 7287,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 87,
+   "page": 33,
+   "box": [
+    0.86,
+    0.2828,
+    0.97,
+    0.3088
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1645,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.2828,
+      0.175,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1005,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.2828,
+      0.296,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3608,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.2828,
+      0.418,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 37,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.2828,
+      0.581,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 79,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.2828,
+      0.698,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 199,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.2828,
+      0.738,
+      0.3088
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 714,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.2828,
+      0.778,
+      0.3088
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 4,
+   "title": "Provincia de Coquimbo, 4.a Agrupación",
+   "areas": [
+    "La Serena",
+    "Coquimbo",
+    "Elqui",
+    "Ovalle",
+    "Combarbalá",
+    "Illapel"
+   ],
+   "seats": 7,
+   "registered": 19727,
+   "cast": 16227,
+   "valid": 16147,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 80,
+   "page": 33,
+   "box": [
+    0.86,
+    0.3047,
+    0.97,
+    0.3307
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 2151,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.3047,
+      0.175,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 916,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.3047,
+      0.296,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5393,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.29,
+      0.3047,
+      0.338,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5111,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.372,
+      0.3047,
+      0.418,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 424,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.3047,
+      0.461,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.3047,
+      0.541,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 84,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.3047,
+      0.581,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 495,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.3047,
+      0.698,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 517,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.3047,
+      0.738,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1055,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.3047,
+      0.778,
+      0.3307
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 0,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.3047,
+      0.865,
+      0.3307
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 5,
+   "title": "Provincia de Aconcagua, 5.a Agrupación",
+   "areas": [
+    "San Felipe",
+    "Petorca",
+    "Los Andes"
+   ],
+   "seats": 3,
+   "registered": 13964,
+   "cast": 11942,
+   "valid": 11888,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 54,
+   "page": 33,
+   "box": [
+    0.86,
+    0.3266,
+    0.97,
+    0.3526
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 3018,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.3266,
+      0.175,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 441,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.3266,
+      0.296,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4439,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.3266,
+      0.338,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2834,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.3266,
+      0.418,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 184,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.3266,
+      0.541,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 182,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.3266,
+      0.581,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 146,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.3266,
+      0.698,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 0,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.3266,
+      0.738,
+      0.3526
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 644,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.3266,
+      0.778,
+      0.3526
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 6,
+   "title": "Provincia de Valparaíso, 6.a Agrupación",
+   "areas": [
+    "Valparaíso",
+    "Quillota"
+   ],
+   "seats": 12,
+   "registered": 56130,
+   "cast": 45756,
+   "valid": 45387,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 369,
+   "page": 33,
+   "box": [
+    0.86,
+    0.3485,
+    0.97,
+    0.3745
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 10952,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.122,
+      0.3485,
+      0.175,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 3846,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 12,
+     "page": 33,
+     "box": [
+      0.169,
+      0.3485,
+      0.216,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1075,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.3485,
+      0.296,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7663,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.29,
+      0.3485,
+      0.338,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 9598,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.372,
+      0.3485,
+      0.418,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1677,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.3485,
+      0.461,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 334,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.455,
+      0.3485,
+      0.5,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1606,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.3485,
+      0.541,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 2136,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.3485,
+      0.581,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 633,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.3485,
+      0.621,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Demócrata",
+     "party": "Demócrata",
+     "votes": 1994,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.615,
+      0.3485,
+      0.658,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 2074,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.3485,
+      0.698,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 397,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.3485,
+      0.738,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1387,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.3485,
+      0.778,
+      0.3745
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 15,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.812,
+      0.3485,
+      0.865,
+      0.3745
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 7,
+   "title": "Provincia de Santiago, 1.er Distrito, 7.a Agrupación",
+   "areas": [
+    "Santiago (1er. Distrito)"
+   ],
+   "seats": 18,
+   "registered": 85059,
+   "cast": 58638,
+   "valid": 56621,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 2017,
+   "page": 33,
+   "box": [
+    0.86,
+    0.3704,
+    0.97,
+    0.3964
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 13167,
+     "unassigned": null,
+     "seats": 4,
+     "candidates_presented": 8,
+     "page": 33,
+     "box": [
+      0.122,
+      0.3704,
+      0.175,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Social Cristiano",
+     "party": "Movimiento Social Cristiano",
+     "votes": 296,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.21,
+      0.3704,
+      0.255,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2034,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.3704,
+      0.296,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 8321,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.29,
+      0.3704,
+      0.338,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8262,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 6,
+     "page": 33,
+     "box": [
+      0.372,
+      0.3704,
+      0.418,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 2028,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.3704,
+      0.461,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1049,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.455,
+      0.3704,
+      0.5,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 5315,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.3704,
+      0.541,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 3159,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.535,
+      0.3704,
+      0.581,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1932,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.3704,
+      0.621,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 4077,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.652,
+      0.3704,
+      0.698,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 313,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.692,
+      0.3704,
+      0.738,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 3112,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.732,
+      0.3704,
+      0.778,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Acción Renovadora de Chile",
+     "party": "Acción Renovadora de Chile",
+     "votes": 1985,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.772,
+      0.3704,
+      0.818,
+      0.3964
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 1571,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.812,
+      0.3704,
+      0.865,
+      0.3964
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 8,
+   "title": "Provincia de Santiago, 2.o Distrito, 7.a Agrupación",
+   "areas": [
+    "Santiago (2º Distrito)",
+    "Talagante"
+   ],
+   "seats": 5,
+   "registered": 26937,
+   "cast": 20885,
+   "valid": 20486,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 399,
+   "page": 33,
+   "box": [
+    0.86,
+    0.3923,
+    0.97,
+    0.4183
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 5493,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.122,
+      0.3923,
+      0.175,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Social Cristiano",
+     "party": "Movimiento Social Cristiano",
+     "votes": 150,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.21,
+      0.3923,
+      0.255,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 353,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.3923,
+      0.296,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1813,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.3923,
+      0.338,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3099,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.3923,
+      0.418,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 922,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.3923,
+      0.461,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1952,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.3923,
+      0.541,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 778,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.3923,
+      0.581,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 248,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.575,
+      0.3923,
+      0.621,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1816,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.3923,
+      0.698,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 2089,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.692,
+      0.3923,
+      0.738,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1724,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.732,
+      0.3923,
+      0.778,
+      0.4183
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 49,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.3923,
+      0.865,
+      0.4183
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 9,
+   "title": "Provincia de Santiago, 3.er Distrito, 7.a Agrupación",
+   "areas": [
+    "Santiago (3er. Distrito)"
+   ],
+   "seats": 5,
+   "registered": 40904,
+   "cast": 30064,
+   "valid": 29736,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 328,
+   "page": 33,
+   "box": [
+    0.86,
+    0.4142,
+    0.97,
+    0.4402
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 6300,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.122,
+      0.4142,
+      0.175,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Social Cristiano",
+     "party": "Movimiento Social Cristiano",
+     "votes": 43,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.21,
+      0.4142,
+      0.255,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1249,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.4142,
+      0.296,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5440,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.29,
+      0.4142,
+      0.338,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 4812,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.4142,
+      0.418,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 51,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.4142,
+      0.461,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 807,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.455,
+      0.4142,
+      0.5,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3655,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.4142,
+      0.541,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 1348,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.4142,
+      0.581,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 359,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.4142,
+      0.621,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1294,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.652,
+      0.4142,
+      0.698,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1950,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.4142,
+      0.778,
+      0.4402
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2428,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.812,
+      0.4142,
+      0.865,
+      0.4402
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 10,
+   "title": "Provincia de Santiago, Melipilla, San Antonio, San Bernardo, Maipo, 8.a Agrupación",
+   "areas": [
+    "Melipilla",
+    "San Antonio",
+    "San Bernardo",
+    "Maipo"
+   ],
+   "seats": 5,
+   "registered": 19877,
+   "cast": 16409,
+   "valid": 16235,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 174,
+   "page": 33,
+   "box": [
+    0.86,
+    0.4361,
+    0.97,
+    0.4621
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 6640,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.122,
+      0.4361,
+      0.175,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 946,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.4361,
+      0.296,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2257,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.4361,
+      0.338,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2849,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.4361,
+      0.418,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 79,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.4361,
+      0.461,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.455,
+      0.4361,
+      0.5,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1204,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.494,
+      0.4361,
+      0.541,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": null,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.4361,
+      0.581,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 741,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.4361,
+      0.621,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 379,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.652,
+      0.4361,
+      0.698,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 19,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.4361,
+      0.738,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1117,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.4361,
+      0.778,
+      0.4621
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.4361,
+      0.865,
+      0.4621
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates. Democrático shows 1 candidate presented and a dash for votes; votes recorded as null."
+  },
+  {
+   "number": 11,
+   "title": "Provincia de O'Higgins, 9.a Agrupación",
+   "areas": [
+    "Rancagua",
+    "Cachapoal",
+    "Caupolicán",
+    "San Vicente"
+   ],
+   "seats": 6,
+   "registered": 23752,
+   "cast": 19636,
+   "valid": 19461,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 175,
+   "page": 33,
+   "box": [
+    0.86,
+    0.458,
+    0.97,
+    0.484
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 7596,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 4,
+     "page": 33,
+     "box": [
+      0.122,
+      0.458,
+      0.175,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1507,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.458,
+      0.296,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2612,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.458,
+      0.338,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2265,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.458,
+      0.418,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 722,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.458,
+      0.461,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 2493,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.458,
+      0.541,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 9,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.458,
+      0.581,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": null,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.458,
+      0.621,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1132,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.458,
+      0.698,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": null,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.458,
+      0.738,
+      0.484
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1125,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.458,
+      0.778,
+      0.484
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates. Democrático del Pueblo and Socialista Auténtico each show 1 candidate presented and a dash for votes; votes null."
+  },
+  {
+   "number": 12,
+   "title": "Provincia de Colchagua, 10.a Agrupación",
+   "areas": [
+    "San Fernando",
+    "Santa Cruz"
+   ],
+   "seats": 4,
+   "registered": 13476,
+   "cast": 11726,
+   "valid": 11630,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 96,
+   "page": 33,
+   "box": [
+    0.86,
+    0.4799,
+    0.97,
+    0.5059
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 4981,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.4799,
+      0.175,
+      0.5059
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3500,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.4799,
+      0.338,
+      0.5059
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2010,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.4799,
+      0.418,
+      0.5059
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 866,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.4799,
+      0.461,
+      0.5059
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 94,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.4799,
+      0.698,
+      0.5059
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 179,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.4799,
+      0.778,
+      0.5059
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 13,
+   "title": "Provincia de Curicó, 11.a Agrupación",
+   "areas": [
+    "Curicó",
+    "Mataquito"
+   ],
+   "seats": 3,
+   "registered": 8224,
+   "cast": 6988,
+   "valid": 6974,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 14,
+   "page": 33,
+   "box": [
+    0.86,
+    0.5018,
+    0.97,
+    0.5278
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1591,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.5018,
+      0.175,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1723,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.5018,
+      0.338,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1952,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.5018,
+      0.418,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 222,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.5018,
+      0.461,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1077,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.5018,
+      0.541,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 69,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.5018,
+      0.581,
+      0.5278
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 340,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.5018,
+      0.778,
+      0.5278
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 14,
+   "title": "Provincia de Talca, 12.a Agrupación",
+   "areas": [
+    "Talca",
+    "Lontué",
+    "Curepto"
+   ],
+   "seats": 5,
+   "registered": 16790,
+   "cast": 14263,
+   "valid": 14241,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 22,
+   "page": 33,
+   "box": [
+    0.86,
+    0.5237,
+    0.97,
+    0.5497
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 3811,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.5237,
+      0.175,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 482,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.5237,
+      0.296,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3763,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.5237,
+      0.338,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2308,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.5237,
+      0.418,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 93,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.5237,
+      0.461,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 2374,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.5237,
+      0.541,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 122,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.5237,
+      0.581,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 15,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.5237,
+      0.621,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 35,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.5237,
+      0.698,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 369,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.5237,
+      0.738,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 864,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.5237,
+      0.778,
+      0.5497
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 5,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.5237,
+      0.865,
+      0.5497
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 15,
+   "title": "Provincia de Maule, 13.a Agrupación",
+   "areas": [
+    "Cauquenes",
+    "Constitución",
+    "Chanco"
+   ],
+   "seats": 3,
+   "registered": 8931,
+   "cast": 7775,
+   "valid": 7755,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 20,
+   "page": 33,
+   "box": [
+    0.86,
+    0.5456,
+    0.97,
+    0.5716
+   ],
+   "lists": [
+    {
+     "label": "Movimiento Social Cristiano",
+     "party": "Movimiento Social Cristiano",
+     "votes": 1529,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.21,
+      0.5456,
+      0.255,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 205,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.5456,
+      0.296,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2567,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.5456,
+      0.338,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1714,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.5456,
+      0.418,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 451,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.5456,
+      0.461,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1205,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.5456,
+      0.541,
+      0.5716
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 84,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.5456,
+      0.581,
+      0.5716
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 16,
+   "title": "Provincia de Linares, 14.a Agrupación",
+   "areas": [
+    "Linares",
+    "Loncomilla",
+    "Parral"
+   ],
+   "seats": 4,
+   "registered": 14219,
+   "cast": 12471,
+   "valid": 12410,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 61,
+   "page": 33,
+   "box": [
+    0.86,
+    0.5675,
+    0.97,
+    0.5935
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 2926,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.5675,
+      0.175,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 371,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.5675,
+      0.296,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4294,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.29,
+      0.5675,
+      0.338,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2492,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.5675,
+      0.418,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 270,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.5675,
+      0.461,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1933,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.5675,
+      0.541,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.5675,
+      0.581,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 18,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.5675,
+      0.698,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 103,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.5675,
+      0.778,
+      0.5935
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.5675,
+      0.865,
+      0.5935
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 17,
+   "title": "Provincia de Ñuble, 15.a Agrupación",
+   "areas": [
+    "Itata",
+    "San Carlos"
+   ],
+   "seats": 3,
+   "registered": 7823,
+   "cast": 6621,
+   "valid": 6615,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 6,
+   "page": 33,
+   "box": [
+    0.86,
+    0.5894,
+    0.97,
+    0.6154
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1580,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.5894,
+      0.175,
+      0.6154
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1449,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.5894,
+      0.338,
+      0.6154
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1836,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.5894,
+      0.418,
+      0.6154
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 245,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.5894,
+      0.461,
+      0.6154
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1327,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.5894,
+      0.541,
+      0.6154
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 178,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.5894,
+      0.778,
+      0.6154
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 18,
+   "title": "Provincia de Ñuble, 16.a Agrupación",
+   "areas": [
+    "Chillán",
+    "Bulnes",
+    "Yungay"
+   ],
+   "seats": 5,
+   "registered": 15949,
+   "cast": 13826,
+   "valid": 13717,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 109,
+   "page": 33,
+   "box": [
+    0.86,
+    0.6113,
+    0.97,
+    0.6373
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1101,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.6113,
+      0.175,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 3639,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.169,
+      0.6113,
+      0.216,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 235,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.6113,
+      0.296,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6762,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.6113,
+      0.418,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 654,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.6113,
+      0.461,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 105,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.6113,
+      0.541,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 686,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.6113,
+      0.581,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 190,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.6113,
+      0.698,
+      0.6373
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 345,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.6113,
+      0.778,
+      0.6373
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 19,
+   "title": "Provincia de Concepción, 17.a Agrupación",
+   "areas": [
+    "Concepción",
+    "Tomé",
+    "Talcahuano",
+    "Yumbel",
+    "Coronel"
+   ],
+   "seats": 9,
+   "registered": 36839,
+   "cast": 31028,
+   "valid": 30787,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 241,
+   "page": 33,
+   "box": [
+    0.86,
+    0.6332,
+    0.97,
+    0.6592
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 6295,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.6332,
+      0.175,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 992,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.6332,
+      0.296,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4899,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.6332,
+      0.338,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8669,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.372,
+      0.6332,
+      0.418,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1070,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.6332,
+      0.461,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 619,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.6332,
+      0.541,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 3705,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 6,
+     "page": 33,
+     "box": [
+      0.535,
+      0.6332,
+      0.581,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1836,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.575,
+      0.6332,
+      0.621,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1731,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.652,
+      0.6332,
+      0.698,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 28,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.6332,
+      0.738,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 941,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.6332,
+      0.778,
+      0.6592
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.6332,
+      0.865,
+      0.6592
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 20,
+   "title": "Provincia de Arauco, 18.a Agrupación",
+   "areas": [
+    "Arauco",
+    "Lebu",
+    "Cañete"
+   ],
+   "seats": 2,
+   "registered": 6963,
+   "cast": 6030,
+   "valid": 6012,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 18,
+   "page": 33,
+   "box": [
+    0.86,
+    0.6551,
+    0.97,
+    0.6811
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1530,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.6551,
+      0.175,
+      0.6811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2123,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.6551,
+      0.418,
+      0.6811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 600,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.6551,
+      0.461,
+      0.6811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 875,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.535,
+      0.6551,
+      0.581,
+      0.6811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 502,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.6551,
+      0.778,
+      0.6811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 382,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.6551,
+      0.865,
+      0.6811
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 21,
+   "title": "Provincia de Bío-Bío, 19.a Agrupación",
+   "areas": [
+    "La Laja",
+    "Nacimiento",
+    "Mulchén"
+   ],
+   "seats": 4,
+   "registered": 14639,
+   "cast": 12532,
+   "valid": 12407,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 125,
+   "page": 33,
+   "box": [
+    0.86,
+    0.677,
+    0.97,
+    0.703
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1686,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 23,
+     "box": [
+      0.3,
+      0.82,
+      0.4,
+      0.85
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 827,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.677,
+      0.296,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1842,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.677,
+      0.338,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal Progresista",
+     "party": "Liberal Progresista",
+     "votes": 983,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.332,
+      0.677,
+      0.378,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1887,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.677,
+      0.418,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1718,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.677,
+      0.461,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1821,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.677,
+      0.541,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 705,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.677,
+      0.581,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 98,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.677,
+      0.621,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 405,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.677,
+      0.698,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 433,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.677,
+      0.778,
+      0.703
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.677,
+      0.865,
+      0.703
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates. Conservador votes: the summary table (p.33) is creased over the last digit and reads like 1 680; the detailed table (p.23, PROVINCIA BIO-BIO) prints 1 686 (= departments 1 410 + 141 + 135), which is recorded and makes the parties add up to the printed 12 407."
+  },
+  {
+   "number": 22,
+   "title": "Provincia de Malleco, 20.a Agrupación",
+   "areas": [
+    "Angol",
+    "Collipulli",
+    "Traiguén",
+    "Victoria"
+   ],
+   "seats": 6,
+   "registered": 16146,
+   "cast": 13936,
+   "valid": 13878,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 58,
+   "page": 33,
+   "box": [
+    0.86,
+    0.6989,
+    0.97,
+    0.7249
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1104,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.6989,
+      0.175,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 269,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.6989,
+      0.296,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2681,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.6989,
+      0.338,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal Progresista",
+     "party": "Liberal Progresista",
+     "votes": 2629,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.332,
+      0.6989,
+      0.378,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1997,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.6989,
+      0.418,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1533,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.6989,
+      0.461,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 404,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.455,
+      0.6989,
+      0.5,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1734,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.494,
+      0.6989,
+      0.541,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 1083,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.6989,
+      0.581,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": null,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.575,
+      0.6989,
+      0.621,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 334,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.692,
+      0.6989,
+      0.738,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 110,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.6989,
+      0.778,
+      0.7249
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": null,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.6989,
+      0.865,
+      0.7249
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates. The summary table prints 10 candidates presented in the totals column, but the party columns add up to 20 presented, and the national total 412 requires 20. Democrático del Pueblo (2 presented) and Laborista (1 presented) show a dash for votes; votes null."
+  },
+  {
+   "number": 23,
+   "title": "Provincia de Cautín, 21.a Agrupación",
+   "areas": [
+    "Temuco",
+    "Lautaro",
+    "Imperial",
+    "Villarrica",
+    "Pitrufquén"
+   ],
+   "seats": 10,
+   "registered": 35089,
+   "cast": 28852,
+   "valid": 28673,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 179,
+   "page": 33,
+   "box": [
+    0.86,
+    0.7208,
+    0.97,
+    0.7468
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 5638,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.7208,
+      0.175,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 687,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.7208,
+      0.296,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3661,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.7208,
+      0.338,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal Progresista",
+     "party": "Liberal Progresista",
+     "votes": 2819,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 6,
+     "page": 33,
+     "box": [
+      0.332,
+      0.7208,
+      0.378,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3192,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.7208,
+      0.418,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 2214,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.7208,
+      0.461,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1828,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.455,
+      0.7208,
+      0.5,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 5544,
+     "unassigned": null,
+     "seats": 3,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.494,
+      0.7208,
+      0.541,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 2017,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.535,
+      0.7208,
+      0.581,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 320,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.575,
+      0.7208,
+      0.621,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 139,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.7208,
+      0.698,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 7,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.7208,
+      0.738,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 605,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.7208,
+      0.778,
+      0.7468
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.7208,
+      0.865,
+      0.7468
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 24,
+   "title": "Provincia de Valdivia, 22.a Agrupación",
+   "areas": [
+    "Valdivia",
+    "La Unión",
+    "Río Bueno"
+   ],
+   "seats": 5,
+   "registered": 23458,
+   "cast": 18820,
+   "valid": 18738,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 82,
+   "page": 33,
+   "box": [
+    0.86,
+    0.7427,
+    0.97,
+    0.7687
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1086,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.7427,
+      0.175,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 962,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.7427,
+      0.296,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5047,
+     "unassigned": null,
+     "seats": 2,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.29,
+      0.7427,
+      0.338,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3969,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.7427,
+      0.418,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1753,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.7427,
+      0.461,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1947,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.7427,
+      0.541,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 2155,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 3,
+     "page": 33,
+     "box": [
+      0.535,
+      0.7427,
+      0.581,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 118,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.575,
+      0.7427,
+      0.621,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 722,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.7427,
+      0.698,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.692,
+      0.7427,
+      0.738,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 437,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.7427,
+      0.778,
+      0.7687
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 541,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.812,
+      0.7427,
+      0.865,
+      0.7687
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 25,
+   "title": "Provincia de Osorno, 23.a Agrupación",
+   "areas": [
+    "Osorno",
+    "Río Negro"
+   ],
+   "seats": 3,
+   "registered": 12633,
+   "cast": 10911,
+   "valid": 10822,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 89,
+   "page": 33,
+   "box": [
+    0.86,
+    0.7646,
+    0.97,
+    0.7906
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1800,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.7646,
+      0.175,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1603,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.7646,
+      0.338,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3778,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.7646,
+      0.418,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1678,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.7646,
+      0.461,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1100,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.7646,
+      0.541,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 14,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.652,
+      0.7646,
+      0.698,
+      0.7906
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 849,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.732,
+      0.7646,
+      0.778,
+      0.7906
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 26,
+   "title": "Provincia de Llanquihue y Aysén, 24.a Agrupación",
+   "areas": [
+    "Llanquihue",
+    "Puerto Varas",
+    "Maullín",
+    "Calbuco",
+    "Aysén"
+   ],
+   "seats": 3,
+   "registered": 15401,
+   "cast": 12339,
+   "valid": 12215,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 124,
+   "page": 33,
+   "box": [
+    0.86,
+    0.7865,
+    0.97,
+    0.8125
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 3519,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.122,
+      0.7865,
+      0.175,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2511,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.7865,
+      0.338,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3144,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.372,
+      0.7865,
+      0.418,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1233,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.7865,
+      0.461,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1533,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.494,
+      0.7865,
+      0.541,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 69,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.535,
+      0.7865,
+      0.581,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 86,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 2,
+     "page": 33,
+     "box": [
+      0.575,
+      0.7865,
+      0.621,
+      0.8125
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 120,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.7865,
+      0.778,
+      0.8125
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 27,
+   "title": "Provincia de Chiloé, 25.a Agrupación",
+   "areas": [
+    "Ancud",
+    "Castro",
+    "Quinchao"
+   ],
+   "seats": 3,
+   "registered": 8909,
+   "cast": 6970,
+   "valid": 6951,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 19,
+   "page": 33,
+   "box": [
+    0.86,
+    0.8084,
+    0.97,
+    0.8344
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1544,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.8084,
+      0.175,
+      0.8344
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 496,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.249,
+      0.8084,
+      0.296,
+      0.8344
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1801,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.29,
+      0.8084,
+      0.338,
+      0.8344
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2028,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.8084,
+      0.418,
+      0.8344
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1076,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.412,
+      0.8084,
+      0.461,
+      0.8344
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 6,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.8084,
+      0.778,
+      0.8344
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  },
+  {
+   "number": 28,
+   "title": "Provincia de Magallanes, 26.a Agrupación",
+   "areas": [
+    "Magallanes",
+    "Ultima Esperanza",
+    "Tierra del Fuego"
+   ],
+   "seats": 1,
+   "registered": 7934,
+   "cast": 5470,
+   "valid": 5421,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 49,
+   "page": 33,
+   "box": [
+    0.86,
+    0.8303,
+    0.97,
+    0.8563
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 153,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.122,
+      0.8303,
+      0.175,
+      0.8563
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2488,
+     "unassigned": null,
+     "seats": 0,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.372,
+      0.8303,
+      0.418,
+      0.8563
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2780,
+     "unassigned": null,
+     "seats": 1,
+     "candidates_presented": 1,
+     "page": 33,
+     "box": [
+      0.732,
+      0.8303,
+      0.778,
+      0.8563
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source: 'Cuadro resumen del resultado de la Elección de Diputados' (p.33), one row per agrupación with party presented/elected/votes and Totales generales (votos hábiles, nulos en blanco, total votos emitidos, total inscritos hábiles). Valid = votos hábiles, null_blank = nulos en blanco, cast = total votos emitidos. The volume does not name the elected candidates."
+  }
+ ],
+ "national": {
+  "valid": 464872,
+  "cast": 470376,
+  "registered": 591994,
+  "null_blank": 5504,
+  "page": 33,
+  "box": [
+   0.06,
+   0.85,
+   0.97,
+   0.875
+  ],
+  "parties": {
+   "Conservador": 98118,
+   "Conservador Tradicionalista": 7485,
+   "Movimiento Social Cristiano": 2018,
+   "Falange Nacional": 18221,
+   "Liberal": 83582,
+   "Liberal Progresista": 6431,
+   "Radical": 100869,
+   "Radical Democrático": 23248,
+   "Radical Doctrinario": 4424,
+   "Agrario Laborista": 38742,
+   "Democrático": 20682,
+   "Democrático del Pueblo": 8536,
+   "Demócrata": 1994,
+   "Socialista de Chile": 15676,
+   "Socialista Auténtico": 5125,
+   "Socialista Popular": 22631,
+   "Acción Renovadora de Chile": 1985,
+   "Laborista": 5105
+  }
+ },
+ "notes": "Contents: p.2-3 list of agrupaciones with departments and seats (147 deputies); p.4 seats per agrupación; pp.5-32 detailed 'Cuadro sinóptico' by comuna/departamento/provincia (party presented/elected/votes over facing pages, totals hábiles/nulos y en blanco/total/inscritos); p.33 one-page summary table 'Cuadro resumen ... conforme con los escrutinios practicados por el Tribunal Calificador', from which all contest figures were transcribed (every row's party votes add to its votos hábiles, every party column adds to its printed national total); pp.34-36 an annex of national party totals for 1941, 1945 and 1949 (the 1949 figures on p.36 equal the p.33 totals). The detailed tables were used to check Tarapacá and Bío-Bío. Contest numbers are sequential: Santiago's 7.a agrupación is split into 1er, 2º (with Talagante) and 3er distritos (contests 7-9), so contest n>=10 is agrupación n-2. No candidate names or preference votes are printed, so candidates lists are empty; 'candidates_presented' is an extra field with the printed Presentados count. National: 412 presented, 147 elected; the p.33 national row reads Conservador 98 118, which agrees with the row sum once Bío-Bío is read as 1 686."
+}

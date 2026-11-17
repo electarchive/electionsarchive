@@ -1,0 +1,2750 @@
+{
+ "volume": "1930-deputies",
+ "chamber": "deputies",
+ "year": 1930,
+ "day": null,
+ "day_printed": null,
+ "contests": [
+  {
+   "number": 1,
+   "title": "Agrupación Departamental de Pisagua y Tarapacá",
+   "areas": [
+    "Pisagua",
+    "Tarapacá"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 4,
+   "box": [
+    0.15,
+    0.62,
+    0.85,
+    0.84
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 4,
+     "box": [
+      0.15,
+      0.62,
+      0.85,
+      0.84
+     ],
+     "candidates": [
+      {
+       "name": "Marco Antonio de la Cuadra Poisson",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.15,
+        0.62,
+        0.85,
+        0.84
+       ]
+      },
+      {
+       "name": "Ricardo Puelma Laval",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.15,
+        0.62,
+        0.85,
+        0.84
+       ]
+      },
+      {
+       "name": "Ernesto Silva Román",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.15,
+        0.62,
+        0.85,
+        0.84
+       ]
+      },
+      {
+       "name": "Arturo Venegas Sánchez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.15,
+        0.62,
+        0.85,
+        0.84
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 1.a). The index prints the seat figure for the 1.a with a stray mark ('^4')."
+  },
+  {
+   "number": 2,
+   "title": "Agrupación Departamental de Tocopilla, Loa, Antofagasta y Taltal",
+   "areas": [
+    "Tocopilla",
+    "Loa",
+    "Antofagasta",
+    "Taltal"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.15,
+    0.1,
+    0.85,
+    0.3
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 6,
+     "page": 5,
+     "box": [
+      0.15,
+      0.1,
+      0.85,
+      0.3
+     ],
+     "candidates": [
+      {
+       "name": "Arturo H. Lois Fraga",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Héctor Marino Meléndez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Selin Carrasco Toledo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Carlos Ramirez Novoa",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Juan Pradenas Muñoz",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Anaclicio López Parra",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.3
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 2.a)."
+  },
+  {
+   "number": 3,
+   "title": "Agrupación Departamental de Chañaral, Copiapó, Freirina y Vallenar",
+   "areas": [
+    "Chañaral",
+    "Copiapó",
+    "Freirina",
+    "Vallenar"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.15,
+    0.32,
+    0.85,
+    0.43
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 2,
+     "page": 5,
+     "box": [
+      0.15,
+      0.32,
+      0.85,
+      0.43
+     ],
+     "candidates": [
+      {
+       "name": "Isauro Torres Cereceda",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.43
+       ]
+      },
+      {
+       "name": "Isaac Hevia Concha",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.43
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 3.a)."
+  },
+  {
+   "number": 4,
+   "title": "Agrupación Departamental de La Serena, Coquimbo, Elqui, Ovalle, Combarbalá e Illapel",
+   "areas": [
+    "La Serena",
+    "Coquimbo",
+    "Elqui",
+    "Ovalle",
+    "Combarbalá",
+    "Illapel"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.15,
+    0.43,
+    0.85,
+    0.68
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 7,
+     "page": 5,
+     "box": [
+      0.15,
+      0.43,
+      0.85,
+      0.68
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Estevez Gazmuri",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Angel Custodio Vicuña Pérez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Enrique Echavarría Barriga",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Gustavo Silva Campos",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Gabriel González",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Oscar Peña y Lillo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      },
+      {
+       "name": "Héctor Alvarez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.43,
+        0.85,
+        0.68
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 4.a)."
+  },
+  {
+   "number": 5,
+   "title": "Agrupación Departamental de Petorca, Ligua, Putaendo, San Felipe y Los Andes",
+   "areas": [
+    "Petorca",
+    "Ligua",
+    "Putaendo",
+    "San Felipe",
+    "Los Andes"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.15,
+    0.68,
+    0.85,
+    0.86
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 5,
+     "box": [
+      0.15,
+      0.68,
+      0.85,
+      0.86
+     ],
+     "candidates": [
+      {
+       "name": "Arturo Ruiz de Gamboa",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Tito V. Lisoni",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "José M. Rios Arias",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Santiago Machiavello Varas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Alejandro Cataldo Maureira",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.86
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 5.a)."
+  },
+  {
+   "number": 6,
+   "title": "Agrupación Departamental de Valparaiso, Casablanca, Quillota y Limache",
+   "areas": [
+    "Valparaiso",
+    "Casablanca",
+    "Quillota",
+    "Limache"
+   ],
+   "seats": 11,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.15,
+    0.13,
+    0.85,
+    0.45
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 11,
+     "page": 6,
+     "box": [
+      0.15,
+      0.13,
+      0.85,
+      0.45
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Muñoz Cornejo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Francisco Montané Urrejola",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Gustavo Rivera Baeza",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "José María Lorca",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Alfredo Guillermo Bravo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Miguel A. Salvo Rocuant",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Luis Cruz Almeida",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Abraham Morales Ibañez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Enrique Lillo Pacheco",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Armando Tamayo Torres",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      },
+      {
+       "name": "Ramón Sepúlveda Leal",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.45
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 6.a)."
+  },
+  {
+   "number": 7,
+   "title": "Agrupación Departamental de Santiago",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 18,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.15,
+    0.48,
+    0.85,
+    0.86
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 18,
+     "page": 6,
+     "box": [
+      0.15,
+      0.48,
+      0.85,
+      0.86
+     ],
+     "candidates": [
+      {
+       "name": "Fernando Varas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Carlos Vergara Leyton",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Domingo Fuentes",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Samuel Guzmán Garcia",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Pedro Salinas Fuenzalida",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Ismael Edwards Matte",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Rogelio Ugarte Bustamante",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Juvenal Hernández",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Francisco Jorquera F.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Luis Castillo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Luis Moreno Fontanez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Humberto Martones Quezada",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Julio Rojas Rojas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Francisco Araya Z.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Nicasio Retamales",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Rafael Silva Lastra",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Santiago Wilson Hernández",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Luis Muñoz Moyano",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.86
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 7.a)."
+  },
+  {
+   "number": 8,
+   "title": "Agrupación Departamental de La Victoria, Melipilla y San Antonio",
+   "areas": [
+    "La Victoria",
+    "Melipilla",
+    "San Antonio"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 7,
+   "box": [
+    0.15,
+    0.14,
+    0.85,
+    0.31
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 7,
+     "box": [
+      0.15,
+      0.14,
+      0.85,
+      0.31
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Cruzat Vicuña",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "Rafael Moreno Echavarría",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "Cardenio González Sepúlveda",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "Pedro Pablo Navarrete",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "Arturo Gutierrez Reveco",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 8.a)."
+  },
+  {
+   "number": 9,
+   "title": "Agrupación Departamental de Maipo, Rancagua y Cachapoal",
+   "areas": [
+    "Maipo",
+    "Rancagua",
+    "Cachapoal"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 7,
+   "box": [
+    0.15,
+    0.32,
+    0.85,
+    0.46
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 7,
+     "box": [
+      0.15,
+      0.32,
+      0.85,
+      0.46
+     ],
+     "candidates": [
+      {
+       "name": "Alejo Lira Infante",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Alfredo Moreno Bruce",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Florencio Durán Bernales",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Carlos Sánchez Mejía",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 9.a)."
+  },
+  {
+   "number": 10,
+   "title": "Agrupación Departamental de Caupolicán, San Vicente y San Fernando",
+   "areas": [
+    "Caupolicán",
+    "San Vicente",
+    "San Fernando"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 7,
+   "box": [
+    0.15,
+    0.48,
+    0.85,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 6,
+     "page": 7,
+     "box": [
+      0.15,
+      0.48,
+      0.85,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Tagle Ruiz",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Guillermo González Echenique",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Hermógenes Labbé",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Domingo Núñez Galeno",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Pedro Muñoz Rojas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Nicolás Vallejos Encina",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 10.a)."
+  },
+  {
+   "number": 11,
+   "title": "Agrupación Departamental de Santa Cruz, Vichuquén y Curicó",
+   "areas": [
+    "Santa Cruz",
+    "Vichuquén",
+    "Curicó"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 7,
+   "box": [
+    0.15,
+    0.68,
+    0.85,
+    0.82
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 7,
+     "box": [
+      0.15,
+      0.68,
+      0.85,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "Leoncio Toro Muñoz",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.82
+       ]
+      },
+      {
+       "name": "Guillermo Correa Fuenzalida",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.82
+       ]
+      },
+      {
+       "name": "Roberto Merino Fuenzalida",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.82
+       ]
+      },
+      {
+       "name": "Francisco Veliz Fredes",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.15,
+        0.68,
+        0.85,
+        0.82
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 11.a)."
+  },
+  {
+   "number": 12,
+   "title": "Agrupación Departamental de Lontué, Curepto y Talca",
+   "areas": [
+    "Lontué",
+    "Curepto",
+    "Talca"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.15,
+    0.13,
+    0.85,
+    0.3
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 8,
+     "box": [
+      0.15,
+      0.13,
+      0.85,
+      0.3
+     ],
+     "candidates": [
+      {
+       "name": "Ernesto Cruz Concha",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Alejandro Dussaillant",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Rodolfo Armas Riquelme",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Manuel Jorquera Ortíz",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.3
+       ]
+      },
+      {
+       "name": "Horacio Azócar Toledo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.13,
+        0.85,
+        0.3
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.2 (agrupación 12.a)."
+  },
+  {
+   "number": 13,
+   "title": "Agrupación Departamental de Constitución, Chanco, Cauquenes e Itata",
+   "areas": [
+    "Constitución",
+    "Chanco",
+    "Cauquenes",
+    "Itata"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.15,
+    0.32,
+    0.85,
+    0.46
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 8,
+     "box": [
+      0.15,
+      0.32,
+      0.85,
+      0.46
+     ],
+     "candidates": [
+      {
+       "name": "Enrique Lira Urquieta",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Arturo Lavín Urrutia",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Luis Letelier del Campo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      },
+      {
+       "name": "Galvarino Ponce",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.32,
+        0.85,
+        0.46
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 13.a)."
+  },
+  {
+   "number": 14,
+   "title": "Agrupación Departamental de Loncomilla, Linares y Parral",
+   "areas": [
+    "Loncomilla",
+    "Linares",
+    "Parral"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.15,
+    0.48,
+    0.85,
+    0.62
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 8,
+     "box": [
+      0.15,
+      0.48,
+      0.85,
+      0.62
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Isidoro Cruz Ferrada",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.62
+       ]
+      },
+      {
+       "name": "Ignacio Urrutia Manzano",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.62
+       ]
+      },
+      {
+       "name": "Ernesto Rojas del Campo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.62
+       ]
+      },
+      {
+       "name": "Javier Ibañez del Campo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.48,
+        0.85,
+        0.62
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 14.a)."
+  },
+  {
+   "number": 15,
+   "title": "Agrupación Departamental de San Carlos, Chillán, Bulnes y Yungay",
+   "areas": [
+    "San Carlos",
+    "Chillán",
+    "Bulnes",
+    "Yungay"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.15,
+    0.64,
+    0.85,
+    0.83
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 6,
+     "page": 8,
+     "box": [
+      0.15,
+      0.64,
+      0.85,
+      0.83
+     ],
+     "candidates": [
+      {
+       "name": "Ricardo Salas Edwards",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      },
+      {
+       "name": "José Miguel Opazo Letelier",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      },
+      {
+       "name": "Demetrio Zañartu Urrutia",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      },
+      {
+       "name": "René Carvajal Euth",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      },
+      {
+       "name": "Eliecer Mejias Concha",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      },
+      {
+       "name": "Maximiliano Becerra Mera",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.15,
+        0.64,
+        0.85,
+        0.83
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 15.a)."
+  },
+  {
+   "number": 16,
+   "title": "Agrupación Departamental de Coelemu, Talcahuano y Concepción",
+   "areas": [
+    "Coelemu",
+    "Talcahuano",
+    "Concepción"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.15,
+    0.1,
+    0.85,
+    0.25
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 9,
+     "box": [
+      0.15,
+      0.1,
+      0.85,
+      0.25
+     ],
+     "candidates": [
+      {
+       "name": "Eleazar Lezaeta Acharán",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.25
+       ]
+      },
+      {
+       "name": "Marcos Serrano Menchaca",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.25
+       ]
+      },
+      {
+       "name": "Leonidas Banderas Le-Brun",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.25
+       ]
+      },
+      {
+       "name": "Fernando Escobar Ferrada",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.25
+       ]
+      },
+      {
+       "name": "Santiago Silva Alvarez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.25
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 16.a)."
+  },
+  {
+   "number": 17,
+   "title": "Agrupación Departamental de Puchacay, Rere y Lautaro",
+   "areas": [
+    "Puchacay",
+    "Rere",
+    "Lautaro"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.15,
+    0.26,
+    0.85,
+    0.39
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 9,
+     "box": [
+      0.15,
+      0.26,
+      0.85,
+      0.39
+     ],
+     "candidates": [
+      {
+       "name": "Víctor Alamos Lamas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.26,
+        0.85,
+        0.39
+       ]
+      },
+      {
+       "name": "Carlos Roberto Elgueta González",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.26,
+        0.85,
+        0.39
+       ]
+      },
+      {
+       "name": "Luis Torres S.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.26,
+        0.85,
+        0.39
+       ]
+      },
+      {
+       "name": "Vicente Acuña Concha",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.26,
+        0.85,
+        0.39
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 17.a)."
+  },
+  {
+   "number": 18,
+   "title": "Agrupación Departamental de Laja, Nacimiento y Mulchén",
+   "areas": [
+    "Laja",
+    "Nacimiento",
+    "Mulchén"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.15,
+    0.4,
+    0.85,
+    0.53
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 9,
+     "box": [
+      0.15,
+      0.4,
+      0.85,
+      0.53
+     ],
+     "candidates": [
+      {
+       "name": "René de La Jara",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.4,
+        0.85,
+        0.53
+       ]
+      },
+      {
+       "name": "Jorge Orrego Puelma",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.4,
+        0.85,
+        0.53
+       ]
+      },
+      {
+       "name": "Manuel Escobar Moreira",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.4,
+        0.85,
+        0.53
+       ]
+      },
+      {
+       "name": "Ricardo Alegría Molina",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.4,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 18.a)."
+  },
+  {
+   "number": 19,
+   "title": "Agrupación Departamental de Arauco, Lebu y Cañete",
+   "areas": [
+    "Arauco",
+    "Lebu",
+    "Cañete"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.15,
+    0.54,
+    0.85,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 3,
+     "page": 9,
+     "box": [
+      0.15,
+      0.54,
+      0.85,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "Alfonso Figueroa Unzueta",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.54,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Eudocio Rivas Roa",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.54,
+        0.85,
+        0.66
+       ]
+      },
+      {
+       "name": "Luis Muñoz Monje",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.15,
+        0.54,
+        0.85,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 19.a)."
+  },
+  {
+   "number": 20,
+   "title": "Agrupación Departamental de Angol, Collipulli, Traiguén y Mariluán",
+   "areas": [
+    "Angol",
+    "Collipulli",
+    "Traiguén",
+    "Mariluán"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.15,
+    0.14,
+    0.85,
+    0.28
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 10,
+     "box": [
+      0.15,
+      0.14,
+      0.85,
+      0.28
+     ],
+     "candidates": [
+      {
+       "name": "Alfredo Soto Bunster",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.28
+       ]
+      },
+      {
+       "name": "Bartolomé Sepúlveda Onfray",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.28
+       ]
+      },
+      {
+       "name": "Javier Cuellar V.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.28
+       ]
+      },
+      {
+       "name": "Heriberto Arnechino",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.14,
+        0.85,
+        0.28
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 20.a)."
+  },
+  {
+   "number": 21,
+   "title": "Agrupación Departamental de LLaima, Imperial y Temuco",
+   "areas": [
+    "LLaima",
+    "Imperial",
+    "Temuco"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.15,
+    0.3,
+    0.85,
+    0.48
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 6,
+     "page": 10,
+     "box": [
+      0.15,
+      0.3,
+      0.85,
+      0.48
+     ],
+     "candidates": [
+      {
+       "name": "Manuel de la Lastra Cruchaga",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      },
+      {
+       "name": "Manuel Manquilef",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      },
+      {
+       "name": "Rudecindo Ortega Masson",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      },
+      {
+       "name": "Luis Uribe Barra",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      },
+      {
+       "name": "Francisco Melivilu Henríquez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      },
+      {
+       "name": "Luis Mandujano Tobar",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.3,
+        0.85,
+        0.48
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 21.a)."
+  },
+  {
+   "number": 22,
+   "title": "Agrupación Departamental de Villarrica, Valdivia, La Unión y Rio Bueno",
+   "areas": [
+    "Villarrica",
+    "Valdivia",
+    "La Unión",
+    "Rio Bueno"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.15,
+    0.5,
+    0.85,
+    0.7
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 7,
+     "page": 10,
+     "box": [
+      0.15,
+      0.5,
+      0.85,
+      0.7
+     ],
+     "candidates": [
+      {
+       "name": "Enrique Montero",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Pablo Hoffmann",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Miguel Luis Lagos",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Litré Quiroga Arenas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Prudencio Garrido Salazar",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Nolasco Cárdenas Avendaño",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      },
+      {
+       "name": "Abraham Quevedo Vega",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.5,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 22.a)."
+  },
+  {
+   "number": 23,
+   "title": "Agrupación Departamental de Osorno, Llanquihue y Carelmapu",
+   "areas": [
+    "Osorno",
+    "Llanquihue",
+    "Carelmapu"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.15,
+    0.72,
+    0.85,
+    0.86
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 10,
+     "box": [
+      0.15,
+      0.72,
+      0.85,
+      0.86
+     ],
+     "candidates": [
+      {
+       "name": "Ignacio Garcia Henriquez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.72,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Arturo Montecinos Rozas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.72,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Aurelio Morales M.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.72,
+        0.85,
+        0.86
+       ]
+      },
+      {
+       "name": "Manuel Araya Vargas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.15,
+        0.72,
+        0.85,
+        0.86
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 23.a)."
+  },
+  {
+   "number": 24,
+   "title": "Agrupación Departamental de Ancud, Castro y Quinchao",
+   "areas": [
+    "Ancud",
+    "Castro",
+    "Quinchao"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 11,
+   "box": [
+    0.15,
+    0.1,
+    0.85,
+    0.24
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 4,
+     "page": 11,
+     "box": [
+      0.15,
+      0.1,
+      0.85,
+      0.24
+     ],
+     "candidates": [
+      {
+       "name": "Luis Cabrera Ferrada",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.24
+       ]
+      },
+      {
+       "name": "Rafael del Canto",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.24
+       ]
+      },
+      {
+       "name": "Javier María Silva",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.24
+       ]
+      },
+      {
+       "name": "Leonidas Leyton Leyton",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.15,
+        0.1,
+        0.85,
+        0.24
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 of 6 Jan 1930. The volume names the proclaimed deputies only, with no party per candidate and no votes; seats from the index on p.3 (agrupación 24.a)."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": null,
+  "registered": null,
+  "page": null,
+  "parties": {}
+ },
+ "notes": "Volume (11 pp.): index of the 24 agrupaciones departamentales with seats (pp.2-3, 132 seats), the statement (p.4) that the entities recognized under art. 14 a) of Ley 4763 (Partido Conservador, Partido Liberal Unificado, Partido Radical, Partido Demócrata, Confederación Republicana de Acción Cívica) presented exactly as many candidates as seats, so the Tribunal Calificador by sentence of 9 April 1930 proclaimed them without a vote (Protocolo II pp.41-46), and the proclaimed deputies by agrupación (pp.4-11). No votes, registered voters, election day or party affiliation of candidates are printed. Each contest has one pseudo-list 'Candidatos proclamados sin votación' with votes null and all candidates elected. No grouping held a vote in this volume."
+}

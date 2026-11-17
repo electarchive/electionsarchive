@@ -1,0 +1,969 @@
+{
+ "volume": "1949-senators",
+ "chamber": "senators",
+ "year": 1949,
+ "day": "1949-03-06",
+ "day_printed": "6 de Marzo de 1949",
+ "contests": [
+  {
+   "number": 2,
+   "title": "Segunda Circunscripción Electoral Provincial: Atacama y Coquimbo",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 23620,
+   "valid": 23467,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 153,
+   "page": 17,
+   "box": [
+    0.86,
+    0.515,
+    0.94,
+    0.555
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 2316,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.36,
+      0.515,
+      0.39,
+      0.555
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2222,
+     "unassigned": null,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.42,
+      0.515,
+      0.45,
+      0.555
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Frei Montalva",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.774,
+        0.86,
+        0.79
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7369,
+     "unassigned": null,
+     "seats": 2,
+     "page": 17,
+     "box": [
+      0.475,
+      0.515,
+      0.505,
+      0.555
+     ],
+     "candidates": [
+      {
+       "name": "Hernán Videla Lira",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.613,
+        0.8,
+        0.629
+       ]
+      },
+      {
+       "name": "Raúl Marín Balmaceda",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.622,
+        0.8,
+        0.638
+       ]
+      }
+     ],
+     "presented": 2
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8443,
+     "unassigned": null,
+     "seats": 2,
+     "page": 17,
+     "box": [
+      0.535,
+      0.515,
+      0.565,
+      0.555
+     ],
+     "candidates": [
+      {
+       "name": "Humberto Alvarez Suárez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.34,
+        0.417,
+        0.5,
+        0.433
+       ]
+      },
+      {
+       "name": "Isauro Torres Cereceda",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.34,
+        0.426,
+        0.5,
+        0.442
+       ]
+      }
+     ],
+     "presented": 2
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 598,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.73,
+      0.515,
+      0.755,
+      0.555
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 733,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.785,
+      0.515,
+      0.81,
+      0.555
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1786,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.84,
+      0.515,
+      0.865,
+      0.555
+     ],
+     "candidates": [],
+     "presented": 1
+    }
+   ],
+   "notes": "Row 'Total 2.a Circunscripción Provincial' (p17). Party columns give candidates presented (P.) and elected (E.) and votes; 'Total votantes hábiles' recorded as valid, 'Total votos nulos y en blanco' as null_blank, 'Total general de votos' as cast. Registered not printed. Votes per the Tribunal Calificador's scrutiny. The table names no candidates; elected names come from the Acta de Inscripción de Partidos (pp. 12-13), which lists each party's senators with their circunscripción; candidates' votes not printed."
+  },
+  {
+   "number": 4,
+   "title": "Cuarta Circunscripción Electoral Provincial: Santiago",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 133569,
+   "valid": 131562,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 2007,
+   "page": 18,
+   "box": [
+    0.9,
+    0.7,
+    0.98,
+    0.74
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 34832,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.36,
+      0.7,
+      0.39,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Cruz Coke",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.29,
+        0.771,
+        0.45,
+        0.787
+       ]
+      }
+     ],
+     "presented": 2
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 15381,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.47,
+      0.7,
+      0.5,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "Arturo Alessandri Palma",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.631,
+        0.8,
+        0.647
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 17627,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.56,
+      0.7,
+      0.59,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "Angel Faivovich H.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.34,
+        0.434,
+        0.5,
+        0.45
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 1031,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.605,
+      0.7,
+      0.63,
+      0.74
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 3822,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.64,
+      0.7,
+      0.665,
+      0.74
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 26920,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.665,
+      0.7,
+      0.695,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Ibáñez del Campo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.461,
+        0.86,
+        0.477
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 5649,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.705,
+      0.7,
+      0.725,
+      0.74
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 5972,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.74,
+      0.7,
+      0.76,
+      0.74
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 14585,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.77,
+      0.7,
+      0.795,
+      0.74
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 5743,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.815,
+      0.7,
+      0.835,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "Eugenio González Rojas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.86,
+        0.86,
+        0.876
+       ]
+      }
+     ],
+     "presented": 1
+    }
+   ],
+   "notes": "Row 'Total 4.a Circunscripción Provincial' (p18), after the Santiago distritos and departments Talagante, Melipilla, San Antonio, San Bernardo, Maipo. Totals columns as in contest 2. Elected names from the Acta de Inscripción (pp. 12-13); Eugenio González Rojas is listed there under '4.a Circunscripción Santiago'. Null/blank total read as 2 007 (the print is blurred; it equals the department sum 1 906 + 30 + 46 + 2 + 23 and makes valid + null/blank = cast)."
+  },
+  {
+   "number": 6,
+   "title": "Sexta Circunscripción Electoral Provincial: Curicó, Talca, Maule y Linares",
+   "areas": [
+    "Curicó",
+    "Talca",
+    "Maule",
+    "Linares"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 40993,
+   "valid": 40961,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 32,
+   "page": 20,
+   "box": [
+    0.9,
+    0.364,
+    0.98,
+    0.404
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 9961,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.335,
+      0.364,
+      0.36,
+      0.404
+     ],
+     "candidates": [
+      {
+       "name": "Julio Pereira Larraín",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.29,
+        0.779,
+        0.45,
+        0.795
+       ]
+      }
+     ],
+     "presented": 2
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 13383,
+     "unassigned": null,
+     "seats": 2,
+     "page": 20,
+     "box": [
+      0.445,
+      0.364,
+      0.47,
+      0.404
+     ],
+     "candidates": [
+      {
+       "name": "Eduardo Alessandri Rodríguez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.64,
+        0.8,
+        0.656
+       ]
+      },
+      {
+       "name": "Pedro Opazo Cousiño",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.649,
+        0.8,
+        0.665
+       ]
+      }
+     ],
+     "presented": 2
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8200,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.535,
+      0.364,
+      0.56,
+      0.404
+     ],
+     "candidates": [
+      {
+       "name": "Ulises Correa Correa",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.34,
+        0.444,
+        0.5,
+        0.46
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 3612,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.58,
+      0.364,
+      0.6,
+      0.404
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 5530,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.7,
+      0.364,
+      0.725,
+      0.404
+     ],
+     "candidates": [
+      {
+       "name": "Alberto del Pedregal A.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.47,
+        0.86,
+        0.486
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 68,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.745,
+      0.364,
+      0.76,
+      0.404
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 195,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.775,
+      0.364,
+      0.795,
+      0.404
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 12,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.85,
+      0.364,
+      0.87,
+      0.404
+     ],
+     "candidates": [],
+     "presented": 1
+    }
+   ],
+   "notes": "Row 'Total 6.a Circunscripción Provincial' (p20); the grouping starts on p18 (Curicó) and runs over p19. Areas as printed in the table heading ('Curicó, Talca, Maule y Linares'); the section title page (p15) prints 'Curicó, Talca, Linares y Maule'. Totals columns as in contest 2. Elected names from the Acta de Inscripción (pp. 12-13)."
+  },
+  {
+   "number": 8,
+   "title": "Octava Circunscripción Electoral Provincial: Bío-Bío, Malleco y Cautín",
+   "areas": [
+    "Bío-Bío",
+    "Malleco",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 54721,
+   "valid": 54562,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 159,
+   "page": 21,
+   "box": [
+    0.88,
+    0.705,
+    0.96,
+    0.745
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 8716,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.34,
+      0.705,
+      0.37,
+      0.745
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Prieto Concha",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.29,
+        0.789,
+        0.45,
+        0.805
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6797,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.44,
+      0.705,
+      0.47,
+      0.745
+     ],
+     "candidates": [
+      {
+       "name": "Gregorio Amunátegui Jordán",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.61,
+        0.659,
+        0.8,
+        0.675
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Liberal Progresista",
+     "party": "Liberal Progresista",
+     "votes": 6002,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.49,
+      0.705,
+      0.52,
+      0.745
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7855,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.54,
+      0.705,
+      0.57,
+      0.745
+     ],
+     "candidates": [
+      {
+       "name": "Raúl Rettig Guissen",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.34,
+        0.453,
+        0.5,
+        0.469
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Radical Democrático",
+     "party": "Radical Democrático",
+     "votes": 5802,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.585,
+      0.705,
+      0.615,
+      0.745
+     ],
+     "candidates": [
+      {
+       "name": "Hernán Figueroa Anguita",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.246,
+        0.86,
+        0.262
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 4791,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.61,
+      0.705,
+      0.64,
+      0.745
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 9780,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.66,
+      0.705,
+      0.69,
+      0.745
+     ],
+     "candidates": [
+      {
+       "name": "Jaime Larraín",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.64,
+        0.479,
+        0.86,
+        0.495
+       ]
+      }
+     ],
+     "presented": 1
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 3535,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.71,
+      0.705,
+      0.74,
+      0.745
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 53,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.76,
+      0.705,
+      0.78,
+      0.745
+     ],
+     "candidates": [],
+     "presented": 1
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1231,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.83,
+      0.705,
+      0.86,
+      0.745
+     ],
+     "candidates": [],
+     "presented": 1
+    }
+   ],
+   "notes": "Row 'Total 8.a Circunscripción Provincial' (p21); the grouping starts on p20 (Bío-Bío, Malleco departments). Totals columns as in contest 2. Radical Democrático: the printed total reads only '802' because the thousands digit is missing from the print in this column (the same column also prints Malleco '438' and Cautín '881' with no thousands digit, and the national '445'). 5802 is reconstructed: printed Total votantes hábiles 54 562 minus the other nine party totals as read; it also equals Bío-Bío 1 483 + Malleco 1 438 + Cautín 2 881, where the Malleco and Cautín values are each the province's printed votantes hábiles minus its other parties. Not a printed figure. Elected names from the Acta de Inscripción (pp. 12-13)."
+  }
+ ],
+ "national": {
+  "valid": 250552,
+  "cast": 252903,
+  "registered": null,
+  "page": 21,
+  "parties": {
+   "Conservador": 55825,
+   "Falange Nacional": 2222,
+   "Liberal": 42930,
+   "Liberal Progresista": 6002,
+   "Radical": 42125,
+   "Radical Democrático": 10445,
+   "Radical Doctrinario": 8613,
+   "Agrario Laborista": 42230,
+   "Democrático": 9252,
+   "Socialista de Chile": 6818,
+   "Socialista Auténtico": 15318,
+   "Socialista Popular": 8772
+  }
+ },
+ "notes": "Volume (pp. 1-22) holds the 1949 ordinary congressional election front matter: decree/text pages, party registration acts (pp. 4-14, including the Acta de Inscripción de Partidos for 1949-1953 listing each party's senators by circunscripción provincial and deputies by agrupación), the Senate section (p15) and the senate synoptic table by commune/department/province 'de acuerdo con los escrutinios efectuados por el Tribunal Calificador' for circunscripciones 2, 4, 6 and 8 (pp. 16-21). Each list is a party column with candidates presented/elected; the extra key 'presented' records the P. (candidatos presentados) count. Candidate-level votes are not printed; elected senators' names come from the Acta (pp. 12-13). p22 is a grey, low-contrast fold-out summary table (appears to include a DIPUTADOS block) that was not transcribed. National row 'TOTAL GENERAL' (p21): party totals as printed except Radical Democrático, printed '445' with digits missing (P. 3, E. 1); 10445 is reconstructed from the circunscripción totals (1 031 + 3 612 + 5 802) and makes the national party sum equal the printed 250 552. Registered voters are not printed anywhere."
+}

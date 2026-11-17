@@ -1,0 +1,816 @@
+{
+ "volume": "1973-senators",
+ "chamber": "senators",
+ "year": 1973,
+ "day": "1973-03-04",
+ "day_printed": "4 de Marzo de 1973",
+ "contests": [
+  {
+   "number": 2,
+   "title": "2a. AGRUPACION PROVINCIAL ATACAMA-COQUIMBO",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 190529,
+   "valid": null,
+   "invalid": 2901,
+   "blank": 1331,
+   "null_blank": null,
+   "page": 17,
+   "box": [
+    0.86,
+    0.742,
+    0.97,
+    0.905
+   ],
+   "lists": [
+    {
+     "label": "A",
+     "party": "CONFEDERACION DE LA DEMOCRACIA",
+     "votes": 83073,
+     "unassigned": 976,
+     "seats": 2,
+     "page": 17,
+     "box": [
+      0.91,
+      0.52,
+      0.969,
+      0.545
+     ],
+     "candidates": [
+      {
+       "name": "ALEJANDRO NOEMI HUERTA",
+       "party": "P.D.C.",
+       "votes": 22683,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.756,
+        0.446,
+        0.969,
+        0.471
+       ]
+      },
+      {
+       "name": "ANDRES ZALDIVAR LARRAIN",
+       "party": "P.D.C.",
+       "votes": 37325,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.756,
+        0.47,
+        0.969,
+        0.495
+       ]
+      },
+      {
+       "name": "JULIO MERCADO ILLANES",
+       "party": null,
+       "votes": 22089,
+       "elected": false,
+       "page": 17,
+       "box": [
+        0.756,
+        0.495,
+        0.969,
+        0.521
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B",
+     "party": "PARTIDO DE LA UNIDAD POPULAR",
+     "votes": 103224,
+     "unassigned": 1211,
+     "seats": 3,
+     "page": 17,
+     "box": [
+      0.91,
+      0.677,
+      0.969,
+      0.702
+     ],
+     "candidates": [
+      {
+       "name": "HUGO MIRANDA RAMIREZ",
+       "party": "P.R.",
+       "votes": 12627,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.756,
+        0.579,
+        0.969,
+        0.604
+       ]
+      },
+      {
+       "name": "JULIETA CAMPUSANO CHAVEZ",
+       "party": "P.C.",
+       "votes": 47002,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.756,
+        0.602,
+        0.969,
+        0.627
+       ]
+      },
+      {
+       "name": "FRANCISCO GONZALEZ DEL RIO",
+       "party": null,
+       "votes": 3871,
+       "elected": false,
+       "page": 17,
+       "box": [
+        0.756,
+        0.627,
+        0.969,
+        0.652
+       ]
+      },
+      {
+       "name": "LUIS AGUILERA BAEZ",
+       "party": "P.S.",
+       "votes": 38513,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.756,
+        0.652,
+        0.969,
+        0.677
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the T (total) column of the grouping-total column on the last commune page (V/M split ignored). Lists are the two federated tickets as printed (A.- CONFEDERACION DE LA DEMOCRACIA = CODE: PDC, PN, PADENA, PIR, DR; B.- PARTIDO DE LA UNIDAD POPULAR = Unidad Popular: PS, PC, PR, MAPU, IC, API). The volume prints no per-party vote totals, only federation totals and candidate preferences, so each list is a federation, not a party. List row 'A.-'/'B.-' figure = votes for the federation without preference (unassigned). Candidate parties (P.D.C., P.N., P.C., P.S., P.R.) are hand-annotated beside elected names in the Tribunal Calificador proclamation (p101-102); non-elected candidates' parties are not printed (null). Seats elected per federation from the proclamation, consistent with p3 (CODE-UP elected counts). valid not printed (lists sum to cast minus nulos and blancos). Totals agree with the Tribunal's Escrutinio General summary on p80. Registered voters not printed."
+  },
+  {
+   "number": 4,
+   "title": "4a. AGRUPACION PROVINCIAL PROVINCIA DE SANTIAGO",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 1433222,
+   "valid": null,
+   "invalid": 15300,
+   "blank": 4721,
+   "null_blank": null,
+   "page": 35,
+   "box": [
+    0.846,
+    0.734,
+    0.945,
+    0.885
+   ],
+   "lists": [
+    {
+     "label": "A",
+     "party": "CONFEDERACION DE LA DEMOCRACIA",
+     "votes": 826640,
+     "unassigned": 9661,
+     "seats": 3,
+     "page": 35,
+     "box": [
+      0.896,
+      0.511,
+      0.945,
+      0.536
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO FREI MONTALVA",
+       "party": "P.D.C.",
+       "votes": 398238,
+       "elected": true,
+       "page": 35,
+       "box": [
+        0.742,
+        0.393,
+        0.945,
+        0.418
+       ]
+      },
+      {
+       "name": "JOSE MUSALEM SAFFIE",
+       "party": "P.D.C.",
+       "votes": 109314,
+       "elected": true,
+       "page": 35,
+       "box": [
+        0.742,
+        0.415,
+        0.945,
+        0.44
+       ]
+      },
+      {
+       "name": "ALBERTO BALTRA CORTES",
+       "party": null,
+       "votes": 26790,
+       "elected": false,
+       "page": 35,
+       "box": [
+        0.742,
+        0.437,
+        0.945,
+        0.462
+       ]
+      },
+      {
+       "name": "ALBERTO LABBE TRONCOSO",
+       "party": null,
+       "votes": 87165,
+       "elected": false,
+       "page": 35,
+       "box": [
+        0.742,
+        0.461,
+        0.945,
+        0.486
+       ]
+      },
+      {
+       "name": "SERGIO ONOFRE JARPA REYES",
+       "party": "P.N.",
+       "votes": 195472,
+       "elected": true,
+       "page": 35,
+       "box": [
+        0.742,
+        0.485,
+        0.945,
+        0.511
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B",
+     "party": "PARTIDO UNIDAD POPULAR",
+     "votes": 586561,
+     "unassigned": 11081,
+     "seats": 2,
+     "page": 35,
+     "box": [
+      0.896,
+      0.67,
+      0.945,
+      0.695
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS ALTAMIRANO ORREGO",
+       "party": "P.S.",
+       "votes": 234232,
+       "elected": true,
+       "page": 35,
+       "box": [
+        0.742,
+        0.572,
+        0.945,
+        0.597
+       ]
+      },
+      {
+       "name": "ANIBAL PALMA FOURCADE",
+       "party": null,
+       "votes": 76037,
+       "elected": false,
+       "page": 35,
+       "box": [
+        0.742,
+        0.596,
+        0.945,
+        0.621
+       ]
+      },
+      {
+       "name": "CARMEN GLORIA AGUAYO IRRIBARRA",
+       "party": null,
+       "votes": 21320,
+       "elected": false,
+       "page": 35,
+       "box": [
+        0.742,
+        0.62,
+        0.945,
+        0.645
+       ]
+      },
+      {
+       "name": "VOLODIA TEITELBOIM VOLOSKY",
+       "party": "P.C.",
+       "votes": 243891,
+       "elected": true,
+       "page": 35,
+       "box": [
+        0.742,
+        0.645,
+        0.945,
+        0.67
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the T (total) column of the grouping-total column on the last commune page (V/M split ignored). Lists are the two federated tickets as printed (A.- CONFEDERACION DE LA DEMOCRACIA = CODE: PDC, PN, PADENA, PIR, DR; B.- PARTIDO UNIDAD POPULAR = Unidad Popular: PS, PC, PR, MAPU, IC, API). The volume prints no per-party vote totals, only federation totals and candidate preferences, so each list is a federation, not a party. List row 'A.-'/'B.-' figure = votes for the federation without preference (unassigned). Candidate parties (P.D.C., P.N., P.C., P.S., P.R.) are hand-annotated beside elected names in the Tribunal Calificador proclamation (p101-102); non-elected candidates' parties are not printed (null). Seats elected per federation from the proclamation, consistent with p3 (CODE-UP elected counts). valid not printed (lists sum to cast minus nulos and blancos). Totals agree with the Tribunal's Escrutinio General summary on p80. Registered voters not printed."
+  },
+  {
+   "number": 6,
+   "title": "6a. AGRUPACION PROVINCIAL PROVINCIA CURICO-TALCA-MAULE-LINARES",
+   "areas": [
+    "Curicó",
+    "Talca",
+    "Maule",
+    "Linares"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 245878,
+   "valid": null,
+   "invalid": 3525,
+   "blank": 2077,
+   "null_blank": null,
+   "page": 49,
+   "box": [
+    0.867,
+    0.734,
+    0.96,
+    0.89
+   ],
+   "lists": [
+    {
+     "label": "A",
+     "party": "CONFEDERACION DE LA DEMOCRACIA",
+     "votes": 132091,
+     "unassigned": 1605,
+     "seats": 3,
+     "page": 49,
+     "box": [
+      0.917,
+      0.529,
+      0.96,
+      0.555
+     ],
+     "candidates": [
+      {
+       "name": "PATRICIO AYLWIN AZOCAR",
+       "party": "P.D.C.",
+       "votes": 35541,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.763,
+        0.397,
+        0.96,
+        0.422
+       ]
+      },
+      {
+       "name": "JOSE FONCEA AEDO",
+       "party": "P.D.C.",
+       "votes": 16190,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.763,
+        0.421,
+        0.96,
+        0.446
+       ]
+      },
+      {
+       "name": "HECTOR VALENZUELA VALDERRAMA",
+       "party": null,
+       "votes": 11708,
+       "elected": false,
+       "page": 49,
+       "box": [
+        0.763,
+        0.446,
+        0.96,
+        0.471
+       ]
+      },
+      {
+       "name": "SERGIO DIEZ URZUA",
+       "party": "P.N.",
+       "votes": 59503,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.763,
+        0.471,
+        0.96,
+        0.496
+       ]
+      },
+      {
+       "name": "EUGENIO VELASCO LETELIER",
+       "party": null,
+       "votes": 7544,
+       "elected": false,
+       "page": 49,
+       "box": [
+        0.763,
+        0.496,
+        0.96,
+        0.521
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B",
+     "party": "PARTIDO UNIDAD POPULAR",
+     "votes": 108185,
+     "unassigned": 1991,
+     "seats": 2,
+     "page": 49,
+     "box": [
+      0.917,
+      0.667,
+      0.96,
+      0.693
+     ],
+     "candidates": [
+      {
+       "name": "ALEJANDRO TORO HERRERA",
+       "party": "P.C.",
+       "votes": 42770,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.763,
+        0.587,
+        0.96,
+        0.612
+       ]
+      },
+      {
+       "name": "ERICH SCHNAKE SILVA",
+       "party": "P.S.",
+       "votes": 53483,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.763,
+        0.611,
+        0.96,
+        0.636
+       ]
+      },
+      {
+       "name": "JORGE CABELLO PIZARRO",
+       "party": null,
+       "votes": 9941,
+       "elected": false,
+       "page": 49,
+       "box": [
+        0.763,
+        0.636,
+        0.96,
+        0.661
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the T (total) column of the grouping-total column on the last commune page (V/M split ignored). Lists are the two federated tickets as printed (A.- CONFEDERACION DE LA DEMOCRACIA = CODE: PDC, PN, PADENA, PIR, DR; B.- PARTIDO UNIDAD POPULAR = Unidad Popular: PS, PC, PR, MAPU, IC, API). The volume prints no per-party vote totals, only federation totals and candidate preferences, so each list is a federation, not a party. List row 'A.-'/'B.-' figure = votes for the federation without preference (unassigned). Candidate parties (P.D.C., P.N., P.C., P.S., P.R.) are hand-annotated beside elected names in the Tribunal Calificador proclamation (p101-102); non-elected candidates' parties are not printed (null). Seats elected per federation from the proclamation, consistent with p3 (CODE-UP elected counts). valid not printed (lists sum to cast minus nulos and blancos). Totals agree with the Tribunal's Escrutinio General summary on p80. Registered voters not printed."
+  },
+  {
+   "number": 8,
+   "title": "8° AGRUPACION PROVINCIAL BIO BIO, MALLECO Y CAUTIN",
+   "areas": [
+    "Bio Bio",
+    "Malleco",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 279267,
+   "valid": null,
+   "invalid": 4064,
+   "blank": 2154,
+   "null_blank": null,
+   "page": 65,
+   "box": [
+    0.815,
+    0.684,
+    0.906,
+    0.808
+   ],
+   "lists": [
+    {
+     "label": "A",
+     "party": "CONFEDERACION DE LA DEMOCRACIA",
+     "votes": 167983,
+     "unassigned": 1833,
+     "seats": 3,
+     "page": 65,
+     "box": [
+      0.865,
+      0.518,
+      0.906,
+      0.543
+     ],
+     "candidates": [
+      {
+       "name": "RENAN FUENTEALBA MOENA",
+       "party": "P.D.C.",
+       "votes": 37882,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.712,
+        0.429,
+        0.906,
+        0.454
+       ]
+      },
+      {
+       "name": "JORGE LAVANDEROS ILLANES",
+       "party": "P.D.C.",
+       "votes": 46772,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.712,
+        0.445,
+        0.906,
+        0.471
+       ]
+      },
+      {
+       "name": "PATRICIO PHILLIPS PEÑAFIEL",
+       "party": "P.N.",
+       "votes": 42348,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.712,
+        0.462,
+        0.906,
+        0.487
+       ]
+      },
+      {
+       "name": "MIGUEL HUERTA MUÑOZ",
+       "party": null,
+       "votes": 21405,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.712,
+        0.478,
+        0.906,
+        0.504
+       ]
+      },
+      {
+       "name": "JULIO DURAN NEUMANN",
+       "party": null,
+       "votes": 17743,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.712,
+        0.495,
+        0.906,
+        0.52
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B",
+     "party": "PARTIDO DE LA UNIDAD POPULAR",
+     "votes": 105066,
+     "unassigned": 2594,
+     "seats": 2,
+     "page": 65,
+     "box": [
+      0.865,
+      0.635,
+      0.906,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "LUIS FERNANDO LUENGO ESCALONA",
+       "party": null,
+       "votes": 20846,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.712,
+        0.572,
+        0.906,
+        0.597
+       ]
+      },
+      {
+       "name": "JAIME SUAREZ BASTIDAS",
+       "party": "P.S.",
+       "votes": 45825,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.712,
+        0.588,
+        0.906,
+        0.613
+       ]
+      },
+      {
+       "name": "ERNESTO ARANEDA BRIONES",
+       "party": "P.C.",
+       "votes": 35801,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.712,
+        0.609,
+        0.906,
+        0.634
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the T (total) column of the grouping-total column on the last commune page (V/M split ignored). Lists are the two federated tickets as printed (A.- CONFEDERACION DE LA DEMOCRACIA = CODE: PDC, PN, PADENA, PIR, DR; B.- PARTIDO DE LA UNIDAD POPULAR = Unidad Popular: PS, PC, PR, MAPU, IC, API). The volume prints no per-party vote totals, only federation totals and candidate preferences, so each list is a federation, not a party. List row 'A.-'/'B.-' figure = votes for the federation without preference (unassigned). Candidate parties (P.D.C., P.N., P.C., P.S., P.R.) are hand-annotated beside elected names in the Tribunal Calificador proclamation (p101-102); non-elected candidates' parties are not printed (null). Seats elected per federation from the proclamation, consistent with p3 (CODE-UP elected counts). valid not printed (lists sum to cast minus nulos and blancos). Totals agree with the Tribunal's Escrutinio General summary on p80. Registered voters not printed. Proclamation spells 'JORGE LAVANDERO ILLANES'; table prints 'LAVANDEROS'."
+  },
+  {
+   "number": 10,
+   "title": "10°AGRUPACION PROVINCIAL CHILOE, AYSEN y MAGALLANES",
+   "areas": [
+    "Chiloé",
+    "Aysén",
+    "Magallanes"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 91123,
+   "valid": null,
+   "invalid": 1443,
+   "blank": 648,
+   "null_blank": null,
+   "page": 78,
+   "box": [
+    0.7849999999999999,
+    0.672,
+    0.878,
+    0.796
+   ],
+   "lists": [
+    {
+     "label": "A",
+     "party": "CONFEDERACION DE LA DEMOCRACIA",
+     "votes": 49556,
+     "unassigned": 357,
+     "seats": 3,
+     "page": 78,
+     "box": [
+      0.835,
+      0.499,
+      0.878,
+      0.524
+     ],
+     "candidates": [
+      {
+       "name": "RAUL MORALES ADRIASOLA",
+       "party": null,
+       "votes": 8160,
+       "elected": false,
+       "page": 78,
+       "box": [
+        0.681,
+        0.416,
+        0.878,
+        0.442
+       ]
+      },
+      {
+       "name": "FERNANDO OCHAGAVIA VALDES",
+       "party": "P.N.",
+       "votes": 11418,
+       "elected": true,
+       "page": 78,
+       "box": [
+        0.681,
+        0.433,
+        0.878,
+        0.458
+       ]
+      },
+      {
+       "name": "JUAN HAMILTON DEPASSIER",
+       "party": "P.D.C.",
+       "votes": 16130,
+       "elected": true,
+       "page": 78,
+       "box": [
+        0.681,
+        0.45,
+        0.878,
+        0.475
+       ]
+      },
+      {
+       "name": "ALFREDO LORCA VALENCIA",
+       "party": "P.D.C.",
+       "votes": 13491,
+       "elected": true,
+       "page": 78,
+       "box": [
+        0.681,
+        0.467,
+        0.878,
+        0.492
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B",
+     "party": "PARTIDO DE LA UNIDAD POPULAR",
+     "votes": 39476,
+     "unassigned": 554,
+     "seats": 2,
+     "page": 78,
+     "box": [
+      0.835,
+      0.622,
+      0.878,
+      0.647
+     ],
+     "candidates": [
+      {
+       "name": "ADONIS SEPULVEDA ACUÑA",
+       "party": "P.S.",
+       "votes": 20416,
+       "elected": true,
+       "page": 78,
+       "box": [
+        0.681,
+        0.556,
+        0.878,
+        0.581
+       ]
+      },
+      {
+       "name": "CARLOS MORALES ABARZUA",
+       "party": null,
+       "votes": 7510,
+       "elected": false,
+       "page": 78,
+       "box": [
+        0.681,
+        0.573,
+        0.878,
+        0.598
+       ]
+      },
+      {
+       "name": "LUIS GODOY GOMEZ",
+       "party": "P.C.",
+       "votes": 10996,
+       "elected": true,
+       "page": 78,
+       "box": [
+        0.681,
+        0.59,
+        0.878,
+        0.615
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the T (total) column of the grouping-total column on the last commune page (V/M split ignored). Lists are the two federated tickets as printed (A.- CONFEDERACION DE LA DEMOCRACIA = CODE: PDC, PN, PADENA, PIR, DR; B.- PARTIDO DE LA UNIDAD POPULAR = Unidad Popular: PS, PC, PR, MAPU, IC, API). The volume prints no per-party vote totals, only federation totals and candidate preferences, so each list is a federation, not a party. List row 'A.-'/'B.-' figure = votes for the federation without preference (unassigned). Candidate parties (P.D.C., P.N., P.C., P.S., P.R.) are hand-annotated beside elected names in the Tribunal Calificador proclamation (p101-102); non-elected candidates' parties are not printed (null). Seats elected per federation from the proclamation, consistent with p3 (CODE-UP elected counts). valid not printed (lists sum to cast minus nulos and blancos). Totals agree with the Tribunal's Escrutinio General summary on p80. Registered voters not printed."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": 2240019,
+  "registered": null,
+  "page": 80,
+  "parties": {
+   "CONFEDERACION DE LA DEMOCRACIA": 1259343,
+   "PARTIDO DE LA UNIDAD POPULAR": 942512,
+   "NULOS Y BLANCOS": 38164
+  }
+ },
+ "notes": "1973 ordinary Senate election, even-numbered agrupaciones (2a, 4a, 6a, 8a, 10a), 5 seats each. Pages 5-78 give commune/department/province/grouping tables with V/M/T columns; grouping totals transcribed from pp 17, 35, 49, 65, 78 (T column). Parties ran in two federations: CODE (Confederación de la Democracia) and UP (Unidad Popular, printed 'Partido (de la) Unidad Popular'); the tables print only federation totals, so lists = federations and per-party totals cannot be recorded. p2 lists candidates per federation; p3 counts candidates and elected per federation; p80 is the Tribunal Calificador's Escrutinio General by agrupación (national totals taken from its TOTAL AGRUPACIONES row; nulos y blancos combined there); pp 81-100 repeat it by department (not transcribed, totals match); pp 101-102 Sentencia de Proclamación with hand-written party abbreviations. Registered voters never printed."
+}

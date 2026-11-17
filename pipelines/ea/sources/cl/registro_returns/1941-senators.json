@@ -1,0 +1,937 @@
+{
+ "volume": "1941-senators",
+ "chamber": "senators",
+ "year": 1941,
+ "day": "1941-03-02",
+ "day_printed": "2 DE MARZO DE 1941",
+ "contests": [
+  {
+   "number": 2,
+   "title": "2a. CIRCUNSCRIPCION PROVINCIAL DE ATACAMA Y COQUIMBO",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": 35784,
+   "cast": null,
+   "valid": 27669,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 20,
+   "box": [
+    0.834,
+    0.383,
+    0.873,
+    0.396
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Partidos Radical, Democrático y Progresista Nacional",
+     "votes": 15019,
+     "unassigned": 219,
+     "seats": 3,
+     "page": 10,
+     "box": [
+      0.934,
+      0.477,
+      0.975,
+      0.493
+     ],
+     "candidates": [
+      {
+       "name": "Humberto Alvarez Suarez",
+       "party": "Rad.",
+       "votes": 5006,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.934,
+        0.396,
+        0.975,
+        0.411
+       ]
+      },
+      {
+       "name": "Isauro Torres Cereceda",
+       "party": "Rad.",
+       "votes": 2597,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.934,
+        0.412,
+        0.975,
+        0.427
+       ]
+      },
+      {
+       "name": "Humberto García Pino",
+       "party": "Rad.",
+       "votes": 1291,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.428,
+        0.975,
+        0.443
+       ]
+      },
+      {
+       "name": "Guillermo Guevara Vargas",
+       "party": "P.Nac.",
+       "votes": 5676,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.934,
+        0.445,
+        0.975,
+        0.46
+       ]
+      },
+      {
+       "name": "Agustin Ortúzar Estay",
+       "party": "Democrático",
+       "votes": 230,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.461,
+        0.975,
+        0.476
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Partidos Liberal, Demócrata y Falange Nacional",
+     "votes": 8106,
+     "unassigned": 68,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.934,
+      0.647,
+      0.975,
+      0.663
+     ],
+     "candidates": [
+      {
+       "name": "Edmundo Pizarro Cabezas",
+       "party": "Lib.",
+       "votes": 2822,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.582,
+        0.975,
+        0.597
+       ]
+      },
+      {
+       "name": "Hernán Videla Lira",
+       "party": "Lib.",
+       "votes": 3983,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.934,
+        0.599,
+        0.975,
+        0.614
+       ]
+      },
+      {
+       "name": "Mariano Ruiz Correa",
+       "party": "F.Nac.",
+       "votes": 1228,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.615,
+        0.975,
+        0.63
+       ]
+      },
+      {
+       "name": "Oscar Chanks Cámus",
+       "party": "Demócrata",
+       "votes": 5,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.631,
+        0.975,
+        0.646
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Partido Socialista",
+     "votes": 4544,
+     "unassigned": 83,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.934,
+      0.791,
+      0.975,
+      0.81
+     ],
+     "candidates": [
+      {
+       "name": "Eleodoro Dominguez",
+       "party": null,
+       "votes": 4407,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.934,
+        0.737,
+        0.975,
+        0.752
+       ]
+      },
+      {
+       "name": "Aquiles Concha Stuardo",
+       "party": null,
+       "votes": 37,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.753,
+        0.975,
+        0.768
+       ]
+      },
+      {
+       "name": "Alamiro Concha González",
+       "party": null,
+       "votes": 17,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.934,
+        0.769,
+        0.975,
+        0.784
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Lists and candidates from the Tribunal Calificador's definitive table (p. 10, 'TOTAL GENERAL' column); its 'Votos marcados o en blanco' rows are empty. registered and valid come from the 'Total 2.a Circunscripción' row of the Dirección's Senate synoptic table (p. 5, and the same figures in the per-circunscripción summary on p. 20: 'Total general de votantes hábiles' 27.669, 'Electores hábiles para concurrir al sufragio' 35.784): registered 35.784; votes 27.669 (the latter equals the list sum, so it is recorded as valid). No null/blank figure printed. Elected per the proclamation on p. 11 (Lista 1: 3, Lista 2: 1, Lista 3: 1). Candidate party abbreviations as printed after each name."
+  },
+  {
+   "number": 4,
+   "title": "4a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL DE SANTIAGO",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": 149657,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 12,
+   "box": [
+    0.846,
+    0.812,
+    0.896,
+    0.836
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Partido Laborista de Chile",
+     "votes": 5690,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.846,
+      0.327,
+      0.896,
+      0.344
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Ibañez del Campo",
+       "party": null,
+       "votes": 5690,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.311,
+        0.896,
+        0.328
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Partidos Radical, Democrático y Progresista Nac.",
+     "votes": 41192,
+     "unassigned": 2438,
+     "seats": 2,
+     "page": 12,
+     "box": [
+      0.846,
+      0.473,
+      0.896,
+      0.491
+     ],
+     "candidates": [
+      {
+       "name": "Gustavo Girón Latapiat",
+       "party": "Radical",
+       "votes": 14692,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.846,
+        0.428,
+        0.896,
+        0.444
+       ]
+      },
+      {
+       "name": "Cárlos Contreras Labarca",
+       "party": "Prog.Nac.",
+       "votes": 15987,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.846,
+        0.444,
+        0.896,
+        0.459
+       ]
+      },
+      {
+       "name": "Leonidas Leyton Leyton",
+       "party": "Democrático",
+       "votes": 8075,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.459,
+        0.896,
+        0.475
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Partido Socialista",
+     "votes": 20252,
+     "unassigned": 6404,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.846,
+      0.611,
+      0.896,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "Marmaduke Grove Vallejos",
+       "party": null,
+       "votes": 12372,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.846,
+        0.564,
+        0.896,
+        0.579
+       ]
+      },
+      {
+       "name": "Luis Zúñiga Ibañez",
+       "party": null,
+       "votes": 721,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.579,
+        0.896,
+        0.595
+       ]
+      },
+      {
+       "name": "Arturo Bianchi Gundián",
+       "party": null,
+       "votes": 755,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.595,
+        0.896,
+        0.611
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°4",
+     "party": "Partidos Conservador, Liberal, Alianza Popular Libertadora y Demócrata",
+     "votes": 44276,
+     "unassigned": 5809,
+     "seats": 2,
+     "page": 12,
+     "box": [
+      0.846,
+      0.815,
+      0.896,
+      0.833
+     ],
+     "candidates": [
+      {
+       "name": "Horacio Walker Larraín",
+       "party": "Conserv.",
+       "votes": 10589,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.846,
+        0.736,
+        0.896,
+        0.751
+       ]
+      },
+      {
+       "name": "Máximo Valdés Fontecilla",
+       "party": "Lib",
+       "votes": 12115,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.752,
+        0.896,
+        0.767
+       ]
+      },
+      {
+       "name": "Eduardo Cruz Coke",
+       "party": "Conservador",
+       "votes": 14899,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.846,
+        0.768,
+        0.896,
+        0.784
+       ]
+      },
+      {
+       "name": "Virgilio Morales Vivanco",
+       "party": "A.P.L.",
+       "votes": 746,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.784,
+        0.896,
+        0.799
+       ]
+      },
+      {
+       "name": "Héctor Alvarez Alvarez",
+       "party": "Demócrata",
+       "votes": 118,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.846,
+        0.8,
+        0.896,
+        0.815
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Lists and candidates from the Tribunal Calificador's table (p. 12, 'TOTAL' column over departments Santiago, Melipilla, S. Antonio, S. Bernardo, Maipo); the proclamation (pp. 13 and 15) is labelled 'ESCRUTINIO PROVINCIAL PROVISIONAL' and declares the five 'presuntivamente electos' (Lista 4: 2, Lista 2: 2, Lista 3: 1). Lists sum 111.410; no grouping total, null/blank or registered row in the TC table. 'Votos marcados o en blanco' are printed only for the Santiago department, by district (pp. 14-15: Lista 2 528, Lista 3 239, Lista 4 315), not for the grouping; not recorded. The Dirección's Senate synoptic (p. 6, 'Total 4.a Circunscripción') prints 'Total votos emitidos' 114 481 (3.071 more than the TC list sum; Depto. Santiago 99 666 vs TC 96.970) and 'Total votantes hábiles' 149 6?7 (blurred); the summary on p. 20 prints the same 114.481 and 'Electores hábiles para concurrir al sufragio' 149.657, which is recorded as registered (p. 20). The 114.481 is not recorded as valid because it disagrees with the TC list totals. pp. 14-15 also hand-annotate a Lista 4 subtotal (37.260) in pencil."
+  },
+  {
+   "number": 6,
+   "title": "6a. CIRCUNSCRIPCION PROVINCIAL DE CURICO, TALCA, MAULE, Y LINARES",
+   "areas": [
+    "Curicó",
+    "Talca",
+    "Maule",
+    "Linares"
+   ],
+   "seats": 5,
+   "registered": 49745,
+   "cast": null,
+   "valid": 39282,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 20,
+   "box": [
+    0.834,
+    0.444,
+    0.873,
+    0.456
+   ],
+   "lists": [
+    {
+     "label": "Lista N°2",
+     "party": "Partidos Radical, Democrático y Progresista Nacional",
+     "votes": 13603,
+     "unassigned": 844,
+     "seats": 2,
+     "page": 16,
+     "box": [
+      0.944,
+      0.441,
+      0.982,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "Ulises Correa Correa",
+       "party": "R.",
+       "votes": 7067,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.944,
+        0.386,
+        0.982,
+        0.399
+       ]
+      },
+      {
+       "name": "Rodolfo Armas Riquelme",
+       "party": "R.",
+       "votes": 253,
+       "elected": false,
+       "page": 16,
+       "box": [
+        0.944,
+        0.4,
+        0.982,
+        0.413
+       ]
+      },
+      {
+       "name": "Antonio Poupin Gray",
+       "party": "Democrátic",
+       "votes": 1351,
+       "elected": false,
+       "page": 16,
+       "box": [
+        0.944,
+        0.414,
+        0.982,
+        0.426
+       ]
+      },
+      {
+       "name": "Amador Pairoa Trujillo",
+       "party": "Prog.Nac",
+       "votes": 4088,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.944,
+        0.428,
+        0.982,
+        0.44
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Partido Socialista",
+     "votes": 4872,
+     "unassigned": 2012,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.944,
+      0.557,
+      0.982,
+      0.572
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Eduardo Hubner R.",
+       "party": null,
+       "votes": 2740,
+       "elected": false,
+       "page": 16,
+       "box": [
+        0.944,
+        0.53,
+        0.982,
+        0.543
+       ]
+      },
+      {
+       "name": "Miguel Etchebarne Riol",
+       "party": null,
+       "votes": 120,
+       "elected": false,
+       "page": 16,
+       "box": [
+        0.944,
+        0.545,
+        0.982,
+        0.557
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°5",
+     "party": "Partido Liberal y Conservador",
+     "votes": 20807,
+     "unassigned": 662,
+     "seats": 3,
+     "page": 16,
+     "box": [
+      0.944,
+      0.716,
+      0.982,
+      0.73
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Opazo Letelier",
+       "party": "L.",
+       "votes": 7230,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.944,
+        0.662,
+        0.982,
+        0.674
+       ]
+      },
+      {
+       "name": "Maximiano Errázuriz Valdes",
+       "party": "C.",
+       "votes": 4065,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.944,
+        0.676,
+        0.982,
+        0.688
+       ]
+      },
+      {
+       "name": "Matías Silva Sepúlveda",
+       "party": "L.",
+       "votes": 738,
+       "elected": false,
+       "page": 16,
+       "box": [
+        0.944,
+        0.69,
+        0.982,
+        0.702
+       ]
+      },
+      {
+       "name": "Ernesto Cruz Concha",
+       "party": "C.",
+       "votes": 8112,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.944,
+        0.703,
+        0.982,
+        0.716
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Lists and candidates from the Tribunal Calificador's table (p. 16, 'TOTAL GRAL.' column); 'Votos marcados o en blanco' rows are empty. The proclamation (p. 17) is an 'ESCRUTINIO PROVINCIAL PROVISIONAL' naming the five 'presuntivamente electos' (Lista 5: 3, Lista 2: 2). registered ('Electores hábiles para concurrir al sufragio' 49.745) and valid ('Total general de votantes hábiles' 39.282, equal to the list sum) from the summary on p. 20; the same figures appear in the 'Total 6.a Circunscripción' row of the synoptic on p. 8, where the registered figure's last digit is blurred but provincial rows (9 021 + 17 267 + 8 619 + 14 838) confirm 49 745. Lista 5's total is printed '20 807' without the thousands point. Antonio Poupin Gray's party is cut off as '(Democrátic'."
+  },
+  {
+   "number": 8,
+   "title": "8a. CIRCUNSCRIPCION PROVINCIAL DE BIO BIO, MALLECO Y CAUTIN",
+   "areas": [
+    "Bío-Bío",
+    "Malleco",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": 65872,
+   "cast": null,
+   "valid": 52053,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 20,
+   "box": [
+    0.834,
+    0.471,
+    0.873,
+    0.483
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Partidos Radical, Democrático y Progresista Nac.",
+     "votes": 19961,
+     "unassigned": 1328,
+     "seats": 2,
+     "page": 18,
+     "box": [
+      0.907,
+      0.441,
+      0.948,
+      0.454
+     ],
+     "candidates": [
+      {
+       "name": "Rudecindo Ortega Masson",
+       "party": "R",
+       "votes": 6865,
+       "elected": true,
+       "page": 18,
+       "box": [
+        0.907,
+        0.365,
+        0.948,
+        0.377
+       ]
+      },
+      {
+       "name": "Dario Barrueto Molinet",
+       "party": "R.",
+       "votes": 6638,
+       "elected": true,
+       "page": 18,
+       "box": [
+        0.907,
+        0.378,
+        0.948,
+        0.39
+       ]
+      },
+      {
+       "name": "Máximo Venegas Sepúlveda",
+       "party": "Dem",
+       "votes": 2982,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.391,
+        0.948,
+        0.402
+       ]
+      },
+      {
+       "name": "Juan de Dios Morales Huichaleo",
+       "party": "Prog.Nac.",
+       "votes": 2113,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.404,
+        0.948,
+        0.415
+       ]
+      },
+      {
+       "name": "Venancio Coñoepan Huenchual",
+       "party": "R.",
+       "votes": 35,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.429,
+        0.948,
+        0.441
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Partido Socialista",
+     "votes": 7629,
+     "unassigned": 1755,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.907,
+      0.576,
+      0.948,
+      0.589
+     ],
+     "candidates": [
+      {
+       "name": "Asdrubal Pezoa Estrada",
+       "party": null,
+       "votes": 5608,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.539,
+        0.948,
+        0.551
+       ]
+      },
+      {
+       "name": "Julio Cepeda Gallardo",
+       "party": null,
+       "votes": 253,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.552,
+        0.948,
+        0.564
+       ]
+      },
+      {
+       "name": "Jenaro Torres Contreras",
+       "party": null,
+       "votes": 13,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.564,
+        0.948,
+        0.576
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Partido Liberal, Agrario, Conservador y Demócrata",
+     "votes": 24463,
+     "unassigned": 1183,
+     "seats": 3,
+     "page": 18,
+     "box": [
+      0.907,
+      0.775,
+      0.948,
+      0.789
+     ],
+     "candidates": [
+      {
+       "name": "Gregorio Amunátegui Jordan",
+       "party": "Liberal",
+       "votes": 8888,
+       "elected": true,
+       "page": 18,
+       "box": [
+        0.907,
+        0.725,
+        0.948,
+        0.737
+       ]
+      },
+      {
+       "name": "Humberto del Pino Pereira",
+       "party": "A",
+       "votes": 3855,
+       "elected": true,
+       "page": 18,
+       "box": [
+        0.907,
+        0.738,
+        0.948,
+        0.75
+       ]
+      },
+      {
+       "name": "Zenobio Gutierrez",
+       "party": "Demócrata",
+       "votes": 2274,
+       "elected": false,
+       "page": 18,
+       "box": [
+        0.907,
+        0.751,
+        0.948,
+        0.762
+       ]
+      },
+      {
+       "name": "Joaquín Prieto Concha",
+       "party": "Cons.",
+       "votes": 8263,
+       "elected": true,
+       "page": 18,
+       "box": [
+        0.907,
+        0.764,
+        0.948,
+        0.775
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Lists and candidates from the Tribunal Calificador's table (p. 18, 'TOTAL GENERAL' column); 'Votos marcados o en blanco' rows are empty. The proclamation (p. 19) is an 'ESCRUTINIO PROVINCIAL PROVISIONAL' naming the five 'presuntivamente electos' (Lista 3: 3, Lista 1: 2). registered ('Electores hábiles para concurrir al sufragio' 65.872) and valid ('Total general de votantes hábiles' 52.053, equal to the list sum) from the summary on p. 20; the synoptic on p. 9 ('Total 8.a Circunscripción') prints the same, though its votes figure is blurred (reads like 52 853). Areas as printed in the p. 20 summary ('Provincias de Bío-Bío, Malleco y Cautín'); the TC title prints 'BIO BIO, MALLECO Y CAUTIN'. Jenaro Torres Contreras's 13 has a speck after it."
+  }
+ ],
+ "national": {
+  "valid": 233485,
+  "cast": null,
+  "registered": 301058,
+  "page": 20,
+  "parties": {
+   "Conservador": 52450,
+   "Falange": 1228,
+   "Liberal": 37965,
+   "Alianza Popular Libertadora": 762,
+   "Demócrata": 2399,
+   "Agrario": 3855,
+   "Socialista": 37857,
+   "Radical": 49719,
+   "Progresista Nacional": 28449,
+   "Democrático": 12924,
+   "Laborista de Chile": 5877
+  }
+ },
+ "notes": "Volume: pp. 1-3 cover/title pages; pp. 4-9 the Dirección del Registro Electoral's Senate synoptic by party, commune and department for the four groupings renewed in 1941 (2a, 4a, 6a, 8a); pp. 10-19 the Tribunal Calificador's tables and proclamations per grouping; p. 20 a one-page summary per circunscripción for the Senate (top) and a comparative table for the Chamber of Deputies in the same territories (bottom, not transcribed). Lists/candidates come from the TC tables; registered and valid from the p. 20 summary. national = the 'Total general' row of the p. 20 Senate summary (party votes from the Dirección's count; for the 4a grouping this count, 114.481, differs from the TC list sum 111.410, so the national figure exceeds the contests' sum by 3.071). No null/blank or cast figures are printed. Proclamations for 4a, 6a and 8a are provisional ('presuntivamente electos'); elected flags follow them."
+}

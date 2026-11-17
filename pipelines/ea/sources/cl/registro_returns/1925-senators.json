@@ -1,0 +1,1824 @@
+{
+ "volume": "1925-senators",
+ "chamber": "senators",
+ "year": 1925,
+ "day": "1925-11-22",
+ "day_printed": "22 de Noviembre (column heading of the complementary tables, pp.4 and 13)",
+ "notes": "Volume: general scrutiny of the 9 agrupaciones provinciales (5 senators each, index p.2), pp.3-13. For the 1.a (p.4) and 9.a (p.13) the final complementary tables (22 Nov + 14 Mar 1926 elections) are transcribed; the provisional figures (pp.3, 12) are summarized in notes. No grouping prints cast, valid or null totals; registered = sum of province inscritos in each heading. Lists are numbered, with no party labels. No national totals printed.",
+ "contests": [
+  {
+   "number": 1,
+   "title": "1.a Circunscripción Provincial",
+   "areas": [
+    "Tarapacá",
+    "Antofagasta"
+   ],
+   "seats": 5,
+   "registered": 22219,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": 11,
+   "null_blank": null,
+   "page": 4,
+   "box": [
+    0.66,
+    0.48,
+    0.73,
+    0.91
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 1562,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.66,
+      0.49,
+      0.73,
+      0.52
+     ],
+     "candidates": [
+      {
+       "name": "Francisco Javier Hurtado",
+       "party": null,
+       "votes": 1562,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.49,
+        0.73,
+        0.52
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 5",
+     "party": null,
+     "votes": 7764,
+     "unassigned": 112,
+     "seats": 3,
+     "page": 4,
+     "box": [
+      0.66,
+      0.53,
+      0.73,
+      0.62
+     ],
+     "candidates": [
+      {
+       "name": "Arturo Alessandri Palma",
+       "party": null,
+       "votes": 1550,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.66,
+        0.53,
+        0.73,
+        0.62
+       ]
+      },
+      {
+       "name": "Maximiliano Poblete Cortés",
+       "party": null,
+       "votes": 1009,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.53,
+        0.73,
+        0.62
+       ]
+      },
+      {
+       "name": "Carlos Briones Luco",
+       "party": null,
+       "votes": 1429,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.53,
+        0.73,
+        0.62
+       ]
+      },
+      {
+       "name": "Oscar Viel Cavero",
+       "party": null,
+       "votes": 1681,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.66,
+        0.53,
+        0.73,
+        0.62
+       ]
+      },
+      {
+       "name": "Manuel Hidalgo Plaza",
+       "party": null,
+       "votes": 1983,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.66,
+        0.53,
+        0.73,
+        0.62
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 6",
+     "party": null,
+     "votes": 2004,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.66,
+      0.63,
+      0.73,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "Aurelio Núñez Morgado",
+       "party": null,
+       "votes": 2004,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.66,
+        0.63,
+        0.73,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 8",
+     "party": null,
+     "votes": 1483,
+     "unassigned": 4,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.66,
+      0.68,
+      0.73,
+      0.73
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Hidalgo",
+       "party": null,
+       "votes": 22,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.68,
+        0.73,
+        0.73
+       ]
+      },
+      {
+       "name": "Luis Malaquías Concha",
+       "party": null,
+       "votes": 1457,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.68,
+        0.73,
+        0.73
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 10",
+     "party": null,
+     "votes": 1972,
+     "unassigned": 56,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.66,
+      0.75,
+      0.73,
+      0.85
+     ],
+     "candidates": [
+      {
+       "name": "Alberto Cabero",
+       "party": null,
+       "votes": 1813,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.66,
+        0.75,
+        0.73,
+        0.85
+       ]
+      },
+      {
+       "name": "Oscar Viel",
+       "party": null,
+       "votes": 24,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.75,
+        0.73,
+        0.85
+       ]
+      },
+      {
+       "name": "Carlos Briones Luco",
+       "party": null,
+       "votes": 35,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.75,
+        0.73,
+        0.85
+       ]
+      },
+      {
+       "name": "Carlos Villarroel",
+       "party": null,
+       "votes": 8,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.75,
+        0.73,
+        0.85
+       ]
+      },
+      {
+       "name": "Manuel Hidalgo",
+       "party": null,
+       "votes": 36,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.75,
+        0.73,
+        0.85
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 12",
+     "party": null,
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.66,
+      0.86,
+      0.73,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Hidalgo Plaza",
+       "party": null,
+       "votes": 1,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.66,
+        0.86,
+        0.73,
+        0.88
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Final figures from the 'Cuadro complementario' (p.4): TOTAL GENERAL = 22 November votes + complementary election of 14 March 1926 ordered by the Tribunal Calificador; proclamation 23 Apr 1926 (as printed). The provisional 22 November scrutiny is on p.3 (Lista 3 1,309; Lista 5 6,403; Lista 6 1,717; Lista 8 1,478; Lista 10 1,786; presumptive elected Hidalgo, Alessandri, Poblete, Núñez Morgado, Cabero). registered = sum of province inscritos in header (Tarapacá 8,606; Antofagasta 13,613; handwritten total 22,219). blank = 'En blanco' 11; 'Sin escrutar' 3 not recorded in a field. No cast/valid printed. Lista 10: TOTAL GENERAL prints the list sum as 1,072, but the cuociente table prints 1,972 and the rows (56+1,813+24+35+8+36) give 1,972; recorded 1,972. Its no-preference (56), Cabero (1,813) and Viel (24) cells in TOTAL GENERAL are blurred; taken as the sum of the two province TOTAL cells (3+53, 2+1,811, 0+24), and Cabero's 1,813 is confirmed by the text. Seats: Lista 5 three (Hidalgo, Alessandri, Viel by relative majority), Lista 6 one, Lista 10 one."
+  },
+  {
+   "number": 2,
+   "title": "Segunda Circunscripción Provincial",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": 15232,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": 4,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.84,
+    0.43,
+    0.94,
+    0.6
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 460,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.84,
+      0.44,
+      0.94,
+      0.47
+     ],
+     "candidates": [
+      {
+       "name": "Pedro J. 2.o Obrien R.",
+       "party": null,
+       "votes": 460,
+       "elected": false,
+       "page": 5,
+       "box": [
+        0.84,
+        0.44,
+        0.94,
+        0.47
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 10521,
+     "unassigned": 10517,
+     "seats": 5,
+     "page": 5,
+     "box": [
+      0.84,
+      0.48,
+      0.94,
+      0.55
+     ],
+     "candidates": [
+      {
+       "name": "Abraham Gatica",
+       "party": null,
+       "votes": 1,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.84,
+        0.48,
+        0.94,
+        0.55
+       ]
+      },
+      {
+       "name": "Guillermo Asócar",
+       "party": null,
+       "votes": 0,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.84,
+        0.48,
+        0.94,
+        0.55
+       ]
+      },
+      {
+       "name": "Joaquín Irarrázaval",
+       "party": null,
+       "votes": 1,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.84,
+        0.48,
+        0.94,
+        0.55
+       ]
+      },
+      {
+       "name": "Nicolás Marambio Montt",
+       "party": null,
+       "votes": 2,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.84,
+        0.48,
+        0.94,
+        0.55
+       ]
+      },
+      {
+       "name": "Oscar Urzúa Jaramillo",
+       "party": null,
+       "votes": 0,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.84,
+        0.48,
+        0.94,
+        0.55
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 607,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.84,
+      0.57,
+      0.94,
+      0.6
+     ],
+     "candidates": [
+      {
+       "name": "Juan Antonio Thenoux Rivera",
+       "party": null,
+       "votes": 607,
+       "elected": false,
+       "page": 5,
+       "box": [
+        0.84,
+        0.57,
+        0.94,
+        0.6
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "registered = sum of province inscritos in header (Atacama 3,429; Coquimbo 11,803), summed by transcriber. blank = 'En blanco' 4, printed only in the Chañaral department column (no grouping total printed). No cast/valid printed. All five seats to Lista 2, whose votes were nearly all list votes without preference; elected Abraham Gatica, Guillermo Asócar, Joaquín Irarrázaval, Nicolás Marambio Montt, Oscar Urzúa Jaramillo (proclamation 12 Feb 1926)."
+  },
+  {
+   "number": 3,
+   "title": "Tercera Circunscripción Provincial",
+   "areas": [
+    "Valparaíso",
+    "Aconcagua"
+   ],
+   "seats": 5,
+   "registered": 42672,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.85,
+    0.44,
+    0.95,
+    0.73
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 4046,
+     "unassigned": 426,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.85,
+      0.45,
+      0.95,
+      0.5
+     ],
+     "candidates": [
+      {
+       "name": "Francisco Hinojosa Robles",
+       "party": null,
+       "votes": 1554,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.45,
+        0.95,
+        0.5
+       ]
+      },
+      {
+       "name": "José María Pizarro",
+       "party": null,
+       "votes": 2066,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.45,
+        0.95,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 86,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.85,
+      0.52,
+      0.95,
+      0.55
+     ],
+     "candidates": [
+      {
+       "name": "Pablo Ramírez Rodríguez",
+       "party": null,
+       "votes": 86,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.52,
+        0.95,
+        0.55
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 27335,
+     "unassigned": 572,
+     "seats": 5,
+     "page": 6,
+     "box": [
+      0.85,
+      0.56,
+      0.95,
+      0.63
+     ],
+     "candidates": [
+      {
+       "name": "Silvestre Ochagavía",
+       "party": null,
+       "votes": 1903,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.95,
+        0.63
+       ]
+      },
+      {
+       "name": "Rafael Luis Barahona",
+       "party": null,
+       "votes": 8724,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.95,
+        0.63
+       ]
+      },
+      {
+       "name": "Ismael Undurraga",
+       "party": null,
+       "votes": 1089,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.95,
+        0.63
+       ]
+      },
+      {
+       "name": "Alberto Vial Infante",
+       "party": null,
+       "votes": 7539,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.95,
+        0.63
+       ]
+      },
+      {
+       "name": "Arturo Lyon Peña",
+       "party": null,
+       "votes": 7698,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.85,
+        0.56,
+        0.95,
+        0.63
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": null,
+     "votes": 3876,
+     "unassigned": 47,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.85,
+      0.66,
+      0.95,
+      0.7
+     ],
+     "candidates": [
+      {
+       "name": "Francisco Hinojosa",
+       "party": null,
+       "votes": 112,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.66,
+        0.95,
+        0.7
+       ]
+      },
+      {
+       "name": "Abraham Leckie",
+       "party": null,
+       "votes": 3717,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.85,
+        0.66,
+        0.95,
+        0.7
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "registered = sum of province inscritos in header (Valparaíso 34,602; Aconcagua 8,070), summed by transcriber. No cast/valid/blank printed ('Sin escrutar' row shows only a small figure under Petorca). Lista 2 prints two total rows, 60 (Los Andes 64) and 86 (Los Andes 84); recorded 86, the row aligned with the candidate, uncertain. Lista 3: printed rows (572 + 1,903 + 8,724 + 1,089 + 7,539 + 7,698 = 27,525) do not add to the printed list total 27,335 (also 27.335 in the cuociente table); department cells are partly illegible and do not settle it. The first digit of Ochagavía's 1,903 is unclear; the printed total would need 1,713. All five seats to Lista 3 (proclamation 12 Feb 1926)."
+  },
+  {
+   "number": 4,
+   "title": "4.a Circunscripción Provincial",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": 64713,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 7,
+   "box": [
+    0.66,
+    0.47,
+    0.73,
+    0.78
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 101,
+     "unassigned": 32,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.66,
+      0.47,
+      0.73,
+      0.52
+     ],
+     "candidates": [
+      {
+       "name": "Aquiles Concha Stuardo",
+       "party": null,
+       "votes": 45,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.66,
+        0.47,
+        0.73,
+        0.52
+       ]
+      },
+      {
+       "name": "José Santos Salas Morales",
+       "party": null,
+       "votes": 24,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.66,
+        0.47,
+        0.73,
+        0.52
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 4755,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.66,
+      0.55,
+      0.73,
+      0.58
+     ],
+     "candidates": [
+      {
+       "name": "José A.d Alfonso",
+       "party": null,
+       "votes": 4755,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.66,
+        0.55,
+        0.73,
+        0.58
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 32003,
+     "unassigned": 2669,
+     "seats": 4,
+     "page": 7,
+     "box": [
+      0.66,
+      0.6,
+      0.73,
+      0.69
+     ],
+     "candidates": [
+      {
+       "name": "Guillermo Barros Jara",
+       "party": null,
+       "votes": 6284,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.66,
+        0.6,
+        0.73,
+        0.69
+       ]
+      },
+      {
+       "name": "Joaquín Echenique G.",
+       "party": null,
+       "votes": 9513,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.66,
+        0.6,
+        0.73,
+        0.69
+       ]
+      },
+      {
+       "name": "Roberto Sánchez G. de la H.",
+       "party": null,
+       "votes": 5313,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.66,
+        0.6,
+        0.73,
+        0.69
+       ]
+      },
+      {
+       "name": "Luis Salas Romo",
+       "party": null,
+       "votes": 6932,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.66,
+        0.6,
+        0.73,
+        0.69
+       ]
+      },
+      {
+       "name": "José Santos Salas",
+       "party": null,
+       "votes": 1292,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.66,
+        0.6,
+        0.73,
+        0.69
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": null,
+     "votes": 15927,
+     "unassigned": 1092,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.66,
+      0.71,
+      0.73,
+      0.77
+     ],
+     "candidates": [
+      {
+       "name": "Pedro A. Fajardo",
+       "party": null,
+       "votes": 6782,
+       "elected": false,
+       "page": 7,
+       "box": [
+        0.66,
+        0.71,
+        0.73,
+        0.77
+       ]
+      },
+      {
+       "name": "Aquiles Concha",
+       "party": null,
+       "votes": 8053,
+       "elected": true,
+       "page": 7,
+       "box": [
+        0.66,
+        0.71,
+        0.73,
+        0.77
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Name column very faint; several names partly illegible: Lista 1 second name read 'Aquiles Concha Stuardo' (uncertain), Lista 2 'José A.d Alfonso' (uncertain), Lista 3 last 'José Santos Salas' (first name partly illegible), Lista 4 'Pedro A. Fajardo' (uncertain). registered from header (Provincia de Santiago: 64,713 inscriptos). No cast/valid/null printed. A handwritten figure under Lista 4 reads 52,726 (the four list totals sum to 52,786). Seats: 4 Lista 3, 1 Lista 4 (proclamation 13 Feb 1926)."
+  },
+  {
+   "number": 5,
+   "title": "Quinta Circunscripción Provincial",
+   "areas": [
+    "O'Higgins",
+    "Colchagua",
+    "Curicó"
+   ],
+   "seats": 5,
+   "registered": 30278,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.82,
+    0.49,
+    0.88,
+    0.68
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 56,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.82,
+      0.5,
+      0.88,
+      0.53
+     ],
+     "candidates": [
+      {
+       "name": "Santiago Lazo T.",
+       "party": null,
+       "votes": 56,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.82,
+        0.5,
+        0.88,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 3690,
+     "unassigned": 131,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.82,
+      0.53,
+      0.88,
+      0.58
+     ],
+     "candidates": [
+      {
+       "name": "Juan Pradenas Muñoz",
+       "party": null,
+       "votes": 1856,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.82,
+        0.53,
+        0.88,
+        0.58
+       ]
+      },
+      {
+       "name": "Santiago Lazo T.",
+       "party": null,
+       "votes": 1703,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.82,
+        0.53,
+        0.88,
+        0.58
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 21229,
+     "unassigned": 260,
+     "seats": 5,
+     "page": 8,
+     "box": [
+      0.82,
+      0.6,
+      0.88,
+      0.68
+     ],
+     "candidates": [
+      {
+       "name": "Exequiel González Cortés",
+       "party": null,
+       "votes": 3591,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.82,
+        0.6,
+        0.88,
+        0.68
+       ]
+      },
+      {
+       "name": "Armando Jaramillo Valderrama",
+       "party": null,
+       "votes": 4014,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.82,
+        0.6,
+        0.88,
+        0.68
+       ]
+      },
+      {
+       "name": "Francisco Vidal Garcés",
+       "party": null,
+       "votes": 4847,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.82,
+        0.6,
+        0.88,
+        0.68
+       ]
+      },
+      {
+       "name": "Ladislao Errázuriz L.",
+       "party": null,
+       "votes": 4687,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.82,
+        0.6,
+        0.88,
+        0.68
+       ]
+      },
+      {
+       "name": "Alfredo Piwonka",
+       "party": null,
+       "votes": 3830,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.82,
+        0.6,
+        0.88,
+        0.68
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "registered = sum of province inscritos in header (O'Higgins 9,816; Colchagua 11,672; Curicó 8,790 (last digits unclear)), summed by transcriber. No cast/valid/null printed. Lista 2: Juan Pradenas Muñoz total cell reads like 1.356 but the list total 3,690 and the department cells (about 1,854) require 1,856; recorded 1,856. All five seats to Lista 3 (proclamation 12 Feb 1926)."
+  },
+  {
+   "number": 6,
+   "title": "Sexta Circunscripción Provincial",
+   "areas": [
+    "Talca",
+    "Maule",
+    "Linares"
+   ],
+   "seats": 5,
+   "registered": 25870,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.84,
+    0.47,
+    0.96,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 0,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.84,
+      0.47,
+      0.96,
+      0.5
+     ],
+     "candidates": [
+      {
+       "name": "Héctor Zañartu Prieto",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.84,
+        0.47,
+        0.96,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 3,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.84,
+      0.51,
+      0.96,
+      0.53
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Pablo Dartnell",
+       "party": null,
+       "votes": 3,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.84,
+        0.51,
+        0.96,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 20677,
+     "unassigned": 134,
+     "seats": 5,
+     "page": 9,
+     "box": [
+      0.84,
+      0.54,
+      0.96,
+      0.62
+     ],
+     "candidates": [
+      {
+       "name": "Pedro Opazo Letelier",
+       "party": null,
+       "votes": 3963,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.84,
+        0.54,
+        0.96,
+        0.62
+       ]
+      },
+      {
+       "name": "Romualdo Silva Cortés",
+       "party": null,
+       "votes": 2531,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.84,
+        0.54,
+        0.96,
+        0.62
+       ]
+      },
+      {
+       "name": "Nicanor Silva",
+       "party": null,
+       "votes": 4161,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.84,
+        0.54,
+        0.96,
+        0.62
+       ]
+      },
+      {
+       "name": "Matías Silva S.",
+       "party": null,
+       "votes": 4537,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.84,
+        0.54,
+        0.96,
+        0.62
+       ]
+      },
+      {
+       "name": "Gonzalo Urrejola",
+       "party": null,
+       "votes": 5351,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.84,
+        0.54,
+        0.96,
+        0.62
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 4",
+     "party": null,
+     "votes": 675,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.84,
+      0.63,
+      0.96,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "Máximo Bravo Mesa",
+       "party": null,
+       "votes": 675,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.84,
+        0.63,
+        0.96,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "registered = sum of province inscritos in header (Talca 10,853; Maule 7,557; Linares 7,460, last digit unclear), summed by transcriber. No cast/valid/null printed. The proclamation text says 'Los cinco puestos corresponden a la Lista N.o 1' but the elected are the five candidates of Lista 3 (cuociente table: Lista 3 20,677); seats recorded for Lista 3. Proclamation 16 Feb 1926."
+  },
+  {
+   "number": 7,
+   "title": "Séptima Circunscripción Provincial",
+   "areas": [
+    "Ñuble",
+    "Concepción",
+    "Bío-Bío"
+   ],
+   "seats": 5,
+   "registered": 44439,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.9,
+    0.47,
+    1.0,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 139,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.9,
+      0.47,
+      1.0,
+      0.5
+     ],
+     "candidates": [
+      {
+       "name": "Augusto Rivera Parga",
+       "party": null,
+       "votes": 139,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.9,
+        0.47,
+        1.0,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 31670,
+     "unassigned": 3710,
+     "seats": 4,
+     "page": 10,
+     "box": [
+      0.9,
+      0.51,
+      1.0,
+      0.59
+     ],
+     "candidates": [
+      {
+       "name": "Enrique Oyarzún",
+       "party": null,
+       "votes": 592,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.9,
+        0.51,
+        1.0,
+        0.59
+       ]
+      },
+      {
+       "name": "Juan Serrano",
+       "party": null,
+       "votes": 4581,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.9,
+        0.51,
+        1.0,
+        0.59
+       ]
+      },
+      {
+       "name": "Alfredo Barros Errázuriz",
+       "party": null,
+       "votes": 8744,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.9,
+        0.51,
+        1.0,
+        0.59
+       ]
+      },
+      {
+       "name": "Augusto Rivera P.",
+       "party": null,
+       "votes": 8709,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.9,
+        0.51,
+        1.0,
+        0.59
+       ]
+      },
+      {
+       "name": "Enrique Zañartu P.",
+       "party": null,
+       "votes": 5334,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.9,
+        0.51,
+        1.0,
+        0.59
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 7305,
+     "unassigned": 2081,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.9,
+      0.6,
+      1.0,
+      0.65
+     ],
+     "candidates": [
+      {
+       "name": "Luis Enrique Concha",
+       "party": null,
+       "votes": 3732,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.9,
+        0.6,
+        1.0,
+        0.65
+       ]
+      },
+      {
+       "name": "Francisco Ramírez",
+       "party": null,
+       "votes": 1492,
+       "elected": false,
+       "page": 10,
+       "box": [
+        0.9,
+        0.6,
+        1.0,
+        0.65
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "registered = sum of province inscritos in header (Ñuble 13,446; Concepción 20,369; Bío-Bío 10,624), summed by transcriber. No cast/valid/null printed; a handwritten figure under the totals reads 39,104 (list totals sum to 39,114). Lista 2: Oyarzún's total cell reads 502/592; 592 per the proclamation text, closes the list total 31,670. Barros Errázuriz 8,744 in the table, 8,746 in the text. Seats: Lista 2 four (Barros Errázuriz, Rivera Parga, Oyarzún, Zañartu Prieto, the last two by relative majority under art. 117), Lista 3 one (Luis Enrique Concha). Proclamation 12 Feb 1926."
+  },
+  {
+   "number": 8,
+   "title": "Octava Circunscripción Provincial",
+   "areas": [
+    "Arauco",
+    "Malleco",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": 26831,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 11,
+   "box": [
+    0.88,
+    0.46,
+    0.97,
+    0.62
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 16773,
+     "unassigned": 11272,
+     "seats": 4,
+     "page": 11,
+     "box": [
+      0.88,
+      0.46,
+      0.97,
+      0.53
+     ],
+     "candidates": [
+      {
+       "name": "Remigio Medina N.",
+       "party": null,
+       "votes": 76,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.88,
+        0.46,
+        0.97,
+        0.53
+       ]
+      },
+      {
+       "name": "Carlos Werner",
+       "party": null,
+       "votes": 912,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.88,
+        0.46,
+        0.97,
+        0.53
+       ]
+      },
+      {
+       "name": "Manuel Truoco",
+       "party": null,
+       "votes": 146,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.88,
+        0.46,
+        0.97,
+        0.53
+       ]
+      },
+      {
+       "name": "Augusto Smitsmans",
+       "party": null,
+       "votes": 1023,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.88,
+        0.46,
+        0.97,
+        0.53
+       ]
+      },
+      {
+       "name": "Braulio Sandoval",
+       "party": null,
+       "votes": 3344,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.88,
+        0.46,
+        0.97,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 4635,
+     "unassigned": 1256,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.88,
+      0.55,
+      0.97,
+      0.61
+     ],
+     "candidates": [
+      {
+       "name": "Artemio Gutiérrez",
+       "party": null,
+       "votes": 3273,
+       "elected": true,
+       "page": 11,
+       "box": [
+        0.88,
+        0.55,
+        0.97,
+        0.61
+       ]
+      },
+      {
+       "name": "Manuel Espinosa",
+       "party": null,
+       "votes": 9,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.88,
+        0.55,
+        0.97,
+        0.61
+       ]
+      },
+      {
+       "name": "Belisario Quevedo",
+       "party": null,
+       "votes": 97,
+       "elected": false,
+       "page": 11,
+       "box": [
+        0.88,
+        0.55,
+        0.97,
+        0.61
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Lista 1 no-preference total cell is blurred in its hundreds digit (11,?72/11,?73); recorded 11,272, the value that closes the printed list total 16,773. registered = sum of province inscritos in header (Arauco 4,868; Malleco 9,148; Cautín 12,815), summed by transcriber. No cast/valid/null printed. By a Tribunal Calificador ruling of 11 Feb, Lista 1 was presented with an unalterable order of preference, so its 16,773 votes count as list votes and its four seats go to its first four candidates (Medina, Werner, Truoco, Smitsmans). Lista 2 one seat (Artemio Gutiérrez). Proclamation 16 Feb 1926."
+  },
+  {
+   "number": 9,
+   "title": "9.a Circunscripción Provincial",
+   "areas": [
+    "Valdivia",
+    "Llanquihue",
+    "Chiloé"
+   ],
+   "seats": 5,
+   "registered": 32600,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 13,
+   "box": [
+    0.6,
+    0.38,
+    0.71,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Lista N.o 1",
+     "party": null,
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.6,
+      0.39,
+      0.71,
+      0.43
+     ],
+     "candidates": [
+      {
+       "name": "Carlos Mohr",
+       "party": null,
+       "votes": 1,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.6,
+        0.39,
+        0.71,
+        0.43
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 2",
+     "party": null,
+     "votes": 23603,
+     "unassigned": 91,
+     "seats": 5,
+     "page": 13,
+     "box": [
+      0.6,
+      0.45,
+      0.71,
+      0.56
+     ],
+     "candidates": [
+      {
+       "name": "José Maza",
+       "party": null,
+       "votes": 5025,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.6,
+        0.45,
+        0.71,
+        0.56
+       ]
+      },
+      {
+       "name": "Luis Alberto Cariola",
+       "party": null,
+       "votes": 4621,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.6,
+        0.45,
+        0.71,
+        0.56
+       ]
+      },
+      {
+       "name": "Carlos Schürmann",
+       "party": null,
+       "votes": 4375,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.6,
+        0.45,
+        0.71,
+        0.56
+       ]
+      },
+      {
+       "name": "Absalón Valencia",
+       "party": null,
+       "votes": 4835,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.6,
+        0.45,
+        0.71,
+        0.56
+       ]
+      },
+      {
+       "name": "Alfonso Bórquez",
+       "party": null,
+       "votes": 4626,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.6,
+        0.45,
+        0.71,
+        0.56
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N.o 3",
+     "party": null,
+     "votes": 4523,
+     "unassigned": 408,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.6,
+      0.58,
+      0.71,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "Moisés Anabalón",
+       "party": null,
+       "votes": 3468,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.6,
+        0.58,
+        0.71,
+        0.66
+       ]
+      },
+      {
+       "name": "Salvador Barra Woll",
+       "party": null,
+       "votes": 647,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.6,
+        0.58,
+        0.71,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Final figures from the 'Cuadro complementario' (p.13): TOTAL GENERAL = 22 November votes + the repeated election in the department of Quinchao (14 March 1926) ordered by the Tribunal Calificador; proclamation 27 Apr 1926. The provisional 22 November scrutiny is on p.12 (Lista 2 22,749; Lista 3 4,500; presumptive proclamation 16 Feb 1926); there Carlos Schürmann prints 4,310 although the p.13 copy of the same column prints 4,210, which closes the 22,749 sum. registered = sum of province inscritos in header (Valdivia 16,939; Llanquihue 10,519; Chiloé 5,142); handwritten total 32,600. No cast/valid/null printed; a handwritten figure under the totals reads 28,127 (list totals sum to 28,127). Lista 2: the printed TOTAL GENERAL rows (91+5,025+4,621+4,375+4,835+4,626 = 23,573) are 30 short of the printed total 23,603, because the complementary column prints a sum of 854 while its rows add to 833; kept printed figures. Bórquez's total cell is blurred (4,656 or 4,626); 4,626 = 3,971 + 655. Lista 3: Anabalón's total cell reads 3,408 but 3,445 + 23 = 3,468 and the list total 4,523 needs 3,468; recorded 3,468. All five seats to Lista 2 (text says 'Lista N.o 1' by misprint; cuociente table and elected names are Lista 2)."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": null,
+  "registered": null,
+  "page": null,
+  "parties": {}
+ }
+}

@@ -1,0 +1,442 @@
+{
+ "volume": "1930-senators",
+ "chamber": "senators",
+ "year": 1930,
+ "day": null,
+ "day_printed": null,
+ "contests": [
+  {
+   "number": 2,
+   "title": "Segunda Circunscripción Provincial de Atacama y Coquimbo",
+   "areas": [
+    "Atacama",
+    "Coquimbo"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 2,
+   "box": [
+    0.15,
+    0.36,
+    0.85,
+    0.49
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 2,
+     "box": [
+      0.15,
+      0.36,
+      0.85,
+      0.49
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Irarrázaval Larraín",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.36,
+        0.85,
+        0.49
+       ]
+      },
+      {
+       "name": "Oscar Urzúa Jaramillo",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.36,
+        0.85,
+        0.49
+       ]
+      },
+      {
+       "name": "Carlos Villarroel M",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.36,
+        0.85,
+        0.49
+       ]
+      },
+      {
+       "name": "Nicolás Marambio Montt",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.36,
+        0.85,
+        0.49
+       ]
+      },
+      {
+       "name": "Guillermo Azócar Alvarez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.36,
+        0.85,
+        0.49
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 (Protocolo II p.40). The volume names five proclaimed senators, with no party per candidate and no votes; seats = number of names proclaimed (this volume has no seat index)."
+  },
+  {
+   "number": 4,
+   "title": "Cuarta Circunscripción Provincial de Santiago",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 2,
+   "box": [
+    0.15,
+    0.52,
+    0.85,
+    0.64
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 2,
+     "box": [
+      0.15,
+      0.52,
+      0.85,
+      0.64
+     ],
+     "candidates": [
+      {
+       "name": "Joaquín Echenique Gandarillas",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.52,
+        0.85,
+        0.64
+       ]
+      },
+      {
+       "name": "Guillermo Barros Jara",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.52,
+        0.85,
+        0.64
+       ]
+      },
+      {
+       "name": "Roberto Sánchez G. de la H.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.52,
+        0.85,
+        0.64
+       ]
+      },
+      {
+       "name": "Emilio Rodriguez Mendoza",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.52,
+        0.85,
+        0.64
+       ]
+      },
+      {
+       "name": "Vicente Adrian Villalobos",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 2,
+       "box": [
+        0.15,
+        0.52,
+        0.85,
+        0.64
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 (Protocolo II p.40). The volume names five proclaimed senators, with no party per candidate and no votes; seats = number of names proclaimed (this volume has no seat index)."
+  },
+  {
+   "number": 6,
+   "title": "Sexta Circunscripción Provincial de Talca, Linares y Maule",
+   "areas": [
+    "Talca",
+    "Linares",
+    "Maule"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 3,
+   "box": [
+    0.15,
+    0.07,
+    0.85,
+    0.2
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 3,
+     "box": [
+      0.15,
+      0.07,
+      0.85,
+      0.2
+     ],
+     "candidates": [
+      {
+       "name": "Romualdo Silva Cortés",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.07,
+        0.85,
+        0.2
+       ]
+      },
+      {
+       "name": "Pedro Opazo Letelier",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.07,
+        0.85,
+        0.2
+       ]
+      },
+      {
+       "name": "Jacinto León Lavin",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.07,
+        0.85,
+        0.2
+       ]
+      },
+      {
+       "name": "Pedro Pablo Dartnell",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.07,
+        0.85,
+        0.2
+       ]
+      },
+      {
+       "name": "Gabriel Letelier Elgart",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.07,
+        0.85,
+        0.2
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 (Protocolo II p.40). The volume names five proclaimed senators, with no party per candidate and no votes; seats = number of names proclaimed (this volume has no seat index)."
+  },
+  {
+   "number": 8,
+   "title": "Octava Circunscripción Provincial de Arauco, Malleco y Cautín",
+   "areas": [
+    "Arauco",
+    "Malleco",
+    "Cautín"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 3,
+   "box": [
+    0.15,
+    0.22,
+    0.85,
+    0.35
+   ],
+   "lists": [
+    {
+     "label": "Candidatos proclamados sin votación",
+     "party": null,
+     "votes": null,
+     "unassigned": null,
+     "seats": 5,
+     "page": 3,
+     "box": [
+      0.15,
+      0.22,
+      0.85,
+      0.35
+     ],
+     "candidates": [
+      {
+       "name": "Victor Körner",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.22,
+        0.85,
+        0.35
+       ]
+      },
+      {
+       "name": "Juan Antonio Rios",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.22,
+        0.85,
+        0.35
+       ]
+      },
+      {
+       "name": "Remigio Medina Neira",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.22,
+        0.85,
+        0.35
+       ]
+      },
+      {
+       "name": "Artemio Gutierrez",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.22,
+        0.85,
+        0.35
+       ]
+      },
+      {
+       "name": "Fidel 2º Estay Cortés",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.15,
+        0.22,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "No vote held: the recognized parties presented exactly as many candidates as seats, and the Tribunal Calificador (sentence of 9 April 1930) proclaimed them under art. 14 a) of Ley 4763 (Protocolo II p.40). The volume names five proclaimed senators, with no party per candidate and no votes; seats = number of names proclaimed (this volume has no seat index)."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": null,
+  "registered": null,
+  "page": null,
+  "parties": {}
+ },
+ "notes": "Volume (3 pp.): title page, then the statement (p.2) that the entities recognized under art. 14 a) of Ley 4763 of 6 Jan 1930 (Partido Conservador, Partido Liberal Unificado, Partido Radical, Partido Demócrata, Confederación Republicana de Acción Cívica) presented exactly as many candidates as seats, so the Tribunal Calificador by sentence of 9 April 1930 proclaimed them without a vote. Only the four circunscripciones provinciales renewed in 1930 appear (2.a, 4.a, 6.a, 8.a), five senators each; contest numbers are the printed circunscripción ordinals. No votes, registered voters, election day or party affiliations are printed. Each contest has one pseudo-list 'Candidatos proclamados sin votación' with votes null."
+}

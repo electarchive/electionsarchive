@@ -1,0 +1,1207 @@
+{
+ "volume": "1937-senators",
+ "chamber": "senators",
+ "year": 1937,
+ "day": "1937-03-07",
+ "day_printed": "7 DE MARZO DE 1937",
+ "contests": [
+  {
+   "number": 1,
+   "title": "1.a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL : TARAPACA Y ANTOFAGASTA",
+   "areas": [
+    "Tarapacá",
+    "Antofagasta"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 127,
+   "page": 4,
+   "box": [
+    0.855,
+    0.728,
+    0.964,
+    0.8
+   ],
+   "lists": [
+    {
+     "label": "Lista N°2",
+     "party": "Independiente",
+     "votes": 1229,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.911,
+      0.531,
+      0.966,
+      0.558
+     ],
+     "candidates": [
+      {
+       "name": "Augusto de Ramón Correa",
+       "party": null,
+       "votes": 1229,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.911,
+        0.492,
+        0.966,
+        0.516
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°5",
+     "party": "Soc. Chileno",
+     "votes": 13422,
+     "unassigned": 1276,
+     "seats": 3,
+     "page": 3,
+     "box": [
+      0.911,
+      0.711,
+      0.966,
+      0.744
+     ],
+     "candidates": [
+      {
+       "name": "Osvaldo Hiriat Corvalán",
+       "party": null,
+       "votes": 1573,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.911,
+        0.615,
+        0.966,
+        0.632
+       ]
+      },
+      {
+       "name": "Oscar Schnake Vergara",
+       "party": null,
+       "votes": 3400,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.911,
+        0.631,
+        0.966,
+        0.648
+       ]
+      },
+      {
+       "name": "Elías Laffertte Gaviño",
+       "party": null,
+       "votes": 5758,
+       "elected": true,
+       "page": 3,
+       "box": [
+        0.911,
+        0.648,
+        0.966,
+        0.665
+       ]
+      },
+      {
+       "name": "Juan Luis Mery Frías",
+       "party": null,
+       "votes": 1400,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.911,
+        0.664,
+        0.966,
+        0.681
+       ]
+      },
+      {
+       "name": "Raúl Cáceres Georgeson",
+       "party": null,
+       "votes": 15,
+       "elected": false,
+       "page": 3,
+       "box": [
+        0.911,
+        0.68,
+        0.966,
+        0.697
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°9",
+     "party": "Acción Política Gremial Empl. Particulares.",
+     "votes": 48,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.913,
+      0.335,
+      0.96,
+      0.362
+     ],
+     "candidates": [
+      {
+       "name": "Nicolás Tanco Jara",
+       "party": null,
+       "votes": 48,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.302,
+        0.96,
+        0.326
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°13",
+     "party": "Radical",
+     "votes": 1513,
+     "unassigned": 955,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.913,
+      0.497,
+      0.96,
+      0.521
+     ],
+     "candidates": [
+      {
+       "name": "Alberto Cabero Díaz",
+       "party": null,
+       "votes": 469,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.419,
+        0.96,
+        0.436
+       ]
+      },
+      {
+       "name": "Jorge Wachholtz Araya",
+       "party": null,
+       "votes": 34,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.435,
+        0.96,
+        0.452
+       ]
+      },
+      {
+       "name": "Ernesto Torres Galdames",
+       "party": null,
+       "votes": 49,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.451,
+        0.96,
+        0.468
+       ]
+      },
+      {
+       "name": "Gustavo Schele Rodriguez",
+       "party": null,
+       "votes": 6,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.468,
+        0.96,
+        0.484
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°15",
+     "party": "Liberal,Conservador y Demócrata.",
+     "votes": 9292,
+     "unassigned": 546,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.913,
+      0.692,
+      0.96,
+      0.716
+     ],
+     "candidates": [
+      {
+       "name": "Fernando Alessandri R",
+       "party": null,
+       "votes": 5492,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.913,
+        0.597,
+        0.96,
+        0.613
+       ]
+      },
+      {
+       "name": "Arnaldo Villablanca V.",
+       "party": null,
+       "votes": 30,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.613,
+        0.96,
+        0.63
+       ]
+      },
+      {
+       "name": "Miguel Cruchaga Tocornal",
+       "party": null,
+       "votes": 3148,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.913,
+        0.63,
+        0.96,
+        0.646
+       ]
+      },
+      {
+       "name": "Luis Advis Lobos",
+       "party": null,
+       "votes": 10,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.646,
+        0.96,
+        0.663
+       ]
+      },
+      {
+       "name": "Luis Bustamante Cordero",
+       "party": null,
+       "votes": 66,
+       "elected": false,
+       "page": 4,
+       "box": [
+        0.913,
+        0.662,
+        0.96,
+        0.679
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Grouping totals from the 'Total General' column (pp. 3-4). Lista N°1 (Independiente) is printed as 'Retirada.' with no votes and is omitted. 'Votos viciados y en blanco' 127 printed. cast 25631 is a handwritten pencil total at the foot of the Total General column (another handwritten 15.203 under Total Provincia); no typed valid/cast total is printed. Lists sum 25504; 25504+127=25631. Elected per the Tribunal Calificador proclamation on p. 5 (Lista 5: 3, Lista 15: 2). Area names from p. 2 (printed TARAPACA/ANTOFAGASTA in capitals). The archive leaves that handwritten total out and stores only typed figures."
+  },
+  {
+   "number": 3,
+   "title": "3a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL, ACONCAGUA Y VALPARAISO",
+   "areas": [
+    "Aconcagua",
+    "Valparaíso"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": 50315,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.877,
+    0.826,
+    0.959,
+    0.856
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Independiente Nacista",
+     "votes": 2578,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.877,
+      0.397,
+      0.959,
+      0.421
+     ],
+     "candidates": [
+      {
+       "name": "Lautaro Clavel Dinator",
+       "party": null,
+       "votes": 2578,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.877,
+        0.365,
+        0.959,
+        0.388
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Conservador, Liberal, Demócrata y Social Republicano.",
+     "votes": 27358,
+     "unassigned": 1999,
+     "seats": 3,
+     "page": 6,
+     "box": [
+      0.877,
+      0.591,
+      0.959,
+      0.615
+     ],
+     "candidates": [
+      {
+       "name": "Alvaro Santa María Cerveró",
+       "party": null,
+       "votes": 9311,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.877,
+        0.513,
+        0.959,
+        0.529
+       ]
+      },
+      {
+       "name": "Manuel Muñoz Cornejo",
+       "party": null,
+       "votes": 8811,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.877,
+        0.529,
+        0.959,
+        0.546
+       ]
+      },
+      {
+       "name": "Enrique Bravo Ortiz",
+       "party": null,
+       "votes": 4429,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.877,
+        0.545,
+        0.959,
+        0.562
+       ]
+      },
+      {
+       "name": "Alejandro Serani Burgos",
+       "party": null,
+       "votes": 2808,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.877,
+        0.562,
+        0.959,
+        0.578
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Radical, Socialista y Nacional Democrático.",
+     "votes": 20379,
+     "unassigned": 1503,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.877,
+      0.788,
+      0.959,
+      0.812
+     ],
+     "candidates": [
+      {
+       "name": "Eleodoro Enrique Guzmán F.",
+       "party": null,
+       "votes": 3197,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.877,
+        0.693,
+        0.959,
+        0.709
+       ]
+      },
+      {
+       "name": "Hugo Grove Vallejo",
+       "party": null,
+       "votes": 6136,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.877,
+        0.709,
+        0.959,
+        0.726
+       ]
+      },
+      {
+       "name": "Manuel Hidalgo Plaza",
+       "party": null,
+       "votes": 718,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.877,
+        0.725,
+        0.959,
+        0.742
+       ]
+      },
+      {
+       "name": "José García Tello",
+       "party": null,
+       "votes": 5996,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.877,
+        0.742,
+        0.959,
+        0.758
+       ]
+      },
+      {
+       "name": "Alfredo Guillermo Bravo Z.",
+       "party": null,
+       "votes": 2830,
+       "elected": false,
+       "page": 6,
+       "box": [
+        0.877,
+        0.758,
+        0.959,
+        0.775
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "'TOTAL GENERAL' row (50.315) is the sum of the list totals, recorded as valid; no null/blank or registered figures printed. Source inconsistency in Lista N°3: its candidate rows (Total General column) sum to 20.380 while the printed list total is 20.379; the proclamation on p. 7 uses 20.380 for the quotient. The discrepancy is in José García Tello's row: provincial columns 427 + 5.568 = 5.995 but Total General prints 5.996. Printed figures kept. Elected per proclamation p. 7."
+  },
+  {
+   "number": 5,
+   "title": "5a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL: O'HIGGINS Y COLCHAGUA.",
+   "areas": [
+    "O'Higgins",
+    "Colchagua"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.872,
+    0.81,
+    0.979,
+    0.837
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Radical, Socialista Chileno y Radical Socialista.",
+     "votes": 7855,
+     "unassigned": 429,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.925,
+      0.462,
+      0.976,
+      0.485
+     ],
+     "candidates": [
+      {
+       "name": "Florencio Duran Bernales",
+       "party": null,
+       "votes": 4545,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.925,
+        0.416,
+        0.976,
+        0.433
+       ]
+      },
+      {
+       "name": "Juan B. Arredondo S.",
+       "party": null,
+       "votes": 2881,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.925,
+        0.432,
+        0.976,
+        0.449
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Conservador, Liberal y Demócrata",
+     "votes": 18391,
+     "unassigned": 303,
+     "seats": 4,
+     "page": 8,
+     "box": [
+      0.925,
+      0.684,
+      0.976,
+      0.701
+     ],
+     "candidates": [
+      {
+       "name": "Oscar Valenzuela Valdes",
+       "party": null,
+       "votes": 4999,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.925,
+        0.619,
+        0.976,
+        0.634
+       ]
+      },
+      {
+       "name": "Héctor Rodriguez de la S.",
+       "party": null,
+       "votes": 3560,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.925,
+        0.635,
+        0.976,
+        0.651
+       ]
+      },
+      {
+       "name": "Fidel 2° Estay Cortés",
+       "party": null,
+       "votes": 1322,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.925,
+        0.653,
+        0.976,
+        0.669
+       ]
+      },
+      {
+       "name": "Manuel Ossa Covarrubias",
+       "party": null,
+       "votes": 8207,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.925,
+        0.669,
+        0.976,
+        0.685
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°4",
+     "party": "Independiente.",
+     "votes": 1774,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.925,
+      0.779,
+      0.976,
+      0.803
+     ],
+     "candidates": [
+      {
+       "name": "Oscar Gajardo Villarroel",
+       "party": null,
+       "votes": 1774,
+       "elected": false,
+       "page": 8,
+       "box": [
+        0.925,
+        0.745,
+        0.976,
+        0.769
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Grouping totals from the 'TOTAL GENERAL' column. Lista N°2 (Democrático) printed as 'Retirada.' with no votes; omitted. No typed total, null/blank or registered row printed; valid 28020 is a handwritten pencil total at the foot of the TOTAL GENERAL column (equals the sum of list totals). The last digit of Héctor Rodriguez de la S.'s 3.560 is clipped at the page edge; confirmed by 146 + 3.414 and by the list sum. Fidel Estay's name is overtyped in the table; spelling taken from the proclamation (p. 9). Elected per proclamation p. 9 (Lista 3: 4, Lista 1: 1). The archive leaves that handwritten total out and stores only typed figures."
+  },
+  {
+   "number": 7,
+   "title": "7a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL: ÑUBLE, CONCEPCION Y ARAUCO.",
+   "areas": [
+    "Ñuble",
+    "Concepción",
+    "Arauco"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 12,
+   "box": [
+    0.783,
+    0.762,
+    0.897,
+    0.788
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Radical",
+     "votes": 13894,
+     "unassigned": 6354,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.783,
+      0.404,
+      0.897,
+      0.425
+     ],
+     "candidates": [
+      {
+       "name": "Alberto Moller Bordeu",
+       "party": null,
+       "votes": 3652,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.783,
+        0.357,
+        0.897,
+        0.372
+       ]
+      },
+      {
+       "name": "Juan Antonio Ríos",
+       "party": null,
+       "votes": 3888,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.783,
+        0.374,
+        0.897,
+        0.389
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Socialista",
+     "votes": 11678,
+     "unassigned": 1125,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.783,
+      0.566,
+      0.897,
+      0.587
+     ],
+     "candidates": [
+      {
+       "name": "Guillermo Azócar",
+       "party": null,
+       "votes": 3952,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.783,
+        0.487,
+        0.897,
+        0.502
+       ]
+      },
+      {
+       "name": "Raúl Puga",
+       "party": null,
+       "votes": 3365,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.783,
+        0.503,
+        0.897,
+        0.518
+       ]
+      },
+      {
+       "name": "Teófilo Hinojosa",
+       "party": null,
+       "votes": 884,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.783,
+        0.519,
+        0.897,
+        0.534
+       ]
+      },
+      {
+       "name": "Miguel A. Rivera",
+       "party": null,
+       "votes": 2352,
+       "elected": false,
+       "page": 12,
+       "box": [
+        0.783,
+        0.535,
+        0.897,
+        0.551
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Conservador, Demócrata y Liberal",
+     "votes": 24057,
+     "unassigned": 3715,
+     "seats": 3,
+     "page": 12,
+     "box": [
+      0.783,
+      0.729,
+      0.897,
+      0.75
+     ],
+     "candidates": [
+      {
+       "name": "J.Francisco Urrejola",
+       "party": null,
+       "votes": 6841,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.783,
+        0.666,
+        0.897,
+        0.681
+       ]
+      },
+      {
+       "name": "Julio Martinez Montt",
+       "party": null,
+       "votes": 2743,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.783,
+        0.682,
+        0.897,
+        0.698
+       ]
+      },
+      {
+       "name": "Gustavo Rivera Baeza",
+       "party": null,
+       "votes": 10758,
+       "elected": true,
+       "page": 12,
+       "box": [
+        0.783,
+        0.699,
+        0.897,
+        0.714
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Figures are the 'Escrutinio General' column of the Tribunal Calificador's definitive table (p. 12), which adds the complementary election of 13 June 1937 in the communes of Quirihue, Ninhue and Cobquecura to the earlier scrutiny; the proclamation (p. 13, dated 14 de Julio de 1937) uses these totals and elects Lista 3: 3, Lista 1: 1, Lista 2: 1. valid 49629 is a handwritten pencil total under the column (equals the list sum); no typed grouping total, null/blank or registered figure is printed. The earlier provincial scrutiny on p. 10 (before the complementary election) gives, after the Tribunal's annulments ('Saldo Liquido'), Lista 1 13.309, Lista 2 11.195, Lista 3 22.824 (before annulment 14.373, 11.255, 24.070; 2.370 votes annulled in all); that table's header prints the election as '7 DE MAYO DE 1937'. Pencil annotations on p. 10 ignored. The archive leaves that handwritten total out and stores only typed figures."
+  },
+  {
+   "number": 9,
+   "title": "9a. CIRCUNSCRIPCION ELECTORAL PROVINCIAL: VALDIVIA, LLANQUIHUE, AYSEN, CHILOE Y MAGALLANES",
+   "areas": [
+    "Valdivia",
+    "Llanquihue",
+    "Aysen",
+    "Chiloe",
+    "Magallanes"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": null,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 15,
+   "box": [
+    0.933,
+    0.463,
+    0.967,
+    0.476
+   ],
+   "lists": [
+    {
+     "label": "Lista N°1",
+     "party": "Independiente",
+     "votes": 111,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.924,
+      0.385,
+      0.95,
+      0.397
+     ],
+     "candidates": [
+      {
+       "name": "Federico Schilling",
+       "party": null,
+       "votes": 111,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.371,
+        0.95,
+        0.383
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°2",
+     "party": "Radical",
+     "votes": 11179,
+     "unassigned": 529,
+     "seats": 2,
+     "page": 14,
+     "box": [
+      0.924,
+      0.473,
+      0.95,
+      0.485
+     ],
+     "candidates": [
+      {
+       "name": "Luis Ambrosio Concha",
+       "party": null,
+       "votes": 2649,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.924,
+        0.443,
+        0.95,
+        0.452
+       ]
+      },
+      {
+       "name": "Alejandro Rengifo Reyes",
+       "party": null,
+       "votes": 3387,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.451,
+        0.95,
+        0.46
+       ]
+      },
+      {
+       "name": "Alfonso Borquez Pérez",
+       "party": null,
+       "votes": 4614,
+       "elected": true,
+       "page": 14,
+       "box": [
+        0.924,
+        0.459,
+        0.95,
+        0.468
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°3",
+     "party": "Democrático",
+     "votes": 4520,
+     "unassigned": 316,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.924,
+      0.56,
+      0.95,
+      0.572
+     ],
+     "candidates": [
+      {
+       "name": "Luis Malaquías Concha",
+       "party": null,
+       "votes": 857,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.526,
+        0.95,
+        0.535
+       ]
+      },
+      {
+       "name": "Pedro Salvadores Arias",
+       "party": null,
+       "votes": 2451,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.534,
+        0.95,
+        0.543
+       ]
+      },
+      {
+       "name": "Nolasco Cárdenas Avendaño",
+       "party": null,
+       "votes": 879,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.542,
+        0.95,
+        0.551
+       ]
+      },
+      {
+       "name": "Luis A. Hernandez Mendez",
+       "party": null,
+       "votes": 17,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.55,
+        0.95,
+        0.559
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°4",
+     "party": "Independiente",
+     "votes": 0,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.924,
+      0.592,
+      0.95,
+      0.605
+     ],
+     "candidates": [
+      {
+       "name": "Manuel Chaparro Ruminot",
+       "party": null,
+       "votes": 0,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.592,
+        0.95,
+        0.605
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°5",
+     "party": "Acción Republicana.",
+     "votes": 2187,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.924,
+      0.64,
+      0.95,
+      0.652
+     ],
+     "candidates": [
+      {
+       "name": "Julio Schwarzenberg",
+       "party": null,
+       "votes": 2187,
+       "elected": false,
+       "page": 14,
+       "box": [
+        0.924,
+        0.626,
+        0.95,
+        0.638
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista N°6",
+     "party": "Conservador, Liberal y Demócrata.",
+     "votes": 20018,
+     "unassigned": 1099,
+     "seats": 3,
+     "page": 15,
+     "box": [
+      0.933,
+      0.437,
+      0.967,
+      0.449
+     ],
+     "candidates": [
+      {
+       "name": "Alejo Lira Infante",
+       "party": null,
+       "votes": 6169,
+       "elected": true,
+       "page": 15,
+       "box": [
+        0.933,
+        0.376,
+        0.967,
+        0.383
+       ]
+      },
+      {
+       "name": "José Maza",
+       "party": null,
+       "votes": 7473,
+       "elected": true,
+       "page": 15,
+       "box": [
+        0.933,
+        0.383,
+        0.967,
+        0.39
+       ]
+      },
+      {
+       "name": "Carlos Haverbeck",
+       "party": null,
+       "votes": 5142,
+       "elected": true,
+       "page": 15,
+       "box": [
+        0.933,
+        0.389,
+        0.967,
+        0.396
+       ]
+      },
+      {
+       "name": "Carlos Haffemann",
+       "party": null,
+       "votes": 131,
+       "elected": false,
+       "page": 15,
+       "box": [
+        0.933,
+        0.396,
+        0.967,
+        0.403
+       ]
+      },
+      {
+       "name": "Miguel Letelier",
+       "party": null,
+       "votes": 4,
+       "elected": false,
+       "page": 15,
+       "box": [
+        0.933,
+        0.403,
+        0.967,
+        0.41
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Grouping totals from the 'TOTAL GENERAL' column (pp. 14-15). Areas as printed in the table title (p. 2 lists the 9th grouping as Valdivia, Llanquihue, Aysen, Chiloe; the table includes Magallanes columns). Lista N°4 (Independiente, Manuel Chaparro Ruminot) is printed with dashes in every column and no 'Total votos de Lista' row; recorded as 0. valid 38015 is a handwritten pencil total under the TOTAL GENERAL column (equals the list sum); no typed total, null/blank or registered figure printed. Elected per the proclamation on p. 15 (Lista 6: 3, Lista 2: 2); the proclamation names 'Luis.Ambrosio Concha'. The archive leaves that handwritten total out and stores only typed figures."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": null,
+  "registered": null,
+  "page": null,
+  "parties": {}
+ },
+ "notes": "Volume holds the Tribunal Calificador's definitive scrutiny tables and proclamations for the five provincial groupings that elected senators in 1937 (1a, 3a, 5a, 7a, 9a; 5 seats each); p. 2 lists all nine groupings of the 1937-1941 period. No registered, cast or national totals are printed. Grouping totals are the 'Total General' columns; several grouping valid totals exist only as handwritten pencil sums, recorded and flagged in each contest's notes. Lists printed as 'Retirada' (withdrawn) with no votes are omitted. Party labels are the list descriptions as printed; candidates' party affiliations are printed only in the proclamations and are not recorded."
+}
