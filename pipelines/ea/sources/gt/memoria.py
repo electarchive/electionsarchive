@@ -4,9 +4,10 @@ The Tribunal's per-table files reach back only to 2023 (`gt.tse`). For earlier e
 publishes is the municipality, in the tables of each election's memoria. The memorias are typeset PDFs with a text
 layer, so each number is read with its word box from `pdftotext -bbox` and stored with its page and box.
 
-The four memorias print their results in four layouts: 2007 a page of results for each municipality, department, and
-the Distrito Central; 2011 a table for each department, the district tables set sideways, and a block for each
-municipality; 2015 tables by department and mayoral blocks; 2019 one contest per page.
+The 2003 memoria is a two-page file for each municipality, read in `gt.memoria2003`. The other four print their
+results in four layouts: 2007 a page of results for each municipality, department, and the Distrito Central; 2011 a
+table for each department, the district tables set sideways, and a block for each municipality; 2015 tables by
+department and mayoral blocks; 2019 one contest per page.
 """
 
 import re
@@ -19,6 +20,7 @@ from difflib import get_close_matches
 from functools import cache
 from html import unescape
 from pathlib import Path
+from types import ModuleType
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -568,7 +570,8 @@ class Memoria(NamedTuple):
     seats: int
     """Deputies elected by national list."""
     layout: str = "tables"
-    """"tables" prints each contest by municipality; "cards" prints one contest per page, by its own area."""
+    """"tables" prints each contest by municipality; "cards" prints one contest per page, by its own area; "files2003"
+    is a two-page file for each municipality."""
     districts: tuple[int, int] = (0, 0)
     """The pages of the district tables of a memoria that sets each one sideways."""
     parlacen: tuple[int, int] = (0, 0)
@@ -591,19 +594,47 @@ MEMORIA_LIST = (
     Memoria(2007, "2007_Memoria_Elecciones", date(2007, 9, 9), date(2007, 11, 4), (0, 0), (0, 0), 31, "report2007"),
     Memoria(2015, "2015_Memoria_Elecciones", date(2015, 9, 6), date(2015, 10, 25), (248, 326), (328, 456), 31),
     Memoria(2019, "2019_Memoria_Elecciones", date(2019, 6, 16), date(2019, 8, 11), (375, 804), (0, 0), 32, "cards"),
+    Memoria(2003, "", date(2003, 11, 9), date(2003, 12, 28), (0, 0), (0, 0), 31, "files2003"),
 )
 NATION = "GT"
 """The unit code of a contest the memoria prints only as a national total."""
 BY_YEAR = {m.year: m for m in MEMORIA_LIST}
 
 
+def _files2003() -> ModuleType:
+    """The reader of the 2003 memoria, which imports this module."""
+    from ea.sources.gt import memoria2003
+
+    return memoria2003
+
+
 def url(m: Memoria) -> str:
+    """The memoria's PDF, or for the memoria that is a file for each municipality, its index page."""
+    if m.layout == "files2003":
+        return _files2003().INDEX
     return f"{SITE}/images/memoriaselec/me/{m.file}.pdf"
+
+
+def artifacts(m: Memoria) -> list[raw.Artifact]:
+    """The raw files a memoria's numbers are read from."""
+    if m.layout == "files2003":
+        return _files2003().used()
+    return [raw.cached(SOURCE, url(m))]
+
+
+def located(m: Memoria, page: int) -> tuple[raw.Artifact, int]:
+    """The raw file a page number of a memoria's words is in, with its page number there."""
+    if m.layout == "files2003":
+        return _files2003().pages()[page]
+    return raw.cached(SOURCE, url(m)), page
 
 
 def fetch() -> None:
     for m in MEMORIA_LIST:
-        raw.fetch(SOURCE, url(m), suffix=".pdf")
+        if m.layout == "files2003":
+            _files2003().fetch()
+        else:
+            raw.fetch(SOURCE, url(m), suffix=".pdf")
 
 
 def key(kind: str, *parts: object) -> str:
@@ -695,6 +726,8 @@ def _add_row(contest: Contest, code: str, values: list[Word]) -> None:
 def read(year: int) -> tuple[dict[str, Contest], list[Block]]:
     """Every contest of a year's memoria, and its mayoral blocks."""
     m = BY_YEAR[year]
+    if m.layout == "files2003":
+        return _files2003().read(), []
     path = raw.cached(SOURCE, url(m)).path
     if m.layout == "cards":
         return _read_cards(path, m), []
@@ -882,13 +915,14 @@ def _town(code: str) -> str:
 
 def national_labels(year: int) -> set[str]:
     contests, _ = read(year)
-    return {
+    found = {
         label(c)
         for contest in contests.values()
         if contest.kind not in ("municipal", "rerun")
         for c in contest.columns
         if label(c) not in ACCOUNTS
     }
+    return found | _files2003().alliances() if year == 2003 else found
 
 
 def party(year: int, text: str, code: str) -> str:
@@ -936,7 +970,7 @@ def registry(year: int) -> Package:
         depends=["gt.tse/geo"],
     )
     p.external |= {GUATEMALA}
-    artifact = raw.cached(SOURCE, url(m))
+    contests, _ = read(year)
     source = key("source", year)
     p.add(
         "source",
@@ -949,17 +983,17 @@ def registry(year: int) -> Package:
         license_url=f"{SITE}/informacion-publica",
         attribution="Tribunal Supremo Electoral (TSE), Guatemala",
     )
-    artifact_id = p.artifact(artifact, source)
-    contests, _ = read(year)
+    artifact_ids = {a.path: p.artifact(a, source) for a in artifacts(m)}
     pages = {w.page for contest in contests.values() for row in contest.rows.values() for w in row if w}
     for page in sorted(pages):
-        width, height = SIZES[(artifact.path, page)]
+        artifact, local = located(m, page)
+        width, height = SIZES[(artifact.path, local)]
         p.add(
             "source_page",
             id=key("page", year, page),
-            artifact_id=artifact_id,
-            page_number=page,
-            image_key=f"pages/{SOURCE}/{artifact.path.stem}/{page}.png",
+            artifact_id=artifact_ids[artifact.path],
+            page_number=local,
+            image_key=f"pages/{SOURCE}/{artifact.path.stem}/{local}.png",
             width=width,
             height=height,
         )
@@ -1087,7 +1121,8 @@ def election(year: int, day: date) -> Package:
         depends,
     )
     p.external |= {GUATEMALA, COUNTRY}
-    p.uses(raw.cached(SOURCE, url(m)))
+    for artifact in artifacts(m):
+        p.uses(artifact)
     source = key("source", year)
     elections: dict[str, str] = {}
 
