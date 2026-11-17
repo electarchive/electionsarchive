@@ -103,6 +103,30 @@
       "publisher": "Election Commission of Bhutan",
       "url": "https://ecb.bt/declaration-of-the-results-of-the-third-parliamentary-elections-2018-general-election-to-the-national-assembly/",
       "kind": "official_body"
+    },
+    "ecb-delim": {
+      "title": "Delimitation of Parliamentary and Local Government Constituencies (Name Change Order and Names of Villages under 1044 Chiwogs)",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/delimitation-of-parliamentary-and-local-government-constituencies/",
+      "kind": "official_body"
+    },
+    "ecb-lgc": {
+      "title": "Local Government Constituencies (constituency maps, chiwogs in gewogs, and boundary descriptions by dzongkhag)",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/local-government-constituencies/",
+      "kind": "official_body"
+    },
+    "ecb-lg2016": {
+      "title": "Declaration of the Results of the Second Phase of Second Local Government Elections (28 September 2016)",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/wp-content/uploads/2026/06/english.pdf",
+      "kind": "official_body"
+    },
+    "ecb-thromde2021": {
+      "title": "Declaration of the Results of the Dzongkhag Thromde Elections of Thimphu, Phuentshogling and Gelegphu (29 April 2021)",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/declaration-of-the-results-of-the-dzongkhag-thromde-elections-of-thimphu-phuentshogling-and-gelegphu/",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -186,7 +210,16 @@
       "name_en": "Chiwogs: each elects one Tshogpa to its Gewog Tshogde (the finest unit that elects anyone)",
       "parent": "gewog",
       "polity_kind": "submunicipal",
-      "source": "ea-2008"
+      "source": "ea-2008",
+      "counts": [
+        {
+          "date": "2026-06-01",
+          "precision": "month",
+          "value": 1044,
+          "source": "ecb-delim",
+          "locator": "https://ecb.bt/wp-content/uploads/2026/06/NamesOfVillagesUnder1044Chiwogs.pdf (foreword: \"the Delimitation of 1044 Chiwogs in 205 Gewogs\"; the page title reads \"Name Of Villages under 1044 Chiwogs\"; the Final Delimitation Order of the Chiwogs is dated 27 February 2011)"
+        }
+      ]
     },
     {
       "key": "thromde",
@@ -210,7 +243,15 @@
       "name_en": "Dzongkhag Yenlag Thromdes (satellite towns): together elect one Thuemi to the Dzongkhag Tshogdu",
       "parent": "dzongkhag",
       "polity_kind": "submunicipal",
-      "source": "lga-2014"
+      "source": "lga-2014",
+      "counts": [
+        {
+          "date": "2016-09-27",
+          "value": 13,
+          "source": "ecb-lg2016",
+          "locator": "https://ecb.bt/wp-content/uploads/2026/06/english.pdf (\"13 Dzongkhag Thromdes of Bumthang, Dagana, Haa, Lhuentse, Paro, Punakha, Samtse, Trashigang, Trashi Yangtse, Trongsa, Tsirang, Wangdue Phodrang and Zhemgang Dzongkhags\"; the Samdrup Jongkhar Dzongkhag Thromde Tshogde is listed separately)"
+        }
+      ]
     }
   ],
   "classes": [
@@ -744,28 +785,28 @@
         {
           "date": "2011-01-01",
           "precision": "year",
-          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "note": "First Local Government Elections under the Local Government Act 2009; the Thromde Thuemi files list 9 yenlag thromdes (6 contested, 3 uncontested) and carry no poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "contests": 13,
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "13 yenlag thromdes polled for a Thromde Ngotshab (the declaration's term for the Thuemi); 10 were elected."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a declaration or poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
           "date": "2027-01-01",
           "precision": "year",
-          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "note": "Fourth Local Government Elections; the Commission's notice of the second phase names the gewogs and Samdrup Jongkhar Thromde and does not mention the yenlag thromdes.",
           "source": "ecb-lg2027",
           "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
         }
@@ -830,30 +871,31 @@
         {
           "date": "2011-01-01",
           "precision": "year",
-          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested, without a poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "contests": 205,
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "Second phase of the Second Local Government Elections, held in the 205 gewogs of the 20 dzongkhags together with the Samdrup Jongkhar Thromde and 13 yenlag thromdes. One post per gewog."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a declaration or poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2027-01-01",
-          "precision": "year",
-          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "date": "2027-01-22",
+          "through": "2027-04-21",
+          "precision": "day",
+          "note": "Second phase of the Fourth Local Government Elections: gewogs of the 20 dzongkhags and Samdrup Jongkhar Thromde, within the statutory 90-day window after the incumbent term ends on 21 January 2027; the poll day is not yet announced in the Commission's notice.",
           "source": "ecb-lg2027",
-          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+          "quote": "the second phase of the Fourth Local Government Elections, comprising elections to the Gewog Tshogdes in the 20 Dzongkhags and Samdrup Jongkhar Thromde, shall be conducted within the statutory 90-day period from 22 January to 21 April 2027"
         }
       ],
       "est_votes": 900000,
@@ -916,30 +958,31 @@
         {
           "date": "2011-01-01",
           "precision": "year",
-          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested, without a poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "contests": 205,
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "Second phase of the Second Local Government Elections, held in the 205 gewogs of the 20 dzongkhags together with the Samdrup Jongkhar Thromde and 13 yenlag thromdes. One post per gewog."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a declaration or poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2027-01-01",
-          "precision": "year",
-          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "date": "2027-01-22",
+          "through": "2027-04-21",
+          "precision": "day",
+          "note": "Second phase of the Fourth Local Government Elections: gewogs of the 20 dzongkhags and Samdrup Jongkhar Thromde, within the statutory 90-day window after the incumbent term ends on 21 January 2027; the poll day is not yet announced in the Commission's notice.",
           "source": "ecb-lg2027",
-          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+          "quote": "the second phase of the Fourth Local Government Elections, comprising elections to the Gewog Tshogdes in the 20 Dzongkhags and Samdrup Jongkhar Thromde, shall be conducted within the statutory 90-day period from 22 January to 21 April 2027"
         }
       ],
       "est_votes": 800000,
@@ -1002,30 +1045,30 @@
         {
           "date": "2011-01-01",
           "precision": "year",
-          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested, without a poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "Second phase of the Second Local Government Elections, held in the 205 gewogs of the 20 dzongkhags together with the Samdrup Jongkhar Thromde and 13 yenlag thromdes. Posts are chiwog seats (1,044 chiwogs); the declaration lists the elected, vacant, and tied seats by gewog without a count of contests."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a declaration or poll day.",
           "source": "ecb-lg",
           "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
         },
         {
-          "date": "2027-01-01",
-          "precision": "year",
-          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "date": "2027-01-22",
+          "through": "2027-04-21",
+          "precision": "day",
+          "note": "Second phase of the Fourth Local Government Elections: gewogs of the 20 dzongkhags and Samdrup Jongkhar Thromde, within the statutory 90-day window after the incumbent term ends on 21 January 2027; the poll day is not yet announced in the Commission's notice.",
           "source": "ecb-lg2027",
-          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+          "quote": "the second phase of the Fourth Local Government Elections, comprising elections to the Gewog Tshogdes in the 20 Dzongkhags and Samdrup Jongkhar Thromde, shall be conducted within the statutory 90-day period from 22 January to 21 April 2027"
         }
       ],
       "est_votes": 800000,
@@ -1101,25 +1144,45 @@
           "date": "2011-01-01",
           "precision": "year",
           "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011",
+          "note": "First thromde elections; the 2011 results files carry no poll day."
         },
         {
           "date": "2016-01-01",
           "precision": "year",
+          "note": "First phase of the Second Local Government Elections (Thimphu, Phuentsholing, and Gelephu Thromde Tshogdes); the Commission's pages give the year without a declaration or poll day.",
           "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011"
         },
         {
-          "date": "2021-01-01",
-          "precision": "year",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "Samdrup Jongkhar Dzongkhag Thromde Tshogde, polled with the gewogs."
         },
         {
-          "date": "2026-01-01",
-          "precision": "year",
+          "date": "2021-04-28",
+          "source": "ecb-thromde2021",
+          "quote": "the results of the Thromde Elections held on 28th April 2021 for the three Dzongkhag Thromdes of Thimphu, Phuentshogling and Gelegphu",
+          "note": "Thimphu, Phuentsholing, and Gelephu. Samdrup Jongkhar was not in this poll; Phuentsholing voters also voted by mobile booth on 24 and 25 April. One Thrompon post per thromde; the declaration's results table is an image that the Commission no longer serves."
+        },
+        {
+          "date": "2026-07-15",
+          "contests": 2,
+          "seats": 2,
           "source": "ecb-thromde2026",
-          "quote": "Dzongkhag Thromde Tshogde Elections, 2026"
+          "quote": "Elections held on 15 July 2026 for the two Dzongkhag Thromde Tshogdes of Phuentshogling and Thimphu",
+          "note": "Fourth thromde elections: Phuentsholing and Thimphu only (the declaration names no other thromde). Two contested Thrompon races."
+        },
+        {
+          "date": "2027-01-22",
+          "through": "2027-04-21",
+          "precision": "day",
+          "note": "Samdrup Jongkhar Thromde Tshogde, whose term ends on 21 January 2027, is polled in the second phase of the Fourth Local Government Elections.",
+          "source": "ecb-lg2027",
+          "quote": "the second phase of the Fourth Local Government Elections, comprising elections to the Gewog Tshogdes in the 20 Dzongkhags and Samdrup Jongkhar Thromde, shall be conducted within the statutory 90-day period from 22 January to 21 April 2027"
         }
       ],
       "est_votes": 60000,
@@ -1195,25 +1258,45 @@
           "date": "2011-01-01",
           "precision": "year",
           "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011",
+          "note": "First thromde elections; the 2011 results files carry no poll day."
         },
         {
           "date": "2016-01-01",
           "precision": "year",
+          "note": "First phase of the Second Local Government Elections (Thimphu, Phuentsholing, and Gelephu Thromde Tshogdes); the Commission's pages give the year without a declaration or poll day.",
           "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011"
         },
         {
-          "date": "2021-01-01",
-          "precision": "year",
-          "source": "ecb-lg",
-          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+          "date": "2016-09-27",
+          "contests": 5,
+          "seats": 5,
+          "source": "ecb-lg2016",
+          "quote": "the Second Phase of Second Local Government Elections 2016 held in the 205 Gewogs of the 20 Dzongkhags, Dzongkhag Thromde Tshogde of Samdrup Jongkhar Dzongkhag and 13 Dzongkhag Thromdes ... held on 27th of September 2016",
+          "note": "Samdrup Jongkhar Dzongkhag Thromde Tshogde, polled with the gewogs. Six constituencies; Samdrup Jongkhar Toed is listed vacant."
         },
         {
-          "date": "2026-01-01",
-          "precision": "year",
+          "date": "2021-04-28",
+          "source": "ecb-thromde2021",
+          "quote": "the results of the Thromde Elections held on 28th April 2021 for the three Dzongkhag Thromdes of Thimphu, Phuentshogling and Gelegphu",
+          "note": "Of 35 candidates, 20 were elected across the three Tshogdes (Thrompon and Tshogpa posts together); the Tshogpa seats of Motithang (Thimphu) and Trashiling (Gelephu) stayed vacant because the nominees were party members."
+        },
+        {
+          "date": "2026-07-15",
+          "contests": 12,
+          "seats": 12,
           "source": "ecb-thromde2026",
-          "quote": "Dzongkhag Thromde Tshogde Elections, 2026"
+          "quote": "Elections held on 15 July 2026 for the two Dzongkhag Thromde Tshogdes of Phuentshogling and Thimphu",
+          "note": "Fourth thromde elections: Phuentsholing and Thimphu only (the declaration names no other thromde). Two contested and ten uncontested Tshogpa seats: Phuentsholing 5, Thimphu 7."
+        },
+        {
+          "date": "2027-01-22",
+          "through": "2027-04-21",
+          "precision": "day",
+          "note": "Samdrup Jongkhar Thromde Tshogde, whose term ends on 21 January 2027, is polled in the second phase of the Fourth Local Government Elections.",
+          "source": "ecb-lg2027",
+          "quote": "the second phase of the Fourth Local Government Elections, comprising elections to the Gewog Tshogdes in the 20 Dzongkhags and Samdrup Jongkhar Thromde, shall be conducted within the statutory 90-day period from 22 January to 21 April 2027"
         }
       ],
       "est_votes": 100000,
