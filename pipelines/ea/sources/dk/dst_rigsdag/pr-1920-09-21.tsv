@@ -1,0 +1,175 @@
+# Folketingsvalget den 21. September 1920; Tabel 1 a-c, pages 80-85
+# Abbreviated names as printed ("-Kr.", "Amtskr.") are written in full
+columns	80	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	80	I. Søndre Storkreds
+row	80	9	Sundby-Kredsen	211	664	227	2388	1069	10562	474	0	15595
+row	80	2	Kristianshavns-Kredsen	286	758	267	4362	1992	9668	734	0	18067
+row	80	3	Raadhus-Kredsen	112	700	216	5192	1266	4156	781	0	12423
+row	80	8	Havne-Kredsen	105	449	226	4294	946	5114	547	0	11681
+row	80	7	Rosenborg-Kredsen	134	903	217	3995	972	4934	674	0	11829
+row	80	5	Blaagaards-Kredsen	220	586	252	2086	622	8060	371	0	12197
+subtotal	80	Tilsammen	1068	4060	1405	22317	6867	42494	3581	0	81792
+block	80	II. Østre Storkreds
+row	80	10	Østerbro-Kredsen	152	660	221	4361	1478	7744	606	0	15222
+row	80	4	Ravnsborg-Kredsen	163	584	181	2952	952	7042	544	0	12418
+row	80	6	Østbane-Kredsen	66	621	280	7254	1557	3303	930	0	14011
+row	80	11	Nørrebro-Kredsen	211	566	231	1534	805	10218	303	0	13868
+row	80	12	Bispeeng-Kredsen	253	848	275	2311	1162	10731	547	0	16127
+row	80	15	Bispebjerg-Kredsen	226	908	259	3240	1330	10758	607	0	17328
+subtotal	80	Tilsammen	1071	4187	1447	21652	7284	49796	3537	0	88974
+block	80	III. Vestre Storkreds
+row	80	1	Vesterbro-Kredsen	127	621	213	2778	922	7290	422	0	12373
+row	80	13	Enghave-Kredsen	139	700	271	1831	1079	9795	413	0	14228
+row	80	14	Valby-Kredsen	127	740	383	3097	1142	10577	667	0	16733
+row	80	Frb. 1	Gl. Kongevej-Kredsen	47	647	332	9363	1377	2653	1142	0	15561
+row	80	Frb. 2	Slots-Kredsen	122	615	309	4236	1217	8994	781	0	16274
+row	80	Frb. 3	Falkonér-Kredsen	87	719	361	6099	1397	5423	841	0	14927
+subtotal	80	Tilsammen	649	4042	1869	27404	7134	44732	4266	0	90096
+total	80	I alt Hovedstadens Omraade	2788	12289	4721	71373	21285	137022	11384	0	260862
+columns	81	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	81	I. Københavns Amtskreds
+row	81	1	Gentofte	14	697	0	7093	1110	3197	962	0	13073
+row	81	2	Lyngby	27	1418	0	3892	609	6722	1065	0	13733
+row	81	3	Roskilde	40	198	0	2868	1669	3986	2177	0	10938
+row	81	4	Køge	37	322	0	2130	1739	4140	2609	0	10977
+row	81	5	Lejre	7	40	0	632	3507	1125	3367	0	8678
+subtotal	81	Tilsammen	125	2675	0	16615	8634	19170	10180	0	57399
+block	81	II. Frederiksborg Amtskreds
+row	81	1	Helsingør	166	131	41	2526	1196	4059	1125	0	9244
+row	81	2	Fredensborg	11	291	49	3056	1092	3691	2964	0	11154
+row	81	3	Hillerød	66	179	63	1711	1272	3275	4065	0	10631
+row	81	4	Frederiksværk	15	140	21	1688	2183	1910	3739	0	9696
+subtotal	81	Tilsammen	258	741	174	8981	5743	12935	11893	0	40725
+block	81	III. Holbæk Amtskreds
+row	81	1	Holbæk	0	48	0	1458	3619	2865	3940	0	11930
+row	81	2	Nykøbing	0	87	0	622	3940	1048	5430	0	11127
+row	81	3	Vedby	0	163	0	851	1772	1816	5868	0	10470
+row	81	4	Kalundborg-Onsbjerg	0	128	0	1174	3938	2964	3076	0	11280
+subtotal	81	Tilsammen	0	426	0	4105	13269	8693	18314	0	44807
+block	81	IV. Sorø Amtskreds
+row	81	1	Ringsted	7	40	0	1222	3675	2954	2853	0	10751
+row	81	2	Sorø	12	45	0	817	1942	1811	4883	0	9510
+row	81	3	Slagelse	67	258	0	2451	627	5958	3307	0	12668
+row	81	4	Skelskør	4	72	0	1763	775	2252	5502	0	10368
+subtotal	81	Tilsammen	90	415	0	6253	7019	12975	16545	0	43297
+block	81	V. Præstø Amtskreds
+row	81	1	Storeheddinge	0	108	0	1582	2151	3395	2733	0	9969
+row	81	2	Præstø	0	166	0	1301	2007	2955	4594	0	11023
+row	81	3	Næstved	0	309	0	1111	821	4815	3744	0	10800
+row	81	4	Stege-Vordingborg	0	108	0	1702	2779	3716	3543	0	11848
+subtotal	81	Tilsammen	0	691	0	5696	7758	14881	14614	0	43640
+columns	82	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	82	VI. Bornholms Amtskreds
+row	82	1	Rønne	0	148	0	1640	336	4389	2889	0	9402
+row	82	2	Aakirkeby	0	53	0	846	881	1624	3661	0	7065
+subtotal	82	Tilsammen	0	201	0	2486	1217	6013	6550	0	16467
+block	82	VII. Maribo Amtskreds
+row	82	1	Nakskov	0	126	0	1999	643	5434	3280	0	11482
+row	82	2	Maribo	0	82	0	2119	1495	3290	2351	0	9337
+row	82	3	Sakskøbing	0	34	0	1464	1855	2518	1903	0	7774
+row	82	4	Nykøbing	0	35	0	1527	1268	4658	3809	0	11297
+row	82	5	Stubbekøbing	0	7	0	606	2336	1904	2846	0	7699
+subtotal	82	Tilsammen	0	284	0	7715	7597	17804	14189	0	47589
+block	82	VIII. Odense Amtskreds
+row	82	1	Odense 1	94	38	602	2826	509	5340	681	0	10090
+row	82	2	Odense 2	127	66	692	5485	750	4750	873	0	12743
+row	82	3	Kerteminde	1	31	65	1575	2314	1671	4062	0	9719
+row	82	4	Assens	9	24	53	1372	1281	1816	4728	0	9283
+row	82	5	Middelfart	15	25	45	813	3499	2536	2929	0	9862
+row	82	6	Bogense	7	32	37	1326	2532	1466	4559	0	9959
+row	82	7	Otterup	6	18	71	1660	2298	1703	4166	0	9922
+subtotal	82	Tilsammen	259	234	1565	15057	13183	19282	21998	0	71578
+block	82	IX. Svendborg Amtskreds
+row	82	1	Nyborg	41	142	0	1147	1196	3801	3785	0	10112
+row	82	2	Gudme	2	213	0	966	1441	1454	4500	0	8576
+row	82	3	Svendborg	10	400	0	3148	631	3860	2680	0	10729
+row	82	4	Faaborg-Ærøskøbing	6	204	0	3393	1064	1482	3756	0	9905
+row	82	5	Højrup	3	139	0	884	2876	978	4257	0	9137
+row	82	6	Rudkøbing	1	128	0	703	3464	956	2912	0	8164
+subtotal	82	Tilsammen	63	1226	0	10241	10672	12531	21890	0	56623
+total	82	I alt Øernes Omraade	795	6893	1739	77149	75092	124284	136173	0	422125
+columns	83	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	83	I. Hjørring Amtskreds
+row	83	1	Frederikshavn	56	0	0	2819	749	1630	4224	0	9478
+row	83	2	Sæby	5	0	0	893	1052	530	5395	0	7875
+row	83	3	Hjørring	12	0	0	1490	2000	1780	6005	0	11287
+row	83	4	Vraa	9	0	0	674	2045	1421	5496	0	9645
+row	83	5	Halvrimme	3	0	0	293	592	469	5215	0	6572
+subtotal	83	Tilsammen	85	0	0	6169	6438	5830	26335	0	44857
+block	83	II. Thisted Amtskreds
+row	83	1	Thisted	13	141	0	3684	350	1184	4498	0	9870
+row	83	2	Hurup	2	86	0	4022	92	512	5240	0	9954
+row	83	3	Nykøbing	31	253	0	949	597	2445	5208	0	9483
+subtotal	83	Tilsammen	46	480	0	8655	1039	4141	14946	0	29307
+block	83	III. Aalborg Amtskreds
+row	83	1	Aalborg (vest)	26	49	0	1889	464	4835	1708	0	8971
+row	83	2	Aalborg (øst)	38	65	0	1405	594	5054	2078	0	9234
+row	83	3	Bælum	13	41	0	228	1481	1840	5839	0	9442
+row	83	4	Aars	4	60	0	288	1262	1362	8293	0	11269
+row	83	5	Nibe	13	47	0	336	879	1118	5460	0	7853
+row	83	6	Nørresundby	4	19	0	450	942	2558	5716	0	9689
+subtotal	83	Tilsammen	98	281	0	4596	5622	16767	29094	0	56458
+block	83	IV. Viborg Amtskreds
+row	83	1	Skive	42	0	0	1587	3932	1665	1746	0	8972
+row	83	2	Viborg	14	0	0	2095	1725	2391	2654	0	8879
+row	83	3	Kjellerup	2	0	0	253	2113	1372	5921	0	9661
+row	83	4	Søndervinge	19	0	0	368	1825	1647	4649	0	8508
+row	83	5	Løvel	7	0	0	417	712	684	7036	0	8856
+subtotal	83	Tilsammen	84	0	0	4720	10307	7759	22006	0	44876
+columns	84	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	84	V. Randers Amtskreds
+row	84	1	Mariager	1	208	0	640	840	2924	3230	0	7843
+row	84	2	Randers	95	221	0	4455	508	6120	1157	0	12556
+row	84	3	Borup	2	121	0	441	1065	1620	3840	0	7089
+row	84	4	Hornslet	5	102	0	367	1482	1520	4457	0	7933
+row	84	5	Grenaa	7	100	0	737	694	2261	5517	0	9316
+row	84	6	Æbeltoft	2	116	0	266	182	1786	4518	0	6870
+subtotal	84	Tilsammen	112	868	0	6906	4771	16231	22719	0	51607
+block	84	VI. Aarhus Amtskreds
+row	84	1	Odder	3	164	0	326	1029	2237	3908	0	7667
+row	84	2	Aarhus (midt Kr.)	86	392	0	3420	244	4771	418	0	9331
+row	84	3	Aarhus (nord)	73	338	0	2797	262	6483	403	0	10356
+row	84	4	Aarhus (syd)	69	325	0	2915	564	6420	2045	0	12338
+row	84	5	Skjoldelev	9	222	0	632	447	3305	4104	0	8719
+subtotal	84	Tilsammen	240	1441	0	10090	2546	23216	10878	0	48411
+block	84	VII. Skanderborg Amtskreds
+row	84	1	Horsens	140	815	0	3121	294	6111	1049	0	11530
+row	84	2	Skanderborg	8	391	0	466	1013	2805	5224	0	9907
+row	84	3	Østbirk	7	138	0	493	1244	1741	5722	0	9345
+row	84	4	Silkeborg	18	406	0	475	485	4105	4714	0	10203
+subtotal	84	Tilsammen	173	1750	0	4555	3036	14762	16709	0	40985
+block	84	VIII. Vejle Amtskreds
+row	84	1	Fredericia	75	274	0	1119	341	4893	5474	0	12176
+row	84	2	Kolding	52	111	0	2199	833	3813	5511	0	12519
+row	84	3	Vejle	91	713	0	1627	566	5931	7223	0	16151
+row	84	4	Give	4	244	0	112	747	879	7691	0	9677
+row	84	5	Bjerre	4	119	0	338	599	2019	4087	0	7166
+row	84	6	Vonsild	5	62	0	2639	384	1041	2510	0	6641
+subtotal	84	Tilsammen	231	1523	0	8034	3470	18576	32496	0	64330
+columns	85	Venstre-Socialister	Erhvervspartiet	Frie Socialdemokrati	Konservative Folkeparti	Radikale Venstre	Socialdemokratiet	Venstre	Slesvigske Parti	Tilsammen
+block	85	IX. Ringkøbing Amtskreds
+row	85	1	Ringkøbing	0	18	0	170	434	680	6762	0	8064
+row	85	2	Lemvig	0	9	0	2244	604	712	4932	0	8501
+row	85	3	Holstebro	0	79	0	498	307	1403	6561	0	8848
+row	85	4	Vinderup	0	35	0	460	1837	1159	3982	0	7473
+row	85	5	Herning	0	25	0	1010	499	1493	8818	0	11845
+row	85	6	Skjern	0	11	0	602	300	548	7514	0	8975
+subtotal	85	Tilsammen	0	177	0	4984	3981	5995	38569	0	53706
+block	85	X. Ribe Amtskreds
+row	85	1	Varde	0	33	0	199	1337	843	6695	0	9107
+row	85	2	Esbjerg	0	224	0	700	477	5072	1997	0	8470
+row	85	3	Ribe	0	71	0	720	1295	847	4210	0	7143
+row	85	4	Bække	0	132	0	407	1100	1340	6941	0	9920
+row	85	5	Guldager	0	6	0	260	868	500	5602	0	7236
+subtotal	85	Tilsammen	0	466	0	2286	5077	8602	25445	0	41876
+block	85	XI. Haderslev-Aabenraa-Sønderborg-Tønder Amtskreds
+row	85	1	Haderslev	99	252	0	1905	1217	1582	3093	1170	9318
+row	85	2	Aabenraa	160	76	0	543	544	979	3359	1645	7306
+row	85	3	Sønderborg	124	145	0	844	243	1668	2134	1243	6401
+row	85	4	Augustenborg	44	381	0	394	580	806	4843	383	7431
+row	85	5	Tønder	56	72	0	1755	419	609	3384	1381	7676
+row	85	6	Løgumkloster	7	117	0	700	475	401	3568	1487	6755
+row	85	7	Rødding	18	192	0	1075	978	423	4526	196	7408
+subtotal	85	Tilsammen	508	1235	0	7216	4456	6468	24907	7505	52295
+total	85	I alt Jyllands Omraade	1577	8221	0	68211	50743	128347	264104	7505	528708
+total	85	I alt Hele Landet	5160	27403	6460	216733	147120	389653	411661	7505	1211695
