@@ -456,21 +456,81 @@
    "dates": [
     {
      "date": "1997-12-25",
-     "note": "First election of the Council of the Nation: both seats of each of the 48 wilayas."
+     "contests": 48,
+     "source": "joradp",
+     "note": "First election of the Council of the Nation: both seats of each of the 48 wilayas. Proclamation n° 02-97/P.CC of 27 December 1997, Journal officiel n° 86, https://www.joradp.dz/FTP/jo-francais/1997/F1997086.pdf."
     },
     {
-     "date": "2000-01-01",
-     "precision": "year",
-     "through": "2019-12-31",
-     "note": "Seven half renewals, every three years from December 2000; not yet listed or counted."
+     "date": "2000-12-30",
+     "contests": 48,
+     "source": "joradp",
+     "note": "Half renewal; one seat in each of the 48 wilayas. Proclamation n° 01-P-CC-01 of 1 January 2001, Journal officiel n° 4 of 2001, https://www.joradp.dz/FTP/jo-francais/2001/F2001004.pdf."
+    },
+    {
+     "date": "2003-12-30",
+     "contests": 45,
+     "source": "joradp",
+     "note": "Half renewal. The proclamation covers 46 wilayas and omits Béjaïa and Tizi Ouzou; the vote in El Bayadh was annulled and no later poll is printed, so 45 wilayas have a result. Proclamation n° 01/P-CC/04 of 4 January 2004, Journal officiel n° 5 of 2004, https://www.joradp.dz/FTP/jo-francais/2004/F2004005.pdf."
+    },
+    {
+     "date": "2006-12-28",
+     "contests": 46,
+     "source": "joradp",
+     "note": "Half renewal. The votes in Djelfa and Constantine were annulled and repeated on 8 January 2007. Proclamation n° 01/P.CC/07 of 1 January 2007, Journal officiel n° 4 of 2007, https://www.joradp.dz/FTP/jo-francais/2007/F2007004.pdf."
+    },
+    {
+     "date": "2007-01-08",
+     "contests": 2,
+     "source": "joradp",
+     "note": "Repeat poll in Djelfa and Constantine. Proclamation n° 02/P.CC/07 of 9 January 2007, Journal officiel n° 10 of 2007, https://www.joradp.dz/FTP/jo-francais/2007/F2007010.pdf."
+    },
+    {
+     "date": "2009-12-29",
+     "contests": 48,
+     "source": "joradp",
+     "note": "Half renewal. The Ouargla result was annulled and the poll repeated on 13 January 2010. Proclamation n° 02/P.CC/09 of 31 December 2009, Journal officiel n° 6 of 2010, https://www.joradp.dz/FTP/jo-francais/2010/F2010006.pdf."
+    },
+    {
+     "date": "2010-01-13",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Repeat poll in Ouargla. Proclamation n° 01/P.CC/10 of 14 January 2010, Journal officiel n° 6 of 2010, https://www.joradp.dz/FTP/jo-francais/2010/F2010006.pdf."
+    },
+    {
+     "date": "2012-12-29",
+     "contests": 48,
+     "source": "joradp",
+     "note": "Half renewal. Proclamation n° 01/P.CC/13 of 1 January 2013, Journal officiel n° 2 of 2013, https://www.joradp.dz/FTP/jo-francais/2013/F2013002.pdf."
+    },
+    {
+     "date": "2015-12-29",
+     "contests": 48,
+     "source": "joradp",
+     "note": "Half renewal. Proclamation n° 01/P.CC/16 of 1 January 2016, Journal officiel n° 2 of 2016, https://www.joradp.dz/FTP/jo-francais/2016/F2016002.pdf."
+    },
+    {
+     "date": "2018-12-29",
+     "contests": 47,
+     "source": "joradp",
+     "note": "Half renewal. The vote in Tlemcen was annulled and repeated on 10 January 2019. Proclamation n° 01/P.CC/19 of 4 January 2019, Journal officiel n° 5 of 2019, https://www.joradp.dz/FTP/jo-francais/2019/F2019005.pdf."
+    },
+    {
+     "date": "2019-01-10",
+     "contests": 1,
+     "source": "joradp",
+     "note": "Repeat poll in Tlemcen. Proclamation n° 02/P.CC/19 of 14 January 2019, Journal officiel n° 9 of 2019, https://www.joradp.dz/FTP/jo-francais/2019/F2019009.pdf."
     },
     {
      "date": "2022-02-05",
-     "note": "Half renewal; the ten wilayas created by Loi 19-12 elected both their seats."
+     "contests": 58,
+     "source": "joradp",
+     "note": "Half renewal; the ten wilayas created by Loi 19-12 elected both their seats. Proclamation n° 01/PCC/22 of 10 February 2022, Journal officiel n° 12 of 2022, https://www.joradp.dz/FTP/jo-francais/2022/F2022012.pdf."
     },
     {
      "date": "2025-03-09",
-     "note": "Half renewal."
+     "contests": 58,
+     "source": "joradp",
+     "note": "Half renewal; the Constitutional Court proclaimed the result. Proclamation n° 01/P.C.C/25 of 13 March 2025, Journal officiel n° 19 of 2025, https://www.joradp.dz/FTP/jo-francais/2025/F2025019.pdf."
     }
    ],
    "cadence": [

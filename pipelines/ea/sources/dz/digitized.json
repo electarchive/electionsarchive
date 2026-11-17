@@ -1,0 +1,1882 @@
+{
+ "1997": {
+  "day": "1997-12-25",
+  "file": "https://www.joradp.dz/FTP/jo-francais/1997/F1997086.pdf",
+  "proclamation": "Proclamation n° 02-97/P.CC of 27 December 1997 (Journal officiel n° 86 of 28 December 1997, pages 12 to 15)",
+  "pages": {
+   "12": {
+    "width": 2184,
+    "height": 3225
+   },
+   "13": {
+    "width": 2184,
+    "height": 3225
+   },
+   "14": {
+    "width": 2184,
+    "height": 3225
+   },
+   "15": {
+    "width": 2300,
+    "height": 3300
+   }
+  },
+  "printed": {
+   "registered": 15003,
+   "voting": 14224,
+   "abstaining": 779,
+   "valid": 13258,
+   "null": 966
+  },
+  "rows": [
+   {
+    "code": 1,
+    "page": 12,
+    "y0": 0.1845,
+    "y1": 0.2583,
+    "registered": 245,
+    "voting": 243,
+    "valid": 236,
+    "abstaining": 2,
+    "null": 7,
+    "members": [
+     [
+      "Benabdelkrim Abdelkrim",
+      88
+     ],
+     [
+      "Mazouzi Abdelkader",
+      81
+     ]
+    ]
+   },
+   {
+    "code": 2,
+    "page": 12,
+    "y0": 0.2583,
+    "y1": 0.3147,
+    "registered": 378,
+    "voting": 370,
+    "valid": 362,
+    "abstaining": 8,
+    "null": 8,
+    "members": [
+     [
+      "Cheikh Ahmed",
+      213
+     ],
+     [
+      "Bouthiba Mohamed",
+      136
+     ]
+    ]
+   },
+   {
+    "code": 3,
+    "page": 12,
+    "y0": 0.3147,
+    "y1": 0.3709,
+    "registered": 217,
+    "voting": 214,
+    "valid": 202,
+    "abstaining": 3,
+    "null": 12,
+    "members": [
+     [
+      "Seddiki Ahmed",
+      69
+     ],
+     [
+      "Badaoui Naceur",
+      53
+     ]
+    ]
+   },
+   {
+    "code": 4,
+    "page": 12,
+    "y0": 0.3709,
+    "y1": 0.4437,
+    "registered": 278,
+    "voting": 275,
+    "valid": 262,
+    "abstaining": 3,
+    "null": 13,
+    "members": [
+     [
+      "Boukernous Boubekeur",
+      169
+     ],
+     [
+      "Berkani Bouzid",
+      141
+     ]
+    ]
+   },
+   {
+    "code": 5,
+    "page": 12,
+    "y0": 0.4437,
+    "y1": 0.4992,
+    "registered": 526,
+    "voting": 433,
+    "valid": 381,
+    "abstaining": 93,
+    "null": 52,
+    "members": [
+     [
+      "Benhassir Belkacem",
+      252
+     ],
+     [
+      "Houamel Nabil",
+      243
+     ]
+    ]
+   },
+   {
+    "code": 6,
+    "page": 12,
+    "y0": 0.4992,
+    "y1": 0.5553,
+    "registered": 489,
+    "voting": 461,
+    "valid": 436,
+    "abstaining": 28,
+    "null": 25,
+    "members": [
+     [
+      "Abid Abdelmadjid",
+      250
+     ],
+     [
+      "Amri Boualem",
+      229
+     ]
+    ]
+   },
+   {
+    "code": 7,
+    "page": 12,
+    "y0": 0.5553,
+    "y1": 0.6118,
+    "registered": 310,
+    "voting": 293,
+    "valid": 283,
+    "abstaining": 17,
+    "null": 10,
+    "members": [
+     [
+      "Zeribi Nadir",
+      174
+     ],
+     [
+      "Mezghiche Bouzidi",
+      159
+     ]
+    ]
+   },
+   {
+    "code": 8,
+    "page": 12,
+    "y0": 0.6118,
+    "y1": 0.6664,
+    "registered": 198,
+    "voting": 196,
+    "valid": 184,
+    "abstaining": 2,
+    "null": 12,
+    "members": [
+     [
+      "Larabi Abdellah",
+      67
+     ],
+     [
+      "Abbad Larbi",
+      53
+     ]
+    ]
+   },
+   {
+    "code": 9,
+    "page": 12,
+    "y0": 0.6664,
+    "y1": 0.7209,
+    "registered": 296,
+    "voting": 267,
+    "valid": 246,
+    "abstaining": 29,
+    "null": 21,
+    "members": [
+     [
+      "Bouchekir Mohamed",
+      96
+     ],
+     [
+      "Kaid Salah",
+      83
+     ]
+    ]
+   },
+   {
+    "code": 10,
+    "page": 12,
+    "y0": 0.7209,
+    "y1": 0.7783,
+    "registered": 406,
+    "voting": 387,
+    "valid": 373,
+    "abstaining": 19,
+    "null": 14,
+    "members": [
+     [
+      "Khelifa Abdelkader",
+      127
+     ],
+     [
+      "Kamiri Mohammed",
+      101
+     ]
+    ]
+   },
+   {
+    "code": 11,
+    "page": 12,
+    "y0": 0.7783,
+    "y1": 0.8515,
+    "registered": 115,
+    "voting": 112,
+    "valid": 112,
+    "abstaining": 3,
+    "null": 0,
+    "members": [
+     [
+      "Immed Mustapha",
+      44
+     ],
+     [
+      "Benmessaoud Othmane",
+      30
+     ]
+    ]
+   },
+   {
+    "code": 12,
+    "page": 12,
+    "y0": 0.8515,
+    "y1": 0.9079,
+    "registered": 277,
+    "voting": 275,
+    "valid": 252,
+    "abstaining": 2,
+    "null": 23,
+    "members": [
+     [
+      "Boussahia Tounsi",
+      181
+     ],
+     [
+      "Tartare Ahmed",
+      160
+     ]
+    ]
+   },
+   {
+    "code": 13,
+    "page": 12,
+    "y0": 0.9079,
+    "y1": 0.973,
+    "registered": 488,
+    "voting": 478,
+    "valid": 443,
+    "abstaining": 10,
+    "null": 35,
+    "members": [
+     [
+      "Oucherif Miloud",
+      316
+     ],
+     [
+      "Gaouar Mounir",
+      215
+     ]
+    ]
+   },
+   {
+    "code": 14,
+    "page": 13,
+    "y0": 0.1575,
+    "y1": 0.2347,
+    "registered": 389,
+    "voting": 378,
+    "valid": 349,
+    "abstaining": 11,
+    "null": 29,
+    "members": [
+     [
+      "Belhadj Djamel Eddine",
+      138
+     ],
+     [
+      "Boutouiga Benhalima",
+      96
+     ]
+    ]
+   },
+   {
+    "code": 15,
+    "page": 13,
+    "y0": 0.2347,
+    "y1": 0.3126,
+    "registered": 622,
+    "voting": 569,
+    "valid": 548,
+    "abstaining": 53,
+    "null": 21,
+    "members": [
+     [
+      "Hamadache Abdelkader",
+      321
+     ],
+     [
+      "Si Mohamed Ouiza, épouse Chetti",
+      317
+     ]
+    ]
+   },
+   {
+    "code": 16,
+    "page": 13,
+    "y0": 0.3126,
+    "y1": 0.3588,
+    "registered": 730,
+    "voting": 662,
+    "valid": 589,
+    "abstaining": 68,
+    "null": 73,
+    "members": [
+     [
+      "Bekkar Lakhdar",
+      178
+     ],
+     [
+      "Douagui Habib",
+      141
+     ]
+    ]
+   },
+   {
+    "code": 17,
+    "page": 13,
+    "y0": 0.3588,
+    "y1": 0.4056,
+    "registered": 339,
+    "voting": 333,
+    "valid": 313,
+    "abstaining": 6,
+    "null": 20,
+    "members": [
+     [
+      "El Guizi Ali",
+      172
+     ],
+     [
+      "Bennadji Mohamed",
+      167
+     ]
+    ]
+   },
+   {
+    "code": 18,
+    "page": 13,
+    "y0": 0.4056,
+    "y1": 0.4676,
+    "registered": 293,
+    "voting": 285,
+    "valid": 280,
+    "abstaining": 8,
+    "null": 5,
+    "members": [
+     [
+      "Bouchâar Abdeslam",
+      134
+     ],
+     [
+      "Yahi Mohamed Kamel",
+      102
+     ]
+    ]
+   },
+   {
+    "code": 19,
+    "page": 13,
+    "y0": 0.4676,
+    "y1": 0.5448,
+    "registered": 579,
+    "voting": 557,
+    "valid": 529,
+    "abstaining": 22,
+    "null": 28,
+    "members": [
+     [
+      "Guenifi Salah Eddine",
+      345
+     ],
+     [
+      "Mezaâche Mohamed Lamine",
+      338
+     ]
+    ]
+   },
+   {
+    "code": 20,
+    "page": 13,
+    "y0": 0.5448,
+    "y1": 0.5913,
+    "registered": 169,
+    "voting": 166,
+    "valid": 152,
+    "abstaining": 3,
+    "null": 14,
+    "members": [
+     [
+      "Hafsi Noria",
+      74
+     ],
+     [
+      "Hamami Belkacem",
+      63
+     ]
+    ]
+   },
+   {
+    "code": 21,
+    "page": 13,
+    "y0": 0.5913,
+    "y1": 0.653,
+    "registered": 375,
+    "voting": 349,
+    "valid": 298,
+    "abstaining": 26,
+    "null": 51,
+    "members": [
+     [
+      "Kati Zouheir dit Mounir",
+      214
+     ],
+     [
+      "Bachiri Mustapha",
+      200
+     ]
+    ]
+   },
+   {
+    "code": 22,
+    "page": 13,
+    "y0": 0.653,
+    "y1": 0.7147,
+    "registered": 433,
+    "voting": 392,
+    "valid": 343,
+    "abstaining": 41,
+    "null": 49,
+    "members": [
+     [
+      "Bachir Bouidjra Nasredine",
+      144
+     ],
+     [
+      "Azzi Bentabet",
+      97
+     ]
+    ]
+   },
+   {
+    "code": 23,
+    "page": 13,
+    "y0": 0.7147,
+    "y1": 0.7609,
+    "registered": 171,
+    "voting": 152,
+    "valid": 144,
+    "abstaining": 19,
+    "null": 8,
+    "members": [
+     [
+      "Taleb Abdellah",
+      92
+     ],
+     [
+      "Temim Hamid",
+      84
+     ]
+    ]
+   },
+   {
+    "code": 24,
+    "page": 13,
+    "y0": 0.7609,
+    "y1": 0.8078,
+    "registered": 303,
+    "voting": 298,
+    "valid": 285,
+    "abstaining": 5,
+    "null": 13,
+    "members": [
+     [
+      "Ouarath Bougara",
+      120
+     ],
+     [
+      "Maifia Saïd",
+      102
+     ]
+    ]
+   },
+   {
+    "code": 25,
+    "page": 13,
+    "y0": 0.8078,
+    "y1": 0.854,
+    "registered": 181,
+    "voting": 176,
+    "valid": 165,
+    "abstaining": 5,
+    "null": 11,
+    "members": [
+     [
+      "Zermane Salim",
+      115
+     ],
+     [
+      "Bensari Mourad",
+      102
+     ]
+    ]
+   },
+   {
+    "code": 26,
+    "page": 13,
+    "y0": 0.854,
+    "y1": 0.9153,
+    "registered": 543,
+    "voting": 487,
+    "valid": 461,
+    "abstaining": 56,
+    "null": 26,
+    "members": [
+     [
+      "Benaidja Djelloul",
+      243
+     ],
+     [
+      "Chiker Said Mansour",
+      220
+     ]
+    ]
+   },
+   {
+    "code": 27,
+    "page": 13,
+    "y0": 0.9153,
+    "y1": 0.9805,
+    "registered": 323,
+    "voting": 319,
+    "valid": 287,
+    "abstaining": 4,
+    "null": 32,
+    "members": [
+     [
+      "Bouzouina Abdellah",
+      179
+     ],
+     [
+      "Tadjine Mohamed",
+      149
+     ]
+    ]
+   },
+   {
+    "code": 28,
+    "page": 14,
+    "y0": 0.1826,
+    "y1": 0.2605,
+    "registered": 424,
+    "voting": 417,
+    "valid": 383,
+    "abstaining": 7,
+    "null": 34,
+    "members": [
+     [
+      "Hadji Athmane",
+      274
+     ],
+     [
+      "Zerrouak Ahmed",
+      258
+     ]
+    ]
+   },
+   {
+    "code": 29,
+    "page": 14,
+    "y0": 0.2605,
+    "y1": 0.338,
+    "registered": 418,
+    "voting": 399,
+    "valid": 371,
+    "abstaining": 19,
+    "null": 28,
+    "members": [
+     [
+      "Zaoui Djillali",
+      302
+     ],
+     [
+      "Bouchentouf Senouci",
+      294
+     ]
+    ]
+   },
+   {
+    "code": 30,
+    "page": 14,
+    "y0": 0.338,
+    "y1": 0.3994,
+    "registered": 214,
+    "voting": 210,
+    "valid": 203,
+    "abstaining": 4,
+    "null": 7,
+    "members": [
+     [
+      "Benouaer Salim",
+      104
+     ],
+     [
+      "Khakha Mohamed",
+      63
+     ]
+    ]
+   },
+   {
+    "code": 31,
+    "page": 14,
+    "y0": 0.3994,
+    "y1": 0.4772,
+    "registered": 287,
+    "voting": 282,
+    "valid": 259,
+    "abstaining": 5,
+    "null": 23,
+    "members": [
+     [
+      "Hamdadou Mokhtar",
+      190
+     ],
+     [
+      "Soumeur Abdelkader",
+      174
+     ]
+    ]
+   },
+   {
+    "code": 32,
+    "page": 14,
+    "y0": 0.4772,
+    "y1": 0.5544,
+    "registered": 199,
+    "voting": 183,
+    "valid": 174,
+    "abstaining": 16,
+    "null": 9,
+    "members": [
+     [
+      "Gueniber Djillali",
+      148
+     ],
+     [
+      "Djidel Ben Eddine",
+      142
+     ]
+    ]
+   },
+   {
+    "code": 33,
+    "page": 14,
+    "y0": 0.5544,
+    "y1": 0.6245,
+    "registered": 77,
+    "voting": 75,
+    "valid": 75,
+    "abstaining": 2,
+    "null": 0,
+    "members": [
+     [
+      "Madhoui Ahmida",
+      28
+     ],
+     [
+      "Bouchikhi Mehani",
+      27
+     ]
+    ]
+   },
+   {
+    "code": 34,
+    "page": 14,
+    "y0": 0.6245,
+    "y1": 0.7085,
+    "registered": 317,
+    "voting": 292,
+    "valid": 285,
+    "abstaining": 25,
+    "null": 7,
+    "members": [
+     [
+      "Zouaoui Amar",
+      181
+     ],
+     [
+      "Boudache Nacer",
+      176
+     ]
+    ]
+   },
+   {
+    "code": 35,
+    "page": 14,
+    "y0": 0.7085,
+    "y1": 0.7702,
+    "registered": 319,
+    "voting": 285,
+    "valid": 260,
+    "abstaining": 34,
+    "null": 25,
+    "members": [
+     [
+      "Gouri Abdelaziz",
+      109
+     ],
+     [
+      "Laouira Abdelhafid",
+      102
+     ]
+    ]
+   },
+   {
+    "code": 36,
+    "page": 14,
+    "y0": 0.7702,
+    "y1": 0.8322,
+    "registered": 233,
+    "voting": 189,
+    "valid": 178,
+    "abstaining": 44,
+    "null": 11,
+    "members": [
+     [
+      "Djermoune Mohamed",
+      129
+     ],
+     [
+      "Djeffal Hocine",
+      128
+     ]
+    ]
+   },
+   {
+    "code": 37,
+    "page": 14,
+    "y0": 0.8322,
+    "y1": 0.8921,
+    "registered": 51,
+    "voting": 51,
+    "valid": 47,
+    "abstaining": 0,
+    "null": 4,
+    "members": [
+     [
+      "Tahar Ali",
+      23
+     ],
+     [
+      "Beya Saïd",
+      13
+     ]
+    ]
+   },
+   {
+    "code": 38,
+    "page": 14,
+    "y0": 0.8921,
+    "y1": 0.9572,
+    "registered": 209,
+    "voting": 207,
+    "valid": 197,
+    "abstaining": 2,
+    "null": 10,
+    "members": [
+     [
+      "Meriane Omar",
+      168
+     ],
+     [
+      "Mesbah Djillali",
+      164
+     ]
+    ]
+   },
+   {
+    "code": 39,
+    "page": 15,
+    "y0": 0.1812,
+    "y1": 0.2418,
+    "registered": 289,
+    "voting": 284,
+    "valid": 273,
+    "abstaining": 5,
+    "null": 11,
+    "members": [
+     [
+      "Tidjani Abdelmalek",
+      139
+     ],
+     [
+      "Brahmi Youcef",
+      98
+     ]
+    ]
+   },
+   {
+    "code": 40,
+    "page": 15,
+    "y0": 0.2418,
+    "y1": 0.3173,
+    "registered": 202,
+    "voting": 201,
+    "valid": 193,
+    "abstaining": 1,
+    "null": 8,
+    "members": [
+     [
+      "Kellil Tahar",
+      129
+     ],
+     [
+      "Benali Chérif Noureddine",
+      109
+     ]
+    ]
+   },
+   {
+    "code": 41,
+    "page": 15,
+    "y0": 0.3173,
+    "y1": 0.3782,
+    "registered": 241,
+    "voting": 240,
+    "valid": 230,
+    "abstaining": 1,
+    "null": 10,
+    "members": [
+     [
+      "Gouasmia Mansour",
+      140
+     ],
+     [
+      "Abid Rachid",
+      136
+     ]
+    ]
+   },
+   {
+    "code": 42,
+    "page": 15,
+    "y0": 0.3782,
+    "y1": 0.4388,
+    "registered": 275,
+    "voting": 255,
+    "valid": 241,
+    "abstaining": 20,
+    "null": 14,
+    "members": [
+     [
+      "Khouider Tahar",
+      155
+     ],
+     [
+      "Driouèche Mustapha",
+      146
+     ]
+    ]
+   },
+   {
+    "code": 43,
+    "page": 15,
+    "y0": 0.4388,
+    "y1": 0.4979,
+    "registered": 317,
+    "voting": 291,
+    "valid": 264,
+    "abstaining": 26,
+    "null": 27,
+    "members": [
+     [
+      "Benalia Mohamed",
+      135
+     ],
+     [
+      "Boughaba Omar",
+      129
+     ]
+    ]
+   },
+   {
+    "code": 44,
+    "page": 15,
+    "y0": 0.4979,
+    "y1": 0.5733,
+    "registered": 355,
+    "voting": 345,
+    "valid": 319,
+    "abstaining": 10,
+    "null": 26,
+    "members": [
+     [
+      "Bensmaili Mohamed",
+      195
+     ],
+     [
+      "Bouzar-Kouadri Mohamed",
+      131
+     ]
+    ]
+   },
+   {
+    "code": 45,
+    "page": 15,
+    "y0": 0.5733,
+    "y1": 0.6336,
+    "registered": 127,
+    "voting": 126,
+    "valid": 122,
+    "abstaining": 1,
+    "null": 4,
+    "members": [
+     [
+      "Zellati Boudjemaâ",
+      47
+     ],
+     [
+      "Saidi Kaddour",
+      38
+     ]
+    ]
+   },
+   {
+    "code": 46,
+    "page": 15,
+    "y0": 0.6336,
+    "y1": 0.6785,
+    "registered": 257,
+    "voting": 252,
+    "valid": 245,
+    "abstaining": 5,
+    "null": 7,
+    "members": [
+     [
+      "Tahar Mohamed",
+      103
+     ],
+     [
+      "Maarouf Mohamed",
+      55
+     ]
+    ]
+   },
+   {
+    "code": 47,
+    "page": 15,
+    "y0": 0.6785,
+    "y1": 0.7382,
+    "registered": 152,
+    "voting": 146,
+    "valid": 139,
+    "abstaining": 6,
+    "null": 7,
+    "members": [
+     [
+      "Tarbagou Ahmed",
+      99
+     ],
+     [
+      "Hani Bakir",
+      97
+     ]
+    ]
+   },
+   {
+    "code": 48,
+    "page": 15,
+    "y0": 0.7382,
+    "y1": 0.8018,
+    "registered": 367,
+    "voting": 367,
+    "valid": 285,
+    "abstaining": 0,
+    "null": 82,
+    "members": [
+     [
+      "Benhadj Djelloul Abderrahmane",
+      267
+     ],
+     [
+      "Chadli Assia",
+      257
+     ]
+    ]
+   }
+  ]
+ },
+ "2000": {
+  "day": "2000-12-30",
+  "file": "https://www.joradp.dz/FTP/jo-francais/2001/F2001004.pdf",
+  "proclamation": "Proclamation n° 01-P-CC-01 of 1 January 2001 (Journal officiel n° 4 of 14 January 2001, pages 5 and 6)",
+  "pages": {
+   "5": {
+    "width": 2400,
+    "height": 3375
+   },
+   "6": {
+    "width": 2400,
+    "height": 3375
+   }
+  },
+  "printed": {
+   "registered": 14939,
+   "voting": 13801,
+   "abstaining": 1138,
+   "valid": 12712,
+   "null": 1089
+  },
+  "rows": [
+   {
+    "code": 1,
+    "page": 5,
+    "y0": 0.1799,
+    "y1": 0.2142,
+    "registered": 245,
+    "voting": 239,
+    "valid": 234,
+    "abstaining": 6,
+    "null": 5,
+    "members": [
+     [
+      "Bekri Bekri",
+      89
+     ]
+    ]
+   },
+   {
+    "code": 2,
+    "page": 5,
+    "y0": 0.2142,
+    "y1": 0.2596,
+    "registered": 378,
+    "voting": 366,
+    "valid": 341,
+    "abstaining": 12,
+    "null": 25,
+    "members": [
+     [
+      "Boucherour Ahmed dit Merouan",
+      107
+     ]
+    ]
+   },
+   {
+    "code": 3,
+    "page": 5,
+    "y0": 0.2596,
+    "y1": 0.2892,
+    "registered": 217,
+    "voting": 213,
+    "valid": 204,
+    "abstaining": 4,
+    "null": 9,
+    "members": [
+     [
+      "Kaddari Benharzellah",
+      44
+     ]
+    ]
+   },
+   {
+    "code": 4,
+    "page": 5,
+    "y0": 0.2892,
+    "y1": 0.3173,
+    "registered": 269,
+    "voting": 262,
+    "valid": 245,
+    "abstaining": 7,
+    "null": 17,
+    "members": [
+     [
+      "Nedjaoum Mahmoud",
+      92
+     ]
+    ]
+   },
+   {
+    "code": 5,
+    "page": 5,
+    "y0": 0.3173,
+    "y1": 0.3496,
+    "registered": 526,
+    "voting": 463,
+    "valid": 436,
+    "abstaining": 63,
+    "null": 27,
+    "members": [
+     [
+      "Rouabah Abdelhakim",
+      274
+     ]
+    ]
+   },
+   {
+    "code": 6,
+    "page": 5,
+    "y0": 0.3496,
+    "y1": 0.3781,
+    "registered": 489,
+    "voting": 417,
+    "valid": 389,
+    "abstaining": 72,
+    "null": 28,
+    "members": [
+     [
+      "Mammeri Djoudi",
+      189
+     ]
+    ]
+   },
+   {
+    "code": 7,
+    "page": 5,
+    "y0": 0.3781,
+    "y1": 0.4222,
+    "registered": 310,
+    "voting": 300,
+    "valid": 290,
+    "abstaining": 10,
+    "null": 10,
+    "members": [
+     [
+      "Boucetta Ramdane Azzeddine",
+      155
+     ]
+    ]
+   },
+   {
+    "code": 8,
+    "page": 5,
+    "y0": 0.4222,
+    "y1": 0.4516,
+    "registered": 198,
+    "voting": 194,
+    "valid": 176,
+    "abstaining": 4,
+    "null": 18,
+    "members": [
+     [
+      "Belmadani Madani",
+      49
+     ]
+    ]
+   },
+   {
+    "code": 9,
+    "page": 5,
+    "y0": 0.4516,
+    "y1": 0.4815,
+    "registered": 291,
+    "voting": 271,
+    "valid": 244,
+    "abstaining": 20,
+    "null": 27,
+    "members": [
+     [
+      "Boutelhik Salah",
+      147
+     ]
+    ]
+   },
+   {
+    "code": 10,
+    "page": 5,
+    "y0": 0.4815,
+    "y1": 0.5111,
+    "registered": 406,
+    "voting": 368,
+    "valid": 351,
+    "abstaining": 38,
+    "null": 17,
+    "members": [
+     [
+      "Merabti Mohamed",
+      165
+     ]
+    ]
+   },
+   {
+    "code": 11,
+    "page": 5,
+    "y0": 0.5111,
+    "y1": 0.5407,
+    "registered": 115,
+    "voting": 107,
+    "valid": 102,
+    "abstaining": 8,
+    "null": 5,
+    "members": [
+     [
+      "Afarouak Afelkane",
+      36
+     ]
+    ]
+   },
+   {
+    "code": 12,
+    "page": 5,
+    "y0": 0.5407,
+    "y1": 0.5701,
+    "registered": 277,
+    "voting": 273,
+    "valid": 229,
+    "abstaining": 4,
+    "null": 44,
+    "members": [
+     [
+      "Boudiar Mohamed",
+      120
+     ]
+    ]
+   },
+   {
+    "code": 13,
+    "page": 5,
+    "y0": 0.5701,
+    "y1": 0.5994,
+    "registered": 488,
+    "voting": 444,
+    "valid": 397,
+    "abstaining": 44,
+    "null": 47,
+    "members": [
+     [
+      "Benselama Mohammed",
+      101
+     ]
+    ]
+   },
+   {
+    "code": 14,
+    "page": 5,
+    "y0": 0.5994,
+    "y1": 0.6276,
+    "registered": 389,
+    "voting": 366,
+    "valid": 321,
+    "abstaining": 23,
+    "null": 45,
+    "members": [
+     [
+      "Khiar Mostéfa",
+      144
+     ]
+    ]
+   },
+   {
+    "code": 15,
+    "page": 5,
+    "y0": 0.6276,
+    "y1": 0.6587,
+    "registered": 622,
+    "voting": 541,
+    "valid": 524,
+    "abstaining": 81,
+    "null": 17,
+    "members": [
+     [
+      "Aït Ahmed Ahmed",
+      260
+     ]
+    ]
+   },
+   {
+    "code": 16,
+    "page": 5,
+    "y0": 0.6587,
+    "y1": 0.6886,
+    "registered": 730,
+    "voting": 620,
+    "valid": 563,
+    "abstaining": 110,
+    "null": 57,
+    "members": [
+     [
+      "Chihab Seddik",
+      287
+     ]
+    ]
+   },
+   {
+    "code": 17,
+    "page": 5,
+    "y0": 0.6886,
+    "y1": 0.7191,
+    "registered": 339,
+    "voting": 320,
+    "valid": 299,
+    "abstaining": 19,
+    "null": 21,
+    "members": [
+     [
+      "Harizi Mohamed",
+      153
+     ]
+    ]
+   },
+   {
+    "code": 18,
+    "page": 5,
+    "y0": 0.7191,
+    "y1": 0.7461,
+    "registered": 293,
+    "voting": 273,
+    "valid": 262,
+    "abstaining": 20,
+    "null": 11,
+    "members": [
+     [
+      "Karaoui Rabah",
+      148
+     ]
+    ]
+   },
+   {
+    "code": 19,
+    "page": 5,
+    "y0": 0.7461,
+    "y1": 0.7784,
+    "registered": 579,
+    "voting": 513,
+    "valid": 488,
+    "abstaining": 66,
+    "null": 25,
+    "members": [
+     [
+      "Bouilfane Omar",
+      295
+     ]
+    ]
+   },
+   {
+    "code": 20,
+    "page": 5,
+    "y0": 0.7784,
+    "y1": 0.8071,
+    "registered": 169,
+    "voting": 167,
+    "valid": 158,
+    "abstaining": 2,
+    "null": 9,
+    "members": [
+     [
+      "Djellouli Mohamed",
+      42
+     ]
+    ]
+   },
+   {
+    "code": 21,
+    "page": 5,
+    "y0": 0.8071,
+    "y1": 0.8347,
+    "registered": 371,
+    "voting": 314,
+    "valid": 260,
+    "abstaining": 57,
+    "null": 54,
+    "members": [
+     [
+      "Oudina Mohamed",
+      179
+     ]
+    ]
+   },
+   {
+    "code": 22,
+    "page": 5,
+    "y0": 0.8347,
+    "y1": 0.8673,
+    "registered": 433,
+    "voting": 412,
+    "valid": 360,
+    "abstaining": 21,
+    "null": 52,
+    "members": [
+     [
+      "Lebid Boualem",
+      113
+     ]
+    ]
+   },
+   {
+    "code": 23,
+    "page": 5,
+    "y0": 0.8673,
+    "y1": 0.8969,
+    "registered": 171,
+    "voting": 163,
+    "valid": 161,
+    "abstaining": 8,
+    "null": 2,
+    "members": [
+     [
+      "Amir Mohamed",
+      89
+     ]
+    ]
+   },
+   {
+    "code": 24,
+    "page": 5,
+    "y0": 0.8969,
+    "y1": 0.9265,
+    "registered": 303,
+    "voting": 277,
+    "valid": 261,
+    "abstaining": 26,
+    "null": 16,
+    "members": [
+     [
+      "Bounefla Hacène",
+      122
+     ]
+    ]
+   },
+   {
+    "code": 25,
+    "page": 5,
+    "y0": 0.9265,
+    "y1": 0.9644,
+    "registered": 181,
+    "voting": 171,
+    "valid": 166,
+    "abstaining": 10,
+    "null": 5,
+    "members": [
+     [
+      "Belhadj Mostéfa Mourad",
+      64
+     ]
+    ]
+   },
+   {
+    "code": 26,
+    "page": 6,
+    "y0": 0.1502,
+    "y1": 0.1787,
+    "registered": 533,
+    "voting": 461,
+    "valid": 407,
+    "abstaining": 72,
+    "null": 54,
+    "members": [
+     [
+      "Douihasni Mohamed",
+      212
+     ]
+    ]
+   },
+   {
+    "code": 27,
+    "page": 6,
+    "y0": 0.1787,
+    "y1": 0.1994,
+    "registered": 323,
+    "voting": 310,
+    "valid": 280,
+    "abstaining": 13,
+    "null": 30,
+    "members": [
+     [
+      "Benrached Mansour",
+      144
+     ]
+    ]
+   },
+   {
+    "code": 28,
+    "page": 6,
+    "y0": 0.1994,
+    "y1": 0.2364,
+    "registered": 412,
+    "voting": 409,
+    "valid": 386,
+    "abstaining": 3,
+    "null": 23,
+    "members": [
+     [
+      "Bendakmousse Mohamed Belkacem",
+      121
+     ]
+    ]
+   },
+   {
+    "code": 29,
+    "page": 6,
+    "y0": 0.2364,
+    "y1": 0.2661,
+    "registered": 418,
+    "voting": 398,
+    "valid": 352,
+    "abstaining": 20,
+    "null": 46,
+    "members": [
+     [
+      "Moumen Omar Saïd",
+      181
+     ]
+    ]
+   },
+   {
+    "code": 30,
+    "page": 6,
+    "y0": 0.2661,
+    "y1": 0.2883,
+    "registered": 213,
+    "voting": 208,
+    "valid": 197,
+    "abstaining": 5,
+    "null": 11,
+    "members": [
+     [
+      "Belhadj Miloud",
+      68
+     ]
+    ]
+   },
+   {
+    "code": 31,
+    "page": 6,
+    "y0": 0.2883,
+    "y1": 0.3117,
+    "registered": 280,
+    "voting": 259,
+    "valid": 235,
+    "abstaining": 21,
+    "null": 24,
+    "members": [
+     [
+      "Dine Bendjebara",
+      155
+     ]
+    ]
+   },
+   {
+    "code": 32,
+    "page": 6,
+    "y0": 0.3117,
+    "y1": 0.3339,
+    "registered": 199,
+    "voting": 193,
+    "valid": 174,
+    "abstaining": 6,
+    "null": 19,
+    "members": [
+     [
+      "Bouazza Bouhafs",
+      65
+     ]
+    ]
+   },
+   {
+    "code": 33,
+    "page": 6,
+    "y0": 0.3339,
+    "y1": 0.3561,
+    "registered": 77,
+    "voting": 71,
+    "valid": 70,
+    "abstaining": 6,
+    "null": 1,
+    "members": [
+     [
+      "Benabderahmane Brahim",
+      17
+     ]
+    ]
+   },
+   {
+    "code": 34,
+    "page": 6,
+    "y0": 0.3561,
+    "y1": 0.3796,
+    "registered": 317,
+    "voting": 296,
+    "valid": 263,
+    "abstaining": 21,
+    "null": 33,
+    "members": [
+     [
+      "Sahed Messaoud",
+      160
+     ]
+    ]
+   },
+   {
+    "code": 35,
+    "page": 6,
+    "y0": 0.3796,
+    "y1": 0.3994,
+    "registered": 319,
+    "voting": 282,
+    "valid": 269,
+    "abstaining": 37,
+    "null": 13,
+    "members": [
+     [
+      "Draoui Mohamed",
+      129
+     ]
+    ]
+   },
+   {
+    "code": 36,
+    "page": 6,
+    "y0": 0.3994,
+    "y1": 0.4228,
+    "registered": 231,
+    "voting": 222,
+    "valid": 215,
+    "abstaining": 9,
+    "null": 7,
+    "members": [
+     [
+      "Gouacem Ali",
+      122
+     ]
+    ]
+   },
+   {
+    "code": 37,
+    "page": 6,
+    "y0": 0.4228,
+    "y1": 0.445,
+    "registered": 51,
+    "voting": 51,
+    "valid": 51,
+    "abstaining": 0,
+    "null": 0,
+    "members": [
+     [
+      "Abiri Mohamed Nouh",
+      24
+     ]
+    ]
+   },
+   {
+    "code": 38,
+    "page": 6,
+    "y0": 0.445,
+    "y1": 0.4673,
+    "registered": 208,
+    "voting": 203,
+    "valid": 185,
+    "abstaining": 5,
+    "null": 18,
+    "members": [
+     [
+      "Gazouz M'Hamed",
+      102
+     ]
+    ]
+   },
+   {
+    "code": 39,
+    "page": 6,
+    "y0": 0.4673,
+    "y1": 0.4892,
+    "registered": 289,
+    "voting": 277,
+    "valid": 263,
+    "abstaining": 12,
+    "null": 14,
+    "members": [
+     [
+      "Benmoussa Ahmed",
+      68
+     ]
+    ]
+   },
+   {
+    "code": 40,
+    "page": 6,
+    "y0": 0.4892,
+    "y1": 0.5114,
+    "registered": 200,
+    "voting": 195,
+    "valid": 175,
+    "abstaining": 5,
+    "null": 20,
+    "members": [
+     [
+      "Attia Belkacem",
+      56
+     ]
+    ]
+   },
+   {
+    "code": 41,
+    "page": 6,
+    "y0": 0.5114,
+    "y1": 0.5336,
+    "registered": 236,
+    "voting": 233,
+    "valid": 227,
+    "abstaining": 3,
+    "null": 6,
+    "members": [
+     [
+      "Lahouasnia Abdenacer",
+      80
+     ]
+    ]
+   },
+   {
+    "code": 42,
+    "page": 6,
+    "y0": 0.5336,
+    "y1": 0.5559,
+    "registered": 275,
+    "voting": 257,
+    "valid": 218,
+    "abstaining": 18,
+    "null": 39,
+    "members": [
+     [
+      "Matlou Taieb",
+      143
+     ]
+    ]
+   },
+   {
+    "code": 43,
+    "page": 6,
+    "y0": 0.5559,
+    "y1": 0.5781,
+    "registered": 317,
+    "voting": 291,
+    "valid": 279,
+    "abstaining": 26,
+    "null": 12,
+    "members": [
+     [
+      "Kourtel Bahi",
+      105
+     ]
+    ]
+   },
+   {
+    "code": 44,
+    "page": 6,
+    "y0": 0.5781,
+    "y1": 0.5991,
+    "registered": 355,
+    "voting": 332,
+    "valid": 289,
+    "abstaining": 23,
+    "null": 43,
+    "members": [
+     [
+      "Benrokia Missoum",
+      82
+     ]
+    ]
+   },
+   {
+    "code": 45,
+    "page": 6,
+    "y0": 0.5991,
+    "y1": 0.6222,
+    "registered": 127,
+    "voting": 123,
+    "valid": 114,
+    "abstaining": 4,
+    "null": 9,
+    "members": [
+     [
+      "Mahmoudi Lakhdar",
+      24
+     ]
+    ]
+   },
+   {
+    "code": 46,
+    "page": 6,
+    "y0": 0.6222,
+    "y1": 0.6456,
+    "registered": 257,
+    "voting": 248,
+    "valid": 220,
+    "abstaining": 9,
+    "null": 28,
+    "members": [
+     [
+      "Bendouma Ahmed",
+      92
+     ]
+    ]
+   },
+   {
+    "code": 47,
+    "page": 6,
+    "y0": 0.6456,
+    "y1": 0.667,
+    "registered": 152,
+    "voting": 140,
+    "valid": 126,
+    "abstaining": 12,
+    "null": 14,
+    "members": [
+     [
+      "Boughalaba Moussa",
+      51
+     ]
+    ]
+   },
+   {
+    "code": 48,
+    "page": 6,
+    "y0": 0.667,
+    "y1": 0.6895,
+    "registered": 361,
+    "voting": 288,
+    "valid": 256,
+    "abstaining": 73,
+    "null": 32,
+    "members": [
+     [
+      "Hadj Slimane Abed",
+      155
+     ]
+    ]
+   }
+  ]
+ }
+}
