@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -12,11 +13,12 @@ from ea.sources.br import tse_early
 from ea.store import DATA, connect
 
 SOURCE = "br.match"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 YOUNGEST = 21
 OLDEST = 75
 REDEMOCRATIZATION = 1982
+CONSECUTIVE = 12
 STATEWIDE = ("br.tse_history", "br.tse")
 SPELLED = {"juscelino-kubistcheck-de-oliveira": "juscelino-kubitschek-de-oliveira"}
 NAMESAKES = {
@@ -114,6 +116,53 @@ def _items() -> tuple[dict[str, list[tuple[str, str | None, int, int]]], dict[st
         for row in _bindings(LABELS, top):
             called[tse_early.slug(row["name"])].add(row["item"].rsplit("/", 1)[1])
     return held, born, called
+
+
+def cross_state(
+    careers: list[tuple[str, str, int, int, int, set[str], set[str]]],
+    births: dict[str, set[int]],
+    items: dict[str, set[str]],
+) -> dict[str, str]:
+    """Join persons who share a full name across states when the name is unique nationwide among plausible ages.
+
+    Each career is (person, name slug, first year, last year, candidacies, parties at the first race, parties at the
+    last race). A name's persons merge only when, ordered by first year, each career ends before the next begins, every
+    neighboring pair shares a Wikidata item or, within CONSECUTIVE years, a party between the earlier person's last
+    race and the later person's first, and no two persons hold different items or different birth years. A shared
+    item bridges any gap, such as an exile under the military regime. A name with any other plausible namesake, or
+    any pair that fails, is left apart.
+    """
+    by_name: dict[str, list[tuple[str, str, int, int, int, set[str], set[str]]]] = defaultdict(list)
+    for career in careers:
+        by_name[career[1]].append(career)
+    merges: dict[str, str] = {}
+    for group in by_name.values():
+        anchor = min(career[2] for career in group)
+        group = [
+            career for career in group if all(YOUNGEST <= anchor - born <= OLDEST for born in births.get(career[0], ()))
+        ]
+        if len(group) < 2:
+            continue
+        group.sort(key=lambda career: (career[2], career[3]))
+        people = [career[0] for career in group]
+        if any(before[3] >= after[2] for before, after in pairwise(group)):
+            continue
+        held = [items.get(person, set()) for person in people]
+        if any(a and b and not a & b for i, a in enumerate(held) for b in held[i + 1 :]):
+            continue
+        known = [births[person] for person in people if births.get(person)]
+        if any(not a & b for i, a in enumerate(known) for b in known[i + 1 :]):
+            continue
+        if not all(
+            held[i] & held[i + 1] or (before[6] & after[5] and after[2] - before[3] <= CONSECUTIVE)
+            for i, (before, after) in enumerate(pairwise(group))
+        ):
+            continue
+        survivor = min(group, key=lambda career: (not items.get(career[0]), -career[4], career[0]))[0]
+        for person in people:
+            if person != survivor:
+                merges[person] = survivor
+    return merges
 
 
 def emit() -> Path:
@@ -233,16 +282,6 @@ def emit() -> Path:
             f"{early_people['root'].n_unique()} early people, {pairs['root'].n_unique()} with a later namesake "
             f"in their state, {chosen['root'].n_unique()} matched to {chosen['later'].n_unique()} later people"
         )
-        held, born, called = _items()
-        taken = {
-            value: root(entity)
-            for value, entity in conn.execute(
-                "select value, entity_id::text from external_id where scheme = 'wikidata'"
-            ).fetchall()
-        }
-        holding = defaultdict(set)
-        for value, entity in taken.items():
-            holding[entity].add(value)
         survivors = dict(chosen.select("root", "later").iter_rows())
         keyed = conn.execute(
             "select value, entity_id::text from external_id where scheme = %s", [f"{tse_early.SOURCE}.person"]
@@ -259,12 +298,23 @@ def emit() -> Path:
             survivor = min(group, key=lambda person: (person not in returning, person))
             for person in group - {survivor}:
                 survivors[person] = survivor
-        for person, survivor in list(survivors.items()):
-            if survivor in survivors:
-                survivors[person] = survivors[survivor]
-        birth_years = {
-            person: {day.year for day in days} for person, days in births.iter_rows() if person in survivors.values()
+
+        def settle() -> None:
+            for person in list(survivors):
+                while survivors[person] in survivors:
+                    survivors[person] = survivors[survivors[person]]
+
+        settle()
+        held, born, called = _items()
+        taken = {
+            value: root(entity)
+            for value, entity in conn.execute(
+                "select value, entity_id::text from external_id where scheme = 'wikidata'"
+            ).fetchall()
         }
+        holding = defaultdict(set)
+        for value, entity in taken.items():
+            holding[entity].add(value)
         wins = early.filter(pl.col("elected")).with_columns(office=pl.col("key").str.split(":").list.get(1))
         spellings = pl.concat(
             [
@@ -275,31 +325,84 @@ def emit() -> Path:
         terms_of: dict[str, list[tuple[str, str, int]]] = defaultdict(list)
         for person, office, uf, year in wins.select("root", "office", "uf", "year").unique().iter_rows():
             terms_of[person].append((office, uf, year))
-        claims: dict[str, set[str]] = defaultdict(set)
-        for person, slugs in (
-            spellings.join(wins.select("root").unique(), on="root").group_by("root").agg("slug").iter_rows()
-        ):
-            terms = terms_of[person]
-            first = min(year for _, _, year in terms)
-            survivor = survivors.get(person, person)
-            found = {
-                item
-                for slug in slugs
-                for item in called.get(slug, ())
-                if any(
-                    office == kind and where in (None, uf) and start <= year + POSITIONS[office][1] and end >= year + 1
-                    for office, uf, year in terms
-                    for kind, where, start, end in held.get(item, ())
-                )
-                and all(first - born_in >= YOUNGEST - 3 for born_in in born.get(item, ()))
-                and (not born.get(item) or not birth_years.get(survivor) or born[item] & birth_years[survivor])
+        slugs_of = {
+            person: slugs
+            for person, slugs in spellings.join(wins.select("root").unique(), on="root")
+            .group_by("root")
+            .agg("slug")
+            .iter_rows()
+        }
+
+        def claim() -> dict[str, set[str]]:
+            birth_years = {
+                person: {day.year for day in days}
+                for person, days in births.iter_rows()
+                if person in survivors.values() or person in survivors
             }
-            if len(found) == 1:
-                claims[found.pop()].add(survivor)
+            found_by: dict[str, set[str]] = defaultdict(set)
+            for person, slugs in slugs_of.items():
+                terms = terms_of[person]
+                first = min(year for _, _, year in terms)
+                survivor = survivors.get(person, person)
+                found = {
+                    item
+                    for slug in slugs
+                    for item in called.get(slug, ())
+                    if any(
+                        office == kind
+                        and where in (None, uf)
+                        and start <= year + POSITIONS[office][1]
+                        and end >= year + 1
+                        for office, uf, year in terms
+                        for kind, where, start, end in held.get(item, ())
+                    )
+                    and all(first - born_in >= YOUNGEST - 3 for born_in in born.get(item, ()))
+                    and (not born.get(item) or not birth_years.get(survivor) or born[item] & birth_years[survivor])
+                }
+                if len(found) == 1:
+                    found_by[found.pop()].add(survivor)
+            return found_by
+
+        everyone = candidacies.with_columns(
+            final=pl.col("root").map_elements(lambda person: survivors.get(person, person), return_dtype=pl.String)
+        )
+        careers = []
+        for person, slug, first, last, count, first_parties, last_parties in (
+            everyone.join(names.select("root", "slug").unique(), on="root")
+            .group_by("final", "slug")
+            .agg(
+                first=pl.col("year").min(),
+                last=pl.col("year").max(),
+                count=pl.len(),
+                first_parties=pl.col("party").filter(pl.col("year") == pl.col("year").min()).drop_nulls().unique(),
+                last_parties=pl.col("party").filter(pl.col("year") == pl.col("year").max()).drop_nulls().unique(),
+            )
+            .iter_rows()
+        ):
+            careers.append((person, slug, first, last, count, set(first_parties), set(last_parties)))
+        slug_people = defaultdict(set)
+        for person, slug, *_ in careers:
+            slug_people[slug].add(person)
+        careers = [career for career in careers if len(slug_people[career[1]]) > 1]
+        items_of: dict[str, set[str]] = defaultdict(set)
+        for item, entity in taken.items():
+            items_of[survivors.get(entity, entity)].add(item)
+        for item, people in claim().items():
+            for person in people:
+                items_of[person].add(item)
+        births_of = defaultdict(set)
+        for person, days in births.iter_rows():
+            births_of[survivors.get(person, person)] |= {day.year for day in days}
+        across = cross_state(careers, births_of, items_of)
+        survivors.update(across)
+        settle()
+        print(f"{len(across)} persons merged across states by a shared full name")
+        claims = claim()
+        holders = {survivors.get(entity, entity) for entity in holding}
         linked = {
             next(iter(people)): item
             for item, people in claims.items()
-            if len(people) == 1 and item not in taken and not holding.get(next(iter(people)))
+            if len(people) == 1 and item not in taken and next(iter(people)) not in holders
         }
         print(
             f"{wins['root'].n_unique()} early winners, {len(claims)} Wikidata items found, "
@@ -315,7 +418,9 @@ def emit() -> Path:
                 "in the same state, were 21 to 75 at the earlier person's first election, and are the only such "
                 "namesake, when they also share a party or a ballot name, or ran again by 1994, or both won; "
                 "presidential and vice-presidential candidates of 1945 to 1989 merged with the state candidates "
-                "who share their full name; "
+                "who share their full name; candidates who share a full name that no other candidate of a plausible "
+                "age bears, and whose careers in different states follow one another, merged when a Wikidata item "
+                "or a party links them; "
                 "winners of 1945 to 1990 linked to the Wikidata item whose label or alias is their full or ballot "
                 "name and that held the same office for the same state in that term"
             ),
