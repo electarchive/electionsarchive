@@ -1,0 +1,1628 @@
+{
+  "polity": "SB",
+  "name": "Solomon Islands",
+  "sources": {
+    "parl-about": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "About Parliament: historical timeline and basic facts",
+      "url": "https://parliament.gov.sb/about/parliament/"
+    },
+    "pga-1997": {
+      "kind": "official_body",
+      "publisher": "Ministry of Provincial Government and Institutional Strengthening",
+      "title": "The Provincial Government Act 1997 (No. 7 of 1997)",
+      "url": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html"
+    },
+    "pga-amend-2023": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "Provincial Government (Amendment) Act 2023",
+      "url": "https://parliament.gov.sb/business/acts/files/2023/Provincial%20Government%20(Amendment)%20Act%202023.pdf"
+    },
+    "hca-1999": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "The Honiara City Act 1999 (No. 2 of 1999)",
+      "url": "https://parliament.gov.sb/business/acts/files/1999/THE%20HONIARA%20CITY%20ACT%201999.pdf",
+      "note": "A scanned copy, read by OCR."
+    },
+    "hca-amend-2023": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "Honiara City (Amendment) Act 2023",
+      "url": "https://parliament.gov.sb/business/acts/files/2023/Honiara%20City%20(Amendment)%20Act%202023.pdf"
+    },
+    "pahcc-2023": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "Provincial Assemblies and Honiara City Council Electoral Act 2023 (No. 14 of 2023)",
+      "url": "https://parliament.gov.sb/business/acts/files/2023/Provincial%20Assemblies%20and%20Honiara%20City%20Council%20Electoral%20Act%202023.pdf"
+    },
+    "const-amend-2022": {
+      "kind": "official_body",
+      "publisher": "National Parliament of Solomon Islands",
+      "title": "Constitution (Amendment) Act 2022 (No. 6 of 2022)",
+      "url": "https://parliament.gov.sb/business/acts/files/2022/Constitution%20(Amendment)%20Act%202022.pdf"
+    },
+    "mpgis-about": {
+      "kind": "official_body",
+      "publisher": "Ministry of Provincial Government and Institutional Strengthening",
+      "title": "About Us",
+      "url": "https://www.mpgis.gov.sb/about-us.html"
+    },
+    "siec-boundaries": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Electoral Systems and Boundaries",
+      "url": "https://siec.gov.sb/elections/election-review/electoral-systems-and-boundaries/"
+    },
+    "siec-by": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "By-Elections",
+      "url": "https://siec.gov.sb/elections/election-review/by-elections/"
+    },
+    "siec-gaz70": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Extra-ordinary Gazette No. 70 of 30 April 2024: publication of 2024 national general election results",
+      "url": "https://siec.gov.sb/wp-content/uploads/2024/05/Gaz-No.-70-Tuesday-30th-April-2024.pdf"
+    },
+    "siec-gaz71": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Extra-ordinary Gazette No. 71 of 30 April 2024: publication of 2024 provincial assemblies election results",
+      "url": "https://siec.gov.sb/wp-content/uploads/2024/05/Gaz-No.-71-Tuesday-30th-April-2024.pdf"
+    },
+    "siec-gaz72": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Extra-ordinary Gazette No. 72 of 30 April 2024: publication of 2024 Honiara City Council election results",
+      "url": "https://siec.gov.sb/wp-content/uploads/2024/05/Gaz-No.-72-Tuesday-30th-April-2024.pdf"
+    },
+    "siec-booklet": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "2024 Joint Election Information Booklet",
+      "url": "https://siec.gov.sb/wp-content/uploads/2024/03/Joint-Election-info-Booklet-2024_Final_Compressed1.pdf"
+    },
+    "siec-plan": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "SIEC Strategic Plan 2024-2028",
+      "url": "https://siec.gov.sb/wp-content/uploads/2025/07/SIEC-2024-2028-Strategic-Plan-FINAL-20250705.pdf"
+    },
+    "siec-westguale-2025": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Recruitment notice: West Guadalcanal constituency by-election 2025",
+      "url": "https://siec.gov.sb/wp-content/uploads/2025/03/1.-West-Guadalcanal-Constituencuy-Recruitment_Notice_final_.pdf"
+    },
+    "siec-paripao-2025": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Recruitment notice: Paripao Ward provincial assembly by-election 2025",
+      "url": "https://siec.gov.sb/wp-content/uploads/2025/03/2.-Paripao-Ward-Recruitment-Notice_final-1.pdf"
+    },
+    "siec-koviloko-2026": {
+      "kind": "official_body",
+      "publisher": "Solomon Islands Electoral Commission",
+      "title": "Recruitment notice: Koviloko Ward provincial assembly by-election 2026",
+      "url": "https://siec.gov.sb/wp-content/uploads/2026/01/Koviloko-Ward-Recruitment_announcement_final.pdf"
+    },
+    "idx-1997": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "1997 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/1997-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-1998": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "1998 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/1998-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-1999": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "1999 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/1999-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2002": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2002 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2002-annual-index-of-gazette-and-legal-notices/"
+    },
+    "idx-2003": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2003 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2003-annual-index-of-gazette-and-legal-notices/"
+    },
+    "idx-2004": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2004 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2004-annual-index-of-gazette-and-legal-notices/"
+    },
+    "idx-2005": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2005 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2005-annual-index-of-gazette-and-legal-notices/"
+    },
+    "idx-2006": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2006 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2006-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2007": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2007 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2007-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2008": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2008 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2008-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2009": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2009 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2009-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2010": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2010 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2010-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2011": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2011 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2011-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2012": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2012 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2012-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2013": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2013 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2013-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2014": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2014 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2014-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2015": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2015 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2015-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2016": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2016 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2016-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2017": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2017 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2017-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2018": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2018 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2018-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2019": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2019 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2019-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2020": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2020 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2020-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2021": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2021 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2021-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2022": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2022 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2022-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2023": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2023 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2023-annual-index-to-gazette-and-legal-notices/"
+    },
+    "idx-2024": {
+      "kind": "official_body",
+      "publisher": "Attorney General's Chambers, Ministry of Justice and Legal Affairs, Solomon Islands Government",
+      "title": "2024 Annual Index to Gazette and Legal Notices",
+      "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2024-annual-index-to-gazette-and-legal-notices/"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Solomon Islands",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "parl-about"
+    },
+    {
+      "key": "constituency",
+      "name": "Electoral constituencies",
+      "parent": "national",
+      "scheme": "sb.constituency",
+      "source": "siec-boundaries",
+      "counts": [
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "value": 38,
+          "source": "parl-about",
+          "locator": "\"The Legislative Assembly had 38 members who were elected by Solomon Islanders.\""
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "value": 47,
+          "source": "parl-about",
+          "locator": "\"1994 - The number of seats increased from 38 to 47.\""
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "value": 50,
+          "source": "siec-boundaries",
+          "locator": "\"The most recent redrawing of constituency boundaries occurred in 1997 (increasing the number of constituencies from 47 to 50).\""
+        },
+        {
+          "date": "2024-04-17",
+          "value": 50,
+          "source": "siec-gaz70",
+          "locator": "\"the 50 returning officers of the 50 electoral constituencies in the Solomon Islands\""
+        }
+      ]
+    },
+    {
+      "key": "province",
+      "name": "Provinces",
+      "parent": "national",
+      "scheme": "sb.province",
+      "source": "pga-1997",
+      "counts": [
+        {
+          "date": "2018-09-04",
+          "value": 9,
+          "source": "mpgis-about",
+          "locator": "\"responsible for the administration of Solomon Islands' 9 provincial governments\""
+        },
+        {
+          "date": "2024-03-30",
+          "value": 9,
+          "source": "siec-booklet",
+          "locator": "\"the number of constituencies and wards for the nine (9) provinces and Honiara City Council\""
+        }
+      ]
+    },
+    {
+      "key": "ward",
+      "name": "Provincial electoral wards",
+      "parent": "province",
+      "scheme": "sb.ward",
+      "source": "pga-1997",
+      "counts": [
+        {
+          "date": "2024-03-30",
+          "value": 173,
+          "source": "siec-booklet",
+          "locator": "ward table, p.7: Central 13, Choiseul 16, Guadalcanal 21, Isabel 16, Makira-Ulawa 20, Malaita 33, Rennell-Bellona 10, Temotu 18, Western 26 (185 with Honiara's 12)"
+        },
+        {
+          "date": "2025-07-05",
+          "value": 173,
+          "source": "siec-plan",
+          "locator": "\"The members of Provincial Assemblies are directly elected from the 173 single-member wards.\""
+        }
+      ]
+    },
+    {
+      "key": "honiara",
+      "name": "Honiara City",
+      "parent": "national",
+      "source": "hca-1999",
+      "counts": [
+        {
+          "date": "2024-03-30",
+          "value": 1,
+          "source": "siec-booklet",
+          "locator": "\"the nine (9) provinces and Honiara City Council\""
+        }
+      ]
+    },
+    {
+      "key": "honiara_ward",
+      "name": "Honiara City Council wards",
+      "parent": "honiara",
+      "scheme": "sb.ward",
+      "source": "hca-1999",
+      "counts": [
+        {
+          "date": "2024-03-30",
+          "value": 12,
+          "source": "siec-booklet",
+          "locator": "ward table, p.7: \"Honiara City Council 3 12\""
+        },
+        {
+          "date": "2025-07-05",
+          "value": 12,
+          "source": "siec-plan",
+          "locator": "\"The elected members of the council are directly elected from the 12 single-member wards.\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "parliament",
+      "tier": "national",
+      "name": "General elections to the National Parliament",
+      "name_en": "National Parliament general elections (Legislative Assembly in 1976)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.constituency"
+        ]
+      },
+      "finest_note": "Each returning officer's gazetted notice gives one constituency's candidate votes, rejected votes, electors who voted, and registered electors; no polling-station figures are published.",
+      "valid_from": "1974-01-01",
+      "first_held": "1976-01-01",
+      "earliest_record": "1997-08-06",
+      "source": "parl-about",
+      "note": "First past the post in single-member constituencies: 38 from 1976, 47 from 1993, and 50 since 1997. The Legislative Assembly elected in 1976 became the National Parliament at independence on 7 July 1978, and the Parliament numbers it as the first; the 2024 Parliament is the twelfth. Parliament runs four years from its first sitting unless dissolved sooner (Constitution s.73); the Constitution (Amendment) Act 2022 suspended s.73(3) and dissolved the eleventh Parliament on 31 December 2023, and the 2024 election was the first held jointly with the provincial assembly and Honiara City Council elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SB",
+          "valid_from": "1974-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "siec-boundaries",
+          "locator": "https://siec.gov.sb/elections/election-review/electoral-systems-and-boundaries/ (\"The Parliamentary term is four years\")",
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Solomon Islands Electoral Commission, through the Solomon Islands Electoral Office and constituency returning officers"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Solomon Islands Electoral Commission, declared winners and extra-ordinary gazettes",
+          "url": "https://siec.gov.sb/elections/list-of-constituencies-and-winners/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-04-17",
+          "last_date": "2024-04-17",
+          "finest": "sb.constituency",
+          "source": "siec-gaz70",
+          "license": "Official publication; reuse terms are not stated",
+          "role": "administers",
+          "evidence": "Gazette No. 70 of 30 April 2024 holds each of the 50 returning officers' notices. SIEC hosts the gazetted results of the 2024 Joint Election only; earlier results were published in the Solomon Islands Gazette, which is listed in the Attorney General's annual indexes but not online."
+        },
+        {
+          "platform": "Solomon Islands Gazette (indexed by the Attorney General's Chambers)",
+          "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-17",
+          "first_date": "1997-08-06",
+          "source": "idx-2006",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "The indexes list the gazetted results of the general elections of 1997, 2001, 2006 (one notice per constituency), 2010, 2014, and 2019; the gazettes themselves are not online."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 38,
+          "seats": 38,
+          "source": "parl-about",
+          "quote": "1976, 2 January - Solomon Islands achieved internal self-government. The Legislative Assembly had 38 members who were elected by Solomon Islanders.",
+          "note": "The Legislative Assembly elected in 1976 became the first National Parliament at independence on 7 July 1978; the polling day is not quoted from a fetched official source."
+        },
+        {
+          "date": "1980-08-06",
+          "contests": 38,
+          "seats": 38,
+          "source": "parl-about",
+          "quote": "1994 - The number of seats increased from 38 to 47.",
+          "note": "One member per constituency; the count is the Parliament's own constituency total for those years, and the polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1984-10-24",
+          "contests": 38,
+          "seats": 38,
+          "source": "parl-about",
+          "quote": "1994 - The number of seats increased from 38 to 47.",
+          "note": "One member per constituency; the count is the Parliament's own constituency total for those years, and the polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1989-02-22",
+          "contests": 38,
+          "seats": 38,
+          "source": "parl-about",
+          "quote": "1994 - The number of seats increased from 38 to 47.",
+          "note": "One member per constituency; the count is the Parliament's own constituency total for those years, and the polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1993-05-26",
+          "contests": 47,
+          "seats": 47,
+          "source": "parl-about",
+          "quote": "1994 - The number of seats increased from 38 to 47.",
+          "note": "The Parliament dates the change from 38 to 47 seats to 1994, when the fifth Parliament (1994-1997 on its list of past Parliaments) met; it was elected with 47 seats. The polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1997-08-06",
+          "contests": 50,
+          "seats": 50,
+          "source": "siec-boundaries",
+          "quote": "The most recent redrawing of constituency boundaries occurred in 1997 (increasing the number of constituencies from 47 to 50).",
+          "note": "Results were gazetted on 12 September 1997 (Gazette 44, notices 165-166 in the 1997 index); the polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "2001-12-05",
+          "contests": 50,
+          "seats": 50,
+          "source": "siec-boundaries",
+          "quote": "The Solomon Islands Parliament consists of 50 members, directly elected from single-member constituencies",
+          "note": "Results were gazetted on 14 December 2001 (Gazette 64, notice 184 in the 2001 index); the polling date is not quoted from a fetched official source."
+        },
+        {
+          "date": "2006-04-05",
+          "contests": 50,
+          "seats": 50,
+          "source": "idx-2006",
+          "quote": "Proclamation | Appointing 5th April 2006 for National Parliament General Elections.",
+          "note": "The 2006 index lists a results notice for each of the 50 constituencies (Gazette 21 of 11 May 2006)."
+        },
+        {
+          "date": "2010-08-04",
+          "contests": 50,
+          "seats": 50,
+          "source": "idx-2010",
+          "quote": "Proclamation | Appointment of Wednesday 4th August 2010 to be the date for the holding of the General Election."
+        },
+        {
+          "date": "2014-11-19",
+          "contests": 50,
+          "seats": 50,
+          "source": "idx-2014",
+          "quote": "Proclamation | Appointment of Wednesday 19th November 2014 as date for the holding of National Parliament General Elections"
+        },
+        {
+          "date": "2019-04-03",
+          "contests": 50,
+          "seats": 50,
+          "source": "idx-2019",
+          "quote": "Proclamation | Appoints 3 April 2019 as date of the National Parliament General Election."
+        },
+        {
+          "date": "2024-04-17",
+          "contests": 50,
+          "seats": 50,
+          "source": "siec-gaz70",
+          "quote": "the full results of the elections held on 17 April 2024, received from the 50 returning officers of the 50 electoral constituencies in the Solomon Islands"
+        }
+      ],
+      "est_votes": 2800000,
+      "effort": 4
+    },
+    {
+      "key": "parliament_by",
+      "tier": "national",
+      "name": "By-elections to the National Parliament",
+      "name_en": "National Parliament by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.constituency"
+        ]
+      },
+      "valid_from": "1974-01-01",
+      "source": "siec-by",
+      "note": "A vacant seat is filled at a by-election called by the Governor-General's proclamation once the Electoral Commission notifies the vacancy.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SB",
+          "valid_from": "1974-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "siec-by",
+          "called": true,
+          "administered_by": "Solomon Islands Electoral Commission",
+          "vacancy_rule": "The law requires the Governor-General to issue a proclamation calling a by-election after the Electoral Commission notifies the vacancy."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Solomon Islands Gazette (indexed by the Attorney General's Chambers)",
+          "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-17",
+          "first_date": "2003-11-21",
+          "source": "idx-2019",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "By-election results are gazetted under the electoral law; the indexes list them from 2003, and SIEC does not host them."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "through": "1996-12-31",
+          "note": "By-elections before 1997 are not yet counted: the Attorney General's gazette indexes begin in 1996 and list none for the National Parliament before 2003."
+        },
+        {
+          "date": "2003-11-21",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2003",
+          "quote": "Notification of Results for South Guadalcanal Constituency | Election held on 21 November 2003"
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2005",
+          "quote": "Notification of Results | Results for North Malaita. DON: 4/3/2005 | Notification of Results | Results for Ulawa and Ugi. DON: 4/3/2005",
+          "note": "North Malaita and Ulawa/Ugi; the polling date is not stated in the index."
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2008",
+          "quote": "Publication of 2008 By Election Results | Aoke/Langalanga | Publication of 2008 By Election Results | East Malaita",
+          "note": "Aoke/Langalanga and East Malaita, results gazetted on 1 and 23 April 2008; the polling date is not stated in the index."
+        },
+        {
+          "date": "2008-09-23",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2008",
+          "quote": "Publication of 23rd September 2008 By-Elections Results",
+          "note": "The index lists two results notices for this date without naming the constituencies."
+        },
+        {
+          "date": "2009-05-06",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2009",
+          "quote": "Notice of By-Election for Central Guadalcanal Constituency | Appointing 6th May 2009 as date for holding By-election."
+        },
+        {
+          "date": "2009-10-29",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2009",
+          "quote": "Notice of Date for Holding of By-Election for Savo/Russell Electoral Constituency | Appoint 29/10/2009 as date."
+        },
+        {
+          "date": "2011-03-30",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2011",
+          "quote": "Appointment of Wednesday 30th March 2011 as date for by-elections in electoral constituencies of (i) Shortlands (ii) Baegu Asifola."
+        },
+        {
+          "date": "2012-08-01",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2012",
+          "quote": "Appointment of date (1/8/2012) for by-elections in North Malaita and East Are'Are."
+        },
+        {
+          "date": "2013-02-27",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2013",
+          "quote": "Appointing Wednesday 27th February 2013 date of National Parliament by-election for Electoral Constituency of Ngella."
+        },
+        {
+          "date": "2018-05-23",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2018",
+          "quote": "Notice for the Holding of By-Election for Gizo/Kolombangara Electoral Constituency | Wednesday, 23 May, 2018"
+        },
+        {
+          "date": "2019-12-11",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2019",
+          "quote": "Publication of East Makira Constituency By-Election Results | By-Election held on 11 December 2019"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2020",
+          "quote": "Notice for the Holding of By-Election for Central Honiara Electoral Constituency | Notice for the Holding of By-Election for North East Guadalcanal Electoral Constituency",
+          "note": "Results gazetted on 25 November 2020; the polling date is not stated in the index."
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2021",
+          "quote": "Notice for the holding of a By-Election for South Choiseul Electoral Constituency",
+          "note": "Results gazetted on 17 June 2021; the polling date is not stated in the index."
+        },
+        {
+          "date": "2022-09-21",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2022",
+          "quote": "Notice for the Holding of By-Election for West Kwaio Electoral Constituency | Appoints 21 September 2022"
+        },
+        {
+          "date": "2023-05-24",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2023",
+          "quote": "Election Date for By-Election for West Kwara'ae Constituency | 24 May 2023"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "contests": 1,
+          "seats": 1,
+          "source": "siec-westguale-2025",
+          "quote": "TEMPORARY ELECTORAL POSITIONS FOR THE WEST GUADALCANAL",
+          "note": "West Guadalcanal; SIEC's recruitment notice of March 2025 does not give the polling date, and the 2025 gazette index is not yet published."
+        }
+      ],
+      "est_votes": 250000,
+      "effort": 4
+    },
+    {
+      "key": "provincial_assemblies",
+      "tier": "ward",
+      "name": "Ordinary elections to the provincial assemblies",
+      "name_en": "Provincial assembly elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.ward"
+        ]
+      },
+      "finest_note": "Each returning officer's notice gives one ward's candidate votes, rejected votes, electors who voted, and registered electors.",
+      "valid_from": "1981-01-01",
+      "earliest_record": "1998-03-04",
+      "source": "pga-1997",
+      "locator": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html (ss.7 and 9)",
+      "note": "Each of the nine provincial assemblies is elected by first past the post in single-member wards (Provincial Government Act 1997 s.7), 173 in all. Until 2024 each assembly kept its own cycle, an ordinary election falling on the fourth anniversary of the last (s.9). The Provincial Government (Amendment) Act 2023 moved seven assemblies to the 2024 joint election and Choiseul and Western, elected in December 2022, to the same day in 2028. The assemblies were created by the Provincial Government Act 1981; the 1996 Act briefly replaced them in Temotu, Isabel, and Central with area assemblies and provincial councils.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Provincial Assembly",
+          "iso_pattern": "SB",
+          "valid_from": "1981-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "pga-1997",
+          "locator": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html (s.9(1): \"an ordinary election of members of a Provincial Assembly shall be held on the fourth anniversary of the date of the office of previous election\")",
+          "term_years": 4,
+          "called": true,
+          "valid_to": "2024-01-05",
+          "administered_by": "Provincial returning officers appointed under the Provincial Government (Election) Regulations"
+        },
+        {
+          "source": "pga-amend-2023",
+          "locator": "https://parliament.gov.sb/business/acts/files/2023/Provincial%20Government%20(Amendment)%20Act%202023.pdf (new s.9A)",
+          "term_years": 4,
+          "called": true,
+          "valid_from": "2024-01-05",
+          "administered_by": "Solomon Islands Electoral Commission, under the Provincial Assemblies and Honiara City Council Electoral Act 2023"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Solomon Islands Electoral Commission, declared winners and extra-ordinary gazettes",
+          "url": "https://siec.gov.sb/elections/list-of-constituencies-and-winners/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-04-17",
+          "last_date": "2024-04-17",
+          "finest": "sb.ward",
+          "source": "siec-gaz71",
+          "license": "Official publication; reuse terms are not stated",
+          "role": "administers",
+          "evidence": "Gazette No. 71 holds the notices of the 128 wards polled on 17 April 2024 and Gazette No. 73 the uncontested wards. SIEC hosts the gazetted results of the 2024 Joint Election only; earlier results were published in the Solomon Islands Gazette, which is listed in the Attorney General's annual indexes but not online."
+        },
+        {
+          "platform": "Solomon Islands Gazette (indexed by the Attorney General's Chambers)",
+          "url": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-17",
+          "first_date": "1998-03-04",
+          "source": "idx-2011",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "The indexes list provincial results notices by province and ward from 1996 (the 2011 index has one per ward for the December 2010 elections); the gazettes themselves are not online."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "through": "1997-12-31",
+          "note": "Provincial assembly elections under the Provincial Government Act 1981, each province on its own cycle; the gazette indexes begin in 1996 and list results for Western Province (January 1996) but no full list of these elections has been reached."
+        },
+        {
+          "date": "1998-03-04",
+          "source": "idx-1998",
+          "quote": "Notification of Results for the Malaita Provincial Assembly Elections held on the 4th March 1998",
+          "note": "Isabel, Central, Malaita, and Rennell and Bellona, the first elections under the Provincial Government Act 1997 (the 1998 index also lists election orders for Guadalcanal and Temotu). Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "1999-09-28",
+          "source": "idx-1999",
+          "quote": "Makira Ulawa Provincial Assembly Election Order 1999 | 28 September 1999 - date of Provincial Assembly election",
+          "note": "Makira-Ulawa. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "1999-12-13",
+          "source": "idx-1999",
+          "quote": "Western Provincial Assembly Election Order 1999 | 13 December 1999 - date of Provincial Assembly election",
+          "note": "Choiseul and Western. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2002-12-05",
+          "source": "idx-2002",
+          "quote": "Isabel Provincial Assembly Elections 2002 | Appointing 5/12/2002 as date for Provincial Assembly Elections.",
+          "note": "Isabel; the elections first appointed for 5 March 2002 in Central, Isabel, Temotu, Rennell and Bellona, Guadalcanal, and Malaita were held late in 2002, with results declared on 16 and 30 December 2002 for Guadalcanal, Temotu, Malaita, and Rennell and Bellona (2003 index). Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2003-11-25",
+          "source": "idx-2003",
+          "quote": "For Provincial Elections held 25/11/2003 re Makira Ulawa Province.",
+          "note": "Makira-Ulawa. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2005-06-29",
+          "source": "idx-2005",
+          "quote": "Western Provincial Assembly Election 2005 | Appointing 29/6/2005 date for Provincial Assembly Election",
+          "note": "Western, with Choiseul's results declared the same day (4 July 2005). Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2006-12-05",
+          "source": "idx-2006",
+          "quote": "Appointing 5/12/2006 as election day for Central Islands Province.",
+          "note": "Central and Isabel. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2006-12-12",
+          "deferred": [
+            "2006-12-18"
+          ],
+          "source": "idx-2006",
+          "quote": "Appointment of 12/12/2006 as election day for Guadalcanal Province.",
+          "note": "Guadalcanal, Temotu wards 1-12, and Malaita wards 1-5; Temotu wards 13-16 and Malaita wards 6-33 polled on 18 December 2006. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2006-12-14",
+          "source": "idx-2006",
+          "quote": "Appointment of 14/12/2006 as election day for Western Province.",
+          "note": "Choiseul and Western. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2006-12-19",
+          "source": "idx-2006",
+          "quote": "Appointment of 19/12/2006 as election day for Rennell Bellona Province.",
+          "note": "Rennell and Bellona. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2007-11-26",
+          "source": "idx-2007",
+          "quote": "Makira Ulawa Provincial Assembly Election Notice 2007 | Election Day - 26/11/2007",
+          "note": "Makira-Ulawa. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2009-06-29",
+          "source": "idx-2009",
+          "quote": "Appointment of: (a) 29th June 2009 as date of election in Western Province",
+          "note": "Choiseul and Western. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2010-12-06",
+          "deferred": [
+            "2010-12-10"
+          ],
+          "source": "idx-2010",
+          "quote": "Notice to Hold Provincial Elections 2010 | Appointing 6th December 2010 as election day in Isabel Province.",
+          "note": "Central, Guadalcanal, Isabel, Malaita, Rennell and Bellona, and Temotu; polling in some wards was deferred to 10 December 2010. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2013-09-26",
+          "source": "idx-2013",
+          "quote": "Notice to Hold Provincial Assembly Elections in Western Province | Appointing 26/9/2013 date of election",
+          "note": "Choiseul and Western. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2014-12-10",
+          "source": "idx-2014",
+          "quote": "Notice to Hold Provincial Assembly Elections in Malaita Province | Appointing 10/12/2014 as date of election",
+          "note": "Central, Guadalcanal, Isabel, Malaita, Rennell and Bellona, and Temotu. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "source": "idx-2015",
+          "quote": "Notice to Hold Provincial Election in Makira Ulawa Province",
+          "note": "Makira-Ulawa; noticed on 4 November 2015 with results declared on 18 January 2016, and the polling date is not stated in the index. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2018-06-13",
+          "source": "idx-2018",
+          "quote": "Appointment of date for Ordinary Election of Members Western Provincial Assembly | 13 June 2018",
+          "note": "Western, and Choiseul, whose returning officers were appointed in the same notice. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2019-06-12",
+          "source": "idx-2019",
+          "quote": "Appointment of Date and Returning Officer to Hold Provincial Assembly Elections in Malaita Province | Election date 12 June 2019",
+          "note": "Central, Guadalcanal, Isabel, Malaita, and Temotu. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2019-06-26",
+          "source": "idx-2019",
+          "quote": "Appointment date for Ordinary Election of Members Rennell and Bellona Provincial Assembly | Revoke GN 752 of 2019 Election date now 26 June 2019",
+          "note": "Rennell and Bellona. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2019-12-11",
+          "source": "idx-2019",
+          "quote": "Appointment of Date of Ordinary Election of Members of Makira/Ulawa Provincial Assembly | Revokes GN 112 of 2019 and sets new date of 11 December 2019 for election",
+          "note": "Makira-Ulawa. Wards not yet counted for this election from an official source."
+        },
+        {
+          "date": "2022-12-14",
+          "contests": 42,
+          "seats": 42,
+          "source": "idx-2022",
+          "quote": "Order - Time of Election of Provincial Assembly of Western Province | 14 Dec 2022",
+          "note": "Choiseul (16 wards) and Western (26 wards), counted from the ward table of SIEC's 2024 Joint Election booklet; SIEC's 2024-2028 plan confirms both were held in late 2022."
+        },
+        {
+          "date": "2024-04-17",
+          "contests": 131,
+          "seats": 131,
+          "source": "siec-booklet",
+          "quote": "the Provincial Assembly elections will be for 131 members across seven (7) Provincial Assemblies (excluding Choiseul and Western Provincial wards)",
+          "note": "128 wards polled on 17 April 2024 (Gazette 71), Anuta and Tirotonga were uncontested (Gazette 73), and the Duidui ward poll was deferred and its result gazetted on 7 August 2024 (2024 index, notice 1263)."
+        }
+      ],
+      "est_votes": 2200000,
+      "effort": 5
+    },
+    {
+      "key": "provincial_by",
+      "tier": "ward",
+      "name": "Provincial assembly ward by-elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.ward"
+        ]
+      },
+      "valid_from": "1981-01-01",
+      "source": "pahcc-2023",
+      "note": "A vacant ward seat is filled at a by-election; since 2024 the Electoral Commission runs them (Provincial Assemblies and Honiara City Council Electoral Act 2023 s.12).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Provincial Assembly",
+          "iso_pattern": "SB",
+          "valid_from": "1981-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "pahcc-2023",
+          "called": true,
+          "administered_by": "Solomon Islands Electoral Commission (since 2024)",
+          "vacancy_rule": "A vacant ward is filled at a by-election on a date fixed by notice in the Gazette."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "through": "2009-12-31",
+          "note": "Ward by-elections before 2010 are not yet counted; the gazette indexes list some (Makira-Ulawa ward 17, Choiseul, and Western wards 7 and 23 on 4 March 1998; Tataba, Isabel, and Bangara, Choiseul, in 1998; Temotu in 1999)."
+        },
+        {
+          "date": "2010-06-04",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2010",
+          "quote": "Appointing 4 June 2010 for by Election in Provincial Ward 15 Santa Anna Makira Ulawa Pro"
+        },
+        {
+          "date": "2012-06-28",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2012",
+          "quote": "Notice for By-Election for Ward 22 of Western Province | Notice of date of election (28/6/2012) | Notice for By-Election for Ward 11 of Choiseul Province | Notice of date of election (28/6/2012)"
+        },
+        {
+          "date": "2012-10-12",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2012",
+          "quote": "Notice for By-Election for Ward 16 of Western Province | Notice of date of election (12/10/2012)"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2013",
+          "quote": "Notice to Hold Provincial Assembly Bye-Election in Ward 6 of Rennel and Bellona Province"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "source": "idx-2015",
+          "quote": "Notice to Defer the By-Election in Ward 2, Rennell and Bellona Province | Notice of Provincial Assembly By-Election - Ward 21 of Western Province",
+          "note": "Rennell and Bellona ward 2 (deferred) and Western ward 21 (result declared in February 2016); not yet counted."
+        },
+        {
+          "date": "2017-07-12",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2017",
+          "quote": "Notice of Provincial Assembly By-Election Ward 5 of Guadalcanal Province | 12 July 2017"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 4,
+          "seats": 4,
+          "source": "idx-2019",
+          "quote": "Appointment of Date and Returning Officer to Hold Provincial Assembly By-Elections in Ward 18 and Ward 25 in W",
+          "note": "Choiseul wards 4 and 9 and Western wards 18 and 25, appointed in May 2019."
+        },
+        {
+          "date": "2019-11-06",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2019",
+          "quote": "Notice of Provincial Assembly By-Election Ward 20 of Western Province | Date: 6 November 2019"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2021",
+          "quote": "Appointment of By-Election Date and Returning Officer Ward 16 of Temotu Province | Appointment of By-Election Date and Returning Officer Ward 16 of Choiseul Province"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 3,
+          "seats": 3,
+          "source": "idx-2022",
+          "quote": "Appointment of By-Election Date and Returning Officer for Ward 18 of Malaita Province | Appointment of By-Election Date and Returning Officer for Ward 28 of Malaita Province | Election Notice for By-election of Member of Provincial Assembly of Guadalcanal Province",
+          "note": "Malaita wards 18 and 28 and Guadalcanal ward 19."
+        },
+        {
+          "date": "2024-11-13",
+          "contests": 1,
+          "seats": 1,
+          "source": "idx-2024",
+          "quote": "Notice of the By-Election for Tandai Electoral Ward | Date of By- Election 13 November 2024"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "contests": 1,
+          "seats": 1,
+          "source": "siec-paripao-2025",
+          "quote": "the Provincial Assembly By-Election for Paripao Ward, Guadalcanal Province"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 1,
+          "seats": 1,
+          "source": "siec-koviloko-2026",
+          "quote": "the Provincial Assembly By-Election for Koviloko Ward, Isabel Province",
+          "note": "Koviloko, Isabel; the 2026 by-election for West Baegu/Fataleka ward, Malaita, is announced in a separate SIEC notice and not yet counted here."
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 5
+    },
+    {
+      "key": "honiara_city_council",
+      "tier": "honiara_ward",
+      "name": "Ordinary elections to the Honiara City Council",
+      "name_en": "Honiara City Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.ward"
+        ]
+      },
+      "finest_note": "Each returning officer's notice gives one ward's candidate votes, rejected votes, electors who voted, and registered electors.",
+      "valid_from": "1999-01-01",
+      "first_held": "1999-12-08",
+      "earliest_record": "2024-04-17",
+      "source": "hca-1999",
+      "locator": "https://parliament.gov.sb/business/acts/files/1999/THE%20HONIARA%20CITY%20ACT%201999.pdf (s.6)",
+      "note": "The elected members of the council are returned by single-member wards, 12 since at least 2024, by first past the post; the council also has appointed and ex officio members. An ordinary election fell on the fourth anniversary of the last (Honiara City Act 1999 s.6(3)) until the Honiara City (Amendment) Act 2023 moved it to the 2024 joint election.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Honiara City Council",
+          "iso_pattern": "SB",
+          "valid_from": "1999-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "hca-1999",
+          "locator": "https://parliament.gov.sb/business/acts/files/1999/THE%20HONIARA%20CITY%20ACT%201999.pdf (s.6(3): \"any subsequent ordinary election of members of the City Council shall be held on the fourth anniversary of the date of the previous election\")",
+          "term_years": 4,
+          "called": true,
+          "valid_to": "2024-01-05",
+          "administered_by": "A returning officer appointed under the Honiara City Council (Elections) Regulations 1999"
+        },
+        {
+          "source": "hca-amend-2023",
+          "term_years": 4,
+          "called": true,
+          "valid_from": "2024-01-05",
+          "administered_by": "Solomon Islands Electoral Commission, under the Provincial Assemblies and Honiara City Council Electoral Act 2023"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Solomon Islands Electoral Commission, declared winners and extra-ordinary gazettes",
+          "url": "https://siec.gov.sb/elections/list-of-constituencies-and-winners/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-04-17",
+          "last_date": "2024-04-17",
+          "finest": "sb.ward",
+          "source": "siec-gaz72",
+          "license": "Official publication; reuse terms are not stated",
+          "role": "administers",
+          "evidence": "Gazette No. 72 holds the notices of the 11 wards polled on 17 April 2024 and Gazette No. 73 the uncontested Kukum ward. SIEC hosts the gazetted results of the 2024 Joint Election only; earlier results were published in the Solomon Islands Gazette, which is listed in the Attorney General's annual indexes but not online."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-12-08",
+          "source": "idx-1999",
+          "quote": "Notice appointing date for holding of elections | Appoints: 8 th Dec 99 for elections",
+          "note": "The first election under the Honiara City Act 1999; wards not yet counted from an official source."
+        },
+        {
+          "date": "2004-03-30",
+          "source": "idx-2004",
+          "quote": "Notice to Hold Honiara City Council Elections | Appointing 30/3/2004 as election date.",
+          "note": "Postponed from 8 December 2003 (Honiara City Council (Appointment of Elections) Order 2004). Wards not yet counted."
+        },
+        {
+          "date": "2006-08-23",
+          "source": "idx-2006",
+          "quote": "Appointment of 23/8/2006 as date of election.",
+          "note": "Wards not yet counted."
+        },
+        {
+          "date": "2010-12-08",
+          "source": "idx-2010",
+          "quote": "Honiara City Council (2010 Elections) Notice | Appointment of 8/12/2010 as date for election of the Honiara City Council.",
+          "note": "Wards not yet counted."
+        },
+        {
+          "date": "2014-12-17",
+          "source": "idx-2014",
+          "quote": "Honiara City Council (2014 Election) Notice | Appointing 17/12/2014 as date of election",
+          "note": "Wards not yet counted."
+        },
+        {
+          "date": "2019-05-29",
+          "source": "idx-2019",
+          "quote": "Appointment of New Election Date | Date appointed 29 May 2019",
+          "note": "Moved from 22 May 2019. Wards not yet counted."
+        },
+        {
+          "date": "2024-04-17",
+          "contests": 12,
+          "seats": 12,
+          "source": "siec-booklet",
+          "quote": "the Honiara City Council (HCC) election will be for the 12 elected members.",
+          "note": "11 wards polled (Gazette 72) and Kukum ward was uncontested (Gazette 73)."
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 4
+    },
+    {
+      "key": "honiara_city_by",
+      "tier": "honiara_ward",
+      "name": "Honiara City Council ward by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "sb.ward"
+        ]
+      },
+      "valid_from": "1999-01-01",
+      "source": "hca-amend-2023",
+      "note": "A vacant ward is filled at a by-election on a date fixed by the Minister on the Electoral Commission's advice, within three months of the vacancy (Honiara City Act 1999 s.10(2) as amended in 2023).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Honiara City Council",
+          "iso_pattern": "SB",
+          "valid_from": "1999-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "hca-amend-2023",
+          "called": true,
+          "administered_by": "Solomon Islands Electoral Commission (since 2024)",
+          "vacancy_rule": "The date of the by-election must be fixed by the Minister, acting on the advice of the Electoral Commission, no later than three months after the vacancy comes to the Minister's notice."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "through": "2015-12-31",
+          "note": "Ward by-elections before 2016 are not yet counted."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "idx-2016",
+          "quote": "Honiara City Council (2016 By-Election) Notice",
+          "note": "The ward is not named in the index; not yet counted."
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 2,
+          "seats": 2,
+          "source": "idx-2022",
+          "quote": "Notice of By-Election - Vuhokesa Ward 6 | Notice of By-Election -Vavaea Ward 5"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 5
+    },
+    {
+      "key": "honiara_town_council",
+      "tier": "honiara_ward",
+      "name": "Honiara Town Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_to": "1999-01-01",
+      "source": "idx-1997",
+      "note": "Before the Honiara City Act 1999 Honiara was governed as a town council under the Local Government Act (Cap. 14); the 1997 index lists a notice of Honiara Town elections.",
+      "disposition": "blocked",
+      "disposition_reason": "Results were printed only in the Solomon Islands Gazette, which is not online; no official publication of the town council polls has been reached.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Honiara Town",
+          "iso_pattern": "SB",
+          "valid_to": "1999-01-01"
+        }
+      ],
+      "dates": [],
+      "est_votes": 30000,
+      "effort": 5
+    },
+    {
+      "key": "area_assemblies",
+      "tier": "ward",
+      "name": "Area assembly elections under the Provincial Government Act 1996",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1996-01-01",
+      "valid_to": "1998-01-01",
+      "source": "pga-1997",
+      "locator": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html (s.8(1)(a))",
+      "note": "The Provincial Government Act 1996 replaced the provincial assemblies with area assemblies and provincial councils; area assemblies were elected in Temotu, Isabel, and Central in 1996-1997 before the Provincial Government Act 1997 restored the assemblies (the 1996 and 1997 indexes list returning officers for area assembly elections in every province).",
+      "disposition": "blocked",
+      "disposition_reason": "Results were printed only in the Solomon Islands Gazette, which is not online.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Area Assembly",
+          "iso_pattern": "SB",
+          "valid_from": "1996-01-01",
+          "valid_to": "1998-01-01"
+        }
+      ],
+      "dates": [],
+      "est_votes": 80000,
+      "effort": 5
+    },
+    {
+      "key": "area_councils",
+      "tier": "ward",
+      "name": "Area council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_to": "1998-01-01",
+      "source": "pga-1997",
+      "locator": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html (s.8(1)(b) and Schedule 3 para. 8)",
+      "note": "Area councils sat below the provinces under the Provincial Government Act 1981; the 1997 Act kept them only until new assemblies were elected and left area councils to provincial ordinance, and none is elected today.",
+      "disposition": "blocked",
+      "disposition_reason": "No official record of area council elections has been reached; any results were local notices, not gazetted results.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Area Council",
+          "iso_pattern": "SB",
+          "valid_to": "1998-01-01"
+        }
+      ],
+      "dates": [],
+      "est_votes": 100000,
+      "effort": 5
+    },
+    {
+      "key": "governing_council",
+      "tier": "national",
+      "name": "Governing Council elections",
+      "name_en": "Governing Council (1970-1974)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1970-01-01",
+      "valid_to": "1974-01-01",
+      "first_held": "1970-01-01",
+      "source": "parl-about",
+      "note": "In 1970 the Legislative and Executive Councils were replaced by a Governing Council with elected members, elected in 1970 and 1973, and replaced by the Legislative Assembly in 1974.",
+      "disposition": "blocked",
+      "disposition_reason": "Protectorate-era returns survive only in colonial gazettes and reports; no official body publishes them online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SB",
+          "valid_from": "1970-01-01",
+          "valid_to": "1974-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "note": "Governing Council election; the date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "note": "Governing Council election; the date is not quoted from a fetched official source."
+        }
+      ],
+      "est_votes": 80000,
+      "effort": 5
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Legislative Council elections",
+      "name_en": "Legislative Council (elected members, 1964-1970)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1960-01-01",
+      "valid_to": "1970-01-01",
+      "source": "parl-about",
+      "note": "The Advisory Council became the Legislative Council in 1960; its first elected members were returned in 1964 and 1967, partly by direct vote and partly through local councils acting as electoral colleges.",
+      "disposition": "blocked",
+      "disposition_reason": "Protectorate-era returns survive only in colonial gazettes and reports; no official body publishes them online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SB",
+          "valid_from": "1960-01-01",
+          "valid_to": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-01-01",
+          "precision": "year",
+          "note": "The first Legislative Council election with elected members; the date is not quoted from a fetched official source."
+        },
+        {
+          "date": "1967-01-01",
+          "precision": "year",
+          "note": "Legislative Council election; the date is not quoted from a fetched official source."
+        }
+      ],
+      "est_votes": 20000,
+      "effort": 5
+    },
+    {
+      "key": "governor_general",
+      "tier": "national",
+      "name": "Election of the Governor-General by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl-about",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor-General represents the King and is chosen by a vote of the members of Parliament before appointment (Constitution s.27 and Schedule 1); there is no public vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Election of the Prime Minister by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "idx-2024",
+      "locator": "https://solomons.gov.sb/ministry-of-justice-and-legal-affairs/attorney-generals-chambers/annual-indexes-of-gazette-notices-and-legal-notices/2024-annual-index-to-gazette-and-legal-notices/ (Gazette 74, notice 641: \"Notification of the Election of the Prime Minister\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Prime Minister is elected by the members of Parliament from among themselves (Constitution s.33 and Schedule 2), and the result is gazetted; there is no public vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "SB"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "premiers",
+      "tier": "province",
+      "name": "Election of provincial premiers by the assemblies",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "pga-1997",
+      "locator": "https://www.mpgis.gov.sb/legislation/6-provincial-government-act-1997.html (s.20(2))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each premier is elected by secret ballot by an absolute majority of the provincial assembly (Provincial Government Act 1997 s.20(2)), and the result is gazetted; there is no public vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "honiara_mayor",
+      "tier": "honiara",
+      "name": "Election of the Mayor of Honiara by the City Council",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hca-1999",
+      "locator": "https://parliament.gov.sb/business/acts/files/1999/THE%20HONIARA%20CITY%20ACT%201999.pdf (s.7(1))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The City Council elects the Mayor from its elected members within fourteen days of an ordinary election (Honiara City Act 1999 s.7(1)); there is no public vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const-amend-2022",
+      "locator": "https://parliament.gov.sb/business/acts/files/2022/Constitution%20(Amendment)%20Act%202022.pdf (\"This Act alters the Constitution under section 61(5)(b)(iii) and (iv) of the Constitution\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Constitution provides no referendum: it is altered by Act of Parliament under s.61, and no national vote has been held. A referendum would be a new class.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "SB"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "judiciary",
+      "tier": "national",
+      "name": "Judges and magistrates",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl-about",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges and magistrates are appointed by the Governor-General under the Constitution, on the advice of the Prime Minister or of the Judicial and Legal Service Commission; none is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Party candidate selections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "siec-booklet",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties registered under the Political Parties Integrity Act 2014 choose their candidates by their own rules; the state neither runs nor publishes the selections, and candidates enter the official process at nomination.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "SB"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
