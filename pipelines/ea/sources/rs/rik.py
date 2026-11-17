@@ -7,7 +7,7 @@ import time
 import urllib.parse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from typing import Any
 from uuid import uuid5
@@ -187,6 +187,24 @@ FILES = {
     "2012-parliament": archived("poslanici/2012/4. 2012 np rzs.xls"),
     "2012-president": archived("predsednik/2012/6. 2012 rezultati izbora rzs.xls"),
     "2014-parliament": archived("poslanici/2014/4. Rezultati izbora po BM2014 np rzs.xls"),
+    "2002-report-1": archived("predsednik/2002 I/cir/3. 2002 I izvestaj o rezultatima pr 29.09. (prvi krug).doc"),
+    "2002-report-2": archived(
+        "predsednik/2002 I/cir/4. 2002 I izvestaj o rezultatima pr 29.09. i 13.10. (drugi krug).doc"
+    ),
+    "2002-report-3": archived("predsednik/2002 II/cir/2. 2002 II izvestaj o rezultatima pr.doc"),
+    "2003-president-report": archived("predsednik/2003/cir/2. 2003 izvestaj sa podacima o rezultatima pr.doc"),
+    "2008-report-1": archived("predsednik/2008/cir/3. 2008 izvestaj o rezultatima pr (prvi krug).doc"),
+    "2008-report-2": archived("predsednik/2008/cir/4. 2008 izvestaj o konacnim rezultatima pr (drugi krug).doc"),
+    "2012-report-1": archived("predsednik/2012/cir/3. 2012 izvestaj o rezultatima pr 06.05.docx"),
+    "2012-report-2": archived("predsednik/2012/cir/4. 2012 izvestaj o konacnim rezultatima pr 20.05.doc"),
+    "2017-report": f"{CURRENT}/izbori-2017/dokumenta/{urllib.parse.quote('izvestaj o konacnim rezultatina izbora odrzanih 2. aprila 2017.doc')}",
+    "2003-parliament-report": archived("poslanici/2003/CIR/2. izvestaj o rezultatima np.doc"),
+    "2008-parliament-report": archived("poslanici/2008/cir/2. izvestaj o ukupnim rezultatima np.doc"),
+    "2012-parliament-report": archived("poslanici/2012/CIR/2. izvestaj o ukupnim rezultatima np.docx"),
+    "2014-parliament-report": archived("poslanici/2014/cir/2. Izvestaj o ukupnim rezultatima np.doc"),
+    "2016-decision": f"{CURRENT}/izbori-2016/odluke/{urllib.parse.quote('odluka o dodeli mandata narodnih poslanika.doc')}",
+    "2023-decision": f"{BASE}/extfile/sr/files/additionalDocuments/565/094/{urllib.parse.quote('RESENJE O DODELI MANDATA (2).pdf')}",
+    "2026-decision": f"{BASE}/extfile/sr/files/additionalDocuments/822/554/{urllib.parse.quote('Rešenje o dodeli mandata narodnih poslanika Narodne skupštine.pdf')}",
     "2020-totals": xls(9419, "1 Ukupni rezultatic.XLS"),
     "2020-municipalities": xls(9407, "2 po opstinama1.XLS"),
     "2020-stations": xls(9428, "3 po bir mesrima1.XLS"),
@@ -431,6 +449,9 @@ class Table:
     declared_lists: dict[int, int]
     seats: dict[int, int]
     files: list[str]
+    outcomes: dict[int, str] = field(
+        default_factory=dict
+    )  # ballot position -> declared outcome of a presidential round
 
 
 def _tidy_list(text: str) -> str:
@@ -714,6 +735,36 @@ def _from_layout(e: Election) -> Table:
 
 
 def table(e: Election, places: dict[str, tuple[str, str]] | None = None) -> Table:
+    """The election's stations and declared totals, with the seats and outcomes its reports declare."""
+    from ea.sources.rs import rik_seats
+
+    t = _table(e, places)
+    if e.family == "parliament" and not t.seats:
+        votes = dict(t.declared_lists)
+        for s in t.stations:
+            for number, count in s.lists.items():
+                if count is not None and number not in t.declared_lists:
+                    votes[number] = votes.get(number, 0) + count
+        found = rik_seats.seats(e.slug, t.labels, votes)
+        if found:
+            t.seats, name = found
+            t.files.append(name)
+            if sum(t.seats.values()) != e.seats:
+                raise ValueError(
+                    f"{e.slug}: the seats read from {name} add up to {sum(t.seats.values())}, not {e.seats}"
+                )
+    if e.family == "president":
+        outcomes = rik_seats.presidential(e.slug, t.labels)
+        if outcomes:
+            t.outcomes, name = outcomes
+            if name not in t.files:
+                t.files.append(name)
+        elif e.slug in rik_seats.UNSUCCESSFUL and rik_seats.UNSUCCESSFUL[e.slug] not in t.files:
+            t.files.append(rik_seats.UNSUCCESSFUL[e.slug])
+    return t
+
+
+def _table(e: Election, places: dict[str, tuple[str, str]] | None = None) -> Table:
     if e.layout is not None:
         return _from_layout(e)
     if e.slug == "2020-06-21":
@@ -942,6 +993,8 @@ def _path(e: Election) -> str:
 
 
 def build(e: Election) -> Package:
+    from ea.sources.rs import rik_seats
+
     p = Package(
         f"{SOURCE}/{e.slug}",
         SOURCE,
@@ -993,7 +1046,23 @@ def build(e: Election) -> Package:
         is_default=True,
         completeness=1.0,
     )
-    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=e.method, lang="en")
+    method = e.method
+    if e.seats and e.family == "parliament" and t.seats:
+        method += (
+            " Seats are as the Republic Electoral Commission declared them for each list, in its report of results or "
+            "its decision allocating the seats; a list with no seats has no outcome."
+        )
+    if t.outcomes:
+        method += (
+            " Outcomes are as the Republic Electoral Commission declared them in its report of results: the candidates "
+            "who go on to the next round, or the candidate elected."
+        )
+    elif e.slug in rik_seats.UNSUCCESSFUL:
+        method += (
+            " The Commission recorded that too few voters came out, so the election was unsuccessful and no one was "
+            "elected; no outcome is declared for any candidate."
+        )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     options: dict[int, str] = {}
     for number, label in sorted(t.labels.items()):
         option = options[number] = key("option", e.slug, number)
@@ -1027,6 +1096,8 @@ def build(e: Election) -> Package:
     for number, seats in t.seats.items():
         if seats:
             p.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=seats)
+    for number, kind in t.outcomes.items():
+        p.add("outcome", result_set_id=result_set, option_id=options[number], kind=kind)
     for measure, value in t.declared.items():
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
     for number, value in t.declared_lists.items():
