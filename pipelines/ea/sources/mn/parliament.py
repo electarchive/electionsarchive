@@ -160,3 +160,62 @@ def constituencies_2020() -> list[Constituency]:
         if sum(votes for _, _, votes in entry.candidates) != entry.total:
             raise ValueError(f"2020 constituency {entry.number}: candidate votes do not sum to the printed total")
     return out
+
+
+BY_ELECTION_2021 = date(2021, 10, 16)
+BY_ELECTIONS_2021 = {28: "53649ec2", 18: "e78f8a03"}
+SECTION_NUMBER = re.compile(r"^(\d+-\d+)(?:-р хэсэг)?$")
+LISTED = re.compile(r"^(.+?)\s*/([^/]+)/\s*нэр дэвшигчийн")
+
+
+@dataclass
+class ByElection:
+    number: int
+    candidates: list[polls.Candidate]
+    rows: list[polls.Row]
+    declared: list[int]
+    declared_extra: dict[int, int]
+    file: str
+
+
+def by_election_2021(number: int) -> ByElection:
+    name = BY_ELECTIONS_2021[number]
+    rows = sheets.sheet_rows(name, 0)
+    candidates = []
+    for cell in next(row for row in rows if any(LISTED.match(c) for c in row)):
+        found = LISTED.match(cell)
+        if found:
+            party = found[2].strip()
+            independent = party.startswith("Бие даан")
+            candidates.append(polls.Candidate(found[1].strip(), None if independent else party))
+    out: list[polls.Row] = []
+    declared: list[int] = []
+    declared_extra: dict[int, int] = {}
+    count = len(candidates)
+    for row in rows:
+        cells = [c for c in row if c]
+        if cells and cells[0] == "Дүн":
+            values = [sheets.number(c) or 0 for c in cells[1:]]
+            declared = [values[6 + 2 * k] for k in range(count)]
+            declared_extra = {2: values[0], 3: values[5], 6: values[6 + 2 * count]}
+            continue
+        at = next((i for i, c in enumerate(cells) if SECTION_NUMBER.match(c)), None)
+        if at is None or at < 1:
+            continue
+        values = [sheets.number(c) for c in cells[at + 1 :]]
+        code = SECTION_NUMBER.match(cells[at])
+        assert code is not None
+        extra = {2: values[0], 3: values[5], 6: values[6 + 2 * count]}
+        out.append(
+            polls.Row(
+                code[1],
+                None,
+                f"{cells[at - 1]}, {code[1]}",
+                [values[6 + 2 * k] for k in range(count)],
+                {m: v for m, v in extra.items() if v is not None},
+            )
+        )
+    sums = [sum(r.votes[k] or 0 for r in out) for k in range(count)]
+    if sums != declared:
+        raise ValueError(f"by-election {number}: sections sum to {sums}, the total row prints {declared}")
+    return ByElection(number, candidates, out, declared, declared_extra, sheets.url(name))

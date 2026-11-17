@@ -109,7 +109,7 @@ def parliament_2024() -> list[parliament.Contest]:
 
 
 def parliament_keys() -> list[str]:
-    return [str(parliament.DAY_2020), str(parliament.DAY_2024)]
+    return [str(parliament.DAY_2020), str(parliament.BY_ELECTION_2021), str(parliament.DAY_2024)]
 
 
 PLACE_LIST_2020 = "1fa2007c"
@@ -249,6 +249,7 @@ def parse() -> None:
     for poll in all_polls():
         election(poll).write()
     legislature_2020().write()
+    by_elections_2021().write()
     legislature_2024().write()
     for election_ in local_elections():
         councils(election_).write()
@@ -296,6 +297,7 @@ def geo() -> Package:
         p.name(id, english, "en", "official")
         p.name(id, name, "mn", "native", False)
     constituencies = [(parliament.DAY_2020.year, entry.number) for entry in parliament.constituencies_2020()]
+    constituencies += [(parliament.BY_ELECTION_2021.year, number) for number in parliament.BY_ELECTIONS_2021]
     constituencies += [
         (parliament.DAY_2024.year, contest.number) for contest in parliament_2024() if contest.number is not None
     ]
@@ -343,6 +345,7 @@ def registry() -> Package:
     files = {url for poll in all_polls() for url in poll.files}
     files |= {url for contest in parliament_2024() for url in contest.files}
     files |= {sheets.url(parliament.RESULTS_2020), sheets.url(parliament.TURNOUT_2020)}
+    files |= {sheets.url(name) for name in parliament.BY_ELECTIONS_2021.values()}
     files |= {url for election_ in local_elections() for url in election_.files}
     for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
@@ -902,4 +905,115 @@ def legislature_2020() -> Package:
             )
             _value(p, result_set, unit, option, 1, votes)
             p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=votes)
+    return p
+
+
+def by_elections_2021() -> Package:
+    day = parliament.BY_ELECTION_2021
+    entries = [parliament.by_election_2021(number) for number in parliament.BY_ELECTIONS_2021]
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "The 2021 Mongolian parliamentary by-elections in constituencies 18 and 28 by polling section from the "
+        "General Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {MONGOLIA, TERRITORY}
+    for entry in entries:
+        p.uses(raw.cached(SOURCE, entry.file))
+    election_id = key("election", str(day))
+    p.add("election", id=election_id, polity_id=MONGOLIA, kind="by_election", date_from=day, date_to=day, status="held")
+    p.name(election_id, "2021 Mongolian parliamentary by-elections", "en", "official")
+    p.name(election_id, "Улсын Их Хурлын 2021 оны нөхөн сонгууль", "mn", "native", False)
+    path = f"mn/{day}-by-election"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    for entry in entries:
+        tag = str(entry.number)
+        contest = key("contest", str(day), tag)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=KHURAL,
+            district_area_id=area("mn.constituency", f"{day.year}-{entry.number}"),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=BLOCK_2024,
+            default_result_kind="counted",
+        )
+        p.name(
+            contest, f"{day.year} Mongolian parliamentary by-election, constituency {entry.number}", "en", "official"
+        )
+        p.add("slug", path=f"{path}/constituency-{entry.number}", entity_id=contest, is_current=True)
+        result_set = key("result_set", str(day), tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=GEC_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md="One seat, filled by the candidate with the most votes. Votes are stored per candidate for each "
+            "polling section as the Commission published them; the sections' place within the constituency is not "
+            "published in a form that names the soum.",
+            lang="en",
+        )
+        options: list[str] = []
+        for index, candidate in enumerate(entry.candidates):
+            option = key("option", str(day), tag, index)
+            options.append(option)
+            person = key("person", str(day), tag, index)
+            p.add("person", id=person)
+            p.name(person, candidate.label, "mn", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party(candidate.party),
+                ballot_position=index + 1,
+                ballot_label=candidate.label + (f" ({candidate.party})" if candidate.party else ""),
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", str(day), tag, index),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=candidate.label,
+                member_of_party_id=party(candidate.party),
+                is_independent=candidate.party is None,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=entry.declared[index])
+        for measure, value in entry.declared_extra.items():
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for row in entry.rows:
+            unit = key("unit", str(day), tag, row.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=MONGOLIA,
+                scheme_code="mn.hesg",
+                code=f"{day}:{tag}:{row.code}",
+                area_relation="unlocated",
+                area_id=None,
+                kind="standard",
+            )
+            p.name(unit, row.label, "mn", "official")
+            for option, value in zip(options, row.votes, strict=True):
+                if value is not None:
+                    _value(p, result_set, unit, option, 1, value)
+            for measure, value in row.extra.items():
+                _value(p, result_set, unit, None, measure, value)
     return p
