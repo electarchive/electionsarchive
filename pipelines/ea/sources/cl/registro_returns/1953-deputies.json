@@ -1,0 +1,8104 @@
+{
+ "volume": "1953-deputies",
+ "chamber": "deputies",
+ "year": 1953,
+ "day": "1953-03-01",
+ "day_printed": "Domingo 1.º de Marzo de 1953",
+ "contests": [
+  {
+   "number": 1,
+   "title": "1.a Agrupación Electoral Departamental: Iquique, Arica y Pisagua",
+   "areas": [
+    "Iquique",
+    "Arica",
+    "Pisagua"
+   ],
+   "seats": 4,
+   "registered": 19584,
+   "cast": 12884,
+   "valid": 12796,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 88,
+   "page": 5,
+   "box": [
+    0.599,
+    0.631,
+    0.842,
+    0.661
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 663,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.248,
+      0.63,
+      0.324,
+      0.66
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 119,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.472,
+      0.63,
+      0.548,
+      0.66
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1906,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.528,
+      0.63,
+      0.605,
+      0.66
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1949,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.585,
+      0.63,
+      0.661,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "LUIS UNDURRAGA CORREA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.18,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2605,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.641,
+      0.63,
+      0.717,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "JOSE ZARATE ANDREU",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.18,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 2641,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.697,
+      0.63,
+      0.773,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "JUAN CHECURA JERIA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.18,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1312,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.753,
+      0.63,
+      0.829,
+      0.66
+     ],
+     "candidates": [
+      {
+       "name": "HERMINIO TAMAYO TAMAYO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.18,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 101,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.265,
+      0.631,
+      0.341,
+      0.661
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 410,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.321,
+      0.631,
+      0.397,
+      0.661
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 493,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.432,
+      0.631,
+      0.508,
+      0.661
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 60,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.488,
+      0.631,
+      0.564,
+      0.661
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 537,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.544,
+      0.631,
+      0.619,
+      0.661
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. TARAPACA' row (party columns p4, accounting and remaining parties p5); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 2,
+   "title": "2.a Agrupación Electoral Departamental: Antofagasta, Tocopilla, El Loa y Taltal",
+   "areas": [
+    "Antofagasta",
+    "Tocopilla",
+    "El Loa",
+    "Taltal"
+   ],
+   "seats": 7,
+   "registered": 31318,
+   "cast": 19346,
+   "valid": 18810,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 536,
+   "page": 7,
+   "box": [
+    0.603,
+    0.417,
+    0.846,
+    0.447
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1191,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.273,
+      0.425,
+      0.348,
+      0.455
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 251,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.328,
+      0.425,
+      0.404,
+      0.455
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 376,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.384,
+      0.425,
+      0.46,
+      0.455
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 406,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.44,
+      0.425,
+      0.515,
+      0.455
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 259,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.495,
+      0.425,
+      0.571,
+      0.455
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2003,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.551,
+      0.425,
+      0.627,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "JUAN DE DIOS CARMONA PERALTA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1903,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.607,
+      0.425,
+      0.682,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "DOMINGO CUADRA GAZMURI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3391,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.662,
+      0.425,
+      0.738,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "HERNAN BRUCHER ENCINA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 2080,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.718,
+      0.425,
+      0.794,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "VICTOR GALLEGUILLOS CLETT",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 3636,
+     "unassigned": null,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.774,
+      0.425,
+      0.849,
+      0.455
+     ],
+     "candidates": [
+      {
+       "name": "RAMON SILVA ULLOA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      },
+      {
+       "name": "PEDRO CISTERNAS GUZMAN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 114,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.156,
+      0.417,
+      0.232,
+      0.447
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 151,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.212,
+      0.417,
+      0.288,
+      0.447
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 275,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.268,
+      0.417,
+      0.344,
+      0.447
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 659,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.324,
+      0.417,
+      0.399,
+      0.447
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 985,
+     "unassigned": null,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.435,
+      0.417,
+      0.511,
+      0.447
+     ],
+     "candidates": [
+      {
+       "name": "JOSE CUETO HOMETT",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.26,
+        0.85,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 594,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.491,
+      0.417,
+      0.567,
+      0.447
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 536,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.547,
+      0.417,
+      0.623,
+      0.447
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. ANTOFAGASTA' row (party columns p6, accounting and remaining parties p7); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 3,
+   "title": "3.a Agrupación Electoral Departamental: Copiapó, Chañaral, Huasco y Freirina",
+   "areas": [
+    "Copiapó",
+    "Chañaral",
+    "Huasco",
+    "Freirina"
+   ],
+   "seats": 2,
+   "registered": 15215,
+   "cast": 10437,
+   "valid": 10332,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 105,
+   "page": 7,
+   "box": [
+    0.603,
+    0.642,
+    0.846,
+    0.672
+   ],
+   "lists": [
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2009,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.551,
+      0.645,
+      0.627,
+      0.675
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3595,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.662,
+      0.645,
+      0.738,
+      0.675
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL MAGALHAES MEDLIN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.38,
+        0.85,
+        0.41
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2260,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.774,
+      0.645,
+      0.849,
+      0.675
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR MONTERO SOTO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.38,
+        0.85,
+        0.41
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 2443,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.324,
+      0.642,
+      0.399,
+      0.672
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 25,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.435,
+      0.642,
+      0.511,
+      0.672
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. ATACAMA' row (party columns p6, accounting and remaining parties p7); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 4,
+   "title": "4.a Agrupación Electoral Departamental: La Serena, Coquimbo, Elqui, Ovalle, Combarbalá e Illapel",
+   "areas": [
+    "La Serena",
+    "Coquimbo",
+    "Elqui",
+    "Ovalle",
+    "Combarbalá",
+    "Illapel"
+   ],
+   "seats": 7,
+   "registered": 37337,
+   "cast": 28380,
+   "valid": 28174,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 206,
+   "page": 9,
+   "box": [
+    0.569,
+    0.507,
+    0.813,
+    0.537
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1195,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.254,
+      0.512,
+      0.33,
+      0.542
+     ],
+     "candidates": [
+      {
+       "name": "RENE BENAVIDES DEL VILLAR",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1197,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.31,
+      0.512,
+      0.386,
+      0.542
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 59,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.365,
+      0.512,
+      0.441,
+      0.542
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 265,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.477,
+      0.512,
+      0.553,
+      0.542
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1130,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.533,
+      0.512,
+      0.609,
+      0.542
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 8711,
+     "unassigned": null,
+     "seats": 3,
+     "page": 8,
+     "box": [
+      0.589,
+      0.512,
+      0.665,
+      0.542
+     ],
+     "candidates": [
+      {
+       "name": "HUGO ZEPEDA BARRIOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      },
+      {
+       "name": "EDMUNDO PIZARRO CABEZAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      },
+      {
+       "name": "JUAN PEÑAFIEL ILLANES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6819,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.645,
+      0.512,
+      0.721,
+      0.542
+     ],
+     "candidates": [
+      {
+       "name": "HUGO MIRANDA RAMIREZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1464,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.701,
+      0.512,
+      0.776,
+      0.542
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO SALINAS MOREIRA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 4071,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.756,
+      0.512,
+      0.832,
+      0.542
+     ],
+     "candidates": [
+      {
+       "name": "ALEJANDRO CHELEN ROJAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.44,
+        0.85,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 243,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.178,
+      0.507,
+      0.254,
+      0.537
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 148,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.234,
+      0.507,
+      0.31,
+      0.537
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 1728,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.29,
+      0.507,
+      0.366,
+      0.537
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 268,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.402,
+      0.507,
+      0.478,
+      0.537
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 876,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.458,
+      0.507,
+      0.533,
+      0.537
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. COQUIMBO' row (party columns p8, accounting and remaining parties p9); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 5,
+   "title": "5.a Agrupación Electoral Departamental: Petorca, San Felipe y Los Andes",
+   "areas": [
+    "Petorca",
+    "San Felipe",
+    "Los Andes"
+   ],
+   "seats": 3,
+   "registered": 25970,
+   "cast": 20302,
+   "valid": 20166,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 136,
+   "page": 11,
+   "box": [
+    0.543,
+    0.305,
+    0.79,
+    0.335
+   ],
+   "lists": [
+    {
+     "label": "Acción Renovadora de Chile",
+     "party": "Acción Renovadora de Chile",
+     "votes": 13,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.16,
+      0.31,
+      0.236,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3403,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.216,
+      0.31,
+      0.292,
+      0.34
+     ],
+     "candidates": [
+      {
+       "name": "ALFONSO DAVI[illegible]EBON",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.555,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1699,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.272,
+      0.31,
+      0.348,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 2458,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.328,
+      0.31,
+      0.403,
+      0.34
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR RIOS [illegible]ALT",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.555,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 13,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.383,
+      0.31,
+      0.459,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3636,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.551,
+      0.31,
+      0.627,
+      0.34
+     ],
+     "candidates": [
+      {
+       "name": "ABELARDO PIZARRO HERRERA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.555,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2938,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.607,
+      0.31,
+      0.682,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 610,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.662,
+      0.31,
+      0.738,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1508,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.718,
+      0.31,
+      0.794,
+      0.34
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 440,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.203,
+      0.305,
+      0.28,
+      0.335
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 1266,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.26,
+      0.305,
+      0.337,
+      0.335
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 2182,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.373,
+      0.305,
+      0.45,
+      0.335
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. ACONCAGUA' row (party columns p10, accounting and remaining parties p11); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Some elected names on p45/46 are partly blotted; illegible letters marked [illegible]."
+  },
+  {
+   "number": 6,
+   "title": "6.a Agrupación Electoral Departamental: Valparaíso y Quillota",
+   "areas": [
+    "Valparaíso",
+    "Quillota"
+   ],
+   "seats": 12,
+   "registered": 97165,
+   "cast": 75165,
+   "valid": 75099,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 66,
+   "page": 11,
+   "box": [
+    0.543,
+    0.59,
+    0.79,
+    0.62
+   ],
+   "lists": [
+    {
+     "label": "Acción Renovadora de Chile",
+     "party": "Acción Renovadora de Chile",
+     "votes": 3094,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.16,
+      0.595,
+      0.236,
+      0.625
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 8415,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.216,
+      0.595,
+      0.292,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "RAUL BENAPRES LAFOURCADE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 7167,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.272,
+      0.595,
+      0.348,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "FRANCISCO PALMA SANGUINETTI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 5156,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.328,
+      0.595,
+      0.403,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "HERNAN ROMANI [illegible]ENZUELA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 1129,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.383,
+      0.595,
+      0.459,
+      0.625
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1694,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.439,
+      0.595,
+      0.515,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "JOSE OYARZUN DESCOUVIERES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 942,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.495,
+      0.595,
+      0.571,
+      0.625
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6296,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.551,
+      0.595,
+      0.627,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO VIAL L[illegible]ELIER",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      },
+      {
+       "name": "GUILLERMO RIVERA BUSTOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 9024,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.607,
+      0.595,
+      0.682,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "ROLANDO RIVAS FERNANDEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      },
+      {
+       "name": "ALFREDO NAZAR FERES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 3864,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.662,
+      0.595,
+      0.738,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "ARMANDO MALLET SIMONETTI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 4456,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.718,
+      0.595,
+      0.794,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "HERIBERTO ALEGRE ARAYA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 582,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.09,
+      0.59,
+      0.167,
+      0.62
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 489,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.147,
+      0.59,
+      0.223,
+      0.62
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1509,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.203,
+      0.59,
+      0.28,
+      0.62
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 1424,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.26,
+      0.59,
+      0.337,
+      0.62
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 13108,
+     "unassigned": null,
+     "seats": 2,
+     "page": 11,
+     "box": [
+      0.373,
+      0.59,
+      0.45,
+      0.62
+     ],
+     "candidates": [
+      {
+       "name": "ARTURO IBAÑEZ CEZA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      },
+      {
+       "name": "RUBEN HURTADO O'RYAN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.05,
+        0.625,
+        0.85,
+        0.78
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 6750,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.487,
+      0.59,
+      0.563,
+      0.62
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. VALPARAISO' row (party columns p10, accounting and remaining parties p11); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Liberal 6.296 and Conservador Tradicionalista 5.156 read with difficulty (column crease); with them the lists add to the printed valid total. Some elected names on p45/46 are partly blotted; illegible letters marked [illegible]."
+  },
+  {
+   "number": 71,
+   "title": "7.a Agrupación Electoral Departamental: Santiago — Primer Distrito",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 18,
+   "registered": 168590,
+   "cast": 102809,
+   "valid": 101307,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1502,
+   "page": 11,
+   "box": [
+    0.543,
+    0.71,
+    0.79,
+    0.74
+   ],
+   "lists": [
+    {
+     "label": "Acción Renovadora de Chile",
+     "party": "Acción Renovadora de Chile",
+     "votes": 6222,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.16,
+      0.712,
+      0.236,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "JORGE MELENDEZ ESCOBAR",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 13944,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.216,
+      0.712,
+      0.292,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "JAVIER LIRA MERINO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "SERGIO RECABARREN VALENZUELA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 2366,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.272,
+      0.712,
+      0.348,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "HUGO ROSENDE SUBIABRE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 8928,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.328,
+      0.712,
+      0.403,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "BERNARDO LARRAIN VIAL",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "JAIME EGAÑA BARAONA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 7257,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.439,
+      0.712,
+      0.515,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO MARTONES MORALES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2247,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.495,
+      0.712,
+      0.571,
+      0.742
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4564,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.551,
+      0.712,
+      0.627,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "PABLO ALDUNATE PHILLIPS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 9198,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.607,
+      0.712,
+      0.682,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "JACOBO SCHAULSOHN N.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "JUAN MARTINEZ CAMPS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 9229,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.662,
+      0.712,
+      0.738,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO GONZALEZ ESPINOZA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "JOSE OYARCE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 4485,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.718,
+      0.712,
+      0.794,
+      0.742
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO PIZARRO SOBRADO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      },
+      {
+       "name": "EDGARDO MAASS JENSEN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 143,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.774,
+      0.712,
+      0.85,
+      0.742
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 1593,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.09,
+      0.71,
+      0.167,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 4176,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.147,
+      0.71,
+      0.223,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "JOSE MUSALEM SAFFIE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 3681,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.203,
+      0.71,
+      0.28,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "ARTURO OLAVARRIA GABLER",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 6091,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.26,
+      0.71,
+      0.337,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO OJEDA DOREN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unidad Popular",
+     "party": "Unidad Popular",
+     "votes": 420,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.317,
+      0.71,
+      0.393,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 468,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.373,
+      0.71,
+      0.45,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 8468,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.43,
+      0.71,
+      0.507,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO PINTO DIAZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.085,
+        0.85,
+        0.31
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 7827,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.487,
+      0.71,
+      0.563,
+      0.74
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Primer Distrito' row (party columns p10, accounting and remaining parties p11); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 72,
+   "title": "7.a Agrupación Electoral Departamental: Santiago — Segundo Distrito",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": 61911,
+   "cast": 43228,
+   "valid": 41945,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1283,
+   "page": 13,
+   "box": [
+    0.543,
+    0.399,
+    0.79,
+    0.429
+   ],
+   "lists": [
+    {
+     "label": "Acción Renovadora de Chile",
+     "party": "Acción Renovadora de Chile",
+     "votes": 151,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.16,
+      0.399,
+      0.238,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 6727,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.217,
+      0.399,
+      0.295,
+      0.429
+     ],
+     "candidates": [
+      {
+       "name": "ARNALDO RODRIGUEZ LAZO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.335,
+        0.85,
+        0.4
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 5805,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.333,
+      0.399,
+      0.41,
+      0.429
+     ],
+     "candidates": [
+      {
+       "name": "JUAN VAL[illegible]S RIESCO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.335,
+        0.85,
+        0.4
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 727,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.448,
+      0.399,
+      0.525,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1344,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.505,
+      0.399,
+      0.583,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2458,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.562,
+      0.399,
+      0.64,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3181,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.62,
+      0.399,
+      0.698,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 6142,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.677,
+      0.399,
+      0.755,
+      0.429
+     ],
+     "candidates": [
+      {
+       "name": "FLORENCIO GALLEGUILLOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.335,
+        0.85,
+        0.4
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1863,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.735,
+      0.399,
+      0.812,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.792,
+      0.399,
+      0.87,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 4001,
+     "unassigned": null,
+     "seats": 1,
+     "page": 13,
+     "box": [
+      0.09,
+      0.399,
+      0.167,
+      0.429
+     ],
+     "candidates": [
+      {
+       "name": "GALVARINO RIVERA GONZALEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.335,
+        0.85,
+        0.4
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 5166,
+     "unassigned": null,
+     "seats": 1,
+     "page": 13,
+     "box": [
+      0.147,
+      0.399,
+      0.223,
+      0.429
+     ],
+     "candidates": [
+      {
+       "name": "JOSE LASCAR LASCAR",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.335,
+        0.85,
+        0.4
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 374,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.203,
+      0.399,
+      0.28,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 1579,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.26,
+      0.399,
+      0.337,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 406,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.373,
+      0.399,
+      0.45,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 982,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.43,
+      0.399,
+      0.507,
+      0.429
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 1038,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.487,
+      0.399,
+      0.563,
+      0.429
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Total Segundo Distrito' row (party columns p12, accounting and remaining parties p13); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Some elected names on p45/46 are partly blotted; illegible letters marked [illegible]."
+  },
+  {
+   "number": 73,
+   "title": "7.a Agrupación Electoral Departamental: Santiago — Tercer Distrito",
+   "areas": [
+    "Santiago"
+   ],
+   "seats": 5,
+   "registered": 94287,
+   "cast": 58624,
+   "valid": 58139,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 485,
+   "page": 13,
+   "box": [
+    0.543,
+    0.486,
+    0.79,
+    0.516
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 9958,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.217,
+      0.486,
+      0.295,
+      0.516
+     ],
+     "candidates": [
+      {
+       "name": "MARCO ANTONIO SALUM YAZIGI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.425,
+        0.85,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 3080,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.275,
+      0.486,
+      0.353,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 5300,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.333,
+      0.486,
+      0.41,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 305,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.39,
+      0.486,
+      0.468,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1081,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.448,
+      0.486,
+      0.525,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6051,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.562,
+      0.486,
+      0.64,
+      0.516
+     ],
+     "candidates": [
+      {
+       "name": "RAFAEL VIVES VIVES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.425,
+        0.85,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5096,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.62,
+      0.486,
+      0.698,
+      0.516
+     ],
+     "candidates": [
+      {
+       "name": "HERMES AHUMADA PACHECO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.425,
+        0.85,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 3595,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.677,
+      0.486,
+      0.755,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 6064,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.735,
+      0.486,
+      0.812,
+      0.516
+     ],
+     "candidates": [
+      {
+       "name": "MARIO PALESTRO ROJAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.425,
+        0.85,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 1515,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.147,
+      0.486,
+      0.223,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 5182,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.203,
+      0.486,
+      0.28,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 5238,
+     "unassigned": null,
+     "seats": 1,
+     "page": 13,
+     "box": [
+      0.26,
+      0.486,
+      0.337,
+      0.516
+     ],
+     "candidates": [
+      {
+       "name": "JULIO JUSTINIANO PRENDEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.425,
+        0.85,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1082,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.373,
+      0.486,
+      0.45,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 3490,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.43,
+      0.486,
+      0.507,
+      0.516
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 1102,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.487,
+      0.486,
+      0.563,
+      0.516
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Tercer Distrito' row (party columns p12, accounting and remaining parties p13); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 8,
+   "title": "8.a Agrupación Electoral Departamental: Melipilla, San Antonio, San Bernardo y Maipo",
+   "areas": [
+    "Melipilla",
+    "San Antonio",
+    "San Bernardo",
+    "Maipo"
+   ],
+   "seats": 5,
+   "registered": 38525,
+   "cast": 29946,
+   "valid": 29300,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 646,
+   "page": 13,
+   "box": [
+    0.7,
+    0.61,
+    0.89,
+    0.74
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3515,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.217,
+      0.61,
+      0.295,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "RAFAEL DE LA PRESA CASANUEVA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.52,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 6458,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.333,
+      0.61,
+      0.41,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "LUIS VALDES LARRAIN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.52,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 724,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.39,
+      0.61,
+      0.468,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 2935,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.448,
+      0.61,
+      0.525,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 3260,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.505,
+      0.61,
+      0.583,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO VIDELA RIQUELME",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.52,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1093,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.562,
+      0.61,
+      0.64,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2920,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.62,
+      0.61,
+      0.698,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 772,
+     "unassigned": null,
+     "seats": 0,
+     "page": 12,
+     "box": [
+      0.677,
+      0.61,
+      0.755,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2010,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.735,
+      0.61,
+      0.812,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO OSORIO PARDO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.52,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 13,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.147,
+      0.61,
+      0.223,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 175,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.203,
+      0.61,
+      0.28,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 733,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.26,
+      0.61,
+      0.337,
+      0.74
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 2934,
+     "unassigned": null,
+     "seats": 1,
+     "page": 13,
+     "box": [
+      0.373,
+      0.61,
+      0.45,
+      0.74
+     ],
+     "candidates": [
+      {
+       "name": "JUAN ACEVEDO PAEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.52,
+        0.85,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 1758,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.487,
+      0.61,
+      0.563,
+      0.74
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "The volume prints no total row for this agrupación (the next row is PROV. SANTIAGO, which mixes in the Santiago districts), so every figure here, including registered/cast/valid/null, is the sum of the four department rows: Depto. Melipilla, San Antonio and San Bernardo (p12 parties, p13 accounting, y 0.62-0.74) and Depto. Maipo (p14 y 0.30, p15). List boxes point at the Melipilla-San Bernardo rows on p12/p13; Maipo is on p14/p15. Department sums close (lists = valid, valid + nulos y blancos = cast). Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 9,
+   "title": "9.a Agrupación Electoral Departamental: Rancagua, Caupolicán, San Vicente y Cachapoal",
+   "areas": [
+    "Rancagua",
+    "Caupolicán",
+    "San Vicente",
+    "Cachapoal"
+   ],
+   "seats": 6,
+   "registered": 42581,
+   "cast": 32406,
+   "valid": 32038,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 368,
+   "page": 15,
+   "box": [
+    0.543,
+    0.591,
+    0.79,
+    0.621
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 4303,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.217,
+      0.598,
+      0.295,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS MIRANDA MIRANDA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 621,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.275,
+      0.598,
+      0.353,
+      0.628
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 6881,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.333,
+      0.598,
+      0.41,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR CORREA LARRAIN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 2244,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.505,
+      0.598,
+      0.583,
+      0.628
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3963,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.562,
+      0.598,
+      0.64,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "ARMANDO JARAMILLO LYON",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2571,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.62,
+      0.598,
+      0.698,
+      0.628
+     ],
+     "candidates": [
+      {
+       "name": "SEBASTIAN SANTANDREU HERRERA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1473,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.677,
+      0.598,
+      0.755,
+      0.628
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 821,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.735,
+      0.598,
+      0.812,
+      0.628
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 7848,
+     "unassigned": null,
+     "seats": 1,
+     "page": 15,
+     "box": [
+      0.26,
+      0.591,
+      0.337,
+      0.621
+     ],
+     "candidates": [
+      {
+       "name": "BALTAZAR CASTRO PALMA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1271,
+     "unassigned": null,
+     "seats": 1,
+     "page": 15,
+     "box": [
+      0.373,
+      0.591,
+      0.45,
+      0.621
+     ],
+     "candidates": [
+      {
+       "name": "RENE JEREZ CONTRERAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.615,
+        0.85,
+        0.7
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 42,
+     "unassigned": null,
+     "seats": 0,
+     "page": 15,
+     "box": [
+      0.43,
+      0.591,
+      0.507,
+      0.621
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. O'HIGGINS' row (party columns p14, accounting and remaining parties p15); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 10,
+   "title": "10.a Agrupación Electoral Departamental: San Fernando y Santa Cruz",
+   "areas": [
+    "San Fernando",
+    "Santa Cruz"
+   ],
+   "seats": 4,
+   "registered": 25885,
+   "cast": 20756,
+   "valid": 20669,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 87,
+   "page": 17,
+   "box": [
+    0.543,
+    0.408,
+    0.79,
+    0.438
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1977,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.217,
+      0.398,
+      0.295,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "JORGE DE LA FUENTE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.72,
+        0.85,
+        0.79
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 840,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.275,
+      0.398,
+      0.353,
+      0.428
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 8151,
+     "unassigned": null,
+     "seats": 2,
+     "page": 16,
+     "box": [
+      0.333,
+      0.398,
+      0.41,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS JOSE ERRAZURIZ EYZAGUIRRE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.72,
+        0.85,
+        0.79
+       ]
+      },
+      {
+       "name": "PEDRO GONZALEZ FERNANDEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.72,
+        0.85,
+        0.79
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3647,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.562,
+      0.398,
+      0.64,
+      0.428
+     ],
+     "candidates": [
+      {
+       "name": "JORGE ERRAZURIZ ECHENIQUE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 46,
+       "box": [
+        0.05,
+        0.72,
+        0.85,
+        0.79
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1126,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.62,
+      0.398,
+      0.698,
+      0.428
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 758,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.677,
+      0.398,
+      0.755,
+      0.428
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 995,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.735,
+      0.398,
+      0.812,
+      0.428
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 1748,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.147,
+      0.408,
+      0.223,
+      0.438
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 1162,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.26,
+      0.408,
+      0.337,
+      0.438
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 265,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.43,
+      0.408,
+      0.507,
+      0.438
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. COLCHAGUA' row (party columns p16, accounting and remaining parties p17); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 11,
+   "title": "11.a Agrupación Electoral Departamental: Curicó y Mataquito",
+   "areas": [
+    "Curicó",
+    "Mataquito"
+   ],
+   "seats": 3,
+   "registered": 16160,
+   "cast": 12451,
+   "valid": 12420,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 31,
+   "page": 17,
+   "box": [
+    0.543,
+    0.568,
+    0.79,
+    0.598
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 2309,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.217,
+      0.559,
+      0.295,
+      0.589
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 1754,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.333,
+      0.559,
+      0.41,
+      0.589
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO BOLADOS RITTER",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.08,
+        0.85,
+        0.135
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 414,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.448,
+      0.559,
+      0.525,
+      0.589
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 38,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.505,
+      0.559,
+      0.583,
+      0.589
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2741,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.562,
+      0.559,
+      0.64,
+      0.589
+     ],
+     "candidates": [
+      {
+       "name": "HERNAN ARELLANO MATURANA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.08,
+        0.85,
+        0.135
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 1913,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.62,
+      0.559,
+      0.698,
+      0.589
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 187,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.677,
+      0.559,
+      0.755,
+      0.589
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2728,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.735,
+      0.559,
+      0.812,
+      0.589
+     ],
+     "candidates": [
+      {
+       "name": "OSCAR NARANJO JARA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.08,
+        0.85,
+        0.135
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 336,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.792,
+      0.559,
+      0.87,
+      0.589
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. CURICO' row (party columns p16, accounting and remaining parties p17); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 12,
+   "title": "12.a Agrupación Electoral Departamental: Talca, Lontué y Curepto",
+   "areas": [
+    "Talca",
+    "Lontué",
+    "Curepto"
+   ],
+   "seats": 5,
+   "registered": 32381,
+   "cast": 25693,
+   "valid": 25632,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 61,
+   "page": 19,
+   "box": [
+    0.543,
+    0.305,
+    0.79,
+    0.335
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 10159,
+     "unassigned": null,
+     "seats": 2,
+     "page": 18,
+     "box": [
+      0.217,
+      0.311,
+      0.295,
+      0.341
+     ],
+     "candidates": [
+      {
+       "name": "SANTIAGO URCELAY EMPARANZA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.155,
+        0.85,
+        0.23
+       ]
+      },
+      {
+       "name": "JOSE FONCEA AEDO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.155,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1779,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.275,
+      0.311,
+      0.353,
+      0.341
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 5135,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.333,
+      0.311,
+      0.41,
+      0.341
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO HURTADO ECHENIQUE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.155,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 618,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.505,
+      0.311,
+      0.583,
+      0.341
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2757,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.562,
+      0.311,
+      0.64,
+      0.341
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO ILLANES BENITEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.155,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2167,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.62,
+      0.311,
+      0.698,
+      0.341
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 576,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.677,
+      0.311,
+      0.755,
+      0.341
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1127,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.735,
+      0.311,
+      0.812,
+      0.341
+     ],
+     "candidates": [
+      {
+       "name": "RICARDO QUINTANA AYLWIN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.155,
+        0.85,
+        0.23
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.792,
+      0.311,
+      0.87,
+      0.341
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 450,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.147,
+      0.305,
+      0.223,
+      0.335
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 388,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.203,
+      0.305,
+      0.28,
+      0.335
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 475,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.487,
+      0.305,
+      0.563,
+      0.335
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. TALCA' row (party columns p18, accounting and remaining parties p19); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 13,
+   "title": "13.a Agrupación Electoral Departamental: Cauquenes, Constitución y Chanco",
+   "areas": [
+    "Cauquenes",
+    "Constitución",
+    "Chanco"
+   ],
+   "seats": 3,
+   "registered": 16893,
+   "cast": 14030,
+   "valid": 14023,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 7,
+   "page": 19,
+   "box": [
+    0.543,
+    0.504,
+    0.79,
+    0.534
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3511,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.217,
+      0.511,
+      0.295,
+      0.541
+     ],
+     "candidates": [
+      {
+       "name": "RICARDO DEL RIO PINOCHET",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.25,
+        0.85,
+        0.305
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1679,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.275,
+      0.511,
+      0.353,
+      0.541
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 73,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.333,
+      0.511,
+      0.41,
+      0.541
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 4242,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.448,
+      0.511,
+      0.525,
+      0.541
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MINCHEL BALLADARES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.25,
+        0.85,
+        0.305
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 232,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.505,
+      0.511,
+      0.583,
+      0.541
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3276,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.562,
+      0.511,
+      0.64,
+      0.541
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO DEL RIO GUNDIAN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.25,
+        0.85,
+        0.305
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 497,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.62,
+      0.511,
+      0.698,
+      0.541
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 513,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.735,
+      0.511,
+      0.812,
+      0.541
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. MAULE' row (party columns p18, accounting and remaining parties p19); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 14,
+   "title": "14.a Agrupación Electoral Departamental: Linares, Loncomilla y Parral",
+   "areas": [
+    "Linares",
+    "Loncomilla",
+    "Parral"
+   ],
+   "seats": 4,
+   "registered": 29713,
+   "cast": 24648,
+   "valid": 24582,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 66,
+   "page": 19,
+   "box": [
+    0.543,
+    0.697,
+    0.79,
+    0.727
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 7778,
+     "unassigned": null,
+     "seats": 2,
+     "page": 18,
+     "box": [
+      0.217,
+      0.703,
+      0.295,
+      0.733
+     ],
+     "candidates": [
+      {
+       "name": "JOSE MARIA MUÑOZ SAN MARTIN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.325,
+        0.85,
+        0.39
+       ]
+      },
+      {
+       "name": "SERGIO BUSTAMANTE DEL CAMPO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.325,
+        0.85,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 2232,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.333,
+      0.703,
+      0.41,
+      0.733
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 310,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.505,
+      0.703,
+      0.583,
+      0.733
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3569,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.562,
+      0.703,
+      0.64,
+      0.733
+     ],
+     "candidates": [
+      {
+       "name": "IGNACIO URRUTIA DE LA SOTTA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.325,
+        0.85,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3176,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.62,
+      0.703,
+      0.698,
+      0.733
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 114,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.677,
+      0.703,
+      0.755,
+      0.733
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2453,
+     "unassigned": null,
+     "seats": 0,
+     "page": 18,
+     "box": [
+      0.735,
+      0.703,
+      0.812,
+      0.733
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 2792,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.792,
+      0.703,
+      0.87,
+      0.733
+     ],
+     "candidates": [
+      {
+       "name": "HERNAN LOBOS ARIAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.325,
+        0.85,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 1393,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.147,
+      0.697,
+      0.223,
+      0.727
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 765,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.487,
+      0.697,
+      0.563,
+      0.727
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. LINARES' row (party columns p18, accounting and remaining parties p19); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 15,
+   "title": "15.a Agrupación Electoral Departamental: Itata y San Carlos",
+   "areas": [
+    "Itata",
+    "San Carlos"
+   ],
+   "seats": 3,
+   "registered": 13820,
+   "cast": 11373,
+   "valid": 11370,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 3,
+   "page": 21,
+   "box": [
+    0.543,
+    0.421,
+    0.79,
+    0.451
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 2829,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.217,
+      0.419,
+      0.295,
+      0.449
+     ],
+     "candidates": [
+      {
+       "name": "RAMON ESPINOZA VASQUEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.405,
+        0.85,
+        0.46
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 912,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.275,
+      0.419,
+      0.353,
+      0.449
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 1167,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.333,
+      0.419,
+      0.41,
+      0.449
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2496,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.562,
+      0.419,
+      0.64,
+      0.449
+     ],
+     "candidates": [
+      {
+       "name": "JOVINO ANTONIO PARADA Q.",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.405,
+        0.85,
+        0.46
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2144,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.62,
+      0.419,
+      0.698,
+      0.449
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS MONTANE CASTRO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.405,
+        0.85,
+        0.46
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 78,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.677,
+      0.419,
+      0.755,
+      0.449
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1272,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.735,
+      0.419,
+      0.812,
+      0.449
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 330,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.792,
+      0.419,
+      0.87,
+      0.449
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 55,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.147,
+      0.421,
+      0.223,
+      0.451
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.26,
+      0.421,
+      0.337,
+      0.451
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 82,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.373,
+      0.421,
+      0.45,
+      0.451
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 3,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.43,
+      0.421,
+      0.507,
+      0.451
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Total 15.a Agrupación' row (party columns p20, accounting and remaining parties p21); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 16,
+   "title": "16.a Agrupación Electoral Departamental: Chillán, Bulnes y Yungay",
+   "areas": [
+    "Chillán",
+    "Bulnes",
+    "Yungay"
+   ],
+   "seats": 5,
+   "registered": 29231,
+   "cast": 22689,
+   "valid": 22303,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 386,
+   "page": 21,
+   "box": [
+    0.543,
+    0.677,
+    0.79,
+    0.707
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 1798,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.217,
+      0.674,
+      0.295,
+      0.704
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MARTIN MARDONES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.475,
+        0.85,
+        0.555
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1029,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.275,
+      0.674,
+      0.353,
+      0.704
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 2845,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.333,
+      0.674,
+      0.41,
+      0.704
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS IZQUIERDO EDWARDS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.475,
+        0.85,
+        0.555
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 1181,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.39,
+      0.674,
+      0.468,
+      0.704
+     ],
+     "candidates": [
+      {
+       "name": "SERAFIN SOTO RODRIGUEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.475,
+        0.85,
+        0.555
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1343,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.448,
+      0.674,
+      0.525,
+      0.704
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1939,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.562,
+      0.674,
+      0.64,
+      0.704
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 4998,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.62,
+      0.674,
+      0.698,
+      0.704
+     ],
+     "candidates": [
+      {
+       "name": "ORLANDO SANDOVAL VARGAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.475,
+        0.85,
+        0.555
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 1420,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.677,
+      0.674,
+      0.755,
+      0.704
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO POBLETE VERAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.475,
+        0.85,
+        0.555
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1392,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.735,
+      0.674,
+      0.812,
+      0.704
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 776,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.147,
+      0.677,
+      0.223,
+      0.707
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 639,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.203,
+      0.677,
+      0.28,
+      0.707
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1900,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.373,
+      0.677,
+      0.45,
+      0.707
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 353,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.43,
+      0.677,
+      0.507,
+      0.707
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 690,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.487,
+      0.677,
+      0.563,
+      0.707
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Total 16.a Agrupación' row (party columns p20, accounting and remaining parties p21); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 17,
+   "title": "17.a Agrupación Electoral Departamental: Concepción, Tomé, Talcahuano, Coronel y Yumbel",
+   "areas": [
+    "Concepción",
+    "Tomé",
+    "Talcahuano",
+    "Coronel",
+    "Yumbel"
+   ],
+   "seats": 9,
+   "registered": 71133,
+   "cast": 52485,
+   "valid": 52063,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 422,
+   "page": 23,
+   "box": [
+    0.57,
+    0.608,
+    0.83,
+    0.638
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 4741,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.217,
+      0.597,
+      0.295,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "ANIBAL ZUÑIGA PUENTE ALBA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 3050,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.275,
+      0.597,
+      0.353,
+      0.627
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 4034,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.333,
+      0.597,
+      0.41,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "ENRIQUE SERRANO VIALE-RIGO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 2789,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.39,
+      0.597,
+      0.468,
+      0.627
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 5302,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.448,
+      0.597,
+      0.525,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "ADAN PUENTE GOMEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 11,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.505,
+      0.597,
+      0.583,
+      0.627
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4858,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.562,
+      0.597,
+      0.64,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO ESPINA RITCHIE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7504,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.62,
+      0.597,
+      0.698,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO ENRIQUEZ FRODDEN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 4561,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.677,
+      0.597,
+      0.755,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "ALBINO BARRA VILLALOBOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 8091,
+     "unassigned": null,
+     "seats": 2,
+     "page": 22,
+     "box": [
+      0.735,
+      0.597,
+      0.812,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "SALOMON CORBALAN GONZALEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      },
+      {
+       "name": "MANUEL VALDES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 1376,
+     "unassigned": null,
+     "seats": 0,
+     "page": 23,
+     "box": [
+      0.09,
+      0.608,
+      0.17,
+      0.638
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 168,
+     "unassigned": null,
+     "seats": 0,
+     "page": 23,
+     "box": [
+      0.15,
+      0.608,
+      0.23,
+      0.638
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 3088,
+     "unassigned": null,
+     "seats": 1,
+     "page": 23,
+     "box": [
+      0.27,
+      0.608,
+      0.35,
+      0.638
+     ],
+     "candidates": [
+      {
+       "name": "ENRIQUE RODRIGUEZ BALLESTEROS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.57,
+        0.85,
+        0.695
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 321,
+     "unassigned": null,
+     "seats": 0,
+     "page": 23,
+     "box": [
+      0.39,
+      0.608,
+      0.47,
+      0.638
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 2167,
+     "unassigned": null,
+     "seats": 0,
+     "page": 23,
+     "box": [
+      0.45,
+      0.608,
+      0.53,
+      0.638
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 2,
+     "unassigned": null,
+     "seats": 0,
+     "page": 23,
+     "box": [
+      0.51,
+      0.608,
+      0.59,
+      0.638
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. CONCEPCION' row (party columns p22, accounting and remaining parties p23); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 18,
+   "title": "18.a Agrupación Electoral Departamental: Lebu, Arauco y Cañete",
+   "areas": [
+    "Lebu",
+    "Arauco",
+    "Cañete"
+   ],
+   "seats": 2,
+   "registered": 11156,
+   "cast": 8502,
+   "valid": 8469,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 33,
+   "page": 25,
+   "box": [
+    0.57,
+    0.332,
+    0.83,
+    0.362
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 780,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.275,
+      0.33,
+      0.353,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 1504,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.333,
+      0.33,
+      0.41,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 12,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.39,
+      0.33,
+      0.468,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 1444,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.448,
+      0.33,
+      0.525,
+      0.36
+     ],
+     "candidates": [
+      {
+       "name": "VIRGILIO MORALES VIVANCO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.712,
+        0.85,
+        0.755
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 891,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.62,
+      0.33,
+      0.698,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 698,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.677,
+      0.33,
+      0.755,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 772,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.735,
+      0.33,
+      0.812,
+      0.36
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 443,
+     "unassigned": null,
+     "seats": 0,
+     "page": 25,
+     "box": [
+      0.27,
+      0.332,
+      0.35,
+      0.362
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unidad Popular",
+     "party": "Unidad Popular",
+     "votes": 1900,
+     "unassigned": null,
+     "seats": 1,
+     "page": 25,
+     "box": [
+      0.33,
+      0.332,
+      0.41,
+      0.362
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MARTINEZ SARAVIA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.712,
+        0.85,
+        0.755
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 25,
+     "unassigned": null,
+     "seats": 0,
+     "page": 25,
+     "box": [
+      0.39,
+      0.332,
+      0.47,
+      0.362
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. ARAUCO' row (party columns p24, accounting and remaining parties p25); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Elected Luis Martínez Saravia printed '(PARTIDO DE UNION POPULAR)' with 'Unidad' handwritten; placed in the Unidad Popular list."
+  },
+  {
+   "number": 19,
+   "title": "19.a Agrupación Electoral Departamental: La Laja, Nacimiento y Mulchén",
+   "areas": [
+    "La Laja",
+    "Nacimiento",
+    "Mulchén"
+   ],
+   "seats": 4,
+   "registered": 21258,
+   "cast": 16936,
+   "valid": 16850,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 86,
+   "page": 25,
+   "box": [
+    0.57,
+    0.534,
+    0.83,
+    0.564
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 2596,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.217,
+      0.535,
+      0.295,
+      0.565
+     ],
+     "candidates": [
+      {
+       "name": "JORGE RIGO-RIGHI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.775,
+        0.85,
+        0.84
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 1803,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.333,
+      0.535,
+      0.41,
+      0.565
+     ],
+     "candidates": [
+      {
+       "name": "FRANCISCO VIAL FREIRE",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.775,
+        0.85,
+        0.84
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 2238,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.39,
+      0.535,
+      0.468,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 665,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.448,
+      0.535,
+      0.525,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 399,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.505,
+      0.535,
+      0.583,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 1287,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.562,
+      0.535,
+      0.64,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3864,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.62,
+      0.535,
+      0.698,
+      0.565
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL RIOSECO VASQUEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.775,
+        0.85,
+        0.84
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 248,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.677,
+      0.535,
+      0.755,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1860,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.735,
+      0.535,
+      0.812,
+      0.565
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO AQUEVEQUE CASTRO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 47,
+       "box": [
+        0.05,
+        0.775,
+        0.85,
+        0.84
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 425,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.792,
+      0.535,
+      0.87,
+      0.565
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1465,
+     "unassigned": null,
+     "seats": 0,
+     "page": 25,
+     "box": [
+      0.21,
+      0.534,
+      0.29,
+      0.564
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. BIO-BIO' row (party columns p24, accounting and remaining parties p25); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 20,
+   "title": "20.a Agrupación Electoral Departamental: Angol, Collipulli, Traiguén, Victoria y Curacautín",
+   "areas": [
+    "Angol",
+    "Collipulli",
+    "Traiguén",
+    "Victoria",
+    "Curacautín"
+   ],
+   "seats": 6,
+   "registered": 26885,
+   "cast": 20934,
+   "valid": 20711,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 223,
+   "page": 27,
+   "box": [
+    0.57,
+    0.376,
+    0.83,
+    0.406
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3235,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.217,
+      0.376,
+      0.295,
+      0.406
+     ],
+     "candidates": [
+      {
+       "name": "ANTONIO ORPIS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 474,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.275,
+      0.376,
+      0.353,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 1006,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.39,
+      0.376,
+      0.468,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 55,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.448,
+      0.376,
+      0.525,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5376,
+     "unassigned": null,
+     "seats": 2,
+     "page": 26,
+     "box": [
+      0.562,
+      0.376,
+      0.64,
+      0.406
+     ],
+     "candidates": [
+      {
+       "name": "ERNESTO ARANEDA ROCHA",
+       "party": "Liberal Progresista",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      },
+      {
+       "name": "MIGUEL HUERTA MUÑOZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3244,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.62,
+      0.376,
+      0.698,
+      0.406
+     ],
+     "candidates": [
+      {
+       "name": "JULIO SEPULVEDA RONDANELLI",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2745,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.735,
+      0.376,
+      0.812,
+      0.406
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO MARTINEZ MARTINEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 1704,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.792,
+      0.376,
+      0.87,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 480,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.15,
+      0.376,
+      0.23,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1572,
+     "unassigned": null,
+     "seats": 1,
+     "page": 27,
+     "box": [
+      0.21,
+      0.376,
+      0.29,
+      0.406
+     ],
+     "candidates": [
+      {
+       "name": "NABOR COFRE PALMA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.083,
+        0.85,
+        0.172
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 26,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.27,
+      0.376,
+      0.35,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 4,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.39,
+      0.376,
+      0.47,
+      0.406
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 790,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.51,
+      0.376,
+      0.59,
+      0.406
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. MALLECO' row (party columns p26, accounting and remaining parties p27); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Ernesto Araneda Rocha elected as '(LIBERAL PROGRESISTA)'; the summary (p34) says Liberal Progresista votes are included in the Partido Liberal, so he is placed in the Liberal list."
+  },
+  {
+   "number": 21,
+   "title": "21.a Agrupación Electoral Departamental: Temuco, Lautaro, Imperial, Pitrufquén y Villarrica",
+   "areas": [
+    "Temuco",
+    "Lautaro",
+    "Imperial",
+    "Pitrufquén",
+    "Villarrica"
+   ],
+   "seats": 10,
+   "registered": 56638,
+   "cast": 41006,
+   "valid": 40927,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 79,
+   "page": 27,
+   "box": [
+    0.57,
+    0.738,
+    0.83,
+    0.768
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 8942,
+     "unassigned": null,
+     "seats": 2,
+     "page": 26,
+     "box": [
+      0.217,
+      0.738,
+      0.295,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "EDGARDO BARRUETO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      },
+      {
+       "name": "MANUEL BART",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 412,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.275,
+      0.738,
+      0.353,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 3385,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.333,
+      0.738,
+      0.41,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO LOYOLA VASQUEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 73,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.39,
+      0.738,
+      0.468,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 471,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.448,
+      0.738,
+      0.525,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1067,
+     "unassigned": null,
+     "seats": 0,
+     "page": 26,
+     "box": [
+      0.505,
+      0.738,
+      0.583,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 2684,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.562,
+      0.738,
+      0.64,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "ENRIQUE CAMPOS MENENDEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6345,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.62,
+      0.738,
+      0.698,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "JULIO DURAN NEUMANN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2080,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.735,
+      0.738,
+      0.812,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "HAROLDO MARTINEZ URRUTIA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 2393,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.792,
+      0.738,
+      0.87,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "JULIAN ECHEVARRI ELORZA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 4393,
+     "unassigned": null,
+     "seats": 2,
+     "page": 27,
+     "box": [
+      0.15,
+      0.738,
+      0.23,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "ESTEBAN ROMERO SANDOVAL",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      },
+      {
+       "name": "JOSE CAYUPI CATRILAF",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 1325,
+     "unassigned": null,
+     "seats": 1,
+     "page": 27,
+     "box": [
+      0.21,
+      0.738,
+      0.29,
+      0.768
+     ],
+     "candidates": [
+      {
+       "name": "JUAN FUENTEALBA OREÑO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.185,
+        0.85,
+        0.32
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 3540,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.27,
+      0.738,
+      0.35,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1101,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.39,
+      0.738,
+      0.47,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 263,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.45,
+      0.738,
+      0.53,
+      0.768
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 2453,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.51,
+      0.738,
+      0.59,
+      0.768
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. CAUTIN' row (party columns p26, accounting and remaining parties p27); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 22,
+   "title": "22.a Agrupación Electoral Departamental: Valdivia, La Unión y Río Bueno",
+   "areas": [
+    "Valdivia",
+    "La Unión",
+    "Río Bueno"
+   ],
+   "seats": 5,
+   "registered": 37877,
+   "cast": 26925,
+   "valid": 26537,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 388,
+   "page": 29,
+   "box": [
+    0.57,
+    0.524,
+    0.83,
+    0.554
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 5798,
+     "unassigned": null,
+     "seats": 2,
+     "page": 28,
+     "box": [
+      0.217,
+      0.54,
+      0.295,
+      0.57
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO LEA PLAZA SAENZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.34,
+        0.85,
+        0.415
+       ]
+      },
+      {
+       "name": "RICARDO WEBER KUNSTMANN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.34,
+        0.85,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1447,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.275,
+      0.54,
+      0.353,
+      0.57
+     ],
+     "candidates": [
+      {
+       "name": "LIA LAFFAYE DE MUÑOZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.34,
+        0.85,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 1620,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.39,
+      0.54,
+      0.468,
+      0.57
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 2737,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.448,
+      0.54,
+      0.525,
+      0.57
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 1811,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.505,
+      0.54,
+      0.583,
+      0.57
+     ],
+     "candidates": [
+      {
+       "name": "IGNACIO PALMA VICUÑA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.34,
+        0.85,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4841,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.562,
+      0.54,
+      0.64,
+      0.57
+     ],
+     "candidates": [
+      {
+       "name": "JUAN EDUARDO PUENTES GARCIA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.34,
+        0.85,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2788,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.62,
+      0.54,
+      0.698,
+      0.57
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 608,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.677,
+      0.54,
+      0.755,
+      0.57
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1042,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.735,
+      0.54,
+      0.812,
+      0.57
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Laborista",
+     "party": "Laborista",
+     "votes": 505,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.09,
+      0.524,
+      0.17,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 133,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.15,
+      0.524,
+      0.23,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical Doctrinario",
+     "party": "Radical Doctrinario",
+     "votes": 608,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.21,
+      0.524,
+      0.29,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 17,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.27,
+      0.524,
+      0.35,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1768,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.39,
+      0.524,
+      0.47,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 306,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.45,
+      0.524,
+      0.53,
+      0.554
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 508,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.51,
+      0.524,
+      0.59,
+      0.554
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. VALDIVIA' row (party columns p28, accounting and remaining parties p29); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 23,
+   "title": "23.a Agrupación Electoral Departamental: Osorno y Río Negro",
+   "areas": [
+    "Osorno",
+    "Río Negro"
+   ],
+   "seats": 3,
+   "registered": 21755,
+   "cast": 15903,
+   "valid": 15786,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 197,
+   "page": 29,
+   "box": [
+    0.57,
+    0.731,
+    0.83,
+    0.761
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 3209,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.217,
+      0.747,
+      0.295,
+      0.777
+     ],
+     "candidates": [
+      {
+       "name": "LUIS ALBERTO GUZMAN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.435,
+        0.85,
+        0.485
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 1552,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.275,
+      0.747,
+      0.353,
+      0.777
+     ],
+     "candidates": [
+      {
+       "name": "ARMANDO PALMA GALLARDO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.435,
+        0.85,
+        0.485
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 77,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.333,
+      0.747,
+      0.41,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 344,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.448,
+      0.747,
+      0.525,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 25,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.505,
+      0.747,
+      0.583,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3633,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.562,
+      0.747,
+      0.64,
+      0.777
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO SEPULVEDA GARCES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.435,
+        0.85,
+        0.485
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2485,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.62,
+      0.747,
+      0.698,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 234,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.677,
+      0.747,
+      0.755,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1642,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.735,
+      0.747,
+      0.812,
+      0.777
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 2074,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.27,
+      0.731,
+      0.35,
+      0.761
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 36,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.39,
+      0.731,
+      0.47,
+      0.761
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 395,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.45,
+      0.731,
+      0.53,
+      0.761
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. OSORNO' row (party columns p28, accounting and remaining parties p29); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list. Lists add to 15.706 but the volume prints Total votos válidamente emitidos 15.786 (80 more); valid + nulos y blancos 197 = 15.903 printed cast is consistent with 15.706, and the p34 national total of valid votes (779.174) matches the contests only with 15.706, so 15.786 looks like a misprint; the printed 15.786 is kept as valid."
+  },
+  {
+   "number": 24,
+   "title": "24.a Agrupación Electoral Departamental: Llanquihue, Maullín, Calbuco, Puerto Varas y Aysén",
+   "areas": [
+    "Llanquihue",
+    "Maullín",
+    "Calbuco",
+    "Puerto Varas",
+    "Aysén"
+   ],
+   "seats": 3,
+   "registered": 25909,
+   "cast": 18078,
+   "valid": 17943,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 135,
+   "page": 31,
+   "box": [
+    0.57,
+    0.602,
+    0.83,
+    0.632
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 5753,
+     "unassigned": null,
+     "seats": 1,
+     "page": 30,
+     "box": [
+      0.217,
+      0.605,
+      0.295,
+      0.635
+     ],
+     "candidates": [
+      {
+       "name": "JULIO VON MUHLENBROCK LIRA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.508,
+        0.85,
+        0.558
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 2579,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.275,
+      0.605,
+      0.353,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 2505,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.333,
+      0.605,
+      0.41,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático de Chile",
+     "party": "Democrático de Chile",
+     "votes": 74,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.39,
+      0.605,
+      0.468,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 433,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.448,
+      0.605,
+      0.525,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 462,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.562,
+      0.605,
+      0.64,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3606,
+     "unassigned": null,
+     "seats": 1,
+     "page": 30,
+     "box": [
+      0.62,
+      0.605,
+      0.698,
+      0.635
+     ],
+     "candidates": [
+      {
+       "name": "FEDERICO BUCHER WEIBEL",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.508,
+        0.85,
+        0.558
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 183,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.677,
+      0.605,
+      0.755,
+      0.635
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 1003,
+     "unassigned": null,
+     "seats": 1,
+     "page": 30,
+     "box": [
+      0.735,
+      0.605,
+      0.812,
+      0.635
+     ],
+     "candidates": [
+      {
+       "name": "EUDALDO LOBO BARRIENTOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.508,
+        0.85,
+        0.558
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 10,
+     "unassigned": null,
+     "seats": 0,
+     "page": 31,
+     "box": [
+      0.27,
+      0.602,
+      0.35,
+      0.632
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 516,
+     "unassigned": null,
+     "seats": 0,
+     "page": 31,
+     "box": [
+      0.39,
+      0.602,
+      0.47,
+      0.632
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 819,
+     "unassigned": null,
+     "seats": 0,
+     "page": 31,
+     "box": [
+      0.51,
+      0.602,
+      0.59,
+      0.632
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'Total 24.a Agrupación' row (party columns p30, accounting and remaining parties p31); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 25,
+   "title": "25.a Agrupación Electoral Departamental: Ancud, Castro y Quinchao",
+   "areas": [
+    "Ancud",
+    "Castro",
+    "Quinchao"
+   ],
+   "seats": 3,
+   "registered": 15445,
+   "cast": 11084,
+   "valid": 11080,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 4,
+   "page": 33,
+   "box": [
+    0.64,
+    0.461,
+    0.88,
+    0.491
+   ],
+   "lists": [
+    {
+     "label": "Agrario Laborista",
+     "party": "Agrario Laborista",
+     "votes": 534,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.202,
+      0.451,
+      0.285,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 233,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.265,
+      0.451,
+      0.348,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Tradicionalista",
+     "party": "Conservador Tradicionalista",
+     "votes": 2297,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.328,
+      0.451,
+      0.41,
+      0.481
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR CORREA LETELIER",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.577,
+        0.85,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático del Pueblo",
+     "party": "Democrático del Pueblo",
+     "votes": 174,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.453,
+      0.451,
+      0.535,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Falange Nacional",
+     "party": "Falange Nacional",
+     "votes": 757,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.515,
+      0.451,
+      0.598,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 734,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.578,
+      0.451,
+      0.66,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3021,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.64,
+      0.451,
+      0.723,
+      0.481
+     ],
+     "candidates": [
+      {
+       "name": "RAUL MORALES ADRIAZOLA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.577,
+        0.85,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 55,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.703,
+      0.451,
+      0.785,
+      0.481
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 2172,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.765,
+      0.451,
+      0.848,
+      0.481
+     ],
+     "candidates": [
+      {
+       "name": "BELARMINO ELGUETA BECKER",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.577,
+        0.85,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Nacional Cristiano",
+     "party": "Nacional Cristiano",
+     "votes": 32,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.255,
+      0.461,
+      0.33,
+      0.491
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Unión Nacional de Independientes",
+     "party": "Unión Nacional de Independientes",
+     "votes": 96,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.365,
+      0.461,
+      0.44,
+      0.491
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional Ibañista",
+     "party": "Movimiento Nacional Ibañista",
+     "votes": 1,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.475,
+      0.461,
+      0.55,
+      0.491
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Movimiento Nacional del Pueblo",
+     "party": "Movimiento Nacional del Pueblo",
+     "votes": 974,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.53,
+      0.461,
+      0.605,
+      0.491
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. CHILOE' row (party columns p32, accounting and remaining parties p33); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  },
+  {
+   "number": 26,
+   "title": "26.a Agrupación Electoral Departamental: Magallanes, Última Esperanza y Tierra del Fuego",
+   "areas": [
+    "Magallanes",
+    "Última Esperanza",
+    "Tierra del Fuego"
+   ],
+   "seats": 1,
+   "registered": 15234,
+   "cast": 9791,
+   "valid": 9783,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 8,
+   "page": 33,
+   "box": [
+    0.64,
+    0.63,
+    0.88,
+    0.66
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 185,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.265,
+      0.626,
+      0.348,
+      0.656
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2543,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.64,
+      0.626,
+      0.723,
+      0.656
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista de Chile",
+     "party": "Socialista de Chile",
+     "votes": 89,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.703,
+      0.626,
+      0.785,
+      0.656
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Popular",
+     "party": "Socialista Popular",
+     "votes": 3845,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.765,
+      0.626,
+      0.848,
+      0.656
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO HERNANDEZ BARRIENTOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.05,
+        0.648,
+        0.85,
+        0.673
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unidad Popular",
+     "party": "Unidad Popular",
+     "votes": 24,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.42,
+      0.63,
+      0.495,
+      0.66
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Partidos que no alcanzaron representación parlamentaria",
+     "party": "Partidos que no alcanzaron representación parlamentaria",
+     "votes": 3097,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.585,
+      0.63,
+      0.66,
+      0.66
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Grouping totals from the 'PROV. MAGALLANES' row (party columns p32, accounting and remaining parties p33); each table cell has Varones / Mujeres / Total sub-columns, the Total is used. Valid = 'Total votos válidamente emitidos'; null_blank = 'Total votos nulos y en blanco'; cast = 'Total general votos emitidos'; registered = 'Total general votantes hábiles con derecho a sufragio'. Lists are party columns; parties with no votes in the grouping are omitted. 'Partidos que no alcanzaron representación' is printed as one aggregate column. Elected deputies (names as typed on pp45-48, votes not printed per candidate) are attached to their party's list."
+  }
+ ],
+ "national": {
+  "valid": 779172,
+  "cast": 785609,
+  "registered": 1100027,
+  "page": 33,
+  "parties": {
+   "Acción Renovadora de Chile": 9489,
+   "Agrario Laborista": 118483,
+   "Conservador": 33332,
+   "Conservador Tradicionalista": 78383,
+   "Democrático de Chile": 11570,
+   "Democrático del Pueblo": 31961,
+   "Falange Nacional": 22353,
+   "Liberal": 84924,
+   "Radical": 103650,
+   "Socialista de Chile": 41679,
+   "Socialista Popular": 68218,
+   "Agrario": 8125,
+   "Laborista": 8171,
+   "Nacional Cristiano": 21381,
+   "Radical Doctrinario": 17882,
+   "Unión Nacional de Independientes": 39877,
+   "Unidad Popular": 2344,
+   "Movimiento Nacional Ibañista": 28976,
+   "Movimiento Nacional del Pueblo": 19238,
+   "Partidos que no alcanzaron representación parlamentaria": 29147
+  }
+ },
+ "notes": "Volume: p1-3 introductory text, p4-33 'Elección de Diputados por comunas, departamentos y provincias' (each spread is a left page with 12 party columns and a right page with 8 more party columns plus totals; Varones/Mujeres/Total sub-columns; grouping totals only, Total sub-column), p34 summary by party, p35-42 parties without representation by commune, p43-44 fold-out tables (not used), p45-48 elected deputies by grouping, p49 typed national party totals, p50 seat chart. 28 contests: agrupaciones 1-26, with the 7th (Santiago) split into its three districts that each elect separately (numbers 71, 72, 73 = 7th agrupación, districts 1-3). 147 seats in all, matching p34. Only party votes are printed (no candidate votes); candidates hold the elected only. National = 'Total República' row (p32-33): valid 779.172, nulos y blancos 7.637, cast 785.609 (valid + null = 786.809, so the printed national row does not close), registered 1.100.027; national party figures sum to 779.183 (11 over printed valid). Pages are slightly skewed scans; boxes were measured on deskewed renders (rotation under 1.6 degrees), so they are approximate but contain the cited numbers."
+}

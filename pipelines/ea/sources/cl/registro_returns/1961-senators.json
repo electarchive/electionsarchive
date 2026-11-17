@@ -1,0 +1,1015 @@
+{
+ "volume": "1961-senators",
+ "chamber": "senators",
+ "year": 1961,
+ "day": "1961-03-05",
+ "day_printed": "Domingo 5 de Marzo 1961",
+ "contests": [
+  {
+   "number": 1,
+   "title": "1º Agrupación Provincial de Tarapacá y Antofagasta",
+   "areas": [
+    "Tarapacá",
+    "Antofagasta"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 73430,
+   "valid": 70585,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 2845,
+   "page": 7,
+   "box": [
+    0.05,
+    0.838,
+    0.86,
+    0.868
+   ],
+   "lists": [
+    {
+     "label": "Lista B",
+     "party": "Demócrata Cristiano",
+     "votes": 10345,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.208,
+      0.841,
+      0.278,
+      0.865
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista E",
+     "party": "Radical",
+     "votes": 20708,
+     "unassigned": null,
+     "seats": 2,
+     "page": 7,
+     "box": [
+      0.385,
+      0.841,
+      0.455,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "JONAS GOMEZ GALLO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.284,
+        0.82,
+        0.302
+       ]
+      },
+      {
+       "name": "JUAN LUIS MAURAS NOVELLA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.297,
+        0.82,
+        0.315
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista G",
+     "party": "Comunista",
+     "votes": 15844,
+     "unassigned": null,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.454,
+      0.841,
+      0.524,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "VICTOR CONTRERAS TAPIA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.258,
+        0.82,
+        0.276
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista I",
+     "party": "Liberal",
+     "votes": 14141,
+     "unassigned": null,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.572,
+      0.841,
+      0.642,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO ALESSANDRI RODRIGUEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.309,
+        0.82,
+        0.327
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista J",
+     "party": "Socialista",
+     "votes": 8860,
+     "unassigned": null,
+     "seats": 1,
+     "page": 7,
+     "box": [
+      0.622,
+      0.841,
+      0.692,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "RAUL AMPUERO DIAZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.272,
+        0.82,
+        0.29
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista K",
+     "party": "Democrático Nacional",
+     "votes": 687,
+     "unassigned": null,
+     "seats": 0,
+     "page": 7,
+     "box": [
+      0.683,
+      0.841,
+      0.753,
+      0.865
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Totals from the 'TOTAL 1a. CIRCUNSCRIPCION' row, p7. valid (70585) is the 'Total' printed in the summary by party and circunscripción, p15 (box [0.78,0.25,0.95,0.30]); party figures there agree with p7. Elected names from the proclamation list p16; on the candidate list p2 Victor Contreras F.'s '(Elegido)' is handwritten. No registered voters printed."
+  },
+  {
+   "number": 3,
+   "title": "3º Agrupación Provincial Aconcagua y Valparaíso",
+   "areas": [
+    "Aconcagua",
+    "Valparaíso"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 172940,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 5705,
+   "page": 9,
+   "box": [
+    0.05,
+    0.215,
+    0.86,
+    0.245
+   ],
+   "lists": [
+    {
+     "label": "Lista B",
+     "party": "Demócrata Cristiano",
+     "votes": 29362,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.195,
+      0.218,
+      0.265,
+      0.242
+     ],
+     "candidates": [
+      {
+       "name": "RADOMIRO TOMIC ROMERO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.414,
+        0.82,
+        0.432
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista C",
+     "party": "Conservador Unido",
+     "votes": 25911,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.249,
+      0.218,
+      0.319,
+      0.242
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista E",
+     "party": "Radical",
+     "votes": 30076,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.363,
+      0.218,
+      0.433,
+      0.242
+     ],
+     "candidates": [
+      {
+       "name": "LUIS BOSSAY LEIVA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.401,
+        0.82,
+        0.419
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista G",
+     "party": "Comunista",
+     "votes": 21570,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.424,
+      0.218,
+      0.494,
+      0.242
+     ],
+     "candidates": [
+      {
+       "name": "JAIME BARROS PEREZ-COTAPOS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.375,
+        0.82,
+        0.393
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista I",
+     "party": "Liberal",
+     "votes": 26858,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.547,
+      0.218,
+      0.617,
+      0.242
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO IBAÑEZ OJEDA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.388,
+        0.82,
+        0.406
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista J",
+     "party": "Socialista",
+     "votes": 24325,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.597,
+      0.218,
+      0.667,
+      0.242
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR ALLENDE GOSSENS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.362,
+        0.82,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista K",
+     "party": "Democrático Nacional",
+     "votes": 9133,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.656,
+      0.218,
+      0.726,
+      0.242
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Totals from 'TOTAL 3a. CIRCUNSCRIPCION', p9; they add up (lists 167235 + nulos y blancos 5705 = 172940), but valid is not printed on that table so it is null. The p15 summary prints Democrático Nacional 8.867 and Total 166.969 for this grouping (266 fewer); the p9 table's 9.133 equals Aconcagua 1.002 + Valparaíso 8.131 (p8, p9), so the table figure is used. Liberal's second digit is blurred on p9 (26.?58); 26.858 confirmed by p15."
+  },
+  {
+   "number": 5,
+   "title": "5º Agrupación Electoral Provincial O'Higgins y Colchagua",
+   "areas": [
+    "O'Higgins",
+    "Colchagua"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 91107,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 3183,
+   "page": 10,
+   "box": [
+    0.05,
+    0.235,
+    0.86,
+    0.265
+   ],
+   "lists": [
+    {
+     "label": "Lista B",
+     "party": "Demócrata Cristiano",
+     "votes": 12154,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.213,
+      0.238,
+      0.283,
+      0.262
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista C",
+     "party": "Conservador Unido",
+     "votes": 19259,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.27,
+      0.238,
+      0.34,
+      0.262
+     ],
+     "candidates": [
+      {
+       "name": "FRANCISCO BULNES SANFUENTES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.493,
+        0.82,
+        0.511
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista D",
+     "party": "Vanguardia Nacional del Pueblo",
+     "votes": 17299,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.324,
+      0.238,
+      0.394,
+      0.262
+     ],
+     "candidates": [
+      {
+       "name": "BALTAZAR CASTRO PALMA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.468,
+        0.82,
+        0.486
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista E",
+     "party": "Radical",
+     "votes": 14144,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.376,
+      0.238,
+      0.446,
+      0.262
+     ],
+     "candidates": [
+      {
+       "name": "HERMES AHUMADA PACHECO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.518,
+        0.82,
+        0.536
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista I",
+     "party": "Liberal",
+     "votes": 12353,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.533,
+      0.238,
+      0.603,
+      0.262
+     ],
+     "candidates": [
+      {
+       "name": "ARMANDO JARAMILLO LYON",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.506,
+        0.82,
+        0.524
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista J",
+     "party": "Socialista",
+     "votes": 12715,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.585,
+      0.238,
+      0.655,
+      0.262
+     ],
+     "candidates": [
+      {
+       "name": "SALOMON CORBALAN GONZALEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.481,
+        0.82,
+        0.499
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Totals from 'TOTAL 5a. CIRCUNSCRIPCION', p10 (lists 87924 + nulos y blancos 3183 = 91107); valid not printed in the table, so null. The p15 summary prints Demócrata Cristiano 12.148 and Total 87.918 (its Vanguardia Nacional del Pueblo 17.299 is given in a footnote); the table's 12.154 equals O'Higgins 7.734 + Colchagua 4.420."
+  },
+  {
+   "number": 7,
+   "title": "7º Agrupación Provincial de Ñuble, Concepción y Arauco",
+   "areas": [
+    "Ñuble",
+    "Concepción",
+    "Arauco"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 168980,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 6044,
+   "page": 11,
+   "box": [
+    0.05,
+    0.615,
+    0.86,
+    0.645
+   ],
+   "lists": [
+    {
+     "label": "Lista B",
+     "party": "Demócrata Cristiano",
+     "votes": 27390,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.238,
+      0.618,
+      0.308,
+      0.642
+     ],
+     "candidates": [
+      {
+       "name": "TOMAS PABLO ELORZA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.623,
+        0.82,
+        0.641
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista C",
+     "party": "Conservador Unido",
+     "votes": 18912,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.299,
+      0.618,
+      0.369,
+      0.642
+     ],
+     "candidates": [
+      {
+       "name": "ENRIQUE CURTI CANOBBIO",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.61,
+        0.82,
+        0.628
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista E",
+     "party": "Radical",
+     "votes": 53048,
+     "unassigned": null,
+     "seats": 2,
+     "page": 11,
+     "box": [
+      0.408,
+      0.618,
+      0.478,
+      0.642
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO AGUIRRE DOOLAN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.572,
+        0.82,
+        0.59
+       ]
+      },
+      {
+       "name": "HUMBERTO ENRIQUEZ FRODDEN",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.584,
+        0.82,
+        0.602
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista G",
+     "party": "Comunista",
+     "votes": 27639,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.465,
+      0.618,
+      0.535,
+      0.642
+     ],
+     "candidates": [
+      {
+       "name": "LUIS CORVALAN LEPEZ",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.597,
+        0.82,
+        0.615
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista H",
+     "party": "Demócrata",
+     "votes": 2594,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.526,
+      0.618,
+      0.596,
+      0.642
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista I",
+     "party": "Liberal",
+     "votes": 16030,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.56,
+      0.618,
+      0.63,
+      0.642
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista J",
+     "party": "Socialista",
+     "votes": 16081,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.61,
+      0.618,
+      0.68,
+      0.642
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista K",
+     "party": "Democrático Nacional",
+     "votes": 1242,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.667,
+      0.618,
+      0.737,
+      0.642
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Totals from 'TOTAL 7a. CIRCUNSCRIPCION', p11 (lists 162936 + nulos y blancos 6044 = 168980); valid not printed in the table, so null. The p15 summary prints materially different party figures for this grouping (DC 27.038, CU 18.636, Radical 52.356, Comunista 27.354, Demócrata 2.575, Liberal 15.859, Socialista 15.904, DN 1.227, Total 160.949); table figures used. Tomás Pablo (DC) is listed elected on the proclamation p16 but not marked '(Elegido)' on the candidate list p5."
+  },
+  {
+   "number": 9,
+   "title": "9º Agrupación Provincial de Valdivia, Osorno, Llanquihue, Chiloé, Aysén y Magallanes",
+   "areas": [
+    "Valdivia",
+    "Osorno",
+    "Llanquihue",
+    "Chiloé",
+    "Aysén",
+    "Magallanes"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 133250,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 6558,
+   "page": 14,
+   "box": [
+    0.05,
+    0.505,
+    0.86,
+    0.535
+   ],
+   "lists": [
+    {
+     "label": "Lista B",
+     "party": "Demócrata Cristiano",
+     "votes": 10960,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.213,
+      0.508,
+      0.283,
+      0.532
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista C",
+     "party": "Conservador Unido",
+     "votes": 15221,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.26,
+      0.508,
+      0.33,
+      0.532
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Lista E",
+     "party": "Radical",
+     "votes": 28397,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.376,
+      0.508,
+      0.446,
+      0.532
+     ],
+     "candidates": [
+      {
+       "name": "EXEQUIEL GONZALEZ MADARIAGA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.737,
+        0.82,
+        0.755
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista G",
+     "party": "Comunista",
+     "votes": 10070,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.435,
+      0.508,
+      0.505,
+      0.532
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS CONTRERAS LABARCA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.725,
+        0.82,
+        0.743
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista I",
+     "party": "Liberal",
+     "votes": 34306,
+     "unassigned": null,
+     "seats": 2,
+     "page": 14,
+     "box": [
+      0.599,
+      0.508,
+      0.669,
+      0.532
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO SEPULVEDA GARCES",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.687,
+        0.82,
+        0.705
+       ]
+      },
+      {
+       "name": "JULIO VON MUHLENBROCK LIRA",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.699,
+        0.82,
+        0.717
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista J",
+     "party": "Socialista",
+     "votes": 21475,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.651,
+      0.508,
+      0.721,
+      0.532
+     ],
+     "candidates": [
+      {
+       "name": "ANICERO RODRIGUEZ ARENAS",
+       "party": null,
+       "votes": null,
+       "elected": true,
+       "page": 16,
+       "box": [
+        0.23,
+        0.712,
+        0.82,
+        0.73
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Lista K",
+     "party": "Democrático Nacional",
+     "votes": 6263,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.71,
+      0.508,
+      0.78,
+      0.532
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Totals from 'TOTAL 9a. CIRCUNSCRIPCION', p14 (lists 126692 + nulos y blancos 6558 = 133250); valid not printed in the table, so null. The p15 summary prints Conservador Unido 15.153 and Total 126.624 (table: 15.221). Names from p16 as printed there (p6 candidate list: 'Aniceto Rodríguez Arenas', 'Exequiel González Madariaga', 'Julio von Muhlenbrock Lira'); p16 spelling kept."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": 639707,
+  "registered": null,
+  "page": 14,
+  "parties": {
+   "Demócrata Cristiano": 90211,
+   "Conservador Unido": 79303,
+   "Vanguardia Nacional del Pueblo": 17299,
+   "Radical": 146373,
+   "Comunista": 75123,
+   "Demócrata": 2594,
+   "Liberal": 105688,
+   "Socialista": 83456,
+   "Democrático Nacional": 17325,
+   "Nulos y en blanco": 24335
+  }
+ },
+ "notes": "Senate election of 5 March 1961, agrupaciones provinciales 1, 3, 5, 7, 9 (5 seats each). p2-6 candidate lists by grouping (Lista letters match the table columns), p7-14 votes by commune/department/province with 'TOTAL Na. CIRCUNSCRIPCION' rows, p15 typed summary by party and circunscripción (disagrees with the detailed tables for groupings 3, 5, 7 and 9; table figures used, see contest notes), p16 elected senators, p17-18 senators 1961-1969 by party. national = 'TOTAL REPUBLICA' row p14 (cast = Total general; valid not printed there; p15 prints Total 613.045). No registered-voter figures printed. Tables give only party votes, so candidates hold only the elected, names as on p16, votes null. Election date printed on p7 heading as '5 de MARZO de 1961'. Table note p14: lists A 'Comandos Populares de Chile' and F 'Unión Nacional' presented no candidates."
+}

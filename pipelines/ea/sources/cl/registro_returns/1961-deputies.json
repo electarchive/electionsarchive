@@ -1,0 +1,5409 @@
+{
+ "volume": "1961-deputies",
+ "chamber": "deputies",
+ "year": 1961,
+ "day": "1961-03-05",
+ "day_printed": "Domingo 5 de Marzo.- 1961.-",
+ "contests": [
+  {
+   "number": 1,
+   "title": "Provincia de Tarapacá (PROVINCIA DE TARAPACA)",
+   "areas": [
+    "Iquique",
+    "Arica",
+    "Pisagua"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 25293,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 886,
+   "page": 3,
+   "box": [
+    0.57,
+    0.835,
+    0.77,
+    0.88
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 3767,
+     "unassigned": null,
+     "seats": 1,
+     "page": 2,
+     "box": [
+      0.38,
+      0.85,
+      0.49,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO MUGA GONZALEZ",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.255,
+        0.65,
+        0.295
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6936,
+     "unassigned": null,
+     "seats": 1,
+     "page": 2,
+     "box": [
+      0.55,
+      0.85,
+      0.65,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "JUAN CHECURA JERIA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.255,
+        0.65,
+        0.295
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 6022,
+     "unassigned": null,
+     "seats": 1,
+     "page": 2,
+     "box": [
+      0.7,
+      0.85,
+      0.81,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "LUIS VALENTE ROSSI",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.255,
+        0.65,
+        0.295
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5783,
+     "unassigned": null,
+     "seats": 1,
+     "page": 3,
+     "box": [
+      0.22,
+      0.84,
+      0.32,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "BERNARDINO GUERRA COFRE",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.255,
+        0.65,
+        0.295
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 1851,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.32,
+      0.84,
+      0.42,
+      0.88
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 48,
+     "unassigned": null,
+     "seats": 0,
+     "page": 3,
+     "box": [
+      0.42,
+      0.84,
+      0.5,
+      0.88
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "1st agrupación. Table gives party votes only (V./M./T. = men/women/total); T. of the province total row transcribed. Areas are the department head communes as printed. Columns A Comandos Populares, C Conservador Unido, F Unión Nacional, H Demócrata, L Independiente print only dashes and are omitted. Registered and valid not printed. Elected deputies and their parties from p.48 (names as printed; no candidate votes printed)."
+  },
+  {
+   "number": 2,
+   "title": "Provincia de Antofagasta (PROVINCIA DE ANTOFAGASTA)",
+   "areas": [
+    "Antofagasta",
+    "Taltal",
+    "Tocopilla",
+    "Calama"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": 48198,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1799,
+   "page": 5,
+   "box": [
+    0.54,
+    0.835,
+    0.78,
+    0.885
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 6402,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.37,
+      0.855,
+      0.46,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "JUAN ARGANDOÑA CORTES",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3704,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.45,
+      0.855,
+      0.54,
+      0.9
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 13178,
+     "unassigned": null,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.54,
+      0.855,
+      0.64,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO CLAVEL AMION",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      },
+      {
+       "name": "HERNAN BRUCHER ENCINA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 9993,
+     "unassigned": null,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.69,
+      0.855,
+      0.79,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "VICTOR GALLEGUILLOS CLETT",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      },
+      {
+       "name": "HUGO ROBLES ROBLES",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6044,
+     "unassigned": null,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.19,
+      0.84,
+      0.29,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "DOMINGO CUADRA GAZMURI",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 8030,
+     "unassigned": null,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.29,
+      0.84,
+      0.39,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "RAMON SILVA ULLOA",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.32,
+        0.68,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 48,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.39,
+      0.84,
+      0.47,
+      0.885
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "2nd agrupación. Source error: the province row prints Conservador Unido T. = 3704, but its V. 1786 + M. 918 = 2704, the department totals (1754+70+705+175) sum to 2704, and only with 2704 do the parties plus nulos y blancos (1799) equal the printed total general 48.198. The printed 3704 is kept. Columns A, F, H, L print only dashes and are omitted."
+  },
+  {
+   "number": 3,
+   "title": "Provincia Atacama (PROVINCIA ATACAMA)",
+   "areas": [
+    "Copiapó",
+    "Chañaral",
+    "Huasco",
+    "Freirina"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 25446,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 388,
+   "page": 6,
+   "box": [
+    0.67,
+    0.83,
+    0.89,
+    0.875
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5346,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.3,
+      0.83,
+      0.4,
+      0.875
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8624,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.4,
+      0.83,
+      0.49,
+      0.875
+     ],
+     "candidates": [
+      {
+       "name": "mMANUEL MAGALHAES MEDLING",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.41,
+        0.62,
+        0.44
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 5711,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.48,
+      0.83,
+      0.58,
+      0.875
+     ],
+     "candidates": [
+      {
+       "name": "JUAN GARCIA ROMERO",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.41,
+        0.62,
+        0.44
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5377,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.58,
+      0.83,
+      0.67,
+      0.875
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "3rd agrupación (ordinal printed on p.53). Only four party columns printed for this province. The first elected name is printed '1.-mMANUEL MAGALHAES MEDLING' with a stray typed 'm', kept as printed."
+  },
+  {
+   "number": 4,
+   "title": "Provincia de Coquimbo (PROVINCIA COQUIMBO)",
+   "areas": [
+    "La Serena",
+    "Coquimbo",
+    "Vicuña",
+    "Ovalle",
+    "Combarbalá",
+    "Illapel"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": 52967,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 958,
+   "page": 10,
+   "box": [
+    0.36,
+    0.595,
+    0.6,
+    0.64
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5292,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.34,
+      0.63,
+      0.43,
+      0.67
+     ],
+     "candidates": [
+      {
+       "name": "RENAN FUENTEALBA MOENA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3456,
+     "unassigned": null,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.43,
+      0.63,
+      0.53,
+      0.67
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 14875,
+     "unassigned": null,
+     "seats": 2,
+     "page": 9,
+     "box": [
+      0.53,
+      0.63,
+      0.62,
+      0.67
+     ],
+     "candidates": [
+      {
+       "name": "HUGO MIRANDA RAMIREZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      },
+      {
+       "name": "JULIO MERCADO ILLANES",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 7574,
+     "unassigned": null,
+     "seats": 1,
+     "page": 9,
+     "box": [
+      0.62,
+      0.63,
+      0.71,
+      0.67
+     ],
+     "candidates": [
+      {
+       "name": "CIPRIANO PONTIGO URRUTIA",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 13436,
+     "unassigned": null,
+     "seats": 2,
+     "page": 9,
+     "box": [
+      0.7,
+      0.63,
+      0.8,
+      0.67
+     ],
+     "candidates": [
+      {
+       "name": "HUGO ZEPEDA COLL",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      },
+      {
+       "name": "JUAN PEÑAFIEL ILLANES",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 7376,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.25,
+      0.595,
+      0.36,
+      0.64
+     ],
+     "candidates": [
+      {
+       "name": "LUIS AGUILERA BAEZ",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.455,
+        0.7,
+        0.525
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "4th agrupación. Province spans pp.7-10 (pp.7-8 first departments, pp.9-10 Illapel and the province row). Communist T. printed '.7574'."
+  },
+  {
+   "number": 5,
+   "title": "Provincia de Aconcagua (PROVINCIA DE ACONCAGUA)",
+   "areas": [
+    "San Felipe",
+    "La Ligua",
+    "Los Andes"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 31280,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1402,
+   "page": 11,
+   "box": [
+    0.75,
+    0.805,
+    0.9,
+    0.85
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 4917,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.36,
+      0.805,
+      0.44,
+      0.85
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 4582,
+     "unassigned": null,
+     "seats": 0,
+     "page": 11,
+     "box": [
+      0.44,
+      0.805,
+      0.52,
+      0.85
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6157,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.52,
+      0.805,
+      0.6,
+      0.85
+     ],
+     "candidates": [
+      {
+       "name": "ESTEBAN SAINZ ARGOMANIZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.545,
+        0.62,
+        0.585
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7513,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.6,
+      0.805,
+      0.67,
+      0.85
+     ],
+     "candidates": [
+      {
+       "name": "ALFONSO RAMIREZ DE LA FUENTE",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.545,
+        0.62,
+        0.585
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 6709,
+     "unassigned": null,
+     "seats": 1,
+     "page": 11,
+     "box": [
+      0.67,
+      0.805,
+      0.75,
+      0.85
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO OSORIO PARDO",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.545,
+        0.62,
+        0.585
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "5th agrupación."
+  },
+  {
+   "number": 6,
+   "title": "Provincia de Valparaíso (PROVINCIA DE VALPARAISO)",
+   "areas": [
+    "Valparaíso",
+    "Quillota"
+   ],
+   "seats": 12,
+   "registered": null,
+   "cast": 141396,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 4822,
+   "page": 12,
+   "box": [
+    0.56,
+    0.825,
+    0.75,
+    0.87
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 22404,
+     "unassigned": null,
+     "seats": 2,
+     "page": 13,
+     "box": [
+      0.42,
+      0.82,
+      0.52,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "EUGENIO BALLESTEROS REYES",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      },
+      {
+       "name": "GRACIELA LACOSTE NAVARRO",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 23146,
+     "unassigned": null,
+     "seats": 2,
+     "page": 13,
+     "box": [
+      0.52,
+      0.82,
+      0.62,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "EDMUNDO ELUCHANS MALHERBE",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      },
+      {
+       "name": "ALBERTO DECOMBE EDWARDS",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 24680,
+     "unassigned": null,
+     "seats": 3,
+     "page": 13,
+     "box": [
+      0.62,
+      0.82,
+      0.71,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS MUÑOZ HORZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      },
+      {
+       "name": "JORGE ASPEE RODRIGUEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      },
+      {
+       "name": "ROLANDO RIVAS FERNANDEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional",
+     "party": "Unión Nacional",
+     "votes": 3255,
+     "unassigned": null,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.71,
+      0.82,
+      0.78,
+      0.865
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 15366,
+     "unassigned": null,
+     "seats": 1,
+     "page": 13,
+     "box": [
+      0.78,
+      0.82,
+      0.89,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "VOLODIA TEITELBOIM VOLOSKY",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 15798,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.29,
+      0.825,
+      0.38,
+      0.87
+     ],
+     "candidates": [
+      {
+       "name": "GUILLERMO RIVERA BUSTOS",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 13252,
+     "unassigned": null,
+     "seats": 1,
+     "page": 12,
+     "box": [
+      0.38,
+      0.825,
+      0.47,
+      0.87
+     ],
+     "candidates": [
+      {
+       "name": "ALONSO ZUMAETA FAUNDEZ",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 18673,
+     "unassigned": null,
+     "seats": 2,
+     "page": 12,
+     "box": [
+      0.47,
+      0.825,
+      0.56,
+      0.87
+     ],
+     "candidates": [
+      {
+       "name": "JOSE OYARZUN DESCOUVIERES",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      },
+      {
+       "name": "RUBEN HURTADO O'RYAN",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 48,
+       "box": [
+        0.14,
+        0.6,
+        0.72,
+        0.725
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "6th agrupación (Valparaíso y Quillota, ordinal printed on p.53). Scan pages are out of order: p.13 holds columns B-G, p.12 columns I-K, nulos y blancos (headed 'L.') and total general. Elected names on p.48 partly overtyped ('ASPEE' and 'REYES' struck over; read as shown)."
+  },
+  {
+   "number": 7,
+   "title": "Santiago, Primer Distrito (TOTAL PRIMER DISTRITO)",
+   "areas": [
+    "Santa Lucía",
+    "Santa Ana",
+    "Portales",
+    "Estación",
+    "Cañadilla",
+    "Recoleta",
+    "Maestranza",
+    "Universidad",
+    "San Lázaro",
+    "Parque Cousiño"
+   ],
+   "seats": 18,
+   "registered": null,
+   "cast": 176474,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 5722,
+   "page": 15,
+   "box": [
+    0.6,
+    0.535,
+    0.8,
+    0.58
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 30780,
+     "unassigned": null,
+     "seats": 3,
+     "page": 14,
+     "box": [
+      0.4,
+      0.55,
+      0.5,
+      0.59
+     ],
+     "candidates": [
+      {
+       "name": "JOSE MUSALEM SAFFIE",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "RAFAEL AGUSTIN GUMUCIO VIVES",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "MARIO HAMUY BERR",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 32532,
+     "unassigned": null,
+     "seats": 4,
+     "page": 14,
+     "box": [
+      0.5,
+      0.55,
+      0.6,
+      0.59
+     ],
+     "candidates": [
+      {
+       "name": "HUGO ROSENDE SUBIABRE",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "HUMBERTO PINTO DIAZ",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "JULIO SUBERCASEAUX BARROS",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "JORGE IVAN HUBNER GALLO",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 37676,
+     "unassigned": null,
+     "seats": 4,
+     "page": 14,
+     "box": [
+      0.6,
+      0.55,
+      0.7,
+      0.59
+     ],
+     "candidates": [
+      {
+       "name": "JACOBO SCHAULSOHN N.",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "JUAN MARTINEZ CAMPS",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "CARLOS MORALES ABARZUA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "ANA EUGENIA UGALDE ARIAS",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 23365,
+     "unassigned": null,
+     "seats": 3,
+     "page": 14,
+     "box": [
+      0.7,
+      0.55,
+      0.79,
+      0.59
+     ],
+     "candidates": [
+      {
+       "name": "JOSE CADEMARTORI INVERNIZZI",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "CESAR GODOY URRUTIA",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "BERNARDO ARAYA ZULETA",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Demócrata",
+     "party": "Demócrata",
+     "votes": 395,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.79,
+      0.55,
+      0.88,
+      0.59
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 20840,
+     "unassigned": null,
+     "seats": 2,
+     "page": 15,
+     "box": [
+      0.29,
+      0.535,
+      0.4,
+      0.58
+     ],
+     "candidates": [
+      {
+       "name": "ENRIQUE EDWARDS ORREGO",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      },
+      {
+       "name": "GREGORIO EGUIGUREN AMUNATEGUI",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 13104,
+     "unassigned": null,
+     "seats": 1,
+     "page": 15,
+     "box": [
+      0.4,
+      0.535,
+      0.49,
+      0.58
+     ],
+     "candidates": [
+      {
+       "name": "CLODOMIRO ALMEYDA MEDINA",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 12060,
+     "unassigned": null,
+     "seats": 1,
+     "page": 15,
+     "box": [
+      0.49,
+      0.535,
+      0.6,
+      0.58
+     ],
+     "candidates": [
+      {
+       "name": "LUIS PARETO GONZALEZ",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.18,
+        0.65,
+        0.35
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "7th agrupación, 1st district (ordinal on p.53). Areas are the communes/subdelegations listed for the district. The total general row prints V. 108710 (last digit 0 or 8 unclear) and M. 67764; T. 176474 equals the sum of party totals plus nulos y blancos."
+  },
+  {
+   "number": 8,
+   "title": "Santiago, 2º Distrito (TOTAL 2º DISTRITO)",
+   "areas": [
+    "Quinta Normal",
+    "Barrancas",
+    "Colina",
+    "Conchalí",
+    "Lampa",
+    "Quilicura",
+    "Renca",
+    "Til-Til",
+    "Talagante"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 83475,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 4133,
+   "page": 15,
+   "box": [
+    0.6,
+    0.85,
+    0.8,
+    0.89
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 14244,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.4,
+      0.86,
+      0.5,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO LORCA VALENCIA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.37,
+        0.65,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 15554,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.5,
+      0.86,
+      0.6,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL TAGLE VALDES",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.37,
+        0.65,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 15762,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.6,
+      0.86,
+      0.7,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "FLORENCIO GALLEGUILLOS VERA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.37,
+        0.65,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 15946,
+     "unassigned": null,
+     "seats": 1,
+     "page": 14,
+     "box": [
+      0.7,
+      0.86,
+      0.79,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "JULIETA CAMPUSANO CHAVEZ",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.37,
+        0.65,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Demócrata",
+     "party": "Demócrata",
+     "votes": 74,
+     "unassigned": null,
+     "seats": 0,
+     "page": 14,
+     "box": [
+      0.79,
+      0.86,
+      0.88,
+      0.89
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 10855,
+     "unassigned": null,
+     "seats": 1,
+     "page": 15,
+     "box": [
+      0.29,
+      0.85,
+      0.4,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR LEHUEDE ALVARADO",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.37,
+        0.65,
+        0.42
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 5621,
+     "unassigned": null,
+     "seats": 0,
+     "page": 15,
+     "box": [
+      0.4,
+      0.85,
+      0.49,
+      0.89
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 1286,
+     "unassigned": null,
+     "seats": 0,
+     "page": 15,
+     "box": [
+      0.49,
+      0.85,
+      0.6,
+      0.89
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "7th agrupación, 2nd district. Areas: communes of the district plus the department of Talagante (Talagante, Peñaflor, Isla de Maipo, Maipú, Curacaví). The elected list on p.49 numbers the five names 1-4 and 6 (no 5)."
+  },
+  {
+   "number": 9,
+   "title": "Santiago, 3er. Distrito (TOTAL 3er. DISTRITO)",
+   "areas": [
+    "Providencia",
+    "Ñuñoa",
+    "Las Condes",
+    "San Miguel",
+    "La Cisterna",
+    "La Florida",
+    "La Granja",
+    "Puente Alto"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 130694,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 2726,
+   "page": 17,
+   "box": [
+    0.6,
+    0.465,
+    0.8,
+    0.5
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 20434,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.45,
+      0.46,
+      0.54,
+      0.49
+     ],
+     "candidates": [
+      {
+       "name": "TOMAS REYES VICUÑA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.445,
+        0.65,
+        0.495
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 19316,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.54,
+      0.46,
+      0.64,
+      0.49
+     ],
+     "candidates": [
+      {
+       "name": "ISMAEL PEREIRA LYON",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.445,
+        0.65,
+        0.495
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 19241,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.64,
+      0.46,
+      0.75,
+      0.49
+     ],
+     "candidates": [
+      {
+       "name": "HERNAN LEIGH GUZMAN",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.445,
+        0.65,
+        0.495
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 19731,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.75,
+      0.46,
+      0.84,
+      0.49
+     ],
+     "candidates": [
+      {
+       "name": "ORLANDO MILLAS CORREA",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.445,
+        0.65,
+        0.495
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 31605,
+     "unassigned": null,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.31,
+      0.465,
+      0.41,
+      0.5
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO ALESSANDRI VALDES",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.445,
+        0.65,
+        0.495
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 17641,
+     "unassigned": null,
+     "seats": 0,
+     "page": 17,
+     "box": [
+      0.41,
+      0.465,
+      0.5,
+      0.5
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "7th agrupación, 3rd district. Areas: communes of the district plus the department of Puente Alto (Puente Alto, Pirque, San José de Maipo)."
+  },
+  {
+   "number": 10,
+   "title": "Santiago 4ª Agrupación (Melipilla, San Antonio, San Bernardo y Maipo) (TOTAL 4º DISTRITO)",
+   "areas": [
+    "Melipilla",
+    "San Antonio",
+    "San Bernardo",
+    "Maipo"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 49834,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1186,
+   "page": 17,
+   "box": [
+    0.6,
+    0.83,
+    0.8,
+    0.86
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 7742,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.45,
+      0.825,
+      0.54,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO VIDELA RIQUELME",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.525,
+        0.98,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 10833,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.54,
+      0.825,
+      0.64,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "LUIS VALDES LARRAIN",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.525,
+        0.98,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5768,
+     "unassigned": null,
+     "seats": 0,
+     "page": 16,
+     "box": [
+      0.64,
+      0.825,
+      0.75,
+      0.855
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 7263,
+     "unassigned": null,
+     "seats": 1,
+     "page": 16,
+     "box": [
+      0.75,
+      0.825,
+      0.84,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "JUAN ACEVEDO PAVEZ",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.525,
+        0.98,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 8521,
+     "unassigned": null,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.31,
+      0.83,
+      0.41,
+      0.86
+     ],
+     "candidates": [
+      {
+       "name": "JAIME BULNES SANFUENTES",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.525,
+        0.98,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 8521,
+     "unassigned": null,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.5,
+      0.83,
+      0.6,
+      0.86
+     ],
+     "candidates": [
+      {
+       "name": "RAFAEL DE LA PRESA CASANUEVA",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.525,
+        0.98,
+        0.575
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Title from the elected list (p.49: 'SANTIAGO 4ª Agrupación ( Melipilla, San Antonio, San Bernardo y Maipo )'); the tables call this grouping 'TOTAL 4º DISTRITO' (pp.16-17). The tables also print a PROVINCIA DE SANTIAGO total over all four, not transcribed. Liberal and Democrático Nacional both total 8521 (5134+3387 and 5307+3214), re-read at 300 dpi."
+  },
+  {
+   "number": 11,
+   "title": "Provincia de O'Higgins (PROVINCIA DE O\"HIGGINS)",
+   "areas": [
+    "Rancagua",
+    "Cachapoal",
+    "San Vicente",
+    "Caupolicán"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": 57904,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 2132,
+   "page": 19,
+   "box": [
+    0.46,
+    0.88,
+    0.71,
+    0.92
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 7478,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.39,
+      0.83,
+      0.48,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "RICARDO VALENZUELA SAEZ",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 10267,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.48,
+      0.83,
+      0.59,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR CORREA LARRAIN",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8132,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.59,
+      0.83,
+      0.69,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "JUAN ATALA GONZALEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 9370,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.69,
+      0.83,
+      0.78,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS ROSALES GUTIERREZ",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6884,
+     "unassigned": null,
+     "seats": 1,
+     "page": 18,
+     "box": [
+      0.78,
+      0.83,
+      0.88,
+      0.865
+     ],
+     "candidates": [
+      {
+       "name": "IVAN URZUA AHUMADA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 6726,
+     "unassigned": null,
+     "seats": 0,
+     "page": 19,
+     "box": [
+      0.22,
+      0.88,
+      0.35,
+      0.92
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 6915,
+     "unassigned": null,
+     "seats": 1,
+     "page": 19,
+     "box": [
+      0.35,
+      0.88,
+      0.46,
+      0.92
+     ],
+     "candidates": [
+      {
+       "name": "ESTEBAN LEYTON SOTO",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 49,
+       "box": [
+        0.1,
+        0.595,
+        0.65,
+        0.66
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "9th agrupación by sequence (ordinal not printed). Total general column headed 'TOTALES GENERALES'."
+  },
+  {
+   "number": 12,
+   "title": "Provincia de Colchagua (PROVINCIA DE COLCHAGUA)",
+   "areas": [
+    "San Fernando",
+    "Santa Cruz"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 33436,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1136,
+   "page": 20,
+   "box": [
+    0.71,
+    0.84,
+    0.89,
+    0.88
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 6229,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.25,
+      0.84,
+      0.34,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO CANCINO TELLO",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.175,
+        0.75,
+        0.215
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 10200,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.34,
+      0.84,
+      0.44,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS JOSE ERRAZURIZ EYZAGUIRRE",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.175,
+        0.75,
+        0.215
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5864,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.44,
+      0.84,
+      0.53,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "RENATO GAONA ACUÑA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.175,
+        0.75,
+        0.215
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5126,
+     "unassigned": null,
+     "seats": 1,
+     "page": 20,
+     "box": [
+      0.53,
+      0.84,
+      0.62,
+      0.88
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO MATURANA ERBETTA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.175,
+        0.75,
+        0.215
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 4881,
+     "unassigned": null,
+     "seats": 0,
+     "page": 20,
+     "box": [
+      0.62,
+      0.84,
+      0.71,
+      0.88
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Second department row printed 'DEPTO.COL.CRUZ' (Santa Cruz)."
+  },
+  {
+   "number": 13,
+   "title": "Provincia Curicó (PROVINCIA CURICO)",
+   "areas": [
+    "Curicó",
+    "Mataquito"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 20557,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 390,
+   "page": 21,
+   "box": [
+    0.71,
+    0.72,
+    0.89,
+    0.765
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 4188,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.26,
+      0.72,
+      0.36,
+      0.765
+     ],
+     "candidates": [
+      {
+       "name": "RAUL GORMAZ MOLINA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.24,
+        0.75,
+        0.27
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3576,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.36,
+      0.72,
+      0.44,
+      0.765
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 4528,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.44,
+      0.72,
+      0.54,
+      0.765
+     ],
+     "candidates": [
+      {
+       "name": "RAUL JULIET GOMEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.24,
+        0.75,
+        0.27
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3265,
+     "unassigned": null,
+     "seats": 0,
+     "page": 21,
+     "box": [
+      0.54,
+      0.72,
+      0.63,
+      0.765
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 4610,
+     "unassigned": null,
+     "seats": 1,
+     "page": 21,
+     "box": [
+      0.63,
+      0.72,
+      0.71,
+      0.765
+     ],
+     "candidates": [
+      {
+       "name": "OSCAR NARANJO JARA",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.24,
+        0.75,
+        0.27
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Elected list prints the Socialist party as 'SOOIALISTA' (typo)."
+  },
+  {
+   "number": 14,
+   "title": "Provincia de Talca (PROVINCIA DE TALCA)",
+   "areas": [
+    "Talca",
+    "Lontué",
+    "Curepto"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 37213,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1028,
+   "page": 23,
+   "box": [
+    0.38,
+    0.79,
+    0.65,
+    0.835
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 3853,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.31,
+      0.79,
+      0.41,
+      0.83
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 8904,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.41,
+      0.79,
+      0.5,
+      0.83
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO DIEZ URZUA",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.295,
+        0.75,
+        0.345
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5058,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.5,
+      0.79,
+      0.6,
+      0.83
+     ],
+     "candidates": [
+      {
+       "name": "RENE LAGOS ROJO",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.295,
+        0.75,
+        0.345
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional",
+     "party": "Unión Nacional",
+     "votes": 102,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.6,
+      0.79,
+      0.68,
+      0.83
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 4144,
+     "unassigned": null,
+     "seats": 0,
+     "page": 22,
+     "box": [
+      0.68,
+      0.79,
+      0.78,
+      0.83
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4517,
+     "unassigned": null,
+     "seats": 1,
+     "page": 22,
+     "box": [
+      0.78,
+      0.79,
+      0.89,
+      0.83
+     ],
+     "candidates": [
+      {
+       "name": "GUILLERMO DONOSO VERGARA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.295,
+        0.75,
+        0.345
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 9607,
+     "unassigned": null,
+     "seats": 2,
+     "page": 23,
+     "box": [
+      0.27,
+      0.79,
+      0.38,
+      0.835
+     ],
+     "candidates": [
+      {
+       "name": "JOSE FONCEA AEDO",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.295,
+        0.75,
+        0.345
+       ]
+      },
+      {
+       "name": "JORGE ARAVENA CARRASCO",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.295,
+        0.75,
+        0.345
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "The last party column on p.22 has no printed header (no letter or name); it is the column that the other provinces head 'I. Liberal' and is labelled Liberal here by that position (Talca elected a Liberal). p.23 column headed only 'K.' (Democrático Nacional elsewhere)."
+  },
+  {
+   "number": 15,
+   "title": "Provincia Maule (PROVINCIA MAULE)",
+   "areas": [
+    "Cauquenes",
+    "Constitución",
+    "Chanco"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 18370,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 180,
+   "page": 24,
+   "box": [
+    0.72,
+    0.78,
+    0.89,
+    0.82
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5293,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.28,
+      0.78,
+      0.37,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "PATRICIO HURTADO PEREIRA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.37,
+        0.75,
+        0.405
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 1621,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.37,
+      0.78,
+      0.46,
+      0.82
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 2912,
+     "unassigned": null,
+     "seats": 0,
+     "page": 24,
+     "box": [
+      0.46,
+      0.78,
+      0.55,
+      0.82
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4138,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.55,
+      0.78,
+      0.64,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "HUMBERTO DEL RIO GUNDIAN",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.37,
+        0.75,
+        0.405
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 4226,
+     "unassigned": null,
+     "seats": 1,
+     "page": 24,
+     "box": [
+      0.64,
+      0.78,
+      0.72,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MINCHEL BALLADARES",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.15,
+        0.37,
+        0.75,
+        0.405
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "13th agrupación (ordinal on p.53). Nulos y blancos printed only for the Cauquenes department (dashes elsewhere); province figure 180."
+  },
+  {
+   "number": 16,
+   "title": "Provincia de Linares (PROVINCIA DE LINARES)",
+   "areas": [
+    "Linares",
+    "Loncomilla",
+    "Parral"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 32104,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 829,
+   "page": 26,
+   "box": [
+    0.38,
+    0.85,
+    0.65,
+    0.885
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5760,
+     "unassigned": null,
+     "seats": 1,
+     "page": 25,
+     "box": [
+      0.34,
+      0.82,
+      0.43,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "ANA RODRIGUEZ DE LOBOS",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.43,
+        0.72,
+        0.47
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 5730,
+     "unassigned": null,
+     "seats": 0,
+     "page": 25,
+     "box": [
+      0.43,
+      0.82,
+      0.53,
+      0.855
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7854,
+     "unassigned": null,
+     "seats": 1,
+     "page": 25,
+     "box": [
+      0.53,
+      0.82,
+      0.63,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "JOAQUIN MORALES ABARZUA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.43,
+        0.72,
+        0.47
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Unión Nacional",
+     "party": "Unión Nacional",
+     "votes": 37,
+     "unassigned": null,
+     "seats": 0,
+     "page": 25,
+     "box": [
+      0.63,
+      0.82,
+      0.71,
+      0.855
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5904,
+     "unassigned": null,
+     "seats": 1,
+     "page": 25,
+     "box": [
+      0.71,
+      0.82,
+      0.83,
+      0.855
+     ],
+     "candidates": [
+      {
+       "name": "IGNACIO URRUTIA DE LA SOTTA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.43,
+        0.72,
+        0.47
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 5990,
+     "unassigned": null,
+     "seats": 1,
+     "page": 26,
+     "box": [
+      0.25,
+      0.85,
+      0.38,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "MARIO DUEÑAS AVARIA",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.43,
+        0.72,
+        0.47
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "The Socialist column on p.26 is headed only 'Socialista' (no letter). The Linares department subtotal row on p.26 has no label."
+  },
+  {
+   "number": 17,
+   "title": "Ñuble ( San Carlos e Itata ) (TOTAL CIRCUNSCRIPCION)",
+   "areas": [
+    "Itata",
+    "San Carlos"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 16998,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 583,
+   "page": 27,
+   "box": [
+    0.72,
+    0.84,
+    0.89,
+    0.885
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5716,
+     "unassigned": null,
+     "seats": 1,
+     "page": 27,
+     "box": [
+      0.28,
+      0.84,
+      0.37,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS CERDA AGUILERA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.49,
+        0.72,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 2466,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.37,
+      0.84,
+      0.46,
+      0.885
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3747,
+     "unassigned": null,
+     "seats": 1,
+     "page": 27,
+     "box": [
+      0.46,
+      0.84,
+      0.55,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS MONTANE CASTRO",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.49,
+        0.72,
+        0.525
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 655,
+     "unassigned": null,
+     "seats": 0,
+     "page": 27,
+     "box": [
+      0.55,
+      0.84,
+      0.62,
+      0.885
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3831,
+     "unassigned": null,
+     "seats": 1,
+     "page": 27,
+     "box": [
+      0.62,
+      0.84,
+      0.71,
+      0.885
+     ],
+     "candidates": [
+      {
+       "name": "JOVINO PARADA QUINTANA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.49,
+        0.72,
+        0.525
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Title from the elected list (p.50); the table (p.27) labels the row 'TOTAL CIRCUNSCRIPCION'. The province of Ñuble elects in two groupings; the volume's 'TOTAL PROVINCIA ÑUBLE' row (pp.28-29) is not transcribed."
+  },
+  {
+   "number": 18,
+   "title": "Ñuble ( Chillán, Bulnes y Yungay ) (TOTAL CIRCUNSCRIPCION)",
+   "areas": [
+    "Chillán",
+    "Bulnes",
+    "Yungay"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 35017,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1222,
+   "page": 29,
+   "box": [
+    0.6,
+    0.75,
+    0.7,
+    0.8
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 7429,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.34,
+      0.76,
+      0.43,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MARTIN MARDONES",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.55,
+        0.75,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3663,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.43,
+      0.76,
+      0.53,
+      0.8
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 12564,
+     "unassigned": null,
+     "seats": 3,
+     "page": 28,
+     "box": [
+      0.53,
+      0.76,
+      0.63,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "OSVALDO BASSO CARVAJAL",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.55,
+        0.75,
+        0.6
+       ]
+      },
+      {
+       "name": "VICTOR FLORES CASTELLI",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.55,
+        0.75,
+        0.6
+       ]
+      },
+      {
+       "name": "CARLOS GONZALEZ UTRERAS",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.55,
+        0.75,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Demócrata",
+     "party": "Demócrata",
+     "votes": 137,
+     "unassigned": null,
+     "seats": 0,
+     "page": 28,
+     "box": [
+      0.69,
+      0.76,
+      0.78,
+      0.8
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3910,
+     "unassigned": null,
+     "seats": 1,
+     "page": 28,
+     "box": [
+      0.78,
+      0.76,
+      0.88,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "JUAN LUIS URRUTIA PRIETO",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.2,
+        0.55,
+        0.75,
+        0.6
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 2634,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.24,
+      0.75,
+      0.35,
+      0.8
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 3458,
+     "unassigned": null,
+     "seats": 0,
+     "page": 29,
+     "box": [
+      0.35,
+      0.75,
+      0.45,
+      0.8
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Title from the elected list (p.50); tables (pp.28-29) label the row 'TOTAL CIRCUNSCRIPCION'. Total general T. printed 35.017 is partly overwritten by a handwritten mark but legible; it equals the party totals plus nulos y blancos. The Comunista column (G.) prints dashes for this grouping."
+  },
+  {
+   "number": 19,
+   "title": "Provincia de Concepción (PROVINCIA DE CONCEPCION)",
+   "areas": [
+    "Concepción",
+    "Tomé",
+    "Talcahuano",
+    "Coronel",
+    "Yumbel"
+   ],
+   "seats": 9,
+   "registered": null,
+   "cast": 101931,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 4088,
+   "page": 31,
+   "box": [
+    0.36,
+    0.87,
+    0.74,
+    0.91
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 14536,
+     "unassigned": null,
+     "seats": 1,
+     "page": 30,
+     "box": [
+      0.45,
+      0.865,
+      0.54,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "ALBERTO JEREZ HORTA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 14740,
+     "unassigned": null,
+     "seats": 1,
+     "page": 30,
+     "box": [
+      0.53,
+      0.865,
+      0.61,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "RUFO RUIZ-ESQUIDE ESPINOZA",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 25649,
+     "unassigned": null,
+     "seats": 3,
+     "page": 30,
+     "box": [
+      0.61,
+      0.865,
+      0.69,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "MARIO SAEZ LAGOS",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      },
+      {
+       "name": "EMILIO MOLINA PINCHEIRA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      },
+      {
+       "name": "DUBERILDO JAQUE ARANEDA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 16296,
+     "unassigned": null,
+     "seats": 2,
+     "page": 30,
+     "box": [
+      0.69,
+      0.865,
+      0.78,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "JORGE MONTES MORAGA",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      },
+      {
+       "name": "GALVARINO MELO PAEZ",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7247,
+     "unassigned": null,
+     "seats": 0,
+     "page": 30,
+     "box": [
+      0.78,
+      0.865,
+      0.88,
+      0.9
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 11226,
+     "unassigned": null,
+     "seats": 1,
+     "page": 31,
+     "box": [
+      0.36,
+      0.87,
+      0.46,
+      0.91
+     ],
+     "candidates": [
+      {
+       "name": "ALBINO BARRA VILLALOBOS",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 8149,
+     "unassigned": null,
+     "seats": 1,
+     "page": 31,
+     "box": [
+      0.46,
+      0.87,
+      0.56,
+      0.91
+     ],
+     "candidates": [
+      {
+       "name": "LUZBERTO ENRIQUE PANTOJA RUBILAR",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.105,
+        0.7,
+        0.19
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Socialist T. printed '11.226' with a blotted digit (V. 7521 + M. 3705 = 11226). Ruiz-Esquide's party printed '( CONSERVADOR )', assigned to the Conservador Unido column."
+  },
+  {
+   "number": 20,
+   "title": "Provincia de Arauco (PROVINCIA DE ARAUCO)",
+   "areas": [
+    "Lebu",
+    "Arauco",
+    "Cañete"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 16321,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 509,
+   "page": 33,
+   "box": [
+    0.25,
+    0.77,
+    0.69,
+    0.81
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 1895,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.33,
+      0.785,
+      0.43,
+      0.82
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3463,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.43,
+      0.785,
+      0.53,
+      0.82
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 3781,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.53,
+      0.785,
+      0.63,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "SANTOS LEONCIO MEDEL BASUALTO",
+       "party": "COMUNISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.21,
+        0.7,
+        0.235
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Demócrata",
+     "party": "Demócrata",
+     "votes": 166,
+     "unassigned": null,
+     "seats": 0,
+     "page": 32,
+     "box": [
+      0.63,
+      0.785,
+      0.72,
+      0.82
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 3673,
+     "unassigned": null,
+     "seats": 1,
+     "page": 32,
+     "box": [
+      0.72,
+      0.785,
+      0.84,
+      0.82
+     ],
+     "candidates": [
+      {
+       "name": "FERMIN FIERRO LUENGO",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.21,
+        0.7,
+        0.235
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 114,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.25,
+      0.77,
+      0.35,
+      0.81
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Independiente",
+     "party": "Independiente",
+     "votes": 2720,
+     "unassigned": null,
+     "seats": 0,
+     "page": 33,
+     "box": [
+      0.35,
+      0.77,
+      0.46,
+      0.81
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Includes a column 'L. Independiente' (2.720) that elected nobody."
+  },
+  {
+   "number": 21,
+   "title": "Provincia Bío-Bío (PROVINCIA DE BIO - BIO)",
+   "areas": [
+    "La Laja",
+    "Nacimiento",
+    "Mulchén"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 25389,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1046,
+   "page": 35,
+   "box": [
+    0.28,
+    0.745,
+    0.65,
+    0.785
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 4161,
+     "unassigned": null,
+     "seats": 1,
+     "page": 34,
+     "box": [
+      0.32,
+      0.8,
+      0.43,
+      0.84
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO STARK TRONCOSO",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.26,
+        0.7,
+        0.3
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 2773,
+     "unassigned": null,
+     "seats": 0,
+     "page": 34,
+     "box": [
+      0.43,
+      0.8,
+      0.54,
+      0.84
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7190,
+     "unassigned": null,
+     "seats": 2,
+     "page": 34,
+     "box": [
+      0.54,
+      0.8,
+      0.64,
+      0.84
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL RIOSECO VASQUEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.26,
+        0.7,
+        0.3
+       ]
+      },
+      {
+       "name": "MARIO SHARPE CARTER",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.26,
+        0.7,
+        0.3
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 3085,
+     "unassigned": null,
+     "seats": 0,
+     "page": 34,
+     "box": [
+      0.64,
+      0.8,
+      0.74,
+      0.84
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 4096,
+     "unassigned": null,
+     "seats": 1,
+     "page": 34,
+     "box": [
+      0.74,
+      0.8,
+      0.87,
+      0.84
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL BUNSTER CARMONA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.26,
+        0.7,
+        0.3
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 3038,
+     "unassigned": null,
+     "seats": 0,
+     "page": 35,
+     "box": [
+      0.28,
+      0.745,
+      0.4,
+      0.785
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": ""
+  },
+  {
+   "number": 22,
+   "title": "Provincia de Malleco (PROVINCIA DE MALLECO)",
+   "areas": [
+    "Angol",
+    "Collipulli",
+    "Traiguén",
+    "Victoria",
+    "Curacautín"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": 31706,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 809,
+   "page": 37,
+   "box": [
+    0.23,
+    0.87,
+    0.67,
+    0.91
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 4733,
+     "unassigned": null,
+     "seats": 1,
+     "page": 36,
+     "box": [
+      0.41,
+      0.88,
+      0.5,
+      0.915
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS BIVORI ALZERRECA",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3167,
+     "unassigned": null,
+     "seats": 1,
+     "page": 36,
+     "box": [
+      0.5,
+      0.88,
+      0.59,
+      0.915
+     ],
+     "candidates": [
+      {
+       "name": "JUAN WIDMER EWERTZ",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6015,
+     "unassigned": null,
+     "seats": 1,
+     "page": 36,
+     "box": [
+      0.59,
+      0.88,
+      0.67,
+      0.915
+     ],
+     "candidates": [
+      {
+       "name": "JULIO SEPULVEDA RONDANELLI",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 12571,
+     "unassigned": null,
+     "seats": 3,
+     "page": 36,
+     "box": [
+      0.67,
+      0.88,
+      0.77,
+      0.915
+     ],
+     "candidates": [
+      {
+       "name": "MIGUEL HUERTA MUÑOZ",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      },
+      {
+       "name": "PATRICIO PHILLIPS PEÑAFIEL",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      },
+      {
+       "name": "GABRIEL DE LA FUENTE CORTES",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.325,
+        0.7,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 2777,
+     "unassigned": null,
+     "seats": 0,
+     "page": 36,
+     "box": [
+      0.77,
+      0.88,
+      0.86,
+      0.915
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 1634,
+     "unassigned": null,
+     "seats": 0,
+     "page": 37,
+     "box": [
+      0.23,
+      0.87,
+      0.37,
+      0.91
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Elected name 5 printed 'CARLOS BIVORI ALZERRECA' (kept as printed)."
+  },
+  {
+   "number": 23,
+   "title": "Provincia Cautín (PROVINCIA CAUTIN)",
+   "areas": [
+    "Temuco",
+    "Lautaro",
+    "Imperial",
+    "Pitrufquén",
+    "Villarrica"
+   ],
+   "seats": 10,
+   "registered": null,
+   "cast": 59413,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1776,
+   "page": 39,
+   "box": [
+    0.6,
+    0.87,
+    0.78,
+    0.9
+   ],
+   "lists": [
+    {
+     "label": "Comandos Populares",
+     "party": "Comandos Populares",
+     "votes": 96,
+     "unassigned": null,
+     "seats": 0,
+     "page": 38,
+     "box": [
+      0.44,
+      0.86,
+      0.52,
+      0.89
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 5011,
+     "unassigned": null,
+     "seats": 1,
+     "page": 38,
+     "box": [
+      0.52,
+      0.86,
+      0.61,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "CONSTANTINO SUAREZ GONZALEZ",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 7179,
+     "unassigned": null,
+     "seats": 1,
+     "page": 38,
+     "box": [
+      0.61,
+      0.86,
+      0.7,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO LOYOLA VASQUEZ",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 10850,
+     "unassigned": null,
+     "seats": 2,
+     "page": 38,
+     "box": [
+      0.7,
+      0.86,
+      0.78,
+      0.89
+     ],
+     "candidates": [
+      {
+       "name": "SAMUEL FUENTES ANDRADES",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      },
+      {
+       "name": "ARMANDO HOLZAPFEL ALVAREZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 2240,
+     "unassigned": null,
+     "seats": 0,
+     "page": 38,
+     "box": [
+      0.78,
+      0.86,
+      0.88,
+      0.89
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 9773,
+     "unassigned": null,
+     "seats": 2,
+     "page": 39,
+     "box": [
+      0.34,
+      0.87,
+      0.42,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "HARDY MOMBERG ROA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      },
+      {
+       "name": "FRITZ HILLMANN SUAREZ",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 5304,
+     "unassigned": null,
+     "seats": 1,
+     "page": 39,
+     "box": [
+      0.42,
+      0.87,
+      0.5,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR MONROY PINTO",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 17184,
+     "unassigned": null,
+     "seats": 3,
+     "page": 39,
+     "box": [
+      0.5,
+      0.87,
+      0.6,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "VICTOR GONZALEZ MAERTENS",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      },
+      {
+       "name": "JORGE LAVANDERO ILLANES",
+       "party": "DEMOCRATICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      },
+      {
+       "name": "JUAN TUMA MASSO",
+       "party": "DEMOCRATAICO NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.4,
+        0.72,
+        0.505
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Includes 'A. Comandos Pop.' (96). Elected name 9 is blurred in the scan, read as 'SALVADOR MONROY PINTO'; Tuma's party printed 'DEMOCRATAICO NACIONAL' (typo)."
+  },
+  {
+   "number": 24,
+   "title": "Provincia Valdivia (PROVINCIA VALDIVIA)",
+   "areas": [
+    "Valdivia",
+    "La Unión",
+    "Río Bueno"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 41905,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1911,
+   "page": 41,
+   "box": [
+    0.23,
+    0.86,
+    0.73,
+    0.9
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 6483,
+     "unassigned": null,
+     "seats": 1,
+     "page": 40,
+     "box": [
+      0.33,
+      0.87,
+      0.43,
+      0.91
+     ],
+     "candidates": [
+      {
+       "name": "LUIS PAPIC RAMOS",
+       "party": "DEMOCRATA CRISTIANO",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.515,
+        0.72,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 926,
+     "unassigned": null,
+     "seats": 0,
+     "page": 40,
+     "box": [
+      0.43,
+      0.87,
+      0.54,
+      0.91
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 10983,
+     "unassigned": null,
+     "seats": 2,
+     "page": 40,
+     "box": [
+      0.54,
+      0.87,
+      0.65,
+      0.91
+     ],
+     "candidates": [
+      {
+       "name": "INES ENRIQUEZ FRODDEN",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.515,
+        0.72,
+        0.575
+       ]
+      },
+      {
+       "name": "GASTON DA BOVE OLAVE",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.515,
+        0.72,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 3371,
+     "unassigned": null,
+     "seats": 0,
+     "page": 40,
+     "box": [
+      0.64,
+      0.87,
+      0.75,
+      0.91
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 9079,
+     "unassigned": null,
+     "seats": 1,
+     "page": 40,
+     "box": [
+      0.75,
+      0.87,
+      0.88,
+      0.91
+     ],
+     "candidates": [
+      {
+       "name": "NICANOR ALLENDE URRUTIA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.515,
+        0.72,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 5033,
+     "unassigned": null,
+     "seats": 1,
+     "page": 41,
+     "box": [
+      0.23,
+      0.86,
+      0.35,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS ALTAMIRANO ORREGO",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 51,
+       "box": [
+        0.17,
+        0.515,
+        0.72,
+        0.575
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 3119,
+     "unassigned": null,
+     "seats": 0,
+     "page": 41,
+     "box": [
+      0.35,
+      0.86,
+      0.46,
+      0.9
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Source error: the province row prints Comunista T. = 3371, but V. 3230 + M. 1141 = 4371, the department totals (3811+357+203) sum to 4371, and only 4371 makes the columns add to the printed total general 41.905 (with 3371 they sum to 40.905). The printed 3371 is kept (re-read at 300 dpi)."
+  },
+  {
+   "number": 25,
+   "title": "Provincia Osorno (PROVINCIA OSORNO)",
+   "areas": [
+    "Osorno",
+    "Río Negro"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 24835,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 904,
+   "page": 42,
+   "box": [
+    0.75,
+    0.76,
+    0.9,
+    0.8
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 4721,
+     "unassigned": null,
+     "seats": 0,
+     "page": 42,
+     "box": [
+      0.29,
+      0.76,
+      0.38,
+      0.8
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6839,
+     "unassigned": null,
+     "seats": 1,
+     "page": 42,
+     "box": [
+      0.38,
+      0.76,
+      0.48,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "AMERICO ACUÑA ROSAS",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.1,
+        0.72,
+        0.14
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7294,
+     "unassigned": null,
+     "seats": 1,
+     "page": 42,
+     "box": [
+      0.48,
+      0.76,
+      0.57,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS FOLLERT FLEIDL",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.1,
+        0.72,
+        0.14
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 4940,
+     "unassigned": null,
+     "seats": 1,
+     "page": 42,
+     "box": [
+      0.57,
+      0.76,
+      0.66,
+      0.8
+     ],
+     "candidates": [
+      {
+       "name": "RIGOBERTO COSSIO GODOY",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.1,
+        0.72,
+        0.14
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático Nacional",
+     "party": "Democrático Nacional",
+     "votes": 137,
+     "unassigned": null,
+     "seats": 0,
+     "page": 42,
+     "box": [
+      0.66,
+      0.76,
+      0.72,
+      0.8
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "The women-candidates table on p.53 calls Osorno the '22ª Agrup.'; first elected name read 'CARLOS FOLLERT FLEIDL' (heavy typeface)."
+  },
+  {
+   "number": 26,
+   "title": "Llanquihue y Aysén (PROVINCIA DE LLANQUIHUE + PROVINCIA AYSEN)",
+   "areas": [
+    "Llanquihue",
+    "Aysén"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 30613,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 1501,
+   "page": 44,
+   "box": [
+    0.25,
+    0.86,
+    0.65,
+    0.9
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 3120,
+     "unassigned": null,
+     "seats": 0,
+     "page": 43,
+     "box": [
+      0.21,
+      0.86,
+      0.43,
+      0.9
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 6789,
+     "unassigned": null,
+     "seats": 1,
+     "page": 43,
+     "box": [
+      0.42,
+      0.86,
+      0.56,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "RAUL IRARRAZAVAL LECAROS",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.16,
+        0.75,
+        0.2
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7936,
+     "unassigned": null,
+     "seats": 1,
+     "page": 43,
+     "box": [
+      0.53,
+      0.86,
+      0.62,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "FEDERICO BUCHER WEIBEL",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.16,
+        0.75,
+        0.2
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Comunista",
+     "party": "Comunista",
+     "votes": 2659,
+     "unassigned": null,
+     "seats": 0,
+     "page": 43,
+     "box": [
+      0.62,
+      0.86,
+      0.72,
+      0.9
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 5423,
+     "unassigned": null,
+     "seats": 1,
+     "page": 43,
+     "box": [
+      0.72,
+      0.86,
+      0.88,
+      0.9
+     ],
+     "candidates": [
+      {
+       "name": "EVALDO KLEIN DOERNER",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.16,
+        0.75,
+        0.2
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 3185,
+     "unassigned": null,
+     "seats": 0,
+     "page": 44,
+     "box": [
+      0.25,
+      0.86,
+      0.37,
+      0.9
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "One grouping ('LLANQUIHUE Y AYSEN' in the elected list, p.52) printed as two province tables with no grouping total. All figures here are COMPUTED sums of the printed province rows: Llanquihue (pp.43-44: DC 2723, CU 5915, Rad 6682, Com 1979, Lib 4665, Soc 2486, nulos y blancos 1210, total general 25.660) + Aysén (p.45, row 'PROVINCIA AYSEN' at about [0.18,0.79,0.9,0.83]: DC 397, CU 874, Rad 1254, Com 680, Lib 758, Soc 699, nulos y blancos 291, total general 4953). List boxes point at the Llanquihue figures; the Aysén addends are on p.45."
+  },
+  {
+   "number": 27,
+   "title": "Provincia Chiloé (PROVINCIA CHILOE)",
+   "areas": [
+    "Ancud",
+    "Castro",
+    "Quinchao",
+    "Palena"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 17720,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 901,
+   "page": 46,
+   "box": [
+    0.78,
+    0.86,
+    0.91,
+    0.895
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 991,
+     "unassigned": null,
+     "seats": 0,
+     "page": 46,
+     "box": [
+      0.4,
+      0.86,
+      0.47,
+      0.895
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 3991,
+     "unassigned": null,
+     "seats": 1,
+     "page": 46,
+     "box": [
+      0.47,
+      0.86,
+      0.55,
+      0.895
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO OCHAGAVIA VALDES",
+       "party": "CONSERVADOR UNIDO",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.22,
+        0.75,
+        0.26
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 5731,
+     "unassigned": null,
+     "seats": 1,
+     "page": 46,
+     "box": [
+      0.55,
+      0.86,
+      0.63,
+      0.895
+     ],
+     "candidates": [
+      {
+       "name": "RAUL MORALES ADRIAZOLA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.22,
+        0.75,
+        0.26
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 3124,
+     "unassigned": null,
+     "seats": 1,
+     "page": 46,
+     "box": [
+      0.63,
+      0.86,
+      0.7,
+      0.895
+     ],
+     "candidates": [
+      {
+       "name": "IGNACIO PRADO BENITEZ",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.22,
+        0.75,
+        0.26
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 2982,
+     "unassigned": null,
+     "seats": 0,
+     "page": 46,
+     "box": [
+      0.7,
+      0.86,
+      0.78,
+      0.895
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Department rows printed 'DEPTO.ANCUD', 'DEPTO.CASTRO', 'DEPTO. QUINCHAO', 'DEPTO. PALENA'."
+  },
+  {
+   "number": 28,
+   "title": "Provincia Magallanes (PROVINCIA MAGALLANES)",
+   "areas": [
+    "Magallanes",
+    "Ultima Esperanza",
+    "Tierra del Fuego"
+   ],
+   "seats": 1,
+   "registered": null,
+   "cast": 19187,
+   "valid": null,
+   "invalid": null,
+   "blank": null,
+   "null_blank": 813,
+   "page": 47,
+   "box": [
+    0.78,
+    0.8,
+    0.9,
+    0.85
+   ],
+   "lists": [
+    {
+     "label": "Demócrata Cristiano",
+     "party": "Demócrata Cristiano",
+     "votes": 543,
+     "unassigned": null,
+     "seats": 0,
+     "page": 47,
+     "box": [
+      0.38,
+      0.5,
+      0.47,
+      0.55
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador Unido",
+     "party": "Conservador Unido",
+     "votes": 145,
+     "unassigned": null,
+     "seats": 0,
+     "page": 47,
+     "box": [
+      0.47,
+      0.5,
+      0.56,
+      0.55
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 8616,
+     "unassigned": null,
+     "seats": 1,
+     "page": 47,
+     "box": [
+      0.56,
+      0.5,
+      0.66,
+      0.55
+     ],
+     "candidates": [
+      {
+       "name": "JORGE CVITANIC SIMUNOVIC",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 52,
+       "box": [
+        0.17,
+        0.27,
+        0.75,
+        0.3
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 531,
+     "unassigned": null,
+     "seats": 0,
+     "page": 47,
+     "box": [
+      0.44,
+      0.8,
+      0.52,
+      0.85
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 8539,
+     "unassigned": null,
+     "seats": 0,
+     "page": 47,
+     "box": [
+      0.52,
+      0.8,
+      0.6,
+      0.85
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Province table is on p.47 (upper half B-G, lower half H-L, nulos, total). Ultima Esperanza department label is handwritten. Radical V. printed 4850 (or 4860; blurred) with M. 3756 and T. 8616; T. agrees with the department rows. Only one deputy is listed as elected for Magallanes on p.52; seats = 1 as printed."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": 1385676,
+  "registered": null,
+  "page": 47,
+  "box": [
+   0.32,
+   0.54,
+   0.9,
+   0.885
+  ],
+  "null_blank": 45780,
+  "parties": {
+   "Comandos Populares": 96,
+   "Demócrata Cristiano": 213468,
+   "Conservador Unido": 198260,
+   "Radical": 296826,
+   "Unión Nacional": 3394,
+   "Comunista": 157572,
+   "Demócrata": 772,
+   "Liberal": 222485,
+   "Socialista": 149122,
+   "Democrático Nacional": 95179,
+   "Independiente": 2720
+  }
+ },
+ "notes": "Volume: Elección Parlamentaria 1961 (deputies), tables of party votes by province/department/commune with V./M./T. (men/women/total) columns, pp.2-47; list of elected deputies by grouping, pp.48-52; table of women candidates and elected by agrupación, p.53. Election day printed on p.1 cover as 'Domingo 5 de Marzo.- 1961.-'. No candidate votes, no registered voters and no separate valid/null/blank figures are printed: lists are parties (T. column at grouping level), candidates are the elected deputies only (votes null), null_blank is 'Nulos y Blancos', cast is 'TOTAL GENERAL'. Party columns that print only dashes for a grouping are omitted. Contest numbers are the sequence in the volume; printed ordinals on p.53 (3a Atacama, 6a Valparaíso y Quillota, 7a Santiago 1-3 distritos, 13a Maule, 14a Linares, 18a Arauco, 22a Osorno) agree with this sequence up to Arauco, but p.53 calls Osorno 22a whereas it is the 23rd grouping here. Province totals of Santiago (all four districts) and Ñuble (both groupings) are printed but not transcribed as contests. National: the TOTAL GENERAL row on p.47 gives party totals; their sum plus nulos y blancos (45.780) is 1.385.674 vs printed total general 1.385.676 (difference 2 in the source). Two province rows contain party totals that disagree with their own V.+M. and with the total general (Antofagasta CU 3704 for 2704; Valdivia Comunista 3371 for 4371); printed values kept, explained in contest notes."
+}

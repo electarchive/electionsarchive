@@ -1,0 +1,6154 @@
+{
+ "volume": "1973-deputies",
+ "chamber": "deputies",
+ "year": 1973,
+ "day": "1973-03-04",
+ "day_printed": "4 de Marzo de 1973",
+ "contests": [
+  {
+   "number": 1,
+   "title": "PRIMERA AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "IQUIQUE",
+    "ARICA",
+    "PISAGUA"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 76902,
+   "valid": null,
+   "invalid": 914,
+   "blank": 219,
+   "null_blank": null,
+   "page": 9,
+   "box": [
+    0.78,
+    0.212,
+    0.97,
+    0.759
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 37461,
+     "unassigned": 449,
+     "seats": 2,
+     "page": 9,
+     "box": [
+      0.78,
+      0.314,
+      0.97,
+      0.338
+     ],
+     "candidates": [
+      {
+       "name": "BERNARDINO GUERRA COFRE",
+       "party": "PN",
+       "votes": 9605,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.78,
+        0.24,
+        0.97,
+        0.264
+       ]
+      },
+      {
+       "name": "ALBERTO KOCH SOLOGUREN",
+       "party": "PN",
+       "votes": 7067,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.25,
+        0.97,
+        0.274
+       ]
+      },
+      {
+       "name": "SAMUEL ASTORGA JORQUERA",
+       "party": "DC",
+       "votes": 6911,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.266,
+        0.97,
+        0.29
+       ]
+      },
+      {
+       "name": "HUMBERTO PALZA CARVACHO",
+       "party": "DC",
+       "votes": 13429,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.78,
+        0.284,
+        0.97,
+        0.308
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 37742,
+     "unassigned": 510,
+     "seats": 2,
+     "page": 9,
+     "box": [
+      0.78,
+      0.447,
+      0.97,
+      0.471
+     ],
+     "candidates": [
+      {
+       "name": "OREL VICIANI ESCKER",
+       "party": "PC",
+       "votes": 16452,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.78,
+        0.37,
+        0.97,
+        0.394
+       ]
+      },
+      {
+       "name": "EDUARDO LONG ALESSANDRI",
+       "party": "PS",
+       "votes": 7920,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.386,
+        0.97,
+        0.41
+       ]
+      },
+      {
+       "name": "VICENTE ATENCIO CORTEZ",
+       "party": "PC",
+       "votes": 9875,
+       "elected": true,
+       "page": 9,
+       "box": [
+        0.78,
+        0.402,
+        0.97,
+        0.426
+       ]
+      },
+      {
+       "name": "TOMISLAV GIUSTINIANOVICH N.",
+       "party": "PR",
+       "votes": 2985,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.417,
+        0.97,
+        0.441
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 566,
+     "unassigned": 31,
+     "seats": 0,
+     "page": 9,
+     "box": [
+      0.78,
+      0.589,
+      0.97,
+      0.613
+     ],
+     "candidates": [
+      {
+       "name": "OTTO KOCH GONZALEZ",
+       "party": null,
+       "votes": 334,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.509,
+        0.97,
+        0.533
+       ]
+      },
+      {
+       "name": "SANTIAGO M. SALINAS MUÑOZ",
+       "party": null,
+       "votes": 68,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.524,
+        0.97,
+        0.548
+       ]
+      },
+      {
+       "name": "MODESTO LETELIER PALMA",
+       "party": null,
+       "votes": 81,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.541,
+        0.97,
+        0.565
+       ]
+      },
+      {
+       "name": "GUILLERMO ZAGAL DIAZ",
+       "party": null,
+       "votes": 52,
+       "elected": false,
+       "page": 9,
+       "box": [
+        0.78,
+        0.557,
+        0.97,
+        0.581
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Title page reads 'PRIMERA AGRUPACION DEPARTAMENTAL IQUIQUE ARICA Y PISAGUA'; total column headed 'TOTAL PROVINCIA TARAPACA'. The elected list prints 'Palza Corvacho, Humberto'; the table prints 'PALZA CARVACHO'."
+  },
+  {
+   "number": 2,
+   "title": "SEGUNDA AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "ANTOFAGASTA",
+    "TOCOPILLA",
+    "EL LOA",
+    "TALTAL"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": 110644,
+   "valid": null,
+   "invalid": 1144,
+   "blank": 320,
+   "null_blank": null,
+   "page": 13,
+   "box": [
+    0.75,
+    0.201,
+    0.9,
+    0.802
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 52880,
+     "unassigned": 524,
+     "seats": 3,
+     "page": 13,
+     "box": [
+      0.75,
+      0.35,
+      0.9,
+      0.374
+     ],
+     "candidates": [
+      {
+       "name": "FLOREAL RECABARREN ROJAS",
+       "party": "DC",
+       "votes": 8927,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.226,
+        0.9,
+        0.25
+       ]
+      },
+      {
+       "name": "PEDRO ARAYA ORTIZ",
+       "party": "DC",
+       "votes": 9847,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.243,
+        0.9,
+        0.267
+       ]
+      },
+      {
+       "name": "CESARIO CASTILLO MICHEA",
+       "party": "DC",
+       "votes": 11742,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.259,
+        0.9,
+        0.283
+       ]
+      },
+      {
+       "name": "ARTURO ALESSANDRI BESA",
+       "party": "PN",
+       "votes": 14671,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.275,
+        0.9,
+        0.299
+       ]
+      },
+      {
+       "name": "ANIBAL RODRIGUEZ CORREA",
+       "party": "PN",
+       "votes": 4507,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.292,
+        0.9,
+        0.316
+       ]
+      },
+      {
+       "name": "CARLOS CARMONA ALVAREZ",
+       "party": "PADENA",
+       "votes": 122,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.308,
+        0.9,
+        0.332
+       ]
+      },
+      {
+       "name": "EDUARDO CLAVEL AMION",
+       "party": "PDR",
+       "votes": 2540,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.324,
+        0.9,
+        0.348
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 54966,
+     "unassigned": 543,
+     "seats": 4,
+     "page": 13,
+     "box": [
+      0.75,
+      0.53,
+      0.9,
+      0.554
+     ],
+     "candidates": [
+      {
+       "name": "RUBEN SOTO GUTIERREZ",
+       "party": "PR",
+       "votes": 8186,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.407,
+        0.9,
+        0.431
+       ]
+      },
+      {
+       "name": "DOMINGO CLAPS GALLO",
+       "party": "PS",
+       "votes": 13691,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.424,
+        0.9,
+        0.448
+       ]
+      },
+      {
+       "name": "VILMA ROJAS ALFARO",
+       "party": "PC",
+       "votes": 11636,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.44,
+        0.9,
+        0.464
+       ]
+      },
+      {
+       "name": "COSME MORGADO",
+       "party": "MAPU",
+       "votes": 1349,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.456,
+        0.9,
+        0.48
+       ]
+      },
+      {
+       "name": "ALEJANDRO RODRIGUEZ",
+       "party": "PS",
+       "votes": 7289,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.473,
+        0.9,
+        0.497
+       ]
+      },
+      {
+       "name": "LEONARDO JEFFS CASTRO",
+       "party": "IC",
+       "votes": 212,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.489,
+        0.9,
+        0.513
+       ]
+      },
+      {
+       "name": "HUGO ROBLES ROBLES",
+       "party": "PC",
+       "votes": 12060,
+       "elected": true,
+       "page": 13,
+       "box": [
+        0.75,
+        0.506,
+        0.9,
+        0.53
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 1334,
+     "unassigned": 52,
+     "seats": 0,
+     "page": 13,
+     "box": [
+      0.75,
+      0.679,
+      0.9,
+      0.703
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS ALFARO OLIVARES",
+       "party": null,
+       "votes": 480,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.588,
+        0.9,
+        0.612
+       ]
+      },
+      {
+       "name": "OSVALDO CARRASCO SALFETA",
+       "party": null,
+       "votes": 90,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.604,
+        0.9,
+        0.628
+       ]
+      },
+      {
+       "name": "ENRIQUE CAMPDELACREU BARRIOS",
+       "party": null,
+       "votes": 175,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.621,
+        0.9,
+        0.645
+       ]
+      },
+      {
+       "name": "EULOGIO MOYANO MOYANO",
+       "party": null,
+       "votes": 407,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.637,
+        0.9,
+        0.661
+       ]
+      },
+      {
+       "name": "OSCAR EUGENIO VELASCO NOVOA",
+       "party": null,
+       "votes": 130,
+       "elected": false,
+       "page": 13,
+       "box": [
+        0.75,
+        0.654,
+        0.9,
+        0.678
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column is headed 'TOTAL PROVINCIA ANTOFAGASTA'. The printed list of elected deputies (p.184-188) spells 'Castillo Michea, Cesáreo' and 'Rojas Alfaro, Wilma'; the table prints 'CESARIO CASTILLO MICHE?' (last letter faint, completed as MICHEA from the elected list) and 'VILMA ROJAS ALFARO' (kept). Eduardo Clavel's total (2.54?) read as 2.540 from V 1.489 + M 1.051, which makes the CODE list add up."
+  },
+  {
+   "number": 3,
+   "title": "TERCERA AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "COPIAPO",
+    "CHAÑARAL",
+    "HUASCO",
+    "FREIRINA"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 60398,
+   "valid": null,
+   "invalid": 921,
+   "blank": 470,
+   "null_blank": null,
+   "page": 17,
+   "box": [
+    0.82,
+    0.279,
+    0.97,
+    0.706
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 26686,
+     "unassigned": 379,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.82,
+      0.376,
+      0.97,
+      0.4
+     ],
+     "candidates": [
+      {
+       "name": "RAUL BARRIONUEVO BARRIONUEVO",
+       "party": "DC",
+       "votes": 19424,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.82,
+        0.313,
+        0.97,
+        0.337
+       ]
+      },
+      {
+       "name": "MANUEL MAGALHAES MEDLING",
+       "party": "PIR",
+       "votes": 6883,
+       "elected": false,
+       "page": 17,
+       "box": [
+        0.82,
+        0.344,
+        0.97,
+        0.368
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 32321,
+     "unassigned": 502,
+     "seats": 1,
+     "page": 17,
+     "box": [
+      0.82,
+      0.522,
+      0.97,
+      0.546
+     ],
+     "candidates": [
+      {
+       "name": "LEONARDO HAGEL ARREDONDO",
+       "party": "PS",
+       "votes": 26515,
+       "elected": true,
+       "page": 17,
+       "box": [
+        0.82,
+        0.457,
+        0.97,
+        0.481
+       ]
+      },
+      {
+       "name": "DAVID ALBIÑA CORTES",
+       "party": "PR",
+       "votes": 5304,
+       "elected": false,
+       "page": 17,
+       "box": [
+        0.82,
+        0.49,
+        0.97,
+        0.514
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column is headed 'TOTAL PROVINCIA ATACAMA'."
+  },
+  {
+   "number": 4,
+   "title": "4°AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "LA SERENA",
+    "COQUIMBO",
+    "ELQUI",
+    "OVALLE",
+    "COMBARBALA",
+    "ILLAPEL"
+   ],
+   "seats": 7,
+   "registered": null,
+   "cast": 130065,
+   "valid": null,
+   "invalid": 1917,
+   "blank": 1164,
+   "null_blank": null,
+   "page": 25,
+   "box": [
+    0.6,
+    0.214,
+    0.75,
+    0.656
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 58043,
+     "unassigned": 688,
+     "seats": 3,
+     "page": 25,
+     "box": [
+      0.6,
+      0.359,
+      0.75,
+      0.383
+     ],
+     "candidates": [
+      {
+       "name": "MARINO PENNA MIRANDA",
+       "party": "DC",
+       "votes": 10843,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.239,
+        0.75,
+        0.263
+       ]
+      },
+      {
+       "name": "MARIO TORRES PERALTA",
+       "party": "DC",
+       "votes": 11934,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.254,
+        0.75,
+        0.278
+       ]
+      },
+      {
+       "name": "EDUARDO SEPULVEDA WHITTLE",
+       "party": "DC",
+       "votes": 13393,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.271,
+        0.75,
+        0.295
+       ]
+      },
+      {
+       "name": "ORLANDO POBLETE GONZALEZ",
+       "party": "PIR",
+       "votes": 4181,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.287,
+        0.75,
+        0.311
+       ]
+      },
+      {
+       "name": "FRANCISCO ALVAREZ MERY",
+       "party": "PN",
+       "votes": 7259,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.303,
+        0.75,
+        0.327
+       ]
+      },
+      {
+       "name": "JORGE MORALES ADRIASOLA",
+       "party": "PN",
+       "votes": 9376,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.319,
+        0.75,
+        0.343
+       ]
+      },
+      {
+       "name": "JUAN JORQUERA NIÑO DE ZEPEDA",
+       "party": "PN",
+       "votes": 369,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.335,
+        0.75,
+        0.359
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 68941,
+     "unassigned": 996,
+     "seats": 4,
+     "page": 25,
+     "box": [
+      0.6,
+      0.536,
+      0.75,
+      0.56
+     ],
+     "candidates": [
+      {
+       "name": "CLEMENTE FUENTEALBA CAAMAÑO",
+       "party": "PR",
+       "votes": 9555,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.416,
+        0.75,
+        0.44
+       ]
+      },
+      {
+       "name": "ALEJANDRO JILIBERTO ZEPEDA",
+       "party": "PS",
+       "votes": 11819,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.432,
+        0.75,
+        0.456
+       ]
+      },
+      {
+       "name": "RENE NAHMIAS ALBALA",
+       "party": "PS",
+       "votes": 9241,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.447,
+        0.75,
+        0.471
+       ]
+      },
+      {
+       "name": "AMANDA ALTAMIRANO GUERRERO",
+       "party": "PC",
+       "votes": 22933,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.464,
+        0.75,
+        0.488
+       ]
+      },
+      {
+       "name": "SILVIA ARAYA GONZALEZ",
+       "party": "API",
+       "votes": 12142,
+       "elected": true,
+       "page": 25,
+       "box": [
+        0.6,
+        0.48,
+        0.75,
+        0.504
+       ]
+      },
+      {
+       "name": "JORGE VASQUEZ MATAMALA",
+       "party": "MAPU",
+       "votes": 1380,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.496,
+        0.75,
+        0.52
+       ]
+      },
+      {
+       "name": "LUCIA CHIRINOS BENAVIDES",
+       "party": "IC",
+       "votes": 875,
+       "elected": false,
+       "page": 25,
+       "box": [
+        0.6,
+        0.512,
+        0.75,
+        0.536
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column is headed 'TOTAL PROVINCIA COQUIMBO'."
+  },
+  {
+   "number": 5,
+   "title": "QUINTA AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "SAN FELIPE",
+    "PETORCA",
+    "LOS ANDES"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 72585,
+   "valid": null,
+   "invalid": 873,
+   "blank": 250,
+   "null_blank": null,
+   "page": 31,
+   "box": [
+    0.73,
+    0.222,
+    0.9,
+    0.779
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 38859,
+     "unassigned": 601,
+     "seats": 2,
+     "page": 31,
+     "box": [
+      0.73,
+      0.327,
+      0.9,
+      0.351
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO CERDA GARCIA",
+       "party": "DC",
+       "votes": 16772,
+       "elected": true,
+       "page": 31,
+       "box": [
+        0.73,
+        0.247,
+        0.9,
+        0.271
+       ]
+      },
+      {
+       "name": "ERNESTO IGLESIAS CORTES",
+       "party": "DC",
+       "votes": 4948,
+       "elected": false,
+       "page": 31,
+       "box": [
+        0.73,
+        0.271,
+        0.9,
+        0.295
+       ]
+      },
+      {
+       "name": "DOMINGO GODOY MATTE",
+       "party": "PN",
+       "votes": 16538,
+       "elected": true,
+       "page": 31,
+       "box": [
+        0.73,
+        0.295,
+        0.9,
+        0.319
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 31667,
+     "unassigned": 588,
+     "seats": 1,
+     "page": 31,
+     "box": [
+      0.73,
+      0.48,
+      0.9,
+      0.504
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS MORA HORMAZABAL",
+       "party": "API",
+       "votes": 808,
+       "elected": false,
+       "page": 31,
+       "box": [
+        0.73,
+        0.4,
+        0.9,
+        0.424
+       ]
+      },
+      {
+       "name": "LUIS MUÑOZ GONZALEZ",
+       "party": "PS",
+       "votes": 13012,
+       "elected": false,
+       "page": 31,
+       "box": [
+        0.73,
+        0.424,
+        0.9,
+        0.448
+       ]
+      },
+      {
+       "name": "RAUL SANCHEZ BAÑADOS",
+       "party": "PC",
+       "votes": 17259,
+       "elected": true,
+       "page": 31,
+       "box": [
+        0.73,
+        0.449,
+        0.9,
+        0.473
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 936,
+     "unassigned": 72,
+     "seats": 0,
+     "page": 31,
+     "box": [
+      0.73,
+      0.609,
+      0.9,
+      0.633
+     ],
+     "candidates": [
+      {
+       "name": "ORLANDO RIOS GONZALEZ",
+       "party": null,
+       "votes": 701,
+       "elected": false,
+       "page": 31,
+       "box": [
+        0.73,
+        0.553,
+        0.9,
+        0.577
+       ]
+      },
+      {
+       "name": "EDMUNDO TULCANAZA NAVARRO",
+       "party": null,
+       "votes": 163,
+       "elected": false,
+       "page": 31,
+       "box": [
+        0.73,
+        0.577,
+        0.9,
+        0.601
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column is headed 'TOTAL PROVINCIA ACONCAGUA'."
+  },
+  {
+   "number": 6,
+   "title": "6°AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "VALPARAISO",
+    "QUILLOTA",
+    "ISLA DE PASCUA"
+   ],
+   "seats": 12,
+   "registered": null,
+   "cast": 362031,
+   "valid": null,
+   "invalid": 3132,
+   "blank": 990,
+   "null_blank": null,
+   "page": 38,
+   "box": [
+    0.57,
+    0.239,
+    0.74,
+    0.846
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 212180,
+     "unassigned": 4397,
+     "seats": 7,
+     "page": 38,
+     "box": [
+      0.57,
+      0.465,
+      0.74,
+      0.489
+     ],
+     "candidates": [
+      {
+       "name": "GONZALO YUSEFF SOTOMAYOR",
+       "party": "PN",
+       "votes": 24575,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.263,
+        0.74,
+        0.287
+       ]
+      },
+      {
+       "name": "EUGENIO ORTUZAR LATAPIAT",
+       "party": "PN",
+       "votes": 20037,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.28,
+        0.74,
+        0.304
+       ]
+      },
+      {
+       "name": "GUSTAVO LORCA ROJAS",
+       "party": "PN",
+       "votes": 19104,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.296,
+        0.74,
+        0.32
+       ]
+      },
+      {
+       "name": "ANIBAL SCARELLA CALANDRONI",
+       "party": "PN",
+       "votes": 26757,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.312,
+        0.74,
+        0.336
+       ]
+      },
+      {
+       "name": "CARLOS SOYA GONZALEZ",
+       "party": "PIR",
+       "votes": 8597,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.328,
+        0.74,
+        0.352
+       ]
+      },
+      {
+       "name": "JORGE OVALLE QUIROZ",
+       "party": "DR",
+       "votes": 5835,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.344,
+        0.74,
+        0.368
+       ]
+      },
+      {
+       "name": "GUSTAVO CARDEMIL ALFARO",
+       "party": "DC",
+       "votes": 20537,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.361,
+        0.74,
+        0.385
+       ]
+      },
+      {
+       "name": "EDUARDO SEPULVEDA MUÑOZ",
+       "party": "DC",
+       "votes": 13492,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.377,
+        0.74,
+        0.401
+       ]
+      },
+      {
+       "name": "JORGE SANTIBAÑEZ CEARDI",
+       "party": "DC",
+       "votes": 15871,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.393,
+        0.74,
+        0.417
+       ]
+      },
+      {
+       "name": "ALFONSO ANSIETA NUÑEZ",
+       "party": "DC",
+       "votes": 25113,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.409,
+        0.74,
+        0.433
+       ]
+      },
+      {
+       "name": "HECTOR CASTRO CASTRO",
+       "party": "DC",
+       "votes": 16168,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.426,
+        0.74,
+        0.45
+       ]
+      },
+      {
+       "name": "TERESA MAILLET DE DE LA MAZA",
+       "party": "DC",
+       "votes": 11697,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.442,
+        0.74,
+        0.466
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 145729,
+     "unassigned": 3610,
+     "seats": 5,
+     "page": 38,
+     "box": [
+      0.57,
+      0.724,
+      0.74,
+      0.748
+     ],
+     "candidates": [
+      {
+       "name": "OSVALDO GIANNINI IÑIGUEZ",
+       "party": "IC",
+       "votes": 5279,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.522,
+        0.74,
+        0.546
+       ]
+      },
+      {
+       "name": "CARLOS ANDRADE VERA",
+       "party": "PC",
+       "votes": 25663,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.539,
+        0.74,
+        0.563
+       ]
+      },
+      {
+       "name": "ANDRES SEPULVEDA CARMONA",
+       "party": "PS",
+       "votes": 11549,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.554,
+        0.74,
+        0.578
+       ]
+      },
+      {
+       "name": "MARIO BARAHONA CEBALLOS",
+       "party": "PR",
+       "votes": 11412,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.57,
+        0.74,
+        0.594
+       ]
+      },
+      {
+       "name": "MANUEL CANTERO PRADO",
+       "party": "PC",
+       "votes": 27833,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.587,
+        0.74,
+        0.611
+       ]
+      },
+      {
+       "name": "NELSON SALINAS GUZMAN",
+       "party": "PS",
+       "votes": 6432,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.603,
+        0.74,
+        0.627
+       ]
+      },
+      {
+       "name": "LUIS GUASTAVINO CORDOVA",
+       "party": "PC",
+       "votes": 23935,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.619,
+        0.74,
+        0.643
+       ]
+      },
+      {
+       "name": "JORGE COX MENDEZ",
+       "party": "MAPU",
+       "votes": 9432,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.635,
+        0.74,
+        0.659
+       ]
+      },
+      {
+       "name": "RODEMIL YAÑEZ",
+       "party": "PC",
+       "votes": 353,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.652,
+        0.74,
+        0.676
+       ]
+      },
+      {
+       "name": "GLORIA FERNANDEZ",
+       "party": "API",
+       "votes": 845,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.668,
+        0.74,
+        0.692
+       ]
+      },
+      {
+       "name": "ARMANDO BARRIENTOS MIRANDA",
+       "party": "PS",
+       "votes": 11579,
+       "elected": true,
+       "page": 38,
+       "box": [
+        0.57,
+        0.684,
+        0.74,
+        0.708
+       ]
+      },
+      {
+       "name": "JUAN ENRIQUE VEGA PATRI",
+       "party": "MAPU",
+       "votes": 7807,
+       "elected": false,
+       "page": 38,
+       "box": [
+        0.57,
+        0.7,
+        0.74,
+        0.724
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column is headed 'TOTAL PROVINCIA VALPARAISO'. Several CODE totals (T) are faded: Scarella 26.757, Soya 8.597, Ovalle 5.835, Cardemil 20.537, Sepulveda Muñoz 13.492 were read where legible and confirmed from the printed V and M columns (with Sepulveda's V 6.187 and Scarella's M 17.330 fixed by the printed V and M list totals 91.612 and 120.568); the list adds to the printed 212.180."
+  },
+  {
+   "number": 7,
+   "title": "SEPTIMA AGRUPACION DEPARTAMENTAL - SANTIAGO PRIMER DISTRITO",
+   "areas": [
+    "SANTIAGO PRIMER DISTRITO"
+   ],
+   "seats": 18,
+   "registered": null,
+   "cast": 392033,
+   "valid": null,
+   "invalid": 2453,
+   "blank": 2410,
+   "null_blank": null,
+   "page": 41,
+   "box": [
+    0.77,
+    0.193,
+    0.96,
+    0.863
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 247505,
+     "unassigned": 5296,
+     "seats": 12,
+     "page": 41,
+     "box": [
+      0.77,
+      0.5,
+      0.96,
+      0.524
+     ],
+     "candidates": [
+      {
+       "name": "WILNA SAAVEDRA CORTES",
+       "party": "DC",
+       "votes": 19362,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.208,
+        0.96,
+        0.232
+       ]
+      },
+      {
+       "name": "BERNARDO LEIGHTON GUZMAN",
+       "party": "DC",
+       "votes": 35158,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.224,
+        0.96,
+        0.248
+       ]
+      },
+      {
+       "name": "LUIS PARETO GONZALEZ",
+       "party": "DC",
+       "votes": 19592,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.24,
+        0.96,
+        0.264
+       ]
+      },
+      {
+       "name": "FERNANDO SANHUEZA HERBAGE",
+       "party": "DC",
+       "votes": 11188,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.256,
+        0.96,
+        0.28
+       ]
+      },
+      {
+       "name": "CLAUDIO ORREGO VICUÑA",
+       "party": "DC",
+       "votes": 18870,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.273,
+        0.96,
+        0.297
+       ]
+      },
+      {
+       "name": "LUIS RICARDO HORMAZABAL SANCHEZ",
+       "party": "DC",
+       "votes": 9734,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.289,
+        0.96,
+        0.313
+       ]
+      },
+      {
+       "name": "SANTIAGO PEREIRA BECERRA",
+       "party": "DC",
+       "votes": 6896,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.305,
+        0.96,
+        0.329
+       ]
+      },
+      {
+       "name": "MANUEL FERNANDEZ DIAZ",
+       "party": "DC",
+       "votes": 6244,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.321,
+        0.96,
+        0.345
+       ]
+      },
+      {
+       "name": "RAFAEL SEÑORET LAPSLEY",
+       "party": "DR",
+       "votes": 5170,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.337,
+        0.96,
+        0.361
+       ]
+      },
+      {
+       "name": "RAFAEL OTERO ECHEVERRIA",
+       "party": "DR",
+       "votes": 16382,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.354,
+        0.96,
+        0.378
+       ]
+      },
+      {
+       "name": "JORGE HAZBUN DIAZ",
+       "party": "PADENA",
+       "votes": 959,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.37,
+        0.96,
+        0.394
+       ]
+      },
+      {
+       "name": "ARTURO VENEGAS GUTIERREZ",
+       "party": "PIR",
+       "votes": 3827,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.386,
+        0.96,
+        0.41
+       ]
+      },
+      {
+       "name": "ENGELBERTO FRIAS MORAN",
+       "party": "PN",
+       "votes": 6486,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.402,
+        0.96,
+        0.426
+       ]
+      },
+      {
+       "name": "HERMOGENES PEREZ DE ARCE",
+       "party": "PN",
+       "votes": 33449,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.419,
+        0.96,
+        0.443
+       ]
+      },
+      {
+       "name": "GUSTAVO MONCKEBERG BARROS",
+       "party": "PN",
+       "votes": 10555,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.434,
+        0.96,
+        0.458
+       ]
+      },
+      {
+       "name": "JUAN LUIS OSSA BULNES",
+       "party": "PN",
+       "votes": 9534,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.45,
+        0.96,
+        0.474
+       ]
+      },
+      {
+       "name": "MARIO ARNELLO ROMO",
+       "party": "PN",
+       "votes": 7687,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.467,
+        0.96,
+        0.491
+       ]
+      },
+      {
+       "name": "SILVIA PINTO TORRES",
+       "party": "PN",
+       "votes": 19116,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.483,
+        0.96,
+        0.507
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 139126,
+     "unassigned": 4502,
+     "seats": 6,
+     "page": 41,
+     "box": [
+      0.77,
+      0.701,
+      0.96,
+      0.725
+     ],
+     "candidates": [
+      {
+       "name": "LUIS MAIRA AGUIRRE",
+       "party": "IC",
+       "votes": 14092,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.539,
+        0.96,
+        0.563
+       ]
+      },
+      {
+       "name": "CARMEN LAZO CARRERA",
+       "party": "PS",
+       "votes": 28179,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.556,
+        0.96,
+        0.58
+       ]
+      },
+      {
+       "name": "GLADYS MARIN MILLIE",
+       "party": "PC",
+       "votes": 28144,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.572,
+        0.96,
+        0.596
+       ]
+      },
+      {
+       "name": "IGNACIO LAGNO CASTILLO",
+       "party": "PR",
+       "votes": 9839,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.588,
+        0.96,
+        0.612
+       ]
+      },
+      {
+       "name": "JOSE ANTONIO VIERA-GALLO QUESNEY",
+       "party": "MAPU",
+       "votes": 4145,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.604,
+        0.96,
+        0.628
+       ]
+      },
+      {
+       "name": "FIDELMA ALLENDE MIRANDA",
+       "party": "PS",
+       "votes": 13744,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.62,
+        0.96,
+        0.644
+       ]
+      },
+      {
+       "name": "PEDRO ARAVENA NAVARRETE",
+       "party": "PC",
+       "votes": 10552,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.637,
+        0.96,
+        0.661
+       ]
+      },
+      {
+       "name": "VICTOR BARBERIS YORI",
+       "party": "PS",
+       "votes": 10803,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.653,
+        0.96,
+        0.677
+       ]
+      },
+      {
+       "name": "MARIO CANDIA HENRIQUEZ",
+       "party": "API",
+       "votes": 600,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.669,
+        0.96,
+        0.693
+       ]
+      },
+      {
+       "name": "ALEJANDRO ROJAS WAINER",
+       "party": "PC",
+       "votes": 14526,
+       "elected": true,
+       "page": 41,
+       "box": [
+        0.77,
+        0.685,
+        0.96,
+        0.709
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 539,
+     "unassigned": null,
+     "seats": 0,
+     "page": 41,
+     "box": [
+      0.77,
+      0.757,
+      0.96,
+      0.781
+     ],
+     "candidates": [
+      {
+       "name": "OSCAR NUÑEZ BRAVO",
+       "party": null,
+       "votes": 539,
+       "elected": false,
+       "page": 41,
+       "box": [
+        0.77,
+        0.741,
+        0.96,
+        0.765
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PRIMER DISTRITO SANTIAGO'. Source arithmetic: the CODE candidate rows plus the no-preference row add to 245.505 (V 106.905), but the volume prints TOTAL LISTA 247.505 (V 108.905); every row was re-read at 300 dpi and each row's V+M equals its T. The Tribunal Calificador table (p.144) also prints 247.505, and TOTAL GENERAL 392.033 is consistent with 247.505. Printed figures kept. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 8,
+   "title": "7° AGRUPACION DEPARTAMENTAL - SEGUNDO DISTRITO SANTIAGO",
+   "areas": [
+    "SANTIAGO SEGUNDO DISTRITO"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 324115,
+   "valid": null,
+   "invalid": 3564,
+   "blank": 2349,
+   "null_blank": null,
+   "page": 45,
+   "box": [
+    0.58,
+    0.21,
+    0.74,
+    0.596
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 160345,
+     "unassigned": 4288,
+     "seats": 3,
+     "page": 45,
+     "box": [
+      0.58,
+      0.325,
+      0.74,
+      0.349
+     ],
+     "candidates": [
+      {
+       "name": "LUCIANO VASQUEZ MURUAGA",
+       "party": "PN",
+       "votes": 52639,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.58,
+        0.234,
+        0.74,
+        0.258
+       ]
+      },
+      {
+       "name": "BENEDICTO FLORES NEIRA",
+       "party": "PADENA",
+       "votes": 11341,
+       "elected": false,
+       "page": 45,
+       "box": [
+        0.58,
+        0.251,
+        0.74,
+        0.275
+       ]
+      },
+      {
+       "name": "JOSE LUIS CORCUERA BOLINAGA",
+       "party": "PIR",
+       "votes": 3186,
+       "elected": false,
+       "page": 45,
+       "box": [
+        0.58,
+        0.267,
+        0.74,
+        0.291
+       ]
+      },
+      {
+       "name": "SERGIO SAAVEDRA VIOLLIER",
+       "party": "DC",
+       "votes": 51298,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.58,
+        0.284,
+        0.74,
+        0.308
+       ]
+      },
+      {
+       "name": "BLANCA RETAMAL CONTRERAS",
+       "party": "DC",
+       "votes": 37593,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.58,
+        0.3,
+        0.74,
+        0.324
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 157857,
+     "unassigned": 3984,
+     "seats": 2,
+     "page": 45,
+     "box": [
+      0.58,
+      0.473,
+      0.74,
+      0.497
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO ROJAS CUELLAR",
+       "party": "MAPU",
+       "votes": 8887,
+       "elected": false,
+       "page": 45,
+       "box": [
+        0.58,
+        0.383,
+        0.74,
+        0.407
+       ]
+      },
+      {
+       "name": "LAURA ALLENDE GOSSENS",
+       "party": "PS",
+       "votes": 90508,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.58,
+        0.4,
+        0.74,
+        0.424
+       ]
+      },
+      {
+       "name": "HUMBERTO ELGUETA GUERIN",
+       "party": "PR",
+       "votes": 3631,
+       "elected": false,
+       "page": 45,
+       "box": [
+        0.58,
+        0.416,
+        0.74,
+        0.44
+       ]
+      },
+      {
+       "name": "ELIANA ARANIBAR FIGUEROA",
+       "party": "PC",
+       "votes": 45661,
+       "elected": true,
+       "page": 45,
+       "box": [
+        0.58,
+        0.432,
+        0.74,
+        0.456
+       ]
+      },
+      {
+       "name": "JULIO SILVA SOLAR",
+       "party": "IC",
+       "votes": 5186,
+       "elected": false,
+       "page": 45,
+       "box": [
+        0.58,
+        0.449,
+        0.74,
+        0.473
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL SEGUNDO DISTRITO SANTIAGO'."
+  },
+  {
+   "number": 9,
+   "title": "SEPTIMA AGRUPACION DEPARTAMENTAL - TERCER DISTRITO SANTIAGO",
+   "areas": [
+    "SANTIAGO TERCER DISTRITO"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 573170,
+   "valid": null,
+   "invalid": 4961,
+   "blank": 3124,
+   "null_blank": null,
+   "page": 50,
+   "box": [
+    0.84,
+    0.244,
+    0.98,
+    0.719
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 332252,
+     "unassigned": 7494,
+     "seats": 3,
+     "page": 50,
+     "box": [
+      0.84,
+      0.39,
+      0.98,
+      0.414
+     ],
+     "candidates": [
+      {
+       "name": "ALBERTO ZALDIVAR LARRAIN",
+       "party": "DC",
+       "votes": 88618,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.84,
+        0.269,
+        0.98,
+        0.293
+       ]
+      },
+      {
+       "name": "CARLOS DUPRE SILVA",
+       "party": "DC",
+       "votes": 73691,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.84,
+        0.293,
+        0.98,
+        0.317
+       ]
+      },
+      {
+       "name": "JOSE QUEZADA MELENDEZ",
+       "party": "DR",
+       "votes": 6821,
+       "elected": false,
+       "page": 50,
+       "box": [
+        0.84,
+        0.317,
+        0.98,
+        0.341
+       ]
+      },
+      {
+       "name": "JORGE MONCKEBERG BARROS",
+       "party": "PN",
+       "votes": 69782,
+       "elected": false,
+       "page": 50,
+       "box": [
+        0.84,
+        0.341,
+        0.98,
+        0.365
+       ]
+      },
+      {
+       "name": "GUSTAVO ALESSANDRI VALDES",
+       "party": "PN",
+       "votes": 85846,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.84,
+        0.366,
+        0.98,
+        0.39
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 232833,
+     "unassigned": 6773,
+     "seats": 2,
+     "page": 50,
+     "box": [
+      0.84,
+      0.582,
+      0.98,
+      0.606
+     ],
+     "candidates": [
+      {
+       "name": "MARIO PALESTRO ROJAS",
+       "party": "PS",
+       "votes": 112556,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.84,
+        0.462,
+        0.98,
+        0.486
+       ]
+      },
+      {
+       "name": "NIEVES YANKOVIC GARAFULIC",
+       "party": "IC",
+       "votes": 5639,
+       "elected": false,
+       "page": 50,
+       "box": [
+        0.84,
+        0.486,
+        0.98,
+        0.51
+       ]
+      },
+      {
+       "name": "JOSE MIGUEL INSULZA SALINAS",
+       "party": "MAPU",
+       "votes": 18815,
+       "elected": false,
+       "page": 50,
+       "box": [
+        0.84,
+        0.51,
+        0.98,
+        0.534
+       ]
+      },
+      {
+       "name": "MIGUEL LEON PRADO OYARZUN",
+       "party": "PR",
+       "votes": 5825,
+       "elected": false,
+       "page": 50,
+       "box": [
+        0.84,
+        0.534,
+        0.98,
+        0.558
+       ]
+      },
+      {
+       "name": "JORGE INSUNZA BECKER",
+       "party": "PC",
+       "votes": 83225,
+       "elected": true,
+       "page": 50,
+       "box": [
+        0.84,
+        0.558,
+        0.98,
+        0.582
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL TERCER DISTRITO SANTIAGO'."
+  },
+  {
+   "number": 10,
+   "title": "8° AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "MELIPILLA",
+    "SAN ANTONIO",
+    "SAN BERNARDO",
+    "MAIPO"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 142514,
+   "valid": null,
+   "invalid": 1667,
+   "blank": 1010,
+   "null_blank": null,
+   "page": 55,
+   "box": [
+    0.83,
+    0.21,
+    0.96,
+    0.588
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 79935,
+     "unassigned": 1242,
+     "seats": 3,
+     "page": 55,
+     "box": [
+      0.83,
+      0.323,
+      0.96,
+      0.347
+     ],
+     "candidates": [
+      {
+       "name": "ANDRES AYLWIN AZOCAR",
+       "party": "DC",
+       "votes": 29965,
+       "elected": true,
+       "page": 55,
+       "box": [
+        0.83,
+        0.234,
+        0.96,
+        0.258
+       ]
+      },
+      {
+       "name": "JUANA DIP DE RODRIGUEZ",
+       "party": "DC",
+       "votes": 15928,
+       "elected": true,
+       "page": 55,
+       "box": [
+        0.83,
+        0.25,
+        0.96,
+        0.274
+       ]
+      },
+      {
+       "name": "LUIS NAVARRO AVILES",
+       "party": "PIR",
+       "votes": 3118,
+       "elected": false,
+       "page": 55,
+       "box": [
+        0.83,
+        0.267,
+        0.96,
+        0.291
+       ]
+      },
+      {
+       "name": "ALFONSO SUAREZ OBIOL",
+       "party": "PN",
+       "votes": 16018,
+       "elected": true,
+       "page": 55,
+       "box": [
+        0.83,
+        0.283,
+        0.96,
+        0.307
+       ]
+      },
+      {
+       "name": "JAIME BULNES SANFUENTES",
+       "party": "PN",
+       "votes": 13664,
+       "elected": false,
+       "page": 55,
+       "box": [
+        0.83,
+        0.299,
+        0.96,
+        0.323
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 59902,
+     "unassigned": 1455,
+     "seats": 2,
+     "page": 55,
+     "box": [
+      0.83,
+      0.467,
+      0.96,
+      0.491
+     ],
+     "candidates": [
+      {
+       "name": "MIREYA BALTRA MORENO",
+       "party": "PC",
+       "votes": 28195,
+       "elected": true,
+       "page": 55,
+       "box": [
+        0.83,
+        0.379,
+        0.96,
+        0.403
+       ]
+      },
+      {
+       "name": "ELIDIO SOTO SOTO",
+       "party": "PR",
+       "votes": 8519,
+       "elected": false,
+       "page": 55,
+       "box": [
+        0.83,
+        0.395,
+        0.96,
+        0.419
+       ]
+      },
+      {
+       "name": "MARIO GODOY SANDOVAL",
+       "party": "MAPU",
+       "votes": 1785,
+       "elected": false,
+       "page": 55,
+       "box": [
+        0.83,
+        0.412,
+        0.96,
+        0.436
+       ]
+      },
+      {
+       "name": "MANUEL IGUALT GROVE",
+       "party": "API",
+       "votes": 433,
+       "elected": false,
+       "page": 55,
+       "box": [
+        0.83,
+        0.427,
+        0.96,
+        0.451
+       ]
+      },
+      {
+       "name": "MATIAS NUÑEZ MALHUE",
+       "party": "PS",
+       "votes": 19515,
+       "elected": true,
+       "page": 55,
+       "box": [
+        0.83,
+        0.444,
+        0.96,
+        0.468
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 8°AGRUP.DEPTAL.'. Candidate 12 is printed 'LUIS NAVARRO AVILES' on p.51 and appears as 'LUIS NAVARRETE AVILES' on p.55; the p.51 spelling is used."
+  },
+  {
+   "number": 11,
+   "title": "9° AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "RANCAGUA",
+    "CAUPOLICAN",
+    "SAN VICENTE",
+    "CACHAPOAL"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": 127035,
+   "valid": null,
+   "invalid": 1624,
+   "blank": 477,
+   "null_blank": null,
+   "page": 61,
+   "box": [
+    0.56,
+    0.223,
+    0.71,
+    0.625
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 64669,
+     "unassigned": 1047,
+     "seats": 3,
+     "page": 61,
+     "box": [
+      0.56,
+      0.354,
+      0.71,
+      0.378
+     ],
+     "candidates": [
+      {
+       "name": "JOSE MONARES GOMEZ",
+       "party": "DC",
+       "votes": 13025,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.248,
+        0.71,
+        0.272
+       ]
+      },
+      {
+       "name": "RICARDO TUDELA BARRAZA",
+       "party": "DC",
+       "votes": 15515,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.264,
+        0.71,
+        0.288
+       ]
+      },
+      {
+       "name": "VICTORIANO ZENTENO SUAZO",
+       "party": "DC",
+       "votes": 7384,
+       "elected": false,
+       "page": 61,
+       "box": [
+        0.56,
+        0.281,
+        0.71,
+        0.305
+       ]
+      },
+      {
+       "name": "EUGENIO RETES OLIVA",
+       "party": "DR",
+       "votes": 1120,
+       "elected": false,
+       "page": 61,
+       "box": [
+        0.56,
+        0.297,
+        0.71,
+        0.321
+       ]
+      },
+      {
+       "name": "ALBERTO ECHENIQUE LYON",
+       "party": "PN",
+       "votes": 9144,
+       "elected": false,
+       "page": 61,
+       "box": [
+        0.56,
+        0.314,
+        0.71,
+        0.338
+       ]
+      },
+      {
+       "name": "PATRICIO MEKIS SPIKIN",
+       "party": "PN",
+       "votes": 17434,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.33,
+        0.71,
+        0.354
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 60265,
+     "unassigned": 874,
+     "seats": 3,
+     "page": 61,
+     "box": [
+      0.56,
+      0.502,
+      0.71,
+      0.526
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR OLIVARES SOLIS",
+       "party": "PS",
+       "votes": 28717,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.412,
+        0.71,
+        0.436
+       ]
+      },
+      {
+       "name": "ESTEBAN LEYTON SOTO",
+       "party": "PR",
+       "votes": 8215,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.429,
+        0.71,
+        0.453
+       ]
+      },
+      {
+       "name": "GLADYS GOEDE GARZ",
+       "party": "MAPU",
+       "votes": 1297,
+       "elected": false,
+       "page": 61,
+       "box": [
+        0.56,
+        0.445,
+        0.71,
+        0.469
+       ]
+      },
+      {
+       "name": "ALEJANDRO SEPULVEDA SAEZ",
+       "party": "IC",
+       "votes": 471,
+       "elected": false,
+       "page": 61,
+       "box": [
+        0.56,
+        0.462,
+        0.71,
+        0.486
+       ]
+      },
+      {
+       "name": "VLADIMIR CHAVEZ RODRIGUEZ",
+       "party": "PC",
+       "votes": 20691,
+       "elected": true,
+       "page": 61,
+       "box": [
+        0.56,
+        0.478,
+        0.71,
+        0.502
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA O'HIGGINS'."
+  },
+  {
+   "number": 12,
+   "title": "10° AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "SAN FERNANDO",
+    "SANTA CRUZ"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 63970,
+   "valid": null,
+   "invalid": 534,
+   "blank": 196,
+   "null_blank": null,
+   "page": 65,
+   "box": [
+    0.81,
+    0.199,
+    0.96,
+    0.759
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 35921,
+     "unassigned": 280,
+     "seats": 2,
+     "page": 65,
+     "box": [
+      0.81,
+      0.33,
+      0.96,
+      0.354
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO MATURANA ERBETTA",
+       "party": "PN",
+       "votes": 6800,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.81,
+        0.223,
+        0.96,
+        0.247
+       ]
+      },
+      {
+       "name": "MAXIMIANO ERRAZURIZ",
+       "party": "PN",
+       "votes": 11891,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.81,
+        0.248,
+        0.96,
+        0.272
+       ]
+      },
+      {
+       "name": "FERNANDO CANCINO TELLEZ",
+       "party": "DC",
+       "votes": 7340,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.81,
+        0.273,
+        0.96,
+        0.297
+       ]
+      },
+      {
+       "name": "RAUL HERRERA HERRERA",
+       "party": "DC",
+       "votes": 9610,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.81,
+        0.297,
+        0.96,
+        0.321
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 27118,
+     "unassigned": 306,
+     "seats": 2,
+     "page": 65,
+     "box": [
+      0.81,
+      0.494,
+      0.96,
+      0.518
+     ],
+     "candidates": [
+      {
+       "name": "JUAN CODELIA DIAZ",
+       "party": "MAPU",
+       "votes": 4152,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.81,
+        0.388,
+        0.96,
+        0.412
+       ]
+      },
+      {
+       "name": "SILVIA COSTA ESPINOZA",
+       "party": "PC",
+       "votes": 5735,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.81,
+        0.413,
+        0.96,
+        0.437
+       ]
+      },
+      {
+       "name": "HECTOR RIOS RIOS",
+       "party": "PR",
+       "votes": 3661,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.81,
+        0.437,
+        0.96,
+        0.461
+       ]
+      },
+      {
+       "name": "JOEL MARAMBIO PAEZ",
+       "party": "PS",
+       "votes": 13264,
+       "elected": true,
+       "page": 65,
+       "box": [
+        0.81,
+        0.462,
+        0.96,
+        0.486
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 201,
+     "unassigned": null,
+     "seats": 0,
+     "page": 65,
+     "box": [
+      0.81,
+      0.586,
+      0.96,
+      0.61
+     ],
+     "candidates": [
+      {
+       "name": "MIGUEL LORCA ZAMORANO",
+       "party": null,
+       "votes": 201,
+       "elected": false,
+       "page": 65,
+       "box": [
+        0.81,
+        0.553,
+        0.96,
+        0.577
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA COLCHAGUA'. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 13,
+   "title": "11° AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "CURICO",
+    "MATAQUITO"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 47353,
+   "valid": null,
+   "invalid": 737,
+   "blank": 392,
+   "null_blank": null,
+   "page": 68,
+   "box": [
+    0.55,
+    0.163,
+    0.7,
+    0.583
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 24330,
+     "unassigned": 280,
+     "seats": 2,
+     "page": 68,
+     "box": [
+      0.55,
+      0.244,
+      0.7,
+      0.268
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS GARCES FERNANDEZ",
+       "party": "DC",
+       "votes": 14114,
+       "elected": true,
+       "page": 68,
+       "box": [
+        0.55,
+        0.187,
+        0.7,
+        0.211
+       ]
+      },
+      {
+       "name": "RODOLFO RAMIREZ VALENZUELA",
+       "party": "PN",
+       "votes": 7419,
+       "elected": true,
+       "page": 68,
+       "box": [
+        0.55,
+        0.204,
+        0.7,
+        0.228
+       ]
+      },
+      {
+       "name": "HECTOR CAMPOS PEREZ",
+       "party": "DR",
+       "votes": 2517,
+       "elected": false,
+       "page": 68,
+       "box": [
+        0.55,
+        0.22,
+        0.7,
+        0.244
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 21399,
+     "unassigned": 403,
+     "seats": 1,
+     "page": 68,
+     "box": [
+      0.55,
+      0.36,
+      0.7,
+      0.384
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR MARTINEZ MOLINA",
+       "party": "PS",
+       "votes": 8194,
+       "elected": false,
+       "page": 68,
+       "box": [
+        0.55,
+        0.303,
+        0.7,
+        0.327
+       ]
+      },
+      {
+       "name": "LEONCIO SAAVEDRA CONCHA",
+       "party": "PR",
+       "votes": 2511,
+       "elected": false,
+       "page": 68,
+       "box": [
+        0.55,
+        0.319,
+        0.7,
+        0.343
+       ]
+      },
+      {
+       "name": "OSCAR MOYA MUÑOZ",
+       "party": "PC",
+       "votes": 10291,
+       "elected": true,
+       "page": 68,
+       "box": [
+        0.55,
+        0.336,
+        0.7,
+        0.36
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 495,
+     "unassigned": 50,
+     "seats": 0,
+     "page": 68,
+     "box": [
+      0.55,
+      0.459,
+      0.7,
+      0.483
+     ],
+     "candidates": [
+      {
+       "name": "LUIS ARMANDO MARTINEZ GONZALEZ",
+       "party": null,
+       "votes": 346,
+       "elected": false,
+       "page": 68,
+       "box": [
+        0.55,
+        0.417,
+        0.7,
+        0.441
+       ]
+      },
+      {
+       "name": "JUAN REYES",
+       "party": null,
+       "votes": 99,
+       "elected": false,
+       "page": 68,
+       "box": [
+        0.55,
+        0.434,
+        0.7,
+        0.458
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA CURICO'."
+  },
+  {
+   "number": 14,
+   "title": "12° AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "TALCA",
+    "LONTUE",
+    "CUREPTO"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 86946,
+   "valid": null,
+   "invalid": 1148,
+   "blank": 682,
+   "null_blank": null,
+   "page": 72,
+   "box": [
+    0.62,
+    0.197,
+    0.77,
+    0.577
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 43103,
+     "unassigned": 514,
+     "seats": 3,
+     "page": 72,
+     "box": [
+      0.62,
+      0.31,
+      0.77,
+      0.334
+     ],
+     "candidates": [
+      {
+       "name": "SILVIO RODRIGUEZ VILLALOBOS",
+       "party": "PN",
+       "votes": 11076,
+       "elected": true,
+       "page": 72,
+       "box": [
+        0.62,
+        0.222,
+        0.77,
+        0.246
+       ]
+      },
+      {
+       "name": "MANUEL GAMBOA VALENZUELA",
+       "party": "PN",
+       "votes": 8724,
+       "elected": true,
+       "page": 72,
+       "box": [
+        0.62,
+        0.238,
+        0.77,
+        0.262
+       ]
+      },
+      {
+       "name": "RENE LAGOS ROJO",
+       "party": "DR",
+       "votes": 3376,
+       "elected": false,
+       "page": 72,
+       "box": [
+        0.62,
+        0.254,
+        0.77,
+        0.278
+       ]
+      },
+      {
+       "name": "RENATO GUERRA ESTEVEZ",
+       "party": "DC",
+       "votes": 8625,
+       "elected": false,
+       "page": 72,
+       "box": [
+        0.62,
+        0.27,
+        0.77,
+        0.294
+       ]
+      },
+      {
+       "name": "GUSTAVO RAMIREZ VERGARA",
+       "party": "DC",
+       "votes": 10788,
+       "elected": true,
+       "page": 72,
+       "box": [
+        0.62,
+        0.287,
+        0.77,
+        0.311
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 42013,
+     "unassigned": 722,
+     "seats": 2,
+     "page": 72,
+     "box": [
+      0.62,
+      0.456,
+      0.77,
+      0.48
+     ],
+     "candidates": [
+      {
+       "name": "JULIO CAMPOS AVILA",
+       "party": "PC",
+       "votes": 16724,
+       "elected": true,
+       "page": 72,
+       "box": [
+        0.62,
+        0.367,
+        0.77,
+        0.391
+       ]
+      },
+      {
+       "name": "GUILLERMO MUÑOZ ZUÑIGA",
+       "party": "PS",
+       "votes": 16904,
+       "elected": true,
+       "page": 72,
+       "box": [
+        0.62,
+        0.383,
+        0.77,
+        0.407
+       ]
+      },
+      {
+       "name": "FRANCISCO VIO GROSSI",
+       "party": "MAPU",
+       "votes": 4633,
+       "elected": false,
+       "page": 72,
+       "box": [
+        0.62,
+        0.4,
+        0.77,
+        0.424
+       ]
+      },
+      {
+       "name": "MANUEL MARTINEZ SALVO",
+       "party": "API",
+       "votes": 368,
+       "elected": false,
+       "page": 72,
+       "box": [
+        0.62,
+        0.416,
+        0.77,
+        0.44
+       ]
+      },
+      {
+       "name": "JUAN MARIN CARDENAS",
+       "party": "PR",
+       "votes": 2662,
+       "elected": false,
+       "page": 72,
+       "box": [
+        0.62,
+        0.432,
+        0.77,
+        0.456
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA TALCA'."
+  },
+  {
+   "number": 15,
+   "title": "13a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "CAUQUENES",
+    "CONSTITUCION",
+    "CHANCO"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 36742,
+   "valid": null,
+   "invalid": 602,
+   "blank": 413,
+   "null_blank": null,
+   "page": 76,
+   "box": [
+    0.8,
+    0.2,
+    0.96,
+    0.806
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 21283,
+     "unassigned": 436,
+     "seats": 2,
+     "page": 76,
+     "box": [
+      0.8,
+      0.327,
+      0.96,
+      0.351
+     ],
+     "candidates": [
+      {
+       "name": "ALBERTO NAUDON ABARCA",
+       "party": "DR / PIR",
+       "votes": 2113,
+       "elected": false,
+       "page": 76,
+       "box": [
+        0.8,
+        0.231,
+        0.96,
+        0.255
+       ]
+      },
+      {
+       "name": "OSVALDO VEGA VERA",
+       "party": "PN",
+       "votes": 10054,
+       "elected": true,
+       "page": 76,
+       "box": [
+        0.8,
+        0.26,
+        0.96,
+        0.284
+       ]
+      },
+      {
+       "name": "JUAN VALDES RODRIGUEZ",
+       "party": "DC",
+       "votes": 8680,
+       "elected": true,
+       "page": 76,
+       "box": [
+        0.8,
+        0.29,
+        0.96,
+        0.314
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 14275,
+     "unassigned": 409,
+     "seats": 1,
+     "page": 76,
+     "box": [
+      0.8,
+      0.494,
+      0.96,
+      0.518
+     ],
+     "candidates": [
+      {
+       "name": "LUIS ESCOBAR ASTABURUAGA",
+       "party": "API",
+       "votes": 6776,
+       "elected": true,
+       "page": 76,
+       "box": [
+        0.8,
+        0.396,
+        0.96,
+        0.42
+       ]
+      },
+      {
+       "name": "JULIO CONSUEGRA NIETO",
+       "party": "API",
+       "votes": 547,
+       "elected": false,
+       "page": 76,
+       "box": [
+        0.8,
+        0.426,
+        0.96,
+        0.45
+       ]
+      },
+      {
+       "name": "JUAN FACUSE HERESI",
+       "party": "API",
+       "votes": 6543,
+       "elected": false,
+       "page": 76,
+       "box": [
+        0.8,
+        0.456,
+        0.96,
+        0.48
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 169,
+     "unassigned": null,
+     "seats": 0,
+     "page": 76,
+     "box": [
+      0.8,
+      0.603,
+      0.96,
+      0.627
+     ],
+     "candidates": [
+      {
+       "name": "RAUL RENE RIQUELME BUSTOS",
+       "party": null,
+       "votes": 169,
+       "elected": false,
+       "page": 76,
+       "box": [
+        0.8,
+        0.566,
+        0.96,
+        0.59
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 13a. AGRUPACION'. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 16,
+   "title": "14a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "LINARES",
+    "LONCOMILLA",
+    "PARRAL"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 74340,
+   "valid": null,
+   "invalid": 1111,
+   "blank": 620,
+   "null_blank": null,
+   "page": 79,
+   "box": [
+    0.75,
+    0.126,
+    0.91,
+    0.641
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 42798,
+     "unassigned": 497,
+     "seats": 2,
+     "page": 79,
+     "box": [
+      0.75,
+      0.244,
+      0.91,
+      0.268
+     ],
+     "candidates": [
+      {
+       "name": "GUIDO CASTILLA HERNANDEZ",
+       "party": "DC",
+       "votes": 11459,
+       "elected": true,
+       "page": 79,
+       "box": [
+        0.75,
+        0.156,
+        0.91,
+        0.18
+       ]
+      },
+      {
+       "name": "ENRIQUE ZORRILLA CONCHA",
+       "party": "DC",
+       "votes": 8310,
+       "elected": false,
+       "page": 79,
+       "box": [
+        0.75,
+        0.175,
+        0.91,
+        0.199
+       ]
+      },
+      {
+       "name": "FERNANDO ROMERO VASQUEZ",
+       "party": "PN",
+       "votes": 18341,
+       "elected": true,
+       "page": 79,
+       "box": [
+        0.75,
+        0.194,
+        0.91,
+        0.218
+       ]
+      },
+      {
+       "name": "JORGE IBAÑEZ VERGARA",
+       "party": "PIR",
+       "votes": 4191,
+       "elected": false,
+       "page": 79,
+       "box": [
+        0.75,
+        0.214,
+        0.91,
+        0.238
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 29559,
+     "unassigned": 634,
+     "seats": 2,
+     "page": 79,
+     "box": [
+      0.75,
+      0.4,
+      0.91,
+      0.424
+     ],
+     "candidates": [
+      {
+       "name": "ALEJANDRO BELL JARA",
+       "party": "MAPU",
+       "votes": 8381,
+       "elected": true,
+       "page": 79,
+       "box": [
+        0.75,
+        0.314,
+        0.91,
+        0.338
+       ]
+      },
+      {
+       "name": "CARLOS VILLALOBOS SEPULVEDA",
+       "party": "PS",
+       "votes": 16848,
+       "elected": true,
+       "page": 79,
+       "box": [
+        0.75,
+        0.332,
+        0.91,
+        0.356
+       ]
+      },
+      {
+       "name": "ENRIQUE BRINKMANN PARADA",
+       "party": "API",
+       "votes": 633,
+       "elected": false,
+       "page": 79,
+       "box": [
+        0.75,
+        0.351,
+        0.91,
+        0.375
+       ]
+      },
+      {
+       "name": "JOAQUIN MORALES ABARZUA",
+       "party": "PR",
+       "votes": 3063,
+       "elected": false,
+       "page": 79,
+       "box": [
+        0.75,
+        0.37,
+        0.91,
+        0.394
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 252,
+     "unassigned": null,
+     "seats": 0,
+     "page": 79,
+     "box": [
+      0.75,
+      0.5,
+      0.91,
+      0.524
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR ENRIQUE BELMAR HERNANDEZ",
+       "party": null,
+       "votes": 252,
+       "elected": false,
+       "page": 79,
+       "box": [
+        0.75,
+        0.47,
+        0.91,
+        0.494
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 14a. AGRUPACION'. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 17,
+   "title": "15a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "SAN CARLOS",
+    "ITATA"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 36409,
+   "valid": null,
+   "invalid": 287,
+   "blank": 131,
+   "null_blank": null,
+   "page": 83,
+   "box": [
+    0.79,
+    0.27,
+    0.95,
+    0.731
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 24194,
+     "unassigned": 175,
+     "seats": 2,
+     "page": 83,
+     "box": [
+      0.79,
+      0.376,
+      0.95,
+      0.4
+     ],
+     "candidates": [
+      {
+       "name": "CESAR RAUL FUENTES VENEGAS",
+       "party": "DC",
+       "votes": 13054,
+       "elected": true,
+       "page": 83,
+       "box": [
+        0.79,
+        0.295,
+        0.95,
+        0.319
+       ]
+      },
+      {
+       "name": "EDUARDO DIAZ ABURTO",
+       "party": "DR",
+       "votes": 4383,
+       "elected": false,
+       "page": 83,
+       "box": [
+        0.79,
+        0.319,
+        0.95,
+        0.343
+       ]
+      },
+      {
+       "name": "GERMAN RIESCO ZAÑARTU",
+       "party": "PN",
+       "votes": 6582,
+       "elected": true,
+       "page": 83,
+       "box": [
+        0.79,
+        0.344,
+        0.95,
+        0.368
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 11797,
+     "unassigned": 221,
+     "seats": 1,
+     "page": 83,
+     "box": [
+      0.79,
+      0.529,
+      0.95,
+      0.553
+     ],
+     "candidates": [
+      {
+       "name": "LUIS SILVA ARAVENA",
+       "party": "IC",
+       "votes": 1522,
+       "elected": false,
+       "page": 83,
+       "box": [
+        0.79,
+        0.449,
+        0.95,
+        0.473
+       ]
+      },
+      {
+       "name": "TOMAS IRRIBARRA DE LA TORRE",
+       "party": "PR",
+       "votes": 2256,
+       "elected": false,
+       "page": 83,
+       "box": [
+        0.79,
+        0.473,
+        0.95,
+        0.497
+       ]
+      },
+      {
+       "name": "JAIME REYES AROCA",
+       "party": "PS",
+       "votes": 7798,
+       "elected": true,
+       "page": 83,
+       "box": [
+        0.79,
+        0.497,
+        0.95,
+        0.521
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 15a. AGRUPACION'. Areas printed as 'SAN CARLOS-ITATA'."
+  },
+  {
+   "number": 18,
+   "title": "16a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "CHILLAN",
+    "BULNES",
+    "YUNGAY"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 83921,
+   "valid": null,
+   "invalid": 658,
+   "blank": 244,
+   "null_blank": null,
+   "page": 87,
+   "box": [
+    0.76,
+    0.213,
+    0.91,
+    0.593
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 48102,
+     "unassigned": 424,
+     "seats": 3,
+     "page": 87,
+     "box": [
+      0.76,
+      0.326,
+      0.91,
+      0.35
+     ],
+     "candidates": [
+      {
+       "name": "OSVALDO BASSO CARVAJAL",
+       "party": "PIR",
+       "votes": 3097,
+       "elected": false,
+       "page": 87,
+       "box": [
+        0.76,
+        0.238,
+        0.91,
+        0.262
+       ]
+      },
+      {
+       "name": "HUGO ALAMOS VASQUEZ",
+       "party": "PN",
+       "votes": 15214,
+       "elected": true,
+       "page": 87,
+       "box": [
+        0.76,
+        0.254,
+        0.91,
+        0.278
+       ]
+      },
+      {
+       "name": "JUAN HECTOR CANAHUATE MARZUCA",
+       "party": "PN",
+       "votes": 3990,
+       "elected": false,
+       "page": 87,
+       "box": [
+        0.76,
+        0.27,
+        0.91,
+        0.294
+       ]
+      },
+      {
+       "name": "LUIS MARTIN MARDONES",
+       "party": "DC",
+       "votes": 16957,
+       "elected": true,
+       "page": 87,
+       "box": [
+        0.76,
+        0.286,
+        0.91,
+        0.31
+       ]
+      },
+      {
+       "name": "LAUTARO VERGARA OSORIO",
+       "party": "DC",
+       "votes": 8420,
+       "elected": true,
+       "page": 87,
+       "box": [
+        0.76,
+        0.303,
+        0.91,
+        0.327
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 34917,
+     "unassigned": 362,
+     "seats": 2,
+     "page": 87,
+     "box": [
+      0.76,
+      0.472,
+      0.91,
+      0.496
+     ],
+     "candidates": [
+      {
+       "name": "IVAN ARANCIBIA SILVA",
+       "party": "MAPU",
+       "votes": 1389,
+       "elected": false,
+       "page": 87,
+       "box": [
+        0.76,
+        0.383,
+        0.91,
+        0.407
+       ]
+      },
+      {
+       "name": "ROGELIO DE LA FUENTE GAETE",
+       "party": "PS",
+       "votes": 18514,
+       "elected": true,
+       "page": 87,
+       "box": [
+        0.76,
+        0.399,
+        0.91,
+        0.423
+       ]
+      },
+      {
+       "name": "ABEL JARPA VALLEJOS",
+       "party": "PR",
+       "votes": 2738,
+       "elected": false,
+       "page": 87,
+       "box": [
+        0.76,
+        0.415,
+        0.91,
+        0.439
+       ]
+      },
+      {
+       "name": "ALBERTO JARAMILLO BORQUEZ",
+       "party": "IC",
+       "votes": 472,
+       "elected": false,
+       "page": 87,
+       "box": [
+        0.76,
+        0.432,
+        0.91,
+        0.456
+       ]
+      },
+      {
+       "name": "EDUARDO CONTRERAS MELLA",
+       "party": "PC",
+       "votes": 11442,
+       "elected": true,
+       "page": 87,
+       "box": [
+        0.76,
+        0.448,
+        0.91,
+        0.472
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 16a. AGRUPACION'."
+  },
+  {
+   "number": 19,
+   "title": "17a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "CONCEPCION",
+    "TOME",
+    "TALCAHUANO",
+    "CORONEL",
+    "YUMBEL"
+   ],
+   "seats": 9,
+   "registered": null,
+   "cast": 260874,
+   "valid": null,
+   "invalid": 1993,
+   "blank": 736,
+   "null_blank": null,
+   "page": 94,
+   "box": [
+    0.83,
+    0.199,
+    0.97,
+    0.797
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 114757,
+     "unassigned": 1387,
+     "seats": 4,
+     "page": 94,
+     "box": [
+      0.83,
+      0.352,
+      0.97,
+      0.376
+     ],
+     "candidates": [
+      {
+       "name": "MARIANO RUIZ-ESQUIDE JARA",
+       "party": "DC",
+       "votes": 17159,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.214,
+        0.97,
+        0.238
+       ]
+      },
+      {
+       "name": "MARIO MOSQUERA ROA",
+       "party": "DC",
+       "votes": 11492,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.23,
+        0.97,
+        0.254
+       ]
+      },
+      {
+       "name": "ARTURO FREI BOLIVAR",
+       "party": "DC",
+       "votes": 34753,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.247,
+        0.97,
+        0.271
+       ]
+      },
+      {
+       "name": "HOSAIN SABAG CASTILLO",
+       "party": "DC",
+       "votes": 12973,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.263,
+        0.97,
+        0.287
+       ]
+      },
+      {
+       "name": "ANTONIO JOSE LAMA ZUGBI",
+       "party": "PADENA",
+       "votes": 927,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.279,
+        0.97,
+        0.303
+       ]
+      },
+      {
+       "name": "DUBERILDO JAQUE ARANEDA",
+       "party": "DR / PIR",
+       "votes": 4583,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.295,
+        0.97,
+        0.319
+       ]
+      },
+      {
+       "name": "ENRIQUE VAN RYSSELBERGHE MARTINEZ",
+       "party": "PN",
+       "votes": 12807,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.311,
+        0.97,
+        0.335
+       ]
+      },
+      {
+       "name": "EDUARDO KING CALDICHOURY",
+       "party": "PN",
+       "votes": 18676,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.327,
+        0.97,
+        0.351
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 142164,
+     "unassigned": 2374,
+     "seats": 5,
+     "page": 94,
+     "box": [
+      0.83,
+      0.547,
+      0.97,
+      0.571
+     ],
+     "candidates": [
+      {
+       "name": "IVAN QUINTANA MIRANDA",
+       "party": "PC",
+       "votes": 21196,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.393,
+        0.97,
+        0.417
+       ]
+      },
+      {
+       "name": "OSCAR GUILLERMO GARRETON PURCELL",
+       "party": "MAPU",
+       "votes": 17632,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.409,
+        0.97,
+        0.433
+       ]
+      },
+      {
+       "name": "GERARDO ESPINOZA CARRILLO",
+       "party": "PS",
+       "votes": 13376,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.425,
+        0.97,
+        0.449
+       ]
+      },
+      {
+       "name": "ORLANDO CANTUARIAS ZEPEDA",
+       "party": "PR",
+       "votes": 13404,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.441,
+        0.97,
+        0.465
+       ]
+      },
+      {
+       "name": "FERNANDO SANTIAGO AGURTO",
+       "party": "PC",
+       "votes": 18287,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.457,
+        0.97,
+        0.481
+       ]
+      },
+      {
+       "name": "OSCAR GONZALEZ ROBLES",
+       "party": "PS",
+       "votes": 20432,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.473,
+        0.97,
+        0.497
+       ]
+      },
+      {
+       "name": "LUIS FUENTEALBA MEDINA",
+       "party": "PC",
+       "votes": 16435,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.489,
+        0.97,
+        0.513
+       ]
+      },
+      {
+       "name": "VERONICA CARIAGA VERA",
+       "party": "IC",
+       "votes": 1828,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.506,
+        0.97,
+        0.53
+       ]
+      },
+      {
+       "name": "MANUEL RODRIGUEZ RODRIGUEZ",
+       "party": "PS",
+       "votes": 17200,
+       "elected": true,
+       "page": 94,
+       "box": [
+        0.83,
+        0.522,
+        0.97,
+        0.546
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 1224,
+     "unassigned": 167,
+     "seats": 0,
+     "page": 94,
+     "box": [
+      0.83,
+      0.675,
+      0.97,
+      0.699
+     ],
+     "candidates": [
+      {
+       "name": "JUAN MUÑOZ PEDREROS",
+       "party": null,
+       "votes": 332,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.587,
+        0.97,
+        0.611
+       ]
+      },
+      {
+       "name": "FRANCISCO SANTIBAÑEZ POZO",
+       "party": null,
+       "votes": 269,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.603,
+        0.97,
+        0.627
+       ]
+      },
+      {
+       "name": "JOSE ERNESTO MANRIQUEZ SALAS",
+       "party": null,
+       "votes": 159,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.62,
+        0.97,
+        0.644
+       ]
+      },
+      {
+       "name": "FERNANDO RUIZ NAVARRETE",
+       "party": null,
+       "votes": 147,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.636,
+        0.97,
+        0.66
+       ]
+      },
+      {
+       "name": "CARLOS ROSALES VALVERDE",
+       "party": null,
+       "votes": 150,
+       "elected": false,
+       "page": 94,
+       "box": [
+        0.83,
+        0.652,
+        0.97,
+        0.676
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL 17a. AGRUPACION'. Areas from the header (p.88) 'CONCEPCION-TOME-TALCAHUANO-...' and the seat table on p.192."
+  },
+  {
+   "number": 20,
+   "title": "18a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "LEBU",
+    "ARAUCO",
+    "CAÑETE"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 37547,
+   "valid": null,
+   "invalid": 513,
+   "blank": 182,
+   "null_blank": null,
+   "page": 97,
+   "box": [
+    0.82,
+    0.197,
+    0.98,
+    0.561
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 12638,
+     "unassigned": 184,
+     "seats": 1,
+     "page": 97,
+     "box": [
+      0.82,
+      0.263,
+      0.98,
+      0.287
+     ],
+     "candidates": [
+      {
+       "name": "RENATO LAEMMERMANN MONSALVES",
+       "party": "DR",
+       "votes": 4209,
+       "elected": false,
+       "page": 97,
+       "box": [
+        0.82,
+        0.222,
+        0.98,
+        0.246
+       ]
+      },
+      {
+       "name": "CLAUDIO HUEPE GARCIA",
+       "party": "DC",
+       "votes": 8245,
+       "elected": true,
+       "page": 97,
+       "box": [
+        0.82,
+        0.238,
+        0.98,
+        0.262
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 24056,
+     "unassigned": 583,
+     "seats": 1,
+     "page": 97,
+     "box": [
+      0.82,
+      0.36,
+      0.98,
+      0.384
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL GALLARDO PAZ",
+       "party": "PC",
+       "votes": 18372,
+       "elected": true,
+       "page": 97,
+       "box": [
+        0.82,
+        0.319,
+        0.98,
+        0.343
+       ]
+      },
+      {
+       "name": "LUIS JURY JURY",
+       "party": "PR",
+       "votes": 5101,
+       "elected": false,
+       "page": 97,
+       "box": [
+        0.82,
+        0.335,
+        0.98,
+        0.359
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 158,
+     "unassigned": null,
+     "seats": 0,
+     "page": 97,
+     "box": [
+      0.82,
+      0.44,
+      0.98,
+      0.464
+     ],
+     "candidates": [
+      {
+       "name": "FERMIN FIERRO LUENGO",
+       "party": null,
+       "votes": 158,
+       "elected": false,
+       "page": 97,
+       "box": [
+        0.82,
+        0.416,
+        0.98,
+        0.44
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA ARAUCO'. Gallardo's party in the printed elected list is 'Demócrata Cristiano' struck through and corrected by hand to Comunista. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 21,
+   "title": "19a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "LA LAJA",
+    "NACIMIENTO",
+    "MULCHEN"
+   ],
+   "seats": 4,
+   "registered": null,
+   "cast": 72131,
+   "valid": null,
+   "invalid": 1483,
+   "blank": 591,
+   "null_blank": null,
+   "page": 100,
+   "box": [
+    0.74,
+    0.219,
+    0.9,
+    0.571
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 39034,
+     "unassigned": 535,
+     "seats": 2,
+     "page": 100,
+     "box": [
+      0.74,
+      0.317,
+      0.9,
+      0.341
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO STARK TRONCOSO",
+       "party": "DC",
+       "votes": 7165,
+       "elected": false,
+       "page": 100,
+       "box": [
+        0.74,
+        0.243,
+        0.9,
+        0.267
+       ]
+      },
+      {
+       "name": "ANSELMO DEL ROSARIO QUEZADA",
+       "party": "DC",
+       "votes": 12246,
+       "elected": true,
+       "page": 100,
+       "box": [
+        0.74,
+        0.26,
+        0.9,
+        0.284
+       ]
+      },
+      {
+       "name": "MARIO RIOS SANTANDER",
+       "party": "PN",
+       "votes": 15237,
+       "elected": true,
+       "page": 100,
+       "box": [
+        0.74,
+        0.276,
+        0.9,
+        0.3
+       ]
+      },
+      {
+       "name": "JUAN HUNT SHARPE",
+       "party": "DR",
+       "votes": 3851,
+       "elected": false,
+       "page": 100,
+       "box": [
+        0.74,
+        0.293,
+        0.9,
+        0.317
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 31023,
+     "unassigned": 783,
+     "seats": 2,
+     "page": 100,
+     "box": [
+      0.74,
+      0.449,
+      0.9,
+      0.473
+     ],
+     "candidates": [
+      {
+       "name": "LUIS TEJEDA OLIVA",
+       "party": "PC",
+       "votes": 17078,
+       "elected": true,
+       "page": 100,
+       "box": [
+        0.74,
+        0.374,
+        0.9,
+        0.398
+       ]
+      },
+      {
+       "name": "ARTURO PEREZ PALAVECINO",
+       "party": "PS",
+       "votes": 9156,
+       "elected": true,
+       "page": 100,
+       "box": [
+        0.74,
+        0.391,
+        0.9,
+        0.415
+       ]
+      },
+      {
+       "name": "MIGUEL RUIZ SAEZ",
+       "party": "MAPU",
+       "votes": 2012,
+       "elected": false,
+       "page": 100,
+       "box": [
+        0.74,
+        0.407,
+        0.9,
+        0.431
+       ]
+      },
+      {
+       "name": "CLEMENTE SOTO ALARCON",
+       "party": "PR",
+       "votes": 1994,
+       "elected": false,
+       "page": 100,
+       "box": [
+        0.74,
+        0.424,
+        0.9,
+        0.448
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA BIO BIO'. Candidate 10 is printed 'ANSELMO DEL ROSARIO QUEZADA' in the tables; the elected list (p.187) prints 'Quezada Quezada, Anselmo'. The CODE T total is partly faded ('39.03?'); 39.034 agrees with its V 21.179 + M 17.855 and with the candidate rows."
+  },
+  {
+   "number": 22,
+   "title": "20a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "ANGOL",
+    "COLLIPULLI",
+    "TRAIGUEN",
+    "VICTORIA",
+    "CURACAUTIN"
+   ],
+   "seats": 6,
+   "registered": null,
+   "cast": 66957,
+   "valid": null,
+   "invalid": 938,
+   "blank": 683,
+   "null_blank": null,
+   "page": 104,
+   "box": [
+    0.86,
+    0.251,
+    0.995,
+    0.752
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 38080,
+     "unassigned": 449,
+     "seats": 4,
+     "page": 104,
+     "box": [
+      0.86,
+      0.383,
+      0.995,
+      0.407
+     ],
+     "candidates": [
+      {
+       "name": "GABRIEL DE LA FUENTE CORTES",
+       "party": "PN",
+       "votes": 5193,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.276,
+        0.995,
+        0.3
+       ]
+      },
+      {
+       "name": "FRANCISCO BAYO VELOSO",
+       "party": "PN",
+       "votes": 5629,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.292,
+        0.995,
+        0.316
+       ]
+      },
+      {
+       "name": "OMAR DIB SANHUEZA",
+       "party": null,
+       "votes": 4874,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.309,
+        0.995,
+        0.333
+       ]
+      },
+      {
+       "name": "ROBERTO MUÑOZ BARRA",
+       "party": "PIR",
+       "votes": 7352,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.325,
+        0.995,
+        0.349
+       ]
+      },
+      {
+       "name": "MANUEL GALILEA WIDMER",
+       "party": "DC",
+       "votes": 6675,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.342,
+        0.995,
+        0.366
+       ]
+      },
+      {
+       "name": "CARLOS SIVORI ALZERRECA",
+       "party": "DC",
+       "votes": 7908,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.358,
+        0.995,
+        0.382
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 27113,
+     "unassigned": 491,
+     "seats": 2,
+     "page": 104,
+     "box": [
+      0.86,
+      0.547,
+      0.995,
+      0.571
+     ],
+     "candidates": [
+      {
+       "name": "CAMILO SALVO INOSTROZA",
+       "party": "PR",
+       "votes": 8288,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.441,
+        0.995,
+        0.465
+       ]
+      },
+      {
+       "name": "DANIEL SALINAS MUÑOZ",
+       "party": "PS",
+       "votes": 8302,
+       "elected": true,
+       "page": 104,
+       "box": [
+        0.86,
+        0.457,
+        0.995,
+        0.481
+       ]
+      },
+      {
+       "name": "ANTONIO INOSTROZA SEGURA",
+       "party": "PC",
+       "votes": 6898,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.473,
+        0.995,
+        0.497
+       ]
+      },
+      {
+       "name": "DOMINGO PAINE HUENUPI",
+       "party": "IC",
+       "votes": 751,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.49,
+        0.995,
+        0.514
+       ]
+      },
+      {
+       "name": "EDUARDO VERGARA CUEVAS",
+       "party": "API",
+       "votes": 277,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.506,
+        0.995,
+        0.53
+       ]
+      },
+      {
+       "name": "DANIEL COLOMPIL QUILAQUEO",
+       "party": "MAPU",
+       "votes": 2106,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.522,
+        0.995,
+        0.546
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 143,
+     "unassigned": 0,
+     "seats": 0,
+     "page": 104,
+     "box": [
+      0.86,
+      0.629,
+      0.995,
+      0.653
+     ],
+     "candidates": [
+      {
+       "name": "JUAN EDUARDO BRAVO JARA",
+       "party": null,
+       "votes": 143,
+       "elected": false,
+       "page": 104,
+       "box": [
+        0.86,
+        0.604,
+        0.995,
+        0.628
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA MALLECO'. Areas from the seat table on p.192 (the header on p.101 reads '20a. AGRUPACION DEPARTAMENTAL ANGOL, ...'). USOPO no-preference row printed as '-' (recorded as 0)."
+  },
+  {
+   "number": 23,
+   "title": "21a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "TEMUCO",
+    "LAUTARO",
+    "IMPERIAL",
+    "PITRUFQUEN",
+    "VILLARRICA"
+   ],
+   "seats": 10,
+   "registered": null,
+   "cast": 139980,
+   "valid": null,
+   "invalid": 1398,
+   "blank": 1236,
+   "null_blank": null,
+   "page": 113,
+   "box": [
+    0.79,
+    0.267,
+    0.95,
+    0.881
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 89034,
+     "unassigned": 801,
+     "seats": 7,
+     "page": 113,
+     "box": [
+      0.79,
+      0.453,
+      0.95,
+      0.477
+     ],
+     "candidates": [
+      {
+       "name": "SERGIO MERINO JARPA",
+       "party": "DC",
+       "votes": 13523,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.283,
+        0.95,
+        0.307
+       ]
+      },
+      {
+       "name": "PEDRO ALVARADO PAEZ",
+       "party": "DC",
+       "votes": 7591,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.299,
+        0.95,
+        0.323
+       ]
+      },
+      {
+       "name": "ENRIQUE KRAUSS RUSQUE",
+       "party": "DC",
+       "votes": 15033,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.316,
+        0.95,
+        0.34
+       ]
+      },
+      {
+       "name": "VICTOR GONZALEZ MAERTENS",
+       "party": "DC",
+       "votes": 6090,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.332,
+        0.95,
+        0.356
+       ]
+      },
+      {
+       "name": "GERMAN BECKER BAECHLER",
+       "party": "DR",
+       "votes": 6661,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.348,
+        0.95,
+        0.372
+       ]
+      },
+      {
+       "name": "FERNANDO MELLADO DIEZ",
+       "party": "PIR",
+       "votes": 2269,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.364,
+        0.95,
+        0.388
+       ]
+      },
+      {
+       "name": "HARDY MOMBERG ROA",
+       "party": "PN",
+       "votes": 15174,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.38,
+        0.95,
+        0.404
+       ]
+      },
+      {
+       "name": "VICTOR CARMINE ZUÑIGA",
+       "party": "PN",
+       "votes": 14158,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.397,
+        0.95,
+        0.421
+       ]
+      },
+      {
+       "name": "LUIS EGUIGUREN HODGSON",
+       "party": "PN",
+       "votes": 5599,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.413,
+        0.95,
+        0.437
+       ]
+      },
+      {
+       "name": "OSCAR SCHLEYER SPRINGMULLER",
+       "party": "PN",
+       "votes": 2135,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.429,
+        0.95,
+        0.453
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 47490,
+     "unassigned": 1218,
+     "seats": 3,
+     "page": 113,
+     "box": [
+      0.79,
+      0.663,
+      0.95,
+      0.687
+     ],
+     "candidates": [
+      {
+       "name": "ANTONIO MILLAPE CANIUQUEO",
+       "party": "IC",
+       "votes": 3639,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.494,
+        0.95,
+        0.518
+       ]
+      },
+      {
+       "name": "JOSE AMAR AMAR",
+       "party": "PS",
+       "votes": 13672,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.51,
+        0.95,
+        0.534
+       ]
+      },
+      {
+       "name": "GASTON LOBOS BARRIENTOS",
+       "party": "PR",
+       "votes": 5200,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.526,
+        0.95,
+        0.55
+       ]
+      },
+      {
+       "name": "ROSENDO HUENUMAN GARCIA",
+       "party": "PC",
+       "votes": 15576,
+       "elected": true,
+       "page": 113,
+       "box": [
+        0.79,
+        0.543,
+        0.95,
+        0.567
+       ]
+      },
+      {
+       "name": "NELSON AVILA CONTRERAS",
+       "party": "MAPU",
+       "votes": 2596,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.559,
+        0.95,
+        0.583
+       ]
+      },
+      {
+       "name": "MARIA SAAVEDRA MARTINEZ",
+       "party": "PS",
+       "votes": 1944,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.574,
+        0.95,
+        0.598
+       ]
+      },
+      {
+       "name": "SERGIO CIFUENTES PINTO",
+       "party": "PR",
+       "votes": 187,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.591,
+        0.95,
+        0.615
+       ]
+      },
+      {
+       "name": "DESIDERIO MILLANAO COLITRIPAY",
+       "party": "PC",
+       "votes": 482,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.607,
+        0.95,
+        0.631
+       ]
+      },
+      {
+       "name": "RAUL CONTRERAS MEDINA",
+       "party": "IC",
+       "votes": 203,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.623,
+        0.95,
+        0.647
+       ]
+      },
+      {
+       "name": "ISAIS VERGARA TORRES",
+       "party": "PS",
+       "votes": 2773,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.639,
+        0.95,
+        0.663
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 822,
+     "unassigned": 89,
+     "seats": 0,
+     "page": 113,
+     "box": [
+      0.79,
+      0.76,
+      0.95,
+      0.784
+     ],
+     "candidates": [
+      {
+       "name": "EUDOCIO MOLINA SANTIBAÑEZ",
+       "party": null,
+       "votes": 273,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.704,
+        0.95,
+        0.728
+       ]
+      },
+      {
+       "name": "SEGUNDO PAINEN LIPIAN",
+       "party": null,
+       "votes": 284,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.72,
+        0.95,
+        0.744
+       ]
+      },
+      {
+       "name": "RAMON OSVALDO BARCELO OLAVE",
+       "party": null,
+       "votes": 176,
+       "elected": false,
+       "page": 113,
+       "box": [
+        0.79,
+        0.737,
+        0.95,
+        0.761
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA CAUTIN'."
+  },
+  {
+   "number": 24,
+   "title": "22a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "VALDIVIA",
+    "PANGUIPULLI",
+    "LA UNION",
+    "RIO BUENO"
+   ],
+   "seats": 5,
+   "registered": null,
+   "cast": 100703,
+   "valid": null,
+   "invalid": 949,
+   "blank": 280,
+   "null_blank": null,
+   "page": 118,
+   "box": [
+    0.77,
+    0.257,
+    0.92,
+    0.641
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 51719,
+     "unassigned": 412,
+     "seats": 3,
+     "page": 118,
+     "box": [
+      0.77,
+      0.372,
+      0.92,
+      0.396
+     ],
+     "candidates": [
+      {
+       "name": "EDUARDO KOENIG CARRILLO",
+       "party": "DC",
+       "votes": 13389,
+       "elected": true,
+       "page": 118,
+       "box": [
+        0.77,
+        0.282,
+        0.92,
+        0.306
+       ]
+      },
+      {
+       "name": "PABLO TOLEDO OBANDO",
+       "party": "DC",
+       "votes": 9439,
+       "elected": false,
+       "page": 118,
+       "box": [
+        0.77,
+        0.299,
+        0.92,
+        0.323
+       ]
+      },
+      {
+       "name": "JOSE HUAQUIN DIPP",
+       "party": "PIR",
+       "votes": 1621,
+       "elected": false,
+       "page": 118,
+       "box": [
+        0.77,
+        0.315,
+        0.92,
+        0.339
+       ]
+      },
+      {
+       "name": "ENRIQUE LARRE ASENJO",
+       "party": "PN",
+       "votes": 13074,
+       "elected": true,
+       "page": 118,
+       "box": [
+        0.77,
+        0.332,
+        0.92,
+        0.356
+       ]
+      },
+      {
+       "name": "AGUSTIN ACUÑA MENDEZ",
+       "party": "PN",
+       "votes": 13784,
+       "elected": true,
+       "page": 118,
+       "box": [
+        0.77,
+        0.348,
+        0.92,
+        0.372
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 47755,
+     "unassigned": 626,
+     "seats": 2,
+     "page": 118,
+     "box": [
+      0.77,
+      0.519,
+      0.92,
+      0.543
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS LORCA TOBAR",
+       "party": "PS",
+       "votes": 13832,
+       "elected": true,
+       "page": 118,
+       "box": [
+        0.77,
+        0.429,
+        0.92,
+        0.453
+       ]
+      },
+      {
+       "name": "SAMUEL PEREZ HUERTA",
+       "party": "PR",
+       "votes": 2147,
+       "elected": false,
+       "page": 118,
+       "box": [
+        0.77,
+        0.445,
+        0.92,
+        0.469
+       ]
+      },
+      {
+       "name": "HECTOR ORMEÑO SALAZAR",
+       "party": "MAPU",
+       "votes": 1745,
+       "elected": false,
+       "page": 118,
+       "box": [
+        0.77,
+        0.462,
+        0.92,
+        0.486
+       ]
+      },
+      {
+       "name": "HERNAN OLAVE VERDUGO",
+       "party": "PS",
+       "votes": 16775,
+       "elected": true,
+       "page": 118,
+       "box": [
+        0.77,
+        0.478,
+        0.92,
+        0.502
+       ]
+      },
+      {
+       "name": "GUILLERMO TEILLIER DEL VALLE",
+       "party": "PC",
+       "votes": 12630,
+       "elected": false,
+       "page": 118,
+       "box": [
+        0.77,
+        0.494,
+        0.92,
+        0.518
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA VALDIVIA'. The CODE block of this column is very faint (names also faint; read from p.114 with contrast enhancement). Candidate totals were confirmed by adding the printed TOTAL DEPTO columns (Valdivia p.115, Panguipulli p.116, La Union p.117, Rio Bueno p.118): Koenig 13.389, Toledo 9.439, Huaquin 1.621, Larre 13.074, Acuña 13.784 (the last looks like '13.754' on the faint scan, but the department totals and the list total 51.719 require 13.784)."
+  },
+  {
+   "number": 25,
+   "title": "23a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "OSORNO",
+    "RIO NEGRO"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 58216,
+   "valid": null,
+   "invalid": 469,
+   "blank": 140,
+   "null_blank": null,
+   "page": 121,
+   "box": [
+    0.84,
+    0.242,
+    0.98,
+    0.651
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 32982,
+     "unassigned": 243,
+     "seats": 2,
+     "page": 121,
+     "box": [
+      0.84,
+      0.324,
+      0.98,
+      0.348
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO SCHOTT SCHEUCH",
+       "party": "PN",
+       "votes": 14934,
+       "elected": true,
+       "page": 121,
+       "box": [
+        0.84,
+        0.267,
+        0.98,
+        0.291
+       ]
+      },
+      {
+       "name": "PEDRO JAUREGUI CASTRO",
+       "party": "PIR",
+       "votes": 4717,
+       "elected": false,
+       "page": 121,
+       "box": [
+        0.84,
+        0.284,
+        0.98,
+        0.308
+       ]
+      },
+      {
+       "name": "JULIO MONTT MOMBERG",
+       "party": "DC",
+       "votes": 13088,
+       "elected": true,
+       "page": 121,
+       "box": [
+        0.84,
+        0.3,
+        0.98,
+        0.324
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 24391,
+     "unassigned": 315,
+     "seats": 1,
+     "page": 121,
+     "box": [
+      0.84,
+      0.439,
+      0.98,
+      0.463
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS BONGCAM WULF",
+       "party": "PS",
+       "votes": 9082,
+       "elected": false,
+       "page": 121,
+       "box": [
+        0.84,
+        0.382,
+        0.98,
+        0.406
+       ]
+      },
+      {
+       "name": "GUIDO ASENJO BRAVO",
+       "party": "PR",
+       "votes": 2553,
+       "elected": false,
+       "page": 121,
+       "box": [
+        0.84,
+        0.398,
+        0.98,
+        0.422
+       ]
+      },
+      {
+       "name": "RUBEN ZAPATA BRAVO",
+       "party": "PC",
+       "votes": 12441,
+       "elected": true,
+       "page": 121,
+       "box": [
+        0.84,
+        0.414,
+        0.98,
+        0.438
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 234,
+     "unassigned": null,
+     "seats": 0,
+     "page": 121,
+     "box": [
+      0.84,
+      0.52,
+      0.98,
+      0.544
+     ],
+     "candidates": [
+      {
+       "name": "FRANCISCO PAREDES NAHUELPAN",
+       "party": null,
+       "votes": 234,
+       "elected": false,
+       "page": 121,
+       "box": [
+        0.84,
+        0.497,
+        0.98,
+        0.521
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA OSORNO'. Candidate names on these pages are very faint; Schott's surname is taken from the printed list of elected deputies (p.188, 'Schott Scheuch, Fernando'), and the UP names 'CARLOS BONGCAM WULF' and 'GUIDO ASENJO BRAVO' are best readings of faint type. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 26,
+   "title": "24a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "LLANQUIHUE",
+    "MAULLIN",
+    "CALBUCO",
+    "PUERTO VARAS"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 58362,
+   "valid": null,
+   "invalid": 437,
+   "blank": 199,
+   "null_blank": null,
+   "page": 127,
+   "box": [
+    0.8,
+    0.313,
+    0.96,
+    0.797
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 35993,
+     "unassigned": 450,
+     "seats": 2,
+     "page": 127,
+     "box": [
+      0.8,
+      0.412,
+      0.96,
+      0.436
+     ],
+     "candidates": [
+      {
+       "name": "MARIO MARCHANT BINDER",
+       "party": "PN",
+       "votes": 16091,
+       "elected": true,
+       "page": 127,
+       "box": [
+        0.8,
+        0.337,
+        0.96,
+        0.361
+       ]
+      },
+      {
+       "name": "ADIB ESSEDIN SIERRA",
+       "party": "PIR",
+       "votes": 2861,
+       "elected": false,
+       "page": 127,
+       "box": [
+        0.8,
+        0.362,
+        0.96,
+        0.386
+       ]
+      },
+      {
+       "name": "SERGIO PAEZ VERDUGO",
+       "party": "DC",
+       "votes": 16591,
+       "elected": true,
+       "page": 127,
+       "box": [
+        0.8,
+        0.386,
+        0.96,
+        0.41
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 21629,
+     "unassigned": 361,
+     "seats": 1,
+     "page": 127,
+     "box": [
+      0.8,
+      0.543,
+      0.96,
+      0.567
+     ],
+     "candidates": [
+      {
+       "name": "ANTONIO SEGUNDO RUIZ PAREDES",
+       "party": "PS",
+       "votes": 12322,
+       "elected": true,
+       "page": 127,
+       "box": [
+        0.8,
+        0.469,
+        0.96,
+        0.493
+       ]
+      },
+      {
+       "name": "PATRICIO ROMANO LORCA",
+       "party": "PC",
+       "votes": 6465,
+       "elected": false,
+       "page": 127,
+       "box": [
+        0.8,
+        0.494,
+        0.96,
+        0.518
+       ]
+      },
+      {
+       "name": "ULISES MANRIQUEZ BUSTOS",
+       "party": "MAPU",
+       "votes": 2481,
+       "elected": false,
+       "page": 127,
+       "box": [
+        0.8,
+        0.518,
+        0.96,
+        0.542
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 104,
+     "unassigned": null,
+     "seats": 0,
+     "page": 127,
+     "box": [
+      0.8,
+      0.625,
+      0.96,
+      0.649
+     ],
+     "candidates": [
+      {
+       "name": "OSVALDO E. ROMO MENA",
+       "party": null,
+       "votes": 104,
+       "elected": false,
+       "page": 127,
+       "box": [
+        0.8,
+        0.601,
+        0.96,
+        0.625
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA LLANQUIHUE'. USOPO list has a single candidate and no no-preference row. 'ADIB ESSEDIN SIERRA' is a best reading of faint type."
+  },
+  {
+   "number": 27,
+   "title": "25a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "ANCUD",
+    "CASTRO",
+    "QUINCHAO",
+    "PALENA"
+   ],
+   "seats": 3,
+   "registered": null,
+   "cast": 33372,
+   "valid": null,
+   "invalid": 448,
+   "blank": 424,
+   "null_blank": null,
+   "page": 135,
+   "box": [
+    0.79,
+    0.309,
+    0.95,
+    0.778
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 18880,
+     "unassigned": 93,
+     "seats": 2,
+     "page": 135,
+     "box": [
+      0.79,
+      0.416,
+      0.95,
+      0.44
+     ],
+     "candidates": [
+      {
+       "name": "RENE TAPIA SALGADO",
+       "party": "PN",
+       "votes": 7731,
+       "elected": true,
+       "page": 135,
+       "box": [
+        0.79,
+        0.333,
+        0.95,
+        0.357
+       ]
+      },
+      {
+       "name": "HERNAN FLORES OPAZO",
+       "party": "DR",
+       "votes": 3079,
+       "elected": false,
+       "page": 135,
+       "box": [
+        0.79,
+        0.357,
+        0.95,
+        0.381
+       ]
+      },
+      {
+       "name": "FELIX GARAY FIGUEROA",
+       "party": "DC",
+       "votes": 7977,
+       "elected": true,
+       "page": 135,
+       "box": [
+        0.79,
+        0.382,
+        0.95,
+        0.406
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO DE LA UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 13620,
+     "unassigned": 89,
+     "seats": 1,
+     "page": 135,
+     "box": [
+      0.79,
+      0.554,
+      0.95,
+      0.578
+     ],
+     "candidates": [
+      {
+       "name": "MANUEL FERREIRA GUZMAN",
+       "party": "PR",
+       "votes": 4509,
+       "elected": false,
+       "page": 135,
+       "box": [
+        0.79,
+        0.473,
+        0.95,
+        0.497
+       ]
+      },
+      {
+       "name": "MANUEL VERA CARCAMO",
+       "party": "PS",
+       "votes": 7223,
+       "elected": true,
+       "page": 135,
+       "box": [
+        0.79,
+        0.497,
+        0.95,
+        0.521
+       ]
+      },
+      {
+       "name": "EDGARDO BORQUEZ OBERREUTER",
+       "party": "PC",
+       "votes": 1799,
+       "elected": false,
+       "page": 135,
+       "box": [
+        0.79,
+        0.522,
+        0.95,
+        0.546
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA CHILOE'. 'HERNAN FLORES OPAZO' is a best reading of faint type."
+  },
+  {
+   "number": 28,
+   "title": "26a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "AYSEN",
+    "COYHAIQUE",
+    "GENERAL CARRERA",
+    "BAKER"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 18091,
+   "valid": null,
+   "invalid": 197,
+   "blank": 121,
+   "null_blank": null,
+   "page": 140,
+   "box": [
+    0.78,
+    0.312,
+    0.95,
+    0.822
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 10479,
+     "unassigned": 54,
+     "seats": 1,
+     "page": 140,
+     "box": [
+      0.78,
+      0.394,
+      0.95,
+      0.418
+     ],
+     "candidates": [
+      {
+       "name": "HUGO ORTIZ DE FILIPPI",
+       "party": "PN",
+       "votes": 4103,
+       "elected": false,
+       "page": 140,
+       "box": [
+        0.78,
+        0.338,
+        0.95,
+        0.362
+       ]
+      },
+      {
+       "name": "BALDEMAR CARRASCO MUÑOZ",
+       "party": "DC",
+       "votes": 6322,
+       "elected": true,
+       "page": 140,
+       "box": [
+        0.78,
+        0.362,
+        0.95,
+        0.386
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 6908,
+     "unassigned": 51,
+     "seats": 1,
+     "page": 140,
+     "box": [
+      0.78,
+      0.51,
+      0.95,
+      0.534
+     ],
+     "candidates": [
+      {
+       "name": "LEOPOLDO ORTEGA RODRIGUEZ",
+       "party": "PC",
+       "votes": 2894,
+       "elected": false,
+       "page": 140,
+       "box": [
+        0.78,
+        0.452,
+        0.95,
+        0.476
+       ]
+      },
+      {
+       "name": "SERGIO ANFOSSI MUÑOZ",
+       "party": "PS",
+       "votes": 3963,
+       "elected": true,
+       "page": 140,
+       "box": [
+        0.78,
+        0.476,
+        0.95,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 386,
+     "unassigned": null,
+     "seats": 0,
+     "page": 140,
+     "box": [
+      0.78,
+      0.601,
+      0.95,
+      0.625
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR CORTES CASTRO",
+       "party": null,
+       "votes": 386,
+       "elected": false,
+       "page": 140,
+       "box": [
+        0.78,
+        0.567,
+        0.95,
+        0.591
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA AYSEN'. Areas from the seat table on p.192. USOPO list has a single candidate and no no-preference row."
+  },
+  {
+   "number": 29,
+   "title": "27a. AGRUPACION DEPARTAMENTAL",
+   "areas": [
+    "MAGALLANES",
+    "ULTIMA ESPERANZA",
+    "TIERRA DEL FUEGO"
+   ],
+   "seats": 2,
+   "registered": null,
+   "cast": 39699,
+   "valid": null,
+   "invalid": 567,
+   "blank": 364,
+   "null_blank": null,
+   "page": 142,
+   "box": [
+    0.83,
+    0.301,
+    0.98,
+    0.811
+   ],
+   "lists": [
+    {
+     "label": "A.- CONFEDERACION DE LA DEMOCRACIA",
+     "party": "CODE",
+     "votes": 19450,
+     "unassigned": 306,
+     "seats": 1,
+     "page": 142,
+     "box": [
+      0.83,
+      0.376,
+      0.98,
+      0.4
+     ],
+     "candidates": [
+      {
+       "name": "TOLENTINO PEREZ SOTO",
+       "party": "DC",
+       "votes": 13966,
+       "elected": true,
+       "page": 142,
+       "box": [
+        0.83,
+        0.326,
+        0.98,
+        0.35
+       ]
+      },
+      {
+       "name": "GERARDO ALVAREZ RODRIGUEZ",
+       "party": "DR",
+       "votes": 5178,
+       "elected": false,
+       "page": 142,
+       "box": [
+        0.83,
+        0.35,
+        0.98,
+        0.374
+       ]
+      }
+     ]
+    },
+    {
+     "label": "B.- PARTIDO UNIDAD POPULAR",
+     "party": "UP",
+     "votes": 16594,
+     "unassigned": 453,
+     "seats": 1,
+     "page": 142,
+     "box": [
+      0.83,
+      0.482,
+      0.98,
+      0.506
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS GONZALEZ JAKSIC",
+       "party": "PS",
+       "votes": 14721,
+       "elected": true,
+       "page": 142,
+       "box": [
+        0.83,
+        0.432,
+        0.98,
+        0.456
+       ]
+      },
+      {
+       "name": "CLAUDIO MARDONES VASQUEZ",
+       "party": "IC",
+       "votes": 1420,
+       "elected": false,
+       "page": 142,
+       "box": [
+        0.83,
+        0.457,
+        0.98,
+        0.481
+       ]
+      }
+     ]
+    },
+    {
+     "label": "C.- UNION SOCIALISTA POPULAR",
+     "party": "USOPO",
+     "votes": 2724,
+     "unassigned": 52,
+     "seats": 0,
+     "page": 142,
+     "box": [
+      0.83,
+      0.588,
+      0.98,
+      0.612
+     ],
+     "candidates": [
+      {
+       "name": "ANICETO LORENZO OVANDO GINER",
+       "party": null,
+       "votes": 2554,
+       "elected": false,
+       "page": 142,
+       "box": [
+        0.83,
+        0.539,
+        0.98,
+        0.563
+       ]
+      },
+      {
+       "name": "HERNAN ULLOA AMPUERO",
+       "party": null,
+       "votes": 118,
+       "elected": false,
+       "page": 142,
+       "box": [
+        0.83,
+        0.563,
+        0.98,
+        0.587
+       ]
+      }
+     ]
+    }
+   ],
+   "notes": "Total column headed 'TOTAL PROVINCIA MAGALLANES'. Areas from the seat table on p.192."
+  }
+ ],
+ "national": {
+  "valid": null,
+  "cast": 3687105,
+  "registered": 4510060,
+  "page": 193,
+  "parties": {
+   "CONFEDERACION DE LA DEMOCRACIA": 2013592,
+   "PARTIDO DE LA UNIDAD POPULAR": 1605170,
+   "PARTIDO UNION SOCIALISTA POPULAR": 10287,
+   "VOTOS NULOS": 37639,
+   "VOTOS BLANCOS": 20417
+  }
+ },
+ "notes": "Volume: Direccion del Registro Electoral, Eleccion Ordinaria Parlamentaria (Diputados), 4 de Marzo de 1973. Pages 7-142 hold one commune-level table per grouping (29 contests: 27 agrupaciones, the 7th split into Santiago 1st, 2nd and 3rd districts), with V (men), M (women) and T (total) columns; only the T column of the grouping-total column (headed TOTAL PROVINCIA / TOTAL nA. AGRUPACION / TOTAL ... DISTRITO) on the last page of each grouping was transcribed. Lists: in 1973 the parties ran in federations and the volume prints votes only per federation list (A.- Confederacion de la Democracia = CODE: PN, DC, DR, PIR, PADENA; B.- Partido de la Unidad Popular = UP: PS, PC, PR, MAPU, IC, API; C.- Union Socialista Popular = USOPO, a single party). No per-party subtotal is printed at grouping level, so each list here is a federation list with its printed TOTAL LISTA; 'unassigned' is the federation row's own figure (votes for the list without candidate preference). Per-party grouping totals could be obtained only by adding candidates by party, which would be a computed figure, so they are not given. Candidate 'party': for elected deputies it is the party printed in the list of deputies elected (pp.183-189); for the others it is the handwritten party annotation on the tables (not printed), abbreviated PN, DC, DR, PIR, PADENA, PDR, PS, PC, PR, MAPU, IC, API; null where none is legible (USOPO candidates). Seats per federation are from the table on p.192 (candidates-elected per grouping); elected candidates are the top preference-getters within each federation, and every one matches the printed list of elected deputies (pp.183-189, 150 deputies) and the '+' marks on the tables. Registered voters are not printed per grouping (only nationally). 'invalid' holds votos nulos. No 'valid' figure is printed (TOTAL GENERAL = cast). Grouping totals for every federation agree with the Tribunal Calificador summary on p.144, and the 29 contests add exactly to the national totals on p.193 (CODE 2.013.592, UP 1.605.170, USOPO 10.287, nulos 37.639, blancos 20.417, total 3.687.105). National: p.193 (inscritos 4.510.060 is handwritten there and typed on p.195, which also prints CODE as 2.013.593). Left out: commune and department rows; pp.144-180 (Tribunal Calificador federation totals by department, used only as a cross-check); p.181-182 cifras repartidoras; p.190-191 candidate counts; p.195 1969 comparison. Boxes are approximate row positions in the grouping-total column."
+}

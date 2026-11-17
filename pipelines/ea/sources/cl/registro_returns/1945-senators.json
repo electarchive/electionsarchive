@@ -1,0 +1,996 @@
+{
+ "volume": "1945-senators",
+ "chamber": "senators",
+ "year": 1945,
+ "day": "1945-03-04",
+ "day_printed": "4 DE MARZO DE 1945",
+ "contests": [
+  {
+   "number": 1,
+   "title": "Total 1.a Circunscripción Electoral",
+   "areas": [
+    "Tarapacá",
+    "Antofagasta"
+   ],
+   "seats": 5,
+   "registered": 43582,
+   "cast": null,
+   "valid": 24550,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 4,
+   "box": [
+    0.902,
+    0.792,
+    0.957,
+    0.811
+   ],
+   "lists": [
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6597,
+     "unassigned": null,
+     "seats": 1,
+     "page": 4,
+     "box": [
+      0.455,
+      0.792,
+      0.474,
+      0.811
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO ALESSANDRI RODRIGUEZ",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.455,
+        0.792,
+        0.474,
+        0.811
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Progresista Nacional",
+     "party": "Progresista Nacional",
+     "votes": 7053,
+     "unassigned": null,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.702,
+      0.792,
+      0.72,
+      0.811
+     ],
+     "candidates": [
+      {
+       "name": "ELIAS LAFFERTE GAVIÑO",
+       "party": "PROGRESISTA NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.702,
+        0.792,
+        0.72,
+        0.811
+       ]
+      },
+      {
+       "name": "RICARDO REYES BASOALTO",
+       "party": "PROGRESISTA NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.702,
+        0.792,
+        0.72,
+        0.811
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 6507,
+     "unassigned": null,
+     "seats": 2,
+     "page": 4,
+     "box": [
+      0.739,
+      0.792,
+      0.758,
+      0.811
+     ],
+     "candidates": [
+      {
+       "name": "GABRIEL GONZALEZ VIDELA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.739,
+        0.792,
+        0.758,
+        0.811
+       ]
+      },
+      {
+       "name": "PEDRO OPITZ VELASQUEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 4,
+       "box": [
+        0.739,
+        0.792,
+        0.758,
+        0.811
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 1716,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.78,
+      0.792,
+      0.799,
+      0.811
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 2677,
+     "unassigned": null,
+     "seats": 0,
+     "page": 4,
+     "box": [
+      0.813,
+      0.792,
+      0.833,
+      0.811
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Party totals from the 'Total 1.a Circunscripción Electoral' row of the Dirección's Senate table (p. 4); the volume prints only party votes, with candidates presented/elected counts (Liberal 2/1, Progresista Nacional 2/2, Radical 2/2, Socialista 1/0, Socialista Auténtico 1/0; 8 presented, 5 elected). 'Votos obtenidos' 24.550 (= party sum) recorded as valid; 'Inscritos hábiles' 43.582; '% votantes' 56. No null/blank printed. Elected senators' names and parties from the list on p. 12 (votes not printed). Same figures in the synoptic on p. 11."
+  },
+  {
+   "number": 3,
+   "title": "Total 3.a Circunscripción Electoral",
+   "areas": [
+    "Aconcagua",
+    "Valparaíso"
+   ],
+   "seats": 5,
+   "registered": 75355,
+   "cast": null,
+   "valid": 56559,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 5,
+   "box": [
+    0.912,
+    0.818,
+    0.969,
+    0.845
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 18936,
+     "unassigned": null,
+     "seats": 2,
+     "page": 5,
+     "box": [
+      0.414,
+      0.818,
+      0.444,
+      0.845
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO CERDA JARAQUEMADA",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.414,
+        0.818,
+        0.444,
+        0.845
+       ]
+      },
+      {
+       "name": "MANUEL MUÑOZ CORNEJO",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.414,
+        0.818,
+        0.444,
+        0.845
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 11756,
+     "unassigned": null,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.452,
+      0.818,
+      0.48,
+      0.845
+     ],
+     "candidates": [
+      {
+       "name": "PEDRO POKLEPOVIC NOVILLO",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.452,
+        0.818,
+        0.48,
+        0.845
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 2245,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.564,
+      0.818,
+      0.585,
+      0.845
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Progresista Nacional",
+     "party": "Progresista Nacional",
+     "votes": 7260,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.701,
+      0.818,
+      0.725,
+      0.845
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 7983,
+     "unassigned": null,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.743,
+      0.818,
+      0.764,
+      0.845
+     ],
+     "candidates": [
+      {
+       "name": "ELEODORO E. GUZMAN FIGUEROA",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.743,
+        0.818,
+        0.764,
+        0.845
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 4351,
+     "unassigned": null,
+     "seats": 1,
+     "page": 5,
+     "box": [
+      0.779,
+      0.818,
+      0.8,
+      0.845
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS ALBERTO MARTINEZ MARTINEZ",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 5,
+       "box": [
+        0.779,
+        0.818,
+        0.8,
+        0.845
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 4028,
+     "unassigned": null,
+     "seats": 0,
+     "page": 5,
+     "box": [
+      0.817,
+      0.818,
+      0.839,
+      0.845
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Party totals from the 'Total 3.a Circunscripción Electoral' row (p. 5); presented/elected: Conservador 2/2, Liberal 1/1, Democrático 1/0, Progresista Nacional 1/0, Radical 1/1, Socialista 1/1, Socialista Auténtico 1/0 (8/5). 'Votos obtenidos' 56.559 (= party sum) recorded as valid; 'Inscritos hábiles' 75.355; '% votantes' 75. Socialista 4.351 is blurred on p. 5 (could read 4.551) but is confirmed by the party sum and by the p. 11 synoptic. Elected names from p. 12. No null/blank printed."
+  },
+  {
+   "number": 5,
+   "title": "Total 5.a Circunscripción Electoral",
+   "areas": [
+    "O'Higgins",
+    "Colchagua"
+   ],
+   "seats": 5,
+   "registered": 41964,
+   "cast": null,
+   "valid": 31817,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 6,
+   "box": [
+    0.912,
+    0.878,
+    0.964,
+    0.903
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 12414,
+     "unassigned": null,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.414,
+      0.878,
+      0.437,
+      0.903
+     ],
+     "candidates": [
+      {
+       "name": "HECTOR RODRIGUEZ DE LA SOTTA",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.414,
+        0.878,
+        0.437,
+        0.903
+       ]
+      },
+      {
+       "name": "MIGUEL CRUCHAGA TOCORNAL",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.414,
+        0.878,
+        0.437,
+        0.903
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 7583,
+     "unassigned": null,
+     "seats": 2,
+     "page": 6,
+     "box": [
+      0.452,
+      0.878,
+      0.475,
+      0.903
+     ],
+     "candidates": [
+      {
+       "name": "LADISLAO ERRAZURIZ PEREIRA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.452,
+        0.878,
+        0.475,
+        0.903
+       ]
+      },
+      {
+       "name": "DIEGO ECHENIQUE ZEGERS",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.452,
+        0.878,
+        0.475,
+        0.903
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 3090,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.562,
+      0.878,
+      0.583,
+      0.903
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 3589,
+     "unassigned": null,
+     "seats": 1,
+     "page": 6,
+     "box": [
+      0.738,
+      0.878,
+      0.758,
+      0.903
+     ],
+     "candidates": [
+      {
+       "name": "FLORENCIO DURAN BERNALES",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 6,
+       "box": [
+        0.738,
+        0.878,
+        0.758,
+        0.903
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 2442,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.779,
+      0.878,
+      0.801,
+      0.903
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 2699,
+     "unassigned": null,
+     "seats": 0,
+     "page": 6,
+     "box": [
+      0.812,
+      0.878,
+      0.835,
+      0.903
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Party totals from the 'Total 5.a Circunscripción Electoral' row (p. 6); presented/elected: Conservador 2/2, Liberal 2/2, Democrático 1/0, Radical 1/1, Socialista 2/0, Socialista Auténtico 3/0 (11/5). 'Votos obtenidos' 31.817 (= party sum) recorded as valid; 'Inscritos hábiles' 41.964; '% votantes' 76. Elected names from p. 12 (grouping printed there as 'O\"HIGGINSE Y COLCHAGUA'). No null/blank printed."
+  },
+  {
+   "number": 7,
+   "title": "Total 7.a Circunscripción Electoral",
+   "areas": [
+    "Ñuble",
+    "Concepción",
+    "Arauco"
+   ],
+   "seats": 5,
+   "registered": 76131,
+   "cast": null,
+   "valid": 53659,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 8,
+   "box": [
+    0.881,
+    0.65,
+    0.929,
+    0.671
+   ],
+   "lists": [
+    {
+     "label": "Agrario",
+     "party": "Agrario",
+     "votes": 213,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.348,
+      0.671,
+      0.364,
+      0.696
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 12517,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.412,
+      0.671,
+      0.437,
+      0.696
+     ],
+     "candidates": [
+      {
+       "name": "FERNANDO ALDUNATE ERRAZURIZ",
+       "party": "CONSERVADOR",
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.412,
+        0.671,
+        0.437,
+        0.696
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 8258,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.45,
+      0.671,
+      0.47,
+      0.696
+     ],
+     "candidates": [
+      {
+       "name": "GUSTAVO RIVERA BAEZA",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.45,
+        0.671,
+        0.47,
+        0.696
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 5861,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.552,
+      0.671,
+      0.573,
+      0.696
+     ],
+     "candidates": [
+      {
+       "name": "JULIO MARTINEZ MONTT",
+       "party": "DEMOCRATICO",
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.552,
+        0.671,
+        0.573,
+        0.696
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Progresista Nacional",
+     "party": "Progresista Nacional",
+     "votes": 8372,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.686,
+      0.65,
+      0.706,
+      0.671
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR OCAMPO PASTENE",
+       "party": "PROGRESISTA NACIONAL",
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.686,
+        0.65,
+        0.706,
+        0.671
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 14677,
+     "unassigned": null,
+     "seats": 1,
+     "page": 8,
+     "box": [
+      0.717,
+      0.65,
+      0.742,
+      0.671
+     ],
+     "candidates": [
+      {
+       "name": "ALBERTO MOLLER BORDEU",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 8,
+       "box": [
+        0.717,
+        0.65,
+        0.742,
+        0.671
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 3761,
+     "unassigned": null,
+     "seats": 0,
+     "page": 8,
+     "box": [
+      0.755,
+      0.65,
+      0.775,
+      0.671
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Party totals from the 'Total 7.a Circunscripción Electoral' row (p. 8); presented/elected: Agrario 1/0, Conservador 1/1, Liberal 1/1, Democrático 1/1, Progresista Nacional 1/1, Radical 2/1, Socialista 1/0 (8/5). 'Votos obtenidos' 53.659 (= party sum; first digit blurred on p. 8, confirmed on p. 11) recorded as valid; 'Inscritos hábiles' 76.131; '% votantes' 70. Elected names from p. 12. No null/blank printed."
+  },
+  {
+   "number": 9,
+   "title": "Total 9.a Circunscripción Electoral",
+   "areas": [
+    "Valdivia",
+    "Osorno",
+    "Llanquihue",
+    "Chiloé",
+    "Aysen",
+    "Magallanes"
+   ],
+   "seats": 5,
+   "registered": 72487,
+   "cast": null,
+   "valid": 49626,
+   "invalid": null,
+   "blank": null,
+   "null_blank": null,
+   "page": 10,
+   "box": [
+    0.75,
+    0.835,
+    0.95,
+    0.855
+   ],
+   "lists": [
+    {
+     "label": "Conservador",
+     "party": "Conservador",
+     "votes": 6116,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.235,
+      0.846,
+      0.259,
+      0.867
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Liberal",
+     "party": "Liberal",
+     "votes": 6658,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.278,
+      0.846,
+      0.302,
+      0.867
+     ],
+     "candidates": [
+      {
+       "name": "JOSE MAZA FERNANDEZ",
+       "party": "LIBERAL",
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.278,
+        0.846,
+        0.302,
+        0.867
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Liberal Progresista",
+     "party": "Liberal Progresista",
+     "votes": 8715,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.326,
+      0.846,
+      0.35,
+      0.867
+     ],
+     "candidates": [
+      {
+       "name": "CARLOS HAVERBECK RICHTER",
+       "party": "LIBERAL PROGRESISTA",
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.326,
+        0.846,
+        0.35,
+        0.867
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Democrático",
+     "party": "Democrático",
+     "votes": 2978,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.42,
+      0.846,
+      0.446,
+      0.867
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Progresista Nacional",
+     "party": "Progresista Nacional",
+     "votes": 45,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.619,
+      0.84,
+      0.633,
+      0.856
+     ],
+     "candidates": []
+    },
+    {
+     "label": "Radical",
+     "party": "Radical",
+     "votes": 15165,
+     "unassigned": null,
+     "seats": 2,
+     "page": 10,
+     "box": [
+      0.65,
+      0.84,
+      0.68,
+      0.856
+     ],
+     "candidates": [
+      {
+       "name": "ALFREDO DUHALDE VASQUEZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.65,
+        0.84,
+        0.68,
+        0.856
+       ]
+      },
+      {
+       "name": "ALFONSO BORQUEZ PEREZ",
+       "party": "RADICAL",
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.65,
+        0.84,
+        0.68,
+        0.856
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista",
+     "party": "Socialista",
+     "votes": 4394,
+     "unassigned": null,
+     "seats": 1,
+     "page": 10,
+     "box": [
+      0.698,
+      0.84,
+      0.724,
+      0.856
+     ],
+     "candidates": [
+      {
+       "name": "SALVADOR ALLENDE GOSSENS",
+       "party": "SOCIALISTA",
+       "votes": null,
+       "elected": true,
+       "page": 10,
+       "box": [
+        0.698,
+        0.84,
+        0.724,
+        0.856
+       ]
+      }
+     ]
+    },
+    {
+     "label": "Socialista Auténtico",
+     "party": "Socialista Auténtico",
+     "votes": 5555,
+     "unassigned": null,
+     "seats": 0,
+     "page": 10,
+     "box": [
+      0.741,
+      0.84,
+      0.771,
+      0.856
+     ],
+     "candidates": []
+    }
+   ],
+   "notes": "Party totals from the 'Total 9.a Circunscripción Electoral' row (p. 10; the table runs pp. 8-10); presented/elected: Conservador 1/0, Liberal 2/1, Liberal Progresista 1/1, Democrático 1/0, Progresista Nacional 1/0, Radical 2/2, Socialista 1/1, Socialista Auténtico 2/0 (11/5). 'Votos obtenidos' 49.626 (= party sum) recorded as valid; 'Inscritos hábiles' 72.487; '% votantes' 68. Elected names from p. 12. No null/blank printed."
+  }
+ ],
+ "national": {
+  "valid": 216211,
+  "cast": null,
+  "registered": 309519,
+  "page": 10,
+  "parties": {
+   "Agrario": 213,
+   "Conservador": 49983,
+   "Liberal": 40852,
+   "Liberal Progresista": 8715,
+   "Democrático": 14174,
+   "Progresista Nacional": 22730,
+   "Radical": 47921,
+   "Socialista": 16664,
+   "Socialista Auténtico": 14959
+  }
+ },
+ "notes": "Volume: pp. 1-3 title pages (p. 3: odd-numbered groupings 1a, 3a, 5a, 7a, 9a elect 5 senators each on 4 de Marzo de 1945); pp. 4-10 the Dirección del Registro Electoral's Senate table by commune, department, province and circunscripción, giving party votes and candidates presented/elected per party; p. 11 a synoptic by province and grouping, plus a comparative of deputies' votes in the same territories (not transcribed); p. 12 the list of elected senators with parties. No lists or preference votes are printed, so each party is a 'list' (label = party) and candidates hold only the elected senators (votes null). 'Votos obtenidos' is recorded as valid (equals the party sum everywhere); no null/blank or cast figures. national = 'TOTAL SENADORES' row on p. 10 (46 presented, 25 elected; elegidos column totals Cons 5, Lib 6, LibProg 1, Democrático 1, PN 3, Rad 7, Soc 2 = 25)."
+}
