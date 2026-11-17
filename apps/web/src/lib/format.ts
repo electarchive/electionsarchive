@@ -78,7 +78,7 @@ export function timeOrDate(
 }
 
 export function count(value: number) {
-  return numbers().format(value);
+  return numbers({ maximumFractionDigits: 6 }).format(value);
 }
 
 export function precision(margin: number | null | undefined) {
