@@ -17,7 +17,19 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.kr import local, local_head, local_pr, local_sgg_pr, na, na_pr, nec, referendums, sigungu, sigungu_head
+from ea.sources.kr import (
+    local,
+    local_dong,
+    local_head,
+    local_pr,
+    local_sgg_pr,
+    na,
+    na_pr,
+    nec,
+    referendums,
+    sigungu,
+    sigungu_head,
+)
 from ea.store import DATA
 
 SOURCE = "kr.nec_stats"
@@ -198,8 +210,8 @@ REASONS = {
     ),
     "accounting.turnout": (
         "units where the commission prints more ballots than registered voters, as with voters who cast ballots "
-        "away from their roll (absentee, early, overseas, or certificate voting) or rolls it prints incompletely; "
-        "stored as printed"
+        "away from their roll (absentee, early, overseas, or certificate voting), rolls it prints incompletely, or "
+        "rows of misplaced ballots (잘못 투입·구분된 투표지) it prints with no registered voters; stored as printed"
     ),
     "accounting.declared": (
         "contests where the winners' list prints a vote count that differs from the sum of the count pages; "
@@ -544,11 +556,18 @@ def _files(day: str) -> list[raw.Artifact]:
         "kr.local_sgg_pr",
         "kr.sigungu",
         "kr.sigungu_head",
+        "kr.local_dong",
     ):
         for address in sorted(raw.keys(source)):
             if f"electionName={day}" in address or f"electionCode={day}" in address:
                 found.append(raw.cached(source, address))
-    return found
+    seen: set[str] = set()
+    unique = []
+    for artifact in found:
+        if artifact.storage_key not in seen:
+            seen.add(artifact.storage_key)
+            unique.append(artifact)
+    return unique
 
 
 def _split(text: str) -> tuple[str | None, bool]:
@@ -990,7 +1009,116 @@ def referendum(day: str, results: pl.DataFrame) -> Contest:
     )
 
 
-FETCHERS = (referendums, nec, na, na_pr, local, local_head, local_pr, local_sgg_pr, sigungu, sigungu_head)
+def _dong_ref(page: dict[str, Any]) -> str:
+    code, city = page["code"], page["city"]
+    if code == "3":
+        return f"head:{local._sido(city)}"
+    if code == "8":
+        return f"sido-pr:{local._sido(city)}"
+    if code == "4":
+        return f"mayor:{city}:{page['sgg_name']}"
+    if code == "9":
+        return f"sigungu-pr:{city}:{page['sgg_name']}"
+    if code == "5":
+        return f"sido-council:{city}:{page['sgg_name']}"
+    return f"sigungu-council:{city}:{page['town_name']}:{page['sgg_name']}"
+
+
+def _order(page: dict[str, Any], contest: Contest) -> list[int] | None:
+    """Each contest option's column on the page, matched by the label the page prints."""
+    labels = [(person or party).replace(" ", "") for party, person in page["options"]]
+    wanted = [opt.label.replace(" ", "") for opt in contest.options]
+    columns = [k for k, label in enumerate(labels) if label]
+    printed = [labels[k] for k in columns]
+    if printed == wanted:
+        return columns
+    if sorted(printed) == sorted(wanted) and len(set(wanted)) == len(wanted):
+        return [columns[printed.index(label)] for label in wanted]
+    return None
+
+
+DONG: Counter[str] = Counter()
+
+
+def refine(day: Day, pages: list[dict[str, Any]]) -> None:
+    """Replace each local contest's counts with the neighborhood or polling-district counts where the commission
+    prints them for every counting office of the contest and the page's options match the contest's."""
+    by_ref: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for page in pages:
+        if page["day"] == day.day:
+            by_ref[_dong_ref(page)].append(page)
+    for contest in day.contests:
+        found = by_ref.pop(contest.ref, [])
+        if not found or contest.tacit:
+            DONG["kept"] += 1
+            continue
+        if not all(page["leaves"] for page in found):
+            DONG["empty page"] += 1
+            continue
+        orders = [_order(page, contest) for page in found]
+        if any(order is None for order in orders):
+            DONG["options differ"] += 1
+            print(
+                f"{day.day} {contest.ref}: options {found[0]['options']} against {[o.label for o in contest.options]}"
+            )
+            continue
+        recs: list[Rec] = []
+        for page, order in zip(found, orders, strict=True):
+            assert order is not None
+            base = local._sido(page["city"])[:2]
+            town = _town(page["town_name"])
+            for leaf in page["leaves"]:
+                extra = [v for k, v in enumerate(leaf["votes"]) if k not in order]
+                if any(extra):
+                    raise ValueError(f"{day.day} {contest.ref}: votes outside the options in {leaf}")
+                channel = leaf["channel"]
+                recs.append(
+                    Rec(
+                        (base, town, leaf["unit"]),
+                        leaf["registered"],
+                        leaf["ballots"],
+                        leaf["valid"],
+                        leaf["invalid"],
+                        [leaf["votes"][k] for k in order],
+                        channel,
+                        "aggregate"
+                        if leaf["unit"].startswith("잘못")
+                        else SPECIAL.get(channel, "standard")
+                        if leaf["special"]
+                        else "standard",
+                    )
+                )
+        old = [sum(column) for column in zip(*(rec.votes for rec in contest.recs), strict=True)]
+        new = [sum(column) for column in zip(*(rec.votes for rec in recs), strict=True)]
+        if contest.recs and old != new:
+            DONG["totals differ"] += 1
+            print(f"{day.day} {contest.ref}: units sum to {new}, the count page to {old}")
+        contest.recs = recs
+        DONG["refined"] += 1
+    for ref, left in by_ref.items():
+        if any(page["leaves"] for page in left):
+            DONG["page without contest"] += 1
+            print(f"{day.day} {ref}: no contest")
+
+
+def _dong_pages() -> list[dict[str, Any]]:
+    path = DATA / "parsed" / local_dong.SOURCE / "pages.json"
+    return json.loads(path.read_text()) if path.exists() else []
+
+
+FETCHERS = (
+    referendums,
+    nec,
+    na,
+    na_pr,
+    local,
+    local_head,
+    local_pr,
+    local_sgg_pr,
+    sigungu,
+    sigungu_head,
+    local_dong,
+)
 
 
 def fetch() -> None:
@@ -1002,7 +1130,7 @@ def _table(source: str, name: str) -> pl.DataFrame:
     return pl.read_parquet(DATA / "parsed" / source / f"{name}.parquet")
 
 
-def days() -> list[Day]:
+def days(local_only: bool = False) -> list[Day]:
     found: dict[str, Day] = {}
 
     def add(day: str, kind: str, korean: str, english: str) -> Day:
@@ -1011,6 +1139,13 @@ def days() -> list[Day]:
         found[day] = Day(day, kind, korean, english)
         return found[day]
 
+    if not local_only:
+        _national(add)
+    _local(add)
+    return [found[day] for day in sorted(found)]
+
+
+def _national(add: Callable[[str, str, str, str], Day]) -> None:
     pres = _table("kr.nec", "results"), _table("kr.nec", "tickets")
     for day in nec.DATES:
         entry = add(
@@ -1031,6 +1166,9 @@ def days() -> list[Day]:
     for day in sorted(referendums.NAMES):
         entry = add(day, "referendum", referendums.NAMES[day], referendums.NAMES[day])
         entry.contests.append(referendum(day, ref))
+
+
+def _local(add: Callable[[str, str, str, str], Day]) -> None:
     council = [_table("kr.local", n) for n in ("results", "tickets", "winners")]
     head = tuple(_table("kr.local_head", n) for n in ("results", "tickets", "winners"))
     local_pr_data = _table("kr.local_pr", "results"), _table("kr.local_pr", "winners")
@@ -1038,6 +1176,7 @@ def days() -> list[Day]:
     sgg_pr_winners = _table("kr.local_sgg_pr", "winners")
     sgg = tuple(_table("kr.sigungu", n) for n in ("results", "tickets", "winners"))
     mayor = tuple(_table("kr.sigungu_head", n) for n in ("results", "tickets", "winners"))
+    dong = _dong_pages()
     for number, day in enumerate(local.DATES, 1):
         entry = add(day, "local", f"제{number}회 전국동시지방선거", f"{day[:4]} South Korean local elections")
         entry.contests.extend(governors(day, *head))
@@ -1070,7 +1209,7 @@ def days() -> list[Day]:
         if day in local_pr_data[0]["day"].unique().to_list():
             entry.contests.extend(sido_proportional(day, *local_pr_data))
         entry.contests.extend(sigungu_proportional(day, sgg_pr_results, sgg_pr_winners))
-    return [found[day] for day in sorted(found)]
+        refine(entry, dong)
 
 
 def packages() -> list[str]:
@@ -1088,6 +1227,22 @@ def parse() -> None:
                 p.accept(code, f"{count:,} {REASONS[code]}")
         if p.accepted:
             p.write()
+
+
+def parse_local() -> None:
+    """Rebuild the local election days alone. The registry this writes holds only what the local days use, so it
+    serves `ea package check` here and is not a release of the registry, which `parse` builds from every day."""
+    every = days(local_only=True)
+    files = {day.day: _files(day.day) for day in every}
+    build_registry(every, []).write()
+    for day in every:
+        p = build_day(day, files[day.day])
+        for code, count, _ in package.check(p.write()):
+            if code in REASONS:
+                p.accept(code, f"{count:,} {REASONS[code]}")
+        if p.accepted:
+            p.write()
+    print(dict(DONG), flush=True)
 
 
 def emit() -> None:
