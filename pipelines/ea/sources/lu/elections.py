@@ -306,6 +306,8 @@ def get(url: str) -> None:
 def fetch() -> None:
     for name in FILES:
         raw.fetch(SOURCE, url(name), suffix=".xml")
+    for link in merged_pages("communal-2017"):
+        get(link)
     for name, (_, base, _) in PAGES.items():
         raw.fetch(SOURCE, page(f"{base}/resultats"), suffix=".html")
     with ThreadPoolExecutor(2) as pool:
@@ -513,11 +515,39 @@ def read_v1(name: str) -> list[Race]:
     return races
 
 
+MERGED_2017 = ("helperknapp", "rosport-mompach", "parc-hosingen", "vallee-de-l-ernz")
+
+
+def merged_pages(name: str) -> list[str]:
+    """The pages of the communes the 2017 file holds only ballots for, which print each section's candidates."""
+    if name != "communal-2017":
+        return []
+    return [f"{SITE}/fr/elections-communales/2017/resultats/communes/{part}.html" for part in MERGED_2017]
+
+
 @functools.cache
 def races(name: str) -> list[Race]:
     if name in FILES:
-        return read_v1(name) if FILES[name][1] == "v1" else read_v2(name)
+        found = read_v1(name) if FILES[name][1] == "v1" else read_v2(name)
+        return found + _sections_2017(found) if merged_pages(name) else found
     return read_pages(name)
+
+
+def _sections_2017(found: list[Race]) -> list[Race]:
+    """The sections of the merged communes, each elected by majority, from the commune pages.
+
+    The file counts these communes' ballots as a whole and holds no candidates. The pages give each section's seats
+    and each candidate's votes, as printed; Ermsdorf's five candidates for five seats print zero votes each.
+    """
+    cantons = {race.places[0].name: race.places[0].canton for race in found if len(race.places) == 1}
+    made: list[Race] = []
+    for link in merged_pages("communal-2017"):
+        for commune, _, _, section, seats, _, plain in pages.communal_2023(html_of(link)):
+            if seats is None or not section:
+                raise ValueError(f"{link}: no section or seats")
+            place = Place(commune, cantons.get(commune), Stats(), [], plain)
+            made.append(Race(f"{commune} ({section})", seats, "MAJORITAIRE", place.stats, [], plain, [place], False))
+    return made
 
 
 def html_of(link: str) -> str:
@@ -962,7 +992,7 @@ def build(day: str) -> Package:
 
 def sources_of(name: str) -> list[raw.Artifact]:
     if name in FILES:
-        return [raw.cached(SOURCE, url(name))]
+        return [raw.cached(SOURCE, url(name)), *[raw.cached(SOURCE, link) for link in merged_pages(name)]]
     return [raw.cached(SOURCE, link) for link in [*index_pages(name), *extra_pages(name), *commune_pages(name)]]
 
 
