@@ -1171,6 +1171,80 @@ MEDIA_RELEASES = {
 }
 
 
+# Where each figure of the scanned media releases is printed, measured from word boxes read with Tesseract on the
+# pages rendered at 300 dpi: the page and the box in pixels, keyed by the measure or the candidate's position.
+SCAN_DPI = 300
+BOXES: dict[str, dict[str | int, tuple[int, int, int, int, int]]] = {
+    "byopuwo2021": {
+        "registered": (2, 2010, 539, 2095, 575),
+        "counted": (1, 704, 1977, 801, 2014),
+        1: (1, 1805, 2386, 1879, 2422),
+        2: (1, 1805, 2502, 1903, 2539),
+        3: (1, 1810, 2619, 1872, 2654),
+        4: (1, 1804, 2734, 1877, 2771),
+        5: (1, 1806, 2832, 1852, 2869),
+    },
+    "byswakopmund2022": {
+        "registered": (2, 284, 1471, 420, 1507),
+        "counted": (1, 730, 1859, 839, 1895),
+        "rejected": (1, 740, 1978, 788, 2014),
+        1: (1, 1954, 2480, 2025, 2515),
+        2: (1, 1954, 2655, 2027, 2691),
+        3: (1, 1939, 2831, 2038, 2866),
+        4: (2, 1963, 319, 2055, 355),
+        5: (2, 1984, 494, 2030, 530),
+        6: (2, 1971, 583, 2042, 619),
+        7: (2, 1957, 758, 2053, 793),
+        8: (2, 1969, 933, 2039, 969),
+    },
+}
+
+
+def _locate(p: Package, name: str, contest: Contest) -> None:
+    """Page records for a scanned release and a locator for each of its figures, boxes normalized to the page."""
+    stored = raw.cached(SOURCE, URLS[name])
+    artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ECN_SOURCE}\x1f{stored.storage_key}"))  # in registry
+    sizes: dict[int, tuple[float, float]] = {}
+    for line in subprocess.run(
+        ["pdfinfo", "-f", "1", "-l", "99", str(stored.path)], capture_output=True, text=True, check=True
+    ).stdout.splitlines():
+        found = re.match(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)", line)
+        if found:
+            sizes[int(found.group(1))] = (float(found.group(2)), float(found.group(3)))
+    pages: dict[int, str] = {}
+    for number in sorted({box[0] for box in BOXES[name].values()}):
+        width, height = sizes[number]
+        pages[number] = key("page", name, number)
+        p.add(
+            "source_page",
+            id=pages[number],
+            artifact_id=artifact,
+            page_number=number,
+            image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
+            width=round(width * 100 / 72),
+            height=round(height * 100 / 72),
+        )
+    code = f"{slug(contest.region)}-{slug(contest.name)}"
+    measures = {"registered": REGISTERED, "counted": VALID, "rejected": INVALID}
+    for spot, (number, x0, y0, x1, y1) in BOXES[name].items():
+        width, height = (side * SCAN_DPI / 72 for side in sizes[number])
+        p.add(
+            "value_locator",
+            result_set_id=key("result_set", f"{name}:{code}"),
+            unit_id=key("unit", name, code),
+            option_id=key("option", f"{name}:{code}", spot) if isinstance(spot, int) else None,
+            channel=0,
+            measure=VOTES if isinstance(spot, int) else measures[spot],
+            count_round=0,
+            page_id=pages[number],
+            source_id=None,
+            x0=round(x0 / width, 4),
+            y0=round(y0 / height, 4),
+            x1=round(x1 / width, 4),
+            y1=round(y1 / height, 4),
+        )
+
+
 @cache
 def local(name: str = "la2020") -> tuple[Area, ...]:
     return tuple(read_local(name))
@@ -1634,6 +1708,7 @@ def build(day: str) -> Package:
             valid_printed=True,
             flags=DIGITIZED,
         )
+        _locate(p, name, contest)
     elif day == "2024-11-27":
         _national_2024(p, day, first)
     elif day == "2025-06-17":
