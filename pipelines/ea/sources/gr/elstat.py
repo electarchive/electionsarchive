@@ -195,8 +195,29 @@ def read(name: str) -> Election:
     return election
 
 
+MISPRINT = re.compile(r"^(\w+) ([A-Z]?\d+|[A-Z])(?: \([^)]*\))?(?: (\w+))?:")
+
+
+def misprints(e: Election) -> set[tuple[str, str, str | None]]:
+    """The cells each `# misprint:` comment owns up to, as (table, row, column); a column of None means the row."""
+    found: set[tuple[str, str, str | None]] = set()
+    for note in e.notes:
+        match = MISPRINT.match(note)
+        if match is None:
+            raise ValueError(f"{e.name}: a misprint note must start with '<table> <row> [<column>]:': {note}")
+        found.add((match.group(1), match.group(2), match.group(3)))
+    return found
+
+
 def _verify(e: Election) -> None:
-    """Raise unless every row agrees with the totals the volume prints."""
+    """Raise unless every row agrees with the totals the volume prints, or a misprint note owns the difference."""
+    owned = misprints(e)
+
+    def excused(table: str, codes: list[str], column: str | None) -> bool:
+        return any(
+            t == table and c in codes and (column is None or col is None or col == column) for t, c, col in owned
+        )
+
     problems: list[str] = []
     for block in e.blocks:
         if len(block.edges) not in (len(block.columns) + 1, 2 * len(block.columns)):
@@ -207,9 +228,10 @@ def _verify(e: Election) -> None:
         for row in block.rows:
             if row.code in ("=", "=="):
                 scope = group if row.code == "=" else everything
+                codes = [r.code for r in scope]
                 for j, column in enumerate(block.columns):
                     summed = sum(r.values[j] or 0 for r in scope)
-                    if summed != (row.values[j] or 0):
+                    if summed != (row.values[j] or 0) and not excused(block.name, codes, column):
                         problems.append(f"{block.name} p{block.page} {row.code} {column}: {summed} <> {row.values[j]}")
                     if row.code == "==" and subtotals:
                         summed = sum(r.values[j] or 0 for r in subtotals)
@@ -229,21 +251,20 @@ def _verify(e: Election) -> None:
             everything.append(row)
     for code, figures in district_values(e).items():
         votes = [v for column, v in figures.items() if column.startswith("votes:")]
-        if votes and "valid" in figures and sum(votes) != figures["valid"]:
+        if votes and "valid" in figures and sum(votes) != figures["valid"] and not excused("votes", [code], None):
             problems.append(f"{code}: party votes {sum(votes)} <> valid {figures['valid']}")
         seats = [v for column, v in figures.items() if column.startswith("seats:")]
-        if seats and "seats" in figures and sum(seats) != figures["seats"]:
+        if seats and "seats" in figures and sum(seats) != figures["seats"] and not excused("seats", [code], None):
             problems.append(f"{code}: party seats {sum(seats)} <> seats {figures.get('seats')}")
         if {"cast", "invalid", "valid"} <= set(figures):
             balance = figures["cast"] - figures["invalid"] - figures.get("blank", 0) - figures["valid"]
-            if balance:
+            if balance and not any(c == code and col in ("valid", "cast", "invalid") for _, c, col in owned):
                 problems.append(f"{code}: cast less invalid differs from valid by {balance}")
     for column in {c for b in e.blocks for c in b.columns if c not in MEASURES and c != "seats"}:
         if column not in e.parties:
             problems.append(f"column {column} names no party")
-    noted = [p for p in problems if not any(p.split(":")[0] in note for note in e.notes)]
-    if noted:
-        raise ValueError(f"{e.name}: " + "; ".join(noted[:20]))
+    if problems:
+        raise ValueError(f"{e.name}: " + "; ".join(problems[:20]))
 
 
 def district_values(e: Election) -> dict[str, dict[str, int]]:
@@ -281,7 +302,30 @@ ALIASES = {
     "νομοσ τρικκαλων": "νομοσ τρικαλων",
     "νομοσ ρεθυμνου": "νομοσ ρεθυμνησ",
     "νομοσ καβαλλασ": "νομοσ καβαλασ",
+    "εκλογικοσ συλλογοσ ισραηλιτων του δημου θεσσαλονικησ": "εκλογικοσ συλλογοσ ισραηλιτων θεσσαλονικησ",
 }
+FRENCH = (
+    (re.compile(r"^Provinces? (?:de la |de |d'|des )(.+)$"), "{} Province"),
+    (re.compile(r"^Tribunal de 1ère instance (?:de la |de |d'|des )(.+)$"), "{} court of first instance district"),
+    (re.compile(r"^Départements? (?:de la |de |d'|des )(.+)$"), "{} Prefecture"),
+)
+
+
+def territorial(code: str) -> bool:
+    """Constituencies with a place; the Senate's seats for professional bodies and for the houses have none."""
+    return code.isdigit()
+
+
+def english_name(greek: str, french: str) -> str:
+    """The constituency's English name: curated where the volumes' wording needs it, else from its French name."""
+    found = ENGLISH.get(area_key(greek))
+    if found is not None:
+        return found
+    for pattern, form in FRENCH:
+        match = pattern.match(french)
+        if match is not None:
+            return form.format(match.group(1))
+    raise ValueError(f"no English name for constituency {greek} ({french})")
 
 
 def area_key(greek: str) -> str:
@@ -343,7 +387,9 @@ def geo() -> Package:
     seen: dict[str, tuple[str, str, date]] = {}
     for name in names():
         e = read(name)
-        for greek, french in e.districts.values():
+        for code, (greek, french) in e.districts.items():
+            if not territorial(code):
+                continue
             seen.setdefault(area_key(greek), (greek, french, e.day))
             if e.day > seen[area_key(greek)][2]:
                 seen[area_key(greek)] = (greek, french, e.day)
@@ -354,10 +400,7 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, greek, "el", "official")
         p.name(id, french, "fr", "official", False)
-        english = ENGLISH.get(folded)
-        if english is None:
-            raise ValueError(f"no English name for constituency {greek}")
-        p.name(id, english, "en", "english", False)
+        p.name(id, english_name(greek, french), "en", "english", False)
     return p
 
 
@@ -462,8 +505,8 @@ def election(e: Election) -> Package:
             polity_id=GREECE,
             scheme_code=SCHEME,
             code=f"{e.day}:{code}",
-            area_relation="equals",
-            area_id=area(greek),
+            area_relation="equals" if territorial(code) else "unlocated",
+            area_id=area(greek) if territorial(code) else None,
             kind="standard",
         )
         p.name(units[code], greek, "el", "official")
@@ -523,16 +566,17 @@ def election(e: Election) -> Package:
                 election_id=election_id,
                 kind="list_allocation",
                 body_id=body,
-                district_area_id=area(greek),
+                district_area_id=area(greek) if territorial(code) else None,
                 magnitude=figures.get(code, {}).get("seats"),
                 round_number=1,
                 default_result_kind="counted",
             )
-            p.name(contest, ENGLISH[area_key(greek)], "en", "official")
+            title = english_name(greek, french)
+            p.name(contest, title, "en", "official")
             p.name(contest, greek, "el", "native", False)
             p.add(
                 "slug",
-                path=f"{path}/{changeset.slug(ENGLISH[area_key(greek)])}",
+                path=f"{path}/{changeset.slug(title)}",
                 entity_id=contest,
                 is_current=True,
             )
@@ -594,6 +638,14 @@ def election(e: Election) -> Package:
                         "y1": row.band[1],
                     }
                 )
+    if e.notes:
+        printed = "; ".join(e.notes)
+        owned = misprints(e)
+        codes = {"accounting.votes_valid"} if any(table == "votes" for table, _, _ in owned) else set()
+        if any(column in ("valid", "cast", "invalid") for _, _, column in owned):
+            codes.add("accounting.ballots_sum")
+        for code in sorted(codes):
+            p.accept(code, f"The volume's own figures disagree, kept as printed and noted on the result set: {printed}")
     for row in values:
         p.add("result_value", **row)
     for row in locators:
@@ -687,6 +739,9 @@ def _result_set(p: Package, e: Election, election_id: str, contest: str, scope: 
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     for index, text in enumerate(e.notes):
+        match = MISPRINT.match(text)
+        if scope != "state" and (match is None or match.group(2) != scope):
+            continue
         p.add(
             "note",
             id=key("note", result_set, "misprint", index),
@@ -748,6 +803,24 @@ ENGLISH: dict[str, str] = {
     "νομοσ ροδοπησ": "Rhodope",
     "νομοσ δραμασ": "Drama",
     "νομοσ καβαλασ": "Kavala",
+    "νομοσ αττικησ και βοιωτιασ": "Attica and Boeotia",
+    "εκλογικοσ συλλογοσ ισραηλιτων θεσσαλονικησ": "Jewish electoral college of Thessaloniki",
+    "εκλογικοσ συλλογοσ μουσουλμανων θρακησ": "Muslim electoral college of Thrace",
+    "προνομιουχοσ περιφερεια υδρασ": "Hydra (privileged constituency)",
+    "προνομιουχοσ περιφερεια σπετσων": "Spetses (privileged constituency)",
+    "προνομιουχοσ περιφερεια ψαρων": "Psara (privileged constituency)",
+    "πρωην δημοσ πειραιωσ": "Piraeus (former municipality)",
+    "υπολοιπον επαρχιασ αττικησ": "Rest of Attica Province",
+    "πρωτοδικειον πρεβεζησ μεθ' ολοκληρου τησ περιφερειασ πρωην υποδιοικησεωσ φιλιππιαδοσ": "Preveza court of first instance district with the former Philippiada subprefecture",
+    "εμπορικα τμηματα των εμπορικων και βιομηχανικων επιμελητηριων": "Commercial sections of the chambers of commerce and industry",
+    "βιομηχανικα τμηματα των εμπορικων και βιομηχανικων επιμελητηριων": "Industrial sections of the chambers of commerce and industry",
+    "επαγγελματικα και βιοτεχνικα επιμελητηρια": "Chambers of trades and crafts",
+    "ενωσισ ελληνων εφοπλιστων": "Union of Greek Shipowners",
+    "γεωργικα επιμελητηρια": "Chambers of agriculture",
+    "γενικη συνομοσπονδια των εργατων τησ ελλαδοσ": "General Confederation of Workers of Greece",
+    "ακαδημια - πανεπιστημια": "Academy and universities",
+    "πολυτεχνειον και τεχνικον επιμελητηριον": "Polytechnic and Technical Chamber",
+    "εκλογη υπο τησ βουλησ και γερουσιασ": "Election by the Chamber and the Senate",
     "τεωσ δημοσ πειραιωσ μετα των επαρχιων αιγινησ, υδρασ, τροιζηνιασ και τησ νησου σπετσων": "Piraeus with Aegina, Hydra, Troezenia, and Spetses",
     "υπολοιπον νομου αττικησ και βοιωτιασ μετα την αφαιρεσιν των ανωτερω περιφερειων": "Rest of Attica and Boeotia (1926)",
     "νομοσ αργολιδοσ και κορινθιασ, πλην τησ επαρχιασ υδρασ και τησ νησου σπετσων": "Argolis and Corinthia without Hydra and Spetses",
