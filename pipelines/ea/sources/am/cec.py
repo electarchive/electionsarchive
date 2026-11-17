@@ -37,8 +37,99 @@ def key(kind: str, *parts: object) -> str:
 SOURCE_ID = key("source", SOURCE)
 NATIONAL_ASSEMBLY = key("body", "national_assembly")
 PRESIDENCY = key("office", "president")
+ODIHR_2007 = "https://cdn.osce.org/sites/default/files/f/documents/d/d/26606.pdf"
+ODIHR_ID = key("source", "osce.odihr")
 PRESIDENT_SYSTEM = key("electoral_system", "president")
 REFERENDUM_SYSTEM = key("electoral_system", "referendum")
+LIST_SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
+    (
+        key("electoral_system", "national_assembly", 2007),
+        date(2007, 1, 1),
+        date(2012, 1, 1),
+        {
+            "formula": "hare",
+            "threshold": [{"percent": 5, "level": "party"}, {"percent": 7, "level": "alliance"}],
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "A mixed parallel system for 131 deputies: 90 elected from closed party and bloc lists in one national "
+            "constituency, and 41 in single-mandate districts by plurality. A party needs 5% of the valid votes to share "
+            "in the list seats and a bloc 7%. The Hare quota with largest remainders reproduces the declared seats."
+        ),
+    ),
+    (
+        key("electoral_system", "national_assembly", 2012),
+        date(2012, 1, 1),
+        date(2017, 1, 1),
+        {
+            "formula": "hare",
+            "threshold": [{"percent": 5, "level": "party"}, {"percent": 7, "level": "alliance"}],
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "Under the Electoral Code adopted in May 2011, the same parallel system: 90 deputies from closed lists in "
+            "one national constituency, with a 5% threshold for a party and 7% for a bloc, and 41 deputies in "
+            "single-mandate districts by plurality. The Hare quota with largest remainders reproduces the declared seats."
+        ),
+    ),
+    (
+        key("electoral_system", "national_assembly", 2017),
+        date(2017, 1, 1),
+        date(2021, 4, 27),
+        {
+            "formula": "hare",
+            "threshold": [{"percent": 5, "level": "party"}, {"percent": 7, "level": "alliance"}],
+            "lists": {"order": "flexible", "vacancy": "next_on_list"},
+        },
+        (
+            "A proportional system for at least 101 deputies from a closed national list and 13 open district lists, "
+            "with a 5% threshold for a party and 7% for an alliance. A party's seats are first apportioned nationally; "
+            "half go to its national list in order and half to the district candidates with the most preference votes. "
+            "Up to four further seats are reserved for the four largest national minorities. A list with a majority "
+            "below 54% of the seats receives additional seats to reach it, and a winner above two thirds of the seats "
+            "leaves the other qualifying lists a third. Without a majority or a coalition within six days, the top "
+            "two lists meet in a second round."
+        ),
+    ),
+    (
+        key("electoral_system", "national_assembly", 2021),
+        date(2021, 4, 27),
+        date(2021, 7, 1),
+        {
+            "formula": "hare",
+            "threshold": [{"percent": 5, "level": "party"}, {"percent": 7, "level": "alliance"}],
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "After the amendments in force from 27 April 2021, at least 101 deputies from closed party and alliance lists "
+            "in one national constituency, with a 5% threshold for a party and 7% for an alliance, four reserved "
+            "minority seats, the 54% stable majority, and the second round. The May 2021 amendments did not apply to "
+            "the June 2021 election."
+        ),
+    ),
+    (
+        key("electoral_system", "national_assembly", 2026),
+        date(2021, 7, 1),
+        None,
+        {
+            "formula": "hare",
+            "threshold": [{"percent": 4, "level": "party"}, {"percent": 8, "level": "alliance"}],
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "Under the May 2021 amendments, 101 deputies from closed lists in one national constituency, allocated by "
+            "the Hare quota with largest remainders, plus four seats for the four largest national minorities. The "
+            "threshold is 4% for a party, 8% for an alliance of up to three parties, and 10% for an alliance of four "
+            "or more; if fewer than three lists pass, the three nearest the threshold share the seats. A list with a "
+            "majority below 52% of the seats receives additional seats to reach it. Without a majority or a coalition, "
+            "the top two lists meet in a second round."
+        ),
+    ),
+]
+
+
+def list_system(day: date) -> str:
+    return next(id for id, since, until, _, _ in LIST_SYSTEMS if since <= day and (until is None or day < until))
 
 
 @dataclass(frozen=True)
@@ -51,6 +142,7 @@ class Election:
     options: tuple[tuple[int, str], ...] = ()  # column in the information table and label, where the export has none
     protocol: str = ""  # the protocol registering the elected deputies, relative to DOCS
     seats: tuple[tuple[str, int], ...] = ()  # list seats each ballot label won, as the protocol registers them
+    report: str = ""  # where the seats come from when the Commission posts no protocol: the observation report's URL
 
 
 ELECTIONS = [
@@ -60,6 +152,14 @@ ELECTIONS = [
         82,
         "doc/resultarm.xls",
         ("2007 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2007"),
+        report=ODIHR_2007,
+        seats=(
+            ("ՀԱՅԱՍՏԱՆԻ ՀԱՆՐԱՊԵՏԱԿԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 41),
+            ("ԲԱՐԳԱՎԱՃ ՀԱՅԱՍՏԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 18),
+            ("ՀԱՅ ՅԵՂԱՓՈԽԱԿԱՆ ԴԱՇՆԱԿՑՈՒԹՅՈՒՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 16),
+            ("ՕՐԻՆԱՑ ԵՐԿԻՐ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 8),
+            ("ԺԱՌԱՆԳՈՒԹՅՈՒՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 7),
+        ),
     ),
     Election(
         date(2008, 2, 19),
@@ -229,6 +329,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, info_url(e), suffix="." + e.info.rsplit(".", 1)[1])
         if e.protocol:
             raw.fetch(SOURCE, protocol_url(e), suffix=".pdf")
+        if e.report:
+            raw.fetch(SOURCE, e.report, suffix=".pdf")
     raw.fetch(SOURCE, ARCHIVE, suffix=".html")
     for e in ELECTIONS:
         page(e)
@@ -532,6 +634,7 @@ def registry() -> Package:
     p.name(PRESIDENCY, "President of the Republic of Armenia", "en", "official")
     p.name(PRESIDENCY, "Հայաստանի Հանրապետության Նախագահ", "hy", "native", False)
     for id, since, until, rules, note in (
+        *LIST_SYSTEMS,
         (
             PRESIDENT_SYSTEM,
             date(1996, 1, 1),
@@ -617,6 +720,20 @@ def election(e: Election) -> Package:
     p.uses(raw.cached(SOURCE, stations_url(e)))
     if e.protocol:
         p.artifact(raw.cached(SOURCE, protocol_url(e)), SOURCE_ID)
+    if e.report:
+        p.add(
+            "source",
+            id=ODIHR_ID,
+            kind="official_body",
+            publisher="OSCE Office for Democratic Institutions and Human Rights",
+            title="Armenia, Parliamentary Elections, 12 May 2007: OSCE/ODIHR Election Observation Mission Final Report",
+            url="https://odihr.osce.org/odihr/elections/armenia/26606",
+            license="Published by the OSCE Office for Democratic Institutions and Human Rights; cited for the seat "
+            "counts its annex prints",
+            license_url="https://www.osce.org/",
+            attribution="OSCE/ODIHR Election Observation Mission Final Report, Armenia, 12 May 2007",
+        )
+        p.artifact(raw.cached(SOURCE, e.report), ODIHR_ID)
     table = export(e)
     data = info(e)
     found = matched(table, data)
@@ -655,7 +772,11 @@ def election(e: Election) -> Package:
         district_area_id=COUNTRY,
         magnitude=1 if e.family == "president" else sum(n for _, n in e.seats) or None,
         round_number=1,
-        electoral_system_id={"president": PRESIDENT_SYSTEM, "referendum": REFERENDUM_SYSTEM}.get(e.family),
+        electoral_system_id={
+            "president": PRESIDENT_SYSTEM,
+            "referendum": REFERENDUM_SYSTEM,
+            "parliament": list_system(day) if e.seats else None,
+        }[e.family],
         default_result_kind="counted",
     )
     p.name(contest, english, "en", "official")
@@ -869,8 +990,12 @@ def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str],
             entity_id=result_set,
             kind="methodology",
             body_md=(
-                "Seats are the deputies the Commission's protocol registering the elected deputies assigns to each "
-                "list, counted from the names the protocol registers under it."
+                "Seats are the deputies the OSCE/ODIHR final report's annex lists as won through the national "
+                "proportional contest by each list. The Commission posts no protocol registering the 2007 deputies "
+                "among its pages. The 41 single-mandate seats are in the district contests."
+                if e.report
+                else "Seats are the deputies the Commission's protocol registering the elected deputies assigns to "
+                "each list, counted from the names the protocol registers under it."
             ),
             lang="en",
         )
