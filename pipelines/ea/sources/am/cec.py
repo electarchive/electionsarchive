@@ -173,7 +173,7 @@ def package_key(e: Election) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e) for e in ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e) for e in ELECTIONS), *(old_key(o) for o in OLD)]
 
 
 def fetch() -> None:
@@ -183,6 +183,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, info_url(e), suffix="." + e.info.rsplit(".", 1)[1])
     for e in ELECTIONS:
         page(e)
+    raw.fetch(SOURCE, ARCHIVE, suffix=".html")
 
 
 def page(e: Election) -> raw.Artifact:
@@ -246,6 +247,8 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         election(e).write()
+    for o in OLD:
+        old_referendum(o).write()
 
 
 def emit() -> None:
@@ -801,3 +804,163 @@ def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str],
     for name, option in options.items():
         kind = ("elected" if e.family == "president" else "won") if name == winner else "lost"
         p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+
+
+# The referendums of 2003 and 2005, whose only published results are the national totals on the Commission's page.
+
+ARCHIVE = f"{SITE}/PageFor/Elections%201999-2005"
+
+
+@dataclass(frozen=True)
+class Old:
+    day: date
+    heading: str  # the start of the section's heading on the page
+    names: tuple[str, str]  # English, Armenian
+
+
+OLD = [
+    Old(
+        date(2003, 5, 25),
+        "25 Մայիսի 2003",
+        ("2003 Armenian constitutional referendum", "Սահմանադրական հանրաքվե, 2003"),
+    ),
+    Old(
+        date(2005, 11, 27),
+        "27 Նոյեմբեր 2005",
+        ("2005 Armenian constitutional referendum", "Սահմանադրական հանրաքվե, 2005"),
+    ),
+]
+
+
+def old_key(o: Old) -> str:
+    return f"{SOURCE}/referendum-{o.day}"
+
+
+@functools.cache
+def old_totals(o: Old) -> dict[str, int]:
+    """The national totals printed under the referendum's heading, by label."""
+    text = raw.cached(SOURCE, ARCHIVE).path.read_text(encoding="utf-8")
+    lines = [
+        clean(html.unescape(line))
+        for line in re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", text)).split("\n")
+    ]
+    lines = [line for line in lines if line]
+    start = next(i for i, line in enumerate(lines) if line.startswith(o.heading) and "Հանրաքվե" in line)
+    out: dict[str, int] = {}
+    i = start + 1
+    while i + 1 < len(lines) and (value := number(lines[i + 1])) is not None and number(lines[i]) is None:
+        out[lines[i]] = value
+        i += 2
+    return out
+
+
+def old_referendum(o: Old) -> Package:
+    p = Package(
+        old_key(o),
+        SOURCE,
+        f"The {o.names[0]}, national totals from the Central Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {ARMENIA, COUNTRY}
+    p.artifact(raw.cached(SOURCE, ARCHIVE), SOURCE_ID)
+    printed = old_totals(o)
+    day = o.day
+    election_id = key("election", day, "referendum")
+    p.add("election", id=election_id, polity_id=ARMENIA, kind="referendum", date_from=day, date_to=day, status="held")
+    p.name(election_id, o.names[0], "en", "official")
+    p.name(election_id, o.names[1], "hy", "native", False)
+    path = f"am/{day}-referendum"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    contest = key("contest", day, "referendum")
+    english = f"Whether to adopt the amendments to the Constitution of the Republic of Armenia put to the {day.year} referendum"
+    native = "Սահմանադրությունում փոփոխություններ կատարելու մասին"
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election_id,
+        kind="ballot_question",
+        office_id=None,
+        body_id=None,
+        district_area_id=COUNTRY,
+        magnitude=None,
+        round_number=1,
+        electoral_system_id=REFERENDUM_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, english, "en", "official")
+    p.name(contest, native, "hy", "native", False)
+    p.add("slug", path=f"{path}/constitutional-amendments", entity_id=contest, is_current=True)
+    p.add("ballot_question", contest_id=contest, type="referendum")
+    result_set = key("result_set", day, "referendum")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "The Commission's archive page prints only national totals for this referendum, so the result is "
+            "held as one unit for the whole country. Registered voters are the electors on the voter lists; voters "
+            "are those registered and issued a ballot, by signature. Votes by answer and invalid ballots are as "
+            "printed. The Commission also prints a figure for inaccuracies, which is not stored."
+        ),
+        lang="en",
+    )
+    options: dict[str, str] = {}
+    for position, (label, prefix) in enumerate((("Yes", "1.Այո"), ("No", "2.Ոչ")), 1):
+        option = options[label] = key("option", day, "referendum", label)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="answer",
+            ballot_position=position,
+            ballot_label=label,
+        )
+        p.name(option, label, "en", "official")
+    unit = key("unit", f"{day}:national")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=ARMENIA,
+        scheme_code="am.precinct",
+        code=f"{day}:national",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
+    values = Facts()
+    figures: dict[tuple[str | None, int], int] = {}
+    for label, value in printed.items():
+        if label.startswith("Ընտրողների ընդհանուր թիվը"):
+            figures[None, REGISTERED] = value
+        elif label.startswith("Գրանցված և քվեաթերթիկ ստացած"):
+            figures[None, VOTERS] = value
+        elif label.startswith("Անվավեր"):
+            figures[None, INVALID] = value
+        elif label.startswith("1.Այո"):
+            figures["Yes", VOTES] = value
+        elif label.startswith("2.Ոչ"):
+            figures["No", VOTES] = value
+    for (label, measure), value in figures.items():
+        option = options[label] if label else None
+        values.add(result_set, unit, option, measure, value)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+    p.frame("result_value", values.frame())
+    votes = {label: figures[label, VOTES] for label in options}
+    winner = max(votes, key=lambda label: votes[label])
+    for label, option in options.items():
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if label == winner else "lost")
+    print(f"{old_key(o)}: {len(figures)} totals", flush=True)
+    return p
