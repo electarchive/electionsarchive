@@ -38,6 +38,7 @@ FILES = {
     "epr2025": f"{UPLOADS}/2025/10/EPR_2025_RESULTAT_NATIONAL.pdf",
     "edan2025": f"{UPLOADS}/2025/12/EDAN_2025_RESULTAT_NATIONAL_DETAILS.pdf",
     "edan2026": f"{UPLOADS}/2026/02/REPRISE_EDAN_2025.pdf",
+    "esen2023": f"{UPLOADS}/2023/12/RESULTATS_ESEN_SEPT_ET_DEC_2023.pdf",
 }
 PROCLAMATION_2015 = f"{SITE}/wp-content/uploads/2020/05/" + (
     "50-Proclammation-des-resultats-provisoires-de-lelection-du-president-de-la-republique-du-25-10-2015.pdf"
@@ -189,6 +190,7 @@ def key(kind: str, *parts: object) -> str:
 
 CEI_SOURCE = key("source", "cei")
 ASSEMBLY = key("body", "national-assembly")
+SENATE = key("body", "senate")
 PRESIDENCY = key("office", "president")
 SYSTEM_PRESIDENT = key("electoral_system", "president", "two_round")
 SYSTEM_SINGLE = key("electoral_system", "assembly", "fptp")
@@ -294,6 +296,9 @@ def parties() -> list[str]:
     for name, layout in {(p.file, p.layout) for p in PLANS if p.kind == "legislative"}:
         for circ in legislature(name, layout)[0]:
             found |= {party_text(c.party) for c in circ.candidates}
+    from ea.sources.ci import senate  # the Senate table's lists add their labels to the registry
+
+    found |= set(senate.party_labels())
     return sorted(found - UNOFFICIAL)
 
 
@@ -306,7 +311,7 @@ def registry() -> Package:
     p = Package(
         "ci.cei/registry",
         SOURCE,
-        "Ivorian parties, the National Assembly, the presidency, and their electoral systems, from the "
+        "Ivorian parties, the National Assembly, the Senate, the presidency, and their electoral systems, from the "
         "Commission Électorale Indépendante's results tables",
     )
     p.external.add(IVORY_COAST)
@@ -334,6 +339,9 @@ def registry() -> Package:
     p.add("body", id=ASSEMBLY, polity_id=IVORY_COAST, kind="lower_house")
     p.name(ASSEMBLY, "National Assembly of Côte d'Ivoire", "en", "official")
     p.name(ASSEMBLY, "Assemblée nationale de Côte d'Ivoire", "fr", "native", False)
+    p.add("body", id=SENATE, polity_id=IVORY_COAST, kind="upper_house")
+    p.name(SENATE, "Senate of Côte d'Ivoire", "en", "official")
+    p.name(SENATE, "Sénat de Côte d'Ivoire", "fr", "native", False)
     p.add("office", id=PRESIDENCY, polity_id=IVORY_COAST, kind="head_of_state")
     p.name(PRESIDENCY, "President of Côte d'Ivoire", "en", "official")
     p.name(PRESIDENCY, "Président de la République de Côte d'Ivoire", "fr", "native", False)
