@@ -265,8 +265,17 @@ def _declared(day: str) -> ElementTree.Element:
 
 
 def _district(
-    code: str, parent: str, okres: str, kraj: str, towns: set[str], districts: set[str], nuts: dict[str, str]
+    code: str,
+    parent: str,
+    okres: str,
+    kraj: str,
+    towns: set[str],
+    districts: set[str],
+    nuts: dict[str, str],
+    wards: set[str],
 ) -> str:
+    if code in wards:
+        return area("cz.mestska_cast", code)
     if code in towns:
         return area("cz.obec", code)
     if parent in towns:
@@ -311,6 +320,7 @@ def municipal(day: str) -> Package:
     places_built = _places()
     towns = set(places_built.filter(pl.col("scheme_code") == "cz.obec")["code"])
     districts = set(places_built.filter(pl.col("scheme_code") == "cz.okres")["code"])
+    wards = set(places_built.filter(pl.col("scheme_code") == "cz.mestska_cast")["code"])
 
     election = p.id("election", "kv", iso)
     kind = "local" if regular else "by_election"
@@ -358,7 +368,7 @@ def municipal(day: str) -> Package:
             kind="list_allocation",
             body_id=body(council),
             district_area_id=_district(
-                council, parent.get(council, ""), row["OKRES"], row["KRAJ"], towns, districts, nuts
+                council, parent.get(council, ""), row["OKRES"], row["KRAJ"], towns, districts, nuts, wards
             ),
             magnitude=int(row["MANDATY"]),
             round_number=1,

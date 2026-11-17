@@ -219,7 +219,8 @@ def geo() -> Package:
         ("cz.kraj", 1, "administrative", "region", "nuts"),
         ("cz.okres", 2, "administrative", "district", "lau"),
         ("cz.obec", 3, "administrative", "municipality", "ruian"),
-        ("cz.okrsek", 4, "precinct", "polling district", None),
+        ("cz.mestska_cast", 4, "administrative", "city district", "ruian"),
+        ("cz.okrsek", 5, "precinct", "polling district", None),
     ):
         p.add("scheme", code=code, polity_id=CZECHIA, kind=kind, rank=rank, noun=noun, code_system=system)
         p.add(
@@ -229,6 +230,7 @@ def geo() -> Package:
             vintage=str(artifact.retrieved_at.year),
             as_of=artifact.retrieved_at.date(),
         )
+    p.uses(raw.cached(SOURCE, url(*_latest_councils())))
     towns, simple = _obce()
 
     def place(scheme: str, code: str, text: str, parent: str, shape: shapely.Geometry) -> None:
@@ -258,15 +260,46 @@ def geo() -> Package:
     for town, shape in zip(towns, simple, strict=True):
         place("cz.obec", str(town["KOD"]), str(town["NAZEV"]), area("cz.okres", lau[str(town["OKRES_KOD"])]), shape)
     names = {str(town["KOD"]): str(town["NAZEV"]) for town in towns}
-    for row, shape in zip(*_okrsky(), strict=True):
+    precincts = list(zip(*_okrsky(), strict=True))
+    wards = _city_districts()
+    for code, text in sorted(wards.items()):
+        members = [shape for row, shape in precincts if str(row["MOMC_KOD"]) == code]
+        parent = {str(row["OBEC_KOD"]) for row, _ in precincts if str(row["MOMC_KOD"]) == code}
+        place("cz.mestska_cast", code, text, area("cz.obec", parent.pop()), shapely.union_all(members))
+    for row, shape in precincts:
+        ward = str(row["MOMC_KOD"])
         place(
             "cz.okrsek",
             f"{row['OBEC_KOD']}:{row['CISLO']}",
             f"{names[str(row['OBEC_KOD'])]}, okrsek {row['CISLO']}",
-            area("cz.obec", str(row["OBEC_KOD"])),
+            area("cz.mestska_cast", ward) if ward in wards else area("cz.obec", str(row["OBEC_KOD"])),
             shape,
         )
     return p
+
+
+def _latest_councils() -> tuple[str, str]:
+    """The folder and code-list file of the newest municipal election's open data."""
+    from ea.sources.cz import volby_kv  # volby_kv builds on this module
+
+    folder, _, _, cis = volby_kv.MUNICIPAL[max(volby_kv.MUNICIPAL)]
+    return folder, cis
+
+
+def _city_districts() -> dict[str, str]:
+    """The city districts and city precincts that have a council, by RÚIAN code, with the name the open data gives.
+
+    RÚIAN draws a district only as the group of polling districts that carry its code, and the open data's council
+    list names the councils, so a district without a council has no name here and its polling districts stay in the
+    city.
+    """
+    folder, cis = _latest_councils()
+    codes = {str(row["MOMC_KOD"]) for row in _okrsky()[0] if row["MOMC_KOD"]}
+    return {
+        row["KODZASTUP"]: clean(row["NAZEVZAST"])
+        for row in table(folder, cis, "kvcoco").iter_rows(named=True)
+        if row["KODZASTUP"] in codes
+    }
 
 
 def _wgs(shape: shapely.Geometry) -> shapely.Geometry:
