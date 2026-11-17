@@ -393,10 +393,15 @@ def geo() -> Package:
             seen.setdefault(area_key(greek), (greek, french, e.day))
             if e.day > seen[area_key(greek)][2]:
                 seen[area_key(greek)] = (greek, french, e.day)
+    codes: set[str] = set()
     for folded, (greek, french, _) in sorted(seen.items()):
         id = area(greek)
         p.add("area", id=id, scheme_code=SCHEME)
-        p.add("area_code", area_id=id, code=f"elstat:{changeset.slug(folded)}")
+        code = f"elstat:{changeset.slug(english_name(greek, french))}"
+        if code in codes:
+            raise ValueError(f"two constituencies share the area code {code}")
+        codes.add(code)
+        p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, greek, "el", "official")
         p.name(id, french, "fr", "official", False)
