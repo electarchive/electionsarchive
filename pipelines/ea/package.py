@@ -659,6 +659,11 @@ CHECKS = {
     "unique.external_id": """select scheme, value, count(*) as n from (
                                select distinct entity_id, scheme, value from all_external_id)
                              group by all having count(*) > 1""",
+    "unique.area_code": """with c as (select area_id, code, valid_from, valid_to, row_number() over () as n from area_code)
+                           select a.area_id, a.code, a.valid_from, a.valid_to, b.code, b.valid_from, b.valid_to
+                           from c a join c b on a.area_id = b.area_id and a.n < b.n
+                           where coalesce(a.valid_from, date '0001-01-01') < coalesce(b.valid_to, date '9999-12-31')
+                             and coalesce(b.valid_from, date '0001-01-01') < coalesce(a.valid_to, date '9999-12-31')""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
                               select p.result_set_id, p.option_id from pairs p
