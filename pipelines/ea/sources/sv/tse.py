@@ -65,10 +65,11 @@ def _crawl(round_number: int, name: str) -> list[str]:
 
 
 def fetch() -> None:
-    from ea.sources.sv import assembly, concejos
+    from ea.sources.sv import assembly, concejos, parlacen
 
     assembly.fetch()
     concejos.fetch()
+    parlacen.fetch()
     for round_number in ROUNDS:
         _crawl(round_number, "pais")
         level = ["dep%02d" % n for n in range(1, 16)]
@@ -79,7 +80,7 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    from ea.sources.sv import assembly, concejos
+    from ea.sources.sv import assembly, concejos, parlacen
 
     return [
         "sv.tse/geo",
@@ -87,12 +88,15 @@ def packages() -> list[str]:
         *(f"sv.tse/pres-{day}" for _, day in ROUNDS.values()),
         *assembly.packages(),
         *concejos.packages(),
+        *parlacen.packages(),
     ]
 
 
 def build(name: str) -> Package:
-    from ea.sources.sv import assembly, concejos
+    from ea.sources.sv import assembly, concejos, parlacen
 
+    if name in parlacen.packages():
+        return parlacen.build(name)
     if name in assembly.packages():
         return assembly.build(name)
     if name in concejos.packages():
