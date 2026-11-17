@@ -182,7 +182,15 @@ DENTAL = {7, 19, 20, 22, 23, 25, 27}
 LABIAL = {14, 17, 18, 26}
 UNITS = ("특별자치시", "특별자치도", "특별시", "광역시", "시", "도", "군", "구", "읍", "면", "동", "리", "가")
 SEATS = {"갑": "A", "을": "B", "병": "C", "정": "D", "무": "E"}
-TAIWAN_UNITS = {"里": "Li", "村": "Village", "鄉": "Township", "鎮": "Town", "市": "City", "區": "District"}
+TAIWAN_UNITS = {
+    "里": "Li",
+    "村": "Village",
+    "鄉": "Township",
+    "鎮": "Town",
+    "市": "City",
+    "區": "District",
+    "縣": "County",
+}
 DISTRICT = re.compile(r"^[가-힣\d\s]+(?:선거구|제\d+|[시군구읍면동리가][갑을병정무]?)$")
 ROMAN = {"II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII"}
 
@@ -406,8 +414,11 @@ def romanizer(lang: str, script: str, group: str, country: str) -> Callable[[str
         return lambda text: unicodedata.normalize("NFC", bgn(text)).replace("·", "").replace("ĭ", "y").replace("Ĭ", "Y")
     if script == "Armn":
         return lambda text: table(text, ARMENIAN, ARMENIAN_INITIAL)
-    if script in ("Geor", "Ethi"):
-        bgn = transform(ICU.get(lang, ICU[SCRIPT_LANGS[script]]))
+    if script == "Geor":
+        bgn = transform(ICU["ka"])
+        return lambda text: capitalized(strip(bgn(text)).replace("’", ""))
+    if script == "Ethi":
+        bgn = transform(ICU.get(lang, ICU["am"]))
         return lambda text: capitalized(strip(bgn(text)))
     if group == "person" or script in LOSSY:
         return None
