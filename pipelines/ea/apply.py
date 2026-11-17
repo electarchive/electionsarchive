@@ -1507,6 +1507,11 @@ def _rollup(
           from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
         )
         select * from ancestors""",
+        "held": """select distinct g.unit_k, coalesce(g.on_date, 'infinity') as day, g.area_id as own_id,
+               h.id as area_id, h.scheme_code
+        from grain g join ancestors o on o.unit_k = g.unit_k and o.on_date is not distinct from g.on_date
+          and o.origin_id = g.area_id
+        join area h on h.id = o.area_id""",
         "climbed": """select u.result_set_k, u.unit_k, a.area_id, bool_or(a.complete) as complete
         from (select distinct result_set_k, unit_k, coalesce(on_date, 'infinity') as day from units) u
         join rs on rs.k = u.result_set_k
@@ -1518,12 +1523,10 @@ def _rollup(
            or (origin.id = district.id or origin.scheme_code is distinct from district.scheme_code)
           and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code))
           and not exists (
-            select from grain g join ancestors o on o.unit_k = g.unit_k and o.on_date is not distinct from g.on_date
-              and o.origin_id = g.area_id
-            join area held on held.id = o.area_id
-            where g.unit_k = a.unit_k and g.on_date is not distinct from a.on_date
-              and a.origin_id is distinct from g.area_id and a.area_id <> a.origin_id
-              and held.scheme_code = reached.scheme_code and held.id <> reached.id
+            select from held h
+            where h.unit_k = a.unit_k and h.day = u.day
+              and a.origin_id is distinct from h.own_id and a.area_id <> a.origin_id
+              and h.scheme_code = reached.scheme_code and h.area_id <> reached.id
           )
         group by u.result_set_k, u.unit_k, a.area_id""",
         "spans": """select rs.k as result_set_k, dc.county_area_id
