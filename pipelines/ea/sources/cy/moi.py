@@ -7,6 +7,7 @@ module builds one package per election day from the crawl, plus the places and t
 
 import functools
 import json
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
@@ -18,6 +19,7 @@ import polars as pl
 from ea import package, raw
 from ea.package import Package
 from ea.sources.cy import crawl
+from ea.sources.cy import seats as declared_seats
 
 SOURCE = crawl.SOURCE
 CYPRUS = str(uuid5(package.NAMESPACE, "polity\x1fCY"))
@@ -25,10 +27,13 @@ COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fCYP"))
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 ABROAD_DISTRICT = 7
 SEATS = 56
-# Seats of each constituency, by the Ministry's district id: the First Schedule of Law 124/1985 for the elections
-# from 2001 to 2021, and the First Schedule as replaced by Law 226(I)/2025 for the 2026 election.
+# Seats of each constituency, by the Ministry's district id: the First Schedule of Law 124/1985 for the 2001 and 2006
+# elections, the schedule as amended before the 2011 election (a seat moved from Nicosia to Larnaca) for 2011 to 2021,
+# and the First Schedule as replaced by Law 226(I)/2025 for the 2026 election.
 DISTRICTS = {1: "Nicosia", 2: "Kyrenia", 3: "Famagusta", 4: "Larnaca", 5: "Limassol", 6: "Paphos"}
 SEATS_1985 = {1: 21, 2: 3, 3: 11, 4: 5, 5: 12, 6: 4}
+SEATS_2011 = {1: 20, 2: 3, 3: 11, 4: 6, 5: 12, 6: 4}
+SEAT_LAW_2011 = date(2011, 1, 1)
 SEATS_2025 = {1: 19, 2: 3, 3: 11, 4: 6, 5: 12, 6: 5}
 SEAT_LAW_2025 = date(2026, 1, 1)
 
@@ -74,9 +79,9 @@ METHOD = (
     "named by its polling station and box. Registered voters are the electoral roll of the box, ballots cast are "
     "the voters who voted, and the valid, invalid, and blank ballots add up to the ballots cast. The site types "
     "every ballot line of a list election as a party, including lines of independent candidates. The site prints no "
-    "seat counts, so no seats are stored. A House election is split into the six constituencies, each with the "
+    "seat counts; where the archive holds declared seats they come from the cited Wikipedia article. A House election is split into the six constituencies, each with the "
     "ballot boxes of its district; the constituency's seats are those of the First Schedule to the law on the "
-    "election of members of the House of Representatives (Law 124/1985, replaced by Law 226(I)/2025 from 2026)."
+    "election of members of the House of Representatives (Law 124/1985, amended before 2011, and replaced by Law 226(I)/2025 from 2026)."
 )
 RUNOFF = {
     date(2008, 2, 24): date(2008, 2, 17),
@@ -94,10 +99,19 @@ MOI_SOURCE = key("source", SOURCE)
 HOUSE = key("body", "house")
 PRESIDENCY = key("office", "president")
 PRESIDENT_SYSTEM = key("electoral_system", "president", 2003)
+HOUSE_SYSTEM = key("electoral_system", "house", 2016)
+HOUSE_SYSTEM_FROM = date(2016, 1, 1)
+WIKIPEDIA_SOURCE = key("source", "wikipedia")
 
 
 def area(scheme: str, code: object) -> str:
     return key("area", scheme, code)
+
+
+def system_of(e: Election) -> str | None:
+    if e.family == "president":
+        return PRESIDENT_SYSTEM
+    return HOUSE_SYSTEM if e.family == "parliament" and e.day >= HOUSE_SYSTEM_FROM else None
 
 
 def package_key(e: Election) -> str:
@@ -111,6 +125,7 @@ def packages() -> list[str]:
 def fetch() -> None:
     for e in ELECTIONS:
         crawl.fetch_election(e.site)
+    declared_seats.fetch()
 
 
 def emit() -> None:
@@ -281,6 +296,35 @@ def registry() -> Package:
         ),
         lang="en",
     )
+    p.add(
+        "electoral_system",
+        id=HOUSE_SYSTEM,
+        polity_id=CYPRUS,
+        valid_from=HOUSE_SYSTEM_FROM,
+        valid_to=None,
+        rules={
+            "formula": "hare",
+            "remainders": "national",
+            "threshold": {"percent": 3.6, "level": "party", "scope": "national", "constituencies": 1},
+        },
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", HOUSE_SYSTEM),
+        entity_id=HOUSE_SYSTEM,
+        kind="methodology",
+        body_md=(
+            "The 56 Greek Cypriot seats of the House of Representatives are filled by open-list proportional "
+            "representation in six constituencies, in three stages. First, each constituency gives every list one seat "
+            "for each Hare quota of its votes. Second, the votes left over, and the seats not yet filled, go to the "
+            "lists that won at least one seat or reached 3.6% of the valid votes in the whole country. Third, seats "
+            "still unfilled are allocated across the country to those lists by their largest remaining votes. Voters "
+            "also cast preferential votes, one for every four seats of the constituency, which choose the members of "
+            "each list."
+        ),
+        lang="en",
+    )
     for name, row in sorted(lines().items()):
         id = key("party", name)
         p.add("party", id=id, kind="party", polity_id=CYPRUS)
@@ -343,6 +387,14 @@ def election(e: Election) -> Package:
     p.external |= {CYPRUS, COUNTRY}
     p.uses(artifact(e.site))
     day = e.day
+    declared = e.day in declared_seats.PAGES
+    rows: list[declared_seats.Row] = []
+    by_district: dict[int, dict[str, int]] | None = None
+    if declared:
+        rows = declared_seats.national(day)
+        by_district = declared_seats.districts(day, rows) if e.family == "parliament" else None
+        declared_seats.check(day, e.family, rows, by_district)
+        add_wikipedia(p, day)
     election_id = key("election", day)
     p.add(
         "election",
@@ -363,7 +415,7 @@ def election(e: Election) -> Package:
     seen: set[object] = set()
     boxes = _boxes(e.site)
     if e.family == "parliament":
-        seats = SEATS_2025 if e.day >= SEAT_LAW_2025 else SEATS_1985
+        seats = SEATS_2025 if e.day >= SEAT_LAW_2025 else SEATS_2011 if e.day >= SEAT_LAW_2011 else SEATS_1985
         if sum(seats.values()) != SEATS:
             raise ValueError("constituency seats do not add up to the House")
         known = {d["district"]["node"][0] for d in document["districts"]}
@@ -402,7 +454,7 @@ def election(e: Election) -> Package:
             magnitude=magnitude,
             round_number=e.round,
             previous_round_id=previous,
-            electoral_system_id=PRESIDENT_SYSTEM if e.family == "president" else None,
+            electoral_system_id=system_of(e),
             default_result_kind="counted",
         )
         p.name(contest, contest_name, "en", "official")
@@ -495,6 +547,9 @@ def election(e: Election) -> Package:
         _compare(f"{package_key(e)} {district_name}".strip(), scope_boxes, total)
         if e.family == "president":
             _outcomes(p, e, result_set, options, island)
+        elif declared:
+            here = None if district is None else (by_district or {})[district]
+            _seats(p, day, result_set, options, island, rows, here)
     p.frame("result_value", values.frame())
     if e.family == "parliament":
         _compare(f"{package_key(e)} island", boxes, island)
@@ -533,6 +588,64 @@ def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str],
         else:
             kind = "advanced" if index < 2 else "eliminated"
         p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+
+
+def add_wikipedia(p: Package, day: date) -> None:
+    title = declared_seats.PAGES[day]
+    p.add(
+        "source",
+        id=WIKIPEDIA_SOURCE,
+        kind="community",
+        publisher="Wikipedia",
+        title=title,
+        url=declared_seats.url(title),
+        license="CC BY-SA 4.0",
+        license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+        attribution=f"Wikipedia contributors, “{title}”",
+        notes="Read from the article's wikitext, pinned to the revision current at retrieval.",
+    )
+    p.artifact(declared_seats.artifact(day), WIKIPEDIA_SOURCE)
+
+
+def _seats(
+    p: Package,
+    day: date,
+    result_set: str,
+    options: dict[str, str],
+    island: dict[str, Any],
+    rows: list[declared_seats.Row],
+    in_district: dict[str, int] | None,
+) -> None:
+    """Declared seats of each list: those of its district, or of the whole contest when it has no districts."""
+    counts = Counter(count for _, count in island["c"])
+    by_votes = {count: str(cid) for cid, count in island["c"] if counts[count] == 1}
+    seats_of: dict[str, int] = {}
+    for row in rows:
+        if row.seats == 0:
+            continue
+        cid = by_votes.get(row.votes)
+        if not cid or cid not in options:
+            raise ValueError(f"{day}: no single ballot line has the {row.votes} votes of {row.target}")
+        seats_of[cid] = row.seats if in_district is None else in_district.get(row.target, 0)
+    total = sum(seats_of.values())
+    for cid, option in options.items():
+        n = seats_of.get(cid, 0)
+        if n:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=n)
+        else:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="lost")
+    p.add(
+        "note",
+        id=key("note", result_set, "seats"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            f"The Ministry's site prints no seats. The {total} seats declared here for the lists are taken from the "
+            f"English Wikipedia article “{declared_seats.PAGES[day]}” and cited in this package's sources; each list is "
+            "matched to its ballot line by its exact votes."
+        ),
+        lang="en",
+    )
 
 
 def _overcount(p: Package, result_sets: Sequence[str], boxes: Sequence[tuple[dict[str, Any], ...]]) -> None:
