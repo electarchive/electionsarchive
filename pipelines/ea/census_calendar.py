@@ -74,6 +74,7 @@ DAY_RULES = {
     "sep_last_tuesday": last_weekday(9, 1),
     "oct_first_monday": nth_weekday(10, 0, 1),
     "oct_second_tuesday": nth_weekday(10, 1, 2),
+    "oct_second_saturday": nth_weekday(10, 5, 2),
     "oct_third_monday": nth_weekday(10, 0, 3),
     "oct_fourth_monday": nth_weekday(10, 0, 4),
     "oct_fourth_wednesday": nth_weekday(10, 2, 4),
