@@ -2,7 +2,7 @@ import csv
 import functools
 import io
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from html.parser import HTMLParser
 from urllib.parse import unquote
@@ -901,6 +901,95 @@ def _electorate_table_1999(name: str) -> tuple[list[list[str]], dict[str, list[s
     return rows, found
 
 
+# The parties every earlier build of the registry held. Packages already loaded refer to them, so the registry keeps
+# them whatever the cache holds: a build from a cache without, say, the 2020 files or with the 2002 to 2014 polling-place
+# files in place of the statistics would otherwise drop parties that loaded candidacies still name.
+REGISTRY_PARTIES = (
+    "99 MP Party",
+    "ACT",
+    "ACT New Zealand",
+    "Advance NZ",
+    "Alliance",
+    "Animal Justice Party",
+    "Aotearoa Legalise Cannabis Party",
+    "Attica",
+    "Ban1080",
+    "Christian Heritage",
+    "Christian Heritage NZ",
+    "Climate First",
+    "Communist League",
+    "Conservative",
+    "Conservative Party",
+    "DemocracyNZ",
+    "Democrats for Social Credit",
+    "Destiny New Zealand",
+    "Direct Democracy Party",
+    "Family Party",
+    "Focus New Zealand",
+    "Freedoms NZ",
+    "Future Youth Party",
+    "GOdsownNZ",
+    "Green Party",
+    "Harmony",
+    "HeartlandNZ",
+    "Human Rights Party",
+    "Integrity New Zealand",
+    "Internet MANA",
+    "Internet Party",
+    "Jim Anderton's Progressive",
+    "Kiwi Party",
+    "Labour Party",
+    "Legalise Cannabis",
+    "Leighton Baker Party",
+    "Libertarianz",
+    "MANA",
+    "Mana Maori",
+    "Maori Party",
+    "Money Free Party",
+    "Māori Party",
+    "NAP",
+    "NMP",
+    "NZ Economic Euthenics Party",
+    "NZ First",
+    "NZ Independent Coalition",
+    "NZ Outdoors Party",
+    "NZ Public Party",
+    "National Party",
+    "New Conservative",
+    "New Conservatives",
+    "New Nation Party",
+    "New Zealand Family Rights Protection Party",
+    "New Zealand First Party",
+    "New Zealand Loyal",
+    "New Zealand Pacific Party",
+    "New Zealand People's Party",
+    "NewZeal",
+    "ONE Party",
+    "OneNZ Party",
+    "Outdoor Rec. NZ",
+    "Progressive Aotearoa New Zealand",
+    "Progressive Coalition",
+    "RAM - Residents Action Movement",
+    "Republic of New Zealand Party",
+    "Social Credit",
+    "Sustainable New Zealand Party",
+    "TEA Party",
+    "Te Pāti Māori",
+    "The Bill and Ben Party",
+    "The Civilian Party",
+    "The Logic Party",
+    "The Opportunities Party (TOP)",
+    "The Republic of New Zealand Party",
+    "Trump New Zealand Party",
+    "United Future",
+    "United Future New Zealand",
+    "Vision New Zealand",
+    "Voice of the People",
+    "Women’s Rights Party",
+    "Workers Party",
+)
+
+
 def registry() -> Package:
     p = Package(
         "nz.ec/registry",
@@ -978,6 +1067,7 @@ def registry() -> Package:
                     names |= {*page.parties.values(), *(label for label in page.labels if vote == "party")}
         elif level(year) == "electorate":
             names |= set(party_columns(year)[0])
+    names |= set(REGISTRY_PARTIES)
     # A party printed under two spellings (MANA and Mana) is one party, under the spelling that sorts first.
     latest: dict[str, str] = {}
     for name in sorted(names - {"Independent"}):
@@ -1149,6 +1239,8 @@ def general(day: str) -> Package:
     else:
         # Only the parties that stood a list or won a seat are options; the others stood electorate candidates only.
         labels = [name for name, votes in summ.votes.items() if votes or name in summ.seats]
+    if bundled(year) and not summ.derived:
+        summ = _relabelled(summ, labels)
     options: dict[str, str] = {}
     for position, label in enumerate(labels, 1):
         option = options[label] = key("option", f"party-{day}", label)
@@ -1184,25 +1276,15 @@ def general(day: str) -> Package:
                 "(1,905) on that row and none on the polling-day row, which holds the votes themselves; the "
                 "electorate's total row and both rows together agree with the votes.",
             )
+            if all(has(e9_url(year, name)) for name in PARTS_1999):
+                _electorates_1999(p, first, labels)
     elif how == "electorate":
         p.uses(art(e9_url(year, "e9_part4.csv")))
         _, electorate_rows, _ = party_columns(year)
-        roll = _roll_1999(electorate_rows) if year == 1999 else {}
+        roll = _roll_1999(p, electorate_rows) if year == 1999 else {}
         made: dict[str, str] = {}
         for name, values in electorate_rows.items():
-            code = f"{year}:{name}"
-            unit = made[name] = key("unit", "electorate", code)
-            p.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=NEW_ZEALAND,
-                scheme_code=ELECTORATE_SCHEME,
-                code=code,
-                area_relation="unlocated",
-                area_id=None,
-                kind="standard",
-            )
-            p.name(unit, name, "en", "official")
+            unit = made[name] = _electorate_unit(p, year, name)
             for label, value in zip(labels, values, strict=False):
                 _put(p, party_set, unit, 0, options[label], VOTES, value)
             _put(p, party_set, unit, 0, None, VALID, values[-2])
@@ -1252,10 +1334,71 @@ def general(day: str) -> Package:
     return p
 
 
-def _roll_1999(electorate_rows: dict[str, list[int]]) -> dict[str, int]:
+def _relabelled(summ: Summary, labels: list[str]) -> Summary:
+    """The summary with each party named as the results files' columns name it, where the summary prints a longer
+    or shorter form of the same name (Christian Heritage Party of New Zealand for Christian Heritage Party)."""
+    rename: dict[str, str] = {}
+    for name in summ.votes:
+        found = [
+            label
+            for label in labels
+            if name.casefold().startswith(label.casefold()) or label.casefold().startswith(name.casefold())
+        ]
+        rename[name] = name if name in labels else found[0] if len(found) == 1 else name
+    if len(set(rename.values())) != len(rename):
+        raise ValueError(f"{summ.url}: two parties of the summary match one column")
+    return replace(
+        summ,
+        votes={rename[name]: value for name, value in summ.votes.items()},
+        seats={rename[name]: value for name, value in summ.seats.items()},
+    )
+
+
+def _electorate_unit(p: Package, year: int, name: str) -> str:
+    code = f"{year}:{name}"
+    unit = key("unit", "electorate", code)
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=NEW_ZEALAND,
+        scheme_code=ELECTORATE_SCHEME,
+        code=code,
+        area_relation="unlocated",
+        area_id=None,
+        kind="standard",
+    )
+    p.name(unit, name, "en", "official")
+    return unit
+
+
+def _electorates_1999(p: Package, first: date, labels: list[str]) -> None:
+    """With the 1999 polling-place files held, the statistics by electorate add the two referendums. Each
+    electorate's party votes in the polling-place files are first checked against part V, whose Māori electorates
+    include their share of the Tangata Whenua votes, so the files are known to count those votes too."""
+    columns, electorate_rows, _ = party_columns(1999)
+    by_slug = {slug(name): values for name, values in electorate_rows.items()}
+    rename = _relabelled(Summary("", {}, dict.fromkeys(columns, 0), 0, None, None), labels).votes
+    order = list(rename)
+    for page in pages(1999, "party").values():
+        values = by_slug.get(slug(page.electorate))
+        if values is None:
+            raise ValueError(f"1999: part V lists no electorate {page.electorate}")
+        held = dict(zip(page.labels, page.total, strict=False))
+        if [held.get(label, 0) for label in order] + page.total[-2:] != values:
+            raise ValueError(f"1999 {page.electorate}: the polling-place files disagree with part V")
+    if len(by_slug) != len(pages(1999, "party")):
+        raise ValueError("1999: part V and the polling-place files list different electorates")
+    p.uses(art(e9_url(1999, "e9_part4.csv")))
+    roll = _roll_1999(p, electorate_rows)
+    made = {name: _electorate_unit(p, 1999, name) for name in electorate_rows}
+    _referendums_1999(p, first, made, roll)
+
+
+def _roll_1999(p: Package, electorate_rows: dict[str, list[int]]) -> dict[str, int]:
     """The electors on the master roll of each electorate (part IX), after checking that part's party votes against
     the party table's: valid, informal, and the combined totals."""
     rows, found = _electorate_table_1999("partix.csv")
+    p.uses(art(e9_url(1999, "partix.csv")))
     if set(found) != {slug(name) for name in electorate_rows}:
         raise ValueError("1999: part IX and the party table list different electorates")
     roll: dict[str, int] = {}
@@ -1334,6 +1477,7 @@ def _referendums_1999(p: Package, first: date, made: dict[str, str], roll: dict[
             _put(p, result_set, unit, 0, None, CAST, cast)
             _put(p, result_set, unit, 0, None, VALID, valid)
             _put(p, result_set, unit, 0, None, INVALID, informal)
+            _put(p, result_set, unit, 0, None, REGISTERED, on_roll)
             sums = [a + b for a, b in zip(sums, (yes, no, valid, informal, cast), strict=True)]
         total = next(row for row in rows if row and row[0] == "Total Votes Cast")
         printed = [number(total[i]) for i in (1, 3, 5, 7, 9)]
