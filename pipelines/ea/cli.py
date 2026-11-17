@@ -239,6 +239,7 @@ def main() -> None:
     caching.add_argument("source", nargs="?", help="limit verify, pin, push, or pull to one source, such as us.medsl")
     caching.add_argument("--quick", action="store_true", help="verify sizes only, without hashing")
     args = parser.parse_args()
+    (DATA / "logs").mkdir(parents=True, exist_ok=True)
     atexit.register(
         lambda: (
             (DATA / "logs" / "ea-maxrss.tsv")
