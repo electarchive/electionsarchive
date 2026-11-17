@@ -1,6 +1,7 @@
 import csv
 import difflib
 import functools
+import itertools
 import re
 import subprocess
 import time
@@ -17,7 +18,7 @@ import httpx
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
-from ea.sources.tt import report2020
+from ea.sources.tt import report2015, report2020
 
 SOURCE = "tt.ebc"
 SITE = "https://ebctt.com"
@@ -29,6 +30,9 @@ REGISTERED, BALLOTS, VALID, INVALID, VOTES = 2, 3, 4, 5, 1
 HISTORY = f"{SITE}/wp-content/plugins/charts/data/parliamentary-results.tsv"
 RESULTS_2015 = f"{UPLOADS}/2015-Parliamentary-Elections-Final-Results-and-CandiatesVote-Count.pdf"
 PARTY_2015 = f"{UPLOADS}/Results-of-the-Parliamentary-Election-Held-on-Monday-7th-September-2015-Political-Party.xlsx"
+REPORT_2015 = f"{UPLOADS}/Report%20on%20the%202015%20Parliamentary%20Election.pdf"
+# The report's station tables of Appendix I lie on these pages.
+REPORT_2015_PAGES = range(9, 347)
 SUMMARY_2020 = f"{UPLOADS}/The-Preliminary-Results-for-the-2020-Parliamentary-Elections.pdf"
 REPORT_2020 = (
     f"{UPLOADS}/Report-of-the-Elections-Boundaries-Commission-on-the-Parliamentary-Elections-held-on-Monday-10th-"
@@ -41,6 +45,7 @@ FILES = {
     HISTORY: ".tsv",
     RESULTS_2015: ".pdf",
     PARTY_2015: ".xlsx",
+    REPORT_2015: ".pdf",
     SUMMARY_2020: ".pdf",
     REPORT_2020: ".pdf",
     REPORT_2025: ".pdf",
@@ -67,7 +72,7 @@ DAYS = {
 }
 COUNCIL = {1946, 1956}
 FULL = {2015, 2020, 2025}
-STATIONS = {2020, 2025}
+STATIONS = {2015, 2020, 2025}
 # Party abbreviations that mean a different party in different decades.
 SPLIT = {("P.D.P.", 1956): "PDP56"}
 PARTIES = {
@@ -156,9 +161,16 @@ class Station:
     votes: list[int]
     valid: int
     rejected: int
-    registered: int
+    registered: int | None
     page: int | None = None
     boxes: list[tuple[float, float, float, float]] = field(default_factory=list)
+
+
+@dataclass
+class Division:
+    registered: int
+    page: int
+    box: tuple[float, float, float, float]
 
 
 @dataclass
@@ -174,6 +186,9 @@ class District:
     declared: dict[str, int] = field(default_factory=dict)
     # For each candidate, the index of its column in the preliminary summary the district supersedes.
     columns: list[int] = field(default_factory=list)
+    # Polling divisions whose electorate is printed once for several stations: the electorate, and the page and
+    # box it was read from.
+    divisions: dict[str, Division] = field(default_factory=dict)
 
 
 class Event(NamedTuple):
@@ -408,7 +423,7 @@ def _district_2025(work: Work, summary: dict[str, tuple[int, int, int, int, str,
 
 
 def s_figures(station: Station, width: int) -> list[int]:
-    return [*station.votes, station.valid, station.rejected, station.registered]
+    return [*station.votes, station.valid, station.rejected, station.registered or 0]
 
 
 def preliminary_2020() -> Election:
@@ -666,7 +681,8 @@ def _columns(earlier: District, candidates: list[Candidate]) -> list[int]:
     return found
 
 
-def election_2015() -> Election:
+def sheet_2015() -> Election:
+    """The 2015 election by district, from the commission's final results sheet and candidate table."""
     reader = fastexcel.read_excel(str(raw.cached(SOURCE, PARTY_2015).path))
     rows = reader.load_sheet(0, header_row=None).to_polars().rows()
     heading = rows[3]
@@ -721,6 +737,202 @@ def election_2015() -> Election:
     return Election(2015, districts, totals, [RESULTS_2015, PARTY_2015])
 
 
+def election_2015() -> Election:
+    """The 2015 election by polling station, from Appendix I of the commission's report, superseding the sheet."""
+    sheet = sheet_2015()
+    earlier = {norm(district.name): district for district in sheet.districts}
+    pdf = raw.cached(SOURCE, REPORT_2015).path
+    overrides = report2015.OVERRIDES
+    fixes = report2020.overrides(overrides)
+    headings = report2020.headings(overrides)
+    groups: dict[str, list[report2020.Draft]] = {}
+    sizes: dict[int, tuple[int, int]] = {}
+    for reading in report2015.readings(pdf, REPORT_2015_PAGES, 3).values():
+        page = report2020.draft(reading, fixes)
+        code = _district_code(page.district, list(earlier))
+        if code is None:
+            raise ValueError(f"report page {page.number}: no district {page.district!r} in the results sheet")
+        groups.setdefault(code, []).append(page)
+        sizes[page.number] = (page.width, page.height)
+    if set(groups) != set(earlier):
+        raise ValueError(f"districts missing from the report: {sorted(set(earlier) - set(groups))}")
+    districts = [_district_2015(earlier[code], pages, headings.get(code)) for code, pages in groups.items()]
+    order = {norm(district.name): index for index, district in enumerate(sheet.districts)}
+    districts.sort(key=lambda district: order[norm(district.name)])
+    return Election(
+        2015,
+        districts,
+        dict(sheet.totals),
+        [REPORT_2015],
+        supersedes=sheet,
+        pages=sizes,
+    )
+
+
+def _sequence(codes: list[str]) -> list[str]:
+    """Station numbers with a misread suffix restored: a division's stations are numbered 01, 02, and so on."""
+    fixed = codes[:]
+    for index, code in enumerate(codes):
+        division, _, suffix = code.partition("-")
+        if not suffix.isdigit():
+            continue
+        before = fixed[index - 1].partition("-") if index else ("", "", "")
+        after = codes[index + 1].partition("-") if index + 1 < len(codes) else ("", "", "")
+        if before[0] == division and before[2].isdigit():
+            expected = int(before[2]) + 1
+        elif after[0] == division and after[2].isdigit():
+            expected = int(after[2]) - 1
+        else:
+            continue
+        if expected >= 1 and int(suffix) != expected:
+            fixed[index] = f"{division}-{expected:02d}"
+    return fixed
+
+
+def _scrub(settled: report2020.Settled) -> None:
+    """Clears specks read as electorates in the empty cells of a division whose electorate one station carries."""
+    rows = [row for _, row in settled.rows]
+    for _, group in itertools.groupby(rows, key=lambda row: row.code.lstrip("*").partition("-")[0]):
+        members = list(group)
+        held = [row for row in members if row.values[-1] >= 20]
+        if len(members) > 1 and len(held) == 1:
+            for row in members:
+                if row is not held[0] and row.values[-1] < 20:
+                    row.values[-1] = 0
+    settled.total = [sum(row.values[c] for row in rows) for c in range(len(settled.total))]
+
+
+def _carried(pages: list[report2020.Draft], values: list[list[int]]) -> int:
+    """How many of the running totals printed at the foot and head of the district's pages the rows reach."""
+    matched, start = 0, 0
+    width = len(values[0])
+    running = [0] * width
+    for k, page in enumerate(pages):
+        for row in values[start : start + len(page.grid)]:
+            running = [a + b for a, b in zip(running, row, strict=True)]
+        start += len(page.grid)
+        if k + 1 == len(pages):
+            break
+        for c in range(width):
+            reads = [*page.totals.get("carried", [[]] * width)[c], *pages[k + 1].totals.get("brought", [[]] * width)[c]]
+            matched += running[c] in reads
+    return matched
+
+
+def _district_2015(earlier: District, pages: list[report2020.Draft], heading: list[list[str]] | None) -> District:
+    name = earlier.name
+    labels = heading or _headings(pages, earlier)
+    width = len(labels) + 3
+    for page in pages:
+        if any(len(row) != width for row in page.grid):
+            raise ValueError(f"{name}: page {page.number} does not have {width} columns")
+    order = _columns(earlier, [Candidate(None, None if c == "IND." else c, None, c == "IND.") for _, c in labels])
+    sheet = [*(earlier.candidates[i].votes or 0 for i in order), earlier.valid, earlier.rejected, earlier.registered]
+    # The results sheet's district totals count as one more reading of the totals row on the district's last page.
+    last = pages[-1].totals.setdefault("total", [[] for _ in range(width)])
+    for column, value in enumerate(sheet):
+        last[column] = [*last[column], value] if value is not None else last[column]
+    settled = report2020.settle(pages)
+    _scrub(settled)
+    # A page's printed running totals sometimes disagree with its own rows, so a district stands on its rows and
+    # on its final totals: every station adds up, and every column adds up to the printed or the sheet's total.
+    problems = [problem for problem in settled.problems if "do not add up" in problem]
+    printed = pages[-1].totals["total"]
+    checked = norm(name) in report2015.discrepancies()
+    problems += (
+        []
+        if checked
+        else [
+            f"column {column} adds up to {settled.total[column]}, printed {printed[column]}"
+            for column in range(width)
+            if settled.total[column] not in printed[column]
+        ]
+    )
+    if problems and not checked:
+        grid = [row for page in pages for row in page.grid]
+        values = [row.values for _, row in settled.rows]
+        solved = report2015.resolve(grid, values, printed, len(labels), functools.partial(_carried, pages))
+        if solved is None:
+            raise ValueError(f"{name}: {'; '.join(problems)}")
+        for (_, row), fixed in zip(settled.rows, solved, strict=True):
+            row.values = fixed
+        settled.total = [sum(row[c] for row in solved) for c in range(width)]
+    elif problems:
+        raise ValueError(f"{name}: {'; '.join(problems)}")
+    # A number read by hand is keyed by page and the scan's reading, with the reading's order on the page after a
+    # hash when the scan reads two stations alike.
+    read, seen = report2015.codes(), Counter[tuple[int, str]]()
+    raw_codes = []
+    for number, row in settled.rows:
+        nth = seen[number, row.code]
+        seen[number, row.code] += 1
+        raw_codes.append(read.get(f"{number}:{row.code}#{nth}", read.get(f"{number}:{row.code}", row.code)))
+    codes = _sequence(raw_codes)
+    if len(codes) != len(set(codes)):
+        raise ValueError(f"{name}: a polling station appears twice in {codes}")
+    stations = [
+        Station(
+            code,
+            row.special,
+            _venue(row.venue),
+            row.values[: len(labels)],
+            row.values[-3],
+            row.values[-2],
+            row.values[-1],
+            number,
+            row.boxes,
+        )
+        for code, (number, row) in zip(codes, settled.rows, strict=True)
+    ]
+    # The electorate of a division with several stations is printed once, beside its first station or its last.
+    divisions: dict[str, Division] = {}
+    for division, group in itertools.groupby(stations, key=lambda station: station.code.partition("-")[0]):
+        members = list(group)
+        if len(members) == 1:
+            continue
+        carriers = [station for station in members if station.registered]
+        if len(carriers) == 1:
+            held = carriers[0]
+            assert held.registered is not None and held.page is not None
+            divisions[division] = Division(held.registered, held.page, held.boxes[-1])
+            for station in members:
+                station.registered = None
+        elif len(carriers) != len(members):
+            raise ValueError(f"{name}: division {division} prints its electorate unevenly")
+    columns = order
+    candidates = []
+    # The district's figures are the commission's declared ones, from the results sheet; the stations hold the
+    # report's rows, which add up to them except where the report's own rows and totals disagree.
+    for index, (label, code) in enumerate(labels):
+        votes = earlier.candidates[columns[index]].votes
+        # The person keeps the name the results sheet gives, which the earlier set already holds.
+        candidates.append(
+            Candidate(
+                earlier.candidates[columns[index]].name,
+                None if code == "IND." else code,
+                votes,
+                independent=code == "IND.",
+                label=label,
+            )
+        )
+    reached = [sum(candidate.votes or 0 for candidate in candidates), earlier.valid]
+    if reached[0] != reached[1]:
+        raise ValueError(f"{name}: the sheet's candidate votes do not add up to its valid votes")
+    return District(
+        name,
+        earlier.registered,
+        earlier.valid,
+        earlier.rejected,
+        earlier.ballots,
+        candidates,
+        _winner(candidates),
+        stations,
+        {"ballots": earlier.ballots or 0},
+        columns,
+        divisions,
+    )
+
+
 MISSING = {(29, "Y.O.U.R."): "Judith De Verteuil"}
 
 
@@ -764,10 +976,23 @@ METHODS = {
         "counts and the winner only. The file's turnout column mixes two formulas between years, so it is not stored."
     ),
     2015: (
+        "From the commission's report on the 7 September 2015 election, Appendix I, which gives each candidate's votes "
+        "at each polling station with its valid votes and rejected ballots, and the electorate of each polling "
+        "division. Where a division has several stations, its electorate is printed once, beside one of them, and is "
+        "stored on the division. The report is a scan, so its figures were read by optical character recognition, "
+        "each figure's ink enlarged and read on its own. Every station's candidate votes add up to its valid votes, "
+        "and the stations add up to the district totals the report prints; figures that did not settle against those "
+        "sums and the totals carried from page to page were read from the page by hand. The district totals are the "
+        "commission's declared figures from its results sheet. In a few districts the report's printed totals differ "
+        "from its own stations or from the sheet; the stations are kept as printed, and the declared totals as "
+        "declared. Candidates keep the names the commission's results sheet gives. Each figure records the page and "
+        "the box it was read from."
+    ),
+    "2015-summary": (
         "From the commission's final results of the 7 September 2015 election: a sheet of votes by party for each "
         "electoral district, and a table of each candidate's votes. The two agree in every district. Registered "
         "voters are the electorate, ballots cast are valid plus rejected ballots, and the winner is the candidate "
-        "with most votes."
+        "with most votes. The polling station figures of the commission's report on the election supersede this set."
     ),
     "2020-summary": (
         "From the commission's published preliminary results summary of the 10 August 2020 election, which gives "
@@ -808,7 +1033,8 @@ def geo() -> Package:
     )
     p.external.add(TRINIDAD)
     p.add("scheme", code="tt.constituency", polity_id=TRINIDAD, kind="electoral_district", rank=1, noun="constituency")
-    p.add("scheme", code="tt.polling_station", polity_id=TRINIDAD, kind="precinct", rank=2, noun="polling station")
+    p.add("scheme", code="tt.polling_division", polity_id=TRINIDAD, kind="precinct", rank=2, noun="polling division")
+    p.add("scheme", code="tt.polling_station", polity_id=TRINIDAD, kind="precinct", rank=3, noun="polling station")
     seen: dict[str, str] = {}
     for election in elections().values():
         for district in election.districts:
@@ -906,6 +1132,13 @@ def general(year: int) -> Package:
             "The commission's historical district data gives each constituency's valid votes and only the elected "
             "candidate, without the votes of any candidate, so the options' votes cannot sum to the valid votes.",
         )
+    if year == 2015:
+        p.accept(
+            "accounting.declared",
+            "In some electoral districts the polling station rows of Appendix I of the commission's report, which add "
+            "up to the district totals the report itself prints, differ from the declared district figures of the "
+            "commission's results sheet, which the result sets keep as declared; the stations are stored as printed.",
+        )
     first = key("election", day)
     p.add("election", id=first, polity_id=TRINIDAD, kind="general", date_from=day, date_to=day, status="held")
     p.name(first, _label(year), "en", "official")
@@ -950,7 +1183,7 @@ def general(year: int) -> Package:
                 id=key("note", result_set),
                 entity_id=result_set,
                 kind="methodology",
-                body_md=METHODS["2020-summary"],
+                body_md=METHODS[f"{year}-summary"],
                 lang="en",
             )
             superseded, result_set = result_set, key("result_set", day, code, "report")
@@ -1029,6 +1262,21 @@ def general(year: int) -> Package:
             _values(p, superseded, [unit], old, previous)
         stations = district.stations
         units = [unit]
+        parents: dict[str, str] = {}
+        for division in district.divisions:
+            parents[division] = key("unit", day, code, "division", division)
+            p.add(
+                "reporting_unit",
+                id=parents[division],
+                polity_id=TRINIDAD,
+                scheme_code="tt.polling_division",
+                code=f"{day}:{code}:{division}",
+                parent_id=unit,
+                area_relation="within",
+                area_id=area(code),
+                kind="standard",
+            )
+            p.name(parents[division], f"Polling division {division}", "en", "official")
         if stations:
             units = []
             for station in stations:
@@ -1039,7 +1287,7 @@ def general(year: int) -> Package:
                     polity_id=TRINIDAD,
                     scheme_code="tt.polling_station",
                     code=f"{day}:{code}:{station.code}",
-                    parent_id=unit,
+                    parent_id=parents.get(station.code.partition("-")[0], unit),
                     area_relation="within",
                     area_id=area(code),
                     kind="standard",
@@ -1047,6 +1295,23 @@ def general(year: int) -> Package:
                 p.name(child, f"{station.code} {station.venue}", "en", "official")
                 units.append(child)
         _values(p, result_set, units, options, district)
+        for division, held in district.divisions.items():
+            _value(p, result_set, parents[division], None, REGISTERED, held.registered)
+            p.add(
+                "value_locator",
+                result_set_id=result_set,
+                unit_id=parents[division],
+                option_id=None,
+                channel=0,
+                measure=REGISTERED,
+                count_round=0,
+                page_id=pages[held.page],
+                source_id=SOURCE_ID,
+                x0=round(held.box[0], 1),
+                y0=round(held.box[1], 1),
+                x1=round(held.box[2], 1),
+                y1=round(held.box[3], 1),
+            )
         if stations and stations[0].page is not None:
             _locate(p, result_set, units, options, district, pages)
     return p
@@ -1082,6 +1347,8 @@ def _locate(
             continue
         cells = [*((option, VOTES) for option in options), (None, VALID), (None, INVALID), (None, REGISTERED)]
         for (option, measure), box in zip(cells, station.boxes, strict=True):
+            if measure == REGISTERED and station.registered is None:
+                continue
             p.add(
                 "value_locator",
                 result_set_id=result_set,

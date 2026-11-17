@@ -273,8 +273,8 @@ def read_page(pdf: Path, number: int, folder: Path) -> dict[str, object] | None:
     }
 
 
-def readings(pdf: Path, pages: range) -> dict[int, dict[str, object]]:
-    folder = raw.parsed("tt.ebc") / "report2020"
+def readings(pdf: Path, pages: range, name: str = "report2020") -> dict[int, dict[str, object]]:
+    folder = raw.parsed("tt.ebc") / name
     images = folder / "pages"
     images.mkdir(parents=True, exist_ok=True)
     found: dict[int, dict[str, object]] = {}
@@ -535,16 +535,16 @@ def settle(pages: list[Draft]) -> Settled:
     return Settled(rows, total, problems)
 
 
-def _overrides() -> dict[str, dict[str, object]]:
-    return json.loads(OVERRIDES.read_text()) if OVERRIDES.exists() else {}
+def _overrides(path: Path) -> dict[str, dict[str, object]]:
+    return json.loads(path.read_text()) if path.exists() else {}
 
 
-def overrides() -> dict[str, int]:
+def overrides(path: Path = OVERRIDES) -> dict[str, int]:
     """Cells read from the page by hand, keyed by page, station or total row, and column."""
-    cells = cast(dict[str, dict[str, object]], _overrides().get("cells", {}))
+    cells = cast(dict[str, dict[str, object]], _overrides(path).get("cells", {}))
     return {key: int(cast(int, item["value"])) for key, item in cells.items()}
 
 
-def headings() -> dict[str, list[list[str]]]:
+def headings(path: Path = OVERRIDES) -> dict[str, list[list[str]]]:
     """Candidate headings read by hand, by district code: each candidate's printed name and party abbreviation."""
-    return cast(dict[str, list[list[str]]], _overrides().get("candidates", {}))
+    return cast(dict[str, list[list[str]]], _overrides(path).get("candidates", {}))
