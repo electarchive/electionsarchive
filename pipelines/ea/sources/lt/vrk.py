@@ -8,6 +8,7 @@ of an election is its own election, a week or two later, in the same package as 
 """
 
 import functools
+import html as markup
 import io
 import re
 import time
@@ -355,32 +356,38 @@ def listing(config: Config) -> list[tuple[str, int, int, str]]:
     return [(prefix, int(round_), int(number), f"{BASE}{path}") for path, round_, number, prefix in found]
 
 
-def get(url: str, suffix: str) -> None:
+def get(url: str, suffix: str) -> bool:
     """Fetch one file into the raw cache, trying again when the connection drops; a missing file is reported."""
     for attempt in range(6):
         try:
             raw.fetch(SOURCE, url, suffix=suffix)
         except httpx.HTTPStatusError as failure:
             print(f"{url}: {failure.response.status_code}", flush=True)
-            return
+            return False
         except httpx.TransportError:
             time.sleep(2**attempt)
         else:
-            return
+            return True
     raise ConnectionError(f"{url} did not download in six tries")
 
 
-def fetch() -> None:
+def fetch(only: int | None = None) -> None:
     for config in ELECTIONS:
+        if only is not None and config.id != only:
+            continue
         get(home(config), ".html")
-        for prefix, _, _, url in listing(config):
-            if prefix in ("VN", "DG", "VNREF"):
-                get(url, ".csv")
+        missing = []
+        for prefix, round_, number, url in listing(config):
+            if prefix in ("VN", "DG", "VNREF") and not get(url, ".csv") and prefix == "VN":
+                missing.append((round_, number))
         for item in config.parts:
             if item.kind in PAGES:
                 for url in summaries(config, item).values():
                     get(url, ".html")
         fetch_summaries(config)
+        for round_, number in missing:
+            for url in district_urls(config, round_, number, fetched=False):
+                get(url, ".html")
         for item in config.parts:
             if item.kind in PREFERENCES:
                 for _, url in preference_urls(config, item):
@@ -493,6 +500,115 @@ def summaries(config: Config, item: Part) -> dict[int, str]:
     for round_, _, url in selected(config, item):
         found[round_] = url.rsplit("/rezultatai/", 1)[0] + f"/rezultatai/lt/{PAGES[item.kind]}.html"
     return found
+
+
+DISTRICT_LISTING = re.compile(
+    r"srcUrl=(/rinkimai/\d+/\d/\d+/rezultatai/lt/rezultataiMeraiVienmRpgApylinkese_[^'\"&]+\.html)"
+)
+DISTRICT_PAGE = re.compile(r"srcUrl=(/rinkimai/\d+/\d/\d+/rezultatai/lt/rezultataiVienmRpl_[^'\"&]+\.html)")
+
+
+def district_urls(config: Config, round_: int, number: int, *, fetched: bool = True) -> list[str]:
+    """The polling-district pages of a mayoral round whose result file the Commission does not serve.
+
+    A municipality's page links the list of its polling districts, and that list links one page per district. With
+    `fetched` false, the list pages are downloaded on the way, so that the district pages can be named.
+    """
+    out: list[str] = []
+    for listing_path in linked(config, "municipalities"):
+        if not listing_path.startswith(f"/rinkimai/{config.id}/{round_}/{number}/"):
+            continue
+        for _, path in places(listing_path):
+            html = summary.cached(path)
+            for found in DISTRICT_LISTING.findall(html or ""):
+                if not fetched:
+                    get(summary.url(found), ".html")
+                districts = summary.cached(found)
+                out += [summary.url(page) for page in dict.fromkeys(DISTRICT_PAGE.findall(districts or ""))]
+    return list(dict.fromkeys(out))
+
+
+def whole(text: str) -> int | None:
+    found = re.match(r"\s*(\d[\d ]*)", text.replace("\xa0", " "))
+    return int(found.group(1).replace(" ", "")) if found else None
+
+
+def page_rows(html: str) -> pl.DataFrame:
+    """One polling district's page of a mayoral round as the rows its result file would carry, one per candidate."""
+    heading = re.search(r"<h2>\s*<a[^>]*>\s*(.*?)\s*</a>\s*</h2>\s*<h3>(.*?)</h3>", html, re.DOTALL)
+    if heading is None:
+        raise ValueError("a polling-district page has no municipality and district headings")
+    municipality = summary.clean(markup.unescape(heading.group(1)))
+    district = summary.clean(markup.unescape(heading.group(2)))
+    found = re.fullmatch(r"(.*?) \(Nr\.(\d+)\) savivaldybė", municipality)
+    place = re.fullmatch(r"(.*?) \(Nr\.(\d+)\) apylinkė", district)
+    if found is None or place is None:
+        raise ValueError(f"unrecognized headings {municipality!r} and {district!r}")
+    tables = summary.tables(html)
+    text = summary.clean(" ".join(cell.text for row in tables[0] for cell in row))
+    numbers = {}
+    for name, pattern in (
+        ("registered", r"Rinkėjų skaičius apylinkėje: (\d+)"),
+        ("box_valid", r"Balsadėžėje rasta rinkimų biuletenių: galiojančių – (\d+)"),
+        ("box_invalid", r"Balsadėžėje rasta rinkimų biuletenių: galiojančių – \d+, negaliojančių – (\d+)"),
+        ("post_valid", r"Paštu gauta rinkimų biuletenių: galiojančių – (\d+)"),
+        ("post_invalid", r"Paštu gauta rinkimų biuletenių: galiojančių – \d+, negaliojančių – (\d+)"),
+        ("cast", r"dalyvavusių rinkimuose rinkėjų skaičius: (\d+)"),
+    ):
+        match = re.search(pattern, text)
+        if match is None:
+            raise ValueError(f"{district}: no {name} in {text!r}")
+        numbers[name] = int(match.group(1))
+    rows = []
+    for row in tables[-1]:
+        if len(row) < 5 or not row[0].href or "savKandidatasAnketa" not in row[0].href:
+            continue
+        words = row[0].text.split()
+        split = next((i for i, word in enumerate(words) if word.isupper()), len(words))
+        first, last = " ".join(words[:split]).upper(), " ".join(words[split:])
+        nominated = row[1].text
+        pats = nominated == "Išsikėlė pats"
+        rows.append(
+            {
+                "ap": found.group(2),
+                "ap_name": found.group(1),
+                "number": place.group(2),
+                "name": place.group(1),
+                "sav": f"{found.group(1)} savivaldybė",
+                "supplementary": False,
+                "self_nominated": pats,
+                **{name: value for name, value in numbers.items()},
+                "option": f"{first}|{last}|{'' if pats else nominated}",
+                "first": first,
+                "last": last,
+                "party": None if pats else nominated,
+                "label": None,
+                "number_on_list": None,
+                "box": whole(row[2].text),
+                "post": whole(row[3].text),
+            }
+        )
+    if not rows:
+        raise ValueError(f"{district}: no candidate rows")
+    return pl.DataFrame(rows, schema_overrides={"label": pl.String, "number_on_list": pl.Int64, "party": pl.String})
+
+
+def from_pages(urls: list[str]) -> Frame | None:
+    """The rows of the cached district pages among `urls`, stamped with the time the Commission last updated them."""
+    cached = raw.keys(SOURCE)
+    frames, stamps = [], []
+    for url in urls:
+        if url not in cached:
+            continue
+        html = raw.cached(SOURCE, url).path.read_text(encoding="utf-8")
+        frames.append(page_rows(html))
+        updated = re.search(r"Puslapis atnaujintas (\d{4}-\d\d-\d\d \d\d:\d\d)", html)
+        if updated:
+            stamps.append(stamp(updated.group(1)))
+    if not frames:
+        return None
+    found = [value for value in stamps if value is not None]
+    return Frame(pl.concat(frames), max(found) if found else None)
 
 
 def read(url: str) -> pl.DataFrame:
@@ -623,9 +739,11 @@ def files(config: Config, item: Part) -> dict[int, list[Frame]]:
     if (config.first, item) not in LOADED:
         cached = raw.keys(SOURCE)
         found: dict[int, list[Frame]] = {}
-        for round_, _, url in selected(config, item):
+        for round_, number, url in selected(config, item):
             if url in cached:
                 found.setdefault(round_, []).append(normalize(url, item.prefix))
+            elif item.kind == "mayor" and (frame := from_pages(district_urls(config, round_, number))):
+                found.setdefault(round_, []).append(frame)
         LOADED[(config.first, item)] = found
     return LOADED[(config.first, item)]
 
@@ -843,9 +961,15 @@ def build(config: Config) -> Package:
             frames = byround[round_]
             rows = pl.concat([f.rows for f in frames])
             as_of = max((f.stamp for f in frames if f.stamp is not None), default=None)
-            for number_round, _, url in selected(config, item):
-                if number_round == round_ and url in raw.keys(SOURCE):
+            for number_round, number, url in selected(config, item):
+                if number_round != round_:
+                    continue
+                if url in raw.keys(SOURCE):
                     p.artifact(raw.cached(SOURCE, url), VRK_SOURCE)
+                elif item.kind == "mayor":
+                    for address in district_urls(config, round_, number):
+                        if address in raw.keys(SOURCE):
+                            p.artifact(raw.cached(SOURCE, address), VRK_SOURCE)
             page_url = summaries(config, item).get(round_) if item.kind in PAGES else None
             page = None
             if page_url is not None and page_url in raw.keys(SOURCE):
