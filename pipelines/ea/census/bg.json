@@ -80,6 +80,30 @@
       "publisher": "Народно събрание на Република България (Държавен вестник)",
       "url": "https://dv.parliament.bg/",
       "kind": "official_body"
+    },
+    "nsi_sg1909": {
+      "title": "Статистически годишник на Българското царство, година първа: 1909, XIV. Законодателни избори, таблици 1–2, с. 401",
+      "publisher": "Главна дирекция на статистиката (Национален статистически институт, Статистическа библиотека)",
+      "url": "https://statlib.nsi.bg/asset/default/SG_6_1909_1910_OCR_BW.pdf",
+      "kind": "official_body"
+    },
+    "nsi_sg1932": {
+      "title": "Статистически годишник на Българското царство, година XXIV: 1932, XIII. Законодателни избори, с. 368",
+      "publisher": "Главна дирекция на статистиката (Национален статистически институт, Статистическа библиотека)",
+      "url": "https://statlib.nsi.bg/asset/default/SG_6_1931_1932_OCR_BW.pdf",
+      "kind": "official_body"
+    },
+    "nsi_sg1940": {
+      "title": "Статистически годишник на Царство България, година XXXII: 1940, XXII. А. Законодателни избори, таблица 1, с. 742",
+      "publisher": "Главна дирекция на статистиката (Национален статистически институт, Статистическа библиотека)",
+      "url": "https://statlib.nsi.bg/asset/default/SG_6_1939_1940_OCR_BW.pdf",
+      "kind": "official_body"
+    },
+    "nsi_sg1946": {
+      "title": "Статистически годишник на Народната република България, година XXXV–XXXVIII: 1943–1946, XXI. А. Законодателни избори, таблица 1, с. 434",
+      "publisher": "Главна дирекция на статистиката (Национален статистически институт, Статистическа библиотека)",
+      "url": "https://statlib.nsi.bg/asset/default/SG_6_1942-1945_1947_OCR_BW.pdf",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -1466,8 +1490,134 @@
       "dates": [
         {
           "date": "1879-04-16",
-          "through": "1945-12-31",
-          "note": "Elections from 1879 to 1945 are known to exist and are not yet listed."
+          "through": "1898-12-31",
+          "note": "Ordinary and Grand Assembly elections from 1879 to 1898 are known to exist and are not yet listed; the statistical yearbooks' series start in 1899."
+        },
+        {
+          "date": "1899-04-25",
+          "seats": 169,
+          "source": "nsi_sg1909",
+          "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1899. априлъ 25 — avril 1899 … 169“",
+          "note": "X Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1901-01-28",
+          "seats": 167,
+          "source": "nsi_sg1909",
+          "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1901. януарий 28 — janvier 1901 … 167“",
+          "note": "XI Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1902-02-17",
+          "seats": 189,
+          "source": "nsi_sg1909",
+          "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1902. февруарий 17 — février 1902 … 189“",
+          "note": "XII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1903-10-19",
+          "seats": 189,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „19. X. 1903 | XIII | 189“",
+          "note": "XIII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1908-05-25",
+          "seats": 203,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „25. V. 1908 | XIV | 203“",
+          "note": "XIV Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1911-06-05",
+          "seats": 426,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „5. VI. 1911 | V | 426“; бележка: „Изборите, произведени на 5. VI. 1911, се отнасятъ за V-то Велико народно събрание“",
+          "note": "V Grand National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1911-09-04",
+          "seats": 213,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „4. IX. 1911 | XV | 170“ и „XV | 43“; бележка: мажоритарна система, „съ изключение на бившите окржзи Пловдивъ и Търново, кждето изборите сж произведени по пропорционалната система“",
+          "note": "XV Ordinary National Assembly: 170 seats by majority and 43 by PR in Plovdiv and Tarnovo, 213 in all. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1913-11-24",
+          "seats": 204,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „24. XI. 1913 | XVI | 204“",
+          "note": "XVI Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1914-02-23",
+          "seats": 245,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „23. II. 1914 | XVII | 245“",
+          "note": "XVII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1919-08-17",
+          "seats": 236,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „17. VIII. 1919 | XVIII | 236“",
+          "note": "XVIII Ordinary National Assembly."
+        },
+        {
+          "date": "1920-03-28",
+          "seats": 229,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „28. III. 1920 | XIX | 229“",
+          "note": "XIX Ordinary National Assembly."
+        },
+        {
+          "date": "1923-04-22",
+          "seats": 245,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „22. IV. 1923 | XX | 245“",
+          "note": "XX Ordinary National Assembly."
+        },
+        {
+          "date": "1923-11-18",
+          "seats": 247,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „18. XI. 1923 | XXI | 247“",
+          "note": "XXI Ordinary National Assembly."
+        },
+        {
+          "date": "1927-05-29",
+          "seats": 273,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „29. V. 1927 | XXII | 273“",
+          "note": "XXII Ordinary National Assembly."
+        },
+        {
+          "date": "1931-06-21",
+          "seats": 274,
+          "source": "nsi_sg1932",
+          "quote": "Законодателни избори: „O. H. С., произведени на 21. VI. 1931 год.“; таблица по изборни години: „21. VI. 1931 … 274“",
+          "note": "XXIII Ordinary National Assembly. The 1940 and 1943–1946 yearbooks print the date as 21. IV. 1931; the 1932 yearbook, published after the election, gives 21. VI. 1931 throughout."
+        },
+        {
+          "date": "1938-03-06",
+          "seats": 158,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „6. III.—27. III. 1938 | XXIV | 158“",
+          "note": "XXIV Ordinary National Assembly, voting from 6 to 27 March 1938; 158 is the yearbook's count of deputies."
+        },
+        {
+          "date": "1939-12-24",
+          "seats": 160,
+          "source": "nsi_sg1940",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „24. XII. 1939— 28. I. 1940 | XXV | 152“; бележка: „8 сж провъзгласени за избрани безъ избори“",
+          "note": "XXV Ordinary National Assembly, voting from 24 December 1939 to 28 January 1940: 152 deputies elected by vote and 8 proclaimed unopposed, 160 in all."
+        },
+        {
+          "date": "1945-11-18",
+          "seats": 276,
+          "source": "nsi_sg1946",
+          "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „18. XI. 1945 | XXVI | 276“",
+          "note": "XXVI Ordinary National Assembly."
         }
       ],
       "access": [
@@ -1479,6 +1629,17 @@
           "checked_at": "2026-11-16T00:00:00Z",
           "source": "dv",
           "evidence": "Results by district in State Gazette notices and the statistical yearbooks of the Kingdom."
+        },
+        {
+          "platform": "НСИ: Статистическа библиотека",
+          "url": "https://statlib.nsi.bg/",
+          "format": "scanned volumes",
+          "access": "manual",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "source": "nsi_sg1940",
+          "first_date": "1899-04-25",
+          "last_date": "1945-11-18",
+          "evidence": "Statistical yearbooks with a table of each legislative election from 1899, and volumes of election statistics by district for the X–XXI Ordinary and V Grand National Assemblies (1899–1927)."
         }
       ]
     },
