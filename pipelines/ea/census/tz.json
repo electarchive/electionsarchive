@@ -1,0 +1,1942 @@
+{
+ "polity": "TZ",
+ "name": "Tanzania",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Tanzania",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "Tanzania",
+    "lang": "sw",
+    "kind": "native"
+   }
+  ],
+  "slug": "tz",
+  "wikidata": "Q924",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "Katiba ya Jamhuri ya Muungano wa Tanzania ya Mwaka 1977",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf",
+   "kind": "official_body",
+   "note": "Constitution of the United Republic as posted by INEC under election laws. Arts. 38-42 (President, elected by the most votes, Art. 41(6); five-year term, Art. 42(2)), 65 (five-year life of Parliament), 66 (classes of member of Parliament), 74 (Electoral Commission), 75 (constituencies), 78 (women's special seats), and 109 and 118 (judges appointed by the President)."
+  },
+  "zanzibar_constitution": {
+   "title": "Katiba ya Zanzibar ya 1984 (Toleo la 2010)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714455504-1.%20sw-1675241093-sw1489729212-Katiba_ya_Zanzibar_ya_1984_(Toleo_la_2010)_sw.pdf",
+   "kind": "official_body",
+   "note": "Constitution of Zanzibar, 2010 edition, as posted by INEC. Ss. 26-28 (President of Zanzibar), 63-67 (House of Representatives), 80A (amendments that need a referendum, added by Act No. 9 of 2010), and 119 (ZEC)."
+  },
+  "election_act_2024": {
+   "title": "Sheria ya Uchaguzi wa Rais, Wabunge na Madiwani ya Mwaka 2024",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714458586-SHERIA%20YA%20UCHAGUZI%20WA%20RAIS,%20WABUNGE%20NA%20MADIWANI%20YA%20MWAKA%202024.pdf",
+   "kind": "official_body",
+   "note": "Act No. 1 of 2024, the single law for presidential, parliamentary, and councillor elections on the Mainland, replacing the National Elections Act (Cap. 343) and the Local Authorities (Elections) Act (Cap. 292)."
+  },
+  "inec_act_2024": {
+   "title": "Sheria ya Tume Huru ya Taifa ya Uchaguzi ya Mwaka 2024",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714458395-SHERIA%20YA%20TUME%20HURU%20YA%20TAIFA%20YA%20UCHAGUZI%20YA%20MWAKA%202024.pdf",
+   "kind": "official_body",
+   "note": "Act No. 2 of 2024. S. 10(1): INEC runs the President, Parliament, and Mainland councillor elections, the village, mtaa, and kitongoji elections under a law Parliament is to enact, and names the women's special seats."
+  },
+  "laea_2015": {
+   "title": "The Local Authorities (Elections) Act, Cap. 292 (Revised Edition 2015)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714458151-1595738431-The%20local%20Authorities%20(Elections),%20Act,%202015-PDF.pdf",
+   "kind": "official_body",
+   "note": "Councillor elections in Mainland wards (s. 8: wards established by the minister for local government) until the 2024 Act."
+  },
+  "inec_report_1980": {
+   "title": "Taarifa ya Uchaguzi Mkuu wa Rais na Wabunge, 1980",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1750677066-Taarifa%20ya%20uchaguzi%20Mkuu%20wa%20Rais%20na%20Wabunge%201980.pdf",
+   "kind": "official_body",
+   "note": "Electoral Commission report on the 26 October 1980 general election (page images, no text layer). Page 1 dates the 1980 and 1975 general elections and lists candidates by region and district."
+  },
+  "inec_report_1985": {
+   "title": "Taarifa ya Uchaguzi Mkuu wa Rais na Wabunge, 1985",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1750676961-TAARIFA%20YA%20UCHAGUZI%20MKUU%201985.pdf",
+   "kind": "official_body",
+   "note": "Electoral Commission report on the 1985 general election (page images, no text layer). Pages 1-2: 85 single-member districts, 27 two-member districts (10 in Zanzibar with 50 members, 17 on the Mainland with 34), and the indirectly chosen and appointed members; 244 members in all."
+  },
+  "inec_report_1994": {
+   "title": "Taarifa ya Uchaguzi wa Madiwani 1994",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1750677147-Taarifa%20ya%20Uchaguzi%20wa%20Madiwani%201994.pdf",
+   "kind": "official_body",
+   "note": "NEC report on the 1994 Mainland councillor elections, the first multiparty councillor elections (page images, no text layer)."
+  },
+  "inec_report_2015": {
+   "title": "Taarifa ya Tume ya Taifa ya Uchaguzi kuhusu Uchaguzi wa Rais, Wabunge na Madiwani, 2015",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1750677287-Taarifa%20ya%20Uchaguzi%20Mkuu%202015.pdf",
+   "kind": "official_body",
+   "note": "S. 1.1 (30 regions; Mainland 25 regions, 181 councils, 3,953 wards, 4,037 mitaa, 12,545 villages; Zanzibar 361 shehia), s. 1.3 (first past the post; proportional special seats), s. 2.4 (264 constituencies, 214 Mainland and 50 Zanzibar, up from 239), and s. 5.3 (8 constituency and 33 ward polls postponed)."
+  },
+  "inec_report_2020": {
+   "title": "Taarifa ya Tume ya Taifa ya Uchaguzi kuhusu Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2020",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1750677397-TAARIFA%20YA%20UCHAGUZI%20WA%20MWAKA%202020..pdf",
+   "kind": "official_body",
+   "note": "S. 1.1 (31 regions; Mainland 26 regions, 139 districts, 184 councils, 3,956 wards, 4,263 mitaa, 12,319 villages; Zanzibar 5 regions, 11 districts, 388 shehia), s. 3.2.1 (264 constituencies), s. 3.2.2 (3,956 wards gazetted in GN 551 of 17 July 2020), s. 4.7 (nominations in 3,953 wards)."
+  },
+  "gazette_2015": {
+   "title": "Gazeti la Jamhuri ya Muungano wa Tanzania, 28 Oktoba 2016: Matokeo ya Uchaguzi Mkuu 2015",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
+   "kind": "official_body",
+   "note": "General Notices 1545 (President, national totals in text and constituency tables as page images), 1546 (candidate votes in each of the 264 constituencies), and 1547 (candidate votes in each Mainland ward)."
+  },
+  "gazette_2020": {
+   "title": "Gazeti la Jamhuri ya Muungano wa Tanzania, 5 Januari 2021 (toleo maalum): Matokeo ya Uchaguzi Mkuu 2020",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1713180982-1624892417-matokeo%20final%205%20january%202021%20special%20gazzete.pdf",
+   "kind": "official_body",
+   "note": "General Notices 30A (President, national totals by candidate) and 30B (candidate votes in each constituency)."
+  },
+  "special_seats_2020": {
+   "title": "Gazeti la Serikali, 4 Disemba 2020: Wabunge na Madiwani Wanawake wa Viti Maalum",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1713443857-1607690211-gazeti%20tarehe%204%20Disemba.pdf",
+   "kind": "official_body",
+   "note": "General Notices 2003-2004: women councillors of the special seats named for each council."
+  },
+  "inec_stats": {
+   "title": "Takwimu: Idadi ya Majimbo, Idadi ya Kata, Vituo vya Kupigia Kura (2025)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/statistics/members-of-parliament",
+   "kind": "official_body",
+   "note": "INEC statistics pages: 272 constituencies (statistics/members-of-parliament), 3,950 wards (statistics/number-of-councillors), 99,895 polling stations, and 37,647,235 registered voters for 2025."
+  },
+  "inec_ge_page": {
+   "title": "Uchaguzi Mkuu",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/pages/general-election",
+   "kind": "official_body",
+   "note": "Lists the six general elections the Commission ran from 1995 to 2020, each for President, members of Parliament, and councillors."
+  },
+  "inec_2025_notice": {
+   "title": "Tangazo la maombi ya mpiga kura kupiga kura ya Rais katika kituo tofauti, 15 Septemba 2025",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1757933393-TANGAZO%20LA%20MAOMBI%20YA%20MPIGA%20KURA%202.pdf",
+   "kind": "official_body"
+  },
+  "inec_by_2026a": {
+   "title": "Tangazo la Mwaliko wa Waangalizi, Uchaguzi Mdogo Jimbo la Peramiho na Kata ya Shiwinga",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1788441753-Waangalizi%20wa%20Uchaguzi%20mdogo%20Peramiho.pdf",
+   "kind": "official_body"
+  },
+  "inec_by_2026c": {
+   "title": "Taarifa kwa Umma kuhusu Uchaguzi Mdogo wa Ubunge Jimbo la Chamwino na Udiwani Kata 11",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/press_releases/sw1790319831-TAARIFA%20KWA%20UMMA%20KUHUSU%20UCHAGUZI%20%20UBUNGE%20%20NA%20UDIWAN1%20KATA%201120260924_15105973%20(1).pdf",
+   "kind": "official_body"
+  },
+  "inec_results_page": {
+   "title": "Matokeo ya Uchaguzi Mkuu",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/publications/general-election-results",
+   "kind": "official_body",
+   "note": "Results publications: the 2015 and 2020 Gazette results, the 2020 special-seat lists. The 2025 presidential results section (publications/presidential-results-for-2025-s-general-election) listed no document on 2026-11-17."
+  },
+  "parliament_history": {
+   "title": "Historia ya Bunge",
+   "publisher": "Bunge la Tanzania (Parliament of Tanzania)",
+   "url": "https://www.parliament.go.tz/pages/history",
+   "kind": "official_body",
+   "note": "Legislative Council from 1926; first elected members at the February 1958 election (TANU won 5 seats); all members elected in 1960 and the body renamed the National Assembly; one-party Parliament from 1965; multiparty Parliament after the 1995 general election."
+  },
+  "tamisemi_stats": {
+   "title": "Takwimu (statistics)",
+   "publisher": "Ofisi ya Rais - Tawala za Mikoa na Serikali za Mitaa (PO-RALG/TAMISEMI)",
+   "url": "https://tamisemi.go.tz/api/statistics",
+   "kind": "official_body",
+   "note": "26 regions, 139 districts, 184 councils (6 city, 22 municipal, 21 town, 135 district), 67 township authorities, 570 divisions, 3,960 wards, 4,318 mitaa, 12,315 villages, and 64,137 vitongoji, read on 2026-11-17 from the statistics feed of the ministry's home page."
+  },
+  "zec_report_2020": {
+   "title": "Ripoti ya Uchaguzi Mkuu wa Zanzibar wa Mwaka 2020",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf",
+   "kind": "official_body",
+   "note": "S. 1.4 (history: Legislative Council elections of 1957, January and June 1961, and July 1963; no election 1964-1980; single-candidate elections of 26 October 1980, 19 April 1984, 1985, and 1990; multiparty from 1995 with seat and ward counts per election; the 2015 election annulled and rerun in March 2016), s. 3.6 (50 constituencies, cut from the 54 of 2015), and Annexes 4-6 (results for the House by constituency, councillors by ward, and President by constituency and district)."
+  },
+  "zec_report_2015": {
+   "title": "Ripoti ya Uchaguzi Mkuu wa Zanzibar wa Mwaka 2015",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1770187865_RIPOTI%20YA%20UCHAGUZI%202015-1.pdf",
+   "kind": "official_body",
+   "note": "The 25 October 2015 election, its annulment, and the 20 March 2016 rerun in 54 constituencies."
+  },
+  "zec_report_2010": {
+   "title": "Ripoti ya Uchaguzi Mkuu wa Mwaka 2010",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1770188689_Ripoti%20ya%20Uchaguzi%20Mkuu%202010.pdf",
+   "kind": "official_body",
+   "note": "Page images without a text layer; the summary dates the general election to 31 October 2010."
+  },
+  "zec_report_2025": {
+   "title": "Ripoti ya Uchaguzi Mkuu wa Mwaka 2025",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1789389706_RIPOTI%20YA%20UCHAGUZI%202025%20FINAL.pdf",
+   "kind": "official_body",
+   "note": "Annexes 3 (wards and shehia gazetted for 2025), 8 (President of Zanzibar by district and constituency), 9 (House of Representatives by constituency), and 10 (councillors by ward, with valid, rejected, and total votes and registered voters)."
+  },
+  "zec_reports": {
+   "title": "Taarifa za Uchaguzi (election reports 1995-2025)",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/api/taarifa-uchaguzi",
+   "kind": "official_body",
+   "note": "ZEC's list of general-election reports for 1995, 2000, 2005, 2010, 2015, 2020, and 2025; the 1995-2010 reports are page images."
+  },
+  "zec_stats": {
+   "title": "Takwimu",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/api/takwimu",
+   "kind": "official_body",
+   "note": "50 constituencies, 110 wards, 1,752 polling stations, and 717,557 registered voters (read 2026-11-17)."
+  },
+  "zec_system": {
+   "title": "Mfumo wa Uchaguzi",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/api/mfumo-uchaguzi",
+   "kind": "official_body",
+   "note": "House of Representatives of 82: 50 elected in constituencies, 10 appointed by the President, 22 women's special seats allocated by party vote share, and the Attorney General; first past the post for President, House, and councillors."
+  },
+  "zec_referendum_act": {
+   "title": "The Referendum Act, 2010 (Sheria ya Kura ya Maoni Nam. 6 ya 2010)",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/Sheria-uchaguzi/1779946223_SHERIA%20YA%20KURA%20YA%20MAONI%202010.pdf",
+   "kind": "official_body",
+   "note": "Page images without a text layer."
+  },
+  "zec_act_2018": {
+   "title": "Election Act No. 4 of 2018",
+   "publisher": "Zanzibar Electoral Commission (ZEC)",
+   "url": "https://www.zec.go.tz/admin_panel/public/Sheria-uchaguzi/1779948493_ELECTION%20ACT%204%20OF%202018_compressed.pdf",
+   "kind": "official_body",
+   "note": "Zanzibar elections of the President, the House of Representatives, and councillors (page images)."
+  },
+  "proposed_constitution": {
+   "title": "Katiba Inayopendekezwa (Proposed Constitution, 2014)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inec.go.tz/uploads/documents/sw-1714457438-1.%20sw-1675241310-sw1489132625-katiba%20inayopendekezwa.pdf",
+   "kind": "official_body",
+   "note": "The Proposed Constitution passed by the Constituent Assembly in 2014 and posted by INEC with the election laws; its referendum under the Referendum Act, 2013 was never held."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Jamhuri ya Muungano wa Tanzania",
+   "name_en": "United Republic of Tanzania",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "tz.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "zanzibar",
+   "name": "Zanzibar (Serikali ya Mapinduzi ya Zanzibar)",
+   "name_en": "Zanzibar, the semi-autonomous part of the Union with its own President and House",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "tz.zanzibar",
+   "source": "zanzibar_constitution"
+  },
+  {
+   "key": "region",
+   "name": "Mikoa",
+   "name_en": "Regions (appointed regional commissioners; no elected organ)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "tz.region",
+   "elects": false,
+   "source": "inec_report_2020",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 30,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"imegawanyika katika Mikoa 30 ambapo Tanzania Bara ina Mikoa 25\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 31,
+     "source": "inec_report_2020",
+     "locator": "s. 1.1: \"imegawanyika katika mikoa 31. Tanzania Bara ina mikoa 26\""
+    },
+    {
+     "date": "2026-11-17",
+     "value": 26,
+     "source": "tamisemi_stats",
+     "locator": "Mikoa 26 (Mainland only)"
+    }
+   ]
+  },
+  {
+   "key": "constituency",
+   "name": "Majimbo ya uchaguzi",
+   "name_en": "Constituencies of the National Assembly (Union-wide)",
+   "parent": "national",
+   "scheme": "tz.constituency",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "value": 112,
+     "source": "inec_report_1985",
+     "locator": "pp. 1-2: 85 single-member and 27 two-member electoral districts (169 members)"
+    },
+    {
+     "date": "2010-10-31",
+     "value": 239,
+     "source": "inec_report_2015",
+     "locator": "Muhtasari: \"Majimbo ya Uchaguzi kuwa 264 Nchi nzima kutoka Majimbo 239 ya awali\""
+    },
+    {
+     "date": "2015-10-25",
+     "value": 264,
+     "source": "inec_report_2015",
+     "locator": "s. 2.4: \"jumla ya Majimbo 264, ambapo Majimbo 214 yalikuwa ni ya Tanzania Bara na Majimbo 50 ni ya Tanzania Zanzibar\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 264,
+     "source": "inec_report_2020",
+     "locator": "s. 3.2.1: \"Idadi ya majimbo yaliyofanya uchaguzi yalikuwa 264\""
+    },
+    {
+     "date": "2025-10-29",
+     "value": 272,
+     "source": "inec_stats",
+     "locator": "Idadi ya Majimbo (2025) 272"
+    }
+   ]
+  },
+  {
+   "key": "council",
+   "name": "Halmashauri (Mamlaka za Serikali za Mitaa)",
+   "name_en": "Mainland local government authorities: city, municipal, town, and district councils",
+   "parent": "region",
+   "polity_kind": "municipality",
+   "scheme": "tz.council",
+   "source": "inec_report_2020",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 181,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"Halmashauri 181\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 184,
+     "source": "inec_report_2020",
+     "locator": "s. 1.1: \"halmashauri 184\""
+    },
+    {
+     "date": "2026-11-17",
+     "value": 184,
+     "source": "tamisemi_stats",
+     "locator": "Halmashauri 184: Majiji 6, Manispaa 22, Miji 21, Wilaya 135"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "Kata",
+   "name_en": "Mainland wards, each electing one councillor",
+   "parent": "council",
+   "polity_kind": "submunicipal",
+   "scheme": "tz.ward",
+   "source": "laea_2015",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 3953,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"Kata 3,953\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 3956,
+     "source": "inec_report_2020",
+     "locator": "s. 3.2.2: \"kata 3,956 za Tanzania Bara\" (GN 551 of 17 July 2020)"
+    },
+    {
+     "date": "2025-10-29",
+     "value": 3950,
+     "source": "inec_stats",
+     "locator": "Idadi ya Kata (2025) 3,950"
+    },
+    {
+     "date": "2026-11-17",
+     "value": 3960,
+     "source": "tamisemi_stats",
+     "locator": "Kata 3,960"
+    }
+   ]
+  },
+  {
+   "key": "village",
+   "name": "Vijiji",
+   "name_en": "Registered villages (rural Mainland), with elected chairpersons and councils",
+   "parent": "ward",
+   "polity_kind": "submunicipal",
+   "source": "inec_act_2024",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 12545,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"Vijiji 12,545\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 12319,
+     "source": "inec_report_2020",
+     "locator": "s. 1.1: \"vijiji 12,319\""
+    },
+    {
+     "date": "2026-11-17",
+     "value": 12315,
+     "source": "tamisemi_stats",
+     "locator": "Vijiji 12,315"
+    }
+   ]
+  },
+  {
+   "key": "mtaa",
+   "name": "Mitaa",
+   "name_en": "Urban neighborhoods (mitaa) with elected chairpersons and committees",
+   "parent": "ward",
+   "polity_kind": "submunicipal",
+   "source": "inec_act_2024",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 4037,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"Mitaa 4,037\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 4263,
+     "source": "inec_report_2020",
+     "locator": "s. 1.1: \"mitaa 4,263\""
+    },
+    {
+     "date": "2026-11-17",
+     "value": 4318,
+     "source": "tamisemi_stats",
+     "locator": "Mitaa 4,318"
+    }
+   ]
+  },
+  {
+   "key": "kitongoji",
+   "name": "Vitongoji",
+   "name_en": "Hamlets within villages, with elected chairpersons",
+   "parent": "village",
+   "polity_kind": "submunicipal",
+   "source": "inec_act_2024",
+   "counts": [
+    {
+     "date": "2026-11-17",
+     "value": 64137,
+     "source": "tamisemi_stats",
+     "locator": "Vitongoji 64,137"
+    }
+   ]
+  },
+  {
+   "key": "zanzibar_constituency",
+   "name": "Majimbo ya uchaguzi ya Zanzibar",
+   "name_en": "Constituencies of the Zanzibar House of Representatives",
+   "parent": "zanzibar",
+   "scheme": "tz.zanzibar_constituency",
+   "source": "zanzibar_constitution",
+   "counts": [
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "value": 50,
+     "source": "zec_report_2020",
+     "locator": "s. 1.4.2.2: \"Wajumbe wa Baraza la Wawakilishi katika majimbo 50 ya uchaguzi\""
+    },
+    {
+     "date": "2016-03-20",
+     "value": 54,
+     "source": "zec_report_2020",
+     "locator": "s. 3.6.1: \"kuongeza majimbo ya uchaguzi kutoka majimbo 50 hadi majimbo 54 ... Uchaguzi wa mwaka 2015 na marejeo yake mwaka 2016\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 50,
+     "source": "zec_report_2020",
+     "locator": "s. 3.6.5: \"uchaguzi wa mwaka 2020 uliendeshwa katika majimbo 50 badala ya majimbo 54\""
+    },
+    {
+     "date": "2026-11-17",
+     "value": 50,
+     "source": "zec_stats",
+     "locator": "majimbo: 50"
+    }
+   ]
+  },
+  {
+   "key": "zanzibar_ward",
+   "name": "Wadi",
+   "name_en": "Zanzibar wards, each electing one councillor",
+   "parent": "zanzibar",
+   "polity_kind": "submunicipal",
+   "scheme": "tz.zanzibar_ward",
+   "source": "zec_report_2020",
+   "counts": [
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "value": 140,
+     "source": "zec_report_2020",
+     "locator": "s. 1.4.2.5: \"majimbo yote 50 ya Uchaguzi na Wadi 140\""
+    },
+    {
+     "date": "2010-10-31",
+     "value": 141,
+     "source": "zec_report_2020",
+     "locator": "s. 1.4.2.7: \"katika Wadi zote 141 za uchaguzi\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 110,
+     "source": "zec_report_2020",
+     "locator": "s. 1.2: \"ina Wadi 110 za kiutawala, Wadi 73 zipo Unguja na Wadi 37 zipo Pemba\""
+    },
+    {
+     "date": "2025-10-29",
+     "value": 110,
+     "source": "zec_report_2025",
+     "locator": "s. 3: \"Uchaguzi wa Madiwani katika Wadi zote 110\""
+    }
+   ]
+  },
+  {
+   "key": "shehia",
+   "name": "Shehia",
+   "name_en": "Zanzibar shehia (appointed sheha; no elected organ)",
+   "parent": "zanzibar_ward",
+   "polity_kind": "submunicipal",
+   "elects": false,
+   "source": "inec_report_2020",
+   "counts": [
+    {
+     "date": "2015-10-25",
+     "value": 361,
+     "source": "inec_report_2015",
+     "locator": "s. 1.1: \"Shehia 361\""
+    },
+    {
+     "date": "2020-10-28",
+     "value": 388,
+     "source": "inec_report_2020",
+     "locator": "s. 1.1: \"shehia 388\""
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Uchaguzi wa Rais wa Jamhuri ya Muungano",
+   "name_en": "President of the United Republic, direct, with a vice-presidential running mate",
+   "category": "executive",
+   "goal": "national",
+   "valid_from": "1964-04-26",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "tz.nation"
+    ],
+    "grain": [
+     "tz.constituency"
+    ],
+    "fine": [
+     "tz.ward",
+     "tz.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 41(6): \"atatangazwa kuwa amechaguliwa kuwa Rais iwapo tu amepata kura nyingi zaidi kuliko mgombea mwingine yeyote\")",
+   "earliest_record": "2015-10-25",
+   "note": "Plurality nationwide (Art. 41(6)). From 1965 to 1990 the single party's one candidate was approved by yes/no vote. Results are declared by INEC and cannot be challenged in court (Art. 41(7)). The 2015 Gazette prints national totals as text and the constituency tables as page images; the 2020 Gazette prints national totals only; INEC's 2025 results page listed no document on 2026-11-17.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "TZ",
+     "valid_from": "1964-04-26"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Independent National Electoral Commission",
+     "source": "constitution",
+     "runoff": "none",
+     "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 42(2): five-year term; Art. 41(4): polling day set by the Commission)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Gazeti la Serikali 28 Oktoba 2016 (GN 1545)",
+     "url": "https://www.inec.go.tz/uploads/documents/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2015-10-25",
+     "finest": "tz.constituency",
+     "source": "gazette_2015",
+     "evidence": "National candidate totals in text; per-constituency tables as page images",
+     "last_date": "2015-10-25"
+    },
+    {
+     "platform": "INEC, Gazeti maalum 5 Januari 2021 (GN 30A)",
+     "url": "https://www.inec.go.tz/uploads/documents/sw-1713180982-1624892417-matokeo%20final%205%20january%202021%20special%20gazzete.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-10-28",
+     "finest": "tz.nation",
+     "source": "gazette_2020",
+     "evidence": "National candidate totals only",
+     "last_date": "2020-10-28"
+    },
+    {
+     "platform": "INEC, Matokeo ya Kiti cha Rais 2025",
+     "url": "https://www.inec.go.tz/publications/presidential-results-for-2025-s-general-election",
+     "format": "html",
+     "access": "none",
+     "checked_at": "2026-11-17",
+     "first_date": "2025-10-29",
+     "finest": "tz.nation",
+     "source": "inec_results_page",
+     "evidence": "Section exists but held no document on 2026-11-17",
+     "last_date": "2025-10-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1965-01-01",
+     "precision": "year",
+     "note": "First Union general election under the one-party interim constitution of 1965. Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1970-01-01",
+     "precision": "year",
+     "note": "Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1975-10-26",
+     "source": "inec_report_1980",
+     "quote": "Uchaguzi mkuu wa Rais na Wabunge ulifanyika tarehe 26 Oktoba, 1975",
+     "contests": 1
+    },
+    {
+     "date": "1980-10-26",
+     "source": "inec_report_1980",
+     "quote": "Uchaguzi Mkuu wa Rais na Wabunge ulifanyika tarehe 26 Oktoba, 1980",
+     "contests": 1
+    },
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "source": "inec_report_1985",
+     "quote": "TAARIFA YA UCHAGUZI MKUU WA RAIS NA WABUNGE, 1985",
+     "contests": 1
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "note": "Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 1995",
+     "contests": 1
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2000",
+     "contests": 1
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2005",
+     "contests": 1
+    },
+    {
+     "date": "2010-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2010",
+     "contests": 1
+    },
+    {
+     "date": "2015-10-25",
+     "source": "gazette_2015",
+     "quote": "MATOKEO YA UCHAGUZI WA RAIS WA JAMHURI YA MUUNGANO ULIOFANYIKA TAREHE 25 OKTOBA, 2015",
+     "contests": 1
+    },
+    {
+     "date": "2020-10-28",
+     "source": "gazette_2020",
+     "quote": "matokeo ya Uchaguzi wa Rais uliofanyika tarehe 28 Oktoba, 2020",
+     "contests": 1
+    },
+    {
+     "date": "2025-10-29",
+     "source": "inec_2025_notice",
+     "quote": "tarehe 29 Oktoba, 2025 ambayo ni siku ya ... kupiga kura",
+     "contests": 1
+    }
+   ],
+   "est_votes": 140000000,
+   "effort": 2
+  },
+  {
+   "key": "bunge",
+   "tier": "national",
+   "name": "Mbunge wa jimbo (Bunge la Jamhuri ya Muungano)",
+   "name_en": "National Assembly, single-member constituency seats (Union-wide, Mainland and Zanzibar)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1964-04-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.constituency"
+    ],
+    "fine": [
+     "tz.ward",
+     "tz.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 66(1)(a): \"Wabunge waliochaguliwa kuwakilisha majimbo ya uchaguzi\"; Art. 75: constituencies)",
+   "earliest_record": "2015-10-25",
+   "boundary_source": "inec_report_2015",
+   "note": "First past the post. Under the one-party state the party put two candidates in each constituency; in 1985 85 districts elected one member and 27 elected two (169 members, INEC 1985 report). Constituencies: 239 in 2010, 264 in 2015 and 2020 (214 Mainland, 50 Zanzibar), 272 in 2025. INEC conducts the Bunge poll in Zanzibar too, using ZEC's register. The women's special seats, the five members chosen by the House of Representatives, and the presidential appointees are separate classes. Tanganyika's 1958-1960 elections are class tanganyika_legco.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "iso_pattern": "TZ",
+     "valid_from": "1964-04-26"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Independent National Electoral Commission",
+     "source": "constitution",
+     "runoff": "none",
+     "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 65(1): \"maisha ya kila Bunge yatakuwa ni muda wa miaka mitano\")"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Gazeti la Serikali 28 Oktoba 2016 (GN 1546)",
+     "url": "https://www.inec.go.tz/uploads/documents/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2015-10-25",
+     "finest": "tz.constituency",
+     "source": "gazette_2015",
+     "evidence": "Candidate votes per constituency for all 264 constituencies, text layer",
+     "last_date": "2015-10-25"
+    },
+    {
+     "platform": "INEC, Gazeti maalum 5 Januari 2021 (GN 30B)",
+     "url": "https://www.inec.go.tz/uploads/documents/sw-1713180982-1624892417-matokeo%20final%205%20january%202021%20special%20gazzete.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-10-28",
+     "finest": "tz.constituency",
+     "source": "gazette_2020",
+     "evidence": "Candidate votes per constituency, text layer",
+     "last_date": "2020-10-28"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1965-01-01",
+     "precision": "year",
+     "note": "First Union general election under the one-party interim constitution of 1965. Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1970-01-01",
+     "precision": "year",
+     "note": "Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1975-10-26",
+     "source": "inec_report_1980",
+     "quote": "Uchaguzi mkuu wa Rais na Wabunge ulifanyika tarehe 26 Oktoba, 1975"
+    },
+    {
+     "date": "1980-10-26",
+     "source": "inec_report_1980",
+     "quote": "Uchaguzi Mkuu wa Rais na Wabunge ulifanyika tarehe 26 Oktoba, 1980"
+    },
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "source": "inec_report_1985",
+     "quote": "TAARIFA YA UCHAGUZI MKUU WA RAIS NA WABUNGE, 1985",
+     "contests": 112,
+     "seats": 169
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "note": "Year from the five-year cycle of Art. 65 and the dated 1975 and 1980 elections in the 1980 report; the day is not in an official source reached here."
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 1995"
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2000"
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2005"
+    },
+    {
+     "date": "2010-10-31",
+     "source": "inec_report_2015",
+     "quote": "Majimbo ya Uchaguzi kuwa 264 Nchi nzima kutoka Majimbo 239 ya awali",
+     "contests": 239,
+     "seats": 239
+    },
+    {
+     "date": "2015-10-25",
+     "source": "inec_report_2015",
+     "quote": "jumla ya Majimbo 264, ambapo Majimbo 214 yalikuwa ni ya Tanzania Bara na Majimbo 50 ni ya Tanzania Zanzibar",
+     "contests": 264,
+     "seats": 264,
+     "note": "Polling in 8 constituencies was postponed past 25 October 2015 (s. 5.3); 264 is the number contested in the cycle."
+    },
+    {
+     "date": "2020-10-28",
+     "source": "inec_report_2020",
+     "quote": "Idadi ya majimbo yaliyofanya uchaguzi yalikuwa 264",
+     "contests": 264,
+     "seats": 264,
+     "note": "28 candidates were returned unopposed (Annex 2)."
+    },
+    {
+     "date": "2025-10-29",
+     "source": "inec_stats",
+     "quote": "Idadi ya Majimbo (2025) 272",
+     "contests": 272,
+     "seats": 272
+    }
+   ],
+   "est_votes": 120000000,
+   "effort": 2
+  },
+  {
+   "key": "bunge_by",
+   "tier": "national",
+   "name": "Uchaguzi mdogo wa Ubunge",
+   "name_en": "National Assembly constituency by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.constituency"
+    ],
+    "fine": [
+     "tz.ward",
+     "tz.polling_station"
+    ]
+   },
+   "source": "election_act_2024",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458586-SHERIA%20YA%20UCHAGUZI%20WA%20RAIS,%20WABUNGE%20NA%20MADIWANI%20YA%20MWAKA%202024.pdf (s. 49: by-election when a constituency seat falls vacant)",
+   "earliest_record": "2026-02-26",
+   "note": "INEC calls a by-election for each vacant constituency seat, usually on the same day as ward by-elections. The 2026 cycle had Peramiho (26 February), Ismani (with 12 wards; announced 20 April 2026, polling day in a page-image press release not read here), and Chamwino (4 November). Earlier by-elections appear only in Gazette notices.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "TZ",
+     "valid_from": "1964-04-26"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC announcements (by-elections)",
+     "url": "https://www.inec.go.tz/publications/announcements",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2026-02-26",
+     "finest": "tz.constituency",
+     "source": "inec_by_2026c",
+     "evidence": "Schedules and observer invitations; results announced in news posts, not as data"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-02-26",
+     "source": "inec_by_2026a",
+     "quote": "uchaguzi mdogo wa Ubunge katika Jimbo la Peramiho ... na Udiwani katika Kata ya Shiwinga ... tarehe 26 Februari, 2026",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2026-11-04",
+     "source": "inec_by_2026c",
+     "quote": "Uchaguzi mdogo wa Ubunge katika Jimbo la Chamwino na Madiwani katika kata 11 za Tanzania Bara utafanyika siku ya Jumatano tarehe 04 Novemba, 2026",
+     "contests": 1,
+     "seats": 1
+    }
+   ],
+   "est_votes": 1500000,
+   "effort": 4
+  },
+  {
+   "key": "councillors",
+   "tier": "ward",
+   "name": "Uchaguzi wa Madiwani (Tanzania Bara)",
+   "name_en": "Mainland ward councillors of city, municipal, town, and district councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.ward"
+    ],
+    "fine": [
+     "tz.polling_station"
+    ]
+   },
+   "source": "laea_2015",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458151-1595738431-The%20local%20Authorities%20(Elections),%20Act,%202015-PDF.pdf (s. 8: the Commission uses the wards established by the minister for councillor elections)",
+   "earliest_record": "2015-10-25",
+   "note": "One councillor per ward, first past the post, on the general-election day since 2000; the 1994 councillor elections were held on their own. INEC publishes ward results as Gazette notices (2015 in text). Councils also seat women's special-seat councillors (class special_seats) and the area's members of Parliament ex officio. Councils existed before 1994 under the one-party state; no official record of those polls was reached.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Independent National Electoral Commission",
+     "source": "election_act_2024",
+     "runoff": "none",
+     "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458586-SHERIA%20YA%20UCHAGUZI%20WA%20RAIS,%20WABUNGE%20NA%20MADIWANI%20YA%20MWAKA%202024.pdf (councillors elected with the President and members of Parliament)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Gazeti la Serikali 28 Oktoba 2016 (GN 1547)",
+     "url": "https://www.inec.go.tz/uploads/documents/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2015-10-25",
+     "finest": "tz.ward",
+     "source": "gazette_2015",
+     "evidence": "Candidate votes per ward, grouped by region and council, pp. 104-492, text layer",
+     "last_date": "2015-10-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "source": "inec_report_1994",
+     "quote": "Taarifa ya Uchaguzi wa Madiwani 1994",
+     "note": "The first multiparty councillor elections, held a year before the 1995 presidential and parliamentary elections."
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2000"
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2005"
+    },
+    {
+     "date": "2010-01-01",
+     "precision": "year",
+     "source": "inec_ge_page",
+     "quote": "Uchaguzi wa Rais, Wabunge na Madiwani wa Mwaka 2010"
+    },
+    {
+     "date": "2015-10-25",
+     "source": "gazette_2015",
+     "quote": "matokeo ya Uchaguzi wa Madiwani uliofanyika tarehe 25 Oktoba, 2015",
+     "contests": 3953,
+     "seats": 3953,
+     "note": "3,953 wards per the 2015 report (s. 1.1); polling in 33 wards was postponed (s. 5.3)."
+    },
+    {
+     "date": "2020-10-28",
+     "source": "inec_report_2020",
+     "quote": "uteuzi ulifanyika katika kata 3,953 Tanzania Bara kati ya kata 3,956 zilizotangazwa na Tume",
+     "contests": 3953,
+     "seats": 3953,
+     "note": "Igombemkulu, Kanindo, and Milambo (Kaliua) held no nomination because of boundary disputes."
+    },
+    {
+     "date": "2025-10-29",
+     "source": "inec_stats",
+     "quote": "Idadi ya Kata (2025) 3,950",
+     "contests": 3950,
+     "seats": 3950
+    }
+   ],
+   "est_votes": 100000000,
+   "effort": 3
+  },
+  {
+   "key": "councillors_by",
+   "tier": "ward",
+   "name": "Uchaguzi mdogo wa Udiwani (Tanzania Bara)",
+   "name_en": "Mainland ward councillor by-elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.ward"
+    ],
+    "fine": [
+     "tz.polling_station"
+    ]
+   },
+   "source": "election_act_2024",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458586-SHERIA%20YA%20UCHAGUZI%20WA%20RAIS,%20WABUNGE%20NA%20MADIWANI%20YA%20MWAKA%202024.pdf (ss. 49, 57, 61, and 68: by-elections for vacant wards, cited in INEC's Chamwino notice)",
+   "earliest_record": "2026-02-26",
+   "note": "Held on the parliamentary by-election days: Shiwinga on 26 February 2026, 12 wards with Ismani in 2026, and 11 wards on 4 November 2026.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-02-26",
+     "source": "inec_by_2026a",
+     "quote": "uchaguzi mdogo wa Ubunge katika Jimbo la Peramiho ... na Udiwani katika Kata ya Shiwinga ... tarehe 26 Februari, 2026",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2026-11-04",
+     "source": "inec_by_2026c",
+     "quote": "Uchaguzi mdogo wa Ubunge katika Jimbo la Chamwino na Madiwani katika kata 11 za Tanzania Bara utafanyika siku ya Jumatano tarehe 04 Novemba, 2026",
+     "contests": 11,
+     "seats": 11
+    }
+   ],
+   "est_votes": 300000,
+   "effort": 4
+  },
+  {
+   "key": "local_government",
+   "tier": "village",
+   "name": "Uchaguzi wa Serikali za Mitaa (vijiji, mitaa na vitongoji)",
+   "name_en": "Village, mtaa, and kitongoji chairpersons and village councils and mtaa committees",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.village",
+     "tz.mtaa",
+     "tz.kitongoji"
+    ]
+   },
+   "source": "inec_act_2024",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458395-SHERIA%20YA%20TUME%20HURU%20YA%20TAIFA%20YA%20UCHAGUZI%20YA%20MWAKA%202024.pdf (s. 10(1)(c): the Commission runs the village, mtaa, and kitongoji elections \"kwa kuzingatia utaratibu utakaoainishwa katika Sheria itakayotungwa na Bunge\")",
+   "note": "About 12,300 villages, 4,300 mitaa, and 64,000 vitongoji each elect a chairperson, and villages and mitaa elect councils or committees, every five years in a separate cycle from the general election (most recently November 2024). The minister for local government (PO-RALG) ran them under regulations made under the Local Government Acts; the 2024 INEC Act moves them to INEC once Parliament passes the enabling law.",
+   "disposition": "blocked",
+   "disposition_reason": "No official returns below the national summary were found: PO-RALG's rebuilt site (tamisemi.go.tz) holds no election documents before December 2025, and returning officers declare results locally on notice boards. Revisit when INEC takes over these elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ]
+    },
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "office_kinds": [
+      "other"
+     ]
+    }
+   ],
+   "est_votes": 60000000,
+   "effort": 5
+  },
+  {
+   "key": "zanzibar_president",
+   "tier": "zanzibar",
+   "name": "Uchaguzi wa Rais wa Zanzibar",
+   "name_en": "President of Zanzibar, direct",
+   "category": "executive",
+   "goal": "subnational",
+   "first_held": "1980-10-26",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "tz.zanzibar"
+    ],
+    "grain": [
+     "tz.zanzibar_constituency"
+    ],
+    "fine": [
+     "tz.zanzibar_ward",
+     "tz.polling_station"
+    ]
+   },
+   "source": "zanzibar_constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455504-1.%20sw-1675241093-sw1489729212-Katiba_ya_Zanzibar_ya_1984_(Toleo_la_2010)_sw.pdf (s. 26-28: President of Zanzibar elected by the voters of Zanzibar for five years)",
+   "earliest_record": "2016-03-20",
+   "note": "Single-candidate yes/no votes in 1980, 1984, 1985, and 1990 (under the 1979 and 1984 constitutions, run by the Speaker as commission chairman); multiparty and plurality since 1995, run by ZEC. ZEC annulled the 25 October 2015 election and reran it on 20 March 2016. ZEC's 2020 and 2025 reports give results by constituency and district.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state",
+      "head_of_government",
+      "governor"
+     ],
+     "name_pattern": "Zanzibar"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Zanzibar Electoral Commission",
+     "source": "zec_system",
+     "locator": "https://www.zec.go.tz/admin_panel/public/api/mfumo-uchaguzi (\"Rais wa Zanzibar anachaguliwa katika kura ya moja kwa moja ... kwa kipindi cha miaka mitano\")"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2020 (Annex 6)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-10-28",
+     "finest": "tz.zanzibar_constituency",
+     "source": "zec_report_2020",
+     "evidence": "President of Zanzibar by constituency and district, text layer",
+     "last_date": "2020-10-28"
+    },
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2025 (Annex 8)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1789389706_RIPOTI%20YA%20UCHAGUZI%202025%20FINAL.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2025-10-29",
+     "finest": "tz.zanzibar_constituency",
+     "source": "zec_report_2025",
+     "evidence": "Votes per candidate by district with constituency columns, text layer",
+     "last_date": "2025-10-29"
+    },
+    {
+     "platform": "ZEC, election reports 1995-2015",
+     "url": "https://www.zec.go.tz/admin_panel/public/api/taarifa-uchaguzi",
+     "format": "pdf (page images)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "1995-01-01",
+     "finest": "tz.zanzibar_constituency",
+     "source": "zec_reports",
+     "evidence": "1995-2010 reports are page images; 2015 report has a text layer",
+     "last_date": "2016-03-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1980-10-26",
+     "source": "zec_report_2020",
+     "quote": "kufanyika uchaguzi wa chama kimoja wa tarehe 26 Oktoba, 1980 na tarehe 19 Aprili, 1984",
+     "contests": 1
+    },
+    {
+     "date": "1984-04-19",
+     "source": "zec_report_2020",
+     "quote": "kufanyika uchaguzi wa chama kimoja wa tarehe 26 Oktoba, 1980 na tarehe 19 Aprili, 1984",
+     "contests": 1
+    },
+    {
+     "date": "1985-10-01",
+     "precision": "month",
+     "source": "zec_report_2020",
+     "quote": "Uchaguzi wa kwanza wa chama kimoja chini ya Katiba mpya ya mwaka 1984 ... uliendeshwa Oktoba 1985",
+     "contests": 1
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Uchaguzi mwengine wa Chama kimoja baada ya Mapinduzi ulifanyika mwaka 1990",
+     "contests": 1
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Mgombea wa Kiti cha Urais wa CCM alipata kura 165,271 sawa na 50.2% na Mgombea CUF alipata kura 163,706",
+     "contests": 1
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Mhe. Dkt. Amani Abeid Amani, Mgombea wa CCM alipata kura 248,095",
+     "contests": 1
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Mhe. Dkt. Amani Abeid Amani Mgombea wa CCM alipata kura 239,832 sawa na 53.2%",
+     "contests": 1
+    },
+    {
+     "date": "2010-10-31",
+     "source": "zec_report_2010",
+     "quote": "Uchaguzi Mkuu wa tarehe 31 Oktoba 2010",
+     "contests": 1
+    },
+    {
+     "date": "2015-10-25",
+     "source": "zec_report_2015",
+     "quote": "upigaji wa kura tarehe 25 Oktoba 2015",
+     "contests": 1,
+     "note": "Annulled by ZEC on 28 October 2015 before a winner was declared; rerun on 20 March 2016."
+    },
+    {
+     "date": "2016-03-20",
+     "source": "zec_report_2015",
+     "quote": "jumapili ya tarehe 20 Machi 2016, wananchi wa Zanzibar walipiga kura katika Uchaguzi Mkuu wa marejeo",
+     "contests": 1
+    },
+    {
+     "date": "2020-10-28",
+     "source": "zec_report_2020",
+     "quote": "Siku ya kupiga kura ya pamoja 28 Oktoba 2020",
+     "contests": 1,
+     "note": "Early voting for election staff, police, and security forces on 27 October 2020."
+    },
+    {
+     "date": "2025-10-29",
+     "source": "zec_report_2025",
+     "quote": "Uchaguzi Mkuu wa Zanzibar uliofanyika tarehe 29 Oktoba, 2025",
+     "contests": 1,
+     "note": "Early voting on 28 October 2025 at 50 sites."
+    }
+   ],
+   "est_votes": 4500000,
+   "effort": 2
+  },
+  {
+   "key": "zanzibar_house",
+   "tier": "zanzibar",
+   "name": "Wajumbe wa Baraza la Wawakilishi (majimbo)",
+   "name_en": "Zanzibar House of Representatives, single-member constituency seats",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.zanzibar_constituency"
+    ],
+    "fine": [
+     "tz.zanzibar_ward",
+     "tz.polling_station"
+    ]
+   },
+   "source": "zec_system",
+   "locator": "https://www.zec.go.tz/admin_panel/public/api/mfumo-uchaguzi (\"Baraza la Wawakilishi la Zanzibar lina Wajumbe 82, ambao 50 kati yao wanachaguliwa moja kwa moja katika majimbo\")",
+   "earliest_record": "2016-03-20",
+   "note": "50 constituencies from 1985 to 2010 and again from 2020; 54 for the annulled 2015 election and its 2016 rerun. First past the post. The 22 women's special seats and 10 presidential appointees are not voted on.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "name_pattern": "(Baraza la Wawakilishi|House of Representatives)",
+     "valid_from": "1980-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Zanzibar Electoral Commission",
+     "source": "zec_system"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2020 (Annex 4)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-10-28",
+     "finest": "tz.zanzibar_constituency",
+     "source": "zec_report_2020",
+     "evidence": "Candidate votes per constituency, text layer",
+     "last_date": "2020-10-28"
+    },
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2025 (Annex 9)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1789389706_RIPOTI%20YA%20UCHAGUZI%202025%20FINAL.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2025-10-29",
+     "finest": "tz.zanzibar_constituency",
+     "source": "zec_report_2025",
+     "evidence": "Candidate votes per constituency, text layer",
+     "last_date": "2025-10-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1985-10-01",
+     "precision": "month",
+     "source": "zec_report_2020",
+     "quote": "Uchaguzi wa kwanza wa chama kimoja chini ya Katiba mpya ya mwaka 1984 ... uliendeshwa Oktoba 1985"
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "kumchagua Rais wa Zanzibar pamoja na Wajumbe wa Baraza la Wawakilishi katika majimbo 50 ya uchaguzi",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Kwa uchaguzi wa Ujumbe katika Baraza la Wawakilishi kulikuwa na majimbo 50 ambayo ni yale yale yaliyotumika katika uchaguzi wa mwaka 1985 na 1990",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "kuweka Wagombea katika majimbo yote 50 ya Uchaguzi na Wadi 140",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "CCM ilipata Viti 31 vya Uwakilishi na viti 83 vya Udiwani na CUF walipata viti 19 vya Uwakilishi",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "2010-10-31",
+     "source": "zec_report_2020",
+     "quote": "Vyama vya CCM na CUF ndivyo vilivyoweza kuchukuwa fomu katika majimbo yote 50 ya Zanzibar na katika Wadi zote 141",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "2015-10-25",
+     "source": "zec_report_2020",
+     "quote": "kuongeza majimbo ya uchaguzi kutoka majimbo 50 hadi majimbo 54 majimbo ambayo yalitumika kwa Uchaguzi wa mwaka 2015 na marejeo yake mwaka 2016",
+     "note": "Annulled by ZEC on 28 October 2015 before a winner was declared; rerun on 20 March 2016.",
+     "contests": 54,
+     "seats": 54
+    },
+    {
+     "date": "2016-03-20",
+     "source": "zec_report_2020",
+     "quote": "kuongeza majimbo ya uchaguzi kutoka majimbo 50 hadi majimbo 54 majimbo ambayo yalitumika kwa Uchaguzi wa mwaka 2015 na marejeo yake mwaka 2016",
+     "contests": 54,
+     "seats": 54
+    },
+    {
+     "date": "2020-10-28",
+     "source": "zec_report_2020",
+     "quote": "uchaguzi wa mwaka 2020 uliendeshwa katika majimbo 50 badala ya majimbo 54",
+     "note": "Early voting for election staff, police, and security forces on 27 October 2020.",
+     "contests": 50,
+     "seats": 50
+    },
+    {
+     "date": "2025-10-29",
+     "source": "zec_stats",
+     "quote": "majimbo: 50",
+     "note": "Early voting on 28 October 2025 at 50 sites.",
+     "contests": 50,
+     "seats": 50
+    }
+   ],
+   "est_votes": 3500000,
+   "effort": 2
+  },
+  {
+   "key": "zanzibar_councillors",
+   "tier": "zanzibar_ward",
+   "name": "Uchaguzi wa Madiwani (Zanzibar)",
+   "name_en": "Zanzibar ward councillors of the municipal, town, and district councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.zanzibar_ward"
+    ],
+    "fine": [
+     "tz.polling_station"
+    ]
+   },
+   "source": "zec_system",
+   "locator": "https://www.zec.go.tz/admin_panel/public/api/mfumo-uchaguzi (\"Mfumo wa uchaguzi unaotumika katika kuchagua Rais, Wajumbe wa Baraza la Wawakilishi na Madiwani ni ... First Past The Post\")",
+   "earliest_record": "2020-10-28",
+   "note": "ZEC runs councillor elections with the Zanzibar general election: 142 wards in 1995, 140 in 2000, 141 from 2005 to 2015, and 110 since 2020. The ZEC 2015 report counts 111 councillors for the 2016 rerun. ZEC's 2025 report gives each ward's candidate votes with rejected ballots and registered voters.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "name_pattern": "(Zanzibar|Unguja|Pemba|Micheweni|Wete|Chake|Mkoani|Mjini Magharibi|Magharibi ?['\"“”]?[AB]|Kaskazini ?['\"“”]?[AB])",
+     "precedence": 1
+    }
+   ],
+   "access": [
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2020 (Annex 5)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-10-28",
+     "finest": "tz.zanzibar_ward",
+     "source": "zec_report_2020",
+     "evidence": "Candidate votes per ward, text layer",
+     "last_date": "2020-10-28"
+    },
+    {
+     "platform": "ZEC, Ripoti ya Uchaguzi Mkuu 2025 (Annex 10)",
+     "url": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1789389706_RIPOTI%20YA%20UCHAGUZI%202025%20FINAL.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2025-10-29",
+     "finest": "tz.zanzibar_ward",
+     "source": "zec_report_2025",
+     "evidence": "Candidate votes per ward with totals and registered voters, text layer",
+     "last_date": "2025-10-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "CCM ilipata viti 26 vya Uwakilishi na Wadi 77 za Udiwani. CUF ilipata viti 24 vya Uwakilishi na Wadi 65 za Udiwani",
+     "contests": 142,
+     "seats": 142
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "kuweka Wagombea katika majimbo yote 50 ya Uchaguzi na Wadi 140",
+     "contests": 140,
+     "seats": 140
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "CCM ilipata Viti 31 vya Uwakilishi na viti 83 vya Udiwani na CUF walipata viti 19 vya Uwakilishi na viti 58 vya Udiwani",
+     "contests": 141,
+     "seats": 141
+    },
+    {
+     "date": "2010-10-31",
+     "source": "zec_report_2020",
+     "quote": "katika majimbo yote 50 ya Zanzibar na katika Wadi zote 141 za uchaguzi",
+     "contests": 141,
+     "seats": 141
+    },
+    {
+     "date": "2015-10-25",
+     "note": "Annulled by ZEC on 28 October 2015 before a winner was declared; rerun on 20 March 2016.",
+     "source": "zec_report_2020",
+     "quote": "Vyama vya CCM na CUF ndivyo vilivyoweza kuchukuwa fomu katika majimbo yote 50 ya Zanzibar na katika Wadi zote 141 za uchaguzi",
+     "contests": 141,
+     "seats": 141
+    },
+    {
+     "date": "2016-03-20",
+     "source": "zec_report_2015",
+     "quote": "Madiwani 111 watakaounda Halmashauri za Wilaya"
+    },
+    {
+     "date": "2020-10-28",
+     "note": "Early voting for election staff, police, and security forces on 27 October 2020.",
+     "source": "zec_report_2020",
+     "quote": "ina Wadi 110 za kiutawala, Wadi 73 zipo Unguja na Wadi 37 zipo Pemba",
+     "contests": 110,
+     "seats": 110
+    },
+    {
+     "date": "2025-10-29",
+     "note": "Early voting on 28 October 2025 at 50 sites.",
+     "source": "zec_report_2025",
+     "quote": "Uchaguzi wa Madiwani katika Wadi zote 110",
+     "contests": 110,
+     "seats": 110
+    }
+   ],
+   "est_votes": 3000000,
+   "effort": 3
+  },
+  {
+   "key": "zanzibar_by",
+   "tier": "zanzibar",
+   "name": "Chaguzi ndogo (Zanzibar)",
+   "name_en": "By-elections to the Zanzibar House of Representatives and Zanzibar ward councils",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "tz.zanzibar_constituency",
+     "tz.zanzibar_ward"
+    ]
+   },
+   "source": "zec_act_2018",
+   "locator": "https://www.zec.go.tz/admin_panel/public/Sheria-uchaguzi/1779948493_ELECTION%20ACT%204%20OF%202018_compressed.pdf (by-elections for vacant seats; ZEC's election cycle lists \"Chaguzi Ndogo\" after the general election)",
+   "note": "ZEC lists by-elections in its post-election cycle; no by-election return was found among its publications.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "name_pattern": "(Baraza la Wawakilishi|House of Representatives|Zanzibar|Unguja|Pemba)",
+     "precedence": 1
+    }
+   ],
+   "est_votes": 100000,
+   "effort": 5
+  },
+  {
+   "key": "zanzibar_referendum",
+   "tier": "zanzibar",
+   "name": "Kura ya Maoni (Zanzibar)",
+   "name_en": "Zanzibar referendums under the Referendum Act, 2010",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "tz.zanzibar_constituency"
+    ]
+   },
+   "source": "zanzibar_constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455504-1.%20sw-1675241093-sw1489729212-Katiba_ya_Zanzibar_ya_1984_(Toleo_la_2010)_sw.pdf (s. 80A: amendments to listed sections need approval \"na wananchi kwa Kura ya Maoni\", added by Act No. 9 of 2010)",
+   "note": "ZEC ran one referendum, in July 2010, on the government of national unity that the tenth amendment (Act No. 9 of 2010) then wrote into the Constitution. The Referendum Act and the 2010 report are page images, and the polling day was not confirmed in a source read here.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "name_pattern": "Zanzibar"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-07-01",
+     "precision": "month",
+     "note": "Referendum on the government of national unity; ZEC's Referendum Act No. 6 of 2010 governed it. The day is not in a text source reached here."
+    }
+   ],
+   "est_votes": 400000,
+   "effort": 4
+  },
+  {
+   "key": "union_referendum",
+   "tier": "national",
+   "name": "Kura ya Maoni ya Katiba Inayopendekezwa",
+   "name_en": "Union constitutional referendum on the Proposed Constitution",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "proposed_constitution",
+   "note": "The Union Constitution (Art. 98) is amended by a two-thirds majority of Parliament with no referendum. The Constitutional Review Act and the Referendum Act, 2013 provided a single referendum on the Proposed Constitution of 2014, which was postponed in 2015 and never held.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No Union-wide referendum has ever been held; the 2015 vote on the Proposed Constitution was postponed and never rescheduled. The class stays so one would be classified if held.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "TZ"
+    }
+   ]
+  },
+  {
+   "key": "zanzibar_legco",
+   "tier": "zanzibar",
+   "name": "Baraza la Kutunga Sheria (Majilis Tashrii) 1957-1963",
+   "name_en": "Zanzibar Protectorate Legislative Council and National Assembly elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_to": "1964-01-12",
+   "first_held": "1957-01-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "zec_report_2020",
+   "locator": "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf (s. 1.4.1: \"Uchaguzi wa mwanzo wa Zanzibar ulifanyika mwaka 1957\")",
+   "note": "Six elected seats in 1957, 22 in January 1961, 23 in June 1961, and 31 in July 1963, under an election commissioner appointed by the British Resident. Ended by the revolution of 12 January 1964; no election followed until 1980.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "name_pattern": "(Zanzibar|Majilis)",
+     "valid_to": "1964-01-12",
+     "precedence": 2
+    }
+   ],
+   "dates": [
+    {
+     "date": "1957-01-01",
+     "precision": "year",
+     "source": "zec_report_2020",
+     "quote": "Katika uchaguzi huu wajumbe sita (6) walichaguliwa kuingia katika Baraza la Kutunga Sheria",
+     "contests": 6,
+     "seats": 6
+    },
+    {
+     "date": "1961-01-01",
+     "precision": "month",
+     "source": "zec_report_2020",
+     "quote": "Uchaguzi huo ulikuwa na viti 22",
+     "contests": 22,
+     "seats": 22
+    },
+    {
+     "date": "1961-06-01",
+     "source": "zec_report_2020",
+     "quote": "uchaguzi wa tarehe 1 Juni, mwaka 1961 ... majimbo 23",
+     "contests": 23,
+     "seats": 23
+    },
+    {
+     "date": "1963-07-08",
+     "through": "1963-07-13",
+     "source": "zec_report_2020",
+     "quote": "kuanzia tarehe 8 Julai hadi tarehe 13 Julai, 1963. Kwa utaratibu huu majimbo 31"
+    }
+   ],
+   "est_votes": 400000,
+   "effort": 5
+  },
+  {
+   "key": "tanganyika_legco",
+   "tier": "national",
+   "name": "Baraza la Kutunga Sheria (LegCo) na Bunge la Tanganyika 1958-1960",
+   "name_en": "Tanganyika Legislative Council and National Assembly elections before the Union",
+   "category": "legislature",
+   "goal": "national",
+   "valid_to": "1964-04-26",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "parliament_history",
+   "locator": "https://www.parliament.go.tz/pages/history (\"Katika Uchaguzi Mkuu uliofanyika Februari, 1958, Baraza lilipata Wajumbe wa kuchaguliwa\")",
+   "note": "The first elected members joined the Council at the election Parliament's history dates to February 1958, then the 1960 election that made every seat elective and renamed the body the National Assembly. Tanganyika's direct presidential election of 1962 is class tanganyika_president.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "TZ",
+     "valid_to": "1964-04-26"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1958-02-01",
+     "precision": "month",
+     "source": "parliament_history",
+     "quote": "Katika Uchaguzi Mkuu uliofanyika Februari, 1958, Baraza lilipata Wajumbe wa kuchaguliwa"
+    },
+    {
+     "date": "1960-01-01",
+     "precision": "year",
+     "source": "parliament_history",
+     "quote": "Mwaka 1960 katika uchaguzi ambao ulikuwa sehemu ya maandalizi ya Uhuru wa Tanganyika, Wajumbe wote wa Baraza walikuwa ni wa kuchaguliwa"
+    }
+   ],
+   "est_votes": 1000000,
+   "effort": 5
+  },
+  {
+   "key": "tanganyika_president",
+   "tier": "national",
+   "name": "Uchaguzi wa Rais wa Jamhuri ya Tanganyika (1962)",
+   "name_en": "President of the Republic of Tanganyika, 1962",
+   "category": "executive",
+   "goal": "national",
+   "valid_to": "1964-04-26",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "inec_report_2015",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1750677287-Taarifa%20ya%20Uchaguzi%20Mkuu%202015.pdf (s. 1.1: \"Tanganyika ilipata uhuru tarehe 9 Desemba, 1961\")",
+   "note": "Tanganyika became a republic on 9 December 1962 after a direct presidential election earlier that year; no official source reached here records the poll or its date, so the class has no dated row.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "TZ",
+     "valid_to": "1964-04-26"
+    }
+   ],
+   "est_votes": 1200000,
+   "effort": 5
+  },
+  {
+   "key": "special_seats",
+   "tier": "national",
+   "name": "Viti Maalum vya Wanawake (Bunge, Baraza la Wawakilishi na Halmashauri)",
+   "name_en": "Women's special seats in Parliament, the House of Representatives, and councils",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 66(1)(b) and 78: seats allocated to parties in proportion to their share)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No vote is cast for these seats: INEC and ZEC allocate them from each party's share of the constituency vote or seats and gazette the nominees (INEC Gazette of 4 December 2020).",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "indirect",
+   "tier": "national",
+   "name": "Chaguzi zisizo za moja kwa moja",
+   "name_en": "Indirect elections: Bunge members chosen by the House of Representatives, East African Legislative Assembly members, and speakers",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Art. 66(1)(c): \"Wabunge watano waliochaguliwa na Baraza la Wawakilishi kutoka miongoni mwa wajumbe wake\")",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Members of a chamber choose these office holders among themselves; no voter casts a ballot and no public returns are published. Until 1990 Parliament also elected 15 national members and 15 women from party lists (INEC 1985 report).",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "party_primaries",
+   "tier": "national",
+   "name": "Kura za maoni za vyama",
+   "name_en": "Party nominations and internal primaries",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "election_act_2024",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714458586-SHERIA%20YA%20UCHAGUZI%20WA%20RAIS,%20WABUNGE%20NA%20MADIWANI%20YA%20MWAKA%202024.pdf (candidates must be nominated by a registered party)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties run their own nominations; the state does not run or publish them.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Majaji",
+   "name_en": "Judicial offices",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.inec.go.tz/uploads/documents/sw-1714455356-1.%20sw-1675190712-sw1499671152-Katiba_ya_Tanzania.pdf (Arts. 109 and 118: the President appoints the judges of the High Court and the Court of Appeal)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Tanzania elects no judges; all are appointed."
+  }
+ ]
+}
