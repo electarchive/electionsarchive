@@ -368,11 +368,13 @@ def packages() -> list[str]:
     return [
         "lv.cvk/geo",
         "lv.cvk/registry",
+        "lv.cvk/registry-pv",
         *(
             f"lv.cvk/{day}"
             for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05", *LEGACY, *EARLY_DAYS])
         ),
         *(f"lv.cvk/tn-{day}" for day in TN),
+        *(f"lv.cvk/{day}" for day in LOCAL_DAYS),
     ]
 
 
@@ -394,11 +396,13 @@ def fetch() -> None:
     for url in pv2021_pages():
         raw.fetch(SOURCE, url, suffix=".html")
     fetch_early()
+    fetch_local()
 
 
 def parse() -> None:
     geo().write()
     registry().write()
+    pv_registry().write()
     for day in DAYS:
         build(day).write()
     for day in REFERENDUMS:
@@ -415,6 +419,8 @@ def parse() -> None:
         build_legacy(day).write()
     for day in TN:
         referendum_archive(day).write()
+    for day in LOCAL_DAYS:
+        local(day).write()
 
 
 def emit() -> None:
@@ -2244,7 +2250,7 @@ def build_legacy(day: str) -> Package:
             contest_id=contest,
             stage="official",
             kind="counted",
-            source_id=CVK_SOURCE,
+            source_id=PV_SOURCE,
             status="active",
             is_default=True,
             completeness=1.0,
@@ -2734,3 +2740,503 @@ def fetch_early() -> None:
         raw.fetch(SOURCE, url, suffix=".json" if url.startswith(RD2020) else ".html")
     for url in vrd2021_pages():
         raw.fetch(SOURCE, url, suffix=".html")
+
+
+# Local council elections of 1997-2005, from the commission's archive pages. The archive prints list seats for every
+# 1997 council, list votes for one council in 2001, and turnout by council for 2001 and for the seven cities in 2005.
+PV_ROOT = f"{ARCHIVE}/pasvaldibu-velesanas/"
+PV1997 = f"{ARCHIVE}/pv-1997-velesanu-rezultati/"
+PV1997_LISTS = f"{ARCHIVE}/pv-1997-kandidatu-saraksti/"
+PV1997_STATS = f"{ARCHIVE}/pv-1997-kandidatu-statistika/"
+PV2001 = f"{ARCHIVE}/pv-2001-rezultati/"
+PV2001_ACTIVITY = f"{ARCHIVE}/pv-2001-aktivitate/"
+PV2001_LISTS = f"{ARCHIVE}/pv-2001-kandidatu-saraksti/"
+PV2005 = f"{ARCHIVE}/pv-2005-rezultati/"
+PV2005_ACTIVITY = f"{ARCHIVE}/pv-2005-aktivitate/"
+RENDA2003 = f"{ARCHIVE}/renda-2003-velesanas/"
+REZEKNE2005 = f"{ARCHIVE}/2005gada-20augusta-atkartotas-velesanas-rezekne/"
+REZEKNE2005_LISTS = f"{ARCHIVE}/rezekne-2005-atkartotas-kandidatu-saraksti/"
+PV_PAGES = {
+    "1997-03-09": f"{ARCHIVE}/1997-gada-9-marta-velesanas/",
+    "2001-03-11": f"{ARCHIVE}/2001-gada-11-marta-velesanas/",
+    "2003-09-20": f"{ARCHIVE}/2003-gada-20-septembra-velesanas-rendas-pagasta/",
+    "2005-03-12": f"{ARCHIVE}/2005gada-12marta-velesanas/",
+    "2005-08-20": REZEKNE2005,
+}
+LOCAL_DAYS = ("1997-03-09", "2001-03-11", "2003-09-20", "2005-03-12", "2005-08-20")
+LOCAL_TITLES = {
+    "1997-03-09": ("1997 Latvian local elections", "1997. gada pilsētu un pagastu vēlēšanas"),
+    "2001-03-11": ("2001 Latvian local elections", "2001. gada pašvaldību vēlēšanas"),
+    "2003-09-20": ("2003 Renda parish council election", "2003. gada Rendas pagasta padomes vēlēšanas"),
+    "2005-03-12": ("2005 Latvian local elections", "2005. gada pašvaldību vēlēšanas"),
+    "2005-08-20": (
+        "2005 Rēzekne city council repeat election",
+        "2005. gada Rēzeknes pilsētas domes atkārtotās vēlēšanas",
+    ),
+}
+LOCAL_METHOD = (
+    "Published by the Central Election Commission of Latvia on its archive site. {what} Each council is elected in "
+    "its own constituency by list proportional representation, and the commission's tables give each list's seats."
+)
+SUPPLEMENT = "The archive keeps no figure for the numbers it does not print, and none is stored."
+RENDA_LOCAL = {
+    'Vēlētāju apvienība "Rendas nākotnei"',
+    "Renda - mūsu mājas",
+    "Rendas tautsaimnieku apvienība",
+    "Par Rendu",
+}
+
+
+@dataclass
+class LList:
+    number: int | None
+    name: str
+    votes: int | None
+    seats: int
+    unmodified: int | None = None
+    modified: int | None = None
+    party: bool = True
+    members: list[tuple[int, str]] = field(default_factory=list)
+
+
+@dataclass
+class LCouncil:
+    code: str
+    name: str
+    group: str
+    seats: int | None
+    registered: int | None
+    cast: int | None
+    lists: list[LList] = field(default_factory=list)
+
+
+@dataclass
+class Local:
+    what: str
+    urls: list[str]
+    councils: list[LCouncil]
+
+
+PV_SOURCE = key("source", "pv-archive")
+SYSTEM_PV = key("electoral_system", "pv-local")
+
+
+def pv_party(label: str) -> str:
+    return key("party", "pv", party_key(label))
+
+
+def pv_registry() -> Package:
+    p = Package(
+        "lv.cvk/registry-pv",
+        SOURCE,
+        "The source, electoral system, and parties of Latvia's 1997-2005 local council elections, from the "
+        "Central Election Commission's archive",
+        depends=["lv.cvk/geo"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    p.add(
+        "source",
+        id=PV_SOURCE,
+        kind="official_body",
+        publisher="Centrālā vēlēšanu komisija",
+        title="Historical file of local council elections (Vēsturiskā kartotēka: Pašvaldību vēlēšanas)",
+        url=PV_ROOT,
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="Centrālā vēlēšanu komisija",
+    )
+    for url in pv_urls():
+        p.artifact(raw.cached(SOURCE, url), PV_SOURCE)
+    p.add("electoral_system", id=SYSTEM_PV, polity_id=LATVIA, rules={"formula": "sainte_lague"}, rules_version=1)
+    p.add(
+        "note",
+        id=key("note", SYSTEM_PV),
+        entity_id=SYSTEM_PV,
+        kind="methodology",
+        body_md=(
+            "Each council is elected in one constituency by list proportional representation with the Sainte-Laguë "
+            "method; the commission's seats for the 2001 Riga, 2003 Renda, and 2005 Rēzekne councils follow from "
+            "their printed votes under it. The thresholds are not stored here."
+        ),
+        lang="en",
+    )
+    labels: dict[str, str] = {}
+    for day in LOCAL_DAYS:
+        for council in read_local(day).councils:
+            for item in council.lists:
+                if item.party:
+                    labels.setdefault(pv_party(item.name), item.name)
+    for id, label in sorted(labels.items(), key=lambda item: item[1]):
+        p.add("party", id=id, kind="bloc" if "apvienot" in label.casefold() else "party", polity_id=LATVIA)
+        p.name(id, label, "lv", "official")
+    return p
+
+
+def pv_urls() -> list[str]:
+    return [
+        PV_ROOT,
+        *PV_PAGES.values(),
+        PV1997,
+        PV1997_LISTS,
+        PV1997_STATS,
+        *(url for _, url in pv1997_pages()),
+        PV2001,
+        PV2001_ACTIVITY,
+        PV2001_LISTS,
+        PV2005,
+        PV2005_ACTIVITY,
+        RENDA2003,
+        REZEKNE2005_LISTS,
+    ]
+
+
+def pv1997_pages() -> list[tuple[str, str]]:
+    """The 1997 council pages as (council name, url), in the order the results page links them. Two parishes
+    share a name, so a name alone does not identify a council."""
+    page = tables(PV1997)
+    found = [
+        (text, f"{ARCHIVE}/{href.rsplit('/lv/', 1)[-1]}")
+        for href, text in page.anchors
+        if re.search(r"/lv/pv-1997-kandidatu-balsis-[^/]+/?$", href)
+    ]
+    if len({url for _, url in found}) != len(found):
+        raise ValueError("1997 council pages share a link")
+    return found
+
+
+def pv1997_blocks(rows: list[list[str]]) -> list[tuple[str, list[list[str]]]]:
+    """Split a 1997 table of (council, list, ...) rows into one block per council: a block ends where the council's
+    name changes or the list numbers stop rising."""
+    blocks: list[tuple[str, list[list[str]]]] = []
+    last = 0
+    for row in rows:
+        number = _list_label(row[1])[0]
+        if not blocks or blocks[-1][0] != row[0] or number <= last:
+            blocks.append((row[0], []))
+        blocks[-1][1].append(row)
+        last = number
+    return blocks
+
+
+def fetch_local() -> None:
+    for url in (PV_ROOT, *PV_PAGES.values(), PV1997, PV1997_LISTS, PV1997_STATS):
+        raw.fetch(SOURCE, url, suffix=".html")
+    raw.fetch_many(SOURCE, [url for _, url in pv1997_pages()], suffix=".html", workers=4)
+    for url in (PV2001, PV2001_ACTIVITY, PV2001_LISTS, PV2005, PV2005_ACTIVITY, RENDA2003, REZEKNE2005_LISTS):
+        raw.fetch(SOURCE, url, suffix=".html")
+
+
+def _list_label(text: str) -> tuple[int, str]:
+    found = re.fullmatch(r"(\d+)\s+(.+)", text)
+    if found is None:
+        raise ValueError(f"cannot read the list {text!r}")
+    return int(found.group(1)), found.group(2)
+
+
+def _stat_parties() -> set[str]:
+    rows = next(rows for heading, rows in sections(PV1997_STATS) if heading == "Sarakstu iesniedzējas partijas")
+    return {party_key(row[0]) for row in rows[1:] if not row[0].startswith("PARTIJU")}
+
+
+def read_1997() -> Local:
+    results = pv1997_blocks(sections(PV1997)[0][1][1:])
+    ballots = pv1997_blocks(sections(PV1997_LISTS)[0][1][1:])
+    pages = pv1997_pages()
+    if not len(results) == len(ballots) == len(pages):
+        raise ValueError(f"1997: {len(results)} councils in results, {len(ballots)} in lists, {len(pages)} pages")
+    named = _stat_parties()
+    councils: list[LCouncil] = []
+    totals = [0, 0]
+    by_name: dict[str, list[str]] = {}
+    for page_name, page_url in pages:
+        by_name.setdefault(page_name, []).append(page_url)
+    taken: set[str] = set()
+    for (name, rows), (ballot_name, ballot_rows) in zip(results, ballots, strict=True):
+        if name != ballot_name:
+            raise ValueError(f"1997: council order differs at {name}")
+        wanted = [row[1] for row in rows]
+        url = next(u for u in by_name[name] if [h for h, _ in sections(u)] == wanted and u not in taken)
+        taken.add(url)
+        slug = url.rstrip("/").rsplit("/", 1)[-1].removeprefix("pv-1997-kandidatu-balsis-")
+        council = LCouncil(f"1997-03-09:{slug}", name, "", None, None, None)
+        numbers: dict[str, list[int]] = {}
+        for row in ballot_rows:
+            number, label = _list_label(row[1])
+            numbers.setdefault(label, []).append(number)
+        page = sections(url)
+        if len(page) != len(rows):
+            raise ValueError(f"1997 {name}: the page holds {len(page)} lists, the results table {len(rows)}")
+        text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8")
+        footers = [int(n) for n in re.findall(r"VIETAS\s*=\s*(\d+)", text)]
+        if len(footers) != len(page):
+            raise ValueError(f"1997 {name}: seats are not printed for every list")
+        for (heading, table), footer, row in zip(page, footers, rows, strict=True):
+            number, label = _list_label(row[1])
+            seats = int(row[2])
+            if _list_label(heading) != (number, label) or footer != seats:
+                raise ValueError(f"1997 {name}: list {heading!r} differs from the results table")
+            ranks = [int(r[0]) for r in table[1:]]
+            if ranks != list(range(1, len(ranks) + 1)) or seats > len(ranks):
+                raise ValueError(f"1997 {name} {heading}: candidate places or seats are not consistent")
+            members = [(int(r[4]), clean(r[5])) for r in table[1:] if int(r[0]) <= seats]
+            totals[0] += len(ranks)
+            ballot_number = numbers.get(label, [])
+            council.lists.append(
+                LList(
+                    ballot_number[0] if len(ballot_number) == 1 else None,
+                    label,
+                    None,
+                    seats,
+                    party=party_key(label) in named,
+                    members=members,
+                )
+            )
+        totals[1] += len(council.lists)
+        council.seats = sum(item.seats for item in council.lists)
+        if sum(len(item.members) for item in council.lists) != council.seats:
+            raise ValueError(f"1997 {name}: elected candidates do not add up to the seats")
+        councils.append(council)
+    if (totals[0], totals[1]) != (11942, 1454):
+        raise ValueError(f"1997: {totals[0]} candidates and {totals[1]} lists, the commission prints 11942 and 1454")
+    return Local(
+        "The archive prints, for each council, the seats each list won and each candidate's plus marks, minus marks, "
+        "and points; it prints no votes per list, no registered voters, and no ballots cast. The elected candidates "
+        "are the first places of each list, as many as the list's seats. Candidate marks are not stored here yet.",
+        [PV1997, PV1997_LISTS, PV1997_STATS, *(url for _, url in pages)],
+        councils,
+    )
+
+
+def _activity_rows(rows: list[list[str]]) -> list[tuple[str, int, int]]:
+    return [(row[0], _num(row[1]), _num(row[-2])) for row in rows[1:]]
+
+
+def read_2001() -> Local:
+    ((heading, rows),) = [s for s in sections(PV2001) if s[0] == "Rīga"]
+    lists = [LList(int(row[0]), row[1], _num(row[2]), _num(row[3])) for row in rows[1:]]
+    parts = sections(PV2001_ACTIVITY)
+    nation = _activity_rows(parts[0][1])[0]
+    councils: list[LCouncil] = []
+    sums = [0, 0]
+    for heading, table in parts[1:]:
+        rows_ = _activity_rows(table)
+        if len(rows_) == 1:
+            group, members = "", rows_
+        else:
+            group, members = rows_[0][0], rows_[1:]
+            if (sum(r[1] for r in members), sum(r[2] for r in members)) != rows_[0][1:]:
+                raise ValueError(f"2001 {heading}: the councils do not add up to the printed district row")
+        for name, registered, cast in members:
+            councils.append(
+                LCouncil(
+                    f"2001-03-11:{changeset.slug(group)}:{changeset.slug(name)}", name, group, None, registered, cast
+                )
+            )
+            sums[0] += registered
+            sums[1] += cast
+    if tuple(sums) != nation[1:]:
+        raise ValueError(f"2001: councils add up to {sums}, the commission prints {nation[1:]}")
+    riga = next(c for c in councils if c.name == "RĪGA")
+    riga.name = "Rīga"
+    riga.lists = lists
+    riga.seats = sum(item.seats for item in lists)
+    if riga.registered != 355983:
+        raise ValueError("2001: Riga's registered voters differ from the results page")
+    for council in councils:
+        council.name = council.name.title() if council.name.isupper() else council.name
+    return Local(
+        "The archive prints list votes and seats only for Riga. For the other councils it prints the voters on the "
+        "register and the voters who took part. " + SUPPLEMENT,
+        [PV2001, PV2001_ACTIVITY, PV2001_LISTS],
+        councils,
+    )
+
+
+def read_2005() -> Local:
+    rows = _activity_rows(sections(PV2005_ACTIVITY)[0][1])
+    nation = rows.pop()
+    if nation[0] != "LATVIJĀ" or (sum(r[1] for r in rows), sum(r[2] for r in rows)) != nation[1:]:
+        raise ValueError("2005: the printed rows do not add up to the Latvian total")
+    cities = [r for r in rows if not r[0].endswith("RAJONS")]
+    if len(cities) != 7 or len(rows) != 33:
+        raise ValueError("2005: expected seven cities and 26 districts")
+    councils = [
+        LCouncil(f"2005-03-12:{changeset.slug(name)}", name.title(), "", None, registered, cast)
+        for name, registered, cast in cities
+    ]
+    return Local(
+        "The archive prints the voters on the register and the voters who took part for the seven republic cities. "
+        "For the other councils it prints turnout only by district, which is not a council, and no list results; "
+        "the results tables of the other councils are no longer in the archive. " + SUPPLEMENT,
+        [PV2005_ACTIVITY],
+        councils,
+    )
+
+
+def read_renda() -> Local:
+    rows = sections(RENDA2003)[0][1]
+    text = re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, RENDA2003).path.read_text(encoding="utf-8"))
+    found = re.search(r"\(20\.09\.2003\)\s*-\s*(\d+)", text)
+    if found is None:
+        raise ValueError("2003 Renda: no registered voters printed")
+    lists = [
+        LList(int(row[0]), row[1], _num(row[2]), _num(row[3]), party=row[1] not in RENDA_LOCAL) for row in rows[1:]
+    ]
+    council = LCouncil(
+        "2003-09-20:renda", "Rendas pagasts", "", sum(item.seats for item in lists), int(found.group(1)), None, lists
+    )
+    return Local(
+        "The archive prints each list's votes and seats and the voters on the register on the day of the call. It "
+        "prints no ballots cast. " + SUPPLEMENT,
+        [RENDA2003],
+        [council],
+    )
+
+
+def read_rezekne() -> Local:
+    rows = sections(PV2005)[0][1]
+    found = re.search(r"Vietas \(\s*(\d+)\s*\)", rows[0][-1])
+    if found is None:
+        raise ValueError("2005 Rēzekne: the seats are not printed in the table header")
+    seats = int(found.group(1))
+    lists = [
+        LList(int(row[0]), clean(row[1]), _num(row[2]), _num(row[5]), _num(row[3]), _num(row[4])) for row in rows[1:]
+    ]
+    for item in lists:
+        if (item.unmodified or 0) + (item.modified or 0) != item.votes:
+            raise ValueError(f"2005 Rēzekne list {item.number}: unmodified and modified marks do not add up")
+    if sum(item.seats for item in lists) != seats:
+        raise ValueError("2005 Rēzekne: seats do not add up to the printed number")
+    page = re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, REZEKNE2005).path.read_text(encoding="utf-8"))
+    cast = re.search(r"piedalījās\s+(\d+)\s+jeb", page)
+    if cast is None or int(cast.group(1)) != 11150:
+        raise ValueError("2005 Rēzekne: ballots cast are not printed as expected")
+    council = LCouncil("2005-08-20:rezekne", "Rēzeknes pilsēta", "", seats, None, int(cast.group(1)), lists)
+    return Local(
+        "The archive prints each list's marks, split into unmodified and modified marks, and seats, and the voters "
+        "who took part. It prints no registered voters. The results table is the commission's snapshot of 22 August "
+        "2005. " + SUPPLEMENT,
+        [PV2005, REZEKNE2005, REZEKNE2005_LISTS],
+        [council],
+    )
+
+
+def read_local(day: str) -> Local:
+    return {
+        "1997-03-09": read_1997,
+        "2001-03-11": read_2001,
+        "2003-09-20": read_renda,
+        "2005-03-12": read_2005,
+        "2005-08-20": read_rezekne,
+    }[day]()
+
+
+def local(day: str) -> Package:
+    data = read_local(day)
+    first = date.fromisoformat(day)
+    english, native = LOCAL_TITLES[day]
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} from the Central Election Commission's archive",
+        depends=["lv.cvk/geo", "lv.cvk/registry-pv"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    for url in (PV_ROOT, PV_PAGES[day], *data.urls):
+        p.uses(raw.cached(SOURCE, url))
+    election = key("election", day, "local")
+    where = f"lv/{day}-local"
+    p.add("election", id=election, polity_id=LATVIA, kind="local", date_from=first, date_to=first, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    method = LOCAL_METHOD.format(what=data.what)
+    used: Counter[str] = Counter()
+    for council in sorted(data.councils, key=lambda c: (c.name, c.group)):
+        contest = key("contest", day, "local", council.code)
+        slug = changeset.slug(council.name)
+        used[slug] += 1
+        slug = slug if used[slug] == 1 else f"{slug}-{changeset.slug(council.group) or used[slug]}"
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            magnitude=council.seats,
+            round_number=1,
+            electoral_system_id=SYSTEM_PV,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{first.year} {council.name} council election", "en", "official")
+        p.name(contest, f"{council.name} domes vēlēšanas {first.year}", "lv", "native", False)
+        p.add("slug", path=f"{where}/{slug}", entity_id=contest, is_current=True)
+        result_set = key("result_set", day, "local", council.code)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=PV_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0 if any(item.votes is not None for item in council.lists) else None,
+        )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        unit = key("unit", council.code)
+        has_values = (
+            council.registered is not None
+            or council.cast is not None
+            or any(item.votes is not None for item in council.lists)
+        )
+        if has_values:
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LATVIA,
+                scheme_code="lv.pasvaldiba",
+                code=council.code,
+                area_relation="unlocated",
+                area_id=None,
+                kind="aggregate",
+            )
+            p.name(unit, council.name, "lv", "official")
+        for measure, value in ((REGISTERED, council.registered), (CAST, council.cast)):
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+                _put(p, result_set, unit, None, measure, value)
+        for item in council.lists:
+            option = key("option", day, "local", council.code, item.number if item.number is not None else item.name)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=pv_party(item.name) if item.party else None,
+                ballot_position=item.number,
+                ballot_label=item.name,
+            )
+            if item.votes is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=item.votes)
+                _put(p, result_set, unit, option, VOTES, item.votes)
+                _put(p, result_set, unit, option, 22, item.unmodified)
+                _put(p, result_set, unit, option, 23, item.modified)
+            if item.seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=item.seats)
+            for position, name in item.members:
+                person = key("person", day, council.code, item.name, position)
+                p.add("person", id=person)
+                p.name(person, name, "lv", "official")
+                candidacy = key("candidacy", day, council.code, item.name, position)
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=position,
+                    ballot_name=name,
+                )
+                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+    return p

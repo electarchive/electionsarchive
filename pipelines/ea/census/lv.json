@@ -1297,15 +1297,17 @@
      "date": "1997-03-09",
      "election_kind": "local",
      "source": "cvk_pasv",
-     "quote": "1997. gada vēlēšanas",
-     "note": "Council count not printed on the archive page."
+     "quote": "Rezultāti pa pašvaldībām",
+     "note": "566 city, town, and parish councils, counted from the council result pages linked from the 1997 results page; each prints list seats and candidate marks, and no list votes. The page prints no council total.",
+     "contests": 566
     },
     {
      "date": "2001-03-11",
      "election_kind": "local",
      "source": "cvk_pasv",
-     "quote": "2001. gada vēlēšanas",
-     "note": "Council count not printed on the archive page."
+     "quote": "Vēlētāju aktivitāte vēlēšanu dienā — 2001. gada pašvaldību vēlēšanas",
+     "note": "552 councils (7 republic cities and the councils of 26 districts), counted from the turnout page, which prints voters and turnout for each. List votes and seats are printed only for Riga.",
+     "contests": 552
     },
     {
      "date": "2003-09-20",
@@ -1319,7 +1321,7 @@
      "election_kind": "local",
      "source": "cvk_pasv",
      "quote": "2005. gada vēlēšanas",
-     "note": "Council count not printed on the archive page."
+     "note": "The archive prints no council count. It prints turnout for the 7 republic cities and, for the other councils, only by district; list results are printed only for the August repeat in Rēzekne."
     },
     {
      "date": "2005-08-20",
