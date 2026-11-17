@@ -1,5 +1,6 @@
 import functools
 import io
+import re
 import zipfile
 from dataclasses import dataclass
 from datetime import date
@@ -9,6 +10,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.fi import early, pages
 
 SOURCE = "fi.vaalit"
 BASE = "https://tulospalvelu.vaalit.fi"
@@ -70,6 +72,7 @@ def fetch() -> None:
     for vote in VOTES:
         for address in files(vote):
             raw.fetch(SOURCE, address, suffix=".pdf" if address.endswith(".pdf") else ".zip")
+    pages.fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -77,6 +80,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 VOLBY = key("source", "results-service")
+STATFIN = key("source", "statfin")
 LEVEL = {"E": "V", "EP": "M", "P": "M", "K": "K", "A": "R"}
 NATIONAL = {"EP", "P"}
 WIDTH = {"alu": 74, "ehd": 45, "puo": 53}
@@ -93,8 +97,10 @@ SCHEMES = (
     ("fi.maa", "administrative", 0, "country"),
     ("fi.vaalipiiri", "electoral_district", 1, "constituency"),
     ("fi.hyvinvointialue", "administrative", 1, "wellbeing services county"),
+    ("fi.maakunta", "administrative", 1, "region"),
     ("fi.kunta", "administrative", 2, "municipality"),
     ("fi.aanestysalue", "precinct", 3, "voting district"),
+    ("fi.kuntalaskenta", "precinct", 3, "municipal count"),
 )
 
 
@@ -138,7 +144,7 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
     ),
     (
         system("local"),
-        date(2011, 1, 1),
+        date(2004, 10, 24),
         None,
         {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_by_votes"}},
         (
@@ -146,6 +152,18 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
             "go to the candidate lists by D'Hondt. A voter marks one candidate, the votes for a candidate count for "
             "the list, and the candidates of a list are ranked by their own votes. The validity start marks the first "
             "election the archive holds from this source."
+        ),
+    ),
+    (
+        system("kainuu"),
+        date(2004, 10, 24),
+        None,
+        {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_by_votes"}},
+        (
+            "The region of Kainuu elects its regional council, whose seats go to the candidate lists by D'Hondt across "
+            "the region. A voter marks one candidate, the votes for a candidate count for the list, and the "
+            "candidates of a list are ranked by their own votes. The validity start marks the first election the "
+            "archive holds from this source."
         ),
     ),
     (
@@ -159,15 +177,16 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
         ),
     ),
 ]
-WHICH = {"E": "parliament", "EP": "european", "K": "local", "A": "local", "P": "president"}
+WHICH = {"E": "parliament", "EP": "european", "K": "local", "A": "local", "P": "president", "M": "kainuu"}
 TITLES = {
     "E": ("Finnish parliamentary election", "Eduskuntavaalit", "Riksdagsval"),
     "EP": ("European Parliament election in Finland", "Europarlamenttivaalit", "Europaparlamentsval"),
     "K": ("Finnish municipal elections", "Kuntavaalit", "Kommunalval"),
     "A": ("Finnish wellbeing services county elections", "Aluevaalit", "Landskapsval"),
     "P": ("Finnish presidential election", "Presidentinvaali", "Presidentval"),
+    "M": ("Kainuu regional council election", "Kainuun maakuntavaalit", "Landskapsval i Kajanaland"),
 }
-SLUGS = {"E": "general", "EP": "european", "K": "municipal", "A": "county", "P": "presidential"}
+SLUGS = {"E": "general", "EP": "european", "K": "municipal", "A": "county", "P": "presidential", "M": "regional"}
 
 
 def read(vote: Vote, part: str) -> pl.DataFrame:
@@ -210,14 +229,17 @@ def packages() -> list[str]:
 
 
 def days() -> list[date]:
-    return sorted({vote.day for vote in VOTES})
+    return sorted({vote.day for vote in VOTES} | {page.day for page in pages.PAGES})
 
 
 def parse() -> None:
     geo().write()
     registry().write()
     for day in days():
-        election(day).write()
+        if day in {page.day for page in pages.PAGES}:
+            early.election(day).write()
+        else:
+            election(day).write()
 
 
 def emit() -> None:
@@ -245,7 +267,24 @@ def places() -> dict[str, dict[str, tuple[str, str]]]:
                 found["fi.vaalipiiri"][row["c6"]] = names
             elif vote.kind == "A":
                 found["fi.hyvinvointialue"][row["c2"]] = names
+    older = early.places()
+    for code, names in older["fi.kunta"].items():
+        found["fi.kunta"].setdefault(code, names)
+    for code, names in older["council"].items():
+        found["council"].setdefault(code, names)
+    found["fi.maakunta"] = older["fi.maakunta"]
     return found
+
+
+@functools.cache
+def former_names() -> dict[str, list[str]]:
+    """Names that a municipality carried in the elections before 2011, when they differ from its later name."""
+    current = places()["fi.kunta"]
+    return {
+        code: [name for name in names if name != current[code][0]]
+        for code, names in early.places_names().items()
+        if any(name != current[code][0] for name in names)
+    }
 
 
 def area(scheme: str, code: str) -> str:
@@ -267,10 +306,8 @@ def geo() -> Package:
     p.name(COUNTRY, "Finland", "en", "official")
     p.name(COUNTRY, "Suomi", "fi", "native", False)
     p.name(COUNTRY, "Finland", "sv", "native", False)
-    for scheme, found in places().items():
-        if scheme == "council":
-            continue
-        for code, (fi, sv) in sorted(found.items()):
+    for scheme in ("fi.vaalipiiri", "fi.hyvinvointialue", "fi.kunta", "fi.maakunta"):
+        for code, (fi, sv) in sorted(places()[scheme].items()):
             id = area(scheme, code)
             p.add("area", id=id, scheme_code=scheme)
             p.add("area_code", area_id=id, code=code)
@@ -278,6 +315,9 @@ def geo() -> Package:
             p.name(id, fi, "fi", "official")
             if sv and sv != fi:
                 p.name(id, sv, "sv", "official", False)
+            if scheme == "fi.kunta":
+                for name in former_names().get(code, []):
+                    p.name(id, name, "fi", "historical", False)
     return p
 
 
@@ -302,6 +342,35 @@ def party(permanent: str) -> str:
     return key("party", permanent)
 
 
+def page_party(name: str) -> str:
+    """A party that only the pages before 2011 name has no permanent identifier, so it is keyed by its name."""
+    return key("party", "page", name)
+
+
+def fold(name: str) -> str:
+    return "".join(ch for ch in re.sub(r"\(.*?\)", "", name) if ch.isalnum()).casefold()
+
+
+@functools.cache
+def known_names() -> dict[str, str]:
+    """The id of each registered party by every name it carried from 2011, folded for comparison."""
+    out: dict[str, str] = {}
+    for permanent, names in parties().items():
+        for field in ("fi", "sv", "en"):
+            for _, text in names[field]:
+                out[fold(text)] = party(permanent)
+    for name, permanent in early.ALIASES.items():
+        out[fold(name)] = party(permanent)
+    for name in early.NEW_PARTIES:
+        out[fold(name)] = page_party(name)
+    return out
+
+
+def list_party(name: str) -> str | None:
+    """The party that a list on a page before 2011 belongs to, or none for a joint list or an electors' association."""
+    return known_names().get(fold(name))
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry", SOURCE, "Finnish parties, the Eduskunta, the presidency, councils, and electoral systems"
@@ -319,8 +388,20 @@ def registry() -> Package:
         attribution="Oikeusministeriö, vaalit.fi",
     )
     cited = [raw.cached(SOURCE, address) for vote in VOTES for address in files(vote)]
+    cited += early.cited()
     for artifact in {artifact.storage_key: artifact for artifact in cited}.values():
-        p.artifact(artifact, VOLBY)
+        p.artifact(artifact, STATFIN if artifact.url.startswith(pages.STATFIN) else VOLBY)
+    p.add(
+        "source",
+        id=STATFIN,
+        kind="official_body",
+        publisher="Tilastokeskus",
+        title="StatFin passive tables (Statistics Finland), municipality numbers",
+        url="https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin_Passiivi/",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="Tilastokeskus, StatFin",
+    )
     p.add("body", id=PARLIAMENT, polity_id=FINLAND, kind="unicameral")
     p.name(PARLIAMENT, "Parliament of Finland", "en", "official")
     p.name(PARLIAMENT, "Eduskunta", "fi", "native", False)
@@ -337,11 +418,20 @@ def registry() -> Package:
         id = council(code, "county")
         p.add("body", id=id, polity_id=FINLAND, kind="council")
         p.name(id, f"County council of {fi}", "en", "official")
+    for code, (fi, sv) in sorted(places()["fi.maakunta"].items()):
+        id = council(code, "regional")
+        p.add("body", id=id, polity_id=FINLAND, kind="council")
+        p.name(id, f"Regional council of {fi}", "en", "official")
+        p.name(id, "Kainuun maakuntavaltuusto", "fi", "native", False)
     for id, since, until, rules, method in SYSTEMS:
         p.add(
             "electoral_system", id=id, polity_id=FINLAND, valid_from=since, valid_to=until, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for name in early.NEW_PARTIES:
+        id = page_party(name)
+        p.add("party", id=id, kind="party", polity_id=FINLAND)
+        p.name(id, name, "fi", "official")
     for permanent, names in sorted(parties().items()):
         id = party(permanent)
         p.add("party", id=id, kind="party", polity_id=FINLAND)
@@ -548,7 +638,11 @@ def _vote(p: Package, vote: Vote, units: dict[tuple[str, str], str]) -> tuple[in
 
 
 def system_of(vote: Vote) -> str:
-    return key("electoral_system", WHICH[vote.kind])
+    return system_of_kind(vote.kind)
+
+
+def system_of_kind(kind: str) -> str:
+    return key("electoral_system", WHICH[kind])
 
 
 def _lists(p: Package, vote: Vote, sets: dict[str, str]) -> dict[tuple[str, str], str]:
