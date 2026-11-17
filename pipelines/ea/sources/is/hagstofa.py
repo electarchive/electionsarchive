@@ -1,5 +1,6 @@
 """Iceland's elections from Statistics Iceland's PxWeb tables, down to the municipality."""
 
+import importlib
 import json
 import os
 import re
@@ -1851,6 +1852,14 @@ TACIT = re.compile(r"^(?P<m>.+?)[,\s]+(?:sjálfkjörið|one list)(?P<rest>.*)$",
 MARKER = re.compile(r"^[\s,]*(?:elected|without voting|no voting|not voting|,)\s*", re.IGNORECASE)
 
 
+def authority_seats() -> dict[str, int]:
+    return importlib.import_module("ea.sources.is.stjornarradid").authority_seats()
+
+
+def committee_covered() -> frozenset[str]:
+    return importlib.import_module("ea.sources.is.stjornarradid").COVERED
+
+
 def count(value: float | None) -> int | None:
     return None if value is None else int(value)
 
@@ -1948,6 +1957,8 @@ def local(event: Event) -> Package:
     seat_rows = {label: [count(seats.cells[(label, seat_unit, "Total")])] for label in seats.labels[seats.dims[0]]}
     r_blocks = {x.name: x for x in blocks(results, result_rows)}
     s_blocks = {x.name: x for x in blocks(seats, seat_rows)}
+    committee = authority_seats() if year == 2022 else {}
+    covered_names = committee_covered() if year == 2022 else frozenset()
     v = grid(votes_table) if votes_table else None
     v_labels = {canon(label): label for label in v.labels["Municipality"]} if v is not None else {}
     note = SOURCE_NOTE + (
@@ -2011,6 +2022,7 @@ def local(event: Event) -> Package:
                 if seated[position - 1]:
                     b.outcome(tacit_set, option, seated[position - 1], "elected")
             continue
+        covered = year == 2022 and name in covered_names
         if block is None:
             contest = b.contest(
                 f"local:{name}", title, kind="body_seats", where=area_id, system=SYSTEM_LOCAL, body_id=COUNCIL_BODY
@@ -2021,6 +2033,7 @@ def local(event: Event) -> Package:
                 SOURCE_NOTE + "This municipality's council was elected by direct personal voting, without candidate "
                 "lists. Statistics Iceland publishes the municipality's turnout and ballots, and not the votes "
                 "for each person.",
+                default=not covered,
             )
             unit = b.municipality(name)
             for measure, value in ((2, registered), (3, cast), (4, valid), (6, blank), (5, void)):
@@ -2036,14 +2049,27 @@ def local(event: Event) -> Package:
         magnitude = share.head[0] if share is not None and share.head[0] is not None else None
         if magnitude is None and share is not None:
             magnitude = sum(vals[0] or 0 for _, vals in share.lists) or None
+        disputed = name in committee and committee[name] != magnitude
+        if disputed:
+            magnitude = committee[name]
         b.p.rows["contest"][-1]["magnitude"] = magnitude
-        result_set = b.result_set(f"local:{name}", contest, note)
+        result_set = b.result_set(f"local:{name}", contest, note, default=not covered)
         unit = b.municipality(name)
         for measure, value in ((2, registered), (3, cast), (4, valid), (6, blank), (5, void)):
             b.value(result_set, unit, None, measure, value)
             b.declare(result_set, None, measure, value)
         listed = 0
         seated = seats_for(block.lists, share)
+        if disputed:
+            b.note(
+                result_set,
+                "caveat",
+                "Statistics Iceland's table of representatives gives a different number of seats than the "
+                f"municipal electoral committee's report, which gives {magnitude}. The seats are not stored here; "
+                "the committee's report holds them.",
+                "seats",
+            )
+            seated = [None] * len(block.lists)
         for position, (text, vals) in enumerate(block.lists, 1):
             pid = local_party(text)
             option = b.option(contest, letter(text), text, position, "list", party(pid) if pid else None)
