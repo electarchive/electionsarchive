@@ -2,8 +2,8 @@
 
 Statistics Denmark publishes one volume per election as a scanned PDF with a text layer (VisPub cid 20199 to 20213 and
 20327 to 20331). Each volume prints the official count of party votes for every nomination district (opstillingskreds)
-with the totals of its amtskreds or storkreds and of the whole country. From 1971 the same table also gives each
-district's registered voters, ballots cast, and blank and other invalid ballots; from 1990 those come from a separate
+with the totals of its amtskreds or storkreds and of the whole country. From 1968 the same table also gives each
+district's registered voters, ballots cast, and blank and other invalid ballots; from 1994 those come from a separate
 table with the same rows.
 
 Each figure is read from the text layer with its page and box (`dst_folketing_read`). Every row's parties must add up to its
@@ -64,10 +64,13 @@ class Part:
     left: float = 0.0
     top: float = 0.0
     bottom: float = 1e9
+    edges: tuple[float, ...] = ()  # the columns' right edges, where the page's own columns cannot be found
 
 
-def part(page: int, *roles: str, left: float = 0.0, top: float = 0.0, bottom: float = 1e9) -> Part:
-    return Part(page, tuple(roles), left, top, bottom)
+def part(
+    page: int, *roles: str, left: float = 0.0, top: float = 0.0, bottom: float = 1e9, edges: tuple[float, ...] = ()
+) -> Part:
+    return Part(page, tuple(roles), left, top, bottom, edges)
 
 
 @dataclass(frozen=True)
@@ -84,7 +87,10 @@ class Volume:
     system: str = SYSTEM_1964
     after: bool = False  # the amtskreds total follows its districts ("Tilsammen") instead of leading them
     fixes: dict[tuple[int, str], int] = field(default_factory=dict)  # (line, role) to the figure on the page image
+    notes: tuple[str, ...] = ()
     tolerance: float = 3.0
+    dots: bool = False  # a dot marks an empty cell
+    adaptive: bool = False  # the scan sets rows off sideways, so each line is fitted to the columns
 
     @property
     def url(self) -> str:
@@ -108,11 +114,12 @@ def fetch() -> None:
 
 NATION = re.compile(r"hele\s*landet|^\W*i\s*alt\W*$", re.IGNORECASE)
 REGION = re.compile(
-    r"^\W*[a-c]\s*[.,]\s|omr\S*de|k\S*benhavn\s*(-|og)?\s*frede|^\W*\S?\S?erne\W*$|^\W*jylland\W*$|^\W*$", re.IGNORECASE
+    r"^\W*[a-c]\s*[.,]\s|omr\S*de|k\S*benhavn\s*(-|og)?\s*frede|^\W*\S?\S?erne\W*$|^\W*jylland\W*$|^\W*$|\s+i\s*alt[\s.]*$",
+    re.IGNORECASE,
 )
 AMT = re.compile(r"(stor|amts)\s*-?\s*kr\S*d|storkr\b|mtskr|a\S?ntskr|\sa\S{1,2}skreds", re.IGNORECASE)
 ROMAN = re.compile(r"^\W*(II|III|IV|VI{0,3}|IX|XI{0,3})\s*[.,]\s*\D")
-TOTAL = re.compile(r"t\S{0,2}l\s*sa\S*men|^\W*i\s*alt\W*$", re.IGNORECASE)
+TOTAL = re.compile(r"t\S{0,2}l\s*sa\S*men|^\W*i\s*alt\W*$|^[^\d\s]*men[\s.]*$", re.IGNORECASE)
 KREDS = re.compile(r"^\W{0,2}(\d{1,2}|[IlJ]|[IlJ]\d|\d[IlJ])\s*[.,:]\s*(.*)$")
 HEADER = re.compile(r"(stor|amts)\s*-?\s*kr\S*d|storkr\b|^\W*[IVX]{1,5}\s*[.,]\s*\S", re.IGNORECASE)
 
@@ -160,46 +167,63 @@ def rows(volume: Volume, pdf: Path) -> list[tuple[str, bool, dict[str, read.Cell
     last = max(p.page for p in every(volume))
     pages = read.pages(pdf, first, last)
     found: list[tuple[str, bool, dict[str, read.Cell | None]]] = []
-    grids: dict[int, list[tuple[str, float, list[read.Word]]]] = {}
-    edges: dict[int, list[float]] = {}
+    grids: dict[Part, list[tuple[str, float, list[read.Word]]]] = {}
+    edges: dict[Part, list[float]] = {}
     templates: dict[tuple[str, ...], list[float]] = {}
     for p in every(volume):
-        left = read.label_edge(pages[p.page], p.top, p.bottom) if p.left < 0 else p.left
-        grids[p.page] = read.lines_of(
+        grids[p] = read.lines_of(
             pages[p.page],
-            left=left,
+            left=p.left,
             top=p.top,
             bottom=p.bottom,
             labels=p.left != 0,
             headers=HEADER if p.left != 0 and volume.after else None,
             tolerance=volume.tolerance,
+            dots=volume.dots,
         )
-        full = [read.joined(g, 6.5) for _, _, g in grids[p.page]]
+        full = [read.joined(g, 6.5) for _, _, g in grids[p]]
         full = [g for g in full if len(g) >= max(2, len(p.roles) // 2)]
+        if p.edges:
+            edges[p] = list(p.edges)
+            continue
         try:
-            edges[p.page] = read.columns(full, len(p.roles))
-            templates.setdefault(p.roles, edges[p.page])
+            edges[p] = read.columns(full, len(p.roles))
+            templates.setdefault(p.roles, edges[p])
         except ValueError:
             pass
     for p in every(volume):
-        if p.page not in edges and p.roles not in templates:
+        if p not in edges and p.roles not in templates:
             templates[p.roles] = union(
                 [
-                    [g for g in (read.joined(g, 6.5) for _, _, g in grids[q.page]) if len(g) >= 2]
+                    [g for g in (read.joined(g, 6.5) for _, _, g in grids[q]) if len(g) >= 2]
                     for q in every(volume)
                     if q.roles == p.roles
                 ],
                 len(p.roles),
             )
-        if p.page not in edges:
-            full = [g for g in (read.joined(g, 6.5) for _, _, g in grids[p.page]) if len(g) >= 2]
-            edges[p.page] = read.columns(full, len(p.roles), templates.get(p.roles))
+        if p not in edges:
+            full = [g for g in (read.joined(g, 6.5) for _, _, g in grids[p]) if len(g) >= 2]
+            edges[p] = read.columns(full, len(p.roles), templates.get(p.roles))
     for spread in volume.spreads:
         parts: list[tuple[Part, list[read.Row]]] = [
-            (group[0], [row for p in group for row in read.place(p.page, grids[p.page], edges[p.page])])
+            (
+                group[0],
+                [
+                    row
+                    for p in group
+                    for row in read.place(
+                        p.page,
+                        grids[p],
+                        edges[p],
+                        adaptive=volume.adaptive,
+                    )
+                ],
+            )
             for group in groups(spread)
         ]
-        figures = [[row for row in got if not row.header] for _, got in parts]
+        figures = [
+            [row for row in got if not row.header and sum(c is not None for c in row.cells) >= 2] for _, got in parts
+        ]
         if all(p.left != 0 for p, _ in parts) and len(parts) > 1:
             figures = aligned(figures)
         lengths = [len(f) for f in figures]
@@ -304,12 +328,30 @@ def classify(
             out.append(Line("region", text, cells))
         else:
             match = KREDS.match(text)
+            if not match and len(re.findall(r"[A-Za-zÆØÅæøå]{5,}", text)) >= 2:
+                continue  # running text that carries a figure, such as a page heading; a lost row breaks the sums
             if not match or amt < 0:
                 raise ValueError(f"{volume.day}: cannot place the row {text!r}")
             number = match.group(1).translate(str.maketrans("IlJ", "111"))
             out.append(Line("kreds", text, cells, amt=amt, number=number, name=match.group(2)))
     for index, line in enumerate(out):
         line.index = index
+    if volume.after:
+        # Headings can run over two lines and table headings repeat on every page, so the amtskredse are counted by
+        # their totals: each total closes the districts printed above it.
+        count = 0
+        pending: list[Line] = []
+        for line in out:
+            if line.kind == "kreds":
+                pending.append(line)
+            elif line.kind == "amt":
+                for member in [*pending, line]:
+                    member.amt = count
+                pending = []
+                count += 1
+        if pending:
+            raise ValueError(f"{volume.day}: districts after the last amtskreds total")
+        names = [line.label for line in out if line.kind == "amt"]
     return out, names
 
 
@@ -486,6 +528,107 @@ def reconcile(volume: Volume, lines: list[Line]) -> list[str]:
                 mend(line, role, alternative, "another reading of the printed figure that its column sum proves")
                 changed = True
                 break
+        if changed:
+            continue
+        # A district's row broken where one figure has a reading that mends the row; the figure's column, if broken
+        # too, is left for the next pass to prove.
+        for n in sorted(broken):
+            r = residual(rules[n])
+            if r is None or len({t[0].index for t in rules[n]}) != 1:
+                continue
+            candidates = []
+            for line, role, sign in rules[n]:
+                cell = line.cells.get(role)
+                if cell is None or cell.value is None:
+                    continue
+                for alternative in cell.alternatives:
+                    if r + sign * (alternative - cell.value) == 0:
+                        candidates.append((line, role, alternative))
+            if len(candidates) == 1:
+                line, role, alternative = candidates[0]
+                others = [m for m in member[(line.index, role)] if m != n]
+                before = {m: residual(rules[m]) == 0 for m in others}
+                old = line.cells[role]
+                assert old is not None
+                previous = old.value
+                old.value = alternative
+                if all(residual(rules[m]) == 0 or not before[m] for m in others):
+                    old.value = previous
+                    mend(line, role, alternative, "another reading of the printed figure that its row sum proves")
+                    changed = True
+                    break
+                old.value = previous
+        if changed:
+            continue
+        # A row with several misread figures, each proved by its own column, where the row is the only one of its
+        # group whose sum fails.
+        for line in lines:
+            row = [n for n in member[(line.index, "valid")] if len({t[0].index for t in rules[n]}) == 1]
+            if not row or row[0] not in broken or residual(rules[row[0]]) is None:
+                continue
+            columns: dict[str, int] = {}
+            for _, role, sign in rules[row[0]]:
+                for m in member[(line.index, role)]:
+                    if m == row[0] or m not in broken:
+                        continue
+                    r = residual(rules[m])
+                    if r is None:
+                        continue
+                    others = {t[0].index for t in rules[m]} - {line.index}
+                    ([k for k in member.get((next(iter(others)), "valid"), []) if k in broken] if others else [])
+                    term = next(t for t in rules[m] if t[0].index == line.index and t[1] == role)
+                    columns[role] = -r * term[2]
+            total = residual(rules[row[0]])
+            signs = {role: sign for _, role, sign in rules[row[0]]}
+            if columns and total is not None and sum(signs[role] * d for role, d in columns.items()) == -total:
+                for role, delta in columns.items():
+                    mend(line, role, (value((line, role, 1)) or 0) + delta, "proved by its column sum and its row sum")
+                if all(residual(rules[n]) == 0 for role in columns for n in member[(line.index, role)]):
+                    changed = True
+                    break
+        if changed:
+            continue
+        # A total whose printed figures were misread in several columns: the sums of its districts, where every
+        # district's row holds and the total's own row then holds with its printed valid votes.
+        for line in lines:
+            if line.kind not in ("amt", "nation"):
+                continue
+            row = [n for n in member[(line.index, "valid")] if len({t[0].index for t in rules[n]}) == 1]
+            if not row or row[0] not in broken:
+                continue
+            sums: dict[str, int] = {}
+            for n in member[(line.index, "valid")]:
+                pass
+            for (index, role), ns in member.items():
+                if index != line.index or role == "valid":
+                    continue
+                for m in ns:
+                    terms = rules[m]
+                    if len({t[0].index for t in terms}) == 1 or m not in broken:
+                        continue
+                    parts = [t for t in terms if t[0].index != line.index]
+                    if any(value(t) is None for t in parts):
+                        continue
+                    if not all(all(residual(rules[k]) == 0 for k in member[(t[0].index, "valid")]) for t in parts):
+                        continue
+                    sums[role] = sum(value(t) or 0 for t in parts)
+            if not sums:
+                continue
+            saved = {role: line.cells.get(role) for role in sums}
+            for role, total in sums.items():
+                line.cells[role] = read.Cell(total, "", -1, (0.0, 0.0, 0.0, 0.0))
+            if residual(rules[row[0]]) == 0:
+                for role, total in sums.items():
+                    old = saved[role]
+                    line.cells[role] = old
+                    mend(line, role, total, "misread on the page; the sum of the rows it totals, which its row proves")
+                changed = True
+                break
+            for role, old in saved.items():
+                if old is None:
+                    del line.cells[role]
+                else:
+                    line.cells[role] = old
         if not changed:
             break
     problems = []
@@ -588,6 +731,8 @@ def amt_names(day: date, printed: list[str]) -> list[str]:
     if len(printed) != len(names):
         raise ValueError(f"{day}: found {len(printed)} amtskredse, expected {len(names)}")
     for name, label in zip(names, printed, strict=True):
+        if TOTAL.search(label):
+            continue  # a total row, which does not print the amtskreds's name
         a, b = fold(name.split(" ")[0])[:5], fold(re.sub(r"^\W*[IVXLl1]{1,5}\s*[.,]?\s+", "", label))[:5]
         if difflib.SequenceMatcher(None, a, b).ratio() < 0.4:
             raise ValueError(f"{day}: the heading {label!r} does not read as {name}")
@@ -756,10 +901,19 @@ def kreds_name(day: date, amt: str, number: str, name: str) -> str:
         )
         return best
 
+    if fold(printed(name)) in MISREAD:
+        return MISREAD[fold(printed(name))]
     index = max(range(len(names)), key=score)
     if score(index) < 0.5:
         raise ValueError(f"{day}: the district {number}. {name!r} in {amt} matches no known name")
+    numbered = f"{names[index].rsplit(' ', 1)[0]} {number}"
+    if names[index][-1].isdigit() and not re.search(r"\d", printed(name)) and numbered in names:
+        return numbered  # the volume names Odense's two districts by their numbers only
     return names[index]
+
+
+# Printed district names the text layer garbled past matching, read from the page image.
+MISREAD = {"liege": "Køge"}
 
 
 ROLE = {"registered": REGISTERED, "cast": CAST, "valid": VALID, "blank": BLANK}
@@ -957,6 +1111,8 @@ def build(day: date) -> Package:
         p.add(
             "note", id=key("note", result_set, "mended"), entity_id=result_set, kind="caveat", body_md=text, lang="en"
         )
+    for text in volume.notes:
+        p.add("note", id=key("note", result_set, text), entity_id=result_set, kind="caveat", body_md=text, lang="en")
     p.add(
         "citation",
         id=key("citation", result_set),

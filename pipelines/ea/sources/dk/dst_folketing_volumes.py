@@ -1,5 +1,6 @@
 """The tables of each historical Folketing volume: pages, columns, parties, and national seats."""
 
+from dataclasses import replace
 from datetime import date
 
 from ea.sources.dk.dst_folketing import SYSTEM_1953, SYSTEM_1953_APRIL, Volume, part
@@ -327,7 +328,7 @@ VOLUMES += [
 ]
 
 
-AUTO = -1.0  # the label column ends where the page's figures begin
+AUTO = -1.0  # each line's label ends with its last word, since the scan sets rows off sideways
 EARLY = {
     **NAMES,
     "D": "Venstre",
@@ -342,59 +343,123 @@ def early(*letters: str) -> dict[str, str]:
     return {letter: EARLY[letter] for letter in letters}
 
 
-def pages(numbers: list[int], *roles: str) -> tuple:
-    return tuple((part(page, *roles, left=AUTO),) for page in numbers)
+def pages(roles: tuple[str, ...], edges: dict[int, tuple[float, ...]]) -> tuple:
+    """Single-page tables whose columns are given by their right edges, read from the page's text layer."""
+    return tuple((part(page, *roles, left=AUTO, edges=columns),) for page, columns in edges.items())
 
 
+ROLES_1960 = ("A", "B", "C", "D", "E", "F", "K", "S", "U", "others", "valid")
 VOLUMES[:0] = [
     Volume(
         date(1953, 4, 21),
         20213,
         "rigsvalg",
         "Rigsdagsvalgene og folkeafstemningerne i april og maj 1953",
-        pages([79, 80, 81, 82, 83, 84], "A", "B", "C", "D", "E", "K", "R", "others", "valid"),
+        pages(
+            ("A", "B", "C", "D", "E", "K", "R", "others", "valid"),
+            {
+                79: (151, 176, 206, 232, 260, 287, 311, 330, 365),
+                80: (173, 203, 231, 259, 287, 315, 338, 358, 396),
+                81: (152, 179, 206, 234, 262, 290, 314, 333, 372),
+                82: (163, 191, 219, 247, 273, 300, 328, 350, 388),
+                83: (145, 170, 199, 227, 253, 281, 309, 331, 369),
+                84: (167, 194, 222, 250, 278, 306, 334, 353, 392),
+            },
+        ),
         early("A", "B", "C", "D", "E", "K", "R"),
         {"A": 61, "B": 13, "C": 26, "D": 33, "E": 9, "K": 7},
         85,
         magnitude=149,
         system=SYSTEM_1953_APRIL,
         after=True,
+        dots=True,
+        adaptive=True,
     ),
     Volume(
         date(1953, 9, 22),
         20213,
         "valg1953",
         "Folketingsvalget den 22. september 1953",
-        pages([92, 93, 94, 95], "A", "B", "C", "D", "E", "K", "U", "others", "valid"),
+        pages(
+            ("A", "B", "C", "D", "E", "K", "U", "others", "valid"),
+            {
+                92: (170, 196, 224, 251, 279, 307, 330, 347, 384),
+                93: (145, 172, 199, 226, 254, 282, 306, 323, 364),
+                94: (166, 193, 220, 248, 276, 304, 327, 344, 385),
+                95: (153, 179, 206, 234, 262, 290, 313, 330, 371),
+            },
+        ),
         early("A", "B", "C", "D", "E", "K", "U"),
         {"A": 74, "B": 14, "C": 30, "D": 42, "E": 6, "K": 8, "others": 1},
         96,
+        notes=(
+            (
+                "The volume counts the Schleswig Party's list (Slesvigsk Parti), which stood in Haderslev m.fl. Amters "
+                "Amtskreds only, among the votes outside the parties; its one seat is stored on that option."
+            ),
+        ),
         system=SYSTEM_1953,
         after=True,
+        dots=True,
+        adaptive=True,
     ),
     Volume(
         date(1957, 5, 14),
         20212,
         "valg1957",
         "Folketingsvalget den 14. maj 1957",
-        pages([90, 91, 92, 93], "A", "B", "C", "D", "E", "K", "S", "U", "others", "valid"),
+        pages(
+            ("A", "B", "C", "D", "E", "K", "S", "U", "others", "valid"),
+            {
+                90: (156, 184, 212, 240, 268, 291, 313, 334, 359, 388),
+                91: (138, 166, 194, 221, 250, 273, 296, 316, 340, 365),
+                92: (154, 182, 210, 237, 265, 289, 311, 332, 350, 386),
+                93: (136, 164, 192, 220, 248, 271, 293, 314, 340, 367),
+            },
+        ),
         early("A", "B", "C", "D", "E", "K", "S", "U"),
         {"A": 70, "B": 14, "C": 30, "D": 45, "E": 9, "K": 6, "S": 1},
         94,
+        # Page 90 prints a dot, for no votes, in the outside-the-parties column of Falkonér and of the Vestre
+        # Storkreds total; the text layer reads each as a one.
+        fixes={(23, "others"): 0, (24, "others"): 0},
         system=SYSTEM_1953,
         after=True,
+        dots=True,
+        adaptive=True,
     ),
     Volume(
         date(1960, 11, 15),
         20211,
         "valg1960",
         "Folketingsvalget den 15. november 1960",
-        pages([24, 25, 26, 27], "A", "B", "C", "D", "E", "F", "K", "S", "U", "others", "valid"),
+        (
+            (
+                part(
+                    24,
+                    *ROLES_1960,
+                    left=AUTO,
+                    bottom=400,
+                    edges=(188, 215, 247, 274, 296, 323, 350, 367, 399, 417, 454),
+                ),
+            ),
+            (part(24, *ROLES_1960, left=AUTO, top=400, edges=(157, 188, 220, 251, 278, 310, 337, 358, 391, 413, 454)),),
+            *pages(
+                ROLES_1960,
+                {
+                    25: (151, 183, 214, 246, 273, 304, 331, 353, 385, 407, 444),
+                    26: (156, 187, 219, 250, 277, 309, 336, 358, 390, 412, 453),
+                    27: (149, 181, 212, 243, 271, 302, 329, 350, 383, 405, 446),
+                },
+            ),
+        ),
         early("A", "B", "C", "D", "E", "F", "K", "S", "U"),
         {"A": 76, "B": 11, "C": 32, "D": 38, "F": 11, "S": 1, "U": 6},
         28,
         system=SYSTEM_1953,
         after=True,
+        dots=True,
+        adaptive=True,
     ),
     Volume(
         date(1964, 9, 22),
@@ -446,3 +511,30 @@ VOLUMES[:0] = [
         64,
     ),
 ]
+
+# The page of each volume's table of all seats ("Samlet fordeling af folketingsmandaterne"), where the national seats
+# are printed.
+SEAT_PAGES = {
+    date(1953, 4, 21): 96,
+    date(1953, 9, 22): 106,
+    date(1957, 5, 14): 104,
+    date(1960, 11, 15): 36,
+    date(1964, 9, 22): 52,
+    date(1966, 11, 22): 58,
+    date(1968, 1, 23): 66,
+    date(1971, 9, 21): 76,
+    date(1973, 12, 4): 90,
+    date(1975, 1, 9): 90,
+    date(1977, 2, 15): 90,
+    date(1979, 10, 23): 90,
+    date(1981, 12, 8): 90,
+    date(1984, 1, 10): 90,
+    date(1987, 9, 8): 78,
+    date(1988, 5, 10): 56,
+    date(1990, 12, 12): 22,
+    date(1994, 9, 21): 22,
+    date(1998, 3, 11): 23,
+    date(2001, 11, 20): 22,
+    date(2005, 2, 8): 22,
+}
+VOLUMES = [replace(volume, seats_page=SEAT_PAGES[volume.day]) for volume in VOLUMES]

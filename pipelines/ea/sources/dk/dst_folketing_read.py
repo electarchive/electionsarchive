@@ -10,6 +10,7 @@ mends a figure the recognition garbled only where both a row and a column prove 
 """
 
 import html
+import itertools
 import re
 import subprocess
 from collections.abc import Iterable
@@ -78,6 +79,8 @@ def lines(words: Iterable[Word], tolerance: float) -> list[list[Word]]:
 def figure(text: str) -> int | None:
     """A printed count: a nil mark is zero, and a figure the recognition garbled is None."""
     text = text.strip()
+    if text in (".", ":"):
+        return 0  # the older volumes mark a list that did not stand with a dot
     parts = text.split(" ")
     if len(parts) > 1 and any(p.strip() in NIL for p in parts):
         kept = [p for p in parts if p.strip() not in NIL]
@@ -145,6 +148,8 @@ def readings(text: str) -> list[int]:
     end, or a digit lost."""
     digits = re.sub(r"[^0-9OolIi|!¡\]]", "", text).translate(DIGIT)
     found: list[int] = []
+    if re.fullmatch(r"[1Il|!]{1,2}", text.strip()):
+        found.append(0)  # a column rule read as a one
     if len(digits) > 1:
         found += [int(digits[:-1]), int(digits[1:])]
     swaps = {"1": "7", "7": "1", "3": "8", "8": "3", "5": "6", "6": "5", "0": "6", "9": "0", "4": "1"}
@@ -183,24 +188,6 @@ def columns(rows: list[list[Word]], count: int, template: list[float] | None = N
     return [t + shift for t in template]
 
 
-def label_edge(page: Page, top: float = 0, bottom: float = 1e9, tolerance: float = 3.0) -> float:
-    """Where the row labels end: just left of the first figure that follows a word, on most lines."""
-    starts: list[float] = []
-    body = [w for w in page.words if top <= (w.y0 + w.y1) / 2 <= bottom]
-    for line in lines(body, tolerance):
-        seen = False
-        for w in line:
-            if re.search(r"[A-Za-zÆØÅæøå]{3,}", w.text):
-                seen = True
-            elif seen and re.fullmatch(r"\d[\d .]*", w.text):
-                starts.append(w.x0)
-                break
-    if not starts:
-        raise ValueError(f"page {page.number}: no row labels found")
-    starts.sort()
-    return starts[len(starts) // 2] - 4
-
-
 def lines_of(
     page: Page,
     *,
@@ -211,10 +198,12 @@ def lines_of(
     tolerance: float = 3.0,
     gap: float = 6.5,
     headers: re.Pattern[str] | None = None,
+    dots: bool = False,
 ) -> list[tuple[str, float, list[Word]]]:
     """The figure lines of one page: each line's label, height, and figures right of `left`."""
     body = [w for w in page.words if top <= (w.y0 + w.y1) / 2 <= bottom]
     grids: list[tuple[str, float, list[Word]]] = []
+    pending = ""
     for line in lines(body, tolerance):
         touching: list[Word] = []
         for w in line:
@@ -225,7 +214,19 @@ def lines_of(
             else:
                 touching.append(w)
         line = touching
-        inside = [w for w in line if w.x1 <= left or (w.x0 < left and not numeric(w.text))]
+        if left < 0:
+            # The labels end with the line's last word, where the scan's rows sit at different offsets.
+            last = max(
+                (
+                    i
+                    for i, w in enumerate(line)
+                    if (len(re.sub(r"[^A-Za-zÆØÅæøå»]", "", w.text)) >= 2 and not numeric(w.text)) or w.text == "»"
+                ),
+                default=-1,
+            )
+            inside = line[: last + 1]
+        else:
+            inside = [w for w in line if w.x1 <= left or (w.x0 < left and not numeric(w.text))]
         while (
             len(inside) > 1
             and re.fullmatch(r"\d{1,3}", inside[-1].text)
@@ -236,12 +237,19 @@ def lines_of(
             inside.pop()  # the leading digits of a figure that starts left of the column's usual edge
         label = " ".join(w.text for w in inside)
         rest = [w for w in line if w not in inside]
-        figures = [w for w in rest if numeric(w.text)]
-        words = [w for w in rest if not numeric(w.text)]
+        start = min((w.x0 for w in rest if numeric(w.text) and any(c.isdigit() for c in w.text)), default=1e9)
+        figures = [w for w in rest if numeric(w.text) or (dots and w.text in (".", ":") and w.x0 > start)]
+        words = [w for w in rest if w not in figures]
         if not figures:
             if headers is not None and label and headers.search(label):
                 grids.append((label, (line[0].y0 + line[0].y1) / 2, []))
+                pending = ""
+            elif labels and re.match(r"^\W{0,2}\d{1,2}\s*[.,]", label):
+                pending = label  # a district whose name runs onto the next line, where its figures are
             continue
+        if pending and not re.match(r"^\W{0,2}(\d|[IVX]+\s*[.,])", label):
+            label = f"{pending} {label}".strip()
+        pending = ""
         prose = sum(len(re.sub(r"[^A-Za-zÆØÅæøå]", "", w.text)) >= 3 for w in words)
         if prose >= 2 or (prose and len(figures) < 3):
             continue
@@ -257,23 +265,40 @@ def grouped(words: list[Word]) -> bool:
     return bool(texts) and bool(LEAD.match(texts[0])) and all(GROUP.match(t) for t in texts[1:])
 
 
+def shifted(figures: list[Word], edges: list[float], snap: float = 5.0) -> float:
+    """How far a line's figures sit from the columns' right edges, where a scanned row is set off sideways: never
+    as far as half a column, which would read every figure one column over."""
+    most = 0.45 * min(b - a for a, b in itertools.pairwise(edges))
+    best = (0, 0.0)
+    for shift in sorted({round(w.x1 - e, 1) for w in figures for e in edges if abs(w.x1 - e) <= most}, key=abs):
+        hits = sum(min(abs(w.x1 - shift - e) for e in edges) <= snap for w in figures)
+        if hits > best[0]:
+            best = (hits, shift)
+    return best[1]
+
+
 def place(
     number: int,
     grids: list[tuple[str, float, list[Word]]],
-    edges: list[float],
+    template: list[float],
     reach: float = 14.0,
     snap: float = 7.0,
+    adaptive: bool = False,
 ) -> list[Row]:
     """Put each figure in the column whose right edge it shares. Digit groups are joined left to right until a
-    group ends on a column's right edge."""
-    count = len(edges)
+    group ends on a column's right edge. With `adaptive`, each line's columns are first shifted onto its figures."""
+    count = len(template)
     found: list[Row] = []
+    edges = template
 
     def nearest(x: float) -> tuple[int, float]:
         best = min(range(count), key=lambda i: abs(x - edges[i]))
         return best, abs(x - edges[best])
 
     for label, y, figures in grids:
+        if adaptive and figures:
+            offset = shifted(figures, template)
+            edges = [e + offset for e in template]
         if not figures:
             found.append(Row(label.strip(), number, y, [None] * count, header=True))
             continue
