@@ -785,6 +785,19 @@
       "publisher": "Electoral Commission of South Australia",
       "url": "https://www.ecsa.sa.gov.au/copyright",
       "kind": "official_body"
+    },
+    "em-rep": {
+      "title": "State and Territory Representation in the House of Representatives (chapter 4, Table 4.1: members returned at each federal election since 1901)",
+      "publisher": "Parliament of Australia, House of Representatives Standing Committee on Legal and Constitutional Affairs / Electoral Matters (Territories report)",
+      "url": "https://aphref.aph.gov.au/house/committee/em/territories/report/chapter4.pdf",
+      "kind": "official_body"
+    },
+    "aec-2004": {
+      "title": "2004 federal election: Introduction (Behind the Scenes)",
+      "publisher": "Australian Electoral Commission",
+      "url": "https://results.aec.gov.au/12246/introduction.htm",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
     }
   },
   "tiers": [
@@ -1071,7 +1084,7 @@
       "locator": "https://www.legislation.gov.au/C1918A00027/latest/text (Part XVIII; s 274: preferential voting in single-member divisions)",
       "first_held": "1901-03-29",
       "earliest_record": "1901-03-29",
-      "note": "Single-member divisions. First past the post (in most states) at the elections of 1901-1917; preferential (instant-runoff) voting since the Commonwealth Electoral Act 1918, first at the 1919 general election; Tasmania voted as one five-member electorate in 1901. Terms run at most three years from the first sitting (Constitution s 28), so elections are called, sometimes after a double dissolution (s 57). 48 general elections 1901-2025; 75 members in 1901, 150 in 2025. Seat counts before 2007 are not yet taken from an official table.",
+      "note": "Single-member divisions. First past the post (in most states) at the elections of 1901-1917; preferential (instant-runoff) voting since the Commonwealth Electoral Act 1918, first at the 1919 general election; Tasmania voted as one five-member electorate in 1901. Terms run at most three years from the first sitting (Constitution s 28), so elections are called, sometimes after a double dissolution (s 57). 48 general elections 1901-2025; 75 members in 1901, 150 in 2025.",
       "match": [
         {
           "election_kinds": [
@@ -1128,153 +1141,317 @@
           "deferred": [
             "1901-03-30"
           ],
-          "note": "NSW, Victoria, Western Australia, and Tasmania polled on 29 March 1901; Queensland and South Australia on 30 March."
+          "note": "NSW, Victoria, Western Australia, and Tasmania polled on 29 March 1901; Queensland and South Australia on 30 March.",
+          "contests": 71,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1901 | NSW 26 Vic. 23 Qld. 9 SA 7 WA 5 Tas 5 NT - ACT - | Total 75 (Tasmania's five members were returned from a single electorate, so 71 contests)"
         },
         {
-          "date": "1903-12-16"
+          "date": "1903-12-16",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1903 | NSW 26 Vic. 23 Qld. 9 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1906-12-12"
+          "date": "1906-12-12",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1906 | NSW 27 Vic. 22 Qld. 9 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1910-04-13"
+          "date": "1910-04-13",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1910 | NSW 27 Vic. 22 Qld. 9 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1913-05-31"
+          "date": "1913-05-31",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1913 | NSW 27 Vic. 21 Qld. 10 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
           "date": "1914-09-05",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1914 | NSW 27 Vic. 21 Qld. 10 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1917-05-05"
+          "date": "1917-05-05",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1917 | NSW 27 Vic. 21 Qld. 10 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1919-12-13"
+          "date": "1919-12-13",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1919 | NSW 27 Vic. 21 Qld. 10 SA 7 WA 5 Tas 5 NT - ACT - | Total 75"
         },
         {
-          "date": "1922-12-16"
+          "date": "1922-12-16",
+          "contests": 76,
+          "seats": 76,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1922 | NSW 28 Vic. 20 Qld. 10 SA 7 WA 5 Tas 5 NT 1 ACT - | Total 76"
         },
         {
           "date": "1925-11-14",
           "deferred": [
             "1925-12-15"
           ],
-          "note": "The Northern Territory polled on 15 December 1925."
+          "note": "The Northern Territory polled on 15 December 1925.",
+          "contests": 76,
+          "seats": 76,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1925 | NSW 28 Vic. 20 Qld. 10 SA 7 WA 5 Tas 5 NT 1 ACT - | Total 76"
         },
         {
           "date": "1928-11-17",
           "deferred": [
             "1928-12-08"
           ],
-          "note": "The Northern Territory polled on 8 December 1928."
+          "note": "The Northern Territory polled on 8 December 1928.",
+          "contests": 76,
+          "seats": 76,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1928 | NSW 28 Vic. 20 Qld. 10 SA 7 WA 5 Tas 5 NT 1 ACT - | Total 76"
         },
         {
           "date": "1929-10-12",
           "deferred": [
             "1929-12-07"
           ],
-          "note": "The Northern Territory polled on 7 December 1929."
+          "note": "The Northern Territory polled on 7 December 1929.",
+          "contests": 76,
+          "seats": 76,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1929 | NSW 28 Vic. 20 Qld. 10 SA 7 WA 5 Tas 5 NT 1 ACT - | Total 76"
         },
         {
-          "date": "1931-12-19"
+          "date": "1931-12-19",
+          "contests": 76,
+          "seats": 76,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1931 | NSW 28 Vic. 20 Qld. 10 SA 7 WA 5 Tas 5 NT 1 ACT - | Total 76"
         },
         {
           "date": "1934-09-15",
           "deferred": [
             "1934-09-22"
           ],
-          "note": "The Northern Territory polled on 22 September 1934."
+          "note": "The Northern Territory polled on 22 September 1934.",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1934 | NSW 28 Vic. 20 Qld. 10 SA 6 WA 5 Tas 5 NT 1 ACT - | Total 75"
         },
         {
           "date": "1937-10-23",
           "deferred": [
             "1937-10-30"
           ],
-          "note": "The Northern Territory polled on 30 October 1937."
+          "note": "The Northern Territory polled on 30 October 1937.",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1937 | NSW 28 Vic. 20 Qld. 10 SA 6 WA 5 Tas 5 NT 1 ACT - | Total 75"
         },
         {
-          "date": "1940-09-21"
+          "date": "1940-09-21",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1940 | NSW 28 Vic. 20 Qld. 10 SA 6 WA 5 Tas 5 NT 1 ACT - | Total 75"
         },
         {
-          "date": "1943-08-21"
+          "date": "1943-08-21",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1943 | NSW 28 Vic. 20 Qld. 10 SA 6 WA 5 Tas 5 NT 1 ACT - | Total 75"
         },
         {
-          "date": "1946-09-28"
+          "date": "1946-09-28",
+          "contests": 75,
+          "seats": 75,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1946 | NSW 28 Vic. 20 Qld. 10 SA 6 WA 5 Tas 5 NT 1 ACT - | Total 75"
         },
         {
-          "date": "1949-12-10"
+          "date": "1949-12-10",
+          "contests": 123,
+          "seats": 123,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1949 | NSW 47 Vic. 33 Qld. 18 SA 10 WA 8 Tas 5 NT 1 ACT 1 | Total 123"
         },
         {
           "date": "1951-04-28",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 123,
+          "seats": 123,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1951 | NSW 47 Vic. 33 Qld. 18 SA 10 WA 8 Tas 5 NT 1 ACT 1 | Total 123"
         },
         {
-          "date": "1954-05-29"
+          "date": "1954-05-29",
+          "contests": 123,
+          "seats": 123,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1954 | NSW 47 Vic. 33 Qld. 18 SA 10 WA 8 Tas 5 NT 1 ACT 1 | Total 123"
         },
         {
-          "date": "1955-12-10"
+          "date": "1955-12-10",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1955 | NSW 46 Vic. 33 Qld. 18 SA 11 WA 9 Tas 5 NT 1 ACT 1 | Total 124"
         },
         {
-          "date": "1958-11-22"
+          "date": "1958-11-22",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1958 | NSW 46 Vic. 33 Qld. 18 SA 11 WA 9 Tas 5 NT 1 ACT 1 | Total 124"
         },
         {
-          "date": "1961-12-09"
+          "date": "1961-12-09",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1961 | NSW 46 Vic. 33 Qld. 18 SA 11 WA 9 Tas 5 NT 1 ACT 1 | Total 124"
         },
         {
-          "date": "1963-11-30"
+          "date": "1963-11-30",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1963 | NSW 46 Vic. 33 Qld. 18 SA 11 WA 9 Tas 5 NT 1 ACT 1 | Total 124"
         },
         {
-          "date": "1966-11-26"
+          "date": "1966-11-26",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1966 | NSW 46 Vic. 33 Qld. 18 SA 11 WA 9 Tas 5 NT 1 ACT 1 | Total 124"
         },
         {
-          "date": "1969-10-25"
+          "date": "1969-10-25",
+          "contests": 125,
+          "seats": 125,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1969 | NSW 45 Vic. 34 Qld. 18 SA 12 WA 9 Tas 5 NT 1 ACT 1 | Total 125"
         },
         {
-          "date": "1972-12-02"
+          "date": "1972-12-02",
+          "contests": 125,
+          "seats": 125,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1972 | NSW 45 Vic. 34 Qld. 18 SA 12 WA 9 Tas 5 NT 1 ACT 1 | Total 125"
         },
         {
           "date": "1974-05-18",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 127,
+          "seats": 127,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1974 | NSW 45 Vic. 34 Qld. 18 SA 12 WA 10 Tas 5 NT 1 ACT 2 | Total 127"
         },
         {
           "date": "1975-12-13",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 127,
+          "seats": 127,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1975 | NSW 45 Vic. 34 Qld. 18 SA 12 WA 10 Tas 5 NT 1 ACT 2 | Total 127"
         },
         {
-          "date": "1977-12-10"
+          "date": "1977-12-10",
+          "contests": 124,
+          "seats": 124,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1977 | NSW 43 Vic. 33 Qld. 19 SA 11 WA 10 Tas 5 NT 1 ACT 2 | Total 124"
         },
         {
-          "date": "1980-10-18"
+          "date": "1980-10-18",
+          "contests": 125,
+          "seats": 125,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1980 | NSW 43 Vic. 33 Qld. 19 SA 11 WA 11 Tas 5 NT 1 ACT 2 | Total 125"
         },
         {
           "date": "1983-03-05",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 125,
+          "seats": 125,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1983 | NSW 43 Vic. 33 Qld. 19 SA 11 WA 11 Tas 5 NT 1 ACT 2 | Total 125"
         },
         {
-          "date": "1984-12-01"
+          "date": "1984-12-01",
+          "contests": 148,
+          "seats": 148,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1984 | NSW 51 Vic. 39 Qld. 24 SA 13 WA 13 Tas 5 NT 1 ACT 2 | Total 148"
         },
         {
           "date": "1987-07-11",
-          "note": "Followed a double dissolution."
+          "note": "Followed a double dissolution.",
+          "contests": 148,
+          "seats": 148,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1987 | NSW 51 Vic. 39 Qld. 24 SA 13 WA 13 Tas 5 NT 1 ACT 2 | Total 148"
         },
         {
-          "date": "1990-03-24"
+          "date": "1990-03-24",
+          "contests": 148,
+          "seats": 148,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1990 | NSW 51 Vic. 38 Qld. 24 SA 13 WA 14 Tas 5 NT 1 ACT 2 | Total 148"
         },
         {
-          "date": "1993-03-13"
+          "date": "1993-03-13",
+          "contests": 147,
+          "seats": 147,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1993 | NSW 50 Vic. 38 Qld. 25 SA 12 WA 14 Tas 5 NT 1 ACT 2 | Total 147"
         },
         {
-          "date": "1996-03-02"
+          "date": "1996-03-02",
+          "contests": 148,
+          "seats": 148,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1996 | NSW 50 Vic. 37 Qld. 26 SA 12 WA 14 Tas 5 NT 1 ACT 3 | Total 148"
         },
         {
-          "date": "1998-10-03"
+          "date": "1998-10-03",
+          "contests": 148,
+          "seats": 148,
+          "source": "em-rep",
+          "quote": "Table 4.1, 1998 | NSW 50 Vic. 37 Qld. 27 SA 12 WA 14 Tas 5 NT 1 ACT 2 | Total 148"
         },
         {
-          "date": "2001-11-10"
+          "date": "2001-11-10",
+          "contests": 150,
+          "seats": 150,
+          "source": "em-rep",
+          "quote": "Table 4.1, 2001 | NSW 50 Vic. 37 Qld. 27 SA 12 WA 15 Tas 5 NT 2 ACT 2 | Total 150"
         },
         {
-          "date": "2004-10-09"
+          "date": "2004-10-09",
+          "contests": 150,
+          "seats": 150,
+          "source": "aec-2004",
+          "quote": "At the 2004 federal election, electors were electing 150 members to the House of Representatives, the same number as at the 2001 federal election."
         },
         {
           "date": "2007-11-24",

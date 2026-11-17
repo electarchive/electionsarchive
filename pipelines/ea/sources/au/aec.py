@@ -74,7 +74,7 @@ EVENTS = [
     Event(29422, date(2023, 7, 15), "by_election", "2023 Fadden by-election", "QLD", "Fadden"),
     Event(29581, date(2023, 10, 14), "referendum", "2023 Australian Indigenous Voice referendum"),
     Event(29778, date(2024, 3, 2), "by_election", "2024 Dunkley by-election", "VIC", "Dunkley"),
-    Event(29807, date(2024, 7, 6), "by_election", "2024 Cook by-election", "NSW", "Cook"),
+    Event(29807, date(2024, 4, 13), "by_election", "2024 Cook by-election", "NSW", "Cook"),
     Event(31496, date(2025, 5, 3), "general", "2025 Australian federal election"),
     Event(31633, date(2026, 5, 9), "by_election", "2026 Farrer by-election", "NSW", "Farrer"),
 ]
