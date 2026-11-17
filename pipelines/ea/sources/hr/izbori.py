@@ -338,6 +338,9 @@ def declared_url(d: Day, contest: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.hr import skenovi
+
+    skenovi.fetch()
     for family, year in sorted({(d.family, d.year) for d in days()}):
         raw.fetch(SOURCE, f"{DATA}/{family}/{year}/zip/rezultati.zip", suffix=".zip")
     for d in days():
@@ -1072,10 +1075,13 @@ def registry() -> Package:
         p.add("party", id=id, kind="bloc", polity_id=CROATIA)
         p.name(id, labels.most_common(1)[0][0], "hr", "official")
         p.name(id, ", ".join(sorted({clean(m) for m in members})), "hr", "ballot", False)
+    from ea.sources.hr import skenovi
+
+    skenovi.registry(p, set(spellings) | set(blocs))
     return p
 
 
-# One package per election day.
+# One package per election day. The 1991-1997 elections, published only as scans, are built in skenovi.
 
 XI_SEATS = {2000: 6, 2003: 4, 2007: 5}
 MINORITY_2000 = {5: "Austrian, German, Jewish, Rusyn, and Ukrainian"}
@@ -1115,12 +1121,17 @@ def package_key(d: Day) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(d) for d in days())]
+    from ea.sources.hr import skenovi
+
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *skenovi.packages(), *(package_key(d) for d in days())]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
+    from ea.sources.hr import skenovi
+
+    skenovi.parse()
     for d in days():
         election(d).write()
 
