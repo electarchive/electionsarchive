@@ -38,7 +38,8 @@ METHOD = (
     "Counted by the polling district commissions (apylinkių rinkimų komisijos) and published by the Central "
     "Electoral Commission per polling district. Registered voters are the electoral roll, ballots cast are the "
     "voters who took part, and valid and invalid ballots are the ballots found valid or invalid. The source "
-    "splits each count between the ballot box and ballots it labels postal (pašto); the two are added here. A "
+    "splits each count between the ballot box and ballots it labels postal (pašto); candidate and list votes are "
+    "stored on the ballot-box and postal channels, and the ballot accounting adds the two. A "
     "polling district that filed a supplementary protocol has its votes and ballots added to its main protocol; "
     "the roll and turnout come from the main protocol. Polling stations abroad, at embassies and consulates, have "
     "no area."
@@ -1342,20 +1343,22 @@ def unit_rows(p: Package, state: State, day: date, scope: str, result_set: str, 
 
 
 def value_rows(p: Package, result_set: str, here: pl.DataFrame, options: dict[str, str], ids: dict[str, str]) -> None:
+    """Votes per option, on the ballot-box channel (1) and the postal channel (3) as the source splits them."""
     votes = here.group_by("unit", "option").agg(pl.col("box").sum(), pl.col("post").sum())
-    p.frame(
-        "result_value",
-        votes.select(
-            result_set_id=pl.lit(result_set),
-            unit_id=pl.col("unit").replace_strict(ids),
-            option_id=pl.col("option").replace_strict(options),
-            channel=pl.lit(0, pl.Int16),
-            measure=pl.lit(1, pl.Int16),
-            count_round=pl.lit(0, pl.Int16),
-            flags=pl.lit(0, pl.Int16),
-            value=pl.sum_horizontal("box", "post"),
-        ),
-    )
+    for column, channel in (("box", 1), ("post", 3)):
+        p.frame(
+            "result_value",
+            votes.select(
+                result_set_id=pl.lit(result_set),
+                unit_id=pl.col("unit").replace_strict(ids),
+                option_id=pl.col("option").replace_strict(options),
+                channel=pl.lit(channel, pl.Int16),
+                measure=pl.lit(1, pl.Int16),
+                count_round=pl.lit(0, pl.Int16),
+                flags=pl.lit(0, pl.Int16),
+                value=pl.col(column),
+            ).drop_nulls("value"),
+        )
 
 
 PREFERRED: dict[tuple[date, Part, int], pl.DataFrame] = {}
