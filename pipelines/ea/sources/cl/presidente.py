@@ -50,6 +50,7 @@ class Election(NamedTuple):
     registered: int | None  # the national roll the returns print, if any
     printed: str  # the date in the returns' heading
     caveat: str
+    advanced: tuple[str, ...] = ()  # with no majority, the two candidates the Congreso Pleno chose between
 
 
 def _c(key: str, name: str) -> Column:
@@ -140,6 +141,56 @@ ELECTIONS: dict[int, Election] = {
             "counted on election day, before the cancellations it lists."
         ),
     ),
+    1958: Election(
+        date(1958, 9, 4),
+        "general",
+        BROWSER + "1958.pdf",
+        "1937",
+        (
+            _c("alessandri", "Jorge Alessandri Rodríguez"),
+            _c("bossay", "Luis Bossay Leiva"),
+            _c("zamorano", "Antonio Zamorano Herrera"),
+            _c("allende", "Salvador Allende Gossens"),
+            _c("frei", "Eduardo Frei Montalva"),
+            Column("invalid", "invalid", "Nulos y blancos"),
+            TOTAL,
+        ),
+        "alessandri",
+        None,
+        "4 de septiembre de 1958",
+        (
+            "The returns print null and blank votes as one figure, stored here as invalid ballots. They also print "
+            "each figure for the men's and the women's registers, which this result set does not hold. No candidate "
+            "won an absolute majority, so the Congreso Pleno chose between Jorge Alessandri and Salvador Allende, and "
+            "elected Alessandri on 24 October 1958; its vote is not part of these returns. The national figures are "
+            "the returns' own totals."
+        ),
+        ("alessandri", "allende"),
+    ),
+    1970: Election(
+        date(1970, 9, 4),
+        "general",
+        BROWSER + "1970.pdf",
+        "1937",
+        (
+            _c("tomic", "Radomiro Tomic Romero"),
+            _c("alessandri", "Jorge Alessandri Rodríguez"),
+            _c("allende", "Salvador Allende Gossens"),
+            Column("invalid", "invalid", "Nulos y blancos"),
+            TOTAL,
+        ),
+        "allende",
+        None,
+        "4 de septiembre de 1970",
+        (
+            "Province totals from the Registry's summary table of the election, which also prints each figure for "
+            "the men's and the women's registers; this result set holds the totals only. Null and blank votes are "
+            "printed as one figure, stored here as invalid ballots. No candidate won an absolute majority, so the "
+            "Congreso Pleno chose between Salvador Allende and Jorge Alessandri, and elected Allende on 24 October "
+            "1970; its vote is not part of these returns."
+        ),
+        ("allende", "alessandri"),
+    ),
 }
 
 # The provinces each division's returns list, in their printed order, with the province's name as the TSV keys it.
@@ -186,10 +237,38 @@ PROVINCES: dict[str, tuple[str, ...]] = {
         "Llanquihue",
         "Chiloé",
     ),
+    "1937": (
+        "Tarapacá",
+        "Antofagasta",
+        "Atacama",
+        "Coquimbo",
+        "Aconcagua",
+        "Valparaíso",
+        "Santiago",
+        "O'Higgins",
+        "Colchagua",
+        "Curicó",
+        "Talca",
+        "Maule",
+        "Linares",
+        "Ñuble",
+        "Concepción",
+        "Arauco",
+        "Bío-Bío",
+        "Malleco",
+        "Cautín",
+        "Valdivia",
+        "Osorno",
+        "Llanquihue",
+        "Chiloé",
+        "Aysén",
+        "Magallanes",
+    ),
 }
 DIVISIONS = {
     "1925": "provincial division of 1925 to 1927",
     "1928": "provincial division of 1928 to 1936",
+    "1937": "provincial division of 1937 to 1974",
 }
 SYSTEM_RULES = {"formula": "contingent", "majority": 0.5, "chooser": "legislature", "among": 2}
 SYSTEM_NOTE = (
@@ -201,7 +280,7 @@ METHOD = (
     "Electoral (Servel) publishes them in its historical archive. The PDF is a scan without a text layer, so the "
     "numbers were keyed by hand from the page images; every province's figures add up to its printed total, the "
     "provinces add up to the printed national totals, and each number keeps its page and box. The returns also print "
-    "each department, which this result set does not hold."
+    "each department (and, from 1938, each commune), which this result set does not hold."
 )
 
 
@@ -298,7 +377,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Chile's historical provinces as the Registro Electoral's presidential returns of 1925 to 1932 list them, "
+        "Chile's historical provinces as the Registro Electoral's presidential returns of 1925 to 1970 list them, "
         "and the presidential electoral system of the 1925 Constitution",
     )
     p.external.update({CHILE, COUNTRY})
@@ -449,12 +528,11 @@ def build(year: int) -> Package:
                 )
         else:
             measures[column.key] = {"invalid": INVALID, "blank": BLANK, "cast": CAST}[column.kind]
-    p.add(
-        "outcome",
-        result_set_id=result_set,
-        option_id=options[election.winner],
-        kind="elected",
-    )
+    if election.advanced:
+        for column in election.advanced:
+            p.add("outcome", result_set_id=result_set, option_id=options[column], kind="advanced")
+    else:
+        p.add("outcome", result_set_id=result_set, option_id=options[election.winner], kind="elected")
 
     pages: dict[int, str] = {}
     for page, width, height in frame.select("page", "width", "height").unique().sort("page").iter_rows():
