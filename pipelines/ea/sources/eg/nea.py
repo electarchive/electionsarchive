@@ -663,6 +663,10 @@ def house(year: int) -> Package:
             )
             p.add("outcome", result_set_id=rs, option_id=option, candidacy_id=candidacy, kind="elected")
         tally["list_seats"] += seats
+    for stage in STAGES:
+        for code in (*(c for s, c in stage_codes(year) if s == stage[:7]), *SECTORS):
+            if page(year, stage, code) is not None:
+                p.uses(raw.cached(SOURCE, fragment_url(year, stage, code)))
     for row in p.rows["result_set"]:
         if row["id"] not in counted:
             row["completeness"] = None
