@@ -115,16 +115,24 @@ def fetch() -> None:
     for url in URLS.values():
         suffix = Path(url).suffix
         raw.fetch(SOURCE, url, suffix=suffix)
+    from ea.sources.ro import aep_local2016
+
+    aep_local2016.fetch()
 
 
 def packages() -> list[str]:
-    return ["ro.aep/registry", *(f"ro.aep/{day}" for day in DAYS)]
+    from ea.sources.ro import aep_local2016
+
+    return ["ro.aep/registry", *(f"ro.aep/{day}" for day in DAYS), *aep_local2016.PACKAGES]
 
 
 def parse() -> None:
+    from ea.sources.ro import aep_local2016
+
     registry().write()
     for day in DAYS:
         build(day).write()
+    aep_local2016.parse()
 
 
 def emit() -> None:
