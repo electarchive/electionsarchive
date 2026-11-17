@@ -768,6 +768,7 @@ def leg_urls(day: str) -> list[str]:
     urls.append(leg_json_url("tickets", day, "L1", "C"))
     if county_files(day, "L2"):
         for type_ in ("L2", "L3"):
+            urls.append(leg_json_url("tickets", day, type_, "C"))
             for kind in ("tickets", "profiles"):
                 urls.extend(leg_json_url(kind, day, type_, "D", code) for code in counties_of(day))
     return urls
