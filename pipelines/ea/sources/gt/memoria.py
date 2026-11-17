@@ -3,11 +3,16 @@
 The Tribunal's per-table files reach back only to 2023 (`gt.tse`). For earlier elections, the finest unit it still
 publishes is the municipality, in the tables of each election's memoria. The memorias are typeset PDFs with a text
 layer, so each number is read with its word box from `pdftotext -bbox` and stored with its page and box.
+
+The four memorias print their results in four layouts: 2007 a page of results for each municipality, department, and
+the Distrito Central; 2011 a table for each department, the district tables set sideways, and a block for each
+municipality; 2015 tables by department and mayoral blocks; 2019 one contest per page.
 """
 
 import re
 import subprocess
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from difflib import get_close_matches
@@ -61,8 +66,8 @@ WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="
 
 
 @cache
-def words(path: Path, first: int, last: int) -> dict[int, list[Word]]:
-    """Every word on pages `first` to `last` of a PDF, by page, with its box in points from the page's top left."""
+def raw_words(path: Path, first: int, last: int) -> tuple[dict[int, list[Word]], dict[int, float]]:
+    """Every word on pages `first` to `last` of a PDF as printed, by page, with each page's height in points."""
     out = subprocess.run(
         ["pdftotext", "-bbox", "-f", str(first), "-l", str(last), str(path), "-"],
         check=True,
@@ -84,12 +89,23 @@ def words(path: Path, first: int, last: int) -> dict[int, list[Word]]:
             continue
         x0, y0, x1, y1 = (float(found.group(i)) for i in range(1, 5))
         pages[page].append(Word(page, x0, y0, x1, y1, unescape(found.group(5)), (x0, y0, x1, y1)))
-    for number, found_words in pages.items():
+    return pages, heights
+
+
+def turned(found: list[Word], height: float) -> list[Word]:
+    """Words set sideways, reading upward, as a page's lines: the printed line runs up the page."""
+    return [Word(w.page, height - w.y1, w.x0, height - w.y0, w.x1, w.text, w.box) for w in found]
+
+
+@cache
+def words(path: Path, first: int, last: int) -> dict[int, list[Word]]:
+    """Every word on pages `first` to `last` of a PDF, by page, with its box in points from the page's top left."""
+    raw_pages, heights = raw_words(path, first, last)
+    pages = dict(raw_pages)
+    for number, found_words in raw_pages.items():
         long = [w for w in found_words if len(w.text) >= 3]
         if long and sum(w.y1 - w.y0 > w.x1 - w.x0 for w in long) > len(long) / 2:
-            # Set sideways, reading upward: the printed line runs up the page and lines follow left to right.
-            height = heights[number]
-            pages[number] = [Word(w.page, height - w.y1, w.x0, height - w.y0, w.x1, w.text, w.box) for w in found_words]
+            pages[number] = turned(found_words, heights[number])
     return pages
 
 
@@ -134,6 +150,8 @@ class Table:
     rows: list[Row] = field(default_factory=list)
     pages: list[int] = field(default_factory=list)
     problems: list[str] = field(default_factory=list)
+    left: list[Word] = field(default_factory=list)
+    """Every word left of the numbers, in page order: the place names, which wrap above and below their rows."""
 
 
 SECTION = re.compile(r"^(?:Contin[uú]a\s+(?:resultados\s+del?\s+)?)?departamento\s+de\s+(.+)$", re.IGNORECASE)
@@ -167,17 +185,20 @@ def _section(row: list[Word]) -> tuple[str | None, list[Word]]:
     return None, row
 
 
-def _segment(page: list[Word], title: str, section: str) -> tuple[list[Segment], str, str]:
+def _segment(page: list[Word], title: str, section: str, band: float = 9) -> tuple[list[Segment], str, str]:
     """Split a page into table segments: (title, header words, lines, section at start)."""
     found: list[Segment] = []
     current: Segment | None = None
     pending: list[list[Word]] = []
     rows = lines(page)
     used: set[int] = set()
+    titled: set[int] = set()
     for index, row in enumerate(rows):
         if index in used:
             continue
-        heads = [i for i, w in enumerate(row) if w.text == "Resultados"]
+        heads = [
+            i for i, w in enumerate(row) if w.text == "Resultados" or (w.text in ("ELECCION", "SEGUNDA") and i == 0)
+        ]
         if heads:
             run = [row[heads[0]]]
             for w in row[heads[0] + 1 :]:
@@ -185,22 +206,35 @@ def _segment(page: list[Word], title: str, section: str) -> tuple[list[Segment],
                     break
                 run.append(w)
             title = text(run)
+            titled.add(index)
             current = None
             pending = []
+            named = re.search(r"DEPARTAMENTO DE (.+)$", title)
+            if named:
+                section = named.group(1)
             row = [w for w in row if w not in run]
             if sum(is_number(w.text) for w in row) < 2:
                 continue
         if _is_header(row):
-            band = [
+            heads = [
                 w
-                for other in rows
+                for j, other in enumerate(rows)
+                if j not in titled
                 for w in other
-                if abs(other[0].yc - row[0].yc) <= 9 and not is_number(w.text) and w is not row[0]
+                if abs(other[0].yc - row[0].yc) <= band
+                and not is_number(w.text)
+                and w is not row[0]
+                and w.x0 > row[0].x1
             ]
             for j, other in enumerate(rows):
-                if j != index and abs(other[0].yc - row[0].yc) <= 9 and not any(is_number(w.text) for w in other):
+                if (
+                    j != index
+                    and abs(other[0].yc - row[0].yc) <= band
+                    and not any(is_number(w.text) for w in other)
+                    and any(w.x0 > row[0].x1 for w in other)
+                ):
                     used.add(j)
-            current = (title, [row[0], *band], [], section)
+            current = (title, [row[0], *heads], [], section)
             found.append(current)
             continue
         if current is not None:
@@ -261,15 +295,27 @@ def _strips(page: list[Word]) -> list[list[Word]]:
     return [page]
 
 
-def tables(path: Path, first: int, last: int) -> list[Table]:
+def spread_tables(path: Path, first: int, last: int) -> dict[int, list[Table]]:
+    """The table set sideways on the right page of each spread, by PDF page."""
+    raw_pages, heights = raw_words(path, first, last)
+    found: dict[int, list[Table]] = {}
+    for number, page in raw_pages.items():
+        right = turned([w for w in page if w.x0 >= 580 and w.x0 < 1100], heights[number])
+        found[number] = tables(path, number, number, {number: right}, 20) if right else []
+    return found
+
+
+def tables(
+    path: Path, first: int, last: int, pages: dict[int, list[Word]] | None = None, band: float = 9
+) -> list[Table]:
     """The tables on pages `first` to `last`, a table running on across pages while its title and columns hold."""
     found: list[Table] = []
     title, section = "", ""
-    pages = words(path, first, last)
+    pages = words(path, first, last) if pages is None else pages
     for number in range(first, last + 1):
         segments: list[Segment] = []
         for strip in _strips(pages[number]):
-            found_segments, title, section = _segment(strip, title, section)
+            found_segments, title, section = _segment(strip, title, section, band)
             segments.extend(found_segments)
         for seg_title, header, rows, start in segments:
             if header is None:
@@ -310,6 +356,7 @@ def _rows(table: Table, rows: list[list[Word]], columns: list[tuple[str, float]]
     names: list[tuple[float, list[Word]]] = []
     for full in rows:
         heading, row = _section(full)
+        table.left.extend(w for w in row if w.xc <= boundary and not is_number(w.text))
         if heading is not None:
             section = heading
         numeric = [w for w in row if is_number(w.text) and w.xc > boundary]
@@ -336,8 +383,12 @@ def _rows(table: Table, rows: list[list[Word]], columns: list[tuple[str, float]]
             slots: list[Word | None] = [None] * len(centers)
             for w in numeric:
                 nearest = min(range(len(centers)), key=lambda i: abs(centers[i] - w.xc))
-                if slots[nearest] is not None:
+                held = slots[nearest]
+                if held is not None:
                     table.problems.append(f"page {w.page}: two numbers in column {nearest} of row {name!r}")
+                    if len(held.text) >= len(w.text):
+                        # A stray digit of the percentage beside the last column, set apart from its decimals.
+                        continue
                 slots[nearest] = w
             if any(s is None for s in slots):
                 table.problems.append(f"page {row[0].page}: row {name!r} has {len(numeric)} of {len(centers)} numbers")
@@ -369,6 +420,7 @@ ALIASES = {
     "SAN MIGUEL PETAPA": "PETAPA",
     "SAN JUAN COMALAPA": "COMALAPA",
     "DISTRITO CENTRAL": "GUATEMALA",
+    "SAN JOSE EL RODEO": "EL RODEO",
 }
 
 
@@ -517,9 +569,26 @@ class Memoria(NamedTuple):
     """Deputies elected by national list."""
     layout: str = "tables"
     """"tables" prints each contest by municipality; "cards" prints one contest per page, by its own area."""
+    districts: tuple[int, int] = (0, 0)
+    """The pages of the district tables of a memoria that sets each one sideways."""
+    parlacen: tuple[int, int] = (0, 0)
+    """The pages of the Central American Parliament's tables."""
 
 
 MEMORIA_LIST = (
+    Memoria(
+        2011,
+        "2011_Memoria_Elecciones",
+        date(2011, 9, 11),
+        date(2011, 11, 6),
+        (318, 355),
+        (380, 547),
+        31,
+        "report2011",
+        districts=(357, 379),
+        parlacen=(548, 561),
+    ),
+    Memoria(2007, "2007_Memoria_Elecciones", date(2007, 9, 9), date(2007, 11, 4), (0, 0), (0, 0), 31, "report2007"),
     Memoria(2015, "2015_Memoria_Elecciones", date(2015, 9, 6), date(2015, 10, 25), (248, 326), (328, 456), 31),
     Memoria(2019, "2019_Memoria_Elecciones", date(2019, 6, 16), date(2019, 8, 11), (375, 804), (0, 0), 32, "cards"),
 )
@@ -541,7 +610,19 @@ def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
-TYPOS = {"CORVERGENCIA": "CONVERGENCIA", "FUEZA": "FUERZA", "UNGMAIZ": "URNGMAIZ", "WIMAQ": "WINAQ"}
+TYPOS = {
+    "CORVERGENCIA": "CONVERGENCIA",
+    "FUEZA": "FUERZA",
+    "UNGMAIZ": "URNGMAIZ",
+    "WIMAQ": "WINAQ",
+    "EMMITIDOS": "EMITIDOS",
+    "BLANCO": "BLANCOS",
+    "ENBLANCO": "BLANCOS",
+    "VOTOSNULOS": "NULOS",
+    "VOTOSENBLANCO": "BLANCOS",
+    "VOTOSEMITIDOS": "EMITIDOS",
+    "EMPADRONADOS": "PADRON",
+}
 """Misspelled acronyms in the memorias' tables, read as the organization they name."""
 BLOCS = {"URNGWINAQ"}
 
@@ -555,8 +636,9 @@ def label(text: str) -> str:
 ACCOUNTS = {label(name): measure for name, measure in ACCOUNTING.items()}
 
 
-def number(w: Word) -> int:
-    return int(w.text.replace(",", ""))
+def number(w: Word | None) -> int:
+    """A printed count; a blank cell counts as zero in sums."""
+    return 0 if w is None else int(w.text.replace(",", ""))
 
 
 @dataclass
@@ -566,13 +648,18 @@ class Contest:
     key: str
     kind: str
     columns: list[str]
-    rows: dict[str, list[Word]] = field(default_factory=dict)
+    rows: dict[str, list[Word | None]] = field(default_factory=dict)
+    """Each municipality's printed cells in the order of `columns`; a cell the memoria leaves blank is None."""
     declared: dict[str, int] = field(default_factory=dict)
     candidates: dict[str, str] = field(default_factory=dict)
-    departments: dict[int, list[Word]] = field(default_factory=dict)
+    departments: dict[int, list[Word | None]] = field(default_factory=dict)
     """The printed department totals of a national contest."""
     zero: list[str] = field(default_factory=list)
     """Municipalities the memoria prints with every cell zero, as for an annulled election."""
+    seats: dict[str, int] = field(default_factory=dict)
+    """Seats the memoria adjudicates to each organization, by its label, where it prints the adjudications."""
+    notes: list[str] = field(default_factory=list)
+    """Sentences about how the memoria prints this contest that its result set's note carries."""
 
 
 DISTRICT = re.compile(
@@ -600,7 +687,8 @@ def _add_row(contest: Contest, code: str, values: list[Word]) -> None:
         return
     if code in contest.rows:
         raise ValueError(f"{contest.key}: municipality {code} is printed twice")
-    contest.rows[code] = values
+    row: list[Word | None] = list(values)
+    contest.rows[code] = row
 
 
 @cache
@@ -610,6 +698,10 @@ def read(year: int) -> tuple[dict[str, Contest], list[Block]]:
     path = raw.cached(SOURCE, url(m)).path
     if m.layout == "cards":
         return _read_cards(path, m), []
+    if m.layout == "report2007":
+        return _read_2007(path), []
+    if m.layout == "report2011":
+        return _read_2011(path, m), []
     contests: dict[str, Contest] = {}
     district = ""
     for table in tables(path, *m.tables):
@@ -648,7 +740,8 @@ def read(year: int) -> tuple[dict[str, Contest], list[Block]]:
             totals = [row for row in table.rows if fold(row.name).startswith("TOTAL") or len(table.rows) == 1]
             for row in table.rows:
                 if row not in totals:
-                    contest.departments[department_code(row.name)] = row.values
+                    cells: list[Word | None] = list(row.values)
+                    contest.departments[department_code(row.name)] = cells
             if totals:
                 contest.declared = {c: number(w) for c, w in zip(table.columns, totals[0].values, strict=True)}
             elif not contest.declared:
@@ -717,10 +810,21 @@ def compare(year: int) -> dict[str, dict[str, tuple[int, int]]]:
         if not contest.declared:
             continue
         sums = {c: sum(number(row[i]) for row in contest.rows.values()) for i, c in enumerate(contest.columns)}
-        diff = {c: (sums[c], contest.declared[c]) for c in contest.columns if sums[c] != contest.declared[c]}
+        diff = {
+            c: (sums[c], contest.declared[c])
+            for c in contest.columns
+            if c in contest.declared and sums[c] != contest.declared[c]
+        }
         if diff:
             report[ck] = diff
     return report
+
+
+def _department_of(code: str, contest: Contest) -> int:
+    """A municipality's department, where a memoria prints the Distrito Central apart from the department's rest."""
+    if code == "0101" and 0 in contest.departments:
+        return 0
+    return int(code[:2]) or 1
 
 
 def compare_departments(year: int) -> dict[str, dict[int, dict[str, tuple[int, int]]]]:
@@ -729,7 +833,7 @@ def compare_departments(year: int) -> dict[str, dict[int, dict[str, tuple[int, i
     report: dict[str, dict[int, dict[str, tuple[int, int]]]] = {}
     for ck, contest in contests.items():
         for dep, values in contest.departments.items():
-            rows = [row for code, row in contest.rows.items() if (int(code[:2]) or 1) == dep]
+            rows = [row for code, row in contest.rows.items() if _department_of(code, contest) == dep]
             sums = [sum(number(row[i]) for row in rows) for i in range(len(contest.columns))]
             diff = {
                 c: (sums[i], number(values[i])) for i, c in enumerate(contest.columns) if sums[i] != number(values[i])
@@ -759,7 +863,8 @@ def unbalanced(contest: Contest) -> list[str]:
     found: list[str] = []
     for code, row in sorted(contest.rows.items()):
         values = [number(w) for w in row]
-        if sum(v for i, v in enumerate(values) if i != cast) != values[cast]:
+        counted = sum(v for i, v in enumerate(values) if labels[i] not in ("EMITIDOS", "VALIDOS", "PADRON"))
+        if counted != values[cast]:
             found.append(_town(code))
     return found
 
@@ -846,7 +951,7 @@ def registry(year: int) -> Package:
     )
     artifact_id = p.artifact(artifact, source)
     contests, _ = read(year)
-    pages = {w.page for contest in contests.values() for row in contest.rows.values() for w in row}
+    pages = {w.page for contest in contests.values() for row in contest.rows.values() for w in row if w}
     for page in sorted(pages):
         width, height = SIZES[(artifact.path, page)]
         p.add(
@@ -879,9 +984,10 @@ SOURCE_NOTE = (
     "Read from the text layer of the Tribunal Supremo Electoral's election report (memoria electoral), with each "
     "number's page and box. The memoria prints each contest's results by municipality, the finest unit the Tribunal "
     "publishes for this election; its per-table files are no longer online. Null votes are stored as invalid "
-    "ballots, blank votes as blank ballots, and the votes cast (emitidos) as ballots cast. A municipality the memoria "
-    "prints with every cell zero, where the election was annulled, is left out."
+    "ballots, blank votes as blank ballots, and the votes cast (emitidos) as ballots cast."
 )
+ZERO_NOTE = " A municipality the memoria prints with every cell zero, where the election was annulled, is left out."
+LEFT_OUT = " A municipality the memoria prints with every cell zero is left out."
 TITLES = {
     "president": ("Presidente y Vicepresidente de la República", "presidente"),
     "president2": ("Presidente y Vicepresidente de la República, segunda elección", "presidente-segunda-eleccion"),
@@ -1066,15 +1172,24 @@ def election(year: int, day: date) -> Package:
             status="active",
             is_default=True,
         )
-        note = SOURCE_NOTE
+        note = SOURCE_NOTE + (ZERO_NOTE if year in (2015, 2019) else LEFT_OUT)
         if contest.zero:
             zeros.extend(contest.zero)
             note += f" Left out as printed with every cell zero: {', '.join(sorted(contest.zero))}."
-        if family == "rerun":
+        if contest.key.startswith("rerun:") and f"municipal:{code}" in contests:
             note += (
-                " The Tribunal annulled this municipality's elections of 6 September and held them again on 25 "
-                "October; the memoria prints the mayoral results of the repeated election."
+                f" The mayoral election tied on {m.general:%-d %B}; the Tribunal held a second election between the "
+                f"tied parties on {m.runoff:%-d %B}, and the memoria prints the result of that second election."
             )
+        elif family == "rerun":
+            note += (
+                f" The Tribunal annulled this municipality's elections of {m.general:%-d %B} and held them again on "
+                f"{m.runoff:%-d %B}; the memoria prints the mayoral results of the repeated election."
+            )
+        if contest.seats:
+            note += " Seats are counted from the memoria's list of the elected, for the titular posts only."
+        if contest.notes:
+            note += " " + " ".join(contest.notes)
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=note, lang="en")
         uneven = unbalanced(contest)
         if uneven:
@@ -1109,9 +1224,16 @@ def election(year: int, day: date) -> Package:
                 ballot_position=position,
                 ballot_label=" ".join(column.replace("- ", "-").split()),
             )
+        for column, count in contest.seats.items():
+            wanted = [i for i, c in enumerate(contest.columns) if label(c) == column]
+            if not wanted:
+                raise ValueError(f"{contest.key}: seats for {column}, which is not on its ballot")
+            p.add("outcome", result_set_id=result_set, option_id=options[wanted[0]], kind="won", seats=count)
         for town, row in contest.rows.items():
             unit_id = unit(town)
             for index, (column, w) in enumerate(zip(contest.columns, row, strict=True)):
+                if w is None:
+                    continue
                 option_id = options.get(index)
                 measure = VOTES if option_id else ACCOUNTS[label(column)]
                 values.append((result_set, unit_id, option_id, measure, number(w)))
@@ -1270,4 +1392,642 @@ def cards(path: Path, first: int, last: int) -> list[Card]:
             name = [w for w in row if w.x0 >= org.x0 - 10 and w.x1 < count[0].x0 and not is_number(w.text)]
             if name:
                 card.rows.append((" ".join(w.text for w in name), count[0]))
+    return found
+
+
+# The 2007 memoria prints a page of results for each municipality, each department, and the Distrito Central. ------
+
+
+def _name(tokens: list[Word]) -> str:
+    """A label the memoria sets with letter spacing ("P A N") as one word."""
+    found = [w.text for w in tokens]
+    if len(found) > 1 and all(len(t) == 1 for t in found):
+        return "".join(found)
+    return " ".join(found)
+
+
+@dataclass
+class Grid:
+    """The cells of one contest read from many pages, by area and by column label."""
+
+    printed: dict[str, str] = field(default_factory=dict)
+    """Each column's label as first printed, in order of first appearance."""
+    cells: dict[str, dict[str, Word]] = field(default_factory=dict)
+    """Each municipality's cells by column label."""
+    totals: dict[int, dict[str, Word]] = field(default_factory=dict)
+    """The printed totals of each department by its code, and of the Distrito Central under 0."""
+    declared: dict[str, Word] = field(default_factory=dict)
+    """The printed total of the whole contest."""
+    seats: Counter[str] = field(default_factory=Counter)
+    notes: list[str] = field(default_factory=list)
+
+    def put(self, name: str, w: Word, into: dict[str, Word]) -> None:
+        column = label(name)
+        self.printed.setdefault(column, name)
+        into[column] = w
+
+
+ACCOUNT_ORDER = ("VALIDOS", "NULOS", "BLANCOS", "EMITIDOS", "PADRON")
+
+
+def _contest(key_: str, kind: str, grid: Grid, declared: dict[str, Word] | None = None) -> Contest:
+    """A contest from a grid: its organizations in order of appearance, then its accounting columns."""
+    used = {c for cells in grid.cells.values() for c in cells} | set(grid.declared)
+    for cells in grid.totals.values():
+        used |= set(cells)
+    order = [
+        *(c for c in grid.printed if c not in ACCOUNTS and c in used),
+        *(c for c in ACCOUNT_ORDER if c in grid.printed and c in used),
+    ]
+    contest = Contest(key_, kind, [grid.printed[c] for c in order])
+    for unit, cells in grid.cells.items():
+        row = [cells.get(c) for c in order]
+        if all(w is None or number(w) == 0 for w in row):
+            contest.zero.append(unit)
+            continue
+        contest.rows[unit] = row
+    for dep, cells in grid.totals.items():
+        contest.departments[dep] = [cells.get(c) for c in order]
+    given = grid.declared if declared is None else declared
+    contest.declared = {grid.printed[c]: number(given[c]) for c in order if c in given}
+    contest.seats = dict(grid.seats)
+    contest.notes = list(grid.notes)
+    return contest
+
+
+def _finalists(grid: Grid) -> list[str]:
+    """Second-round votes the memoria prints on a party that did not run, read as the finalist's.
+
+    Every municipality prints the two finalists' votes; where a count stands on another party's row and a finalist's
+    row is empty, it is that finalist's, and its box still locates the printed cell. Zeros on other rows are dropped.
+    """
+    finalists = [
+        c for c, n in Counter(c for cells in grid.cells.values() for c in cells if c not in ACCOUNTS).most_common(2)
+    ]
+    notes: list[str] = []
+    for unit, cells in grid.cells.items():
+        for column in [c for c in cells if c not in ACCOUNTS and c not in finalists]:
+            w = cells.pop(column)
+            if number(w) == 0:
+                continue
+            missing = [f for f in finalists if f not in cells]
+            if len(missing) != 1:
+                raise ValueError(f"{unit}: second-round votes for {column} and no single finalist missing")
+            cells[missing[0]] = w
+            notes.append(
+                f"{_town(unit)}: {w.text} printed on {grid.printed[column]}, read as {grid.printed[missing[0]]}"
+            )
+    return notes
+
+
+def _find(rows: list[list[Word]], *needles: str) -> int | None:
+    for i, row in enumerate(rows):
+        folded = [fold(w.text) for w in row]
+        if all(n in folded for n in needles):
+            return i
+    return None
+
+
+def _side(rows: list[list[Word]], low: float, high: float) -> list[list[Word]]:
+    """The rows of one of two tables set side by side, cut by the x of their words."""
+    return [r for r in (sorted((w for w in row if low <= w.x0 < high), key=lambda w: w.x0) for row in rows) if r]
+
+
+def _rows_of(found: list[Word], limit: float, lowest: float = 0.0) -> list[tuple[list[Word], list[Word]]]:
+    """Table rows from the words below a header: each label (its words left of `limit`) with the counts nearest it.
+
+    The memorias set a label and its counts a few points apart, so a count goes to the label line closest to it.
+    """
+    labels = lines([w for w in found if w.x0 < limit and not is_number(w.text)], tolerance=3)
+    counts = [w for w in found if w.x0 >= max(limit, lowest) and is_number(w.text)]
+    owned: dict[int, list[Word]] = defaultdict(list)
+    for w in counts:
+        near = min(
+            range(len(labels)), key=lambda i: abs(sum(x.yc for x in labels[i]) / len(labels[i]) - w.yc), default=None
+        )
+        if near is not None and abs(sum(x.yc for x in labels[near]) / len(labels[near]) - w.yc) <= 8:
+            owned[near].append(w)
+    return [(labels[i], sorted(ws, key=lambda w: w.x0)) for i, ws in sorted(owned.items())]
+
+
+def _president(page: list[Word], put: Callable[[str, str, Word], None]) -> None:
+    """The presidential table of a page: each party's votes in the first round and the second."""
+    rows = lines(page, tolerance=3)
+    head = _find(rows, "PRIMERA", "VUELTA")
+    columns = None if head is None else _find(rows[head:], "RESULTADOS", "RESULTADOS")
+    if head is None or columns is None:
+        raise ValueError(f"page {page[0].page}: no presidential table")
+    marks = [w.x0 for w in rows[head + columns] if fold(w.text) == "RESULTADOS"]
+    cut = (marks[0] + marks[1]) / 2 + 10
+    body = [w for row in rows[head + columns + 1 :] for w in row]
+    end = next((w for w in body if fold(w.text) == "ABSTENCIONISMO"), None)
+    if end is not None:
+        body = [w for w in body if w.yc <= end.yc + 3]
+    sigla = min(w.x0 for w in body)
+    for label_, values in _rows_of(body, marks[0] - 60):
+        if label_[0].x0 > sigla + 60 or "ABSTENCIONISMO" in (fold(w.text) for w in label_):
+            continue
+        for w in values:
+            put("president2" if w.x0 >= cut else "president", _name([x for x in label_ if x.x0 < sigla + 60]), w)
+
+
+def _deputies(page: list[Word], put: Callable[[str, str, Word], None]) -> None:
+    """The deputies' votes of a page, and the mayor's beside them where the page prints a municipality."""
+    rows = lines(page, tolerance=3)
+    start = _find(rows, "DIPUTADOS")
+    if start is None:
+        raise ValueError(f"page {page[0].page}: no deputies' table")
+    below = [w for row in rows[start:] for w in row]
+    mayor = next((w for w in below if fold(w.text) == "ALCALDE" and w.x0 > 300), None)
+    split = mayor.x0 - 15 if mayor else 10_000.0
+    left = [w for w in below if w.x0 < split]
+    nacional = next(w for w in left if fold(w.text) == "NACIONAL")
+    distritales = next(w for w in left if fold(w.text) == "DISTRITALES")
+    for label_, values in _rows_of([w for w in left if w.yc > nacional.yc + 3], nacional.x0 - 10):
+        for w in values:
+            put("district" if w.x0 >= distritales.x0 - 5 else "national", _name(label_), w)
+    if mayor:
+        right = [w for w in below if w.x0 >= split]
+        header = next(w for w in right if fold(w.text) == "RESULTADOS")
+        for label_, values in _rows_of([w for w in right if w.yc > header.yc + 3], header.x0 + 5):
+            put("municipal", _name(label_), values[0])
+
+
+POSTS = ("ALCALDE", "SINDICO", "CONCEJAL")
+
+
+def _header(page: list[Word], *needles: str) -> Word:
+    """The first word of the heading row that holds all of `needles`; the pages are set mirrored left to right."""
+    for row in lines(page, tolerance=3):
+        folded = [fold(w.text) for w in row]
+        if all(any(f.startswith(n) for f in folded) for n in needles):
+            last = next(i for i, f in enumerate(folded) if f.startswith(needles[-1]))
+            return next(row[i] for i in range(last, -1, -1) if folded[i].startswith(needles[0]))
+    raise ValueError(f"page {page[0].page}: no heading with {needles}")
+
+
+def _has_heading(rows: list[list[Word]], *prefixes: str) -> bool:
+    return any(all(any(fold(w.text).startswith(p) for w in row) for p in prefixes) for row in rows)
+
+
+def _corporation(page: list[Word]) -> list[list[str]]:
+    """The titular posts a municipal page adjudicates, each as the folded words of its holder and organization.
+
+    The name and the organization sit in one row and are told apart later, against the organizations that ran.
+    """
+    head = _header(page, "ADJUDICACION", "CORPORACION")
+    box = [w for w in page if w.yc > head.yc + 3 and head.x0 - 20 <= w.x0 < head.x0 + 230]
+    posts: list[list[str]] = []
+    cargos: list[Word] = []
+    for row in lines([w for w in box if w.x0 >= head.x0 + 135], tolerance=3):
+        first = next((w for w in row if fold(w.text) in POSTS), None)
+        if first is not None and not any(fold(w.text) == "SUPLENTE" for w in row):
+            cargos.append(first)
+    if not cargos:
+        raise ValueError(f"page {page[0].page}: no adjudicated posts")
+    edge = min(c.x0 for c in cargos) - 8
+    between = [w for w in box if head.x0 - 20 <= w.x0 < edge and not is_number(w.text)]
+    for cargo in cargos:
+        row = sorted((w for w in between if abs(w.yc - cargo.yc) <= 6), key=lambda w: w.x0)
+        posts.append([label(w.text) for w in row])
+    return posts
+
+
+UNRESOLVED: list[tuple[str, list[str], list[str]]] = []
+
+
+def _adjudicated(posts: list[list[str]], known: set[str], where: str) -> Counter[str]:
+    """Seats by organization: each post ends in the label of one organization that ran.
+
+    A civic committee's label in the adjudications can differ from its label in the results, so a post that ends in
+    no known label is matched on its last words to the nearest label that ran.
+    """
+    parties = sorted(k for k in known if k not in ACCOUNTS)
+    found: Counter[str] = Counter()
+    for post in posts:
+        text_ = "".join(post)
+        ends = [k for k in parties if text_.endswith(k)]
+        if ends:
+            found[max(ends, key=len)] += 1
+            continue
+        tails = ["".join(post[-size:]) for size in (3, 2, 1)]
+        near = next(
+            (m_[0] for tail in tails[::-1] if (m_ := get_close_matches(tail, parties, n=1, cutoff=0.6))),
+            next((k for tail in tails if len(tail) >= 6 for k in parties if k.endswith(tail)), None),
+        )
+        if near is None:
+            UNRESOLVED.append((where, post, parties))
+            continue
+        found[near] += 1
+    return found
+
+
+def _district_department(page: list[Word]) -> Counter[str]:
+    """The deputies a department's page adjudicates, each row led by its organization."""
+    head = _header(page, "ADJUDICACION", "DIPUTADO", "DISTRITAL")
+    box = [w for w in page if w.yc > head.yc + 3 and head.x0 - 30 <= w.x0 < head.x0 + 230]
+    found: Counter[str] = Counter()
+    for row in lines(box, tolerance=3):
+        party = [w for w in row if w.x0 < head.x0 + 20]
+        if party and len(row) > len(party) and fold(row[0].text) != "TOMO":
+            found[label(_name(party))] += 1
+    return found
+
+
+def _district_central(page: list[Word]) -> Counter[str]:
+    """The deputies the Distrito Central's page adjudicates, each row ending in its organization."""
+    head = _header(page, "ADJUDICACION", "DIPUTADO")
+    stop = _header(page, "POSTULACION")
+    box = [w for w in page if head.yc + 3 < w.yc < stop.yc - 3 and head.x0 <= w.x0 + 25 and w.x0 < head.x0 + 220]
+    found: Counter[str] = Counter()
+    for row in lines(box, tolerance=3):
+        party = [w for w in row if w.x0 >= head.x0 + 140]
+        if party:
+            found[label(_name(party))] += 1
+    return found
+
+
+def _padron(page: list[Word]) -> Word | None:
+    """The registered voters of the area a page describes, from its "Total en el Municipio" row."""
+    for row in lines([w for w in page if w.x0 >= 250], tolerance=3):
+        folded = [fold(w.text) for w in row]
+        if folded[:3] == ["TOTAL", "EN", "EL"] or folded[:2] == ["EN", "EL"]:
+            counts = [w for w in row if is_number(w.text)]
+            return counts[-1] if counts else None
+    return None
+
+
+def _title(rows: list[list[Word]]) -> tuple[str, str]:
+    """The area a results page names: "municipality", "department", or "central", with its printed name.
+
+    A long name wraps onto the line below the title.
+    """
+    for i, row in enumerate(rows):
+        words_ = [fold(w.text) for w in row]
+        if words_[:1] != ["RESULTADOS"] or len(words_) < 2:
+            continue
+        if words_[1] in ("MUNICIPIO", "DEPARTAMENTO"):
+            name = " ".join(w.text for w in row[3:]) or text(rows[i + 1])
+            return ("municipality" if words_[1] == "MUNICIPIO" else "department"), name
+        if words_[1:3] == ["DISTRITO", "CENTRAL"]:
+            return "central", "Distrito Central"
+    return "", ""
+
+
+def _router(
+    grids: dict[str, Grid], kind: str, unit: str, district: str, department: int
+) -> Callable[[str, str, Word], None]:
+    """Where a results page's cells go: a municipality's cells are rows, a department's are its printed totals."""
+
+    def put(what: str, name: str, w: Word) -> None:
+        if what == "municipal":
+            mayor = grids[f"municipal:{unit}"]
+            mayor.put(name, w, mayor.cells.setdefault(unit, {}))
+            return
+        grid = grids[district] if what == "district" else grids[what]
+        if kind == "department":
+            into = grid.declared if what == "district" else grid.totals.setdefault(department, {})
+        else:
+            into = grid.cells.setdefault(unit, {})
+            if kind == "central":
+                if what == "district":
+                    grid.declared[label(name)] = w
+                else:
+                    grid.totals.setdefault(0, into)
+        grid.put(name, w, into)
+
+    return put
+
+
+def _read_2007(path: Path) -> dict[str, Contest]:
+    pages = words(path, 67, 828)
+    grids: dict[str, Grid] = defaultdict(Grid)
+
+    def national(kind: str, name: str, w: Word) -> None:
+        grids[kind].put(name, w, grids[kind].declared)
+
+    _president(pages[67], national)
+    page = pages[68]
+    # The national list: its adjudications, then its national totals.
+    rows = lines(page, tolerance=3)
+    start = _find(rows, "SIGLAS")
+    stop = _find(rows, "RESULTADOS", "DIPUTADOS")
+    if start is None or stop is None:
+        raise ValueError("page 68: no national list")
+    for row in rows[start + 1 : stop]:
+        grids["national"].seats[label(_name([w for w in row if w.x0 < 195]))] += 1
+    for row in rows[stop + 2 :]:
+        counted = [w for w in row if is_number(w.text)]
+        name = [w for w in row if not is_number(w.text) and w.x0 < 300]
+        if counted and name and fold(name[0].text) != "TOMO":
+            national("national", _name(name), counted[-1])
+    department = 0
+    seats: Counter[str] = Counter()
+    posts: list[list[str]] = []
+    annulled = False
+    registered: Word | None = None
+    reruns: set[str] = set()
+    for number in range(69, 829):
+        page = pages[number]
+        rows = lines(page, tolerance=3)
+        full = fold(" ".join(text(r) for r in rows))
+        if _find(rows, "JUNTA", "ELECTORAL", "MUNICIPAL") is not None:
+            annulled = "NULIDAD" in full
+            posts = []
+        elif _find(rows, "JUNTA", "ELECTORAL", "DEPARTAMENTAL") is not None:
+            seats = _district_department(page)
+        elif "JUNTA ELECTORAL DEL DISTRITO CENTRAL" in full:
+            seats = _district_central(page)
+        if _has_heading(rows, "ADJUDICACION", "CORPORACION"):
+            posts = _corporation(page)
+        if "JUNTA ELECTORAL" in full:
+            registered = _padron(page)
+        kind, name = _title(rows)
+        if not kind:
+            continue
+        if kind == "department":
+            department = department_code(name)
+        unit = ""
+        if kind == "central":
+            unit = match("DISTRITO CENTRAL", "GUATEMALA") or ""
+            department = 1
+        elif kind == "municipality":
+            unit = match(name, departments_by_code()[department]) or ""
+            if not unit or int(unit[:2]) != department:
+                raise ValueError(f"page {number}: no municipality for {name!r} in department {department}")
+        district = f"district:{'00' if kind == 'central' else f'{department:02d}'}"
+        if kind != "municipality":
+            grids[district].seats = Counter(seats)
+        put = _router(grids, kind, unit, district, department)
+
+        try:
+            _president(page, put)
+            _deputies(page, put)
+        except (StopIteration, ValueError, IndexError) as error:
+            raise ValueError(f"page {number}: {name}: {error!r}") from error
+        if registered is not None:
+            for what in ("president", "president2"):
+                put(what, "Padron", registered)
+            registered = None
+        if kind != "department":
+            mayor = grids[f"municipal:{unit}"]
+            mayor.seats = _adjudicated(posts, set(mayor.printed), f"page {number}: {name}")
+            if not posts:
+                mayor.notes.append("The memoria prints no adjudication of this municipal corporation.")
+            posts = []
+            if annulled and kind == "municipality":
+                reruns.add(unit)
+            annulled = False
+    corrections = _finalists(grids["president2"])
+    contests = {
+        k: _contest(
+            k, "rerun" if k.partition(":")[2] in reruns and k.startswith("municipal") else k.partition(":")[0], g
+        )
+        for k, g in grids.items()
+    }
+    contests["president2"].notes = corrections
+    return contests
+
+
+# The 2011 memoria prints each contest's tables by department, its district tables set sideways, and one block per
+# municipality. ---------------------------------------------------------------------------------------------------
+
+TITLE_WORDS = {"DIPUTADOS", "DISTRITALES", "RESULTADOS", "FINALES", "%", "ABST.", "ABST", "PARTICIPACION", "."}
+VOCABULARY = {
+    "PP", "PAN", "UCN", "UNIONISTA", "CREO", "LIDER", "ADN", "CASA", "VIVA", "EG", "UNE", "GANA", "FRG", "FCN",
+    "VICTORIA", "PAIS", "WINAQ", "URNG", "MAIZ", "ANN", "NULOS", "BLANCO", "EN", "EMITIDOS", "PADRON",
+}  # fmt: skip
+
+
+def clean_header(name: str) -> str:
+    """A column's label from the words stacked above it, without the table's title or its percentage column."""
+    found = [t for t in name.split() if t not in TITLE_WORDS and not re.fullmatch(r"[\d.]+%", t)]
+    found = [t for t in found if all(part in VOCABULARY for part in t.split("-") if part)]
+    if "NULOS" in found and "EN" in found:
+        found.remove("EN")
+    if found == ["EN", "BLANCO"]:
+        found = ["BLANCO"]
+    return " ".join(found)
+
+
+PARTY_ALIASES = {"VIVA": "VIVA-EG"}
+
+
+def clean_party(name: str) -> str:
+    return PARTY_ALIASES.get(name, name)
+
+
+def _is_total(name: str) -> bool:
+    return fold(name).startswith("TOTAL")
+
+
+def _read_tables(path: Path, first: int, last: int, grids: dict[str, Grid], kinds: dict[str, str]) -> None:
+    """The president, runoff, and list tables: one summary of the departments, then a table for each department."""
+    for table in tables(path, first, last, band=20):
+        title = fold(table.title)
+        kind = next((k for needle, k in kinds.items() if title.startswith(needle)), None)
+        if kind is None or not table.rows or "DEPARTAMENTO" not in title:
+            continue
+        grid = grids[kind]
+        names = [clean_party(clean_header(c)) for c in table.columns]
+        summary = "TOTALES FINALES" in title
+        codes = iter([] if summary else _towns(table, table.rows[0].section))
+        for row in table.rows:
+            if _is_total(row.name) and summary:
+                where = grid.declared
+            elif _is_total(row.name):
+                continue
+            elif summary:
+                where = grid.totals.setdefault(
+                    0 if fold(row.name) == "DISTRITO CENTRAL" else department_code(row.name), {}
+                )
+            else:
+                where = grid.cells.setdefault(next(codes), {})
+            for name, w in zip(names, row.values, strict=True):
+                grid.put(name, w, where)
+
+
+def _read_districts(path: Path, first: int, last: int) -> dict[str, Contest]:
+    raw_pages, _ = raw_words(path, first, last)
+    found = spread_tables(path, first, last)
+    contests: dict[str, Contest] = {}
+    for number in range(first, last + 1):
+        left = [w for w in raw_pages[number] if w.x1 <= 580]
+        titled = [text(r) for r in lines(left, 3) if r and fold(r[0].text) == "DISTRITO"]
+        if not titled or len(found[number]) != 1:
+            continue
+        table = found[number][0]
+        central = "CENTRAL" in fold(titled[0])
+        dep = 1 if central else department_code(titled[0].removeprefix("DISTRITO DE "))
+        ck = "district:00" if central else f"district:{dep:02d}"
+        grid = Grid()
+        names = [clean_party(clean_header(c)) for c in table.columns]
+        codes = iter([] if central else _towns(table, departments_by_code()[dep]))
+        for row in table.rows:
+            if central:
+                code = match("DISTRITO CENTRAL", "GUATEMALA") or ""
+                where = grid.cells.setdefault(code, {})
+                for name, w in zip(names, row.values, strict=True):
+                    grid.put(name, w, where)
+                    grid.declared[label(name)] = w
+            elif _is_total(row.name):
+                for name, w in zip(names, row.values, strict=True):
+                    grid.put(name, w, grid.declared)
+            else:
+                where = grid.cells.setdefault(next(codes), {})
+                for name, w in zip(names, row.values, strict=True):
+                    grid.put(name, w, where)
+        known = {label(n) for n in names}
+        grid.seats = _seats_list(left, known, "PARTIDO", f"page {number}")
+        contests[ck] = _contest(ck, "district", grid)
+    return contests
+
+
+def _seats_list(page: list[Word], known: set[str], header: str, where: str) -> Counter[str]:
+    """The seats an adjudication table lists: one row for each deputy, led by the deputy's organization."""
+    rows = lines(page, 3)
+    start = next((i for i, r in enumerate(rows) if any(fold(w.text) == header for w in r) and r[0].x0 > 100), None)
+    if start is None:
+        raise ValueError(f"{where}: no adjudications")
+    found: Counter[str] = Counter()
+    for row in rows[start + 1 :]:
+        if any(fold(w.text) in ("TOTAL", "GENERO", "TIPO") for w in row):
+            break
+        party = [w for w in row if w.x0 < 215]
+        name = [w for w in row if w.x0 >= 215]
+        if party and name:
+            found[label(_name(party))] += 1
+    unknown = set(found) - known
+    if unknown:
+        raise ValueError(f"{where}: seats for {sorted(unknown)} but only {sorted(known)} ran")
+    return found
+
+
+MISSING: list[tuple[str, str, str]] = []
+
+
+def _blocks_2011(path: Path, first: int, last: int) -> dict[str, Grid]:
+    """The mayoral results and adjudications of each municipality's block, by the key of the contest.
+
+    A municipality whose election the Tribunal annulled prints the repeated election's results, and one whose
+    mayoral election tied prints a second column for the election it held again; both are contests of the repeat.
+    """
+    raw_pages, _ = raw_words(path, first, last)
+    grids: dict[str, Grid] = defaultdict(Grid)
+    seen: set[str] = set()
+    for number in range(first, last + 1):
+        page = raw_pages[number]
+        starts = sorted(
+            w.x0
+            for row in lines(page, 3)
+            for i, w in enumerate(row)
+            if fold(w.text) == "ELECCION"
+            and w.yc < 100
+            and [fold(x.text) for x in row[i + 1 : i + 3]] == ["DE", "CORPORACION"]
+        )
+        for index, start in enumerate(starts):
+            stop = starts[index + 1] - 20 if index + 1 < len(starts) else 10_000.0
+            region = [w for w in page if start - 20 <= w.x0 < stop and w.x1 < 1100]
+            where = f"page {number}"
+            rows = lines(region, 2.5)
+            head = next(r for r in rows if fold(r[0].text) == "ELECCION")
+            at = next(i for i, w in enumerate(head) if fold(w.text) == "MUNICIPAL")
+            after = rows[rows.index(head) + 1 :]
+            at_dep = next(i for i, r in enumerate(after) if fold(r[0].text) == "DEPARTAMENTO")
+            town = " ".join([*(w.text for w in head[at + 2 :]), *(text(r) for r in after[:at_dep])])
+            dep = text(after[at_dep]).removeprefix("DEPARTAMENTO DE ")
+            code = match(town, dep)
+            if code is None:
+                MISSING.append((where, town, dep))
+                continue
+            if code in seen:
+                raise ValueError(f"{where}: {town!r} is printed twice")
+            seen.add(code)
+            header = next(w for w in region if fold(w.text) == "POSTULADOS")
+            partidos = next(w for w in region if fold(w.text) == "PARTIDOS" and abs(w.yc - header.yc) < 3)
+            cargo = next(w for w in region if fold(w.text) == "CARGO")
+            ends = next(w for w in region if fold(w.text) == "ADJUDICADA")
+            final = next((w for w in region if fold(w.text) == "FINAL" and abs(w.yc - header.yc) < 12), None)
+            annulled = any(fold(w.text) == "NULIDAD" for w in region)
+            first_key = f"rerun:{code}" if annulled else f"municipal:{code}"
+            grid = grids[first_key]
+            limit = (partidos.x0 + header.x0) / 2 - 5
+            body = [w for w in region if header.yc + 3 < w.yc < ends.yc - 8]
+            for label_, values in _rows_of(body, limit):
+                for w in values:
+                    again = final is not None and w.x0 >= final.x0 - 30
+                    target = grids[f"rerun:{code}"] if again else grid
+                    target.put(_name(label_), w, target.cells.setdefault(code, {}))
+            pcol = next(w.x0 for w in region if fold(w.text) == "PARTIDO" and abs(w.yc - cargo.yc) < 3) - 25
+            posts: list[list[str]] = []
+            for row in lines([w for w in region if w.yc > cargo.yc + 3], 2.5):
+                if fold(row[0].text) not in POSTS or any(fold(w.text) == "SUPLENTE" for w in row):
+                    continue
+                near = [w for w in region if w.x0 >= pcol and abs(w.yc - row[0].yc) <= 5]
+                posts.append([label(w.text) for w in sorted(near, key=lambda w: w.x0)])
+            adjudicated = grids[f"rerun:{code}"] if final is not None else grid
+            adjudicated.seats = _adjudicated(posts, set(adjudicated.printed), f"{where}: {town}")
+    return grids
+
+
+def _read_2011(path: Path, m: Memoria) -> dict[str, Contest]:
+    grids: dict[str, Grid] = defaultdict(Grid)
+    _read_tables(
+        path,
+        *m.tables,
+        grids,
+        {
+            "ELECCION DE PRESIDENTE": "president",
+            "SEGUNDA ELECCION": "president2",
+            "ELECCION DE DIPUTADOS POR LISTADO": "national",
+        },
+    )
+    _read_tables(path, *m.parlacen, grids, {"ELECCION DE DIPUTADOS AL PARLAMENTO": "parlacen"})
+    raw_pages, _ = raw_words(path, m.tables[0], m.parlacen[1])
+    for kind, number in (("national", 344), ("parlacen", 549)):
+        left = [w for w in raw_pages[number] if w.x1 <= 580]
+        grids[kind].seats = _seats_list(left, set(grids[kind].printed), "PARTIDO", f"page {number}")
+    contests = {k: _contest(k, k, g) for k, g in grids.items()}
+    contests |= _read_districts(path, *m.districts)
+    for ck, grid in _blocks_2011(path, *m.blocks).items():
+        contests[ck] = _contest(ck, ck.partition(":")[0], grid)
+    return contests
+
+
+def _towns(table: Table, department_name: str) -> list[str]:
+    """The municipality codes of a table's rows, read from the names wrapped above and below the numbers.
+
+    The names appear in the department's order, so each row takes the first municipality whose name the words in
+    turn spell; the table's total row is last.
+    """
+    tokens = [fold(w.text) for w in table.left]
+    if "TOTAL" in tokens:
+        tokens = tokens[: len(tokens) - 1 - tokens[::-1].index("TOTAL")]
+    expected = municipalities()[department(department_name) or ""]
+    aliases: dict[str, list[str]] = defaultdict(list)
+    for printed, official in ALIASES.items():
+        aliases[official].append(printed)
+    total = len([r for r in table.rows if not _is_total(r.name)])
+    found: list[str] = []
+    at = 0
+    used: set[int] = set()
+    while len(found) < total:
+        for k in range(len(expected)):
+            town, code = expected[k]
+            if k in used:
+                continue
+            forms = [town, *aliases.get(town, [])]
+            hit = next((f for f in forms if tokens[at : at + len(f.split())] == f.split()), None)
+            if hit is None:
+                close = get_close_matches(" ".join(tokens[at : at + len(town.split())]), forms, n=1, cutoff=0.85)
+                hit = close[0] if close else None
+            if hit is not None:
+                found.append(code)
+                at += len(hit.split())
+                used.add(k)
+                break
+        else:
+            raise ValueError(f"{table.title}: no municipality at {' '.join(tokens[at : at + 4])!r} after {found[-1:]}")
+    if at != len(tokens):
+        raise ValueError(f"{table.title}: names left over: {' '.join(tokens[at:])!r}")
     return found
