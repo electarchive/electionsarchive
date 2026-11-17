@@ -126,7 +126,7 @@ class LocalElection:
     native: str
     blocks: list[local.Block]
     files: list[str]
-    note: str | None = None
+    kind: str = "local"
 
 
 NATIVE_LOCAL = "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын {year} оны ээлжит сонгууль"
@@ -138,6 +138,8 @@ def local_elections() -> list[LocalElection]:
     results_2020 = "cacc51cc"
     results_2024 = "1c20b694"
     blocks_2024 = local.blocks(results_2024, locate, "Аймаг 10-11") + local.blocks(results_2024, locate, "Сум 10-11")
+    by_2025 = "47956881"
+    native_by = "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын 2025 оны нөхөн сонгууль"
     return [
         LocalElection(
             "2020-10-15",
@@ -160,6 +162,30 @@ def local_elections() -> list[LocalElection]:
             NATIVE_LOCAL.format(year=2024),
             blocks_2024,
             [sheets.url(results_2024), sheets.url(PLACE_LIST_2020)],
+        ),
+        LocalElection(
+            "2025-06-24",
+            date(2025, 6, 24),
+            date(2025, 6, 24),
+            "day",
+            None,
+            "2025 Mongolian local council by-elections",
+            native_by,
+            local.blocks(by_2025, locate, 0),
+            [sheets.url(by_2025), sheets.url(PLACE_LIST_2020)],
+            "by_election",
+        ),
+        LocalElection(
+            "2025-06-28",
+            date(2025, 6, 28),
+            date(2025, 6, 28),
+            "day",
+            None,
+            "2025 Mongolian local council by-election, supplementary vote",
+            native_by + " (нэмэлт санал хураалт)",
+            local.blocks(by_2025, locate, 1),
+            [sheets.url(by_2025), sheets.url(PLACE_LIST_2020)],
+            "by_election",
         ),
     ]
 
@@ -667,7 +693,7 @@ def councils(spec: LocalElection) -> Package:
         "election",
         id=election_id,
         polity_id=MONGOLIA,
-        kind="local",
+        kind=spec.kind,
         date_from=spec.date_from,
         date_to=spec.date_to,
         date_precision=spec.precision,
@@ -676,7 +702,7 @@ def councils(spec: LocalElection) -> Package:
     )
     p.name(election_id, spec.english, "en", "official")
     p.name(election_id, spec.native, "mn", "native", False)
-    path = f"mn/{day}-local"
+    path = f"mn/{day}-local" if spec.kind == "local" else f"mn/{day}-by-election"
     p.add("slug", path=path, entity_id=election_id, is_current=True)
     units: dict[str, str] = {}
     for block in blocks:
