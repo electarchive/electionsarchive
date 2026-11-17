@@ -1,0 +1,10231 @@
+{
+"https://portal-api.valasztas.hu/documents/20182/2315303/20190623_Velence_eredmeny.pdf|2019. június 23.|Velence|„Egyetért-e Ön azzal, hogy a Helyi Építési Szabályzatot és a Velencei Településrendezési Eszközöket Velence Város Önkormányzat Képviselő-testülete úgy módosítsa, hogy semmit ne lehessen a Velence Korzó területén építeni?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/2315303/20190623_Velence_eredmeny.pdf",
+"note": "'ÉRVÉNYTELEN' underlined on the form. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+380.0,
+283.0,
+425.0,
+305.0
+],
+"page": 1,
+"v": 5888
+},
+"in_urn": {
+"box": [
+347.0,
+386.0,
+408.0,
+416.0
+],
+"page": 1,
+"v": 1455
+},
+"invalid": {
+"box": [
+370.0,
+422.0,
+400.0,
+450.0
+],
+"page": 1,
+"v": 4
+},
+"no": {
+"box": [
+648.0,
+383.0,
+692.0,
+420.0
+],
+"page": 1,
+"v": 84
+},
+"unused": {
+"box": [
+375.0,
+352.0,
+412.0,
+380.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+347.0,
+455.0,
+408.0,
+486.0
+],
+"page": 1,
+"v": 1451
+},
+"voters": {
+"box": [
+347.0,
+320.0,
+408.0,
+352.0
+],
+"page": 1,
+"v": 1455
+},
+"yes": {
+"box": [
+627.0,
+317.0,
+696.0,
+352.0
+],
+"page": 1,
+"v": 1367
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/2315303/eredmeny_Revfulop_190811.pdf|2019. augusztus 11.|Révfülöp|„Akarja-e Ön, hogy Révfülöp vízparti központjában, a móló és a futballpálya közötti öblöt az eddigi funkciója helyett teljes területén 133 db vitorláshajó téli-nyári vízen-tárolására alkalmas vitorláskikötővé alakítsák át, ehhez a vízbe ív alakú, az ívével a nagymólón is túlnyúló, 180 m hosszúságú, betonoszlopokkal és szádfalakkal megtámasztott, 16.000 m3 terméskövet tartalmazó kőgátat építsenek, a vízfelületre 600 m2 felületen úszó-pontonokat telepítsenek, a téli vízbefagyás ellen a hajókat szivattyús vízcirkuláló csővezetékekkel vegyék körül, a parton különböző kikötőkiszolgáló létesítményeket, köztük a Nádas borozó mellé mobil hajókiemelő darut telepítsenek, a füves partot a hajók oda és elszállítására, ki-be emelésére használják, és kizárólag a vitorláskikötőt használóknak 101 db-os autóparkolót létesítsenek?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/2315303/eredmeny_Revfulop_190811.pdf",
+"note": "Voters B reads 367 (last digit looks like 7), but in-urn D=366 and unused C=0, so B and D differ by 1 as written. 39+322=361; 5+361=366 ok.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+413.0,
+331.0,
+447.0,
+352.0
+],
+"page": 1,
+"v": 1166
+},
+"in_urn": {
+"box": [
+398.0,
+430.0,
+438.0,
+456.0
+],
+"page": 1,
+"v": 366
+},
+"invalid": {
+"box": [
+409.0,
+465.0,
+432.0,
+490.0
+],
+"page": 1,
+"v": 5
+},
+"no": {
+"box": [
+674.0,
+433.0,
+722.0,
+458.0
+],
+"page": 1,
+"v": 322
+},
+"unused": {
+"box": [
+409.0,
+398.0,
+432.0,
+420.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+393.0,
+500.0,
+432.0,
+525.0
+],
+"page": 1,
+"v": 361
+},
+"voters": {
+"box": [
+404.0,
+362.0,
+442.0,
+388.0
+],
+"page": 1,
+"v": 367
+},
+"yes": {
+"box": [
+682.0,
+362.0,
+713.0,
+388.0
+],
+"page": 1,
+"v": 39
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305699/Algyo_helyi_nepszavazas_jegyzokonyv_2017_02_26.pdf|2017. február 26.|Algyő, Csongrád megye|„Akarja-e Ön, hogy a K&P Chem Kft. az Algyő 01747/9 helyrajzi számú ingatlanon háztartás-vegyipari alapanyagokat előállító üzemet létesítsen?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305699/Algyo_helyi_nepszavazas_jegyzokonyv_2017_02_26.pdf",
+"note": "Page 1 is the settlement summary; pages 2-5 are polling-station protocols (ignored). Arithmetic checks. \"ERVENYTELEN\" underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+405.0,
+300.0,
+470.0,
+328.0
+],
+"page": 1,
+"v": 4409
+},
+"in_urn": {
+"box": [
+405.0,
+388.0,
+470.0,
+414.0
+],
+"page": 1,
+"v": 832
+},
+"invalid": {
+"box": [
+405.0,
+416.0,
+470.0,
+443.0
+],
+"page": 1,
+"v": 3
+},
+"no": {
+"box": [
+667.0,
+385.0,
+740.0,
+413.0
+],
+"page": 1,
+"v": 402
+},
+"unused": {
+"box": [
+405.0,
+360.0,
+470.0,
+386.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+405.0,
+444.0,
+470.0,
+471.0
+],
+"page": 1,
+"v": 829
+},
+"voters": {
+"box": [
+405.0,
+330.0,
+470.0,
+358.0
+],
+"page": 1,
+"v": 832
+},
+"yes": {
+"box": [
+667.0,
+328.0,
+740.0,
+357.0
+],
+"page": 1,
+"v": 427
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305699/Berettyoujfalu_20171008.pdf|2017. október 8.|Berettyóújfalu, Hajdú-Bihar megye|„Akarja-e Ön, hogy Berettyóújfalu Város Önkormányzata Képviselő-testülete a berettyóújfalui 335/10 hrsz-úingatlan büntetés-végrehajtási egészségügyi központ kialakítása céljából történő állami tulajdonba adásáról szóló 107/2017. (V. 25.) önkormányzati határozatot visszavonja?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305699/Berettyoujfalu_20171008.pdf",
+"note": "Arithmetic: valid 3021=1953+1068 ok; in_urn 3036=15+3021 ok; voters 3035 + unused 2 = 3037 does not equal in_urn 3036 (as written: B=3.035, C=2, D=3.036).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+392.0,
+288.0,
+432.0,
+310.0
+],
+"page": 1,
+"v": 12342
+},
+"in_urn": {
+"box": [
+378.0,
+390.0,
+433.0,
+416.0
+],
+"page": 1,
+"v": 3036
+},
+"invalid": {
+"box": [
+398.0,
+424.0,
+435.0,
+452.0
+],
+"page": 1,
+"v": 15
+},
+"no": {
+"box": [
+663.0,
+380.0,
+725.0,
+408.0
+],
+"page": 1,
+"v": 1068
+},
+"unused": {
+"box": [
+405.0,
+358.0,
+432.0,
+382.0
+],
+"page": 1,
+"v": 2
+},
+"valid": {
+"box": [
+374.0,
+458.0,
+433.0,
+484.0
+],
+"page": 1,
+"v": 3021
+},
+"voters": {
+"box": [
+378.0,
+322.0,
+433.0,
+348.0
+],
+"page": 1,
+"v": 3035
+},
+"yes": {
+"box": [
+663.0,
+312.0,
+725.0,
+340.0
+],
+"page": 1,
+"v": 1953
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305699/Felsorajki_helyi_nepsz_eredmeny_jkv.pdf|2017. december 17.|Felsőrajk, Zala megye|„Egyetért-e Ön azzal, hogy Felsőrajk község Önkormányzata a Szociális és Gyermekvédelmi Főigazgatóság által benyújtandó EFOP-2.2.2-17 „Intézményi ellátásról a közösségi alapú szolgáltatásokra való áttérés fejlesztése, -intézményi férőhely kiváltás” tárgyú pályázat megvalósításának céljából az önkormányzat tulajdonát képező ingatlanokat biztosítson a pályázó részére?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305699/Felsorajki_helyi_nepsz_eredmeny_jkv.pdf",
+"note": "Unused is a dash (null). Stamp: 'ÉRVÉNYTELEN' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+394.0,
+330.0,
+421.0,
+347.0
+],
+"page": 1,
+"v": 601
+},
+"in_urn": {
+"box": [
+366.0,
+432.0,
+404.0,
+456.0
+],
+"page": 1,
+"v": 153
+},
+"invalid": {
+"box": [
+384.0,
+468.0,
+404.0,
+488.0
+],
+"page": 1,
+"v": 2
+},
+"no": {
+"box": [
+648.0,
+433.0,
+686.0,
+456.0
+],
+"page": 1,
+"v": 148
+},
+"valid": {
+"box": [
+364.0,
+501.0,
+402.0,
+524.0
+],
+"page": 1,
+"v": 151
+},
+"voters": {
+"box": [
+368.0,
+364.0,
+406.0,
+384.0
+],
+"page": 1,
+"v": 153
+},
+"yes": {
+"box": [
+673.0,
+364.0,
+692.0,
+384.0
+],
+"page": 1,
+"v": 3
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305702/jk_szentlorinckata.pdf|2016. március 6.|Szentlőrinckáta, Pest megye|„Egyetért-e azzal, hogy Szentlőrinckáta község Jász-Nagykun-Szolnok megyéhez csatlakozzon?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305702/jk_szentlorinckata.pdf",
+"note": "2016 style form. 'ERVENYTELEN' is underlined (purple). Arithmetic ok: 32+120=152, 0+152=152, 152+0=152.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+410.0,
+332.0,
+468.0,
+353.0
+],
+"page": 1,
+"v": 1557
+},
+"in_urn": {
+"box": [
+420.0,
+419.0,
+467.0,
+440.0
+],
+"page": 1,
+"v": 152
+},
+"invalid": {
+"box": [
+438.0,
+447.0,
+464.0,
+468.0
+],
+"page": 1,
+"v": 0
+},
+"no": {
+"box": [
+681.0,
+417.0,
+731.0,
+440.0
+],
+"page": 1,
+"v": 120
+},
+"unused": {
+"box": [
+438.0,
+390.0,
+462.0,
+411.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+420.0,
+474.0,
+467.0,
+495.0
+],
+"page": 1,
+"v": 152
+},
+"voters": {
+"box": [
+420.0,
+362.0,
+467.0,
+383.0
+],
+"page": 1,
+"v": 152
+},
+"yes": {
+"box": [
+688.0,
+360.0,
+724.0,
+380.0
+],
+"page": 1,
+"v": 32
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/balatonkenese.pdf|2013. március 24.|Balatonkenese, Veszprém megye|\"Egyetért-e Ön azzal, hogy az új községként Balatonakarattya Balatonkenesével határos közigazgatási határa a Balatonakarattya Leválást Előkészítő Bizottság 8/2012.(V.25.) számú határozatával elfogadott javaslatában szereplő - a Tompa Mihály utca - Juhász Gyula utca - Honvéd utca és Tompa M. utca közötti ingatlanok telekhatára - Rege utca és Tompa M. utca közötti ingatlanok telekhatára - Matacsalja utca és meghosszabbított vonala által meghúzott - határvonal legyen?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/balatonkenese.pdf",
+"note": "Electors 2994 and voters E=1062 on page 2 (page:2). No outcome circled/underlined on the form. 57+996=1053; 9+1053=1062. Unused ballots not on form.",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+140.0,
+503.0,
+215.0,
+540.0
+],
+"page": 2,
+"v": 2994
+},
+"in_urn": {
+"box": [
+190.0,
+553.0,
+258.0,
+592.0
+],
+"page": 3,
+"v": 1062
+},
+"invalid": {
+"box": [
+462.0,
+553.0,
+492.0,
+592.0
+],
+"page": 3,
+"v": 9
+},
+"no": {
+"box": [
+320.0,
+752.0,
+390.0,
+790.0
+],
+"page": 3,
+"v": 996
+},
+"valid": {
+"box": [
+575.0,
+553.0,
+650.0,
+592.0
+],
+"page": 3,
+"v": 1053
+},
+"voters": {
+"box": [
+645.0,
+520.0,
+715.0,
+555.0
+],
+"page": 2,
+"v": 1062
+},
+"yes": {
+"box": [
+215.0,
+752.0,
+270.0,
+790.0
+],
+"page": 3,
+"v": 57
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/bp_13.pdf|2013. augusztus 25.|Budapest Főváros XIII. kerület, Budapest|\"Egyetért-e Ön azzal, hogy a Margitsziget ne Budapest Főváros XIII. kerület közigazgatási területéhez tartozzon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/bp_13.pdf",
+"note": "Summary protocol; Margitsziget has 3 registered voters. Electors = A/C 3 (B=0), voters = E 2 (p2); D returned 0 (written like a circled 0); G difference 0 so unused not on form. 'C sheets' count on p2 written 0. Line 'Ervenyes szavazatok szama osszesen' left blank. No outcome alternative marked or struck out. Scan has a vertical artifact line through the page.",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+196.0,
+541.0,
+224.0,
+566.0
+],
+"page": 2,
+"v": 3
+},
+"in_urn": {
+"box": [
+220.0,
+541.0,
+246.0,
+566.0
+],
+"page": 3,
+"v": 2
+},
+"invalid": {
+"box": [
+463.0,
+541.0,
+495.0,
+566.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+333.0,
+716.0,
+357.0,
+742.0
+],
+"page": 3,
+"v": 2
+},
+"valid": {
+"box": [
+585.0,
+541.0,
+614.0,
+566.0
+],
+"page": 3,
+"v": 2
+},
+"voters": {
+"box": [
+692.0,
+540.0,
+716.0,
+566.0
+],
+"page": 2,
+"v": 2
+},
+"yes": {
+"box": [
+232.0,
+716.0,
+256.0,
+742.0
+],
+"page": 3,
+"v": 0
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/gyomro.pdf|2013. január 6.|Gyömrő, Pest megye|\"Egyetért-e Ön azzal, hogy Horthy Miklósról a vitatott történelmi személyiségről ne nevezzenek el közterületet Gyömrőn?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/gyomro.pdf",
+"note": "Old form: A=13052, B=0, C=13052, D=3, E=2271 (page 2); F=2270, G=-1, H=8, I=2262, J=1778, K=484 (page 3). Arithmetic checks. \"Ervenytelen\" underlined. Number of C sheets blank.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+128.0,
+612.0,
+228.0,
+642.0
+],
+"page": 3,
+"v": 13052
+},
+"in_urn": {
+"box": [
+190.0,
+528.0,
+280.0,
+556.0
+],
+"page": 3,
+"v": 2270
+},
+"invalid": {
+"box": [
+460.0,
+528.0,
+520.0,
+556.0
+],
+"page": 3,
+"v": 8
+},
+"no": {
+"box": [
+338.0,
+708.0,
+400.0,
+740.0
+],
+"page": 3,
+"v": 484
+},
+"valid": {
+"box": [
+570.0,
+528.0,
+675.0,
+556.0
+],
+"page": 3,
+"v": 2262
+},
+"voters": {
+"box": [
+665.0,
+612.0,
+745.0,
+642.0
+],
+"page": 3,
+"v": 2271
+},
+"yes": {
+"box": [
+210.0,
+708.0,
+300.0,
+740.0
+],
+"page": 3,
+"v": 1778
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf|2013. április 7.|Nagykőrös, Pest megye|\"Egyetért-e Ön azzal, hogy Nagykőrös Város Önkormányzata saját segélykeretét munkahelyteremtésre fordítsa?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf",
+"note": "Electors=C (19567, register at close), voters=E=6410 with boxes on page 2 (form B), shared by all four questions. G given as negative difference E-F; unused null. Only 'Érvénytelen' not struck through. Arithmetic checks (valid=yes+no; in_urn=invalid+valid; E+G=F).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+465.0,
+342.0,
+555.0,
+370.0
+],
+"page": 6,
+"v": 19567
+},
+"in_urn": {
+"box": [
+182.0,
+380.0,
+252.0,
+406.0
+],
+"page": 6,
+"v": 6405
+},
+"invalid": {
+"box": [
+535.0,
+380.0,
+580.0,
+406.0
+],
+"page": 6,
+"v": 84
+},
+"no": {
+"box": [
+290.0,
+530.0,
+350.0,
+562.0
+],
+"page": 6,
+"v": 508
+},
+"valid": {
+"box": [
+635.0,
+380.0,
+705.0,
+406.0
+],
+"page": 6,
+"v": 6321
+},
+"voters": {
+"box": [
+718.0,
+343.0,
+775.0,
+372.0
+],
+"page": 6,
+"v": 6410
+},
+"yes": {
+"box": [
+155.0,
+530.0,
+215.0,
+562.0
+],
+"page": 6,
+"v": 5813
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf|2013. április 7.|Nagykőrös, Pest megye|\"Egyetért-e Ön azzal, hogy a munkahelyteremtés érdekében Nagykőrös város segítse a helyi konzervgyár termelésének újraindítását?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf",
+"note": "Electors=C (19567, register at close), voters=E=6410 with boxes on page 2 (form B), shared by all four questions. G given as negative difference E-F; unused null. Only 'Érvénytelen' not struck through. Arithmetic checks (valid=yes+no; in_urn=invalid+valid; E+G=F).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+465.0,
+342.0,
+555.0,
+370.0
+],
+"page": 5,
+"v": 19567
+},
+"in_urn": {
+"box": [
+180.0,
+426.0,
+250.0,
+452.0
+],
+"page": 5,
+"v": 6409
+},
+"invalid": {
+"box": [
+545.0,
+426.0,
+595.0,
+452.0
+],
+"page": 5,
+"v": 84
+},
+"no": {
+"box": [
+292.0,
+587.0,
+342.0,
+614.0
+],
+"page": 5,
+"v": 398
+},
+"valid": {
+"box": [
+630.0,
+426.0,
+700.0,
+452.0
+],
+"page": 5,
+"v": 6325
+},
+"voters": {
+"box": [
+718.0,
+343.0,
+775.0,
+372.0
+],
+"page": 5,
+"v": 6410
+},
+"yes": {
+"box": [
+155.0,
+587.0,
+225.0,
+614.0
+],
+"page": 5,
+"v": 5927
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf|2013. április 7.|Nagykőrös, Pest megye|\"Egyetért-e Ön azzal, hogy több új munkahely létesüljön Nagykőrösön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf",
+"note": "Electors=C (19567, register at close), voters=E=6410 with boxes on page 2 (form B), shared by all four questions. G given as negative difference E-F; unused null. Only 'Érvénytelen' not struck through. Arithmetic checks (valid=yes+no; in_urn=invalid+valid; E+G=F).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+465.0,
+342.0,
+555.0,
+370.0
+],
+"page": 4,
+"v": 19567
+},
+"in_urn": {
+"box": [
+180.0,
+364.0,
+255.0,
+388.0
+],
+"page": 4,
+"v": 6404
+},
+"invalid": {
+"box": [
+525.0,
+364.0,
+572.0,
+388.0
+],
+"page": 4,
+"v": 71
+},
+"no": {
+"box": [
+290.0,
+510.0,
+335.0,
+542.0
+],
+"page": 4,
+"v": 122
+},
+"valid": {
+"box": [
+650.0,
+364.0,
+722.0,
+388.0
+],
+"page": 4,
+"v": 6333
+},
+"voters": {
+"box": [
+718.0,
+343.0,
+775.0,
+372.0
+],
+"page": 4,
+"v": 6410
+},
+"yes": {
+"box": [
+155.0,
+510.0,
+210.0,
+542.0
+],
+"page": 4,
+"v": 6211
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf|2013. április 7.|Nagykőrös, Pestt megye|\"Egyetért-e Ön azzal, hogy Nagykőrös városa Bács-Kiskun megyéhez csatlakozzon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/nagykoros.pdf",
+"note": "Electors=C (19567, register at close), voters=E=6410 with boxes on page 2 (form B), shared by all four questions. G given as negative difference E-F; unused null. Only 'Érvénytelen' not struck through. Arithmetic checks (valid=yes+no; in_urn=invalid+valid; E+G=F).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+465.0,
+342.0,
+555.0,
+370.0
+],
+"page": 3,
+"v": 19567
+},
+"in_urn": {
+"box": [
+178.0,
+372.0,
+255.0,
+395.0
+],
+"page": 3,
+"v": 6406
+},
+"invalid": {
+"box": [
+540.0,
+372.0,
+590.0,
+395.0
+],
+"page": 3,
+"v": 75
+},
+"no": {
+"box": [
+285.0,
+520.0,
+335.0,
+550.0
+],
+"page": 3,
+"v": 694
+},
+"valid": {
+"box": [
+650.0,
+372.0,
+725.0,
+395.0
+],
+"page": 3,
+"v": 6331
+},
+"voters": {
+"box": [
+718.0,
+343.0,
+775.0,
+372.0
+],
+"page": 3,
+"v": 6410
+},
+"yes": {
+"box": [
+135.0,
+520.0,
+205.0,
+550.0
+],
+"page": 3,
+"v": 5637
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/obarok.pdf|2013. február 24.|Óbarok, Fejér megye|\"Egyetért-e azzal, hogy Nagyegyháza településrész leváljon Óbarokról és új községként, Nagyegyháza település névvel szerezze meg önálló önkormányzatiságát?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/obarok.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Unused not stated; D (refused) = 3. Other two outcomes struck through.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+141.0,
+443.0,
+188.0,
+466.0
+],
+"page": 3,
+"v": 671
+},
+"in_urn": {
+"box": [
+134.0,
+376.0,
+186.0,
+400.0
+],
+"page": 3,
+"v": 373
+},
+"invalid": {
+"box": [
+496.0,
+388.0,
+518.0,
+412.0
+],
+"page": 3,
+"v": 7
+},
+"no": {
+"box": [
+299.0,
+523.0,
+354.0,
+547.0
+],
+"page": 3,
+"v": 272
+},
+"valid": {
+"box": [
+602.0,
+394.0,
+652.0,
+418.0
+],
+"page": 3,
+"v": 366
+},
+"voters": {
+"box": [
+680.0,
+433.0,
+734.0,
+456.0
+],
+"page": 3,
+"v": 373
+},
+"yes": {
+"box": [
+153.0,
+523.0,
+190.0,
+547.0
+],
+"page": 3,
+"v": 94
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/ozd.pdf|2013. december 8.|Ózd, Borsod-Abaúj-Zemplén megy|\"Egyetért Ön azzal, hogy Ózd város ne vegyen részt a \"Kulturgyár\" keretén belül a \"Multifunkcionális Nemzetiségi és Roma Kulturális, Oktatási Központ\" elnevezésű projektelem megvalósításában és az e tárgykörben hozott határozatot a város képviselő-testülete visszavonja?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/ozd.pdf",
+"note": "Fax. Pages: 1 signatures, 2 electors/voters (A=28752, B=0, C=28752, D=0, E=5878; boxes for electors and voters refer to page 2), 3 results, 4 receipt of copies. G=-2 (5876-5878). Outcome box: only 'Ervenytelen' is not struck through (the other two are struck). K read as 493 (first digit written like h/4). Arithmetic ok: 5374+493=5867, 9+5867=5876.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+110.0,
+563.0,
+188.0,
+590.0
+],
+"page": 2,
+"v": 28752
+},
+"in_urn": {
+"box": [
+103.0,
+466.0,
+158.0,
+486.0
+],
+"page": 3,
+"v": 5876
+},
+"invalid": {
+"box": [
+438.0,
+466.0,
+460.0,
+486.0
+],
+"page": 3,
+"v": 9
+},
+"no": {
+"box": [
+253.0,
+671.0,
+298.0,
+695.0
+],
+"page": 3,
+"v": 493
+},
+"valid": {
+"box": [
+545.0,
+466.0,
+600.0,
+486.0
+],
+"page": 3,
+"v": 5867
+},
+"voters": {
+"box": [
+635.0,
+563.0,
+705.0,
+590.0
+],
+"page": 2,
+"v": 5878
+},
+"yes": {
+"box": [
+100.0,
+671.0,
+165.0,
+695.0
+],
+"page": 3,
+"v": 5374
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/velem.pdf|2013. november 10.|Velem, Vas megye|\"Támogatja-e Ön a Velem, Rákóczi F. u. 96. sz. alatti ingatlan (volt Stirling villa ), a Velem Kossuth L. u. 1. sz. alatti ingatlan (volt Gyermeküdülő), és a Velem, Petőfi S. u. 16. sz. alatti ingatlan (volt Avar Szálló) ingyenes önkormányzati tulajdonba vagy használatba adásának kezdeményezését a Képviselő-testület által?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/velem.pdf",
+"note": "Electors (A 288) and voters (E 175) are on page 2 (box 'pg':2). 'Érvényes és eredményes' is the unstruck option. Arithmetic checks. Poor fax-quality scan, digits legible.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+165.0,
+594.0,
+218.0,
+616.0
+],
+"page": 2,
+"v": 288
+},
+"in_urn": {
+"box": [
+230.0,
+674.0,
+280.0,
+698.0
+],
+"page": 3,
+"v": 175
+},
+"invalid": {
+"box": [
+495.0,
+674.0,
+525.0,
+698.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+368.0,
+842.0,
+406.0,
+866.0
+],
+"page": 3,
+"v": 56
+},
+"valid": {
+"box": [
+600.0,
+674.0,
+655.0,
+698.0
+],
+"page": 3,
+"v": 174
+},
+"voters": {
+"box": [
+662.0,
+590.0,
+716.0,
+612.0
+],
+"page": 2,
+"v": 175
+},
+"yes": {
+"box": [
+258.0,
+842.0,
+302.0,
+866.0
+],
+"page": 3,
+"v": 118
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305705/velem.pdf|2013. november 10.|Velem, Vas megye|\"Támogatja-e Ön, hogy a falu a gesztenye ünnepet ezentúl Velemi Gesztenye Napok néven, a község közterületére vonatkozóan más szervező bevonása nélkül, önállóan rendezze meg?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305705/velem.pdf",
+"note": "Electors (A 288) and voters (E 175) are on page 2 (box 'pg':2). 'Érvényes és eredményes' is the unstruck option. Arithmetic checks. Poor fax-quality scan, digits legible.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+165.0,
+594.0,
+218.0,
+616.0
+],
+"page": 2,
+"v": 288
+},
+"in_urn": {
+"box": [
+210.0,
+664.0,
+260.0,
+688.0
+],
+"page": 4,
+"v": 175
+},
+"invalid": {
+"box": [
+470.0,
+664.0,
+500.0,
+688.0
+],
+"page": 4,
+"v": 1
+},
+"no": {
+"box": [
+350.0,
+822.0,
+396.0,
+846.0
+],
+"page": 4,
+"v": 52
+},
+"valid": {
+"box": [
+598.0,
+662.0,
+650.0,
+688.0
+],
+"page": 4,
+"v": 174
+},
+"voters": {
+"box": [
+662.0,
+590.0,
+716.0,
+612.0
+],
+"page": 2,
+"v": 175
+},
+"yes": {
+"box": [
+240.0,
+822.0,
+290.0,
+846.0
+],
+"page": 4,
+"v": 122
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080203medgyesegyhaza.pdf|2008. 02. 03.|Medgyesegyháza|\"Egyetért-e Ön azzal, hogy Medgyesegyháza közigazgatási területén belül hőerőmű épüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080203medgyesegyhaza.pdf",
+"note": "Electors (A/C) and voters appeared (E) are on page 2, marked with page=2; ballots and votes on page 3. Unused ballots not on the form (null); G (difference) = 0. Arithmetic checks: 632+1570=2202, 30+2202=2232. Stamp: 'Ervenytelen' and 'Ervenyes, de eredmenytelen' struck through, 'Ervenyes es eredmenyes' left.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+148.0,
+444.0,
+248.0,
+468.0
+],
+"page": 2,
+"v": 3261
+},
+"in_urn": {
+"box": [
+200.0,
+425.0,
+262.0,
+452.0
+],
+"page": 3,
+"v": 2232
+},
+"invalid": {
+"box": [
+463.0,
+425.0,
+503.0,
+452.0
+],
+"page": 3,
+"v": 30
+},
+"no": {
+"box": [
+335.0,
+608.0,
+402.0,
+639.0
+],
+"page": 3,
+"v": 1570
+},
+"valid": {
+"box": [
+587.0,
+425.0,
+645.0,
+452.0
+],
+"page": 3,
+"v": 2202
+},
+"voters": {
+"box": [
+632.0,
+444.0,
+712.0,
+468.0
+],
+"page": 2,
+"v": 2232
+},
+"yes": {
+"box": [
+232.0,
+610.0,
+285.0,
+637.0
+],
+"page": 3,
+"v": 632
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080301dobrokoz.pdf|2008. 03. 01.|Döbrököz|\"Akarja-e Ön, hogy Döbrököz Község Hegyi Óvodája 2007/2008-as tanévtől önálló intézményként továbbra is működjön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080301dobrokoz.pdf",
+"note": "electors (C=A+B on sheet B) and voters (E) are printed on page 2 (shared by both questions; 'page' key inside those fields). Unused ballots not on form. Stamp: 'Érvénytelen' has a line under it on the sheet (only mark visible). Arithmetic ok (287+27=314).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+165.0,
+468.0,
+235.0,
+494.0
+],
+"page": 2,
+"v": 1731
+},
+"in_urn": {
+"box": [
+215.0,
+553.0,
+272.0,
+580.0
+],
+"page": 4,
+"v": 315
+},
+"invalid": {
+"box": [
+465.0,
+553.0,
+502.0,
+580.0
+],
+"page": 4,
+"v": 1
+},
+"no": {
+"box": [
+348.0,
+722.0,
+392.0,
+750.0
+],
+"page": 4,
+"v": 27
+},
+"valid": {
+"box": [
+585.0,
+553.0,
+647.0,
+580.0
+],
+"page": 4,
+"v": 314
+},
+"voters": {
+"box": [
+675.0,
+468.0,
+732.0,
+490.0
+],
+"page": 2,
+"v": 315
+},
+"yes": {
+"box": [
+215.0,
+722.0,
+274.0,
+750.0
+],
+"page": 4,
+"v": 287
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080301dobrokoz.pdf|2008. 03. 01.|Döbrököz|\"Akarja-e Ön, hogy a jövőben Döbrököz Község Önkormányzatának Képviselő-testületi Üléseiről kábeltévén keresztül, állandó tájékoztatást kaphasson a Falu Lakossága?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080301dobrokoz.pdf",
+"note": "electors (C=A+B on sheet B) and voters (E) are printed on page 2 (shared by both questions; 'page' key inside those fields). Unused ballots not on form. Stamp: 'Érvénytelen' has a line under it on the sheet (only mark visible). Arithmetic ok (284+30=314, 1+314=315).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+165.0,
+468.0,
+235.0,
+494.0
+],
+"page": 2,
+"v": 1731
+},
+"in_urn": {
+"box": [
+215.0,
+518.0,
+270.0,
+540.0
+],
+"page": 3,
+"v": 315
+},
+"invalid": {
+"box": [
+465.0,
+518.0,
+500.0,
+540.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+350.0,
+686.0,
+392.0,
+712.0
+],
+"page": 3,
+"v": 30
+},
+"valid": {
+"box": [
+585.0,
+518.0,
+645.0,
+540.0
+],
+"page": 3,
+"v": 314
+},
+"voters": {
+"box": [
+675.0,
+468.0,
+732.0,
+490.0
+],
+"page": 2,
+"v": 315
+},
+"yes": {
+"box": [
+215.0,
+686.0,
+292.0,
+712.0
+],
+"page": 3,
+"v": 284
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080309esztergom.pdf|2008. 03. 09.|Esztergom|\"Egyetért-e Ön azzal, hogy az Önkormányzat a Gyarapodás Programjának megvalósítását felgyorsítsa?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080309esztergom.pdf",
+"note": "Old 2008 form, fields from several pages: electors = C (register at close, p2) 24119 (A 24102 + B 17 added on election day); voters = E (p2) 12342; in_urn = F (p3) 12298; invalid = H; valid = I. Unused ballots not on this form (G = -44 printed, difference between urn ballots and voters who appeared); voters != in_urn + 44 missing ballots as the form itself states. D (returned) = 7 on p2. valid = yes + no checks, in_urn = invalid + valid checks. Stamp: 'Ervenyes es eredmenyes' underlined, other two struck out.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+363.0,
+528.0,
+490.0,
+552.0
+],
+"page": 2,
+"v": 24119
+},
+"in_urn": {
+"box": [
+172.0,
+486.0,
+298.0,
+510.0
+],
+"page": 3,
+"v": 12298
+},
+"invalid": {
+"box": [
+448.0,
+486.0,
+545.0,
+510.0
+],
+"page": 3,
+"v": 328
+},
+"no": {
+"box": [
+326.0,
+725.0,
+390.0,
+750.0
+],
+"page": 3,
+"v": 3823
+},
+"valid": {
+"box": [
+548.0,
+486.0,
+648.0,
+510.0
+],
+"page": 3,
+"v": 11970
+},
+"voters": {
+"box": [
+620.0,
+528.0,
+752.0,
+552.0
+],
+"page": 2,
+"v": 12342
+},
+"yes": {
+"box": [
+225.0,
+725.0,
+292.0,
+750.0
+],
+"page": 3,
+"v": 8147
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080309fulophaza.pdf|2008. 03. 09.|Fülöpháza|\"Egyetért-e Ön azzal, hogy Fülöpházán ne épüljön krematórium?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080309fulophaza.pdf",
+"note": "Old form: electors (A, 734) and voters appeared (E, 491) are on page 2 (boxes on page 2); results on page 3. Page 2 field C reads 739 (or 734) though C should equal A+B=734; B is 0 (crossed zero), D=3 refused. Unused ballots not on form (G difference = 0). Arithmetic ok: 387+102=489, 2+489=491.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+205.0,
+550.0,
+250.0,
+577.0
+],
+"page": 2,
+"v": 734
+},
+"in_urn": {
+"box": [
+208.0,
+603.0,
+255.0,
+630.0
+],
+"page": 3,
+"v": 491
+},
+"invalid": {
+"box": [
+455.0,
+603.0,
+485.0,
+630.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+330.0,
+762.0,
+380.0,
+790.0
+],
+"page": 3,
+"v": 102
+},
+"valid": {
+"box": [
+582.0,
+600.0,
+640.0,
+632.0
+],
+"page": 3,
+"v": 489
+},
+"voters": {
+"box": [
+695.0,
+550.0,
+752.0,
+577.0
+],
+"page": 2,
+"v": 491
+},
+"yes": {
+"box": [
+205.0,
+762.0,
+265.0,
+790.0
+],
+"page": 3,
+"v": 387
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080309tetetlen.pdf|2008. 03. 09.|Tetétlen|\"Hozzájárul-e Ön ahhoz, hogy Tetétlen község külterületén az Európai Uniós szabályozás szerinti elérhető legjobb technikával működő használt akkumlátor feldolgozó és újrahasznosító üzem létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080309tetetlen.pdf",
+"note": "Two polling stations; total row used. Electors and voters from page 2 (shared table, boxes on page 2). Station 1 valid reads 308/309 but total 653 = 494+159 checks. Stamp: 'Érvényes és eredményes' underlined.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+385.0,
+575.0,
+445.0,
+600.0
+],
+"page": 3,
+"v": 1111
+},
+"in_urn": {
+"box": [
+198.0,
+550.0,
+255.0,
+575.0
+],
+"page": 3,
+"v": 674
+},
+"invalid": {
+"box": [
+466.0,
+550.0,
+500.0,
+575.0
+],
+"page": 3,
+"v": 21
+},
+"no": {
+"box": [
+337.0,
+798.0,
+383.0,
+826.0
+],
+"page": 3,
+"v": 159
+},
+"valid": {
+"box": [
+588.0,
+550.0,
+636.0,
+575.0
+],
+"page": 3,
+"v": 653
+},
+"voters": {
+"box": [
+665.0,
+573.0,
+712.0,
+600.0
+],
+"page": 3,
+"v": 674
+},
+"yes": {
+"box": [
+232.0,
+798.0,
+282.0,
+826.0
+],
+"page": 3,
+"v": 494
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080309tetetlen.pdf|2008. 03. 09.|Tetétlen|\"Hozzájárul-e Ön ahhoz, hogy Tetétlen község területén az Európai Uniós szabályozás szerinti elérhető legjobb technikával működő műtrágya-csomagoló üzem létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080309tetetlen.pdf",
+"note": "Two polling stations; total row used. Electors = column C (register at close; A+B, B=0). Voters = column E. Unused ballots not on form (G difference 0). Stamp: 'Érvényes és eredményes' underlined. Page 2 holds the shared voter table; this page is the fertilizer-plant question.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+385.0,
+575.0,
+445.0,
+600.0
+],
+"page": 4,
+"v": 1111
+},
+"in_urn": {
+"box": [
+203.0,
+541.0,
+252.0,
+562.0
+],
+"page": 4,
+"v": 674
+},
+"invalid": {
+"box": [
+475.0,
+541.0,
+512.0,
+562.0
+],
+"page": 4,
+"v": 12
+},
+"no": {
+"box": [
+345.0,
+742.0,
+380.0,
+766.0
+],
+"page": 4,
+"v": 79
+},
+"valid": {
+"box": [
+588.0,
+541.0,
+638.0,
+562.0
+],
+"page": 4,
+"v": 662
+},
+"voters": {
+"box": [
+665.0,
+573.0,
+712.0,
+600.0
+],
+"page": 4,
+"v": 674
+},
+"yes": {
+"box": [
+227.0,
+742.0,
+272.0,
+766.0
+],
+"page": 4,
+"v": 583
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080309tolna.pdf|2008. 03. 09.|Tolna|\"Egyetért-e azzal, hogy Mözs ismét önálló, elkülönült község legyen?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080309tolna.pdf",
+"note": "Old form: A=1779 (register), B=0, C=1779, D=0 (rejected), E=1013 voters appeared (page 2); F=1013 ballots in urn, G=0 difference, H=11 invalid, I=1002 valid, J=685 yes, K=317 no (page 3). Unused ballots not on form (G difference is 0), so null. Committee circled/underlined \"Ervenyes es eredmenyes\"; others struck out.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+150.0,
+512.0,
+250.0,
+542.0
+],
+"page": 3,
+"v": 1779
+},
+"in_urn": {
+"box": [
+185.0,
+480.0,
+300.0,
+512.0
+],
+"page": 3,
+"v": 1013
+},
+"invalid": {
+"box": [
+425.0,
+480.0,
+500.0,
+512.0
+],
+"page": 3,
+"v": 11
+},
+"no": {
+"box": [
+300.0,
+665.0,
+365.0,
+690.0
+],
+"page": 3,
+"v": 317
+},
+"valid": {
+"box": [
+565.0,
+480.0,
+640.0,
+512.0
+],
+"page": 3,
+"v": 1002
+},
+"voters": {
+"box": [
+608.0,
+512.0,
+712.0,
+545.0
+],
+"page": 3,
+"v": 1013
+},
+"yes": {
+"box": [
+205.0,
+665.0,
+285.0,
+690.0
+],
+"page": 3,
+"v": 685
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080330szodliget.pdf|2008. 03. 30.|Sződliget|\"Egyetért-e Ön azzal, hogy Sződliget község Önkormányzata a Lasselsberger Kft.-vel kötött támogatási szerződést egyoldalúan felmondja, vállalva annak anyagi és jogi következményeit?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080330szodliget.pdf",
+"note": "Summary protocol (A-C pages). Electors (A=3464) and voters (E=1188) are on page 2, marked with page:2 in those fields; the other figures are on page 3. Unused ballots not on form (G difference printed 0). Arithmetic checks: 1050+137=1187, 1+1187=1188.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+112.0,
+612.0,
+205.0,
+652.0
+],
+"page": 2,
+"v": 3464
+},
+"in_urn": {
+"box": [
+125.0,
+495.0,
+230.0,
+535.0
+],
+"page": 3,
+"v": 1188
+},
+"invalid": {
+"box": [
+470.0,
+495.0,
+510.0,
+535.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+385.0,
+688.0,
+445.0,
+722.0
+],
+"page": 3,
+"v": 137
+},
+"valid": {
+"box": [
+570.0,
+495.0,
+660.0,
+535.0
+],
+"page": 3,
+"v": 1187
+},
+"voters": {
+"box": [
+636.0,
+610.0,
+714.0,
+654.0
+],
+"page": 2,
+"v": 1188
+},
+"yes": {
+"box": [
+180.0,
+688.0,
+280.0,
+722.0
+],
+"page": 3,
+"v": 1050
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf|2008. 04. 06.|Szentgotthárd|\"Egyetért-e Ön azzal, hogy az Ausztria felől érkező és várható környezeti terhelések akadályozni fogják Szentgotthárdnak a természeti környezetre és a Termálfürdőre alapozott idegenforgalmi elképzeléseinek megvalósulását?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf",
+"note": "Electors (A, 6840) and voters (E, 4054) are on page 2 (box 'pg':2) of the settlement form; the C page has only F-K. 'unused' not on form (G difference printed 0). Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+95.0,
+525.0,
+172.0,
+567.0
+],
+"page": 2,
+"v": 6840
+},
+"in_urn": {
+"box": [
+86.0,
+558.0,
+198.0,
+598.0
+],
+"page": 6,
+"v": 4054
+},
+"invalid": {
+"box": [
+460.0,
+558.0,
+525.0,
+595.0
+],
+"page": 6,
+"v": 43
+},
+"no": {
+"box": [
+420.0,
+738.0,
+475.0,
+778.0
+],
+"page": 6,
+"v": 91
+},
+"valid": {
+"box": [
+595.0,
+558.0,
+685.0,
+598.0
+],
+"page": 6,
+"v": 4011
+},
+"voters": {
+"box": [
+595.0,
+520.0,
+678.0,
+567.0
+],
+"page": 2,
+"v": 4054
+},
+"yes": {
+"box": [
+295.0,
+738.0,
+382.0,
+778.0
+],
+"page": 6,
+"v": 3920
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf|2008. 04. 06.|Szentgotthárd|\"Egyetért-e Ön azzal, hogy az Ausztria felől érkező és várható környezeti terhelések jelentősen veszélyeztetik a Szentgotthárdon élők, különösen a gyermekek egészséges környezethez való alapvető állampolgári jogát?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf",
+"note": "Electors (A, 6840) and voters (E, 4054) are on page 2 (box 'pg':2) of the settlement form; the C page has only F-K. 'unused' not on form (G difference printed 0). Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+95.0,
+525.0,
+172.0,
+567.0
+],
+"page": 2,
+"v": 6840
+},
+"in_urn": {
+"box": [
+96.0,
+543.0,
+175.0,
+590.0
+],
+"page": 5,
+"v": 4054
+},
+"invalid": {
+"box": [
+490.0,
+543.0,
+550.0,
+590.0
+],
+"page": 5,
+"v": 37
+},
+"no": {
+"box": [
+420.0,
+727.0,
+475.0,
+770.0
+],
+"page": 5,
+"v": 79
+},
+"valid": {
+"box": [
+600.0,
+543.0,
+690.0,
+590.0
+],
+"page": 5,
+"v": 4017
+},
+"voters": {
+"box": [
+595.0,
+520.0,
+678.0,
+567.0
+],
+"page": 2,
+"v": 4054
+},
+"yes": {
+"box": [
+295.0,
+727.0,
+380.0,
+770.0
+],
+"page": 5,
+"v": 3938
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf|2008. 04. 06.|Szentgotthárd|\"Elutasítja-e Ön, hogy a Heiligenkreuzi Ipari Parkban építsék fel és üzemeltessék az évi 325.000 tonna hulladék elégetésére alkalmas üzemet?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf",
+"note": "Electors (A, 6840) and voters (E, 4054) are on page 2 (box 'pg':2) of the settlement form; the C page has only F-K. 'unused' not on form (G difference printed 0). Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+95.0,
+525.0,
+172.0,
+567.0
+],
+"page": 2,
+"v": 6840
+},
+"in_urn": {
+"box": [
+100.0,
+575.0,
+200.0,
+617.0
+],
+"page": 4,
+"v": 4054
+},
+"invalid": {
+"box": [
+492.0,
+572.0,
+560.0,
+614.0
+],
+"page": 4,
+"v": 35
+},
+"no": {
+"box": [
+420.0,
+750.0,
+478.0,
+790.0
+],
+"page": 4,
+"v": 49
+},
+"valid": {
+"box": [
+610.0,
+575.0,
+700.0,
+617.0
+],
+"page": 4,
+"v": 4019
+},
+"voters": {
+"box": [
+595.0,
+520.0,
+678.0,
+567.0
+],
+"page": 2,
+"v": 4054
+},
+"yes": {
+"box": [
+295.0,
+750.0,
+378.0,
+790.0
+],
+"page": 4,
+"v": 3970
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf|2008. 04. 06.|Szentgotthárd|\"Elutasítja-e Ön, hogy a Rába és a Lapincs folyók szennyezése, és a Szentgotthárd közvetlen közelébe, a Heiligenkreuzi Ipari Parkba tervezett hulladék-égetőmű tovább terhelje Szentgotthárd környezeti állapotát?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080406szentgotthard.pdf",
+"note": "Electors (A, 6840) and voters (E, 4054) are on page 2 (box 'pg':2) of the settlement form; the C page has only F-K. 'unused' not on form (G difference printed 0). Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+95.0,
+525.0,
+172.0,
+567.0
+],
+"page": 2,
+"v": 6840
+},
+"in_urn": {
+"box": [
+96.0,
+543.0,
+175.0,
+590.0
+],
+"page": 3,
+"v": 4054
+},
+"invalid": {
+"box": [
+490.0,
+543.0,
+550.0,
+590.0
+],
+"page": 3,
+"v": 42
+},
+"no": {
+"box": [
+420.0,
+727.0,
+472.0,
+767.0
+],
+"page": 3,
+"v": 43
+},
+"valid": {
+"box": [
+600.0,
+543.0,
+690.0,
+590.0
+],
+"page": 3,
+"v": 4012
+},
+"voters": {
+"box": [
+595.0,
+520.0,
+678.0,
+567.0
+],
+"page": 2,
+"v": 4054
+},
+"yes": {
+"box": [
+295.0,
+727.0,
+370.0,
+767.0
+],
+"page": 3,
+"v": 3969
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080413bakonya.pdf|2008. 04. 13.|Bakonya|\"Egyetért-e Ön azzal, hogy Bakonya belterületén a körforgalomnál megkezdett út építését, felújítását az önkormányzat közvetlenül a 6-os útra való lecsatlakozással folytassa-e?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080413bakonya.pdf",
+"note": "Protocol form B/C: A=296 (register before), C=296 (register at close), D=3 re-requested; E=158 appeared. Electors taken from C (register at close). unused taken as null (G difference=0). Stamp: 'Érvényes és eredményes' underlined.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+283.0,
+383.0,
+332.0,
+407.0
+],
+"page": 2,
+"v": 296
+},
+"in_urn": {
+"box": [
+38.0,
+709.0,
+84.0,
+735.0
+],
+"page": 2,
+"v": 158
+},
+"invalid": {
+"box": [
+392.0,
+709.0,
+420.0,
+735.0
+],
+"page": 2,
+"v": 3
+},
+"no": {
+"box": [
+208.0,
+850.0,
+248.0,
+876.0
+],
+"page": 2,
+"v": 52
+},
+"valid": {
+"box": [
+508.0,
+709.0,
+552.0,
+735.0
+],
+"page": 2,
+"v": 155
+},
+"voters": {
+"box": [
+575.0,
+383.0,
+620.0,
+407.0
+],
+"page": 2,
+"v": 158
+},
+"yes": {
+"box": [
+35.0,
+850.0,
+80.0,
+876.0
+],
+"page": 2,
+"v": 103
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080413bakonya.pdf|2008. 04. 13.|Bakonya|\"Egyetért-e Ön azzal, hogy Bakonya belterületén a körforgalomnál megkezdett út építését, felújítását az önkormányzat közvetlenül a Bakonya-Kővágótöttös közti volt tsz. belső út nyomvonalán folytassa-e?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080413bakonya.pdf",
+"note": "Protocol form B/C: A=296 (register before), C=296 (register at close), D=3 re-requested; E=158 appeared. Electors taken from C (register at close). unused taken as null (G difference=0). Stamp: 'Érvényes és eredményes' underlined. Electors/voters boxes are on page 2 (shared form B).",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+283.0,
+383.0,
+332.0,
+407.0
+],
+"page": 3,
+"v": 296
+},
+"in_urn": {
+"box": [
+38.0,
+238.0,
+84.0,
+266.0
+],
+"page": 3,
+"v": 158
+},
+"invalid": {
+"box": [
+390.0,
+238.0,
+420.0,
+266.0
+],
+"page": 3,
+"v": 6
+},
+"no": {
+"box": [
+208.0,
+382.0,
+260.0,
+410.0
+],
+"page": 3,
+"v": 101
+},
+"valid": {
+"box": [
+508.0,
+238.0,
+552.0,
+266.0
+],
+"page": 3,
+"v": 152
+},
+"voters": {
+"box": [
+575.0,
+383.0,
+620.0,
+407.0
+],
+"page": 3,
+"v": 158
+},
+"yes": {
+"box": [
+35.0,
+382.0,
+80.0,
+410.0
+],
+"page": 3,
+"v": 51
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080427nyiregyhaza.pdf|2008. 04. 27.|Nyíregyháza|\"Egyetért-e Ön azzal, hogy Oros településrész (Nyíregyháza 20. számú települési önkormányzati képviselői egyéni választókerülete) leváljon Nyíregyházától és önálló községként, településként működjön tovább?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080427nyiregyhaza.pdf",
+"note": "Electors (A/C 6029) and voters appeared (E 3498) are on page 2 (page=2); the rest on page 3. Urn count F=3497 is one fewer than voters (G = -1 on the form, ballot missing); unused ballots not on form (null). 37+3460=3497 and 1233+2227=3460 check. Poor fax quality; digits read after zooming. Stamp: 'Ervenytelen' and 'Ervenyes, de eredmenytelen' struck through.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+152.0,
+570.0,
+215.0,
+597.0
+],
+"page": 2,
+"v": 6029
+},
+"in_urn": {
+"box": [
+205.0,
+615.0,
+273.0,
+640.0
+],
+"page": 3,
+"v": 3497
+},
+"invalid": {
+"box": [
+460.0,
+617.0,
+500.0,
+642.0
+],
+"page": 3,
+"v": 37
+},
+"no": {
+"box": [
+325.0,
+803.0,
+390.0,
+826.0
+],
+"page": 3,
+"v": 2227
+},
+"valid": {
+"box": [
+580.0,
+622.0,
+648.0,
+646.0
+],
+"page": 3,
+"v": 3460
+},
+"voters": {
+"box": [
+642.0,
+576.0,
+715.0,
+600.0
+],
+"page": 2,
+"v": 3498
+},
+"yes": {
+"box": [
+220.0,
+803.0,
+290.0,
+826.0
+],
+"page": 3,
+"v": 1233
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080518kazincbarcika.pdf|2008. 05. 18.|Kazincbarcika|\"Egyetért-e Ön azzal, hogy a Kazincbarcikai Városi Kórház működtetési és vagyonkezelői jogát az Önkormányzat átadja más cégnek vagy szolgáltatónak?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080518kazincbarcika.pdf",
+"note": "Electors (A=C=25626, B=0) and voters (E=7452) are on page 2 (key 'page' inside those fields). Stamp: Érvénytelen left unstruck, the other two outcomes struck through. G=-2 (=F-E) consistent. Arithmetic ok: 915+6510=7425; 25+7425=7450; 7450 in urn vs 7452 appeared (-2 difference on form).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+355.0,
+503.0,
+447.0,
+532.0
+],
+"page": 2,
+"v": 25626
+},
+"in_urn": {
+"box": [
+185.0,
+510.0,
+262.0,
+542.0
+],
+"page": 3,
+"v": 7450
+},
+"invalid": {
+"box": [
+465.0,
+510.0,
+512.0,
+540.0
+],
+"page": 3,
+"v": 25
+},
+"no": {
+"box": [
+320.0,
+698.0,
+388.0,
+730.0
+],
+"page": 3,
+"v": 6510
+},
+"valid": {
+"box": [
+580.0,
+508.0,
+678.0,
+540.0
+],
+"page": 3,
+"v": 7425
+},
+"voters": {
+"box": [
+620.0,
+498.0,
+735.0,
+530.0
+],
+"page": 2,
+"v": 7452
+},
+"yes": {
+"box": [
+228.0,
+698.0,
+288.0,
+730.0
+],
+"page": 3,
+"v": 915
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080607orfu.pdf|2008. 06. 07.|Orfű|\"Akarja-e Ön, hogy Orfű Község Önkormányzata egy max. 40 személyes buszt szerezzen be és üzemeltessen a célból, hogy Pécs és Orfű viszonylatában az orfűi lakosok munkahelyi és iskolai szállítását megoldja?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080607orfu.pdf",
+"note": "Orfu has one polling station (001); its protocol (pp.1-5) is the only one, used as the settlement total, no separate total page. Old 2008 form: electors = C (register at close) 805 (A=805, B=0; first digit of A/C is a looped 8, could be misread as 2); voters = E 105; D (returned) 0; G (difference) 0 so unused not on form. Line 'Ervenyes szavazatok szama osszesen' is filled with 0 instead of the total. Stamp: 'Ervenytelen' left, other two struck out.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+138.0,
+619.0,
+192.0,
+648.0
+],
+"page": 2,
+"v": 805
+},
+"in_urn": {
+"box": [
+180.0,
+412.0,
+245.0,
+448.0
+],
+"page": 4,
+"v": 105
+},
+"invalid": {
+"box": [
+423.0,
+412.0,
+451.0,
+448.0
+],
+"page": 4,
+"v": 3
+},
+"no": {
+"box": [
+308.0,
+584.0,
+358.0,
+620.0
+],
+"page": 4,
+"v": 14
+},
+"valid": {
+"box": [
+530.0,
+412.0,
+598.0,
+448.0
+],
+"page": 4,
+"v": 102
+},
+"voters": {
+"box": [
+652.0,
+616.0,
+706.0,
+648.0
+],
+"page": 2,
+"v": 105
+},
+"yes": {
+"box": [
+208.0,
+584.0,
+262.0,
+620.0
+],
+"page": 4,
+"v": 88
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080607orfu.pdf|2008. 06. 07.|Orfű|\"Akarja-e Ön, hogy létrehozzon az Önkormányzat egy helyi szolgáltató Kft-t, aminek feladata többek között a helyi vízszolgáltatás lenne?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080607orfu.pdf",
+"note": "Orfu has one polling station (001); its protocol (pp.1-5) is the only one, used as the settlement total, no separate total page. Old 2008 form: electors = C (register at close) 805 (A=805, B=0; first digit of A/C is a looped 8, could be misread as 2); voters = E 105; D (returned) 0; G (difference) 0 so unused not on form. Line 'Ervenyes szavazatok szama osszesen' is filled with 0 instead of the total. Stamp: 'Ervenytelen' left, other two struck out.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+138.0,
+619.0,
+192.0,
+648.0
+],
+"page": 2,
+"v": 805
+},
+"in_urn": {
+"box": [
+188.0,
+414.0,
+250.0,
+448.0
+],
+"page": 3,
+"v": 105
+},
+"invalid": {
+"box": [
+447.0,
+414.0,
+478.0,
+448.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+315.0,
+584.0,
+375.0,
+616.0
+],
+"page": 3,
+"v": 10
+},
+"valid": {
+"box": [
+545.0,
+414.0,
+605.0,
+448.0
+],
+"page": 3,
+"v": 103
+},
+"voters": {
+"box": [
+652.0,
+616.0,
+706.0,
+648.0
+],
+"page": 2,
+"v": 105
+},
+"yes": {
+"box": [
+215.0,
+584.0,
+265.0,
+616.0
+],
+"page": 3,
+"v": 93
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080608esztergom.pdf|2008. 06. 08.|Esztergom|\"Egyetért-e Ön azzal, hogy Esztergomban a Széchenyi téri lakóknak engedélyezzék a gépjárművel való egész napos behajtást a Széchenyi térre, mint engedélyezett célforgalmat?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080608esztergom.pdf",
+"note": "Old form: electors (A) and voters appeared (E) are on page 2 (their boxes refer to page 2); C=24195, D (refused)=5. Arithmetic ok.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+95.0,
+518.0,
+222.0,
+542.0
+],
+"page": 2,
+"v": 24195
+},
+"in_urn": {
+"box": [
+145.0,
+472.0,
+250.0,
+497.0
+],
+"page": 4,
+"v": 2214
+},
+"invalid": {
+"box": [
+410.0,
+472.0,
+470.0,
+497.0
+],
+"page": 4,
+"v": 13
+},
+"no": {
+"box": [
+285.0,
+712.0,
+385.0,
+738.0
+],
+"page": 4,
+"v": 940
+},
+"valid": {
+"box": [
+525.0,
+470.0,
+625.0,
+500.0
+],
+"page": 4,
+"v": 2201
+},
+"voters": {
+"box": [
+595.0,
+518.0,
+725.0,
+542.0
+],
+"page": 2,
+"v": 2214
+},
+"yes": {
+"box": [
+195.0,
+712.0,
+260.0,
+738.0
+],
+"page": 4,
+"v": 1261
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080608esztergom.pdf|2008. 06. 08.|Esztergom|\"Egyetért-e Ön azzal, hogy Esztergomban a járműforgalom a Lőrinc utca teljes hosszában és a Bottyán hídon kétirányú legyen?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080608esztergom.pdf",
+"note": "Old form: electors (A) and voters appeared (E) are on page 2 (their boxes refer to page 2); C=24195, D (refused)=5. Arithmetic ok.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+95.0,
+518.0,
+222.0,
+542.0
+],
+"page": 2,
+"v": 24195
+},
+"in_urn": {
+"box": [
+145.0,
+495.0,
+250.0,
+520.0
+],
+"page": 3,
+"v": 2214
+},
+"invalid": {
+"box": [
+410.0,
+495.0,
+470.0,
+520.0
+],
+"page": 3,
+"v": 13
+},
+"no": {
+"box": [
+285.0,
+733.0,
+385.0,
+760.0
+],
+"page": 3,
+"v": 369
+},
+"valid": {
+"box": [
+525.0,
+490.0,
+625.0,
+520.0
+],
+"page": 3,
+"v": 2201
+},
+"voters": {
+"box": [
+595.0,
+518.0,
+725.0,
+542.0
+],
+"page": 2,
+"v": 2214
+},
+"yes": {
+"box": [
+195.0,
+733.0,
+260.0,
+760.0
+],
+"page": 3,
+"v": 1832
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080608sojtor.pdf|2008. 06. 08.|Söjtör|\"Egyetért-e Ön azzal, hogy Söjtör külterületén max. 20 MW villamos teljesítményű növényi biomasszát felhasználó erőmű épüljön a Rendezési Tervben foglaltak szerint?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080608sojtor.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Unused (D) is a dash on the form. Other two outcomes struck through.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+162.0,
+528.0,
+212.0,
+548.0
+],
+"page": 3,
+"v": 1281
+},
+"in_urn": {
+"box": [
+218.0,
+553.0,
+262.0,
+576.0
+],
+"page": 3,
+"v": 848
+},
+"invalid": {
+"box": [
+488.0,
+555.0,
+512.0,
+580.0
+],
+"page": 3,
+"v": 6
+},
+"no": {
+"box": [
+341.0,
+714.0,
+388.0,
+738.0
+],
+"page": 3,
+"v": 103
+},
+"valid": {
+"box": [
+606.0,
+558.0,
+658.0,
+584.0
+],
+"page": 3,
+"v": 842
+},
+"voters": {
+"box": [
+670.0,
+516.0,
+716.0,
+538.0
+],
+"page": 3,
+"v": 848
+},
+"yes": {
+"box": [
+236.0,
+714.0,
+284.0,
+738.0
+],
+"page": 3,
+"v": 739
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080622dragszel.pdf|2008. 06. 22.|Drágszél|\"Egyetért-e Ön azzal, hogy Drágszél községben a köztemető területén krematórium létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080622dragszel.pdf",
+"note": "Old form: A=314, B=0, C=314, D=0, E=166 (page 2); F=166, G=0, H=0, I=166, J=138, K=28 (page 3). No outcome marked on the form (none of the three options struck or circled). Unused ballots not on form (G=0).",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+135.0,
+588.0,
+210.0,
+612.0
+],
+"page": 3,
+"v": 314
+},
+"in_urn": {
+"box": [
+210.0,
+544.0,
+265.0,
+567.0
+],
+"page": 3,
+"v": 166
+},
+"invalid": {
+"box": [
+468.0,
+544.0,
+505.0,
+568.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+340.0,
+703.0,
+378.0,
+728.0
+],
+"page": 3,
+"v": 28
+},
+"valid": {
+"box": [
+590.0,
+544.0,
+645.0,
+567.0
+],
+"page": 3,
+"v": 166
+},
+"voters": {
+"box": [
+630.0,
+588.0,
+720.0,
+612.0
+],
+"page": 3,
+"v": 166
+},
+"yes": {
+"box": [
+237.0,
+703.0,
+282.0,
+728.0
+],
+"page": 3,
+"v": 138
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080629fot.pdf|2008. 06. 29.|Fót|\"Akarja-e Ön, hogy az orvosi rendelők maradjanak a jelenlegi Egészségügyi Központban?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080629fot.pdf",
+"note": "Electors (14.504) and voters (E=3.134) are on page 2 (page:2 in those fields); rest on page 3. Thousands separators are periods. D (returned voters)=2 ignored. Unused ballots not on form. 2901+226=3127; 7+3127=3134.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+118.0,
+530.0,
+228.0,
+568.0
+],
+"page": 2,
+"v": 14504
+},
+"in_urn": {
+"box": [
+218.0,
+503.0,
+310.0,
+543.0
+],
+"page": 3,
+"v": 3134
+},
+"invalid": {
+"box": [
+490.0,
+503.0,
+545.0,
+543.0
+],
+"page": 3,
+"v": 7
+},
+"no": {
+"box": [
+365.0,
+727.0,
+425.0,
+760.0
+],
+"page": 3,
+"v": 226
+},
+"valid": {
+"box": [
+575.0,
+503.0,
+670.0,
+543.0
+],
+"page": 3,
+"v": 3127
+},
+"voters": {
+"box": [
+610.0,
+524.0,
+714.0,
+570.0
+],
+"page": 2,
+"v": 3134
+},
+"yes": {
+"box": [
+225.0,
+727.0,
+305.0,
+760.0
+],
+"page": 3,
+"v": 2901
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080706dabas.pdf|2008. 07. 06.|Dabas|„Egyetért-e Ön azzal, hogy Dabas város külterületén a kommunális hulladéklerakó védőtávolságán belül fémhulladék feldolgozó és hulladékjármű előkezelő üzem létesüljön?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080706dabas.pdf",
+"note": "Electors (A 13.104) and voters (E 2.459) are on page 2 (box 'pg':2). No outcome marked/struck on form. Overprinted vertical line crosses page. 'Valid total' line left blank. Arithmetic checks.",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+135.0,
+469.0,
+225.0,
+496.0
+],
+"page": 2,
+"v": 13104
+},
+"in_urn": {
+"box": [
+220.0,
+427.0,
+305.0,
+456.0
+],
+"page": 3,
+"v": 2459
+},
+"invalid": {
+"box": [
+455.0,
+427.0,
+505.0,
+456.0
+],
+"page": 3,
+"v": 3
+},
+"no": {
+"box": [
+318.0,
+605.0,
+400.0,
+636.0
+],
+"page": 3,
+"v": 1272
+},
+"valid": {
+"box": [
+580.0,
+427.0,
+670.0,
+456.0
+],
+"page": 3,
+"v": 2456
+},
+"voters": {
+"box": [
+608.0,
+469.0,
+700.0,
+497.0
+],
+"page": 2,
+"v": 2459
+},
+"yes": {
+"box": [
+222.0,
+605.0,
+310.0,
+636.0
+],
+"page": 3,
+"v": 1184
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080803petohenye.pdf|2008. 08. 03.|Pethőhenye|\"Egyetért-e Ön azzal, hogy a helyi önkormányzatokról szóló 1990. évi LXV. törvény 54. § (1) bekezdésben foglaltak szerint Pethőhenye község Zalaegerszeg várossal egyesüljön úgy, hogy az egyesülést követően Pethőhenye község valamennyi joga és kötelezettsége Zalaegerszeg városra száll át?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080803petohenye.pdf",
+"note": "Electors/voters boxes are on page 2 (form B); C=368 (register at close) used for electors. Voters E: 230 crossed out, rewritten 229. Invalid H written as slashed zero. Yes read as 104 (last digit partly under a vertical scan line; 104+125=229 matches). Unused null (G='-'); 1 spoiled ballot noted ('rontott') and D=1 re-requested. Other two outcomes struck through, so valid and effective.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+375.0,
+498.0,
+425.0,
+528.0
+],
+"page": 3,
+"v": 368
+},
+"in_urn": {
+"box": [
+210.0,
+495.0,
+262.0,
+525.0
+],
+"page": 3,
+"v": 229
+},
+"invalid": {
+"box": [
+435.0,
+495.0,
+475.0,
+525.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+328.0,
+712.0,
+370.0,
+745.0
+],
+"page": 3,
+"v": 125
+},
+"valid": {
+"box": [
+570.0,
+495.0,
+615.0,
+525.0
+],
+"page": 3,
+"v": 229
+},
+"voters": {
+"box": [
+690.0,
+498.0,
+735.0,
+528.0
+],
+"page": 3,
+"v": 229
+},
+"yes": {
+"box": [
+218.0,
+712.0,
+262.0,
+745.0
+],
+"page": 3,
+"v": 104
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080914tortel.pdf|2008. 09. 14.|Törtel|\"Akarja-e Ön, hogy Törtel község közigazgatási területén bármely természetes, vagy jogi személy olyan telephelyet létesítsen, működtessen, ahol veszélyes, vegyi anyagok gyártása, raktározása, kezelése, illetve vegyi és egyéb hulladékok tárolása történhet?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080914tortel.pdf",
+"note": "Electors 3468 (the 4 is written like an h) and voters 1102 are on page 2 (page=2); the rest on page 3. Unused ballots not on form (null). Arithmetic checks: 15+1081=1096, 6+1096=1102. Stamp: 'Ervenytelen' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+165.0,
+510.0,
+233.0,
+540.0
+],
+"page": 2,
+"v": 3468
+},
+"in_urn": {
+"box": [
+227.0,
+565.0,
+292.0,
+595.0
+],
+"page": 3,
+"v": 1102
+},
+"invalid": {
+"box": [
+494.0,
+570.0,
+518.0,
+600.0
+],
+"page": 3,
+"v": 6
+},
+"no": {
+"box": [
+348.0,
+758.0,
+400.0,
+788.0
+],
+"page": 3,
+"v": 1081
+},
+"valid": {
+"box": [
+604.0,
+572.0,
+667.0,
+600.0
+],
+"page": 3,
+"v": 1096
+},
+"voters": {
+"box": [
+682.0,
+520.0,
+748.0,
+556.0
+],
+"page": 2,
+"v": 1102
+},
+"yes": {
+"box": [
+250.0,
+760.0,
+284.0,
+788.0
+],
+"page": 3,
+"v": 15
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20080928cegenydanyad.pdf|2008. 09. 28.|Cégénydányád|\"Egyetért-e Ön azzal, hogy Cégénydányád közigazgatási határán belül biomassza tüzelésű villamos erőmű létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20080928cegenydanyad.pdf",
+"note": "Electors (A=C=561, B=0) and voters (E=336) are on page 2 (key 'page' inside those fields). Stamp: 'Érvényes és eredményes' underlined. Arithmetic ok: 307+26=333; 3+333=336. Yes digit 7 has a cross-bar.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+170.0,
+518.0,
+222.0,
+542.0
+],
+"page": 2,
+"v": 561
+},
+"in_urn": {
+"box": [
+200.0,
+523.0,
+250.0,
+543.0
+],
+"page": 3,
+"v": 336
+},
+"invalid": {
+"box": [
+470.0,
+523.0,
+500.0,
+543.0
+],
+"page": 3,
+"v": 3
+},
+"no": {
+"box": [
+335.0,
+693.0,
+372.0,
+717.0
+],
+"page": 3,
+"v": 26
+},
+"valid": {
+"box": [
+585.0,
+523.0,
+640.0,
+543.0
+],
+"page": 3,
+"v": 333
+},
+"voters": {
+"box": [
+690.0,
+513.0,
+745.0,
+537.0
+],
+"page": 2,
+"v": 336
+},
+"yes": {
+"box": [
+225.0,
+693.0,
+277.0,
+717.0
+],
+"page": 3,
+"v": 307
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081105kiralyszentistvan.pdf|2008. 11. 05.|Királyszentistván|\"Akarja-e Ön, hogy Királyszentistván Község 1993-ban megalkotott címere és zászlaja eredeti formájában maradjon meg?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081105kiralyszentistvan.pdf",
+"note": "Single polling station (001) protocol used as settlement total. Old 2008 form: electors = C (A=383, B=0), voters = E 108 (p2); D returned 0; G difference 0 so unused not on form. No outcome (invalid/ineffective/effective) marked on the form.",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+133.0,
+590.0,
+172.0,
+614.0
+],
+"page": 2,
+"v": 383
+},
+"in_urn": {
+"box": [
+196.0,
+459.0,
+230.0,
+482.0
+],
+"page": 3,
+"v": 108
+},
+"invalid": {
+"box": [
+481.0,
+459.0,
+498.0,
+482.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+446.0,
+655.0,
+474.0,
+676.0
+],
+"page": 3,
+"v": 12
+},
+"valid": {
+"box": [
+586.0,
+459.0,
+624.0,
+482.0
+],
+"page": 3,
+"v": 107
+},
+"voters": {
+"box": [
+633.0,
+608.0,
+670.0,
+632.0
+],
+"page": 2,
+"v": 108
+},
+"yes": {
+"box": [
+345.0,
+655.0,
+370.0,
+676.0
+],
+"page": 3,
+"v": 95
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081116zsana.pdf|2008. 11. 16.|Zsana|\"Egyetért-e Ön azzal, hogy a Zsana község külterületén szalmatüzelésű hőerőmű létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081116zsana.pdf",
+"note": "Old form: electors (A=700) and voters appeared (E=373) are on page 2 (boxes refer to page 2); results on page 3. D (refused)=2, G=0. Valid and effective underlined. Arithmetic ok.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+180.0,
+495.0,
+255.0,
+520.0
+],
+"page": 2,
+"v": 700
+},
+"in_urn": {
+"box": [
+236.0,
+156.0,
+306.0,
+190.0
+],
+"page": 3,
+"v": 373
+},
+"invalid": {
+"box": [
+493.0,
+153.0,
+537.0,
+185.0
+],
+"page": 3,
+"v": 9
+},
+"no": {
+"box": [
+365.0,
+390.0,
+420.0,
+416.0
+],
+"page": 3,
+"v": 33
+},
+"valid": {
+"box": [
+608.0,
+156.0,
+702.0,
+190.0
+],
+"page": 3,
+"v": 364
+},
+"voters": {
+"box": [
+670.0,
+495.0,
+785.0,
+520.0
+],
+"page": 2,
+"v": 373
+},
+"yes": {
+"box": [
+250.0,
+390.0,
+325.0,
+416.0
+],
+"page": 3,
+"v": 331
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081207csongrad.pdf|2008. 12. 07.|Csongrád|\"Akarja-e Ön, hogy Csongrád-Bokros városrész ismét önálló település legyen?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081207csongrad.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Unused not stated. 'Érvényes, de eredménytelen' struck through; 'Érvénytelen' appears struck too; remaining 'Érvényes és eredményes'.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+115.0,
+558.0,
+172.0,
+588.0
+],
+"page": 3,
+"v": 846
+},
+"in_urn": {
+"box": [
+198.0,
+541.0,
+254.0,
+568.0
+],
+"page": 3,
+"v": 531
+},
+"invalid": {
+"box": [
+508.0,
+543.0,
+545.0,
+570.0
+],
+"page": 3,
+"v": 12
+},
+"no": {
+"box": [
+323.0,
+736.0,
+375.0,
+766.0
+],
+"page": 3,
+"v": 201
+},
+"valid": {
+"box": [
+618.0,
+550.0,
+676.0,
+578.0
+],
+"page": 3,
+"v": 519
+},
+"voters": {
+"box": [
+655.0,
+560.0,
+705.0,
+588.0
+],
+"page": 3,
+"v": 531
+},
+"yes": {
+"box": [
+213.0,
+736.0,
+270.0,
+766.0
+],
+"page": 3,
+"v": 318
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081207miskolc.pdf|2008. 12. 07.|Miskolc|\"Egyetért-e Ön azzal, hogy Miskolc-Tapolca új (önálló) községgé alakuljon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081207miskolc.pdf",
+"note": "Old form: A=2467, B=-, C=2467, D=4 (rejected), E=1432 voters appeared (page 2); F=1430, G=-2 (F-E), H=4, I=1426, J=835, K=591 (page 3). Arithmetic checks: 835+591=1426, 4+1426=1430. G=-2 is the printed difference between urn ballots and voters, so unused is null. \"Ervenyes es eredmenyes\" underlined.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+160.0,
+533.0,
+245.0,
+565.0
+],
+"page": 3,
+"v": 2467
+},
+"in_urn": {
+"box": [
+190.0,
+497.0,
+305.0,
+530.0
+],
+"page": 3,
+"v": 1430
+},
+"invalid": {
+"box": [
+460.0,
+497.0,
+520.0,
+530.0
+],
+"page": 3,
+"v": 4
+},
+"no": {
+"box": [
+330.0,
+707.0,
+415.0,
+738.0
+],
+"page": 3,
+"v": 591
+},
+"valid": {
+"box": [
+585.0,
+497.0,
+690.0,
+530.0
+],
+"page": 3,
+"v": 1426
+},
+"voters": {
+"box": [
+655.0,
+530.0,
+775.0,
+565.0
+],
+"page": 3,
+"v": 1432
+},
+"yes": {
+"box": [
+222.0,
+707.0,
+305.0,
+738.0
+],
+"page": 3,
+"v": 835
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081207szod.pdf|2008. 12. 07.|Sződ|\"Egyetért-e Ön, hogy Nevelek településrész közigazgatásilag továbbra is Sződ községhez tartozzon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081207szod.pdf",
+"note": "Only a single polling-station protocol (szavazokor 002, Sződ) is in the document, no settlement summary page; figures left null as instructed. Station figures seen: electors 487, voters 309, invalid 0, valid 309, yes 115, no 194.",
+"other": [],
+"stamp": null,
+"vals": {}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081221gadoros.pdf|2008. 12. 21.|Gádoros|\"Egyetért-e Ön azzal, hogy a Gádoros nagyközség Képviselő-testülete fejlesztési, felújítási céljainak megvalósítására a község teherviselő képességét figyelembe véve bankhitelt vegyen igénybe, és azt csak a település területén belül használja fel?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081221gadoros.pdf",
+"note": "Electors (A 3317) and voters (E 630) are on page 2 (box 'pg':2). Committee underlined 'Érvénytelen' on the form (stamp invalid). Column D (1, refused/visszautasított) is not unused ballots; unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+148.0,
+524.0,
+245.0,
+555.0
+],
+"page": 2,
+"v": 3317
+},
+"in_urn": {
+"box": [
+218.0,
+526.0,
+288.0,
+556.0
+],
+"page": 3,
+"v": 630
+},
+"invalid": {
+"box": [
+472.0,
+526.0,
+528.0,
+556.0
+],
+"page": 3,
+"v": 10
+},
+"no": {
+"box": [
+348.0,
+712.0,
+400.0,
+745.0
+],
+"page": 3,
+"v": 86
+},
+"valid": {
+"box": [
+598.0,
+526.0,
+665.0,
+556.0
+],
+"page": 3,
+"v": 620
+},
+"voters": {
+"box": [
+658.0,
+524.0,
+748.0,
+552.0
+],
+"page": 2,
+"v": 630
+},
+"yes": {
+"box": [
+222.0,
+712.0,
+292.0,
+745.0
+],
+"page": 3,
+"v": 534
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305708/20081221gadoros.pdf|2008. 12. 21.|Gádoros|\"Egyetért-e Ön azzal, hogy a Szovátán (Románia) épülő pihenőházat a Képviselő-testület jelenlegi készültségi állapotában értékesítse?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305708/20081221gadoros.pdf",
+"note": "Electors (A 3317) and voters (E 630) are on page 2 (box 'pg':2). Committee underlined 'Érvénytelen' on the form (stamp invalid). Column D (1, refused/visszautasított) is not unused ballots; unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+148.0,
+524.0,
+245.0,
+555.0
+],
+"page": 2,
+"v": 3317
+},
+"in_urn": {
+"box": [
+218.0,
+530.0,
+288.0,
+562.0
+],
+"page": 4,
+"v": 630
+},
+"invalid": {
+"box": [
+480.0,
+530.0,
+525.0,
+562.0
+],
+"page": 4,
+"v": 9
+},
+"no": {
+"box": [
+348.0,
+717.0,
+400.0,
+750.0
+],
+"page": 4,
+"v": 71
+},
+"valid": {
+"box": [
+598.0,
+530.0,
+668.0,
+562.0
+],
+"page": 4,
+"v": 621
+},
+"voters": {
+"box": [
+658.0,
+524.0,
+748.0,
+552.0
+],
+"page": 2,
+"v": 630
+},
+"yes": {
+"box": [
+222.0,
+717.0,
+292.0,
+750.0
+],
+"page": 4,
+"v": 550
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305765/alsonyek.pdf|2014. szeptember 20.|Alsónyék, Tolna megye|„Egyetért-e Ön azzal, hogy a jelenleg Alsónyék községhez tartozó 091/2, a 091/1, a 099/2, a 0163/28, a 0163/29, az 1064 és az 1067. hrsz.-u külterületi lakott területrészek közigazgatásilag Bátaszék város közigazgatási területéhez kerüljenek átadásra?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305765/alsonyek.pdf",
+"note": "Electors 17 and voters 11 are on page 2 (page=2); the rest on page 3. Unused ballots not on form (null). Arithmetic checks: 2+9=11, 0+11=11. Stamp: only 'Ervenytelen' is struck through; 'Ervenyes, de eredmenytelen' and 'Ervenyes es eredmenyes' are both left unmarked, so stamp is null (declared status is effective).",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+153.0,
+486.0,
+192.0,
+517.0
+],
+"page": 2,
+"v": 17
+},
+"in_urn": {
+"box": [
+214.0,
+524.0,
+244.0,
+556.0
+],
+"page": 3,
+"v": 11
+},
+"invalid": {
+"box": [
+478.0,
+524.0,
+500.0,
+556.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+353.0,
+708.0,
+372.0,
+737.0
+],
+"page": 3,
+"v": 9
+},
+"valid": {
+"box": [
+589.0,
+524.0,
+621.0,
+556.0
+],
+"page": 3,
+"v": 11
+},
+"voters": {
+"box": [
+671.0,
+486.0,
+701.0,
+517.0
+],
+"page": 2,
+"v": 11
+},
+"yes": {
+"box": [
+241.0,
+708.0,
+266.0,
+737.0
+],
+"page": 3,
+"v": 2
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf|2011. 09. 25.|VIII. kerület, Budapest|„Támogatja-e Ön, hogy Józsefváros Képviselő-testülete rendeletben tiltsa meg Józsefvárosban a közterületen történő életvitelszerű lakhatást?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf",
+"note": "Typed form. G=-2. Arithmetic checks. Page 2 totals shared. \"Ervenytelen\" underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+176.0,
+426.0,
+230.0,
+445.0
+],
+"page": 4,
+"v": 58046
+},
+"in_urn": {
+"box": [
+228.0,
+444.0,
+270.0,
+463.0
+],
+"page": 4,
+"v": 9225
+},
+"invalid": {
+"box": [
+480.0,
+444.0,
+520.0,
+463.0
+],
+"page": 4,
+"v": 152
+},
+"no": {
+"box": [
+366.0,
+611.0,
+410.0,
+630.0
+],
+"page": 4,
+"v": 1092
+},
+"valid": {
+"box": [
+606.0,
+444.0,
+652.0,
+463.0
+],
+"page": 4,
+"v": 9073
+},
+"voters": {
+"box": [
+692.0,
+428.0,
+735.0,
+445.0
+],
+"page": 4,
+"v": 9227
+},
+"yes": {
+"box": [
+254.0,
+611.0,
+298.0,
+630.0
+],
+"page": 4,
+"v": 7981
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf|2011. 09. 25.|VIII. kerület, Budapest|„Támogatja-e Ön, hogy Józsefváros polgármestere még az idei évben tárgyalásokat folytasson a Fővárosi Önkormányzat vezetésével a hajléktalan ellátás színvonalának emelése és a kerület - hajléktalanokkal kapcsolatos - tehermentesítése érdekében?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf",
+"note": "Typed form. G=-6. Arithmetic checks. Page 2 totals shared. \"Ervenytelen\" underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+176.0,
+426.0,
+230.0,
+445.0
+],
+"page": 5,
+"v": 58046
+},
+"in_urn": {
+"box": [
+228.0,
+487.0,
+270.0,
+506.0
+],
+"page": 5,
+"v": 9221
+},
+"invalid": {
+"box": [
+488.0,
+487.0,
+528.0,
+506.0
+],
+"page": 5,
+"v": 112
+},
+"no": {
+"box": [
+358.0,
+653.0,
+402.0,
+672.0
+],
+"page": 5,
+"v": 502
+},
+"valid": {
+"box": [
+611.0,
+487.0,
+657.0,
+506.0
+],
+"page": 5,
+"v": 9109
+},
+"voters": {
+"box": [
+692.0,
+428.0,
+735.0,
+445.0
+],
+"page": 5,
+"v": 9227
+},
+"yes": {
+"box": [
+254.0,
+653.0,
+298.0,
+672.0
+],
+"page": 5,
+"v": 8607
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf|2011. 09. 25.|VIII. kerület, Budapest|„Támogatja-e Ön, hogy hatályban maradjon Józsefváros Képviselő-testületének kukázást tiltó rendelete?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/bp_8.pdf",
+"note": "Printed (typed) form. G=-8 (F-E). Page 2 totals shared by three questions. Arithmetic checks. Unused (C) not on form; E-F=8 missing ballots shown as G=-8. Committee underlined \"Ervenytelen\".",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+176.0,
+426.0,
+230.0,
+445.0
+],
+"page": 3,
+"v": 58046
+},
+"in_urn": {
+"box": [
+228.0,
+462.0,
+270.0,
+481.0
+],
+"page": 3,
+"v": 9219
+},
+"invalid": {
+"box": [
+478.0,
+462.0,
+518.0,
+481.0
+],
+"page": 3,
+"v": 156
+},
+"no": {
+"box": [
+355.0,
+628.0,
+399.0,
+647.0
+],
+"page": 3,
+"v": 1268
+},
+"valid": {
+"box": [
+608.0,
+462.0,
+654.0,
+481.0
+],
+"page": 3,
+"v": 9063
+},
+"voters": {
+"box": [
+692.0,
+428.0,
+735.0,
+445.0
+],
+"page": 3,
+"v": 9227
+},
+"yes": {
+"box": [
+248.0,
+628.0,
+292.0,
+647.0
+],
+"page": 3,
+"v": 7795
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/erdokovesd.pdf|2011. 06. 26.|Erdőkövesd, Heves megye|„Egyetért-e Ön azzal, hogy Erdőkövesd Község Önkormányzata kiváljon 2012.01.01-től Pétervására város, Erdőkövesd, Váraszó, Ivád, Kisfüzes községek alkotta Társult Képviselő-testületből?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/erdokovesd.pdf",
+"note": "Summary protocol (faxed, skewed scan), 1 C sheet. Old 2011 form: electors = A/C 524 (B=0), voters = E 328 (p2); D returned 0; G (difference) left blank/struck. F (328) is cramped and slightly smudged but reads 328 and matches E. 'Ervenyes es eredmenyes' underlined, others not struck.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+72.0,
+452.0,
+115.0,
+474.0
+],
+"page": 2,
+"v": 524
+},
+"in_urn": {
+"box": [
+111.0,
+551.0,
+160.0,
+574.0
+],
+"page": 3,
+"v": 328
+},
+"invalid": {
+"box": [
+436.0,
+563.0,
+458.0,
+586.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+259.0,
+726.0,
+314.0,
+748.0
+],
+"page": 3,
+"v": 112
+},
+"valid": {
+"box": [
+556.0,
+565.0,
+614.0,
+590.0
+],
+"page": 3,
+"v": 327
+},
+"voters": {
+"box": [
+593.0,
+469.0,
+644.0,
+493.0
+],
+"page": 2,
+"v": 328
+},
+"yes": {
+"box": [
+124.0,
+722.0,
+178.0,
+746.0
+],
+"page": 3,
+"v": 215
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/ivad.pdf|2011. 06. 26.|Ivád, Heves megye|„Egyetért-e Ön azzal, hogy Ivád Község Önkormányzata kiváljon 2012. január 1-től Pétervására Város, Erdőkövesd, Váraszó, Ivád, Kisfüzes községek alkotta Társult Képviselő-testületből?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/ivad.pdf",
+"note": "Faint fax copy. Electors (A=326) and voters appeared (E=124) are on page 2 (boxes refer to page 2); results on page 3. D=1, B dash, C=326. F first digit blurred (reads 124, matches E and I). H (invalid) written as 0 (round 'O'-like glyph). 'Ervenytelen' is underlined, the other two outcomes struck through. Arithmetic ok: 44+80=124, 0+124=124.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+82.0,
+443.0,
+123.0,
+465.0
+],
+"page": 2,
+"v": 326
+},
+"in_urn": {
+"box": [
+116.0,
+524.0,
+151.0,
+542.0
+],
+"page": 3,
+"v": 124
+},
+"invalid": {
+"box": [
+430.0,
+531.0,
+447.0,
+547.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+261.0,
+694.0,
+289.0,
+716.0
+],
+"page": 3,
+"v": 80
+},
+"valid": {
+"box": [
+556.0,
+534.0,
+588.0,
+553.0
+],
+"page": 3,
+"v": 124
+},
+"voters": {
+"box": [
+613.0,
+444.0,
+648.0,
+466.0
+],
+"page": 2,
+"v": 124
+},
+"yes": {
+"box": [
+126.0,
+690.0,
+151.0,
+712.0
+],
+"page": 3,
+"v": 44
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/kiskoros.pdf|2011. 04. 03.|Kiskőrös, Bács-Kiskun megye|„Egyetért-e Ön azzal, hogy a Kiskőrös város központjának rekonstrukciója ne tartalmazza az 5301. számú út Petőfi tér és a Katolikus templom közötti szakaszának végleges lezárását?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/kiskoros.pdf",
+"note": "Typed form (2011 style, one sheet). Form offers only 'eredményes / eredménytelen' and 'eredménytelen' is underlined (mapped to valid_ineffective; form has no 'érvénytelen' option, declared status in table is érvénytelen). Electors A=C=12168, B=0; D (visszautasított)=1. Arithmetic ok: 2124+534=2658; 20+2658=2678; G=0.",
+"other": [],
+"stamp": "valid_ineffective",
+"vals": {
+"electors": {
+"box": [
+140.0,
+405.0,
+205.0,
+428.0
+],
+"page": 2,
+"v": 12168
+},
+"in_urn": {
+"box": [
+120.0,
+618.0,
+175.0,
+640.0
+],
+"page": 2,
+"v": 2678
+},
+"invalid": {
+"box": [
+360.0,
+618.0,
+392.0,
+640.0
+],
+"page": 2,
+"v": 20
+},
+"no": {
+"box": [
+650.0,
+618.0,
+690.0,
+640.0
+],
+"page": 2,
+"v": 534
+},
+"valid": {
+"box": [
+450.0,
+618.0,
+505.0,
+640.0
+],
+"page": 2,
+"v": 2658
+},
+"voters": {
+"box": [
+608.0,
+405.0,
+658.0,
+428.0
+],
+"page": 2,
+"v": 2678
+},
+"yes": {
+"box": [
+555.0,
+618.0,
+610.0,
+640.0
+],
+"page": 2,
+"v": 2124
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/pilisszentkereszt_vegzes.pdf|2011. 11. 27.|Pilisszentkereszt, Pest megye|„Szükségesnek tartja-e, hogy az önkormányzat újságot jelentessen meg időszaki kiadványként, mely tájékoztat az önkormányzat, a testület tevékenységéről is?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/pilisszentkereszt_vegzes.pdf",
+"note": "Document is a court order annulling the referendum resolution; no result protocol. Figures null.",
+"other": [],
+"stamp": null,
+"vals": {}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/pilisszentkereszt_vegzes.pdf|2011. 11. 27.|Pilisszentkereszt, Pest megye|„Szükségesnek tartja-e, hogy az önkormányzati ülésekről tv közvetítés legyen látható?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/pilisszentkereszt_vegzes.pdf",
+"note": "Document is a court order (Szentendrei Városi Bíróság) annulling the referendum resolution; no result protocol. Figures null.",
+"other": [],
+"stamp": null,
+"vals": {}
+},
+"https://portal-api.valasztas.hu/documents/20182/305774/varaszo.pdf|2011. 06. 26.|Váraszó, Heves megye|„Egyetért-e Ön azzal, hogy Váraszó Község Önkormányzata kiváljon 2012. január 1-től Pétervására Város, Erdőkövesd, Váraszó, Ivád, Kisfüzes községek alkotta Társult Képviselő-testületből?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305774/varaszo.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Voters (E) digits messy, middle digit overwritten; read 165, consistent with urn 165. NO read as 88 (scribbled; 75+88=163 checks). Unused is a dash. Stamp: 'Érvénytelen' remains, others struck through.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+90.0,
+445.0,
+135.0,
+464.0
+],
+"page": 3,
+"v": 446
+},
+"in_urn": {
+"box": [
+106.0,
+517.0,
+150.0,
+540.0
+],
+"page": 3,
+"v": 165
+},
+"invalid": {
+"box": [
+418.0,
+525.0,
+442.0,
+545.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+243.0,
+686.0,
+282.0,
+712.0
+],
+"page": 3,
+"v": 88
+},
+"valid": {
+"box": [
+548.0,
+526.0,
+594.0,
+548.0
+],
+"page": 3,
+"v": 163
+},
+"voters": {
+"box": [
+616.0,
+442.0,
+662.0,
+462.0
+],
+"page": 3,
+"v": 165
+},
+"yes": {
+"box": [
+116.0,
+688.0,
+158.0,
+708.0
+],
+"page": 3,
+"v": 75
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305780/jk_mehkerek.pdf|2015. december 13.|Méhkerék, Békés megye|„Egyetért-e azzal, hogy Méhkerék Község Román Nemzetiségi Települési Önkormányzat kezdeményezze a Méhkeréki Román Nemzetiségi Kétnyelvű Általános Iskola fenntartói jogának átvételét a 2016/2017-es tanévtől kezdődően?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305780/jk_mehkerek.pdf",
+"note": "Single-page protocol. 'Érvényes és eredményes' underlined. C (unstamped) is a dash -> null. Arithmetic ok: 948+39=987; 26+987=1013. Voters appeared 1014 vs 1013 ballots in urn (difference of 1 on the form itself). Electors 1824: last digit reads 4.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+403.0,
+322.0,
+467.0,
+349.0
+],
+"page": 1,
+"v": 1824
+},
+"in_urn": {
+"box": [
+403.0,
+405.0,
+467.0,
+432.0
+],
+"page": 1,
+"v": 1013
+},
+"invalid": {
+"box": [
+403.0,
+435.0,
+467.0,
+459.0
+],
+"page": 1,
+"v": 26
+},
+"no": {
+"box": [
+675.0,
+404.0,
+722.0,
+428.0
+],
+"page": 1,
+"v": 39
+},
+"valid": {
+"box": [
+403.0,
+461.0,
+467.0,
+487.0
+],
+"page": 1,
+"v": 987
+},
+"voters": {
+"box": [
+403.0,
+350.0,
+467.0,
+376.0
+],
+"page": 1,
+"v": 1014
+},
+"yes": {
+"box": [
+675.0,
+352.0,
+722.0,
+376.0
+],
+"page": 1,
+"v": 948
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305780/jk_normafa.pdf|2015. május 17.|Budapest Főváros XII. kerület, Budapest|„Egyetért-e Ön a Normafa területének helyreállításával a Budapest Főváros XII. kerület Hegyvidéki Önkormányzat Képviselő-testületének 10/2015. (I. 27.) számú határozatában foglaltak szerint?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305780/jk_normafa.pdf",
+"note": "2015 form (A-N/G labels). Unused ballots (C) is a dash (blank), so unused null. Arithmetic: valid = yes + no OK (10561+2479=13040), in_urn = invalid + valid OK (59+13040=13099); but voters B 13111 != in_urn D 13099 (12 difference, C blank), as written. No outcome alternative underlined on the form; the committee decision on p1-2 (not a count page) declares it invalid (turnout 27.37%, 81% yes).",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+403.0,
+304.0,
+457.0,
+327.0
+],
+"page": 3,
+"v": 47911
+},
+"in_urn": {
+"box": [
+403.0,
+389.0,
+457.0,
+410.0
+],
+"page": 3,
+"v": 13099
+},
+"invalid": {
+"box": [
+429.0,
+415.0,
+457.0,
+436.0
+],
+"page": 3,
+"v": 59
+},
+"no": {
+"box": [
+674.0,
+389.0,
+726.0,
+411.0
+],
+"page": 3,
+"v": 2479
+},
+"valid": {
+"box": [
+403.0,
+445.0,
+457.0,
+466.0
+],
+"page": 3,
+"v": 13040
+},
+"voters": {
+"box": [
+403.0,
+333.0,
+457.0,
+353.0
+],
+"page": 3,
+"v": 13111
+},
+"yes": {
+"box": [
+664.0,
+332.0,
+726.0,
+355.0
+],
+"page": 3,
+"v": 10561
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/20100207gellenhaza.pdf|2010. 02. 07.|Gellénháza|\"Egyetért-e Ön azzal, hogy Gellénházán 20 MW-os faapríték tüzelésű bioerőmű épüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/20100207gellenhaza.pdf",
+"note": "Old form: electors (A=1404) and voters appeared (E=785) are on page 2 (boxes refer to page 2); results on page 3. B and D are dashes, C=1404, G dash (0). 'Ervenyes es eredmenyes' underlined, the other two struck through. Arithmetic ok: 465+311=776, 9+776=785.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+185.0,
+533.0,
+243.0,
+554.0
+],
+"page": 2,
+"v": 1404
+},
+"in_urn": {
+"box": [
+238.0,
+586.0,
+283.0,
+608.0
+],
+"page": 3,
+"v": 785
+},
+"invalid": {
+"box": [
+490.0,
+586.0,
+515.0,
+608.0
+],
+"page": 3,
+"v": 9
+},
+"no": {
+"box": [
+360.0,
+747.0,
+405.0,
+770.0
+],
+"page": 3,
+"v": 311
+},
+"valid": {
+"box": [
+608.0,
+586.0,
+650.0,
+608.0
+],
+"page": 3,
+"v": 776
+},
+"voters": {
+"box": [
+683.0,
+533.0,
+732.0,
+554.0
+],
+"page": 2,
+"v": 785
+},
+"yes": {
+"box": [
+256.0,
+747.0,
+309.0,
+770.0
+],
+"page": 3,
+"v": 465
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/20100214paty.pdf|2010. 02. 14.|Páty|\"Egyetért-e azzal, hogy a Képviselő-testület ne fogadja el a \"Telki út melletti golfpálya és környezete\" (020/61-67, 020/23-24, 028/1, 020/33, 026 és 030/32 hrsz.) településszerkezeti és szabályozási tervének olyan módosítását, amely a beépíthető terület növelését vagy építési övezeti besorolásának változását teszi lehetővé a jelenleg érvényben lévő szabályozáshoz képest?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/20100214paty.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Printed G (difference) is -3 although voters 2269 minus urn 2266 = +3: form inconsistency in the committee's own G, not adjusted. Page 2 column D (refused) = 1. Stamp: 'Érvénytelen' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+165.0,
+439.0,
+235.0,
+458.0
+],
+"page": 3,
+"v": 5249
+},
+"in_urn": {
+"box": [
+222.0,
+520.0,
+268.0,
+538.0
+],
+"page": 3,
+"v": 2266
+},
+"invalid": {
+"box": [
+520.0,
+520.0,
+545.0,
+538.0
+],
+"page": 3,
+"v": 6
+},
+"no": {
+"box": [
+355.0,
+686.0,
+395.0,
+704.0
+],
+"page": 3,
+"v": 766
+},
+"valid": {
+"box": [
+665.0,
+518.0,
+715.0,
+538.0
+],
+"page": 3,
+"v": 2260
+},
+"voters": {
+"box": [
+726.0,
+432.0,
+792.0,
+452.0
+],
+"page": 3,
+"v": 2269
+},
+"yes": {
+"box": [
+253.0,
+686.0,
+300.0,
+704.0
+],
+"page": 3,
+"v": 1494
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/20100509val.pdf|2010. 05. 09.|Vál|\"Egyetért-e Ön azzal, hogy Vál Község Képviselő-testületének 170/2007. (11. 07.) határozata értelmében a 0137/2, 0137/3, 0140/3 hrsz-ú külterületi ingatlanokat belterületbe vonják annak érdekében, hogy 700 fő letelepedésére alkalmas lakóövezetet hozzanak létre?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/20100509val.pdf",
+"note": "Page 2 (A=1927,B=0,C=1927,D=0,E=1036) is shared by both questions; question text on page 3 (170/2007 resolution). F=1036,G=0,H=20,I=1016,J=86,K=930. Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+160.0,
+476.0,
+215.0,
+500.0
+],
+"page": 3,
+"v": 1927
+},
+"in_urn": {
+"box": [
+215.0,
+597.0,
+272.0,
+622.0
+],
+"page": 3,
+"v": 1036
+},
+"invalid": {
+"box": [
+472.0,
+597.0,
+512.0,
+622.0
+],
+"page": 3,
+"v": 20
+},
+"no": {
+"box": [
+350.0,
+766.0,
+395.0,
+792.0
+],
+"page": 3,
+"v": 930
+},
+"valid": {
+"box": [
+592.0,
+597.0,
+645.0,
+622.0
+],
+"page": 3,
+"v": 1016
+},
+"voters": {
+"box": [
+665.0,
+476.0,
+725.0,
+500.0
+],
+"page": 3,
+"v": 1036
+},
+"yes": {
+"box": [
+238.0,
+766.0,
+272.0,
+792.0
+],
+"page": 3,
+"v": 86
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/20100509val.pdf|2010. 05. 09.|Vál|\"Egyetért-e Ön azzal, hogy Vál közigazgatási területén lakópark épüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/20100509val.pdf",
+"note": "Page 2 (A=1927,B=0,C=1927,D=0,E=1036) is shared by both questions; question text on page 4 (lakopark). F=1036,G=0,H=19,I=1017,J=96,K=921. Arithmetic checks. Last digit of K read as 1 (921), consistent with I.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+160.0,
+476.0,
+215.0,
+500.0
+],
+"page": 4,
+"v": 1927
+},
+"in_urn": {
+"box": [
+192.0,
+537.0,
+240.0,
+560.0
+],
+"page": 4,
+"v": 1036
+},
+"invalid": {
+"box": [
+452.0,
+537.0,
+490.0,
+560.0
+],
+"page": 4,
+"v": 19
+},
+"no": {
+"box": [
+318.0,
+701.0,
+360.0,
+727.0
+],
+"page": 4,
+"v": 921
+},
+"valid": {
+"box": [
+565.0,
+537.0,
+625.0,
+560.0
+],
+"page": 4,
+"v": 1017
+},
+"voters": {
+"box": [
+665.0,
+476.0,
+725.0,
+500.0
+],
+"page": 4,
+"v": 1036
+},
+"yes": {
+"box": [
+220.0,
+701.0,
+255.0,
+727.0
+],
+"page": 4,
+"v": 96
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/Hatvan.pdf|2010. 10. 03.|Hatvan|„Egyetért-e Ön azzal, hogy 2011. évben Hatvan Város Önkormányzata kétmilliárd forint összeghatárig kötvényt bocsásson ki a hatvani kórház épületegyüttes (3000 Hatvan, Balassi Bálint út 16.) felújítására?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/Hatvan.pdf",
+"note": "NO read as 1032: the first digit is overwritten by a table rule; valid 4230 = 3198 + 1032. Electors 17797 and voters E=4444 on page 2 (page:2). K (NO) reads 4032 but the first digit is overwritten by a table line and may be 1032; as written J+K=3198+4032=7230 does not equal I=4230 (I=F-H=4397-167 ok, G=-47=4397-4444 ok); with K=1032 it would match. Reported as read: 4032. I first digit also slightly unclear (4230 read).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+205.0,
+400.0,
+275.0,
+428.0
+],
+"page": 2,
+"v": 17797
+},
+"in_urn": {
+"box": [
+214.0,
+471.0,
+273.0,
+499.0
+],
+"page": 3,
+"v": 4397
+},
+"invalid": {
+"box": [
+461.0,
+485.0,
+506.0,
+511.0
+],
+"page": 3,
+"v": 167
+},
+"no": {
+"box": [
+341.0,
+631.0,
+401.0,
+663.0
+],
+"page": 3,
+"v": 1032
+},
+"valid": {
+"box": [
+576.0,
+490.0,
+636.0,
+517.0
+],
+"page": 3,
+"v": 4230
+},
+"voters": {
+"box": [
+683.0,
+418.0,
+738.0,
+446.0
+],
+"page": 2,
+"v": 4444
+},
+"yes": {
+"box": [
+236.0,
+629.0,
+286.0,
+658.0
+],
+"page": 3,
+"v": 3198
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/Kismaros.pdf|2010. 10. 03.|Kismaros|„Akarja-e Ön, hogy Kismaros Község Önkormányzata a Duna-menti gát megerősítésére úgynevezett fióktöltést építsen?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/Kismaros.pdf",
+"note": "Electors (A 1709) and voters (E 1109) are on page 2 (box 'pg':2). 'Érvényes és eredményes' underlined; other options struck. G, B, D are dashes. Arithmetic checks. YES 951: last digit written like a 7/1, read 951 from sum 951+92=1043.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+158.0,
+490.0,
+202.0,
+513.0
+],
+"page": 2,
+"v": 1709
+},
+"in_urn": {
+"box": [
+208.0,
+549.0,
+256.0,
+570.0
+],
+"page": 3,
+"v": 1109
+},
+"invalid": {
+"box": [
+470.0,
+549.0,
+502.0,
+570.0
+],
+"page": 3,
+"v": 66
+},
+"no": {
+"box": [
+352.0,
+718.0,
+388.0,
+742.0
+],
+"page": 3,
+"v": 92
+},
+"valid": {
+"box": [
+583.0,
+549.0,
+632.0,
+570.0
+],
+"page": 3,
+"v": 1043
+},
+"voters": {
+"box": [
+644.0,
+490.0,
+692.0,
+513.0
+],
+"page": 2,
+"v": 1109
+},
+"yes": {
+"box": [
+238.0,
+718.0,
+274.0,
+742.0
+],
+"page": 3,
+"v": 951
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/Kismaros.pdf|2010. 10. 03.|Kismaros|„Akarja-e Ön, hogy Kismaros Község Önkormányzata a Kismaros belterületén is keresztül folyó Török (Morgó) patakmeder kismarosi szakaszán kotrási munkákat – a mederben és a rézsűben lévő fák kivágásával is – szükség szerint, időszakonként elvégeztesse?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/Kismaros.pdf",
+"note": "Electors (A 1709) and voters (E 1109) are on page 2 (box 'pg':2). 'Érvényes és eredményes' underlined; other options struck. G, B, D are dashes. Arithmetic checks. Invalid 55 is scrawled; read from 1109-1054.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+158.0,
+490.0,
+202.0,
+513.0
+],
+"page": 2,
+"v": 1709
+},
+"in_urn": {
+"box": [
+210.0,
+529.0,
+258.0,
+552.0
+],
+"page": 4,
+"v": 1109
+},
+"invalid": {
+"box": [
+455.0,
+529.0,
+490.0,
+552.0
+],
+"page": 4,
+"v": 55
+},
+"no": {
+"box": [
+340.0,
+700.0,
+376.0,
+724.0
+],
+"page": 4,
+"v": 140
+},
+"valid": {
+"box": [
+583.0,
+529.0,
+632.0,
+552.0
+],
+"page": 4,
+"v": 1054
+},
+"voters": {
+"box": [
+644.0,
+490.0,
+692.0,
+513.0
+],
+"page": 2,
+"v": 1109
+},
+"yes": {
+"box": [
+238.0,
+700.0,
+274.0,
+724.0
+],
+"page": 4,
+"v": 914
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/Szerencs.pdf|2010. 10. 03.|Szerencs|„Fontosabbnak tartja-e a Szerencs hagyományaira épülő iparfejlesztést és az ehhez kapcsolódó munkahelyteremtést, mint a világörökség védőzónájába tartozást?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/Szerencs.pdf",
+"note": "Electors=A/C (8085, register at close; box on A, page 2), voters=E=5134 on page 2 (form B). G printed -20 but E-F = 5134-5014 = 120 (form's own figures do not agree; E digits read as 5134, not adjusted). unused null. Valid (érvényes) and effective (eredményes) boxes both ticked. valid=yes+no and in_urn=invalid+valid check.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+152.0,
+395.0,
+220.0,
+420.0
+],
+"page": 3,
+"v": 8085
+},
+"in_urn": {
+"box": [
+180.0,
+362.0,
+248.0,
+388.0
+],
+"page": 3,
+"v": 5014
+},
+"invalid": {
+"box": [
+476.0,
+362.0,
+530.0,
+388.0
+],
+"page": 3,
+"v": 404
+},
+"no": {
+"box": [
+472.0,
+562.0,
+525.0,
+592.0
+],
+"page": 3,
+"v": 829
+},
+"valid": {
+"box": [
+603.0,
+362.0,
+668.0,
+388.0
+],
+"page": 3,
+"v": 4610
+},
+"voters": {
+"box": [
+648.0,
+403.0,
+712.0,
+430.0
+],
+"page": 3,
+"v": 5134
+},
+"yes": {
+"box": [
+340.0,
+562.0,
+406.0,
+592.0
+],
+"page": 3,
+"v": 3781
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305798/kisrozvagy.pdf|2010. 12. 28.|Kisrozvágy|„Egyetért-e Ön azzal, hogy Kisrozvágy Község Képviselő-testülete 2011.01.01. nappal kiváljon Nagyrozvágy és Kisrozvágy Községek Társult Képviselő-testületéből?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305798/kisrozvagy.pdf",
+"note": "Electors 150 and voters 78 are on page 2 (page=2); the rest on page 3. Fax quality poor: the 78 (voters, urn) is smudged but consistent with 1+77 and with the 75+2=77 split. Unused ballots not on form (null). Stamp: first three options struck through, 'Ervenyes es eredmenyes' left.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+160.0,
+520.0,
+210.0,
+546.0
+],
+"page": 2,
+"v": 150
+},
+"in_urn": {
+"box": [
+230.0,
+550.0,
+266.0,
+576.0
+],
+"page": 3,
+"v": 78
+},
+"invalid": {
+"box": [
+485.0,
+550.0,
+502.0,
+576.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+357.0,
+802.0,
+385.0,
+826.0
+],
+"page": 3,
+"v": 2
+},
+"valid": {
+"box": [
+604.0,
+550.0,
+647.0,
+576.0
+],
+"page": 3,
+"v": 77
+},
+"voters": {
+"box": [
+684.0,
+520.0,
+720.0,
+548.0
+],
+"page": 2,
+"v": 78
+},
+"yes": {
+"box": [
+242.0,
+802.0,
+282.0,
+826.0
+],
+"page": 3,
+"v": 75
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf|2009. 01. 25.|Kompolt|\"Egyetért-e azzal, hogy Kompolt területén ne épülhessen szemétlerakó létesítmény?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf",
+"note": "Electors=C (register at close); voters=E, both boxes on page 2 (shared form B). Only 'Érvénytelen' not struck through. G='-' so unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+390.0,
+455.0,
+460.0,
+485.0
+],
+"page": 4,
+"v": 1635
+},
+"in_urn": {
+"box": [
+200.0,
+440.0,
+270.0,
+468.0
+],
+"page": 4,
+"v": 458
+},
+"invalid": {
+"box": [
+475.0,
+442.0,
+510.0,
+470.0
+],
+"page": 4,
+"v": 17
+},
+"no": {
+"box": [
+350.0,
+608.0,
+400.0,
+636.0
+],
+"page": 4,
+"v": 129
+},
+"valid": {
+"box": [
+598.0,
+442.0,
+658.0,
+470.0
+],
+"page": 4,
+"v": 441
+},
+"voters": {
+"box": [
+665.0,
+455.0,
+735.0,
+485.0
+],
+"page": 4,
+"v": 458
+},
+"yes": {
+"box": [
+238.0,
+606.0,
+295.0,
+636.0
+],
+"page": 4,
+"v": 312
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf|2009. 01. 25.|Kompolt|\"Egyetért-e azzal, hogy Kompolt területén ne épülhessen szemétszelektáló létesítmény?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf",
+"note": "Electors=C (register at close); voters=E, both boxes on page 2 (shared form B). Only 'Érvénytelen' not struck through. G='-' so unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+390.0,
+455.0,
+460.0,
+485.0
+],
+"page": 6,
+"v": 1635
+},
+"in_urn": {
+"box": [
+200.0,
+442.0,
+270.0,
+470.0
+],
+"page": 6,
+"v": 458
+},
+"invalid": {
+"box": [
+470.0,
+442.0,
+515.0,
+470.0
+],
+"page": 6,
+"v": 16
+},
+"no": {
+"box": [
+350.0,
+610.0,
+405.0,
+640.0
+],
+"page": 6,
+"v": 144
+},
+"valid": {
+"box": [
+605.0,
+442.0,
+662.0,
+470.0
+],
+"page": 6,
+"v": 442
+},
+"voters": {
+"box": [
+665.0,
+455.0,
+735.0,
+485.0
+],
+"page": 6,
+"v": 458
+},
+"yes": {
+"box": [
+238.0,
+610.0,
+292.0,
+640.0
+],
+"page": 6,
+"v": 298
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf|2009. 01. 25.|Kompolt|\"Egyetért-e azzal, hogy Kompolt területén ne épülhessen szemétátrakó létesítmény?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf",
+"note": "Electors=C (register at close); voters=E, both boxes on page 2 (shared form B). Only 'Érvénytelen' not struck through. G='-' so unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+390.0,
+455.0,
+460.0,
+485.0
+],
+"page": 3,
+"v": 1635
+},
+"in_urn": {
+"box": [
+200.0,
+443.0,
+270.0,
+472.0
+],
+"page": 3,
+"v": 458
+},
+"invalid": {
+"box": [
+480.0,
+443.0,
+525.0,
+472.0
+],
+"page": 3,
+"v": 10
+},
+"no": {
+"box": [
+350.0,
+618.0,
+410.0,
+646.0
+],
+"page": 3,
+"v": 174
+},
+"valid": {
+"box": [
+595.0,
+443.0,
+655.0,
+472.0
+],
+"page": 3,
+"v": 448
+},
+"voters": {
+"box": [
+665.0,
+455.0,
+735.0,
+485.0
+],
+"page": 3,
+"v": 458
+},
+"yes": {
+"box": [
+240.0,
+618.0,
+298.0,
+646.0
+],
+"page": 3,
+"v": 274
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf|2009. 01. 25.|Kompolt|\"Egyetért-e azzal, hogy Kompolt területén ne épülhessen szemétégető létesítmény?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090125kompolt.pdf",
+"note": "Electors=C (register at close); voters=E, both boxes on page 2 (shared form B). Only 'Érvénytelen' not struck through. G='-' so unused null. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+390.0,
+455.0,
+460.0,
+485.0
+],
+"page": 5,
+"v": 1635
+},
+"in_urn": {
+"box": [
+200.0,
+444.0,
+272.0,
+472.0
+],
+"page": 5,
+"v": 458
+},
+"invalid": {
+"box": [
+490.0,
+444.0,
+530.0,
+472.0
+],
+"page": 5,
+"v": 13
+},
+"no": {
+"box": [
+350.0,
+610.0,
+405.0,
+640.0
+],
+"page": 5,
+"v": 119
+},
+"valid": {
+"box": [
+608.0,
+444.0,
+665.0,
+472.0
+],
+"page": 5,
+"v": 445
+},
+"voters": {
+"box": [
+665.0,
+455.0,
+735.0,
+485.0
+],
+"page": 5,
+"v": 458
+},
+"yes": {
+"box": [
+238.0,
+610.0,
+292.0,
+640.0
+],
+"page": 5,
+"v": 326
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090201hosszuheteny.pdf|2009. 02. 01.|Hosszúhetény|\"Egyetért-e Ön azzal, hogy az érintettek akarata ellenére hozott 3 utcanév változtatásról szóló határozatot a képviselő-testület vonja vissza?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090201hosszuheteny.pdf",
+"note": "Electors 2725 and voters 635 are on page 2 (page=2); the rest on page 3. Urn count 634 is one fewer than voters (G = -1 on the form); unused ballots not on form (null). 578+51=629 and 5+629=634 check. Stamp: 'Ervenytelen' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+142.0,
+441.0,
+218.0,
+470.0
+],
+"page": 2,
+"v": 2725
+},
+"in_urn": {
+"box": [
+254.0,
+537.0,
+298.0,
+565.0
+],
+"page": 3,
+"v": 634
+},
+"invalid": {
+"box": [
+500.0,
+537.0,
+521.0,
+565.0
+],
+"page": 3,
+"v": 5
+},
+"no": {
+"box": [
+367.0,
+714.0,
+398.0,
+741.0
+],
+"page": 3,
+"v": 51
+},
+"valid": {
+"box": [
+612.0,
+537.0,
+663.0,
+565.0
+],
+"page": 3,
+"v": 629
+},
+"voters": {
+"box": [
+667.0,
+441.0,
+718.0,
+470.0
+],
+"page": 2,
+"v": 635
+},
+"yes": {
+"box": [
+239.0,
+714.0,
+296.0,
+741.0
+],
+"page": 3,
+"v": 578
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090201vat.pdf|2009. 02. 01.|Vát|\"Akarja-e Ön, hogy Vát Község Önkormányzata Képviselő-testülete, Vát Község Településszerkezeti és szabályozási tervében megtiltsa Vát Község közigazgatási területén belül Repülőtér létesítését?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090201vat.pdf",
+"note": "Only a polling-station protocol (1. szavazókör, Vát has a single station, no separate settlement total form); used as settlement result. Electors (A=C=605, B=0) and voters (E=470) are on page 2 (key 'page' inside those fields). No outcome stamp on form. 'Rontott szavazólapok száma' (spoiled ballots)=4 not mapped to unused. Arithmetic ok: 146+317=463; 7+463=470.",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+105.0,
+526.0,
+155.0,
+550.0
+],
+"page": 2,
+"v": 605
+},
+"in_urn": {
+"box": [
+130.0,
+518.0,
+190.0,
+542.0
+],
+"page": 3,
+"v": 470
+},
+"invalid": {
+"box": [
+490.0,
+518.0,
+525.0,
+542.0
+],
+"page": 3,
+"v": 7
+},
+"no": {
+"box": [
+460.0,
+675.0,
+520.0,
+700.0
+],
+"page": 3,
+"v": 317
+},
+"valid": {
+"box": [
+630.0,
+518.0,
+690.0,
+542.0
+],
+"page": 3,
+"v": 463
+},
+"voters": {
+"box": [
+640.0,
+528.0,
+695.0,
+552.0
+],
+"page": 2,
+"v": 470
+},
+"yes": {
+"box": [
+285.0,
+675.0,
+345.0,
+700.0
+],
+"page": 3,
+"v": 146
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090301szigetmonostor.pdf|2009. 03. 01.|Szigetmonostor|\"Egyetért-e Ön azzal, hogy Szigetmonostor település Önkormányzata ragaszkodjon a Szigetmonostort Szentendrével összekötő, közúti közlekedést biztosító autós híd megépítéséhez, és hogy egy kerékpáros – gyalogos híd nem helyettesítheti az építendő autós hidat?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090301szigetmonostor.pdf",
+"note": "Summary protocol (osszesito jegyzokonyv), 1 C sheet. Old 2009 form: electors = A/C 1838 (B=0), voters = E 1138 (p2); D returned 1; G difference 0 so unused not on form. 'Ervenyes es eredmenyes' not struck out (others struck).",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+133.0,
+470.0,
+190.0,
+492.0
+],
+"page": 2,
+"v": 1838
+},
+"in_urn": {
+"box": [
+168.0,
+440.0,
+220.0,
+466.0
+],
+"page": 3,
+"v": 1138
+},
+"invalid": {
+"box": [
+449.0,
+440.0,
+477.0,
+466.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+280.0,
+623.0,
+324.0,
+649.0
+],
+"page": 3,
+"v": 194
+},
+"valid": {
+"box": [
+544.0,
+440.0,
+601.0,
+466.0
+],
+"page": 3,
+"v": 1136
+},
+"voters": {
+"box": [
+636.0,
+474.0,
+694.0,
+498.0
+],
+"page": 2,
+"v": 1138
+},
+"yes": {
+"box": [
+190.0,
+623.0,
+238.0,
+649.0
+],
+"page": 3,
+"v": 942
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090329bodrog.pdf|2009. 03. 29.|Bodrog|\"Egyetért-e Ön azzal, hogy Bodrog Község Önkormányzat Képviselő-testülete a tulajdonában álló Bodrog, Kossuth Lajos utca 83. szám alatti ingatlant értékesítse a Somogy Megyei Önkormányzat részére azzal a céllal, hogy az ingatlanban családjukból kikerült súlyos magatartászavarral rendelkező, disszociális tüneteket mutató fiú ellátottak gondozására speciális gyermekotthon kerüljön kialakításra?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090329bodrog.pdf",
+"note": "Old form: electors (A=357) and voters appeared (E=225) are on page 2 (boxes refer to page 2); results on page 3. G=0, D blank. 'Ervenyes es eredmenyes' underlined. Arithmetic ok: 45+178=223, 2+223=225.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+162.0,
+490.0,
+213.0,
+510.0
+],
+"page": 2,
+"v": 357
+},
+"in_urn": {
+"box": [
+210.0,
+576.0,
+267.0,
+598.0
+],
+"page": 3,
+"v": 225
+},
+"invalid": {
+"box": [
+468.0,
+577.0,
+495.0,
+598.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+330.0,
+724.0,
+382.0,
+749.0
+],
+"page": 3,
+"v": 178
+},
+"valid": {
+"box": [
+565.0,
+576.0,
+627.0,
+599.0
+],
+"page": 3,
+"v": 223
+},
+"voters": {
+"box": [
+665.0,
+490.0,
+727.0,
+510.0
+],
+"page": 2,
+"v": 225
+},
+"yes": {
+"box": [
+240.0,
+726.0,
+277.0,
+748.0
+],
+"page": 3,
+"v": 45
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090405mosonmagyarovar.pdf|2009. 04. 05.|Mosonmagyaróvár|\"Egyetért-e Ön azzal, hogy Újudvar településrész Mosonmagyaróvárról leváljon és utána önálló községként működjön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090405mosonmagyarovar.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Unused not stated. Other two outcomes struck through.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+140.0,
+612.0,
+200.0,
+640.0
+],
+"page": 3,
+"v": 370
+},
+"in_urn": {
+"box": [
+180.0,
+508.0,
+245.0,
+540.0
+],
+"page": 3,
+"v": 231
+},
+"invalid": {
+"box": [
+470.0,
+508.0,
+500.0,
+538.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+440.0,
+714.0,
+490.0,
+745.0
+],
+"page": 3,
+"v": 27
+},
+"valid": {
+"box": [
+575.0,
+508.0,
+630.0,
+540.0
+],
+"page": 3,
+"v": 229
+},
+"voters": {
+"box": [
+650.0,
+612.0,
+705.0,
+640.0
+],
+"page": 3,
+"v": 231
+},
+"yes": {
+"box": [
+333.0,
+712.0,
+392.0,
+744.0
+],
+"page": 3,
+"v": 202
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090405porpac.pdf|2009. 04. 05.|Porpác|\"Akarja-e Ön, hogy Porpác Község Önkormányzatának Képviselő-testülete, Porpác község településszerkezeti és szabályozási tervében megtiltsa Porpác község közigazgatási területén belül repülőtér létesítését?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090405porpac.pdf",
+"note": "Old form: A=161, B=0, C=161, D=2, E=148 (page 2); F=148, G=0, H=5, I=143, J=68, K=75 (page 3). Arithmetic checks. Others struck out, \"Ervenyes es eredmenyes\" left. Unused not on form (G=0).",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+115.0,
+508.0,
+185.0,
+535.0
+],
+"page": 3,
+"v": 161
+},
+"in_urn": {
+"box": [
+205.0,
+486.0,
+262.0,
+516.0
+],
+"page": 3,
+"v": 148
+},
+"invalid": {
+"box": [
+468.0,
+486.0,
+505.0,
+516.0
+],
+"page": 3,
+"v": 5
+},
+"no": {
+"box": [
+300.0,
+660.0,
+345.0,
+690.0
+],
+"page": 3,
+"v": 75
+},
+"valid": {
+"box": [
+555.0,
+486.0,
+608.0,
+516.0
+],
+"page": 3,
+"v": 143
+},
+"voters": {
+"box": [
+595.0,
+525.0,
+655.0,
+553.0
+],
+"page": 3,
+"v": 148
+},
+"yes": {
+"box": [
+215.0,
+660.0,
+260.0,
+690.0
+],
+"page": 3,
+"v": 68
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090425ajka.pdf|2009. 04. 25.|Ajka|\"Egyetért-e Ön azzal, hogy Ajka város Önkormányzata kizárólagos önkormányzati tulajdonában álló gazdálkodó szervezettel biztosítsa a szemétszállítást, hulladékkezelést és hulladéklerakást 2009 évtől Ajka város területén?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090425ajka.pdf",
+"note": "Electors (25.893) and voters (E=2686) on page 2 (page:2). Q1 page 3: G=-1, F=2685. Invalid underlined. 2523+127=2650; 35+2650=2685. Unused ballots not on form (voters 2686 vs in urn 2685, G=-1).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+170.0,
+514.0,
+242.0,
+544.0
+],
+"page": 2,
+"v": 25893
+},
+"in_urn": {
+"box": [
+208.0,
+558.0,
+292.0,
+596.0
+],
+"page": 3,
+"v": 2685
+},
+"invalid": {
+"box": [
+480.0,
+556.0,
+528.0,
+592.0
+],
+"page": 3,
+"v": 35
+},
+"no": {
+"box": [
+350.0,
+738.0,
+415.0,
+766.0
+],
+"page": 3,
+"v": 127
+},
+"valid": {
+"box": [
+588.0,
+556.0,
+662.0,
+592.0
+],
+"page": 3,
+"v": 2650
+},
+"voters": {
+"box": [
+680.0,
+522.0,
+745.0,
+550.0
+],
+"page": 2,
+"v": 2686
+},
+"yes": {
+"box": [
+235.0,
+738.0,
+305.0,
+766.0
+],
+"page": 3,
+"v": 2523
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090425ajka.pdf|2009. 04. 25.|Ajka|\"Egyetért-e Ön azzal, hogy Ajka város Önkormányzata kizárólagos önkormányzati tulajdonában álló gazdálkodó szervezettel biztosítsa a távhőszolgáltatást Ajka város területén 2009 évtől?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090425ajka.pdf",
+"note": "Electors and voters on page 2 (page:2). Q2 page 4. Invalid underlined. 2529+126=2655; 31+2655=2686. Digit of J (2529) read from small handwriting.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+170.0,
+514.0,
+242.0,
+544.0
+],
+"page": 2,
+"v": 25893
+},
+"in_urn": {
+"box": [
+215.0,
+528.0,
+295.0,
+556.0
+],
+"page": 4,
+"v": 2686
+},
+"invalid": {
+"box": [
+480.0,
+530.0,
+525.0,
+558.0
+],
+"page": 4,
+"v": 31
+},
+"no": {
+"box": [
+360.0,
+694.0,
+420.0,
+722.0
+],
+"page": 4,
+"v": 126
+},
+"valid": {
+"box": [
+590.0,
+530.0,
+660.0,
+558.0
+],
+"page": 4,
+"v": 2655
+},
+"voters": {
+"box": [
+680.0,
+522.0,
+745.0,
+550.0
+],
+"page": 2,
+"v": 2686
+},
+"yes": {
+"box": [
+220.0,
+694.0,
+295.0,
+722.0
+],
+"page": 4,
+"v": 2529
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090510pethohenye.pdf|2009. 05. 10.|Pethőhenye|\"Egyetért-e Ön azzal, hogy a helyi önkormányzatokról szóló 1990. évi LXV. törvény 56. § (1) és (5) bekezdéseiben foglaltak szerint Pethőhenye község Önkormányzata átadja Cserlap, Hosszúhegy és Kápolnahegy lakott területrészeit Zalaegerszeg Megyei Jogú Város Önkormányzata részére?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090510pethohenye.pdf",
+"note": "Electors (A 22) and voters (E 13) are on page 2 (box 'pg':2). Invalid (H), NO (K), G, B, D are filled with a dash on the form (treated as null; effectively zero). 'Érvényes és eredményes' underlined. Arithmetic consistent (13 = 13 + 0).",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+163.0,
+479.0,
+198.0,
+501.0
+],
+"page": 2,
+"v": 22
+},
+"in_urn": {
+"box": [
+272.0,
+452.0,
+305.0,
+478.0
+],
+"page": 3,
+"v": 13
+},
+"valid": {
+"box": [
+625.0,
+452.0,
+662.0,
+478.0
+],
+"page": 3,
+"v": 13
+},
+"voters": {
+"box": [
+630.0,
+479.0,
+672.0,
+502.0
+],
+"page": 2,
+"v": 13
+},
+"yes": {
+"box": [
+280.0,
+627.0,
+312.0,
+652.0
+],
+"page": 3,
+"v": 13
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607balatonfuzfo.pdf|2009. 06. 07.|Balatonfűzfő|\"Egyetért-e Ön azzal, hogy Balatonfűzfő rendezési tervében foglaltaknak megfelelően a fűzfőgyártelepi településrészen növényi alapanyagot feldolgozó biofinomító üzem, biogáz üzem, biomassza erőmű épüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607balatonfuzfo.pdf",
+"note": "Electors=C (register at close, 3841), voters=E; boxes for these are on page 2 (form B). G='-' so unused null. Only 'Érvénytelen' not struck through. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+130.0,
+533.0,
+240.0,
+565.0
+],
+"page": 3,
+"v": 3841
+},
+"in_urn": {
+"box": [
+175.0,
+500.0,
+285.0,
+530.0
+],
+"page": 3,
+"v": 1756
+},
+"invalid": {
+"box": [
+440.0,
+500.0,
+480.0,
+530.0
+],
+"page": 3,
+"v": 14
+},
+"no": {
+"box": [
+300.0,
+682.0,
+360.0,
+712.0
+],
+"page": 3,
+"v": 511
+},
+"valid": {
+"box": [
+545.0,
+497.0,
+640.0,
+530.0
+],
+"page": 3,
+"v": 1742
+},
+"voters": {
+"box": [
+615.0,
+530.0,
+725.0,
+562.0
+],
+"page": 3,
+"v": 1756
+},
+"yes": {
+"box": [
+190.0,
+682.0,
+285.0,
+712.0
+],
+"page": 3,
+"v": 1231
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607bedo.pdf|2009. 06. 07.|Bedő|\"Akarja-e Ön azt, hogy Bedő Község Önkormányzat képviselő-testülete Körösszakál Község Önkormányzat képviselő-testületével társult képviselő-testületet alakítson?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607bedo.pdf",
+"note": "Electors 239 and voters 145 are on page 2 (page=2); the rest on page 3. Unused ballots not on form (null). Arithmetic checks: 89+54=143, 2+143=145. Stamp: 'Ervenytelen' and 'Ervenyes, de eredmenytelen' struck through.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+158.0,
+539.0,
+207.0,
+567.0
+],
+"page": 2,
+"v": 239
+},
+"in_urn": {
+"box": [
+187.0,
+592.0,
+233.0,
+623.0
+],
+"page": 3,
+"v": 145
+},
+"invalid": {
+"box": [
+441.0,
+592.0,
+467.0,
+623.0
+],
+"page": 3,
+"v": 2
+},
+"no": {
+"box": [
+325.0,
+768.0,
+360.0,
+802.0
+],
+"page": 3,
+"v": 54
+},
+"valid": {
+"box": [
+558.0,
+588.0,
+607.0,
+617.0
+],
+"page": 3,
+"v": 143
+},
+"voters": {
+"box": [
+638.0,
+530.0,
+687.0,
+560.0
+],
+"page": 2,
+"v": 145
+},
+"yes": {
+"box": [
+218.0,
+768.0,
+254.0,
+802.0
+],
+"page": 3,
+"v": 89
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607budapest18.pdf|2009. 06. 07.|XVIII. kerület|\"Egyetért-e Ön azzal, hogy Budapest, XVIII. kerület Pestszentlőrinc-Pestszentimre Önkormányzata a kerületben városőrséget hozzon létre?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607budapest18.pdf",
+"note": "Typed form. Electors (A=C=80907, B=0) and voters (E=33995) are on page 2 (key 'page' inside those fields). Stamp: only 'Érvénytelen' printed in the outcome box. Arithmetic ok: 29117+4388=33505; 416+33505=33921; G=-74 = 33921-33995.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+125.0,
+448.0,
+185.0,
+472.0
+],
+"page": 2,
+"v": 80907
+},
+"in_urn": {
+"box": [
+230.0,
+478.0,
+292.0,
+500.0
+],
+"page": 3,
+"v": 33921
+},
+"invalid": {
+"box": [
+423.0,
+478.0,
+482.0,
+500.0
+],
+"page": 3,
+"v": 416
+},
+"no": {
+"box": [
+430.0,
+695.0,
+490.0,
+718.0
+],
+"page": 3,
+"v": 4388
+},
+"valid": {
+"box": [
+560.0,
+478.0,
+625.0,
+500.0
+],
+"page": 3,
+"v": 33505
+},
+"voters": {
+"box": [
+638.0,
+448.0,
+702.0,
+472.0
+],
+"page": 2,
+"v": 33995
+},
+"yes": {
+"box": [
+328.0,
+695.0,
+392.0,
+718.0
+],
+"page": 3,
+"v": 29117
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607ebergoc.pdf|2009. 06. 07.|Ebergőc|\"Egyetért-e Ön azzal, hogy Ebergőc közigazgatási területén ne épülhessen halotthamvasztó?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607ebergoc.pdf",
+"note": "Summary protocol, 1 C sheet. Old 2009 form: electors = A/C 118 (B=0), voters = E 106 (p2); D returned 0; G difference 0 so unused not on form. Only 'Ervenyes es eredmenyes' is underlined; the other two alternatives are not struck out.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+153.0,
+465.0,
+196.0,
+487.0
+],
+"page": 2,
+"v": 118
+},
+"in_urn": {
+"box": [
+221.0,
+425.0,
+267.0,
+450.0
+],
+"page": 3,
+"v": 106
+},
+"invalid": {
+"box": [
+499.0,
+425.0,
+517.0,
+450.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+331.0,
+602.0,
+368.0,
+626.0
+],
+"page": 3,
+"v": 36
+},
+"valid": {
+"box": [
+588.0,
+425.0,
+634.0,
+450.0
+],
+"page": 3,
+"v": 105
+},
+"voters": {
+"box": [
+634.0,
+465.0,
+682.0,
+488.0
+],
+"page": 2,
+"v": 106
+},
+"yes": {
+"box": [
+238.0,
+602.0,
+276.0,
+626.0
+],
+"page": 3,
+"v": 69
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607esztergom.pdf|2009. 06. 07.|Esztergom|\"Egyetért Ön azzal, hogy az Önkormányzat a városi holding részvényeinek meghatározott részét ingyenesen vagy rendkívül kedvezményesen átadja az esztergomi polgárok részére?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607esztergom.pdf",
+"note": "Old form: electors (A=24135) and voters appeared (E=10344) are on page 2 (boxes refer to page 2); results on page 3. B=12, C=24147 (=A+B), D=2. G (difference between ballots in urn and voters) = -67, so unused/missing ballots not entered; unused=null. 'Ervenytelen' not struck through (other two outcomes struck). Arithmetic ok: 6722+2974=9696, 581+9696=10277, 10344-67=10277.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+152.0,
+551.0,
+240.0,
+575.0
+],
+"page": 2,
+"v": 24135
+},
+"in_urn": {
+"box": [
+198.0,
+520.0,
+282.0,
+543.0
+],
+"page": 3,
+"v": 10277
+},
+"invalid": {
+"box": [
+486.0,
+520.0,
+534.0,
+543.0
+],
+"page": 3,
+"v": 581
+},
+"no": {
+"box": [
+330.0,
+762.0,
+400.0,
+787.0
+],
+"page": 3,
+"v": 2974
+},
+"valid": {
+"box": [
+571.0,
+520.0,
+642.0,
+543.0
+],
+"page": 3,
+"v": 9696
+},
+"voters": {
+"box": [
+658.0,
+551.0,
+736.0,
+575.0
+],
+"page": 2,
+"v": 10344
+},
+"yes": {
+"box": [
+227.0,
+762.0,
+303.0,
+787.0
+],
+"page": 3,
+"v": 6722
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607gavavencsello.pdf|2009. 06. 07.|Gávavencsellő|\"Egyetért-e Gávavencsellő Paszabcsúcs és Gávavencsellő Szabadságtelep lakott területrészek közigazgatásilag Nyírtelekhez való csatolásával?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607gavavencsello.pdf",
+"note": "Electors and voters from page 2 (boxes on page 2). Unused not stated. Invalid shown as slashed zero. NO written as '8' (looks like a loop digit; 42+8=50 checks). Valid-effective and valid-ineffective struck through; Érvénytelen remains.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+165.0,
+517.0,
+212.0,
+542.0
+],
+"page": 3,
+"v": 106
+},
+"in_urn": {
+"box": [
+164.0,
+494.0,
+200.0,
+520.0
+],
+"page": 3,
+"v": 50
+},
+"invalid": {
+"box": [
+507.0,
+493.0,
+533.0,
+528.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+355.0,
+752.0,
+378.0,
+780.0
+],
+"page": 3,
+"v": 8
+},
+"valid": {
+"box": [
+606.0,
+498.0,
+652.0,
+526.0
+],
+"page": 3,
+"v": 50
+},
+"voters": {
+"box": [
+694.0,
+520.0,
+733.0,
+545.0
+],
+"page": 3,
+"v": 50
+},
+"yes": {
+"box": [
+190.0,
+752.0,
+233.0,
+780.0
+],
+"page": 3,
+"v": 42
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607korosszakal.pdf|2009. 06. 07.|Körösszakál|\"Akarja-e Ön azt, hogy Körösszakál Község Önkormányzat képviselő-testülete Bedő Község Önkormányzat képviselő-testületével társult képviselő-testületet alakítson?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607korosszakal.pdf",
+"note": "Old form: A=668, B and D struck through (none), C=668, E=400 (page 2); F=400, G struck through, H=5, I=395, J=374, K=21 (page 3). Arithmetic checks. Others struck out, \"Ervenyes es eredmenyes\" left. Unused not on form.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+205.0,
+393.0,
+285.0,
+420.0
+],
+"page": 3,
+"v": 668
+},
+"in_urn": {
+"box": [
+210.0,
+408.0,
+295.0,
+433.0
+],
+"page": 3,
+"v": 400
+},
+"invalid": {
+"box": [
+478.0,
+408.0,
+525.0,
+433.0
+],
+"page": 3,
+"v": 5
+},
+"no": {
+"box": [
+320.0,
+583.0,
+365.0,
+610.0
+],
+"page": 3,
+"v": 21
+},
+"valid": {
+"box": [
+570.0,
+408.0,
+630.0,
+433.0
+],
+"page": 3,
+"v": 395
+},
+"voters": {
+"box": [
+675.0,
+393.0,
+765.0,
+420.0
+],
+"page": 3,
+"v": 400
+},
+"yes": {
+"box": [
+228.0,
+584.0,
+285.0,
+610.0
+],
+"page": 3,
+"v": 374
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090607udvari.pdf|2009. 06. 07.|Udvari|\"Egyetért-e Ön azzal, hogy Alsópél területrész Sárszentlőrinc községhez tartozzon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090607udvari.pdf",
+"note": "Protocol is for Alsópél (question text) though place in manifest is Udvari. Electors 84 and voters 62 on page 2 (page:2). Unused ballots not on form. 41+20=61; 1+61=62.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+145.0,
+486.0,
+190.0,
+516.0
+],
+"page": 2,
+"v": 84
+},
+"in_urn": {
+"box": [
+240.0,
+448.0,
+292.0,
+476.0
+],
+"page": 3,
+"v": 62
+},
+"invalid": {
+"box": [
+522.0,
+440.0,
+562.0,
+474.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+355.0,
+643.0,
+405.0,
+672.0
+],
+"page": 3,
+"v": 20
+},
+"valid": {
+"box": [
+628.0,
+440.0,
+688.0,
+474.0
+],
+"page": 3,
+"v": 61
+},
+"voters": {
+"box": [
+683.0,
+500.0,
+730.0,
+526.0
+],
+"page": 2,
+"v": 62
+},
+"yes": {
+"box": [
+255.0,
+643.0,
+310.0,
+672.0
+],
+"page": 3,
+"v": 41
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090614nagykozar.pdf|2009. 06. 14.|Nagykozár|\"Akarja-e Ön, hogy a Zsemenye-dűlő lakott területrész a Nagykozár és Romonya Községek Önkormányzatai által 2009. március 30-án kötött előzetes megállapodás feltételei szerint Romonya községhez történjen átadásra?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090614nagykozar.pdf",
+"note": "Electors (A 15) and voters (E 11) are on page 2 (box 'pg':2). 'Érvényes és eredményes' underlined. Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+175.0,
+488.0,
+208.0,
+512.0
+],
+"page": 2,
+"v": 15
+},
+"in_urn": {
+"box": [
+232.0,
+498.0,
+262.0,
+522.0
+],
+"page": 3,
+"v": 11
+},
+"invalid": {
+"box": [
+490.0,
+498.0,
+520.0,
+522.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+365.0,
+664.0,
+395.0,
+692.0
+],
+"page": 3,
+"v": 0
+},
+"valid": {
+"box": [
+625.0,
+498.0,
+658.0,
+522.0
+],
+"page": 3,
+"v": 11
+},
+"voters": {
+"box": [
+695.0,
+478.0,
+732.0,
+500.0
+],
+"page": 2,
+"v": 11
+},
+"yes": {
+"box": [
+248.0,
+664.0,
+282.0,
+690.0
+],
+"page": 3,
+"v": 11
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090830koszeg.pdf|2009. 08. 30.|Kőszeg|\"Egyetért-e Ön azzal, hogy a kőszegi Lóránt Gyula Sporttelep (2517. hrsz.-ú füves sportpálya, tekepálya; 2518. hrsz.-ú sportpálya; 2515. hrsz.-ú teniszpálya) egésze továbbra is a jelenlegi helyén és sportfunkciójában maradjon?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090830koszeg.pdf",
+"note": "Electors=C (register at close, 9289), voters=E=1378; boxes for these are on page 2 (form B). In urn F=1377, G=-1 (one fewer ballot than voters appeared); unused null. Only 'Érvénytelen' not struck through. valid=yes+no and in_urn=invalid+valid check; voters=in_urn+1 as the form's G=-1 states.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+138.0,
+545.0,
+208.0,
+572.0
+],
+"page": 3,
+"v": 9289
+},
+"in_urn": {
+"box": [
+135.0,
+472.0,
+206.0,
+497.0
+],
+"page": 3,
+"v": 1377
+},
+"invalid": {
+"box": [
+478.0,
+472.0,
+523.0,
+497.0
+],
+"page": 3,
+"v": 26
+},
+"no": {
+"box": [
+305.0,
+696.0,
+365.0,
+724.0
+],
+"page": 3,
+"v": 192
+},
+"valid": {
+"box": [
+628.0,
+472.0,
+692.0,
+497.0
+],
+"page": 3,
+"v": 1351
+},
+"voters": {
+"box": [
+670.0,
+545.0,
+738.0,
+572.0
+],
+"page": 3,
+"v": 1378
+},
+"yes": {
+"box": [
+130.0,
+696.0,
+202.0,
+724.0
+],
+"page": 3,
+"v": 1159
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20090906matraterenye.pdf|2009. 09. 06.|Mátraterenye|\"Egyetért-e Ön azzal, hogy Mátraterenye külterületén szén- és biomassza tüzelésére alkalmas erőmű létesüljön?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20090906matraterenye.pdf",
+"note": "Electors 1590 and voters 790 are on page 2 (page=2); the rest on page 3. Unused ballots not on form (null). Arithmetic checks: 711+79=790, 0+790=790. Stamp: 'Ervenytelen' left, the other two struck through.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+160.0,
+500.0,
+245.0,
+543.0
+],
+"page": 2,
+"v": 1590
+},
+"in_urn": {
+"box": [
+213.0,
+465.0,
+275.0,
+498.0
+],
+"page": 3,
+"v": 790
+},
+"invalid": {
+"box": [
+510.0,
+468.0,
+547.0,
+497.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+367.0,
+676.0,
+406.0,
+708.0
+],
+"page": 3,
+"v": 79
+},
+"valid": {
+"box": [
+585.0,
+462.0,
+655.0,
+498.0
+],
+"page": 3,
+"v": 790
+},
+"voters": {
+"box": [
+630.0,
+508.0,
+732.0,
+544.0
+],
+"page": 2,
+"v": 790
+},
+"yes": {
+"box": [
+240.0,
+676.0,
+293.0,
+708.0
+],
+"page": 3,
+"v": 711
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20091107petfurdo.pdf|2009. 11. 07.|Pétfürdő|\"Akarja-e Ön, hogy az Öskü község területéhez tartozó Péti Szőlőhegy külterületi lakott területrész Pétfürdő nagyközség közigazgatási területéhez kerüljön átvételre?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20091107petfurdo.pdf",
+"note": "Typed form. Electors (A=C=3990, B=0) and voters (E=714) are on page 2 (key 'page' inside those fields). Stamp: 'Érvénytelen' bold and underlined. Arithmetic ok: 690+22=712; 1+712=713; G=-1.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+185.0,
+550.0,
+235.0,
+574.0
+],
+"page": 2,
+"v": 3990
+},
+"in_urn": {
+"box": [
+250.0,
+553.0,
+295.0,
+577.0
+],
+"page": 3,
+"v": 713
+},
+"invalid": {
+"box": [
+508.0,
+553.0,
+530.0,
+577.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+385.0,
+748.0,
+423.0,
+772.0
+],
+"page": 3,
+"v": 22
+},
+"valid": {
+"box": [
+638.0,
+553.0,
+685.0,
+577.0
+],
+"page": 3,
+"v": 712
+},
+"voters": {
+"box": [
+705.0,
+550.0,
+745.0,
+574.0
+],
+"page": 2,
+"v": 714
+},
+"yes": {
+"box": [
+272.0,
+748.0,
+320.0,
+772.0
+],
+"page": 3,
+"v": 690
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/305801/20091206osku.pdf|2009. 12. 06.|Öskü|\"Akarja-e Ön, hogy az Öskü község területéhez tartozó Péti Szőlőhegy külterületi lakott területrész Pétfürdő nagyközség közigazgatási területéhez kerüljön átadásra?\"": {
+"document": "https://portal-api.valasztas.hu/documents/20182/305801/20091206osku.pdf",
+"note": "Summary protocol, 1 C sheet. Old 2009 form: electors = A/C 44 (written in open-top 4s, looks like HH; B=0), voters = E 20 (p2); D returned 0; G difference 0 so unused not on form. Stamp: 'Ervenytelen' left, other two struck out. Page 2 header reads VESZPREM, OSKU.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+138.0,
+567.0,
+167.0,
+591.0
+],
+"page": 2,
+"v": 44
+},
+"in_urn": {
+"box": [
+193.0,
+549.0,
+232.0,
+574.0
+],
+"page": 3,
+"v": 20
+},
+"invalid": {
+"box": [
+448.0,
+540.0,
+482.0,
+568.0
+],
+"page": 3,
+"v": 0
+},
+"no": {
+"box": [
+350.0,
+748.0,
+380.0,
+776.0
+],
+"page": 3,
+"v": 0
+},
+"valid": {
+"box": [
+584.0,
+538.0,
+624.0,
+568.0
+],
+"page": 3,
+"v": 20
+},
+"voters": {
+"box": [
+679.0,
+562.0,
+708.0,
+586.0
+],
+"page": 2,
+"v": 20
+},
+"yes": {
+"box": [
+228.0,
+748.0,
+266.0,
+776.0
+],
+"page": 3,
+"v": 20
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20180422_Kerepes_eredmeny.pdf|2018. április 22.|Kerepes|„Egyetért-e Ön azzal, hogy a Szilasi rétként ismert terület bármely telkén Kerepes Város Önkormányzat Képviselő-testületének 207/2017.(VI.27.) Kt. határozatában meghatározott önkormányzati tulajdonú telkeket is beleértve, orvosi rendelők épüljenek?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20180422_Kerepes_eredmeny.pdf",
+"note": "valid=yes+no and in_urn=invalid+valid check, but voters (B=2459) exceeds in_urn+unused (2458+0) by 1 as written on the form. \"ERVENYTELEN\" underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+385.0,
+296.0,
+427.0,
+318.0
+],
+"page": 1,
+"v": 8411
+},
+"in_urn": {
+"box": [
+365.0,
+394.0,
+427.0,
+427.0
+],
+"page": 1,
+"v": 2458
+},
+"invalid": {
+"box": [
+365.0,
+430.0,
+427.0,
+462.0
+],
+"page": 1,
+"v": 8
+},
+"no": {
+"box": [
+642.0,
+393.0,
+716.0,
+428.0
+],
+"page": 1,
+"v": 1228
+},
+"unused": {
+"box": [
+365.0,
+360.0,
+427.0,
+392.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+365.0,
+464.0,
+427.0,
+497.0
+],
+"page": 1,
+"v": 2450
+},
+"voters": {
+"box": [
+365.0,
+327.0,
+427.0,
+357.0
+],
+"page": 1,
+"v": 2459
+},
+"yes": {
+"box": [
+642.0,
+323.0,
+716.0,
+358.0
+],
+"page": 1,
+"v": 1222
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20180506_Tolnanemedi_eredmeny.pdf|2018. május 6.|Tolnanémedi|„Akarja-e Ön, hogy Tolnanémedi Község Önkormányzatának Képviselő Testülete visszavonja a 25/2017./III.22./ ÖK számú határozatát, melyben intézményi férőhely kiváltásához ingatlant (5 db építési telket) biztosít.”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20180506_Tolnanemedi_eredmeny.pdf",
+"note": "2018 form. All arithmetic checks (161+21=182, 2+182=184, 184+0=184). 'ERVENYTELEN' is underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+406.0,
+274.0,
+432.0,
+291.0
+],
+"page": 1,
+"v": 864
+},
+"in_urn": {
+"box": [
+388.0,
+379.0,
+421.0,
+399.0
+],
+"page": 1,
+"v": 184
+},
+"invalid": {
+"box": [
+401.0,
+411.0,
+427.0,
+432.0
+],
+"page": 1,
+"v": 2
+},
+"no": {
+"box": [
+671.0,
+378.0,
+699.0,
+402.0
+],
+"page": 1,
+"v": 21
+},
+"unused": {
+"box": [
+403.0,
+343.0,
+422.0,
+361.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+381.0,
+446.0,
+427.0,
+467.0
+],
+"page": 1,
+"v": 182
+},
+"voters": {
+"box": [
+389.0,
+305.0,
+426.0,
+327.0
+],
+"page": 1,
+"v": 184
+},
+"yes": {
+"box": [
+668.0,
+308.0,
+701.0,
+331.0
+],
+"page": 1,
+"v": 161
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20180729_Pilisborosjeno_eredmeny.pdf|2018. július 29.|Pilisborosjenő|„Támogatja-e Ön az előző állapot visszaállítását a \"Várvölgy\" vonatkozásában a korábban hatályos HÉSZ szabályozásnak megfelelően, amennyiben a tulajdonosok a jelenleg Hatályos HÉSZ alapján benyújtott kártérítési igényüktől elállnak, melynek bírósági megítélése a község gazdálkodását ellehetetlenítené, és a lakosság terheit növelné.”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20180729_Pilisborosjeno_eredmeny.pdf",
+"note": "Arithmetic: 107+229=336 and 43+336=379 check, but voters appeared 381 != in_urn 379 + unused 0 (differs by 2) on the form itself. Stamp: 'ERVENYTELEN' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+400.0,
+312.0,
+436.0,
+331.0
+],
+"page": 1,
+"v": 3052
+},
+"in_urn": {
+"box": [
+375.0,
+416.0,
+426.0,
+446.0
+],
+"page": 1,
+"v": 379
+},
+"invalid": {
+"box": [
+385.0,
+452.0,
+424.0,
+483.0
+],
+"page": 1,
+"v": 43
+},
+"no": {
+"box": [
+664.0,
+414.0,
+726.0,
+444.0
+],
+"page": 1,
+"v": 229
+},
+"unused": {
+"box": [
+390.0,
+381.0,
+414.0,
+409.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+374.0,
+489.0,
+428.0,
+518.0
+],
+"page": 1,
+"v": 336
+},
+"voters": {
+"box": [
+379.0,
+344.0,
+428.0,
+372.0
+],
+"page": 1,
+"v": 381
+},
+"yes": {
+"box": [
+668.0,
+340.0,
+724.0,
+373.0
+],
+"page": 1,
+"v": 107
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20180819_szentkiraly_eredmeny.pdf|2018. augusztus 19.|Szentkirály|„Ön szerint az M44 gyorsút Szentkirály-Kecskemét leágazása létesítésével összefüggésben a Szentkirály közigazgatási területén áthaladó 4623. és 4622. jelű országos közutak fejlesztésének melyik változata szerint módosítsa a képviselő-testület a helyi településrendezési eszközöket az alábbiak közül: O I. változat: főúttá minősítés kétoldali szerviz utakkal és belterületi elkerülővel; O II. változat: mellékút kerékpárúttal a belterületen át; O II.a. változat: mellékút kerékpárúttal és belterületi elkerülővel?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20180819_szentkiraly_eredmeny.pdf",
+"note": "Single-page protocol. 'ÉRVÉNYES ÉS EREDMÉNYES' underlined. E (difference) = 0. Arithmetic checks: 18+21+866=905; 1+905=906; 906=906+0.",
+"other": [
+{
+"box": [
+597.0,
+512.0,
+623.0,
+531.0
+],
+"label": "I. változat",
+"page": 1,
+"v": 18
+},
+{
+"box": [
+597.0,
+540.0,
+623.0,
+559.0
+],
+"label": "II. változat",
+"page": 1,
+"v": 21
+},
+{
+"box": [
+599.0,
+575.0,
+635.0,
+594.0
+],
+"label": "II.a. változat",
+"page": 1,
+"v": 866
+}
+],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+458.0,
+495.0,
+500.0,
+513.0
+],
+"page": 1,
+"v": 1571
+},
+"in_urn": {
+"box": [
+460.0,
+545.0,
+496.0,
+561.0
+],
+"page": 1,
+"v": 906
+},
+"invalid": {
+"box": [
+471.0,
+576.0,
+491.0,
+593.0
+],
+"page": 1,
+"v": 1
+},
+"unused": {
+"box": [
+470.0,
+528.0,
+494.0,
+545.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+457.0,
+592.0,
+496.0,
+609.0
+],
+"page": 1,
+"v": 905
+},
+"voters": {
+"box": [
+460.0,
+513.0,
+496.0,
+531.0
+],
+"page": 1,
+"v": 906
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20181125_Komlo_eredmeny.pdf|2018. november 25.|Komló|„Egyetért-e Ön azzal, hogy Komló Város Önkormányzata Mánfa Község Önkormányzatával területcserére vonatkozó megállapodást kössön, melynek alapján a 2019. évi általános önkormányzati választás napjával a mánfai 0309/1-25, 0310/1-11, 0310/13-14, 0311, 0312/1-4, 0313/1, 0314-0315, 0318, 0321/1, 0322/1-26, 0323-0325, 0326/1-2, 0326/4-6, 0327, 0339/2, 0339/8, 0380/2, 0380/8-23, 0382-0383, 0384/1-3, 0385-0393, 0394/2, 0396-0398, 0400, 0459/4 helyrajzi szám alatti területek Komló város közigazgatási területéhez, a komlói 0411-0424, 0425/1-2, 0426-0431, 0433-0441, 0442/1-13, 0443, 0444/1-10, 0445, 0446/1-10, 0447, 0448/1-9, 0449, 0450/1-7, 0451 helyrajzi szám alatti területek – így az Ön által lakott ingatlan is – Mánfa község közigazgatási területéhez kerüljenek átcsatolásra?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20181125_Komlo_eredmeny.pdf",
+"note": "2018 style form (only the affected area's voters, A=34). 'ERVENYES ES EREDMENYES' is underlined. Arithmetic ok: 9+13=22, 0+22=22, 22+0=22.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+421.0,
+336.0,
+442.0,
+354.0
+],
+"page": 1,
+"v": 34
+},
+"in_urn": {
+"box": [
+403.0,
+428.0,
+439.0,
+456.0
+],
+"page": 1,
+"v": 22
+},
+"invalid": {
+"box": [
+406.0,
+463.0,
+432.0,
+486.0
+],
+"page": 1,
+"v": 0
+},
+"no": {
+"box": [
+671.0,
+424.0,
+706.0,
+456.0
+],
+"page": 1,
+"v": 13
+},
+"unused": {
+"box": [
+404.0,
+396.0,
+431.0,
+419.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+398.0,
+493.0,
+439.0,
+521.0
+],
+"page": 1,
+"v": 22
+},
+"voters": {
+"box": [
+403.0,
+364.0,
+442.0,
+391.0
+],
+"page": 1,
+"v": 22
+},
+"yes": {
+"box": [
+673.0,
+361.0,
+701.0,
+389.0
+],
+"page": 1,
+"v": 9
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/20181125_Manfa_eredmeny.pdf|2018. november 25.|Mánfa|„Egyetért-e Ön azzal, hogy Mánfa Község Önkormányzata Komló Város Önkormányzatával területcserére vonatkozó megállapodást kössön, melynek alapján a 2019. évi általános önkormányzati választás napjával a komlói 0411-0424, 0425/1-2, 0426-0431, 0433-0441, 0442/1-13, 0443, 0444/1-10, 0445, 0446/1-10, 0447, 0448/1-9, 0449, 0450/1-7, 0451 helyrajzi szám alatti területek Mánfa község közigazgatási területéhez, a mánfai 0309/1-25, 0310/1-11, 0310/13-14, 0311, 0312/1-4, 0313/1, 0314-0315, 0318, 0321/1, 0322/1-26, 0323-0325, 0326/1-2, 0326/4-6, 0327, 0339/2, 0339/8, 0380/2, 0380/8-23, 0382-0383, 0384/1-3, 0385-0393, 0394/2, 0396-0398, 0400, 0459/4 helyrajzi számalatti területek – így az Ön által lakott ingatlan is – Komló város közigazgatási területéhez kerüljenek átcsatolásra?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/20181125_Manfa_eredmeny.pdf",
+"note": "Stamp: line drawn under 'ÉRVÉNYES ÉS EREDMÉNYES*'.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+426.0,
+358.0,
+440.0,
+374.0
+],
+"page": 1,
+"v": 4
+},
+"in_urn": {
+"box": [
+409.0,
+444.0,
+431.0,
+469.0
+],
+"page": 1,
+"v": 3
+},
+"invalid": {
+"box": [
+409.0,
+474.0,
+431.0,
+501.0
+],
+"page": 1,
+"v": 0
+},
+"no": {
+"box": [
+649.0,
+439.0,
+676.0,
+469.0
+],
+"page": 1,
+"v": 0
+},
+"unused": {
+"box": [
+409.0,
+414.0,
+431.0,
+439.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+404.0,
+506.0,
+427.0,
+532.0
+],
+"page": 1,
+"v": 3
+},
+"voters": {
+"box": [
+409.0,
+383.0,
+431.0,
+411.0
+],
+"page": 1,
+"v": 3
+},
+"yes": {
+"box": [
+654.0,
+381.0,
+676.0,
+404.0
+],
+"page": 1,
+"v": 3
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/Eredmeny_jk_Madocsa_180610.pdf|2018. június 10.|Madocsa|„Akarja-e Ön, hogy Madocsa Község Önkormányzatának Képviselő-testülete a településrendezési tervében tilalmazza a kavics- és homokbányászatot érintő külszíni bányatelek nyitását illetve fektetését Madocsa közigazgatási területén?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/Eredmeny_jk_Madocsa_180610.pdf",
+"note": "Arithmetic ok: yes+no=valid; invalid+valid=1207=in_urn=voters. 'Érvényes és eredményes' underlined. Electors 1571 is typed. 1156+43=1199; 8+1199=1207.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+395.0,
+285.0,
+430.0,
+302.0
+],
+"page": 2,
+"v": 1571
+},
+"in_urn": {
+"box": [
+362.0,
+379.0,
+427.0,
+405.0
+],
+"page": 2,
+"v": 1207
+},
+"invalid": {
+"box": [
+375.0,
+418.0,
+415.0,
+445.0
+],
+"page": 2,
+"v": 8
+},
+"no": {
+"box": [
+648.0,
+383.0,
+696.0,
+410.0
+],
+"page": 2,
+"v": 43
+},
+"unused": {
+"box": [
+375.0,
+348.0,
+423.0,
+374.0
+],
+"page": 2,
+"v": 0
+},
+"valid": {
+"box": [
+362.0,
+451.0,
+427.0,
+479.0
+],
+"page": 2,
+"v": 1199
+},
+"voters": {
+"box": [
+362.0,
+314.0,
+427.0,
+341.0
+],
+"page": 2,
+"v": 1207
+},
+"yes": {
+"box": [
+642.0,
+316.0,
+704.0,
+344.0
+],
+"page": 2,
+"v": 1156
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/Eredmeny_jk_Madocsa_180610.pdf|2018. június 10.|Madocsa|„Támogatja-e Ön, hogy Madocsa Község közigazgatási területén homok- és kavicsbánya létesüljön?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/Eredmeny_jk_Madocsa_180610.pdf",
+"note": "Arithmetic ok: yes+no=valid; invalid+valid=1207=in_urn=voters. 'Érvényes és eredményes' underlined. Electors 1571 is typed. 23+1179=1202; 5+1202=1207.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+395.0,
+278.0,
+430.0,
+294.0
+],
+"page": 1,
+"v": 1571
+},
+"in_urn": {
+"box": [
+363.0,
+367.0,
+427.0,
+398.0
+],
+"page": 1,
+"v": 1207
+},
+"invalid": {
+"box": [
+375.0,
+401.0,
+418.0,
+428.0
+],
+"page": 1,
+"v": 5
+},
+"no": {
+"box": [
+645.0,
+368.0,
+703.0,
+396.0
+],
+"page": 1,
+"v": 1179
+},
+"unused": {
+"box": [
+375.0,
+334.0,
+423.0,
+363.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+363.0,
+434.0,
+427.0,
+463.0
+],
+"page": 1,
+"v": 1202
+},
+"voters": {
+"box": [
+363.0,
+302.0,
+427.0,
+329.0
+],
+"page": 1,
+"v": 1207
+},
+"yes": {
+"box": [
+648.0,
+303.0,
+698.0,
+326.0
+],
+"page": 1,
+"v": 23
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/554968/eredmeny_jkv_BpVI_ker_180218.pdf|2018. február 18.|Budapest VII. kerület|„Egyetért-e Ön azzal, hogy Budapest Főváros VII. Kerület Erzsébetvárosi Önkormányzat Képviselő-testülete Budapest VII. kerület Károly körút- Király utca- Erzsébet körút- Rákóczi út által határolt területén úgy szabályozza az üzletek nyitvatartási rendjét, hogy a vendéglátást folytató üzletek 24.00 óra és 6.00 óra között nem tarthatnak nyitva?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/554968/eredmeny_jkv_BpVI_ker_180218.pdf",
+"note": "Single-page 2018 form. valid=yes+no (6888) and in_urn=invalid+valid (6918) check. Does not add up on the form itself: voters appeared B=6920 but unstamped C=0 + stamped D=6918 = 6918 (difference of 2). 'ÉRVÉNYTELEN' is underlined (blue).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+398.0,
+310.0,
+436.0,
+327.0
+],
+"page": 1,
+"v": 43520
+},
+"in_urn": {
+"box": [
+375.0,
+410.0,
+426.0,
+431.0
+],
+"page": 1,
+"v": 6918
+},
+"invalid": {
+"box": [
+395.0,
+445.0,
+426.0,
+464.0
+],
+"page": 1,
+"v": 30
+},
+"no": {
+"box": [
+654.0,
+410.0,
+708.0,
+433.0
+],
+"page": 1,
+"v": 2316
+},
+"unused": {
+"box": [
+403.0,
+379.0,
+424.0,
+396.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+375.0,
+477.0,
+426.0,
+498.0
+],
+"page": 1,
+"v": 6888
+},
+"voters": {
+"box": [
+375.0,
+342.0,
+426.0,
+362.0
+],
+"page": 1,
+"v": 6920
+},
+"yes": {
+"box": [
+655.0,
+341.0,
+718.0,
+364.0
+],
+"page": 1,
+"v": 4572
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Bezenye_7_2022_HVB_hatarozat.pdf|2022. október 9.|Bezenye|„Akarja-e Ön, hogy a bezenyei mezőgazdasági termelőszövetkezet területén több, mint 100 lakótelek kerüljön kialakításra?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Bezenye_7_2022_HVB_hatarozat.pdf",
+"note": "Page 4 is the signed protocol (scanned slightly rotated). Pages 1-3 are the committee decision with the same totals and a per-polling-station table (not used). Stamp: 'ÉRVÉNYTELEN' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+388.0,
+269.0,
+436.0,
+290.0
+],
+"page": 4,
+"v": 1340
+},
+"in_urn": {
+"box": [
+388.0,
+373.0,
+436.0,
+400.0
+],
+"page": 4,
+"v": 637
+},
+"invalid": {
+"box": [
+400.0,
+406.0,
+426.0,
+434.0
+],
+"page": 4,
+"v": 9
+},
+"no": {
+"box": [
+674.0,
+380.0,
+726.0,
+412.0
+],
+"page": 4,
+"v": 595
+},
+"unused": {
+"box": [
+405.0,
+337.0,
+430.0,
+364.0
+],
+"page": 4,
+"v": 0
+},
+"valid": {
+"box": [
+366.0,
+446.0,
+414.0,
+476.0
+],
+"page": 4,
+"v": 628
+},
+"voters": {
+"box": [
+388.0,
+303.0,
+436.0,
+330.0
+],
+"page": 4,
+"v": 637
+},
+"yes": {
+"box": [
+694.0,
+312.0,
+736.0,
+344.0
+],
+"page": 4,
+"v": 33
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Biatorbagy_eredmeny_jegyzokonyv.pdf|2022. június 26.|Biatorbágy|„Egyetért-e Ön azzal, hogy a Budapest-Balaton kerékpárút Biatorbágy belterületi szakasza ne a Szabadság út – Nagy utca nyomvonalon kerüljön kiépítésre?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Biatorbagy_eredmeny_jegyzokonyv.pdf",
+"note": "2022 form. All arithmetic checks (3901+422=4323, 11+4323=4334, 4334+0=4334). No outcome alternative underlined or marked, although the status is invalid (turnout 35.9%).",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+389.0,
+276.0,
+426.0,
+292.0
+],
+"page": 1,
+"v": 12094
+},
+"in_urn": {
+"box": [
+378.0,
+374.0,
+424.0,
+399.0
+],
+"page": 1,
+"v": 4334
+},
+"invalid": {
+"box": [
+394.0,
+413.0,
+417.0,
+436.0
+],
+"page": 1,
+"v": 11
+},
+"no": {
+"box": [
+673.0,
+384.0,
+712.0,
+409.0
+],
+"page": 1,
+"v": 422
+},
+"unused": {
+"box": [
+401.0,
+343.0,
+419.0,
+367.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+371.0,
+444.0,
+421.0,
+472.0
+],
+"page": 1,
+"v": 4323
+},
+"voters": {
+"box": [
+389.0,
+308.0,
+427.0,
+336.0
+],
+"page": 1,
+"v": 4334
+},
+"yes": {
+"box": [
+646.0,
+308.0,
+706.0,
+336.0
+],
+"page": 1,
+"v": 3901
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Boncfolde_7_2022_XI_27_nepszavazas.pdf|2022. november 27.|Boncodfölde|„Egyetért-e Ön azzal, hogy Boncodfölde Község belterületén és külterületén távközlési antennatartó torony épülhessen?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Boncfolde_7_2022_XI_27_nepszavazas.pdf",
+"note": "Protocol is page 4 (pages 1-3 are the committee's decision 7/2022 HVB, which states the same figures: 298, 152, 0, 152, 0, 152, 33, 119; valid and effective). A is printed (typed), the rest handwritten. Underline under 'ERVENYES ES EREDMENYES'. NO read as 119 (last digit open loop). Arithmetic ok: 33+119=152, 0+152=152, 152+0=152.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+400.0,
+258.0,
+428.0,
+276.0
+],
+"page": 4,
+"v": 298
+},
+"in_urn": {
+"box": [
+368.0,
+361.0,
+427.0,
+391.0
+],
+"page": 4,
+"v": 152
+},
+"invalid": {
+"box": [
+398.0,
+398.0,
+423.0,
+426.0
+],
+"page": 4,
+"v": 0
+},
+"no": {
+"box": [
+670.0,
+356.0,
+723.0,
+389.0
+],
+"page": 4,
+"v": 119
+},
+"unused": {
+"box": [
+398.0,
+324.0,
+422.0,
+354.0
+],
+"page": 4,
+"v": 0
+},
+"valid": {
+"box": [
+375.0,
+433.0,
+428.0,
+462.0
+],
+"page": 4,
+"v": 152
+},
+"voters": {
+"box": [
+368.0,
+286.0,
+422.0,
+316.0
+],
+"page": 4,
+"v": 152
+},
+"yes": {
+"box": [
+678.0,
+283.0,
+722.0,
+314.0
+],
+"page": 4,
+"v": 33
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Tata_13_2022_HVB_hatarozat.pdf|2022. július 31.|Tata|„Egyetért-e Ön azzal, hogy a Tata, 1841 hrsz-ú (Esterházy műemlék lóistálló és lovas pálya) ingatlannal szomszédos telkeken gépjármű-közlekedésre alkalmas út ne épüljön, és az ott már meglévő utat se lehessen kiszélesíteni?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Tata_13_2022_HVB_hatarozat.pdf",
+"note": "Settlement total protocol is page 5 (handwritten digits on 2019-style form); pages 1-3 are the committee's typed decision/justification repeating the same totals with a per-polling-station table, page 4 and 6 are blank. valid=yes+no and in_urn=invalid+valid check. Does not add up on the form itself: unused 3 + stamped in urn 8357 = 8360 vs voters appeared 8361 (difference 1; the typed decision on page 1 gives the same figures). 'ÉRVÉNYTELEN' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+384.0,
+298.0,
+436.0,
+320.0
+],
+"page": 5,
+"v": 20560
+},
+"in_urn": {
+"box": [
+365.0,
+393.0,
+436.0,
+428.0
+],
+"page": 5,
+"v": 8357
+},
+"invalid": {
+"box": [
+380.0,
+435.0,
+430.0,
+462.0
+],
+"page": 5,
+"v": 53
+},
+"no": {
+"box": [
+655.0,
+393.0,
+715.0,
+430.0
+],
+"page": 5,
+"v": 517
+},
+"unused": {
+"box": [
+388.0,
+364.0,
+416.0,
+388.0
+],
+"page": 5,
+"v": 3
+},
+"valid": {
+"box": [
+365.0,
+464.0,
+436.0,
+500.0
+],
+"page": 5,
+"v": 8304
+},
+"voters": {
+"box": [
+365.0,
+327.0,
+434.0,
+360.0
+],
+"page": 5,
+"v": 8361
+},
+"yes": {
+"box": [
+645.0,
+324.0,
+726.0,
+358.0
+],
+"page": 5,
+"v": 7787
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Tata_14_2022_HVB_hatarozat.pdf|2022. július 31.|Tata|„Egyetért-e Ön azzal, hogy a Tata, 1841 hrsz-ú (Esterházy műemlék lóistálló és lovas pálya) ingatlanra vonatkozóan a város településképi rendelete (29/2018. (XII.20.)) és helyi építési szabályzata (38/2005. (XII.6.)) a 2020. február 28-án hatályos állapotában maradjon?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Tata_14_2022_HVB_hatarozat.pdf",
+"note": "No handwritten form: figures are the printed totals in the Tata Local Election Committee decision 14/2022 (page 2 list, repeated in the text on page 1; page 3 only has the per-polling-station table, 19 stations, not used). Arithmetic: 7800+502=8302 and 58+8302=8360 check, but voters 8361 != in_urn 8360 + unused 2 = 8362 (differs by 1), as printed. Stamp null: no form; the decision text declares the referendum invalid (fewer than half of voters appeared).",
+"other": [],
+"stamp": null,
+"vals": {
+"electors": {
+"box": [
+582.0,
+787.0,
+637.0,
+805.0
+],
+"page": 2,
+"v": 20560
+},
+"in_urn": {
+"box": [
+590.0,
+847.0,
+637.0,
+865.0
+],
+"page": 2,
+"v": 8360
+},
+"invalid": {
+"box": [
+608.0,
+867.0,
+636.0,
+885.0
+],
+"page": 2,
+"v": 58
+},
+"no": {
+"box": [
+602.0,
+926.0,
+637.0,
+944.0
+],
+"page": 2,
+"v": 502
+},
+"unused": {
+"box": [
+610.0,
+827.0,
+637.0,
+845.0
+],
+"page": 2,
+"v": 2
+},
+"valid": {
+"box": [
+590.0,
+886.0,
+637.0,
+905.0
+],
+"page": 2,
+"v": 8302
+},
+"voters": {
+"box": [
+590.0,
+807.0,
+637.0,
+825.0
+],
+"page": 2,
+"v": 8361
+},
+"yes": {
+"box": [
+590.0,
+906.0,
+637.0,
+924.0
+],
+"page": 2,
+"v": 7800
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/5853375/Tata_15_2022_HVB_hatarozat.pdf|2022. július 31.|Tata|„Egyetért-e Ön azzal, hogy Tata Város Önkormányzata ne köthessen településfejlesztési szerződést a Tatai Öreg-tó Természetvédelmi Területén létesülő beruházáshoz kapcsolódóan, megőrizve ezzel a terület természeti és épített értékeit?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/5853375/Tata_15_2022_HVB_hatarozat.pdf",
+"note": "Settlement protocol on page 5 (page 2-3 of the decision list the same totals and 19 polling-station rows, ignored). 'ÉRVÉNYTELEN' underlined in blue. Figures match the decision text. Arithmetic: 7787+526=8313 ok; 46+8313=8359 ok; but in_urn 8359 + unused 1 = 8360, not voters 8361 (discrepancy on the form itself, not adjusted).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+366.0,
+318.0,
+430.0,
+340.0
+],
+"page": 5,
+"v": 20560
+},
+"in_urn": {
+"box": [
+366.0,
+414.0,
+430.0,
+446.0
+],
+"page": 5,
+"v": 8359
+},
+"invalid": {
+"box": [
+366.0,
+450.0,
+430.0,
+480.0
+],
+"page": 5,
+"v": 46
+},
+"no": {
+"box": [
+665.0,
+412.0,
+724.0,
+444.0
+],
+"page": 5,
+"v": 526
+},
+"unused": {
+"box": [
+366.0,
+378.0,
+430.0,
+406.0
+],
+"page": 5,
+"v": 1
+},
+"valid": {
+"box": [
+366.0,
+484.0,
+430.0,
+516.0
+],
+"page": 5,
+"v": 8313
+},
+"voters": {
+"box": [
+366.0,
+342.0,
+430.0,
+372.0
+],
+"page": 5,
+"v": 8361
+},
+"yes": {
+"box": [
+648.0,
+340.0,
+724.0,
+374.0
+],
+"page": 5,
+"v": 7787
+}
+}
+},
+"https://portal-api.valasztas.hu/documents/20182/6140870/Pilismarot_20230827_helyinepszavazas.pdf|2023. augusztus 27.|Pilismarót|„Egyetért-e Ön azzal, hogy Pilismarót község közigazgatási területén külfejtéses bányászati tevékenységet végezzenek, és ennek érdekében Pilismarót Község Önkormányzat Képviselőtestülete a bányászati tevékenységgel igénybe venni tervezett területet a településrendezési tervben nyersanyag-kitermelés (bánya) vagy nyersanyag-feldolgozás céljára szolgáló különleges beépítésre szánt vagy beépítésre nem szánt övezetbe sorolja?”": {
+"document": "https://portal-api.valasztas.hu/documents/20182/6140870/Pilismarot_20230827_helyinepszavazas.pdf",
+"note": "Arithmetic checks. \"ERVENYTELEN\" underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+385.0,
+306.0,
+450.0,
+336.0
+],
+"page": 1,
+"v": 1910
+},
+"in_urn": {
+"box": [
+378.0,
+414.0,
+450.0,
+447.0
+],
+"page": 1,
+"v": 781
+},
+"invalid": {
+"box": [
+378.0,
+449.0,
+450.0,
+483.0
+],
+"page": 1,
+"v": 11
+},
+"no": {
+"box": [
+671.0,
+410.0,
+748.0,
+447.0
+],
+"page": 1,
+"v": 672
+},
+"unused": {
+"box": [
+378.0,
+377.0,
+450.0,
+411.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+378.0,
+485.0,
+450.0,
+519.0
+],
+"page": 1,
+"v": 770
+},
+"voters": {
+"box": [
+378.0,
+340.0,
+450.0,
+374.0
+],
+"page": 1,
+"v": 781
+},
+"yes": {
+"box": [
+673.0,
+338.0,
+749.0,
+373.0
+],
+"page": 1,
+"v": 98
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c2fcdaf60002949578/Érvénytelennépszavazás.pdf|2012. január 29.|Balatonvilágos, Veszptrém megye|„Egyetért-e Ön azzal, hogy Balatonvilágos község teljes közigazgatási területével elhagyja Veszprém megyét, és Somogy megyéhez csatlakozzon?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c2fcdaf60002949578/Érvénytelennépszavazás.pdf",
+"note": "Electors 1217 and voters 538 are on page 2 (page=2); the rest on page 3. Unused ballots not on form (null). Arithmetic checks: 426+107=533, 5+533=538. Stamp: 'Ervenytelen' underlined.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+162.0,
+412.0,
+238.0,
+442.0
+],
+"page": 2,
+"v": 1217
+},
+"in_urn": {
+"box": [
+187.0,
+482.0,
+245.0,
+511.0
+],
+"page": 3,
+"v": 538
+},
+"invalid": {
+"box": [
+455.0,
+482.0,
+478.0,
+511.0
+],
+"page": 3,
+"v": 5
+},
+"no": {
+"box": [
+318.0,
+677.0,
+405.0,
+706.0
+],
+"page": 3,
+"v": 107
+},
+"valid": {
+"box": [
+562.0,
+482.0,
+616.0,
+511.0
+],
+"page": 3,
+"v": 533
+},
+"voters": {
+"box": [
+665.0,
+412.0,
+720.0,
+442.0
+],
+"page": 2,
+"v": 538
+},
+"yes": {
+"box": [
+212.0,
+677.0,
+298.0,
+706.0
+],
+"page": 3,
+"v": 426
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c3ff8da10002863ce5/Érvénytelennépszavazás.pdf|2012. február 5.|Mátraterenye, Nógrád megye|„Akarja-e Ön, hogy kiváljon Mátraterenyéből, és önálló településként működjön Nádújfalu?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c3ff8da10002863ce5/Érvénytelennépszavazás.pdf",
+"note": "Electors=A/C (616; box on A, page 2), voters=E=231 on page 2 (form B); D=4 re-requested. In urn F=230, G=-1 consistent with E-F. unused null. Only 'Érvénytelen' not struck through. Arithmetic checks.",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+155.0,
+497.0,
+222.0,
+532.0
+],
+"page": 3,
+"v": 616
+},
+"in_urn": {
+"box": [
+195.0,
+425.0,
+260.0,
+465.0
+],
+"page": 3,
+"v": 230
+},
+"invalid": {
+"box": [
+462.0,
+425.0,
+500.0,
+465.0
+],
+"page": 3,
+"v": 1
+},
+"no": {
+"box": [
+345.0,
+630.0,
+402.0,
+670.0
+],
+"page": 3,
+"v": 29
+},
+"valid": {
+"box": [
+555.0,
+425.0,
+620.0,
+465.0
+],
+"page": 3,
+"v": 229
+},
+"voters": {
+"box": [
+610.0,
+498.0,
+690.0,
+534.0
+],
+"page": 3,
+"v": 231
+},
+"yes": {
+"box": [
+205.0,
+630.0,
+270.0,
+670.0
+],
+"page": 3,
+"v": 200
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi Aquasziget élményfürdő üzemeltetésével azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, a város számára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-3).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 12,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+529.0,
+248.0,
+565.0
+],
+"page": 12,
+"v": 8210
+},
+"invalid": {
+"box": [
+452.0,
+529.0,
+520.0,
+565.0
+],
+"page": 12,
+"v": 53
+},
+"no": {
+"box": [
+300.0,
+728.0,
+368.0,
+764.0
+],
+"page": 12,
+"v": 122
+},
+"valid": {
+"box": [
+555.0,
+529.0,
+645.0,
+565.0
+],
+"page": 12,
+"v": 8157
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 12,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+728.0,
+274.0,
+764.0
+],
+"page": 12,
+"v": 8035
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi intézmények közétkeztetésével azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, a város számára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=+3).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 11,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+512.0,
+248.0,
+548.0
+],
+"page": 11,
+"v": 8216
+},
+"invalid": {
+"box": [
+452.0,
+512.0,
+520.0,
+548.0
+],
+"page": 11,
+"v": 47
+},
+"no": {
+"box": [
+300.0,
+710.0,
+368.0,
+746.0
+],
+"page": 11,
+"v": 120
+},
+"valid": {
+"box": [
+555.0,
+512.0,
+645.0,
+548.0
+],
+"page": 11,
+"v": 8169
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 11,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+710.0,
+274.0,
+746.0
+],
+"page": 11,
+"v": 8049
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi parkolók és parkolóházak üzemeltetésével azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, az önkormányzat által meghatározott parkolási díjak mellett, a város számára a legnagyobb jövedelmet biztosító ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-3).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 6,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+530.0,
+248.0,
+566.0
+],
+"page": 6,
+"v": 8210
+},
+"invalid": {
+"box": [
+452.0,
+530.0,
+520.0,
+566.0
+],
+"page": 6,
+"v": 67
+},
+"no": {
+"box": [
+300.0,
+730.0,
+368.0,
+766.0
+],
+"page": 6,
+"v": 155
+},
+"valid": {
+"box": [
+555.0,
+530.0,
+645.0,
+566.0
+],
+"page": 6,
+"v": 8143
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 6,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+730.0,
+274.0,
+766.0
+],
+"page": 6,
+"v": 7988
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi piac működtetésével azt a pályázót bízza meg, aki Esztergom Város Önkormányzata által e célból kiírt nyílt közbeszerzési pályázaton a város számára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-3).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 4,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+528.0,
+248.0,
+564.0
+],
+"page": 4,
+"v": 8210
+},
+"invalid": {
+"box": [
+452.0,
+528.0,
+520.0,
+564.0
+],
+"page": 4,
+"v": 48
+},
+"no": {
+"box": [
+300.0,
+727.0,
+368.0,
+763.0
+],
+"page": 4,
+"v": 127
+},
+"valid": {
+"box": [
+555.0,
+528.0,
+645.0,
+564.0
+],
+"page": 4,
+"v": 8162
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 4,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+727.0,
+274.0,
+763.0
+],
+"page": 4,
+"v": 8035
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi temetők üzemeltetésével azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, a temetkezési költségek minimalizálása mellett, a temetők fenntartására és a temetői szolgáltatások színvonalára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-3).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 5,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+528.0,
+248.0,
+564.0
+],
+"page": 5,
+"v": 8210
+},
+"invalid": {
+"box": [
+452.0,
+528.0,
+520.0,
+564.0
+],
+"page": 5,
+"v": 46
+},
+"no": {
+"box": [
+300.0,
+727.0,
+368.0,
+763.0
+],
+"page": 5,
+"v": 127
+},
+"valid": {
+"box": [
+555.0,
+528.0,
+645.0,
+564.0
+],
+"page": 5,
+"v": 8164
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 5,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+727.0,
+274.0,
+763.0
+],
+"page": 5,
+"v": 8037
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi tulajdonú ingatlanok üzemeltetésével, hasznosításával és értékesítésével azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, a város számára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-4). A scan line runs through the yes figure; read as 7997 (7997+142=8139 confirms).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 7,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+528.0,
+248.0,
+564.0
+],
+"page": 7,
+"v": 8209
+},
+"invalid": {
+"box": [
+452.0,
+528.0,
+520.0,
+564.0
+],
+"page": 7,
+"v": 70
+},
+"no": {
+"box": [
+300.0,
+730.0,
+368.0,
+766.0
+],
+"page": 7,
+"v": 142
+},
+"valid": {
+"box": [
+555.0,
+528.0,
+645.0,
+564.0
+],
+"page": 7,
+"v": 8139
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 7,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+730.0,
+274.0,
+766.0
+],
+"page": 7,
+"v": 7997
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzata a városi tulajdonú közterületeken lévő óriásplakátok üzemeltetésével, hasznosításával azt a pályázót bízza meg, aki az önkormányzat által e célból kiírt nyílt közbeszerzési pályázaton, a város számára összességében a legkedvezőbb ajánlatot adta?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-6).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 9,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+529.0,
+248.0,
+565.0
+],
+"page": 9,
+"v": 8207
+},
+"invalid": {
+"box": [
+452.0,
+529.0,
+520.0,
+565.0
+],
+"page": 9,
+"v": 68
+},
+"no": {
+"box": [
+300.0,
+727.0,
+368.0,
+763.0
+],
+"page": 9,
+"v": 127
+},
+"valid": {
+"box": [
+555.0,
+529.0,
+645.0,
+565.0
+],
+"page": 9,
+"v": 8139
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 9,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+727.0,
+274.0,
+763.0
+],
+"page": 9,
+"v": 8012
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzatának képviselő testülete a települési szilárdhulladék kezelési közszolgáltatásról szóló 10/2004 (IV.1.) esztergomi önkormányzati rendeletét úgy módosítsa, hogy az megfeleljen a 2000. évi XLIII tv. a hulladékgazdálkodásról, valamint a 64/2008.(III.28.) Korm. rendelet a települési hulladékkezelési közszolgáltatási díj megállapításának részletes szakmai szabályairól szóló jogszabályoknak?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-5).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 3,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+530.0,
+248.0,
+566.0
+],
+"page": 3,
+"v": 8208
+},
+"invalid": {
+"box": [
+452.0,
+530.0,
+520.0,
+566.0
+],
+"page": 3,
+"v": 48
+},
+"no": {
+"box": [
+300.0,
+724.0,
+368.0,
+760.0
+],
+"page": 3,
+"v": 118
+},
+"valid": {
+"box": [
+555.0,
+530.0,
+645.0,
+566.0
+],
+"page": 3,
+"v": 8160
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 3,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+724.0,
+274.0,
+760.0
+],
+"page": 3,
+"v": 8042
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzatának képviselő-testülete hozzon határozatot arról, hogy a magánvádas perek költségeinek megtérítésére közpénzből ne történhessen kifizetés, az érintettek maguk legyenek kötelesek ennek költségeit viselni?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-5).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 10,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+529.0,
+248.0,
+565.0
+],
+"page": 10,
+"v": 8208
+},
+"invalid": {
+"box": [
+452.0,
+529.0,
+520.0,
+565.0
+],
+"page": 10,
+"v": 49
+},
+"no": {
+"box": [
+300.0,
+730.0,
+368.0,
+766.0
+],
+"page": 10,
+"v": 120
+},
+"valid": {
+"box": [
+555.0,
+529.0,
+645.0,
+565.0
+],
+"page": 10,
+"v": 8159
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 10,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+730.0,
+274.0,
+766.0
+],
+"page": 10,
+"v": 8039
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzatának képviselő-testülete hozzon határozatot arról, hogy az önkormányzat javára esztergomi ingatlanokra bejegyzett elővásárlási jogok az ingatlan-nyilvántartásban törlésre kerüljenek?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=-4).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 8,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+528.0,
+248.0,
+564.0
+],
+"page": 8,
+"v": 8209
+},
+"invalid": {
+"box": [
+452.0,
+528.0,
+520.0,
+564.0
+],
+"page": 8,
+"v": 67
+},
+"no": {
+"box": [
+300.0,
+730.0,
+368.0,
+766.0
+],
+"page": 8,
+"v": 274
+},
+"valid": {
+"box": [
+555.0,
+528.0,
+645.0,
+564.0
+],
+"page": 8,
+"v": 8142
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 8,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+730.0,
+274.0,
+766.0
+],
+"page": 8,
+"v": 7868
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf|2012. március 25.|Esztergom, Komárom-Esztergom megye|„Egyetért-e Ön azzal, hogy Esztergom Város Önkormányzatának képviselő-testülete hozzon határozatot, a Szent Miklós Alap keretében a már megkötött szerződések teljesítésének meghiúsulása okait feltáró – a képviselő-testülettől független – szakértői bizottság felállításáról?”": {
+"document": "https://portal-api.valasztas.hu/files/694190c5ff8da10002863ce8/Érvénytelennépszavazás.pdf",
+"note": "Electors=C (23759, register at close) and voters=E (8213) with boxes on page 2 (form B, shared by all questions; E digits read as 8213, consistent with F+G on each C page). Nyirád and other-place questions are not in this document. Only 'Érvénytelen' not struck through. unused null. Arithmetic checks (valid=yes+no, in_urn=invalid+valid, voters+G=in_urn with G=+1).",
+"other": [],
+"stamp": "invalid",
+"vals": {
+"electors": {
+"box": [
+372.0,
+452.0,
+456.0,
+486.0
+],
+"page": 13,
+"v": 23759
+},
+"in_urn": {
+"box": [
+170.0,
+529.0,
+248.0,
+565.0
+],
+"page": 13,
+"v": 8214
+},
+"invalid": {
+"box": [
+452.0,
+529.0,
+520.0,
+565.0
+],
+"page": 13,
+"v": 75
+},
+"no": {
+"box": [
+300.0,
+730.0,
+368.0,
+766.0
+],
+"page": 13,
+"v": 157
+},
+"valid": {
+"box": [
+555.0,
+529.0,
+645.0,
+565.0
+],
+"page": 13,
+"v": 8139
+},
+"voters": {
+"box": [
+668.0,
+448.0,
+740.0,
+484.0
+],
+"page": 13,
+"v": 8213
+},
+"yes": {
+"box": [
+188.0,
+730.0,
+274.0,
+766.0
+],
+"page": 13,
+"v": 7982
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190c8ff8da10002863cf1/Érvényesnépszavazás.pdf|2012. augusztus 5.|Balatonkenese, Veszprém megye|\"Egyetért-e Ön azzal, hogy Balatonakarattya településrész Balatonkenese Várostól leváljon, és utána önálló önkormányzattal rendelkező új községként jöjjön létre és működjön tovább?\"": {
+"document": "https://portal-api.valasztas.hu/files/694190c8ff8da10002863cf1/Érvényesnépszavazás.pdf",
+"note": "Electors (A 779) and voters (E 476) are on page 2 (box 'pg':2). Page 3 shows 'Érvényes és eredményes' unstruck (other two struck). Fax-quality scan. Arithmetic checks.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+142.0,
+492.0,
+208.0,
+528.0
+],
+"page": 2,
+"v": 779
+},
+"in_urn": {
+"box": [
+188.0,
+466.0,
+252.0,
+504.0
+],
+"page": 3,
+"v": 476
+},
+"invalid": {
+"box": [
+462.0,
+474.0,
+497.0,
+506.0
+],
+"page": 3,
+"v": 3
+},
+"no": {
+"box": [
+318.0,
+670.0,
+374.0,
+704.0
+],
+"page": 3,
+"v": 57
+},
+"valid": {
+"box": [
+578.0,
+470.0,
+648.0,
+508.0
+],
+"page": 3,
+"v": 473
+},
+"voters": {
+"box": [
+658.0,
+500.0,
+722.0,
+534.0
+],
+"page": 2,
+"v": 476
+},
+"yes": {
+"box": [
+208.0,
+666.0,
+268.0,
+704.0
+],
+"page": 3,
+"v": 416
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190d1a66a3600028a762d/Érvényesnépszavazás.pdf|2024. november 24.|Márkó|„Akarja-e, hogy Márkó Önkormányzata felvegye a kapcsolatot a környező településekkel, önkormányzati környezetvédelmi társulás létrehozása céljából?”": {
+"document": "https://portal-api.valasztas.hu/files/694190d1a66a3600028a762d/Érvényesnépszavazás.pdf",
+"note": "Settlement total page 1 (pages 2-3 are polling stations 001 and 002). 727+21=748; 2+748=750. Checks ok.",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+380.0,
+268.0,
+430.0,
+292.0
+],
+"page": 1,
+"v": 1444
+},
+"in_urn": {
+"box": [
+362.0,
+362.0,
+410.0,
+388.0
+],
+"page": 1,
+"v": 750
+},
+"invalid": {
+"box": [
+372.0,
+396.0,
+398.0,
+420.0
+],
+"page": 1,
+"v": 2
+},
+"no": {
+"box": [
+625.0,
+360.0,
+672.0,
+390.0
+],
+"page": 1,
+"v": 21
+},
+"unused": {
+"box": [
+372.0,
+330.0,
+398.0,
+352.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+362.0,
+424.0,
+410.0,
+450.0
+],
+"page": 1,
+"v": 748
+},
+"voters": {
+"box": [
+362.0,
+300.0,
+410.0,
+326.0
+],
+"page": 1,
+"v": 750
+},
+"yes": {
+"box": [
+618.0,
+298.0,
+672.0,
+326.0
+],
+"page": 1,
+"v": 727
+}
+}
+},
+"https://portal-api.valasztas.hu/files/694190dfff8da10002863cf7/Érvényesnépszavazás.pdf|2024. november 24.|Márkó|„Akarja-e, hogy Márkó Önkormányzata településrendezési tervében tilalmazza új bányatelek nyitását Márkó közigazgatási területén?”": {
+"document": "https://portal-api.valasztas.hu/files/694190dfff8da10002863cf7/Érvényesnépszavazás.pdf",
+"note": "Page 1 is the settlement total (pages 2-3 are polling-station protocols 001 and 002, ignored). 'ÉRVÉNYES ÉS EREDMÉNYES' underlined. Arithmetic checks; station totals also sum (660+784=1444, 270+480=750).",
+"other": [],
+"stamp": "valid_effective",
+"vals": {
+"electors": {
+"box": [
+388.0,
+277.0,
+419.0,
+295.0
+],
+"page": 1,
+"v": 1444
+},
+"in_urn": {
+"box": [
+367.0,
+370.0,
+411.0,
+393.0
+],
+"page": 1,
+"v": 750
+},
+"invalid": {
+"box": [
+377.0,
+398.0,
+406.0,
+422.0
+],
+"page": 1,
+"v": 2
+},
+"no": {
+"box": [
+620.0,
+371.0,
+660.0,
+396.0
+],
+"page": 1,
+"v": 54
+},
+"unused": {
+"box": [
+378.0,
+334.0,
+402.0,
+358.0
+],
+"page": 1,
+"v": 0
+},
+"valid": {
+"box": [
+365.0,
+428.0,
+408.0,
+452.0
+],
+"page": 1,
+"v": 748
+},
+"voters": {
+"box": [
+367.0,
+302.0,
+411.0,
+326.0
+],
+"page": 1,
+"v": 750
+},
+"yes": {
+"box": [
+624.0,
+306.0,
+676.0,
+331.0
+],
+"page": 1,
+"v": 694
+}
+}
+}
+}
