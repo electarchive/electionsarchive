@@ -1,0 +1,1221 @@
+{
+  "polity": "MK",
+  "name": "North Macedonia",
+  "sources": {
+    "ustav": {
+      "title": "Устав на Република Северна Македонија",
+      "publisher": "Собрание на Република Северна Македонија",
+      "url": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf",
+      "kind": "official_body",
+      "note": "Adopted 17 November 1991. Arts. 62-63 (Assembly of 120 to 140 deputies, four-year term, elections in the last 90 days of the term or within 60 days of a dissolution), 73-74 (referendum), 80-81 (President, five-year term, two rounds), 104 (Judicial Council), 114-117 (municipalities, forms of neighborhood self-government, and the City of Skopje)."
+    },
+    "amandmani": {
+      "title": "Амандмани на Уставот на Република Северна Македонија",
+      "publisher": "Собрание на Република Северна Македонија",
+      "url": "https://www.sobranie.mk/WBStorage/Files/UstavnaRmizmeni.pdf",
+      "kind": "official_body",
+      "note": "Amendment XXVIII (2005) makes the Judicial Council 15 members, 8 of them elected by judges from among themselves; Amendment XXXI (9 January 2009) lets a presidential runoff winner take office if more than 40% of voters voted, replacing the earlier majority-turnout rule of art. 81(5)."
+    },
+    "izboren_zakonik": {
+      "title": "Изборен законик (Службен весник на Република Македонија бр. 40/2006, со измените)",
+      "publisher": "Државна изборна комисија",
+      "url": "https://www.sec.mk/",
+      "kind": "official_body",
+      "note": "The Electoral Code of 2006 governs presidential, Assembly, and local elections and the State Election Commission. It replaced the Law on the Election of Members of the Assembly (2002), the Law on Local Elections, and the Law on the Election of the President. The Commission's site carries the consolidated text; on 17 November 2026 it answered automated clients with a Cloudflare browser challenge (HTTP 403)."
+    },
+    "dik": {
+      "title": "Државна изборна комисија: избори и резултати",
+      "publisher": "Државна изборна комисија",
+      "url": "https://www.sec.mk/",
+      "kind": "official_body",
+      "note": "The Commission's results archive for presidential, Assembly, and local elections and referendums, with results by electoral district, municipality, and polling station for recent elections. On 17 November 2026 the site and its results subdomain answered automated clients with a Cloudflare browser challenge (HTTP 403)."
+    },
+    "zls": {
+      "title": "Закон за локалната самоуправа (Службен весник на Република Македонија бр. 5/2002)",
+      "publisher": "Министерство за локална самоуправа",
+      "url": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf",
+      "kind": "official_body",
+      "note": "Adopted 24 January 2002. Arts. 26-28 (citizens' initiative, citizens' gatherings, and municipal referendum on the request of 20% of voters), 31-35 (council of 9 to 33 members by population, elected for four years), 49 (mayor elected every fourth year), 82-86 (urban and local communities, whose councils are chosen at citizens' gatherings under the municipal statute)."
+    },
+    "zto": {
+      "title": "Закон за територијалната организација на локалната самоуправа во Република Македонија (Службен весник на Република Македонија бр. 55/2004)",
+      "publisher": "Министерство за локална самоуправа",
+      "url": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-dvEB.pdf",
+      "kind": "official_body",
+      "note": "Adopted 11 August 2004. Art. 3 (the City of Skopje is made up of the areas of its municipalities), art. 10 (84 municipalities, points 75-84 being the ten in the City of Skopje), art. 16 (Drugovo, Vraneštica, Zajas, and Oslomej to join Kičevo), art. 17 (the next local elections are held on this division)."
+    },
+    "zto_2013": {
+      "title": "Одлука за изменување на Одлуката за утврдување на бројот на членовите на советите на општините во Република Македонија (Службен весник на Република Македонија бр. 17/2013)",
+      "publisher": "Влада на Република Македонија",
+      "url": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-D7xn.pdf",
+      "kind": "official_body",
+      "note": "Government decision of 22 January 2013, published 31 January 2013: deletes points 40, 45, 48, and 62 (the four municipalities merged into Kičevo) and renumbers the list to 80 municipalities for the 2013 local elections; Kičevo's council grows from 19 to 23."
+    },
+    "zgs": {
+      "title": "Закон за градот Скопје (Службен весник на Република Македонија бр. 55/2004)",
+      "publisher": "Министерство за локална самоуправа",
+      "url": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-Z8l0.pdf",
+      "kind": "official_body",
+      "note": "Adopted 12 August 2004. Art. 19 (the organs of the City of Skopje and of its municipalities are a council and a mayor), art. 20 (the City council has 45 members), art. 21 (who may stand for the City council and mayor)."
+    },
+    "mls_zto": {
+      "title": "Извештај за оценка на спроведувањето на Законот за територијална организација на локалната самоуправа во Република Северна Македонија",
+      "publisher": "Министерство за локална самоуправа",
+      "url": "https://portal.mdt.gov.mk/post-body-files/lokalna-samouprava-1-file-jFl9.pdf",
+      "kind": "official_body",
+      "note": "Ministry evaluation report, December 2022: SR Macedonia had 34 municipalities from 1982; the 1996 territorial law created 123; the 2004 law created 84; 80 municipalities and the City of Skopje since the merger into Kičevo. Records the failed referendum of 7 November 2004 (turnout 26.58%) and 41 local referendums held from December 2003 to February 2004."
+    },
+    "mls_zls": {
+      "title": "Извештај за оценка на спроведувањето на Законот за локалната самоуправа",
+      "publisher": "Министерство за локална самоуправа",
+      "url": "https://portal.mdt.gov.mk/post-body-files/lokalna-samouprava-1-file-dMas.pdf",
+      "kind": "official_body",
+      "note": "Ministry evaluation report, April 2020: forms of citizen participation (arts. 26-29) and of neighborhood self-government (arts. 82-86); 56 municipalities had adopted an act on urban and local communities."
+    },
+    "dzs_ntes": {
+      "title": "Територијални единици: Номенклатура на територијални единици за статистика (НТЕС)",
+      "publisher": "Државен завод за статистика",
+      "url": "https://www.stat.gov.mk/OblastOpsto_en.aspx?id=1",
+      "kind": "official_body",
+      "note": "NTES (Official Gazette 158/2007, amended 10/2014 and 131/2019): 8 statistical regions (NTES 3), 80 municipalities (NTES 4), and 1,783 settlements (NTES 5) on 1 July 2019."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Република Северна Македонија",
+      "name_en": "North Macedonia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "ustav"
+    },
+    {
+      "key": "region",
+      "name": "Плански (статистички) региони",
+      "name_en": "Planning regions (statistical regions, NTES 3)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "mk.region",
+      "elects": false,
+      "source": "dzs_ntes",
+      "counts": [
+        {
+          "date": "2019-07-01",
+          "value": 8,
+          "source": "dzs_ntes",
+          "locator": "https://www.stat.gov.mk/OblastOpsto_en.aspx?id=1 (\"At NTES level 3 there are statistical regions (8 units)\")"
+        }
+      ]
+    },
+    {
+      "key": "opstina",
+      "name": "Општини",
+      "name_en": "Municipalities (including the ten municipalities of the City of Skopje)",
+      "parent": "region",
+      "polity_kind": "municipality",
+      "scheme": "mk.opstina",
+      "source": "zto",
+      "counts": [
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "value": 34,
+          "source": "mls_zto",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/lokalna-samouprava-1-file-jFl9.pdf (\"Во текот на 1982 г. настана нова поделба, па во СРМ имаше 34 општини\")"
+        },
+        {
+          "date": "1996-11-17",
+          "value": 123,
+          "source": "mls_zto",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/lokalna-samouprava-1-file-jFl9.pdf (\"Со Законот за територијална поделба на РМ ... од 1996 г. беа воведени 123 општини\"); the 1996 and 2000 local elections were held on this division"
+        },
+        {
+          "date": "2005-03-13",
+          "value": 84,
+          "source": "zto",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-dvEB.pdf (art. 10: municipalities 1-84, of which 75-84 are in the City of Skopje; art. 17: the next local elections are held on this division)"
+        },
+        {
+          "date": "2013-01-31",
+          "value": 80,
+          "source": "zto_2013",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-D7xn.pdf (art. 1: points 40, 45, 48, and 62 are deleted and the list renumbered to point 80)"
+        },
+        {
+          "date": "2019-07-01",
+          "value": 80,
+          "source": "dzs_ntes",
+          "locator": "https://www.stat.gov.mk/OblastOpsto_en.aspx?id=1 (Number of municipalities (01.07.2019): 80)"
+        }
+      ]
+    },
+    {
+      "key": "grad_skopje",
+      "name": "Град Скопје",
+      "name_en": "City of Skopje (a separate unit of local self-government over its ten municipalities)",
+      "parent": "region",
+      "polity_kind": "municipality",
+      "source": "zgs",
+      "counts": [
+        {
+          "date": "2005-03-13",
+          "value": 1,
+          "source": "zto",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-dvEB.pdf (art. 3: the area of the City of Skopje, a separate unit of local self-government, is made up of the areas of the municipalities in the City of Skopje)"
+        }
+      ]
+    },
+    {
+      "key": "mesna_zaednica",
+      "name": "Урбани и месни заедници",
+      "name_en": "Urban and local communities (forms of neighborhood self-government)",
+      "parent": "opstina",
+      "polity_kind": "submunicipal",
+      "source": "zls"
+    }
+  ],
+  "classes": [
+    {
+      "key": "sobranie",
+      "tier": "national",
+      "name": "Избори за пратеници во Собранието на Република Северна Македонија",
+      "name_en": "Assembly of the Republic",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1991-11-17",
+      "first_held": "1994-10-16",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "mk.izborna_edinica"
+        ],
+        "fine": [
+          "mk.opstina",
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (arts. 62 and 63)",
+      "note": "The Constitution sets 120 to 140 deputies elected for four years (arts. 62-63). In 1994 all 120 were elected in single-member districts in two rounds; in 1998, 85 in single-member districts in two rounds and 35 by proportional representation in one nationwide district; since 2002, 120 in six districts of 20 seats each by closed lists and the D'Hondt divisors, with no threshold. The elections of 2011, 2014, and 2016 added three districts abroad electing one deputy each (123 in all); they were abolished before the 2020 election. Repeat voting at annulled polling stations follows some elections (2008, and Tearce on 25 December 2016). The 1990 Assembly of SR Macedonia is class sobranie_srm.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MK",
+          "valid_from": "1991-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Државна изборна комисија",
+          "source": "ustav",
+          "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (art. 63: four-year term; elections in the last 90 days of the term or within 60 days of a dissolution)",
+          "valid_from": "1991-11-17",
+          "phase": 0
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-10-16",
+          "note": "120 single-member districts, first round."
+        },
+        {
+          "date": "1994-10-30",
+          "election_kind": "runoff",
+          "note": "Second round, boycotted by VMRO-DPMNE and the Democratic Party."
+        },
+        {
+          "date": "1998-10-18",
+          "note": "Mixed system: 85 single-member districts and 35 nationwide list seats."
+        },
+        {
+          "date": "1998-11-01",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2002-09-15",
+          "note": "First election in six districts of 20 seats."
+        },
+        {
+          "date": "2006-07-05"
+        },
+        {
+          "date": "2008-06-01",
+          "note": "Early election; voting was repeated at polling stations where it had been annulled."
+        },
+        {
+          "date": "2011-06-05",
+          "note": "Early election; first with three districts abroad (123 seats)."
+        },
+        {
+          "date": "2014-04-27",
+          "note": "Early election, held with the presidential runoff."
+        },
+        {
+          "date": "2016-12-11",
+          "note": "Early election."
+        },
+        {
+          "date": "2016-12-25",
+          "election_kind": "special",
+          "note": "Repeat voting at the Tearce polling station in electoral district 6."
+        },
+        {
+          "date": "2020-07-15",
+          "note": "Early election, postponed from 12 April 2020 by the COVID-19 state of emergency."
+        },
+        {
+          "date": "2024-05-08",
+          "note": "Held with the presidential runoff."
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "sobranie_srm",
+      "tier": "national",
+      "name": "Избори за Собранието на Социјалистичка Република Македонија (1990)",
+      "name_en": "Assembly of SR Macedonia, first multiparty election (1990)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1991-11-17",
+      "first_held": "1990-11-11",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (the Constitution of 17 November 1991 replaced the constitution of SR Macedonia under which this Assembly was elected)",
+      "note": "The first multiparty election chose a unicameral Assembly of 120 deputies in single-member districts in up to three rounds (11 and 25 November and 9 December 1990). This Assembly declared sovereignty, called the 1991 independence referendum, and adopted the 1991 Constitution. Earlier assemblies of SR Macedonia were chosen through the Yugoslav single-list and delegate systems (class sobranie_nrm_srm).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MK",
+          "valid_to": "1991-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "administered_by": "Републичка изборна комисија",
+          "source": "ustav",
+          "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf",
+          "valid_to": "1991-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-11-11"
+        },
+        {
+          "date": "1990-11-25",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1990-12-09",
+          "election_kind": "runoff",
+          "note": "Third round in the districts still undecided."
+        }
+      ],
+      "est_votes": 2500000,
+      "effort": 5
+    },
+    {
+      "key": "pretsedatel",
+      "tier": "national",
+      "name": "Избори за претседател на Република Северна Македонија",
+      "name_en": "President of the Republic, direct",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1991-11-17",
+      "first_held": "1994-10-16",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mk.opstina",
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (arts. 80 and 81); https://www.sobranie.mk/WBStorage/Files/UstavnaRmizmeni.pdf (Amendment XXXI)",
+      "note": "The President is elected directly for five years, at most twice (art. 80). A first-round winner needs a majority of all registered voters; otherwise the two leaders meet within 14 days, and the runoff winner takes office if more than 40% of voters voted (Amendment XXXI of 2009; before it, more than half), or the whole election is repeated (art. 81). The election is held in the last 60 days of the term, or within 40 days of a vacancy. The 2004 election followed President Trajkovski's death; in 1999 the runoff was repeated at polling stations where it had been annulled.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MK",
+          "valid_from": "1991-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "administered_by": "Државна изборна комисија",
+          "source": "ustav",
+          "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (art. 81: in the last 60 days of the term, or within 40 days of a vacancy)",
+          "valid_from": "1991-11-17",
+          "phase": 4,
+          "month": 4
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-10-16",
+          "note": "Gligorov elected in the first round."
+        },
+        {
+          "date": "1999-10-31"
+        },
+        {
+          "date": "1999-11-14",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1999-12-05",
+          "election_kind": "special",
+          "note": "The runoff repeated at polling stations where it had been annulled."
+        },
+        {
+          "date": "2004-04-14",
+          "note": "Early election after President Trajkovski died on 26 February 2004."
+        },
+        {
+          "date": "2004-04-28",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-03-22",
+          "note": "Held with the local elections."
+        },
+        {
+          "date": "2009-04-05",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2014-04-13"
+        },
+        {
+          "date": "2014-04-27",
+          "election_kind": "runoff",
+          "note": "Held with the early Assembly election."
+        },
+        {
+          "date": "2019-04-21"
+        },
+        {
+          "date": "2019-05-05",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2024-04-24"
+        },
+        {
+          "date": "2024-05-08",
+          "election_kind": "runoff",
+          "note": "Held with the Assembly election."
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "pretsedatel_sobranie",
+      "tier": "national",
+      "name": "Избор на претседател на Република Македонија од Собранието (1991)",
+      "name_en": "President elected by the Assembly (1991)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_to": "1991-11-17",
+      "first_held": "1991-01-27",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (art. 80 replaced election by the Assembly with direct election)",
+      "note": "On 27 January 1991 the Assembly elected in 1990 chose Kiro Gligorov as President by a vote of its deputies; the 1991 Constitution made the office directly elected from 1994.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MK",
+          "valid_to": "1991-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-27"
+        }
+      ],
+      "est_votes": 120,
+      "effort": 2
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Државен референдум",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1991-09-08",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mk.opstina",
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (arts. 73 and 74)",
+      "note": "The Assembly calls a referendum by a majority of all deputies, and must call one on the proposal of 150,000 voters; the decision passes if a majority of those voting approve and more than half of all registered voters vote, and binds the Assembly (art. 73). A change of the border needs a majority of all registered voters (art. 74). The 1991 independence referendum was held under SR Macedonia's law; the 2004 referendum on the territorial law and the 2018 consultative referendum on the Prespa agreement both failed on turnout.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "MK"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Државна изборна комисија",
+          "source": "ustav",
+          "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf (art. 73: called by the Assembly, or on the proposal of 150,000 voters)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-09-08",
+          "note": "Independence referendum, called by the Assembly of SR Macedonia."
+        },
+        {
+          "date": "2004-11-07",
+          "source": "mls_zto",
+          "quote": "референдумот беше неуспешен поради тоа што излезноста беше 26,58%",
+          "note": "On repealing the 2004 territorial law; failed on turnout."
+        },
+        {
+          "date": "2018-09-30",
+          "note": "Consultative referendum on the Prespa agreement; failed on turnout."
+        }
+      ],
+      "est_votes": 2300000,
+      "effort": 4
+    },
+    {
+      "key": "sobranie_nrm_srm",
+      "tier": "national",
+      "name": "Избори за Собранието на НР/СР Македонија (1945-1986)",
+      "name_en": "Assemblies of PR and SR Macedonia under the Yugoslav single-list and delegate systems (1945-1986)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1990-11-11",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen on single People's Front lists and, from 1974, through the Yugoslav delegate system of indirect elections by socio-political chambers; there were no competitive popular contests and the State Election Commission holds no results for them.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "jugoslavija",
+      "tier": "national",
+      "name": "Сојузни избори на СФР Југославија во Македонија",
+      "name_en": "Yugoslav federal elections held in Macedonia (1945-1990)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_to": "1991-11-17",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ustav",
+      "locator": "https://www.sobranie.mk/content/Odluki%20USTAV/UstavSRSM.pdf",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections to the federal assembly of Yugoslavia belong to a Yugoslav polity if the archive adds one, not to North Macedonia's census.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "sudski_sovet",
+      "tier": "national",
+      "name": "Избор на членови на Судскиот совет и на Советот на јавните обвинители",
+      "name_en": "Members of the Judicial Council and the Council of Public Prosecutors",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "amandmani",
+      "locator": "https://www.sobranie.mk/WBStorage/Files/UstavnaRmizmeni.pdf (Amendment XXVIII, replacing art. 104)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Eight of the Judicial Council's 15 members are elected by judges from among themselves and five by the Assembly (Amendment XXVIII); prosecutors elect members of their council the same way. These are internal votes of the judiciary and the Assembly, not public elections, and judges are appointed, never elected by voters.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "partii",
+      "tier": "national",
+      "name": "Внатрепартиски избори",
+      "name_en": "Party leadership and candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "izboren_zakonik",
+      "locator": "https://www.sec.mk/",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their leaders and candidates under their own statutes; the Electoral Code provides for no state-run primaries and the State Election Commission neither runs nor publishes these votes.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "sovet_region",
+      "tier": "region",
+      "name": "Совет за развој на планскиот регион",
+      "name_en": "Councils for the development of the planning regions",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "dzs_ntes",
+      "locator": "https://www.stat.gov.mk/OblastOpsto_en.aspx?id=1",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The eight planning regions are statistical and development units with no elected organs; each council for regional development is made up of the region's mayors ex officio.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "sovet_opstina",
+      "tier": "opstina",
+      "name": "Избори за членови на советите на општините",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1996-11-17",
+      "first_held": "1996-11-17",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "mk.opstina"
+        ],
+        "fine": [
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "zls",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (arts. 33-35)",
+      "boundary_source": "zto",
+      "note": "Each municipality is one district; its council of 9 to 33 members by population (law of 2002, art. 34; Kičevo's 23 since 2013) is elected for four years from closed lists by the D'Hondt divisors. The 1996 and 2000 elections were held in 123 municipalities, 2005 and 2009 in 84 (ten of them in the City of Skopje), and since 2013 in 80. A council that is dissolved is replaced by an early election for the rest of the term. The councils of SR Macedonia's 34 municipalities are class sobranie_opstina_srm; the City of Skopje council is class sovet_grad_skopje.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1996-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Државна изборна комисија",
+          "source": "zls",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 35: council members are elected for four years)",
+          "valid_from": "1996-11-17",
+          "phase": 1,
+          "month": 10
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-11-17",
+          "note": "First elections under the 1995 local self-government law, in 123 municipalities."
+        },
+        {
+          "date": "2000-09-10"
+        },
+        {
+          "date": "2005-03-13",
+          "contests": 84,
+          "source": "zto",
+          "quote": "Член 10: Во Република Македонија се основаат и се утврдуваат името и седиштето на следниве општини (точки 1-84)",
+          "note": "First elections on the 2004 division."
+        },
+        {
+          "date": "2009-03-22",
+          "note": "Held with the presidential election."
+        },
+        {
+          "date": "2013-03-24",
+          "contests": 80,
+          "source": "zto_2013",
+          "quote": "Точките 40, 45, 48 и 62 се бришат ... стануваат точки 40 ... 80",
+          "note": "First elections after Drugovo, Vraneštica, Zajas, and Oslomej joined Kičevo."
+        },
+        {
+          "date": "2017-10-15"
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2025-10-19"
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 4
+    },
+    {
+      "key": "gradonacalnik",
+      "tier": "opstina",
+      "name": "Избори за градоначалници на општините",
+      "name_en": "Mayors of municipalities, direct",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "1996-11-17",
+      "first_held": "1996-11-17",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "mk.opstina"
+        ],
+        "fine": [
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "zls",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 49)",
+      "boundary_source": "zto",
+      "note": "Each municipality elects its mayor directly every fourth year (law of 2002, art. 49). A first-round winner needs a majority of the votes cast with at least a third of registered voters voting; otherwise the two leaders meet two weeks later and the plurality wins. When a mayor's term ends early, an early election fills it for the rest of the term. The City of Skopje's mayor is class gradonacalnik_grad_skopje.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1996-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "administered_by": "Државна изборна комисија",
+          "source": "zls",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 49: the mayor is elected every fourth year)",
+          "valid_from": "1996-11-17",
+          "phase": 1,
+          "month": 10
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-11-17"
+        },
+        {
+          "date": "1996-12-01",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2000-09-10"
+        },
+        {
+          "date": "2000-09-24",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2005-03-13"
+        },
+        {
+          "date": "2005-03-27",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-03-22"
+        },
+        {
+          "date": "2009-04-05",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2013-03-24"
+        },
+        {
+          "date": "2013-04-07",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2017-10-15"
+        },
+        {
+          "date": "2017-10-29",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2021-10-31",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2025-10-19"
+        },
+        {
+          "date": "2025-11-02",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2005-04-10",
+          "election_kind": "special",
+          "note": "Voting repeated at polling stations where the earlier rounds were annulled."
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "lokalen_referendum",
+      "tier": "opstina",
+      "name": "Референдум на ниво на општина",
+      "name_en": "Municipal referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "mk.opstina"
+        ]
+      },
+      "source": "zls",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 28)",
+      "note": "The council must call a referendum on a question of municipal competence when 20% of the municipality's voters ask, and may call one itself; the result binds the council (law of 2002, art. 28; procedure in the Law on Referendum and Other Forms of Direct Expression of Citizens). From December 2003 to February 2004, 41 municipalities held non-binding local referendums against their abolition in the territorial reform. No central register of later municipal referendums is published.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Општинска изборна комисија",
+          "source": "zls",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 28(2): on the request of at least 20% of the municipality's voters)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2003-12-01",
+          "precision": "month",
+          "contests": 41,
+          "source": "mls_zto",
+          "quote": "од декември 2003 година до февруари 2004 година се одржани 41 локален референдум на територија која што опфаќа 304 355 жители",
+          "note": "Non-binding referendums in small municipalities against their abolition, held from December 2003 to February 2004."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 5
+    },
+    {
+      "key": "sobir_gragjani",
+      "tier": "opstina",
+      "name": "Собир на граѓани",
+      "name_en": "Citizens' gatherings",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "zls",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (art. 27)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Meetings of residents called by the mayor that adopt non-binding conclusions by show of hands; no ballots are cast and no results are published.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "sobranie_opstina_srm",
+      "tier": "opstina",
+      "name": "Собранија на општините во СР Македонија",
+      "name_en": "Municipal assemblies of SR Macedonia (34 municipalities, until 1996)",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1996-11-17",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "mls_zto",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/lokalna-samouprava-1-file-jFl9.pdf (\"Во текот на 1982 г. настана нова поделба, па во СРМ имаше 34 општини\")",
+      "disposition": "blocked",
+      "disposition_reason": "The assemblies of the 34 municipalities of the 1982 division were chosen under the Yugoslav system and, in 1990, in the first multiparty local elections; the State Election Commission publishes no results for them and no official compendium of them is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_to": "1996-11-17"
+        }
+      ],
+      "dates": [],
+      "est_votes": 1000000,
+      "effort": 5
+    },
+    {
+      "key": "sovet_grad_skopje",
+      "tier": "grad_skopje",
+      "name": "Избори за членови на Советот на градот Скопје",
+      "name_en": "Council of the City of Skopje",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1996-11-17",
+      "first_held": "1996-11-17",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mk.opstina",
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "zgs",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-Z8l0.pdf (arts. 19-21)",
+      "boundary_source": "zto",
+      "note": "The City of Skopje, a separate unit of local self-government over its municipalities (Constitution art. 117), elects a council of 45 members (law of 2004, art. 20) from closed lists by the D'Hondt divisors in one citywide district, on the same day as the municipal elections. The City had seven municipalities under the 1996 division and ten since 2005.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "Град Скопје|Grad Skopje|City of Skopje",
+          "precedence": 1,
+          "valid_from": "1996-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Државна изборна комисија",
+          "source": "zgs",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-Z8l0.pdf (art. 20: the council of the City of Skopje has 45 members)",
+          "valid_from": "1996-11-17",
+          "phase": 1,
+          "month": 10
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-11-17"
+        },
+        {
+          "date": "2000-09-10"
+        },
+        {
+          "date": "2005-03-13"
+        },
+        {
+          "date": "2009-03-22"
+        },
+        {
+          "date": "2013-03-24"
+        },
+        {
+          "date": "2017-10-15"
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2025-10-19"
+        }
+      ],
+      "est_votes": 2000000,
+      "effort": 3
+    },
+    {
+      "key": "gradonacalnik_grad_skopje",
+      "tier": "grad_skopje",
+      "name": "Избори за градоначалник на градот Скопје",
+      "name_en": "Mayor of the City of Skopje, direct",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "1996-11-17",
+      "first_held": "1996-11-17",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mk.opstina",
+          "mk.izbiracko_mesto"
+        ]
+      },
+      "source": "zgs",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-Z8l0.pdf (arts. 19 and 21)",
+      "boundary_source": "zto",
+      "note": "Elected directly by the voters of all the City's municipalities in two rounds under the same rules as municipal mayors, on the same days. A runoff is held only when no candidate wins outright in the first round.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "Град Скопје|Grad Skopje|City of Skopje",
+          "precedence": 1,
+          "valid_from": "1996-11-17"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "administered_by": "Државна изборна комисија",
+          "source": "zgs",
+          "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-Z8l0.pdf (art. 19: the organs of the City of Skopje are a council and a mayor)",
+          "valid_from": "1996-11-17",
+          "phase": 1,
+          "month": 10
+        }
+      ],
+      "access": [
+        {
+          "platform": "Државна изборна комисија, архива на избори",
+          "url": "https://www.sec.mk/",
+          "format": "html, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "source": "dik",
+          "evidence": "Results by electoral district, municipality, and polling station; a Cloudflare browser challenge (HTTP 403) refused an automated client on 17 November 2026",
+          "finest": "mk.izbiracko_mesto"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-11-17"
+        },
+        {
+          "date": "2000-09-10"
+        },
+        {
+          "date": "2005-03-13"
+        },
+        {
+          "date": "2009-03-22"
+        },
+        {
+          "date": "2013-03-24"
+        },
+        {
+          "date": "2017-10-15"
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2025-10-19"
+        },
+        {
+          "date": "2005-03-27",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-04-05",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2021-10-31",
+          "election_kind": "runoff"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 3
+    },
+    {
+      "key": "sovet_mesna_zaednica",
+      "tier": "mesna_zaednica",
+      "name": "Совети на урбаните и месните заедници",
+      "name_en": "Councils of urban and local communities",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "zls",
+      "locator": "https://portal.mdt.gov.mk/post-body-files/zakonii-file-1bsL.pdf (arts. 82-86)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Set up by each municipality's statute and chosen at citizens' gatherings in the community, with the president elected by the council from among its members (law of 2002, arts. 84-85); the State Election Commission does not run them and no results are published.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}
