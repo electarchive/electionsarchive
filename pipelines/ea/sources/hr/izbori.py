@@ -35,7 +35,7 @@ SOURCE_ID = key("source", SOURCE)
 # The authority's archive of every election it ran; each entry is one election day.
 @dataclass(frozen=True)
 class Day:
-    family: str  # parlament, predsjednik, referendum
+    family: str  # parlament, predsjednik, referendum, euparlament
     year: int  # the archive folder
     day: date
     round: int = 1
@@ -61,6 +61,13 @@ PRESIDENT = {
     2024: (date(2024, 12, 29), date(2025, 1, 12)),
 }
 REFERENDUM = {2012: date(2012, 1, 22), 2013: date(2013, 12, 1)}
+EUROPARLAMENT = {
+    2013: date(2013, 4, 14),
+    2014: date(2014, 5, 25),
+    2019: date(2019, 5, 26),
+    2024: date(2024, 6, 9),
+}
+EP_SEATS = {2013: 12, 2014: 11, 2019: 11, 2024: 12}
 
 
 def days() -> list[Day]:
@@ -68,6 +75,7 @@ def days() -> list[Day]:
     for year, (first, second) in PRESIDENT.items():
         out += [Day("predsjednik", year, first), Day("predsjednik", year, second, 2, first)]
     out += [Day("referendum", year, day) for year, day in REFERENDUM.items()]
+    out += [Day("euparlament", year, day) for year, day in EUROPARLAMENT.items()]
     return sorted(out, key=lambda d: d.day)
 
 
@@ -188,6 +196,9 @@ def _round(name: str) -> int:
 def sheets(family: str, year: int) -> tuple[Sheet, ...]:
     archive = zipfile.ZipFile(raw.cached(SOURCE, f"{DATA}/{family}/{year}/zip/rezultati.zip").path)
     names = [n for n in archive.namelist() if n.lower().endswith(".csv") and not _skip(n)]
+    if family == "euparlament":
+        # Each archive holds the counts by list and, from 2019, a second file of the same stations with percentages.
+        names = [n for n in names if "liste" not in fold(n)]
     if family == "predsjednik" and year >= 2019:
         names = [n for n in archive.namelist() if n.lower().endswith(".xlsx")]
     if family == "parlament" and year == 2003:
@@ -239,7 +250,7 @@ ROLES = {
         "grad / opcine",
         "drzava",
     },
-    "kind": {"oznaka gr/op/dr"},
+    "kind": {"oznaka gr/op/dr", "oznaka grop"},
     "district": {"rbr ij", "izborna jedinica", "rbr izborne jedinice biraca"},
 }
 IGNORED = (
@@ -314,6 +325,8 @@ def contests(d: Day) -> list[str]:
 
 
 def declared_url(d: Day, contest: str) -> str:
+    if d.family == "euparlament":
+        return f"{DATA}/euparlament/{d.year}/rezultati/1/r_14_00_0000_000.{'json' if d.year >= 2019 else 'csv'}"
     suffix = "json" if d.year >= 2019 and d.family != "referendum" else "csv"
     if d.family == "predsjednik":
         return f"{DATA}/predsjednik/{d.year}/rezultati/{d.round}/r_01_00_0000_000.{suffix}"
@@ -422,6 +435,24 @@ def _declared_json(url: str, data: dict) -> Declared:
     )
 
 
+def _declared_ep_csv(url: str, rows: list[list[str]]) -> Declared:
+    """The 2013 and 2014 national files: one row per list, repeating the accounting, then its candidates."""
+    options: list[Option] = []
+    for raw_row in rows:
+        row = [clean(cell) for cell in raw_row]
+        rest = row[30:]
+        candidates: list[tuple[int, str, int]] = []
+        for at in range(2, len(rest) - 2, 4):
+            candidates.append((int(rest[at]), rest[at + 1], int(rest[at + 2])))
+        options.append(
+            Option(int(row[18]), row[30], [c for c in row[19:28] if c], None, int(row[29]), None, candidates)
+        )
+    head = [clean(cell) for cell in rows[0]]
+    return Declared(
+        url, number(head[10]), number(head[11]), number(head[13]), number(head[14]), number(head[16]), options
+    )
+
+
 @functools.cache
 def declared(d: Day, contest: str) -> Declared | None:
     url = declared_url(d, contest)
@@ -433,6 +464,8 @@ def declared(d: Day, contest: str) -> Declared | None:
     if url.endswith(".json"):
         return _declared_json(url, json.loads(decode(data)))
     rows = [row for row in csv.reader(io.StringIO(decode(data)), delimiter=";") if any(cell.strip() for cell in row)]
+    if d.family == "euparlament":
+        return _declared_ep_csv(url, rows)
     return _declared_csv(d, url, rows)
 
 
@@ -632,6 +665,9 @@ def stations(d: Day) -> tuple[list[Station], dict[str, Declared | None], dict[st
                 for column in columns:
                     if (index, column) in mapping:
                         station.values[mapping[(index, column)]] = number(row[column]) if column < len(row) else 0
+                if d.family == "euparlament" and station.part == "abroad" and not station.counts.get(REGISTERED):
+                    # Voters abroad have no roll of their own in these files; the roll is national only.
+                    station.counts.pop(REGISTERED, None)
                 out.append(station)
         mine = [s for s in out if s.contest == contest]
         if contest.startswith("12-") and 2 * sum(s.counts.get(REGISTERED, 0) for s in mine) < target.registered:
@@ -861,6 +897,7 @@ def _source(p: Package) -> None:
 HOUSE_2000 = key("body", "zastupnicki_dom")
 SABOR = key("body", "sabor")
 PRESIDENCY = key("office", "president")
+EP_BODY = key("body", "european-parliament")
 INDEPENDENT = ("neovisna lista", "neovisni kandidat", "kandidat grupe biraca", "grupa biraca")
 
 
@@ -913,6 +950,21 @@ SYSTEMS: list[tuple[str, date, date | None, dict, str]] = [
         (
             "Members of the Serb minority elect three representatives in the nationwide twelfth district; each voter may "
             "vote for up to three candidates, and the three with the most votes are elected."
+        ),
+    ),
+    (
+        system("european_parliament"),
+        date(2013, 1, 1),
+        None,
+        {
+            "formula": "dhondt",
+            "threshold": {"level": "list", "scope": "contest", "percent": 5},
+            "lists": {"order": "flexible", "vacancy": "next_on_list"},
+        },
+        (
+            "Croatia elects its members of the European Parliament in one nationwide constituency, from lists of "
+            "candidates, by D'Hondt among the lists with at least 5% of the valid votes (12 seats in 2013 and 2024, 11 "
+            "in 2014 and 2019). A voter may mark one preference on the list."
         ),
     ),
     (
@@ -971,7 +1023,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "The Croatian Parliament, the presidency, their electoral systems, and the parties and coalitions on the "
+        "The Croatian Parliament, the presidency, Croatia's members of the European Parliament, their electoral systems, and the parties and coalitions on the "
         "State Electoral Commission's results since 2000",
         depends=[f"{SOURCE}/geo"],
     )
@@ -982,6 +1034,9 @@ def registry() -> Package:
     p.add("body", id=SABOR, polity_id=CROATIA, kind="unicameral")
     p.name(SABOR, "Croatian Parliament", "en", "official")
     p.name(SABOR, "Hrvatski sabor", "hr", "native", False)
+    p.add("body", id=EP_BODY, polity_id=CROATIA, kind="council")
+    p.name(EP_BODY, "Croatian members of the European Parliament", "en", "official")
+    p.name(EP_BODY, "Zastupnici iz Republike Hrvatske u Europskom parlamentu", "hr", "native", False)
     p.add("office", id=PRESIDENCY, polity_id=CROATIA, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Republic of Croatia", "en", "official")
     p.name(PRESIDENCY, "Predsjednik Republike Hrvatske", "hr", "native", False)
@@ -1053,7 +1108,9 @@ METHOD = (
 
 
 def package_key(d: Day) -> str:
-    kind = {"parlament": "sabor", "predsjednik": "predsjednik", "referendum": "referendum"}[d.family]
+    kind = {"parlament": "sabor", "predsjednik": "predsjednik", "referendum": "referendum", "euparlament": "ep"}[
+        d.family
+    ]
     return f"{SOURCE}/{kind}-{d.day}"
 
 
@@ -1073,6 +1130,12 @@ def emit() -> None:
 
 
 def _election_names(d: Day) -> tuple[str, str, str]:
+    if d.family == "euparlament":
+        return (
+            f"{d.year} European Parliament election in Croatia",
+            f"Izbori za članove u Europski parlament iz Republike Hrvatske {d.year}.",
+            f"hr/{d.day}-european-parliament",
+        )
     if d.family == "parlament":
         return (
             f"{d.year} Croatian parliamentary election",
@@ -1098,6 +1161,16 @@ def _election_names(d: Day) -> tuple[str, str, str]:
 def _contest_frame(d: Day, contest: str) -> tuple[str, str, str, int, str, str | None, str]:
     """kind, english name, croatian name, magnitude, system, body, slug."""
     body = HOUSE_2000 if d.year == 2000 else SABOR
+    if d.family == "euparlament":
+        return (
+            "list_allocation",
+            f"{d.year} European Parliament election in Croatia",
+            f"Izbori za Europski parlament {d.year}.",
+            EP_SEATS[d.year],
+            system("european_parliament"),
+            EP_BODY,
+            "croatia",
+        )
     if d.family == "predsjednik":
         name = f"President of the Republic of Croatia, {'first' if d.round == 1 else 'second'} round"
         return (
@@ -1162,7 +1235,11 @@ def election(d: Day) -> Package:
         except LookupError:
             pass
     election_id = key("election", d.day)
-    kind = {"parlament": "general", "predsjednik": "general" if d.round == 1 else "runoff"}.get(d.family, "referendum")
+    kind = {
+        "parlament": "general",
+        "euparlament": "general",
+        "predsjednik": "general" if d.round == 1 else "runoff",
+    }.get(d.family, "referendum")
     p.add("election", id=election_id, polity_id=CROATIA, kind=kind, date_from=d.day, date_to=d.day, status="held")
     p.name(election_id, english, "en", "official")
     p.name(election_id, native, "hr", "native", False)
