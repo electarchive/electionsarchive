@@ -1,0 +1,1886 @@
+{
+ "polity": "UA",
+ "name": "Ukraine",
+ "sources": {
+  "const": {
+   "title": "Конституція України (Constitution of Ukraine, Law No 254к/96-ВР of 28 June 1996, consolidated text)",
+   "publisher": "Верховна Рада України",
+   "url": "https://zakon.rada.gov.ua/laws/show/254к/96-вр",
+   "kind": "official_body",
+   "note": "Linked from the Commission's legal-basis page (cvk_law). The Parliament's legislation portal reset connections from this survey's network on 2026-11-17, so articles are cited by number, not quoted from a fetched copy."
+  },
+  "code": {
+   "title": "Виборчий кодекс України (Electoral Code of Ukraine, Law No 396-IX of 19 December 2019)",
+   "publisher": "Верховна Рада України",
+   "url": "https://zakon.rada.gov.ua/laws/show/396-20",
+   "kind": "official_body",
+   "note": "In force since 1 January 2020; governs presidential, parliamentary, and local elections and repealed the separate election laws. Cited by article from the Commission's legal-basis page; not quoted from a fetched copy."
+  },
+  "rada_law": {
+   "title": "Закон України «Про вибори народних депутатів України» (Law No 4061-VI of 17 November 2011)",
+   "publisher": "Верховна Рада України",
+   "url": "https://zakon.rada.gov.ua/laws/show/4061-17",
+   "kind": "official_body",
+   "note": "The mixed system (225 list seats with a 5% threshold and 225 single-member districts) used in 2012, 2014, and 2019; repealed by the Electoral Code from 1 January 2020."
+  },
+  "local_law": {
+   "title": "Закон України «Про місцеві вибори» (Law No 595-VIII of 14 July 2015)",
+   "publisher": "Верховна Рада України",
+   "url": "https://zakon.rada.gov.ua/laws/show/595-19",
+   "kind": "official_body",
+   "note": "Governed the 2015 regular local elections, the first elections of amalgamated communities and their starostas in 2015-2020, and interim local elections until the Electoral Code replaced it."
+  },
+  "ref_law": {
+   "title": "Закон України «Про всеукраїнський референдум» (Law No 1135-IX of 26 January 2021)",
+   "publisher": "Верховна Рада України",
+   "url": "https://zakon.rada.gov.ua/laws/show/1135-IX",
+   "kind": "official_body",
+   "note": "The current law on national referendums. No law on local referendums has been in force since Law No 5475-VI of 2012 repealed the 1991 law on all-Ukrainian and local referendums."
+  },
+  "cvk_law": {
+   "title": "Нормативно-правова база (the Commission's list of the constitution and election laws)",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/normativno-pravova-baza.html",
+   "kind": "official_body"
+  },
+  "kodyfikator": {
+   "title": "Кодифікатор адміністративно-територіальних одиниць та територій територіальних громад (order No 290 of 26 November 2020, as revised by order No 3 of 12 January 2021)",
+   "publisher": "Міністерство розвитку громад та територій України",
+   "url": "https://data.gov.ua/dataset/2f4beef4-6bba-43d3-9e9e-120c696f1123/resource/baa61b78-4e0d-499f-89d9-f2863abdb094/download/kodifikator.xlsx",
+   "kind": "official_body",
+   "license": "CC-BY-4.0",
+   "note": "The national register of administrative-territorial units, published on data.gov.ua (dataset 43c2a113-a032-4c8a-a409-3b5e1660bb38) under Creative Commons Attribution. Category codes: O oblast or Autonomous Republic, K city with special status, P raion, H territorial community (hromada), B raion within a city."
+  },
+  "cvk_rada": {
+   "title": "Вибори народних депутатів України (the Commission's index of parliamentary elections and their results sites)",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/vibory_category/vibori-narodnih-deputativ-ukraini.html",
+   "kind": "official_body"
+  },
+  "cvk_vnd2019": {
+   "title": "WWW ІАС «Вибори народних депутатів України 2019»: Одномандатні виборчі округи та дільниці",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vnd2019/wp030pt001f01=919.html",
+   "kind": "official_body"
+  },
+  "cvk_president": {
+   "title": "Вибори Президента України (the Commission's index of presidential elections and their results sites)",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/vibory_category/vibori-prezidenta-ukraini.html",
+   "kind": "official_body"
+  },
+  "cvk_referendum": {
+   "title": "Референдуми (the Commission's index of all-Ukrainian referendums)",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/vibory_category/referendumi.html",
+   "kind": "official_body"
+  },
+  "cvk_local": {
+   "title": "Місцеві вибори (the Commission's index of local elections and their results sites)",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/vibory_category/mistsevi-vibori.html",
+   "kind": "official_body"
+  },
+  "cvk_vm2010": {
+   "title": "WWW ІАС «Місцеві вибори» 31.10.2010: результати виборів депутатів рад та сільських, селищних, міських голів",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vm2010/wp0011.html",
+   "kind": "official_body",
+   "note": "Summary pages wm00113pt00_t001f01=800 (heads) and wm00114pt00_t001f01=800pxto=0 (councils) of the 2010 local elections site."
+  },
+  "cvk_vm2015": {
+   "title": "WWW ІАС «Місцеві вибори 2015»: чергові, перші, позачергові, проміжні, повторні та додаткові місцеві вибори 2015-2020",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vm2015/wm001pt001f01=100.html",
+   "kind": "official_body",
+   "note": "The list pages wm002pt001f01=100kod_group=2pt001f10=01.01.<year>.html name every local election day of 2015-2020 with its kind and the seats and posts it filled."
+  },
+  "cvk_vm2020": {
+   "title": "WWW ІАС «Місцеві вибори 2020»: чергові та наступні місцеві вибори 2020-2022",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+   "kind": "official_body",
+   "note": "Summary pages pvm005 (councils and seats), pvm004 (heads), and pvm006 (territorial commissions) for election 695, the regular local elections of 25 October 2020, and list pages wm002 for the later local election days of 2020-2022."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Україна",
+   "name_en": "Ukraine",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "const"
+  },
+  {
+   "key": "crimea",
+   "name": "Автономна Республіка Крим",
+   "name_en": "Autonomous Republic of Crimea",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2021-01-12",
+     "value": 1,
+     "source": "kodyfikator",
+     "locator": "Category O row UA01000000000013043 «Автономна Республіка Крим»: one of the 25 first-level O rows"
+    }
+   ]
+  },
+  {
+   "key": "oblast",
+   "name": "Області",
+   "name_en": "Oblasts",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2021-01-12",
+     "value": 24,
+     "source": "kodyfikator",
+     "locator": "25 first-level rows of category O, less the Autonomous Republic of Crimea (UA01): the 24 oblasts named in Constitution art. 133"
+    }
+   ]
+  },
+  {
+   "key": "special_city",
+   "name": "Міста зі спеціальним статусом (Київ, Севастополь)",
+   "name_en": "Cities with special status (Kyiv and Sevastopol)",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2021-01-12",
+     "value": 2,
+     "source": "kodyfikator",
+     "locator": "Category K: UA80000000000093317 «Київ» and UA85000000000065278 «Севастополь»"
+    }
+   ]
+  },
+  {
+   "key": "raion",
+   "name": "Райони",
+   "name_en": "Raions (districts)",
+   "parent": "oblast",
+   "polity_kind": "county",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2010-10-31",
+     "value": 488,
+     "source": "cvk_vm2010",
+     "locator": "wm00114pt00_t001f01=800pxto=0.html, the councils summary, row «Разом», column «Районні ради»: 488"
+    },
+    {
+     "date": "2021-01-12",
+     "value": 136,
+     "source": "kodyfikator",
+     "locator": "136 rows of category P (126 in the oblasts and 10 in the Autonomous Republic of Crimea), as formed by Verkhovna Rada resolution No 807-IX of 17 July 2020"
+    }
+   ]
+  },
+  {
+   "key": "hromada",
+   "name": "Територіальні громади (сіл, селищ, міст)",
+   "name_en": "Territorial communities (hromadas) of villages, settlements, and cities",
+   "parent": "raion",
+   "polity_kind": "municipality",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2010-10-31",
+     "value": 11517,
+     "source": "cvk_vm2010",
+     "locator": "wm00114pt00_t001f01=800pxto=0.html, row «Разом»: city councils of oblast and republican significance with Kyiv and Sevastopol 179, city councils of raion significance 278, settlement councils 784, village councils 10278; less the councils of Kyiv and Sevastopol, which form the special_city tier"
+    },
+    {
+     "date": "2021-01-12",
+     "value": 1469,
+     "source": "kodyfikator",
+     "locator": "1,772 rows of category H, less the 303 in the Autonomous Republic of Crimea (UA01), whose communities were drawn on paper but are occupied"
+    }
+   ]
+  },
+  {
+   "key": "city_district",
+   "name": "Райони в містах",
+   "name_en": "Raions within cities",
+   "parent": "hromada",
+   "polity_kind": "submunicipal",
+   "source": "const",
+   "counts": [
+    {
+     "date": "2010-10-31",
+     "value": 55,
+     "source": "cvk_vm2010",
+     "locator": "wm00114pt00_t001f01=800pxto=0.html, row «Разом», column «Районні у містах ради»: 55 councils"
+    },
+    {
+     "date": "2021-01-12",
+     "value": 108,
+     "source": "kodyfikator",
+     "locator": "108 rows of category B, including Kyiv's 10, Sevastopol's 4, and Simferopol's 3; most have no elected council"
+    }
+   ]
+  },
+  {
+   "key": "starosta_district",
+   "name": "Старостинські округи",
+   "name_en": "Starosta districts (villages within amalgamated communities)",
+   "parent": "hromada",
+   "polity_kind": "submunicipal",
+   "source": "local_law"
+  },
+  {
+   "key": "ukrainian_ssr",
+   "name": "Українська Радянська Соціалістична Республіка",
+   "name_en": "Ukrainian Soviet Socialist Republic",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "source": "const",
+   "valid_from": "1919-03-10",
+   "valid_to": "1991-08-24"
+  },
+  {
+   "key": "unr",
+   "name": "Українська Народна Республіка",
+   "name_en": "Ukrainian People's Republic",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "source": "const",
+   "valid_from": "1917-11-20",
+   "valid_to": "1921-03-18"
+  }
+ ],
+ "classes": [
+  {
+   "key": "rada",
+   "tier": "national",
+   "name": "Вибори народних депутатів України (чергові та позачергові)",
+   "name_en": "Verkhovna Rada general elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ua.region",
+     "ua.ovo",
+     "ua.dilnytsia"
+    ]
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "1998-03-29",
+   "finest_note": "Polling station (виборча дільниця) from 2006 on the Commission's sites; single-member district in 1998 and 2002.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 76-77)",
+   "note": "Unicameral, 450 seats (Constitution art. 76). The Verkhovna Rada of the Ukrainian SSR elected on 4 March 1990 in 450 single-member districts (runoffs 18 March) is the first convocation. 1994: 450 majoritarian districts with a 50% turnout rule, so many seats stayed empty and were refilled in repeat elections through 1996. 1998 and 2002: mixed, 225 list seats (4% threshold) and 225 single-member districts. 2006 and the early 2007 vote: closed-list PR in one nationwide district (3%). 2012 and the early 2014 and 2019 votes: mixed again (5% threshold); in 2014 and 2019 the districts in occupied Crimea and parts of Donetsk and Luhansk did not vote (198 and 199 districts). The Electoral Code (2020) moves to 450 seats by open-list PR in 27 regional districts with a 5% threshold, not yet used. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held. The regular election due on 29 October 2023 was not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "UA",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 77 as first adopted: four-year term, regular elections on the last Sunday of March of the fourth year)",
+     "period_years": 4,
+     "phase": 2,
+     "month": 3,
+     "day_rule": "mar_last_sunday",
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Центральна виборча комісія України",
+     "valid_from": "1996-06-28",
+     "valid_to": "2006-03-26"
+    },
+    {
+     "source": "const",
+     "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 76-77 as amended in 2004 and 2011: five-year term, regular elections on the last Sunday of October of the fifth year; art. 90 early dissolution)",
+     "period_years": 5,
+     "phase": 3,
+     "month": 10,
+     "day_rule": "oct_last_sunday",
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Центральна виборча комісія України",
+     "valid_from": "2011-02-01",
+     "vacancy_rule": "A vacant list seat passes to the next candidate on the party's list; a vacant district seat was filled by a by-election (rada_by)."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04",
+     "note": "Supreme Soviet of the Ukrainian SSR, 12th convocation, counted as the Verkhovna Rada's 1st; runoffs 18 March 1990 and repeat votes later in 1990. Not counted from a fetched source."
+    },
+    {
+     "date": "1994-03-27",
+     "note": "Runoffs 10 April 1994; repeat elections for empty seats followed into 1996 (rada_by). Not counted from a fetched source."
+    },
+    {
+     "date": "1998-03-29",
+     "note": "225 single-member districts and one nationwide list. Not counted from a fetched source."
+    },
+    {
+     "date": "2002-03-31",
+     "note": "225 single-member districts and one nationwide list. Not counted from a fetched source."
+    },
+    {
+     "date": "2006-03-26",
+     "note": "One nationwide closed list for 450 seats."
+    },
+    {
+     "date": "2007-09-30",
+     "note": "Early election after the 2007 dissolution; one nationwide closed list for 450 seats."
+    },
+    {
+     "date": "2012-10-28",
+     "note": "225 single-member districts and one nationwide list."
+    },
+    {
+     "date": "2014-10-26",
+     "note": "Early election; voting held in 198 of the 225 districts and the nationwide list."
+    },
+    {
+     "date": "2019-07-21",
+     "contests": 200,
+     "source": "cvk_vnd2019",
+     "note": "Early election: the nationwide list for 225 seats and 199 single-member districts.",
+     "quote": "Одномандатні виборчі округи: «Загальна кількість округів 199»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: веб-відображення інформаційно-аналітичної системи (cvk.gov.ua/pls)",
+     "url": "https://www.cvk.gov.ua/pls/vnd{year}/wp001.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "1998-03-29",
+     "last_date": "2021-10-31",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_rada",
+     "evidence": "One results site per convocation (vnd1998, vnd2002, vnd2006, vnd2007, vnd2012, vnd2014, vnd2019), each answering an automated client with HTTP 200 on 2026-11-17 and linked from the Commission's index. The 2006 site and later ones break results down by polling station; the 1998 and 2002 sites by single-member district. The ua.cvk pipeline reads 2012-2021 by polling station. The 1990 and 1994 elections predate the Commission and its sites.",
+     "finest": "ua.dilnytsia"
+    }
+   ],
+   "est_votes": 300000000,
+   "effort": 2
+  },
+  {
+   "key": "rada_by",
+   "tier": "national",
+   "name": "Проміжні та повторні вибори народних депутатів України в одномандатних округах",
+   "name_en": "Verkhovna Rada by-elections and repeat elections in single-member districts",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ua.ovo",
+     "ua.dilnytsia"
+    ]
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2013-07-07",
+   "finest_note": "Polling station on the Commission's sites from 2012.",
+   "source": "rada_law",
+   "note": "A vacant district seat was filled by a by-election (проміжні вибори), and a failed or annulled district vote by a repeat election (повторні вибори). None were possible in 2006-2012, when every seat was a list seat, and the Electoral Code ends district seats with the current convocation. The by-election called for 27 March 2022 was not held after martial law began.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "UA",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "through": "2005-12-31",
+     "note": "Repeat and by-elections of 1990-2005, many in 1994-1996 after the turnout rule left seats empty; not yet counted from an official list."
+    },
+    {
+     "date": "2013-07-07",
+     "note": "By-elections (vnd2012 site)."
+    },
+    {
+     "date": "2013-12-15",
+     "note": "Repeat elections in five districts whose 2012 results were not established (vnd2012 site)."
+    },
+    {
+     "date": "2014-05-25",
+     "note": "By-elections (vnd2012 site)."
+    },
+    {
+     "date": "2015-07-26",
+     "note": "By-elections (vnd2014 site)."
+    },
+    {
+     "date": "2016-07-17",
+     "note": "By-elections (vnd2014 site)."
+    },
+    {
+     "date": "2020-03-15",
+     "note": "By-election (vnd2019 site)."
+    },
+    {
+     "date": "2020-10-25",
+     "note": "By-election (vnd2019 site)."
+    },
+    {
+     "date": "2021-03-28",
+     "note": "By-elections (vnd2019 site)."
+    },
+    {
+     "date": "2021-10-31",
+     "note": "By-elections (vnd2019 site)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: веб-відображення інформаційно-аналітичної системи (cvk.gov.ua/pls)",
+     "url": "https://www.cvk.gov.ua/pls/vnd{year}/wp001.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "1998-03-29",
+     "last_date": "2021-10-31",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_rada",
+     "evidence": "One results site per convocation (vnd1998, vnd2002, vnd2006, vnd2007, vnd2012, vnd2014, vnd2019), each answering an automated client with HTTP 200 on 2026-11-17 and linked from the Commission's index. The 2006 site and later ones break results down by polling station; the 1998 and 2002 sites by single-member district. The ua.cvk pipeline reads 2012-2021 by polling station. The 1990 and 1994 elections predate the Commission and its sites.",
+     "finest": "ua.dilnytsia"
+    }
+   ],
+   "est_votes": 3000000,
+   "effort": 2
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Вибори Президента України",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ua.region",
+     "ua.ovo",
+     "ua.dilnytsia"
+    ]
+   },
+   "valid_from": "1991-07-05",
+   "first_held": "1991-12-01",
+   "earliest_record": "1999-10-31",
+   "finest_note": "Polling station on the Commission's sites (vp1999 to vp2019); territorial district on the oldest pages.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 103-104)",
+   "note": "Two-round majority vote; the top two meet in a runoff three weeks later when no candidate wins a majority of the votes cast. The post was created by the law of 5 July 1991. Runoffs: 10 July 1994, 14 November 1999, 21 November 2004 (annulled by the Supreme Court and repeated on 26 December 2004), 7 February 2010, and 21 April 2019; 1991 and 2014 were decided in the first round. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held. The regular election due on 31 March 2024 was not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "UA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 103: five-year term; regular elections on the last Sunday of March of the fifth year of the term)",
+     "period_years": 5,
+     "phase": 4,
+     "month": 3,
+     "day_rule": "mar_last_sunday",
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "The two leading candidates meet on the third Sunday after the first round when no one wins more than half of the votes cast.",
+     "administered_by": "Центральна виборча комісія України",
+     "valid_from": "1996-06-28",
+     "vacancy_rule": "An early election within 90 days; the Chair of the Verkhovna Rada acts meanwhile (art. 112)."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-12-01",
+     "note": "Held with the independence referendum. Not counted from a fetched source."
+    },
+    {
+     "date": "1994-06-26",
+     "note": "Early election; runoff 10 July 1994. Not counted from a fetched source."
+    },
+    {
+     "date": "1999-10-31",
+     "note": "Runoff 14 November 1999."
+    },
+    {
+     "date": "2004-10-31",
+     "note": "Runoff 21 November 2004, annulled; repeat runoff 26 December 2004."
+    },
+    {
+     "date": "2010-01-17",
+     "note": "Runoff 7 February 2010."
+    },
+    {
+     "date": "2014-05-25",
+     "note": "Early election after the office fell vacant; decided in the first round."
+    },
+    {
+     "date": "2019-03-31",
+     "note": "Runoff 21 April 2019."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: веб-відображення інформаційно-аналітичної системи (cvk.gov.ua/pls)",
+     "url": "https://www.cvk.gov.ua/pls/vp{year}/wp001.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "1999-10-31",
+     "last_date": "2019-04-21",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_president",
+     "evidence": "One results site per election (vp1999, vp2004, vp2010, vp2014, vp2019), each answering an automated client with HTTP 200 on 2026-11-17. The ua.cvk pipeline reads 2014 and 2019 by polling station. The 1991 and 1994 elections predate the Commission's sites.",
+     "finest": "ua.dilnytsia"
+    }
+   ],
+   "est_votes": 350000000,
+   "effort": 2
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Всеукраїнські референдуми",
+   "name_en": "All-Ukrainian referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "ua.region"
+    ]
+   },
+   "valid_from": "1991-03-17",
+   "first_held": "1991-03-17",
+   "earliest_record": "2000-04-16",
+   "finest_note": "Oblast and territorial district on the 2000 referendum site (r001).",
+   "source": "ref_law",
+   "note": "The Ukrainian SSR's vote of 17 March 1991 put the all-Union question on preserving the USSR and the republic's own question on the Declaration of State Sovereignty. The independence referendum of 1 December 1991 confirmed the Act of Declaration of Independence. The referendum of 16 April 2000, called by popular initiative, put four questions on constitutional change that were never enacted. Constitution arts. 72-74; the 1991 law on all-Ukrainian and local referendums, its 2012 successor (struck down by the Constitutional Court on 26 April 2018), and Law No 1135-IX of 2021, under which no referendum has been held. A referendum on territorial changes must be national (art. 73).",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "UA"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-03-17",
+     "note": "Two questions: the all-Union question and the republic's sovereignty question. Not counted from a fetched source."
+    },
+    {
+     "date": "1991-12-01",
+     "note": "One question: the Act of Declaration of Independence. Not counted from a fetched source."
+    },
+    {
+     "date": "2000-04-16",
+     "note": "Four questions by popular initiative (r001 site)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: веб-відображення інформаційно-аналітичної системи (cvk.gov.ua/pls)",
+     "url": "https://www.cvk.gov.ua/pls/r001/webproc0r.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2000-04-16",
+     "last_date": "2000-04-16",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_referendum",
+     "evidence": "The 2000 referendum site, linked from the Commission's referendums index, answered an automated client with HTTP 200 on 2026-11-17. The two 1991 votes predate the Commission and have no results site."
+    }
+   ],
+   "est_votes": 200000000,
+   "effort": 2
+  },
+  {
+   "key": "oblast_council",
+   "tier": "oblast",
+   "name": "Вибори депутатів обласних рад",
+   "name_en": "Oblast council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "grain": [
+     "ua.region"
+    ]
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the Commission's local sites; polling-station figures stay with territorial commissions.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 140-141)",
+   "contests_per_unit": 1,
+   "note": "Oblast councils (oblast soviets until 1994) are elected for five years (Constitution art. 141; four years before 2006). Systems: majoritarian districts in 1990-2002, closed lists in 2006, mixed in 2010, lists with candidates assigned to territorial districts in 2015, and open lists in 2020. Oblast governors head appointed state administrations and are not elected. No oblast council elections were called in Donetsk and Luhansk oblasts in 2015 or 2020. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held. The regular local elections due on 26 October 2025 were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "code",
+     "locator": "https://zakon.rada.gov.ua/laws/show/396-20 (regular local elections on the last Sunday of October of the fifth year of the councils' term)",
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_last_sunday",
+     "term_years": 5,
+     "administered_by": "Обласні територіальні виборчі комісії",
+     "valid_from": "2015-07-14",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same party organization's list."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04",
+     "note": "Oblast soviets, with the republic's parliament."
+    },
+    {
+     "date": "1994-06-26",
+     "note": "With the presidential first round."
+    },
+    {
+     "date": "1998-03-29",
+     "note": "With the parliamentary election."
+    },
+    {
+     "date": "2002-03-31",
+     "note": "With the parliamentary election."
+    },
+    {
+     "date": "2006-03-26",
+     "note": "With the parliamentary election."
+    },
+    {
+     "date": "2010-10-31",
+     "note": "The councils summary lists 24 councils in its «ВР АРК, обласні ради» column, the Crimean parliament among them."
+    },
+    {
+     "date": "2015-10-25",
+     "note": "No elections in Donetsk and Luhansk oblasts."
+    },
+    {
+     "date": "2020-10-25",
+     "contests": 22,
+     "seats": 1660,
+     "source": "cvk_vm2020",
+     "note": "No elections in Donetsk and Luhansk oblasts; 1,617 of the 1,660 seats were filled.",
+     "quote": "pvm006: «Територіальні виборчі комісії … Обласні … Разом 22»; pvm005: «Обласні … Разом: Склад рад 1660, Обрано 1617»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 120000000,
+   "effort": 3
+  },
+  {
+   "key": "raion_council",
+   "tier": "raion",
+   "name": "Вибори депутатів районних рад",
+   "name_en": "Raion council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "grain": [
+     "ua.region"
+    ]
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the Commission's local sites.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 140-141)",
+   "contests_per_unit": 1,
+   "note": "Raion councils, elected on the same days and systems as the oblast councils. The 2020 reform cut 490 raions to 136; councils in the new raions were first elected on 25 October 2020. Raion governors head appointed state administrations. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "code",
+     "locator": "https://zakon.rada.gov.ua/laws/show/396-20 (regular local elections on the last Sunday of October of the fifth year)",
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_last_sunday",
+     "term_years": 5,
+     "administered_by": "Районні територіальні виборчі комісії",
+     "valid_from": "2015-07-14"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04"
+    },
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31",
+     "contests": 488,
+     "source": "cvk_vm2010",
+     "note": "Mixed system (lists and single-member districts), so a council can hold more than one contest.",
+     "quote": "wm00114: «Загальна кількість рад … Районні ради … Разом 488»"
+    },
+    {
+     "date": "2015-10-25"
+    },
+    {
+     "date": "2020-10-25",
+     "contests": 119,
+     "seats": 5366,
+     "source": "cvk_vm2020",
+     "note": "The new raions, less those in occupied areas and where elections were not called in Donetsk and Luhansk oblasts.",
+     "quote": "pvm006: «Районні … Разом 119»; pvm005: «Районні … Разом: Склад рад 5366, Обрано 5204»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 80000000,
+   "effort": 3
+  },
+  {
+   "key": "hromada_council",
+   "tier": "hromada",
+   "name": "Вибори депутатів сільських, селищних, міських рад",
+   "name_en": "Village, settlement, and city council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "grain": [
+     "ua.region"
+    ]
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the Commission's local sites.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 140-141)",
+   "contests_per_unit": 1,
+   "note": "The councils of the territorial communities, the basic tier of local self-government: over 11,500 village, settlement, and city councils until 2020, and the 1,469 hromada councils formed by the 2015-2020 amalgamation since the regular elections of 25 October 2020. Systems vary by size: majoritarian districts in villages and small communities, lists in larger cities (and mixed in 2010). In 2020 the Commission counts 43,074 seats in 1,575 councils of all tiers. First, early, by-, repeat, and additional elections between regular days are the local_interim class. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "code",
+     "locator": "https://zakon.rada.gov.ua/laws/show/396-20 (regular local elections on the last Sunday of October of the fifth year)",
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_last_sunday",
+     "term_years": 5,
+     "administered_by": "Сільські, селищні, міські територіальні виборчі комісії",
+     "valid_from": "2015-07-14"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04"
+    },
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31",
+     "note": "Councils summary: 278 city councils of raion significance, 784 settlement and 10,278 village councils, and the city councils of oblast significance."
+    },
+    {
+     "date": "2015-10-25",
+     "note": "The 2015 list page counts 10,602 city, 11,438 settlement, and 118,372 village council seats elected that day."
+    },
+    {
+     "date": "2020-10-25",
+     "note": "The 2020 list page counts 11,124 city, 4,642 settlement, and 12,143 village council seats elected that day."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 3
+  },
+  {
+   "key": "hromada_head",
+   "tier": "hromada",
+   "name": "Вибори сільських, селищних, міських голів",
+   "name_en": "Village, settlement, and city head (mayor) elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "grain": [
+     "ua.region"
+    ]
+   },
+   "valid_from": "1994-02-03",
+   "first_held": "1994-06-26",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Community; the Commission's sites list the elected heads, and results by polling station stay with territorial commissions.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 141: the head is elected by the community's voters for five years)",
+   "contests_per_unit": 1,
+   "note": "Direct election of village, settlement, and city heads (голова), first held with the local elections of June 1994. Plurality vote, except a two-round majority vote in cities with 90,000 or more voters under the 2015 law and 75,000 or more under the Electoral Code (runoffs 15 November 2015 and 22 November 2020). Kyiv's mayor is the kyiv_mayor class. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "code",
+     "locator": "https://zakon.rada.gov.ua/laws/show/396-20 (regular local elections on the last Sunday of October of the fifth year)",
+     "period_years": 5,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_last_sunday",
+     "term_years": 5,
+     "runoff": "majority",
+     "runoff_rule": "Only in cities with 75,000 or more voters (90,000 under the 2015 law): the top two meet on the third Sunday after the first round when no one wins a majority; elsewhere plurality.",
+     "administered_by": "Сільські, селищні, міські територіальні виборчі комісії",
+     "valid_from": "2015-07-14",
+     "vacancy_rule": "An early election; the council secretary acts meanwhile."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31",
+     "contests": 11516,
+     "source": "cvk_vm2010",
+     "quote": "wm00113: «Загальна кількість сільських, селищних, міських голів, які обиралися 11516»"
+    },
+    {
+     "date": "2015-10-25",
+     "note": "The 2015 list page counts 357 city, 567 settlement, and 9,126 village heads elected that day."
+    },
+    {
+     "date": "2020-10-25",
+     "contests": 1418,
+     "source": "cvk_vm2020",
+     "note": "1,419 communities less Kyiv, whose mayor is the kyiv_mayor class; 1,395 heads were elected.",
+     "quote": "pvm004: «Загальна кількість громад, в яких були призначені вибори сільських, селищних, міських голів 1419»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 110000000,
+   "effort": 3
+  },
+  {
+   "key": "local_interim",
+   "tier": "hromada",
+   "name": "Перші, позачергові, проміжні, повторні та додаткові місцеві вибори",
+   "name_en": "First, early, by-, repeat, and additional local elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1990-03-04",
+   "earliest_record": "2015-10-25",
+   "finest_note": "Council and electoral district on the Commission's local sites.",
+   "source": "local_law",
+   "note": "Local elections between regular days, of councils and heads at every tier below the nation: first elections of newly amalgamated communities (перші, 2015-2019), early elections after a dissolution or a head's departure (позачергові), by-elections for vacant district seats (проміжні), repeat elections where a vote failed (повторні), and additional elections (додаткові). The Commission's 2015 and 2020 sites list 7, 142, 140, 124, 93, and 48 election days in 2015-2020 and 7, 55, and 15 in 2020-2022, those after 24 February 2022 stopped by martial law. Pipelines should load first and early elections as `special` and by-, repeat, and additional elections as `by_election`. Interim elections before 2015 were posted only by territorial commissions.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "region",
+      "county",
+      "municipality",
+      "submunicipal"
+     ]
+    },
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "through": "2015-06-30",
+     "note": "Interim local elections before the 2015 law; no central list."
+    },
+    {
+     "date": "2015-07-01",
+     "precision": "year",
+     "through": "2020-10-24",
+     "note": "First elections of amalgamated communities on 35, 30, 23, and 8 days in 2016-2019 (the first 159 on 25 October 2015, with the regular elections), with early, by-, repeat, and additional elections, as the Commission's vm2015 list pages show."
+    },
+    {
+     "date": "2020-11-22",
+     "precision": "day",
+     "through": "2022-02-20",
+     "note": "Repeat, early, and by-elections on 55 days in 2021 and the first weeks of 2022 (vm2020 list pages), ending with the repeat elections of 20 February 2022; the 2022 list also names days from 6 March to 30 October 2022 that martial law stopped."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 8000000,
+   "effort": 3
+  },
+  {
+   "key": "starosta",
+   "tier": "starosta_district",
+   "name": "Вибори старост",
+   "name_en": "Starosta elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "2015-02-05",
+   "valid_to": "2020-10-25",
+   "first_held": "2016-01-17",
+   "earliest_record": "2016-01-17",
+   "finest_note": "Starosta district; the vm2015 site lists the elected starostas (pvm009, pvm025).",
+   "source": "local_law",
+   "note": "A starosta represented the villages of a starosta district inside an amalgamated community and was elected by their voters, by plurality, at the community's first elections or later. The vm2015 list pages count 516 starosta posts filled in 2016, 155 in 2017, 119 in 2018, and 15 in 2019 at first elections, plus early and repeat ones. Since the 2020 local elections a starosta is approved by the council on the head's proposal and is no longer elected.",
+   "match": [
+    {
+     "office_kinds": [
+      "other"
+     ],
+     "polity_kinds": [
+      "submunicipal",
+      "municipality"
+     ],
+     "name_pattern": "(?i)старост|starosta"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "through": "2020-10-24",
+     "note": "Starosta elections on the first-election days of amalgamated communities, and early and repeat ones, as listed on the vm2015 site."
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 400000,
+   "effort": 3
+  },
+  {
+   "key": "city_district_council",
+   "tier": "city_district",
+   "name": "Вибори депутатів районних у містах рад",
+   "name_en": "Council elections in raions within cities",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the Commission's local sites.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 140: the city decides whether its raions have councils)",
+   "contests_per_unit": 1,
+   "note": "A city divided into raions may create raion councils; most no longer do. Kyiv abolished its raion councils in 2010. In 2010 the Commission listed 55 such councils, and in 2015 and 2020 it counts 1,032 and 562 seats elected that day. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04"
+    },
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31",
+     "contests": 55,
+     "source": "cvk_vm2010",
+     "note": "Mixed system, so a council can hold more than one contest.",
+     "quote": "wm00114: «Районні у містах ради … Разом 55»"
+    },
+    {
+     "date": "2015-10-25"
+    },
+    {
+     "date": "2020-10-25",
+     "seats": 562,
+     "source": "cvk_vm2020",
+     "quote": "pvm005: «Районні у містах … Разом: Склад рад 562, Обрано 555»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 15000000,
+   "effort": 4
+  },
+  {
+   "key": "kyiv_council",
+   "tier": "special_city",
+   "name": "Вибори депутатів Київської міської ради",
+   "name_en": "Kyiv City Council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2015-10-25",
+   "finest_note": "Council and electoral district on the Commission's local sites.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 133: Kyiv has special status set by law)",
+   "note": "Kyiv's council, 120 seats since 2006. Early elections were called on 25 May 2008 and 25 May 2014, so Kyiv held no council election in 2010. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "UA-30",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04"
+    },
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2008-05-25",
+     "note": "Early election."
+    },
+    {
+     "date": "2014-05-25",
+     "note": "Early election."
+    },
+    {
+     "date": "2015-10-25"
+    },
+    {
+     "date": "2020-10-25",
+     "seats": 120,
+     "source": "cvk_vm2020",
+     "quote": "pvm005: «м.Київ 120 119»"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 11000000,
+   "effort": 3
+  },
+  {
+   "key": "kyiv_mayor",
+   "tier": "special_city",
+   "name": "Вибори Київського міського голови",
+   "name_en": "Kyiv mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1994-02-03",
+   "first_held": "1999-05-30",
+   "earliest_record": "2015-10-25",
+   "finest_note": "City; the Commission's sites list the elected head.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (arts. 133, 141)",
+   "note": "Two-round majority vote since 2015 (runoff 15 November 2015; won outright in 2020). Whether the 1994 vote for the chair of the city council counts as Kyiv's first mayoral election was not settled from a fetched source, so the class starts in 1999. Martial law, in force since 24 February 2022, bars elections while it lasts (Law «Про правовий режим воєнного стану», art. 19), so the regular dates that fell due under it were not held.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "UA-30",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-05-30"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2008-05-25",
+     "note": "Early election."
+    },
+    {
+     "date": "2014-05-25",
+     "note": "Early election."
+    },
+    {
+     "date": "2015-10-25",
+     "note": "Runoff 15 November 2015."
+    },
+    {
+     "date": "2020-10-25"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 9000000,
+   "effort": 3
+  },
+  {
+   "key": "sevastopol_council",
+   "tier": "special_city",
+   "name": "Вибори депутатів Севастопольської міської ради",
+   "name_en": "Sevastopol City Council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1990-03-04",
+   "first_held": "1990-03-04",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the 2010 local site.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 133)",
+   "note": "Sevastopol's council; the city's executive was an appointed state administration. No election under Ukrainian law has been possible since the 2014 occupation; votes the occupying power organizes are the occupied_votes class.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "UA-40",
+     "precedence": 1,
+     "valid_to": "2014-02-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-04"
+    },
+    {
+     "date": "1994-06-26"
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 1200000,
+   "effort": 4
+  },
+  {
+   "key": "crimea_parliament",
+   "tier": "crimea",
+   "name": "Вибори депутатів Верховної Ради Автономної Республіки Крим",
+   "name_en": "Verkhovna Rada of the Autonomous Republic of Crimea elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1994-03-27",
+   "first_held": "1994-03-27",
+   "earliest_record": "2010-10-31",
+   "finest_note": "Council and electoral district on the 2010 local site.",
+   "source": "const",
+   "locator": "https://zakon.rada.gov.ua/laws/show/254к/96-вр (art. 136: the Verkhovna Rada of the Autonomous Republic of Crimea)",
+   "note": "Crimea's 100-seat parliament (Supreme Council of Crimea until 1998), elected in 1994 with the national parliament, in 1998, 2002, and 2006 with it again, and in 2010 with the local elections. The 1990 Crimean oblast council, which became the Supreme Council in 1991, is counted with the oblast councils. No election under Ukrainian law has been possible since the 2014 occupation.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "UA-43",
+     "precedence": 1,
+     "valid_to": "2014-02-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-03-27",
+     "note": "Runoffs 10 April 1994."
+    },
+    {
+     "date": "1998-03-29"
+    },
+    {
+     "date": "2002-03-31"
+    },
+    {
+     "date": "2006-03-26"
+    },
+    {
+     "date": "2010-10-31"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ЦВК: WWW ІАС «Місцеві вибори» (cvk.gov.ua/pls/vm2010, vm2015, vm2020)",
+     "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
+     "format": "html; xml open data (vm2020)",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "role": "administers",
+     "first_date": "2010-10-31",
+     "last_date": "2022-02-20",
+     "license": "Attribution required by the site notice",
+     "source": "cvk_local",
+     "evidence": "The 2010, 2015, and 2020 local results sites answered an automated client with HTTP 200 on 2026-11-17. They publish elected deputies and heads, and the 2015 and 2020 sites list every local election day with its kind; council results are by council and district, not by polling station. Local results before 2010 were never posted by the Commission: territorial commissions declared them."
+    }
+   ],
+   "est_votes": 5000000,
+   "effort": 4
+  },
+  {
+   "key": "crimea_president",
+   "tier": "crimea",
+   "name": "Вибори Президента Республіки Крим",
+   "name_en": "President of the Republic of Crimea election",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1993-09-17",
+   "valid_to": "1995-03-17",
+   "first_held": "1994-01-16",
+   "source": "const",
+   "note": "Crimea's only popular vote for a president of its own, 16 January 1994 with a runoff on 30 January 1994; the Verkhovna Rada abolished the post on 17 March 1995.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state",
+      "governor"
+     ],
+     "iso_pattern": "UA-43",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-01-16",
+     "note": "Runoff 30 January 1994."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Run by Crimea's own election commission before the Central Election Commission existed; no official results publication survives online, so it needs an archival or printed official source.",
+   "est_votes": 2500000,
+   "effort": 5
+  },
+  {
+   "key": "council_chair_1994",
+   "tier": "oblast",
+   "name": "Вибори голів обласних і районних рад 1994 року",
+   "name_en": "Direct elections of oblast and raion council chairs (1994)",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1994-02-03",
+   "valid_to": "1995-06-08",
+   "first_held": "1994-06-26",
+   "source": "const",
+   "note": "Under the February 1994 local elections law, voters elected the chairs of oblast and raion councils directly on 26 June 1994, with runoffs; the 1995 Constitutional Agreement and the 1996 Constitution returned the choice to the councils. Not settled from a fetched source.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "speaker",
+      "other"
+     ],
+     "polity_kinds": [
+      "region",
+      "county"
+     ],
+     "valid_from": "1994-01-01",
+     "valid_to": "1995-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-06-26"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Declared by oblast and raion commissions before the Central Election Commission existed; no official results publication is online.",
+   "est_votes": 30000000,
+   "effort": 5
+  },
+  {
+   "key": "local_referendum",
+   "tier": "hromada",
+   "name": "Місцеві референдуми та дорадчі опитування",
+   "name_en": "Local referendums and consultative polls",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "valid_from": "1991-01-20",
+   "valid_to": "2012-11-06",
+   "first_held": "1991-01-20",
+   "source": "ref_law",
+   "note": "The 1991 law on all-Ukrainian and local referendums allowed oblast, raion, and community referendums: the Crimean referendum of 20 January 1991, the Galician oblasts' independence question of 17 March 1991, Transcarpathia's autonomy question of 1 December 1991, and the Donetsk and Luhansk consultative polls of 27 March 1994 among them. Law No 5475-VI of 2012 repealed it without a local referendum law to follow, so no local referendum has had a legal basis since.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "region",
+      "county",
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "through": "2012-12-31",
+     "note": "Local referendums and polls under the 1991 law; no central list."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Run and declared by local councils' commissions with no central publisher; results survive only in local official gazettes and archives.",
+   "est_votes": 10000000,
+   "effort": 5
+  },
+  {
+   "key": "supreme_soviet_ssr",
+   "tier": "ukrainian_ssr",
+   "name": "Вибори до Верховної Ради Української РСР (1938-1985)",
+   "name_en": "Supreme Soviet of the Ukrainian SSR elections, 1938-1985",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1937-01-30",
+   "valid_to": "1990-03-04",
+   "first_held": "1938-06-26",
+   "source": "const",
+   "note": "Eleven single-candidate elections under the 1937 and 1978 republican constitutions (1938, 1947, 1951, 1955, 1959, 1963, 1967, 1971, 1975, 1980, 1985). The competitive 1990 election opens the rada class.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "UA",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1938-01-01",
+     "precision": "year",
+     "through": "1985-12-31",
+     "note": "Eleven general elections; not counted from an official list."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Results survive only in the republic's printed gazettes and archives; there is no machine-readable official source.",
+   "est_votes": 300000000,
+   "effort": 5
+  },
+  {
+   "key": "local_soviets_ssr",
+   "tier": "ukrainian_ssr",
+   "name": "Вибори до місцевих рад депутатів трудящих (народних депутатів) Української РСР",
+   "name_en": "Local soviet elections of the Ukrainian SSR, 1939-1987",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1937-01-30",
+   "valid_to": "1990-03-04",
+   "first_held": "1939-12-24",
+   "source": "const",
+   "note": "Single-candidate elections of oblast, raion, city, settlement, and village soviets every two years (two and a half after 1977). The competitive local elections of 4 March 1990 open the local classes.",
+   "disposition": "blocked",
+   "disposition_reason": "Results survive only in printed gazettes and archives; there is no machine-readable official source.",
+   "est_votes": 500000000,
+   "effort": 5
+  },
+  {
+   "key": "union_bodies_ssr",
+   "tier": "ukrainian_ssr",
+   "name": "Вибори до Верховної Ради СРСР та З'їзду народних депутатів СРСР в Українській РСР",
+   "name_en": "USSR Supreme Soviet and Congress of People's Deputies elections held in the Ukrainian SSR",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1937-12-12",
+   "valid_to": "1991-08-24",
+   "first_held": "1937-12-12",
+   "source": "const",
+   "note": "Elections of all-Union bodies in the republic's districts, up to the Congress of People's Deputies of 26 March 1989.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "They elected bodies of the USSR, not of Ukraine; they belong to a Soviet Union census, not this one."
+  },
+  {
+   "key": "constituent_assembly_1918",
+   "tier": "unr",
+   "name": "Вибори до Українських Установчих Зборів",
+   "name_en": "Ukrainian Constituent Assembly election (1917-1918)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1917-11-20",
+   "valid_to": "1918-04-29",
+   "first_held": "1917-12-27",
+   "source": "const",
+   "note": "Called by the Central Rada's Third Universal; voting in late December 1917 and January 1918 was completed in only part of the country before the Bolshevik offensive, and the assembly never met. The Central Rada itself was formed by delegation, not by popular vote.",
+   "disposition": "blocked",
+   "disposition_reason": "Partial returns survive only in contemporary press and archives; there is no official results publication.",
+   "est_votes": 5000000,
+   "effort": 5
+  },
+  {
+   "key": "occupied_votes",
+   "tier": "crimea",
+   "name": "Голосування, організовані державою-окупантом на тимчасово окупованих територіях",
+   "name_en": "Votes organized by the occupying power in occupied territory",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "2014-02-27",
+   "source": "const",
+   "note": "The 16 March 2014 Crimean vote and every later vote the occupying power or its proxies have run in Crimea, Sevastopol, and occupied parts of Donetsk, Luhansk, Zaporizhzhia, and Kherson oblasts. Ukrainian law treats them as void.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Not held under Ukrainian law or by Ukrainian authorities; the archive records Ukraine's own elections in its territory."
+  },
+  {
+   "key": "crimean_tatar_kurultai",
+   "tier": "crimea",
+   "name": "Вибори делегатів Курултаю кримськотатарського народу",
+   "name_en": "Kurultai of the Crimean Tatar people delegate elections",
+   "category": "non_territorial",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1991-06-26",
+   "first_held": "1991-06-26",
+   "source": "const",
+   "note": "The Crimean Tatar people's own representative assembly, recognized by the Verkhovna Rada in 2014, whose delegates are elected by Crimean Tatars under the Kurultai's own rules; the Kurultai in turn elects the Mejlis.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the community's own institutions, not by the state or under an election law."
+  },
+  {
+   "key": "self_organization",
+   "tier": "hromada",
+   "name": "Органи самоорганізації населення",
+   "name_en": "Residents' self-organization bodies",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "note": "House, street, quarter, and village committees chosen at residents' meetings under the 2001 law on residents' self-organization bodies.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen at meetings, not by ballot under an election law."
+  },
+  {
+   "key": "indirect_officers",
+   "tier": "national",
+   "name": "Обрання та призначення посадових осіб Верховною Радою",
+   "name_en": "Officers elected or appointed by the Verkhovna Rada",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "note": "The Chair of the Verkhovna Rada, the Prime Minister and Cabinet, members of the Central Election Commission, and other officers chosen by parliamentary vote (Constitution art. 85), and the presidium and executives chosen by local councils.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by a body, not by voters."
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Призначення суддів",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const",
+   "note": "Judges are appointed by the President on the High Council of Justice's submission (art. 128 since 2016; until then the Verkhovna Rada elected judges for life). Constitutional Court judges are appointed in thirds by the President, the Verkhovna Rada, and the Congress of Judges.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judge is chosen by popular vote."
+  },
+  {
+   "key": "party_nominations",
+   "tier": "national",
+   "name": "Висування кандидатів партіями",
+   "name_en": "Party nominations",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "code",
+   "note": "Parties nominate candidates and lists at their own congresses and conferences; the Electoral Code provides no state-run primary.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No state-run nominating contest exists."
+  }
+ ]
+}
