@@ -24,7 +24,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.pt import legacy
+from ea.sources.pt import cne_local, legacy
 from ea.sources.pt.crawl import CANDIDATE_SITES, HOST, Site, bundle_url, store
 from ea.sources.pt.legacy import Old
 
@@ -149,6 +149,13 @@ METHOD = (
     "the Diário da República can differ slightly."
 )
 
+CNE_2005_NOTE = (
+    "The results site prints votes only for this election. The seats each body had and each list won are from the "
+    "National Elections Commission's official results map of the 9 October 2005 local elections (Mapa Oficial "
+    "n.º 1-A/2006, Diário da República, I-B, 6 February 2006), which transcribes the general tally records "
+    "(actas de apuramento geral) literally, including seats that differ from the number the law fixed."
+)
+
 
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
@@ -190,6 +197,8 @@ def fetch() -> None:
     for site in SITES:
         if site.family == "legacy":
             legacy.store(OLD[site.name])
+            if site.name == "Autarquicas2005":
+                cne_local.fetch()
             continue
         store(site)
         for url in party_urls(site):
@@ -518,7 +527,131 @@ def _legacy_tree(site: Site, old: Old) -> Tree:
     for node in nodes.values():
         node.leaf = not node.children and node.key != root
     organs = dict(zip(site.organs, old.types, strict=True))
-    return Tree(site, nodes, counts, root, organs)
+    result = Tree(site, nodes, counts, root, organs)
+    if site.name == "Autarquicas2005":
+        local_seats(result)
+    return result
+
+
+def _line_seats(count: Count, body: cne_local.Body) -> int:
+    """Copy a printed body's seats onto the lines of a count; return the lines that found no printed row.
+
+    The map carries the official tally, so a list's votes can differ a little from the site's election-night count.
+    Lines pair with rows by label and votes, then by votes, then by label, and last by rank in votes.
+    """
+    free = list(body.rows)
+    todo = list(count.lines)
+    passes = (
+        lambda line, row: row.votes == line.votes and fold(row.label) == fold(line.label),
+        lambda line, row: row.votes == line.votes,
+        lambda line, row: (
+            fold(row.label) == fold(line.label) and sum(fold(r.label) == fold(line.label) for r in free) == 1
+        ),
+    )
+    for match in passes:
+        for line in list(todo):
+            row = next((r for r in free if match(line, r)), None)
+            if row is not None:
+                free.remove(row)
+                todo.remove(line)
+                line.seats = row.seats
+    for line in [x for x in todo if not x.votes]:
+        # The map leaves out lists that got no votes.
+        todo.remove(line)
+        line.seats = 0
+    if len(todo) == len(free):
+        for line, row in zip(
+            sorted(todo, key=lambda x: -(x.votes or 0)), sorted(free, key=lambda r: -r.votes), strict=True
+        ):
+            line.seats = row.seats
+        todo = []
+    count.seats = body.seats
+    return len(todo)
+
+
+# Municipalities the Commission's map names differently from the results site, by folded site name.
+MAP_NAMES = {"santa maria da feira": "Feira", "marco de canaveses": "Marco de Canavezes"}
+
+
+def _distance(count: Count, body: cne_local.Body) -> float:
+    """How far a site count is from a printed body: the mean relative gap of its lines' votes."""
+    gaps = [min(abs((count.registered or 0) - (body.registered or 0)) / max(body.registered or 1, 1), 1.0)]
+    rows = {fold(r.label): r.votes for r in body.rows}
+    for line in count.lines:
+        votes = rows.get(fold(line.label))
+        gaps.append(1.0 if votes is None else min(abs(votes - (line.votes or 0)) / max(votes, 1), 1.0))
+    return sum(gaps) / len(gaps)
+
+
+def local_seats(t: Tree) -> dict[str, int]:
+    """Add the seats of the 2005 local election, which the Ministry's site does not print, from the Commission's map.
+
+    The map prints the number of seats the law fixed for each body and the seats each list won, by municipality and
+    parish. Each printed body is matched to the site's territory by name, or by registered voters when a name repeats,
+    and each of its rows to the site's row with the same votes. Returns how many bodies and rows found no match.
+    """
+    printed = cne_local.parse(raw.cached(cne_local.SOURCE, cne_local.URL))
+    by_town: dict[str, list[int]] = defaultdict(list)
+    for body in printed:
+        if body.organ == "CM":
+            by_town[fold(body.municipality)].append(body.ordinal)
+    stats = {"bodies": 0, "unmatched_bodies": 0, "unmatched_rows": 0}
+    towns = [n for n in t.nodes.values() if n.parent and t.nodes[n.parent].parent == t.top and n.children]
+    for town in towns:
+        cm = t.counts.get((town.key, "CM"))
+        ordinals = (
+            by_town.get(fold(MAP_NAMES.get(fold(town.name), town.name)))
+            or by_town.get(fold(TOWN_NAMES.get(fold(town.name), town.name)))
+            or []
+        )
+        if len(ordinals) > 1 and cm is not None:
+            ordinals = [
+                o
+                for o in ordinals
+                if any(b.organ == "CM" and b.ordinal == o and b.registered == cm.registered for b in printed)
+            ] or ordinals
+        if not ordinals:
+            stats["unmatched_bodies"] += 1
+            continue
+        mine = [b for b in printed if b.ordinal == ordinals[0]]
+        for organ in ("CM", "AM"):
+            count = t.counts.get((town.key, organ))
+            body = next((b for b in mine if b.organ == organ), None)
+            if count is None:
+                continue
+            stats["bodies"] += 1
+            if body is None:
+                stats["unmatched_bodies"] += 1
+                continue
+            stats["unmatched_rows"] += _line_seats(count, body)
+        parishes = [b for b in mine if b.organ == "AF"]
+        left: list[tuple[str, Count]] = []
+        for child in town.children:
+            count = t.counts.get((child, "AF"))
+            if count is None:
+                continue
+            stats["bodies"] += 1
+            name = fold(t.nodes[child].name)
+            found = [b for b in parishes if fold(b.parish or "") == name and b.registered == count.registered]
+            found = found or [b for b in parishes if fold(b.parish or "") == name]
+            found = found or [b for b in parishes if b.registered == count.registered]
+            if not found:
+                left.append((child, count))
+                continue
+            parishes.remove(found[0])
+            stats["unmatched_rows"] += _line_seats(count, found[0])
+        # Names differ on the two sources for some parishes: pair what is left by how close their figures are.
+        pairs = sorted((_distance(count, b), i, j) for i, (_, count) in enumerate(left) for j, b in enumerate(parishes))
+        used_left: set[int] = set()
+        used_body: set[int] = set()
+        for distance, i, j in pairs:
+            if distance > 0.5 or i in used_left or j in used_body:
+                continue
+            used_left.add(i)
+            used_body.add(j)
+            stats["unmatched_rows"] += _line_seats(left[i][1], parishes[j])
+        stats["unmatched_bodies"] += len(left) - len(used_left)
+    return stats
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1016,6 +1149,7 @@ def contest_node(t: Tree, organ: str, leaf: str) -> str | None:
 class Built:
     values: list[tuple[str, str, str | None, int, int]] = field(default_factory=list)
     units: dict[str, str] = field(default_factory=dict)
+    short: list[str] = field(default_factory=list)
 
 
 ELECTION_TEXT = {
@@ -1061,6 +1195,8 @@ def election(site: Site) -> Package:
     )
     p.external.add(PORTUGAL)
     p.uses(bundle(site))
+    if site.name == "Autarquicas2005":
+        p.uses(raw.cached(cne_local.SOURCE, cne_local.URL))
     for artifact in _party_files(site):
         p.uses(artifact)
     family = re.sub(r"[^a-z]", "", site.name.lower().split("2")[0].replace("regionais-madeira", "regionais"))
@@ -1114,6 +1250,12 @@ def election(site: Site) -> Package:
             _contest(p, t, site, organ, node, leaves, election_id, path, slugs, built, towns, known, people, first)
     _values(p, built)
     _turnout(p, site, built)
+    if built.short:
+        p.accept(
+            "outcomes.seats_magnitude",
+            f"the official results map assigns fewer seats than the law fixed in {len(built.short)} parish assemblies, "
+            "because it prints no row for a list that the results site counts; stored as printed",
+        )
     if family == "autarquicas" and slates(site):
         p.accept(
             "outcomes.list_members",
@@ -1331,6 +1473,15 @@ def _contest(
         completeness=1.0,
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    if site.name == "Autarquicas2005" and declared is not None and declared.seats:
+        p.add(
+            "note",
+            id=key("note", result_set, "seats"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=CNE_2005_NOTE,
+            lang="en",
+        )
     order: list[tuple[str, int]] = []
     for count in [declared, *counts.values()]:
         for label in _labels(count.lines if count else []):
@@ -1411,6 +1562,21 @@ def _contest(
         p.add("note", id=key("note", result_set, "gap"), entity_id=result_set, kind="caveat", body_md=gap, lang="en")
     if declared is not None:
         _outcomes(p, organ, result_set, declared, options)
+        won = sum(line.seats or 0 for line in declared.lines)
+        if site.name == "Autarquicas2005" and declared.seats and won != declared.seats:
+            built.short.append(result_set)
+            p.add(
+                "note",
+                id=key("note", result_set, "short"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=(
+                    f"The official results map assigns {won} of the body's {declared.seats} seats: it prints no row "
+                    "for one list that the results site counts, and its tally records leave the seats of that list "
+                    "out. The seats are stored as printed."
+                ),
+                lang="en",
+            )
     _slates(p, site, organ, node, result_set, options)
 
 
