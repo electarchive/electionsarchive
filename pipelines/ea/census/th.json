@@ -1,0 +1,2127 @@
+{
+  "polity": "TH",
+  "name": "Thailand",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Thailand",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "ไทย",
+        "lang": "th",
+        "kind": "native"
+      }
+    ],
+    "slug": "th",
+    "wikidata": "Q869",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "title": "รัฐธรรมนูญแห่งราชอาณาจักรไทย พุทธศักราช 2560 (Constitution of the Kingdom of Thailand, B.E. 2560, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Promulgated 6 April 2017 (Royal Gazette vol. 134 part 40 A). s. 83 (House of 500: 400 constituency and 100 party-list members since the first amendment of 2021; 350 and 150 before), s. 107 (Senate of 200 selected among candidates by group), s. 159 (Prime Minister chosen by the House), s. 166 (referendums), s. 252 (local councils elected; local executives elected or approved by the council), s. 256 (amendment), s. 269-272 (transitional appointed Senate of 250 and joint vote on the Prime Minister for the first five years). Not re-read here: krisdika.go.th reset the connection."
+    },
+    "constitution_1997": {
+      "title": "รัฐธรรมนูญแห่งราชอาณาจักรไทย พุทธศักราช 2540 (Constitution of the Kingdom of Thailand, B.E. 2540)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Promulgated 11 October 1997: first directly elected Senate of 200 members by province for six years, non-partisan; party-list seats in the House from 2001; the independent Election Commission."
+    },
+    "mp_act": {
+      "title": "พระราชบัญญัติประกอบรัฐธรรมนูญว่าด้วยการเลือกตั้งสมาชิกสภาผู้แทนราษฎร พ.ศ. 2561 (Organic Act on the Election of Members of the House of Representatives, B.E. 2561, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Constituencies, polling units (หน่วยเลือกตั้ง), the count at each polling unit and its posted sheet, consolidation by constituency, party-list allocation, and by-elections. Amended in 2021 for two ballots (400 constituencies and 100 party-list seats by largest remainder over the whole country)."
+    },
+    "senate_act": {
+      "title": "พระราชบัญญัติประกอบรัฐธรรมนูญว่าด้วยการได้มาซึ่งสมาชิกวุฒิสภา พ.ศ. 2561 (Organic Act on the Acquisition of Senators, B.E. 2561)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Candidates apply in one of 20 occupational and social groups and vote among themselves at district, provincial, and national level, within and then across groups, to select 200 senators for five years."
+    },
+    "referendum_act": {
+      "title": "พระราชบัญญัติประกอบรัฐธรรมนูญว่าด้วยการออกเสียงประชามติ พ.ศ. 2564 (Organic Act on Referendums, B.E. 2564, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "National referendums called by the Cabinet or required by the Constitution, held by the Election Commission; may be polled with a general election."
+    },
+    "parties_act": {
+      "title": "พระราชบัญญัติประกอบรัฐธรรมนูญว่าด้วยพรรคการเมือง พ.ศ. 2560 (Organic Act on Political Parties, B.E. 2560, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Parties choose their constituency and list candidates through their own branches and members (the primary-vote provisions); the Election Commission does not run these votes."
+    },
+    "local_election_act": {
+      "title": "พระราชบัญญัติการเลือกตั้งสมาชิกสภาท้องถิ่นหรือผู้บริหารท้องถิ่น พ.ศ. 2562 (Local Councils and Local Administrators Election Act, B.E. 2562)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Elections of the councils and executives of every local government (provincial administrative organizations, municipalities, subdistrict administrative organizations, Bangkok, and Pattaya), run by the Election Commission through provincial election directors; plurality in each ward or constituency, four-year terms, and a new election within 45 days of a term's end."
+    },
+    "pao_act": {
+      "title": "พระราชบัญญัติองค์การบริหารส่วนจังหวัด พ.ศ. 2540 (Provincial Administrative Organization Act, B.E. 2540, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "One provincial administrative organization per province outside Bangkok, with a council of 24 to 48 members elected by district-based constituencies and, since the third amendment of 2003, a directly elected president (นายกองค์การบริหารส่วนจังหวัด), each for four years."
+    },
+    "municipality_act": {
+      "title": "พระราชบัญญัติเทศบาล พ.ศ. 2496 (Municipality Act, B.E. 2496, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Subdistrict (ตำบล), town (เมือง), and city (นคร) municipalities with councils of 12, 18, and 24 members elected in two, three, and four wards; the mayor directly elected since the amendment of 2003 (chosen by the council before). Municipalities have existed since the Municipal Organization Act of 1933."
+    },
+    "sao_act": {
+      "title": "พระราชบัญญัติสภาตำบลและองค์การบริหารส่วนตำบล พ.ศ. 2537 (Tambon Council and Subdistrict Administrative Organization Act, B.E. 2537, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Subdistrict administrative organizations (องค์การบริหารส่วนตำบล) with a council elected by village and, since the amendment of 2003, a directly elected chief executive (นายก อบต.); tambon councils (สภาตำบล) where no SAO was formed."
+    },
+    "bma_act": {
+      "title": "พระราชบัญญัติระเบียบบริหารราชการกรุงเทพมหานคร พ.ศ. 2528 (Bangkok Metropolitan Administration Act, B.E. 2528)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "A directly elected Governor of Bangkok and Bangkok Metropolitan Council (one member per 100,000 residents of each district, at least one per district; 50 in 2022 and 2026), each for four years, and district councils (สภาเขต) of at least seven elected members per district."
+    },
+    "pattaya_act": {
+      "title": "พระราชบัญญัติระเบียบบริหารราชการเมืองพัทยา พ.ศ. 2542 (Pattaya City Administration Act, B.E. 2542)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "A directly elected Mayor of Pattaya and a council of 24 members elected in four constituencies, each for four years."
+    },
+    "locality_act": {
+      "title": "พระราชบัญญัติลักษณะปกครองท้องที่ พระพุทธศักราช 2457 (Local Administration Act, B.E. 2457, as amended)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Each village (หมู่บ้าน) elects its headman (ผู้ใหญ่บ้าน) by the vote of its residents, and the tambon's voters elect its kamnan (กำนัน) from among the village headmen; both serve until age 60 since the amendment of 2008. The district office (อำเภอ) of the Department of Provincial Administration runs these votes, not the Election Commission."
+    },
+    "local_direct_acts": {
+      "title": "พระราชบัญญัติว่าด้วยการลงคะแนนเสียงเพื่อถอดถอนสมาชิกสภาท้องถิ่นหรือผู้บริหารท้องถิ่น พ.ศ. 2542 and พระราชบัญญัติว่าด้วยการเข้าชื่อเสนอข้อบัญญัติท้องถิ่น (Local Recall Act, B.E. 2542, and the local referendum provisions)",
+      "publisher": "Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)",
+      "url": "https://www.krisdika.go.th/",
+      "kind": "official_body",
+      "note": "Votes of a local electorate to remove a local council member or executive, and local referendums a local government may call on its own affairs."
+    },
+    "dla_register": {
+      "title": "ข้อมูลพื้นฐาน อปท. (Register of local administrative organizations)",
+      "publisher": "Department of Local Administration, Ministry of Interior (กรมส่งเสริมการปกครองท้องถิ่น)",
+      "url": "https://info.dla.go.th/eForm/abtData.do",
+      "kind": "official_body",
+      "note": "Read on 2026-11-17 with searchCondition.pageSize=9000: 7,841 rows (province, district, local government): 76 อบจ., 35 เทศบาลนคร, 246 เทศบาลเมือง, 2,493 เทศบาลตำบล, 4,990 อบต., and เมืองพัทยา, in 76 provinces and 878 districts. Bangkok is not in the register."
+    },
+    "dopa_stat": {
+      "title": "สถิติจำนวนเขตการปกครอง (Statistics of administrative units: provinces, districts, subdistricts, and villages)",
+      "publisher": "Department of Provincial Administration, Ministry of Interior (กรมการปกครอง)",
+      "url": "https://stat.bora.dopa.go.th/",
+      "kind": "official_body",
+      "note": "The Department's count at 31 December 2023: 76 provinces, 878 districts, 7,255 subdistricts (ตำบล), and 75,142 villages (หมู่บ้าน) outside Bangkok. stat.bora.dopa.go.th did not answer this environment (the gateway could not connect), so the figures are not re-read here."
+    },
+    "bma": {
+      "title": "กรุงเทพมหานคร: 50 สำนักงานเขต (Bangkok Metropolitan Administration: the 50 district offices)",
+      "publisher": "Bangkok Metropolitan Administration (กรุงเทพมหานคร)",
+      "url": "https://www.bangkok.go.th/",
+      "kind": "official_body",
+      "note": "Bangkok is divided into 50 districts (เขต) and 180 subdistricts (แขวง). www.bangkok.go.th answered HTTP 403 to this environment, so the count is not re-read here."
+    },
+    "ect": {
+      "title": "สำนักงานคณะกรรมการการเลือกตั้ง (Office of the Election Commission of Thailand)",
+      "publisher": "Office of the Election Commission of Thailand",
+      "url": "https://www.ect.go.th/",
+      "kind": "official_body",
+      "note": "Administers House, Senate, referendum, and local elections since 1998 (local elections since the Local Election Act of 2002) and publishes results. HTTP 403 to this environment on 2026-11-17."
+    },
+    "parliament": {
+      "title": "สำนักงานเลขาธิการสภาผู้แทนราษฎร (Secretariat of the House of Representatives)",
+      "publisher": "Secretariat of the House of Representatives",
+      "url": "https://www.parliament.go.th/",
+      "kind": "official_body",
+      "note": "Records of the House since 1932, including the general elections from 15 November 1933 and the votes of the House on the Prime Minister. Answered HTTP 200 on 2026-11-17."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "ราชอาณาจักรไทย",
+      "name_en": "Kingdom of Thailand",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "constitution"
+    },
+    {
+      "key": "province",
+      "name": "จังหวัด / องค์การบริหารส่วนจังหวัด",
+      "name_en": "Provinces (changwat), each with a provincial administrative organization",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "th.province",
+      "source": "pao_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 76,
+          "source": "dla_register",
+          "locator": "https://info.dla.go.th/eForm/abtData.do?searchCondition.position=0&searchCondition.pageSize=9000 (76 rows named อบจ., one per province)"
+        },
+        {
+          "date": "2023-12-31",
+          "value": 76,
+          "source": "dopa_stat",
+          "locator": "https://stat.bora.dopa.go.th/ (76 จังหวัด at 31 December 2023; not re-read here)"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "อำเภอ",
+      "name_en": "Districts (amphoe), administrative only",
+      "parent": "province",
+      "polity_kind": "county",
+      "scheme": "th.district",
+      "elects": false,
+      "source": "dopa_stat",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 878,
+          "source": "dla_register",
+          "locator": "https://info.dla.go.th/eForm/abtData.do?searchCondition.position=0&searchCondition.pageSize=9000 (878 distinct province and district pairs among the register's 7,841 rows)"
+        },
+        {
+          "date": "2023-12-31",
+          "value": 878,
+          "source": "dopa_stat",
+          "locator": "https://stat.bora.dopa.go.th/ (878 อำเภอ at 31 December 2023; not re-read here)"
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "เทศบาล (นคร เมือง ตำบล)",
+      "name_en": "Municipalities (thesaban): city, town, and subdistrict",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "th.municipality",
+      "source": "municipality_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 2774,
+          "source": "dla_register",
+          "locator": "https://info.dla.go.th/eForm/abtData.do?searchCondition.position=0&searchCondition.pageSize=9000 (35 เทศบาลนคร, 246 เทศบาลเมือง, and 2,493 เทศบาลตำบล)"
+        }
+      ]
+    },
+    {
+      "key": "sao",
+      "name": "องค์การบริหารส่วนตำบล",
+      "name_en": "Subdistrict administrative organizations (SAO, o-bo-to)",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "th.sao",
+      "source": "sao_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 4990,
+          "source": "dla_register",
+          "locator": "https://info.dla.go.th/eForm/abtData.do?searchCondition.position=0&searchCondition.pageSize=9000 (4,990 rows named อบต.)"
+        }
+      ]
+    },
+    {
+      "key": "tambon",
+      "name": "ตำบล",
+      "name_en": "Subdistricts (tambon), electing a kamnan",
+      "parent": "district",
+      "polity_kind": "submunicipal",
+      "scheme": "th.tambon",
+      "source": "locality_act",
+      "counts": [
+        {
+          "date": "2023-12-31",
+          "value": 7255,
+          "source": "dopa_stat",
+          "locator": "https://stat.bora.dopa.go.th/ (7,255 ตำบล at 31 December 2023; not re-read here)"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "หมู่บ้าน",
+      "name_en": "Villages (muban), electing a headman",
+      "parent": "tambon",
+      "polity_kind": "submunicipal",
+      "scheme": "th.village",
+      "source": "locality_act",
+      "counts": [
+        {
+          "date": "2023-12-31",
+          "value": 75142,
+          "source": "dopa_stat",
+          "locator": "https://stat.bora.dopa.go.th/ (75,142 หมู่บ้าน at 31 December 2023; not re-read here)"
+        }
+      ]
+    },
+    {
+      "key": "bangkok",
+      "name": "กรุงเทพมหานคร",
+      "name_en": "Bangkok Metropolitan Administration (special local government at province level)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "th.bangkok",
+      "source": "bma_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 1,
+          "source": "bma",
+          "locator": "https://www.bangkok.go.th/ (the BMA Act constitutes one Bangkok Metropolitan Administration)"
+        }
+      ]
+    },
+    {
+      "key": "bangkok_district",
+      "name": "เขต",
+      "name_en": "Districts of Bangkok (khet)",
+      "parent": "bangkok",
+      "polity_kind": "submunicipal",
+      "scheme": "th.bangkok_district",
+      "source": "bma_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 50,
+          "source": "bma",
+          "locator": "https://www.bangkok.go.th/ (50 สำนักงานเขต; not re-read here, the site answered 403)"
+        }
+      ]
+    },
+    {
+      "key": "pattaya",
+      "name": "เมืองพัทยา",
+      "name_en": "Pattaya City (special local government)",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "th.pattaya",
+      "source": "pattaya_act",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 1,
+          "source": "dla_register",
+          "locator": "https://info.dla.go.th/eForm/abtData.do?searchCondition.position=0&searchCondition.pageSize=9000 (one row ท้องถิ่นรูปแบบพิเศษเมืองพัทยา)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "การเลือกตั้งสมาชิกสภาผู้แทนราษฎรแบบแบ่งเขตเลือกตั้ง",
+      "name_en": "House of Representatives general elections: constituency seats",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1932-12-10",
+      "first_held": "1933-11-15",
+      "earliest_record": "1933-11-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.constituency"
+        ],
+        "fine": [
+          "th.district",
+          "th.polling_unit"
+        ]
+      },
+      "note": "400 single-member constituencies by plurality since 2023 (350 in 2019, 400 in 2001 and 2005, 375 in 2011); multi-member constituencies with block voting by province or part of a province from 1937 to 1996 and in 2007. The House sits four years unless dissolved. The two annulled elections (2006, 2014) are listed with their dates.",
+      "source": "constitution",
+      "locator": "https://www.krisdika.go.th/ (Constitution of 2017, s. 83 as amended in 2021: four hundred constituency members and one hundred party-list members)",
+      "est_votes": 39000000,
+      "effort": 3,
+      "finest_note": "Polling unit (หน่วยเลือกตั้ง): each unit's count is posted on form ส.ส. 5/18 and consolidated by constituency; the Commission's results apps carry unit-level figures for recent elections, unverified here",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "contest_kinds": [
+            "body_seats",
+            "office"
+          ],
+          "iso_pattern": "TH"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand",
+          "source": "constitution",
+          "locator": "https://www.krisdika.go.th/ (Constitution of 2017: four-year term of the House from election day; a general election within 45 days of expiry or 45 to 60 days of a dissolution)",
+          "vacancy_rule": "A vacant constituency seat is filled by a by-election within 45 days unless the House has less than 180 days to run; a vacant list seat passes to the next name on the party's list."
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit",
+          "first_date": "1933-11-15"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1933-11-15",
+          "note": "First election: voters chose subdistrict representatives, who elected the 78 members (indirect, two stages). Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "1937-11-07",
+          "note": "First direct election, by province. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "1938-11-12",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1946-01-06",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1946-08-05",
+          "election_kind": "special",
+          "note": "Supplementary election of the members added under the 1946 Constitution. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1948-01-29",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1949-06-05",
+          "election_kind": "special",
+          "note": "Supplementary election of the members added under the 1949 Constitution. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1952-02-26",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1957-02-26",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1957-12-15",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1969-02-10",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1975-01-26",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1976-04-04",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1979-04-22",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1983-04-18",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1986-07-27",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1988-07-24",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1992-03-22",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1992-09-13",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1995-07-02",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1996-11-17",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2001-01-06",
+          "note": "400 single-member constituencies and 100 national party-list seats (1997 Constitution). Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2005-02-06",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2006-04-02",
+          "note": "Annulled by the Constitutional Court on 8 May 2006. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2007-12-23",
+          "note": "400 seats in multi-member constituencies and 80 party-list seats in 8 groups of provinces (2007 Constitution). Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2011-07-03",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2014-02-02",
+          "note": "Annulled by the Constitutional Court on 21 March 2014; voting was disrupted in 28 constituencies. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2019-03-24",
+          "contests": 350,
+          "seats": 350,
+          "source": "constitution",
+          "quote": "s. 83 as promulgated: สมาชิกซึ่งมาจากการเลือกตั้งแบบแบ่งเขตเลือกตั้ง จำนวนสามร้อยห้าสิบคน",
+          "note": "Single ballot, mixed-member apportionment with the 150 list seats. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 400,
+          "seats": 400,
+          "source": "constitution",
+          "quote": "s. 83 as amended in 2021: สมาชิกซึ่งมาจากการเลือกตั้งแบบแบ่งเขตเลือกตั้ง จำนวนสี่ร้อยคน",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-02-08",
+          "contests": 400,
+          "seats": 400,
+          "source": "constitution",
+          "quote": "s. 83 as amended in 2021: สมาชิกซึ่งมาจากการเลือกตั้งแบบแบ่งเขตเลือกตั้ง จำนวนสี่ร้อยคน",
+          "note": "Polled with the referendum on drafting a new constitution. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        }
+      ]
+    },
+    {
+      "key": "house_list",
+      "tier": "national",
+      "name": "การเลือกตั้งสมาชิกสภาผู้แทนราษฎรแบบบัญชีรายชื่อ",
+      "name_en": "House of Representatives general elections: party-list seats",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1997-10-11",
+      "first_held": "2001-01-06",
+      "earliest_record": "2001-01-06",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "world.country"
+        ],
+        "fine": [
+          "th.constituency",
+          "th.polling_unit"
+        ]
+      },
+      "note": "100 seats from one national list by a second ballot since 2023 (largest remainder); 150 seats apportioned from the single constituency ballot in 2019; 125 in 2011; 80 in eight groups of provinces in 2007; 100 from one national list in 2001 and 2005.",
+      "source": "mp_act",
+      "est_votes": 39000000,
+      "effort": 2,
+      "finest_note": "Polling unit: the party-list ballot is counted with the constituency ballot at each unit (form ส.ส. 5/18 บช.)",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "TH"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand",
+          "source": "mp_act",
+          "locator": "https://www.krisdika.go.th/ (Organic Act on the Election of MPs 2018 as amended in 2021: party-list seats allocated nationwide from the party ballot)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit",
+          "first_date": "2001-01-06"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-01-06",
+          "note": "100 seats, one national list, 5% threshold. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2005-02-06",
+          "note": "100 seats, one national list. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2006-04-02",
+          "note": "Annulled with the constituency election. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2007-12-23",
+          "note": "80 seats in 8 groups of provinces. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2011-07-03",
+          "note": "125 seats, one national list. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2014-02-02",
+          "note": "Annulled with the constituency election. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2019-03-24",
+          "note": "150 seats apportioned from the constituency ballot (mixed-member apportionment). Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 1,
+          "seats": 100,
+          "source": "constitution",
+          "quote": "s. 83 as amended in 2021: สมาชิกซึ่งมาจากบัญชีรายชื่อของพรรคการเมือง จำนวนหนึ่งร้อยคน",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-02-08",
+          "contests": 1,
+          "seats": 100,
+          "source": "constitution",
+          "quote": "s. 83 as amended in 2021: สมาชิกซึ่งมาจากบัญชีรายชื่อของพรรคการเมือง จำนวนหนึ่งร้อยคน",
+          "election_kind": "general",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "การเลือกตั้งสมาชิกสภาผู้แทนราษฎรแทนตำแหน่งที่ว่าง (เลือกตั้งซ่อม)",
+      "name_en": "House of Representatives by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1932-12-10",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.constituency"
+        ],
+        "fine": [
+          "th.polling_unit"
+        ]
+      },
+      "note": "By-elections for vacant constituency seats, and reruns the Commission orders after disqualifying a winner (red and orange cards). Not listed here: the Commission's announcements refused this environment.",
+      "source": "mp_act",
+      "est_votes": 1000000,
+      "effort": 3,
+      "finest_note": "Polling unit",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "contest_kinds": [
+            "body_seats",
+            "office"
+          ],
+          "iso_pattern": "TH"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "การออกเสียงประชามติ",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "2007-08-19",
+      "earliest_record": "2007-08-19",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "th.province"
+        ],
+        "fine": [
+          "th.constituency",
+          "th.polling_unit"
+        ]
+      },
+      "note": "Three held: the draft 2007 Constitution (19 August 2007), the draft 2017 Constitution with a second question on the joint vote for Prime Minister (7 August 2016), and whether to draft a new constitution, polled with the general election (8 February 2026).",
+      "source": "referendum_act",
+      "est_votes": 33000000,
+      "effort": 2,
+      "finest_note": "Polling unit",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "TH"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Election Commission of Thailand",
+          "source": "referendum_act",
+          "locator": "https://www.krisdika.go.th/ (Organic Act on Referendums 2021: a referendum is held on the day the Cabinet fixes by notice in the Royal Gazette)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit",
+          "first_date": "2007-08-19"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-08-19",
+          "note": "One question: the draft 2007 Constitution. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "referendum"
+        },
+        {
+          "date": "2016-08-07",
+          "note": "Two questions: the draft Constitution, and whether the Senate joins the vote on the Prime Minister for the first five years. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "referendum"
+        },
+        {
+          "date": "2026-02-08",
+          "note": "One question on drafting a new constitution, polled with the general election. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "referendum"
+        }
+      ]
+    },
+    {
+      "key": "senate_elected",
+      "tier": "national",
+      "name": "การเลือกตั้งสมาชิกวุฒิสภา",
+      "name_en": "Senate elections (directly elected senators)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1997-10-11",
+      "valid_to": "2014-05-22",
+      "first_held": "2000-03-04",
+      "earliest_record": "2000-03-04",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.province"
+        ],
+        "fine": [
+          "th.district",
+          "th.polling_unit"
+        ]
+      },
+      "note": "200 non-partisan senators elected by province with one vote each for six years under the 1997 Constitution (2000 with five reruns to 22 July, and 2006); 76 elected, one per province, beside 74 appointed under the 2007 Constitution (2008 and 2014). Ended with the coup of 22 May 2014.",
+      "source": "constitution_1997",
+      "est_votes": 30000000,
+      "effort": 3,
+      "finest_note": "Polling unit",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "contest_kinds": [
+            "body_seats",
+            "office"
+          ],
+          "iso_pattern": "TH",
+          "valid_to": "2014-05-22"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "term_years": 6,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand",
+          "valid_from": "1997-10-11",
+          "valid_to": "2014-05-22",
+          "source": "constitution_1997",
+          "locator": "https://www.krisdika.go.th/ (Constitution of 1997, s. 121-130: 200 senators elected by province for six years; Constitution of 2007, s. 111: one elected senator per province)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit",
+          "first_date": "2000-03-04"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-03-04",
+          "deferred": [
+            "2000-04-29",
+            "2000-06-04",
+            "2000-07-09",
+            "2000-07-22"
+          ],
+          "note": "200 seats; the Commission ordered reruns where winners were disqualified. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2006-04-19",
+          "note": "200 seats. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2008-03-02",
+          "note": "76 seats, one per province. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        },
+        {
+          "date": "2014-03-30",
+          "note": "77 seats, one per province and Bangkok. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "general"
+        }
+      ]
+    },
+    {
+      "key": "senate_selection",
+      "tier": "national",
+      "name": "การเลือกสมาชิกวุฒิสภา (การเลือกกันเองตามกลุ่ม)",
+      "name_en": "Senate selection: candidates vote among themselves by occupational group",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2017-04-06",
+      "first_held": "2024-06-09",
+      "earliest_record": "2024-06-09",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "world.country"
+        ],
+        "fine": [
+          "th.province",
+          "th.district"
+        ]
+      },
+      "note": "200 senators for five years chosen by about 48,000 self-nominated candidates in 20 groups, who vote within and then across groups at district (9 June 2024), provincial (16 June), and national (26 June) level; ordinary voters do not vote. The 250 senators of 2019 were appointed (transitional s. 269).",
+      "source": "senate_act",
+      "est_votes": 48000,
+      "effort": 4,
+      "finest_note": "District: the Commission announced each district's and province's selected candidates and the national vote tallies by group",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "TH",
+          "valid_from": "2017-04-06"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "administered_by": "Election Commission of Thailand",
+          "source": "senate_act",
+          "locator": "https://www.krisdika.go.th/ (Organic Act on the Acquisition of Senators 2018: selection within and across 20 groups at district, provincial, and national level; five-year term)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.district",
+          "first_date": "2024-06-09"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-06-09",
+          "deferred": [
+            "2024-06-16",
+            "2024-06-26"
+          ],
+          "note": "District level; provincial level 16 June and national level 26 June 2024; 200 senators and 100 reserves. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "indirect"
+        }
+      ]
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "การลงมติเลือกนายกรัฐมนตรี",
+      "name_en": "Vote of the House (with the Senate, 2019-2024) on the Prime Minister",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The House chooses the Prime Minister from the parties' declared candidates by a majority of its members (s. 159); the appointed Senate joined the vote for the first five years (s. 272). The King is head of state by hereditary succession and is not elected.",
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A recorded roll-call vote of the legislature, not an election by voters; the archive holds it as a parliamentary vote, not a contest.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "TH"
+        }
+      ]
+    },
+    {
+      "key": "senate_1946",
+      "tier": "national",
+      "name": "การเลือกตั้งสมาชิกพฤฒสภา",
+      "name_en": "Election of the Phruetthasapha (Senate) by an electoral college",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1946-05-09",
+      "valid_to": "1947-11-09",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The 1946 Constitution's upper house of 80 members was elected once, in 1946, indirectly by an electoral college; the 1947 coup ended it, and later senates were appointed until 2000.",
+      "source": "parliament",
+      "disposition": "blocked",
+      "disposition_reason": "No official tally of the electoral college's vote located; the House Secretariat's records list the members chosen but not votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "TH",
+          "valid_to": "1947-11-09"
+        }
+      ]
+    },
+    {
+      "key": "drafting_assembly",
+      "tier": "national",
+      "name": "สภาร่างรัฐธรรมนูญ",
+      "name_en": "Constitution drafting assemblies",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The 1996-97 assembly's 76 provincial members were chosen by Parliament from ten candidates each province's applicants elected among themselves; the 2007 and 2015-16 drafters were appointed. The drafting process the 2026 referendum approved had no elected assembly by this census's date.",
+      "source": "parliament",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members were chosen by Parliament or appointed, not elected by voters; a future elected assembly would be a new class.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "TH"
+        }
+      ]
+    },
+    {
+      "key": "primaries",
+      "tier": "national",
+      "name": "การสรรหาผู้สมัครของพรรคการเมือง",
+      "name_en": "Party candidate selection (primary votes)",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parties_act",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties select candidates through their own branches and members; no state-run nominating contest exists.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "TH"
+        }
+      ]
+    },
+    {
+      "key": "non_territorial",
+      "tier": "national",
+      "name": "การเลือกตั้งขององค์กรวิชาชีพและสหกรณ์",
+      "name_en": "Professional councils, cooperatives, and other non-territorial electorates",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ect",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections of private or institutional electorates run by the bodies themselves, not public elections held by the Election Commission; the only state-run group-based vote, the Senate selection, is its own class."
+    },
+    {
+      "key": "pao_president",
+      "tier": "province",
+      "name": "การเลือกตั้งนายกองค์การบริหารส่วนจังหวัด",
+      "name_en": "Provincial administrative organization presidents",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.province"
+        ],
+        "fine": [
+          "th.district",
+          "th.polling_unit"
+        ]
+      },
+      "note": "One directly elected president per province outside Bangkok for four years since the PAO Act's third amendment (2003); chosen by the council before. Terms were staggered by resignations until all 76 were elected on 20 December 2020; on 1 February 2025 the provinces whose president had served the full term voted, the rest having held early elections in 2024 after their presidents resigned.",
+      "source": "pao_act",
+      "est_votes": 27000000,
+      "effort": 4,
+      "finest_note": "Polling unit; results are announced by each provincial election office",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "office_kinds": [
+            "governor",
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "name_pattern": "องค์การบริหารส่วนจังหวัด|อบจ|Provincial Administrative Organi[sz]ation|PAO",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends or a vacancy arises)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-12-20",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2025-02-01",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "pao_council",
+      "tier": "province",
+      "name": "การเลือกตั้งสมาชิกสภาองค์การบริหารส่วนจังหวัด",
+      "name_en": "Provincial administrative organization councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.province"
+        ],
+        "fine": [
+          "th.pao_constituency",
+          "th.polling_unit"
+        ]
+      },
+      "note": "24 to 48 members per province by plurality in single-member constituencies drawn from districts, four-year terms (PAO Act 1997). Its predecessor, the provincial council (สภาจังหวัด), was elected from 1938.",
+      "source": "pao_act",
+      "est_votes": 27000000,
+      "effort": 4,
+      "finest_note": "Polling unit; results are announced by each provincial election office",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "name_pattern": "สภาองค์การบริหารส่วนจังหวัด|ส\\.อบจ|Provincial Administrative Organi[sz]ation Council|PAO council|สภาจังหวัด",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-12-20",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2025-02-01",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "bkk_governor",
+      "tier": "bangkok",
+      "name": "การเลือกตั้งผู้ว่าราชการกรุงเทพมหานคร",
+      "name_en": "Governor of Bangkok",
+      "category": "executive",
+      "goal": "subnational",
+      "first_held": "1975-08-10",
+      "earliest_record": "1975-08-10",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.bangkok"
+        ],
+        "fine": [
+          "th.bangkok_district",
+          "th.polling_unit"
+        ]
+      },
+      "note": "Directly elected for four years by plurality (BMA Act 1985); the first election, in 1975, was held under the BMA Act of that year, and governors were appointed again after the 1976 coup until 1985. No election was held between 2013 and 2022, when the governor was appointed by the military government.",
+      "source": "bma_act",
+      "est_votes": 2700000,
+      "effort": 2,
+      "finest_note": "Polling unit; district totals published by the Commission and the BMA",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "office_kinds": [
+            "governor",
+            "mayor"
+          ],
+          "name_pattern": "ผู้ว่าราชการกรุงเทพมหานคร|Governor of Bangkok|Bangkok governor",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (Bangkok election director)",
+          "source": "bma_act",
+          "locator": "https://www.krisdika.go.th/ (BMA Act 1985: four-year term; a new election within 45 days of a vacancy)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit",
+          "first_date": "1975-08-10"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1975-08-10",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1985-11-14",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1990-01-07",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1992-06-19",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "1996-06-02",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2000-07-23",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2004-08-29",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2008-10-05",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2009-01-11",
+          "note": "Early election after the governor resigned. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "local"
+        },
+        {
+          "date": "2013-03-03",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2022-05-22",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-06-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "bkk_council",
+      "tier": "bangkok",
+      "name": "การเลือกตั้งสมาชิกสภากรุงเทพมหานคร",
+      "name_en": "Bangkok Metropolitan Council",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.bangkok_district"
+        ],
+        "fine": [
+          "th.polling_unit"
+        ]
+      },
+      "note": "One member per district (50 in 2022 and 2026; larger districts had two before the 2022 redistricting) by plurality for four years. Not elected between 2010 and 2022; members were appointed from 2014.",
+      "source": "bma_act",
+      "est_votes": 2600000,
+      "effort": 3,
+      "finest_note": "Polling unit",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "name_pattern": "สภากรุงเทพมหานคร|ส\\.ก\\.|Bangkok Metropolitan Council",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (Bangkok election director)",
+          "source": "bma_act",
+          "locator": "https://www.krisdika.go.th/ (BMA Act 1985: council members for four years, one per 100,000 residents and at least one per district)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-11-14",
+          "through": "2010-08-29",
+          "note": "Council elections of 1985 to 2010, not yet listed one by one. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "local"
+        },
+        {
+          "date": "2022-05-22",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-06-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "bkk_district_council",
+      "tier": "bangkok_district",
+      "name": "การเลือกตั้งสมาชิกสภาเขต",
+      "name_en": "Bangkok district councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.bangkok_district"
+        ]
+      },
+      "note": "At least seven members per district elected for four years (BMA Act 1985); last elected on 29 August 2010 with the Metropolitan Council. Local elections were suspended after the 2014 coup, and district councils were not elected in 2022 or 2026.",
+      "source": "bma_act",
+      "est_votes": 2600000,
+      "effort": 4,
+      "disposition": "blocked",
+      "disposition_reason": "Not elected since 2010; the results of 1985-2010 were announced by the BMA and the Commission, neither of which answered this environment.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "name_pattern": "สภาเขต|ส\\.ข\\.|district council",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "pattaya_mayor",
+      "tier": "pattaya",
+      "name": "การเลือกตั้งนายกเมืองพัทยา",
+      "name_en": "Mayor of Pattaya",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.pattaya"
+        ],
+        "fine": [
+          "th.polling_unit"
+        ]
+      },
+      "note": "Directly elected for four years by plurality (Pattaya City Administration Act 1999); appointed after the 2014 coup until 2022.",
+      "source": "pattaya_act",
+      "est_votes": 60000,
+      "effort": 3,
+      "finest_note": "Polling unit",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "name_pattern": "เมืองพัทยา|Pattaya",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (Chonburi election director)",
+          "source": "pattaya_act",
+          "locator": "https://www.krisdika.go.th/ (Pattaya City Administration Act 1999: mayor elected directly for four years)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "through": "2012-12-31",
+          "note": "Mayoral elections of 2000 to 2012, not yet listed one by one. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "local"
+        },
+        {
+          "date": "2022-05-22",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-06-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "pattaya_council",
+      "tier": "pattaya",
+      "name": "การเลือกตั้งสมาชิกสภาเมืองพัทยา",
+      "name_en": "Pattaya City Council",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "th.pattaya_constituency"
+        ],
+        "fine": [
+          "th.polling_unit"
+        ]
+      },
+      "note": "24 members in four constituencies of six, by block vote, for four years.",
+      "source": "pattaya_act",
+      "est_votes": 60000,
+      "effort": 3,
+      "finest_note": "Polling unit",
+      "contests_per_unit": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "name_pattern": "สภาเมืองพัทยา|Pattaya City Council",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (Chonburi election director)",
+          "source": "pattaya_act",
+          "locator": "https://www.krisdika.go.th/ (Pattaya City Administration Act 1999: 24 council members for four years)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "through": "2012-12-31",
+          "note": "Council elections of 2000 to 2012, not yet listed one by one. Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment.",
+          "election_kind": "local"
+        },
+        {
+          "date": "2022-05-22",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-06-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "municipal_mayor",
+      "tier": "municipality",
+      "name": "การเลือกตั้งนายกเทศมนตรี",
+      "name_en": "Mayors of municipalities (thesaban)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.municipality"
+        ],
+        "fine": [
+          "th.municipal_ward",
+          "th.polling_unit"
+        ]
+      },
+      "note": "One directly elected mayor per city, town, and subdistrict municipality for four years since the Municipality Act's amendment of 2003, phased in as councils' terms ended; chosen by the council before. Synchronized nationally on 28 March 2021 and 11 May 2025; municipalities created since vote on their own dates.",
+      "source": "municipality_act",
+      "est_votes": 9000000,
+      "effort": 5,
+      "finest_note": "Polling unit; results are announced by each provincial election office, municipality by municipality",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "เทศบาล|นายกเทศมนตรี|[Mm]unicipality|Thesaban",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends or a vacancy arises)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-03-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2025-05-11",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "municipal_council",
+      "tier": "municipality",
+      "name": "การเลือกตั้งสมาชิกสภาเทศบาล",
+      "name_en": "Municipal councils (thesaban)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.municipality"
+        ],
+        "fine": [
+          "th.municipal_ward",
+          "th.polling_unit"
+        ]
+      },
+      "contests_per_unit": 2,
+      "note": "12 members in two wards (subdistrict municipality), 18 in three (town), or 24 in four (city), by block vote for four years. Municipalities were created from 1933 under the Municipal Organization Act; their councils were not elected between the 2014 coup and 2021.",
+      "source": "municipality_act",
+      "est_votes": 9000000,
+      "effort": 5,
+      "finest_note": "Polling unit; results are announced by each provincial election office",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "สภาเทศบาล|[Mm]unicipal [Cc]ouncil",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-03-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2025-05-11",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "sao_chief",
+      "tier": "sao",
+      "name": "การเลือกตั้งนายกองค์การบริหารส่วนตำบล",
+      "name_en": "Chief executives of subdistrict administrative organizations",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.sao"
+        ],
+        "fine": [
+          "th.village",
+          "th.polling_unit"
+        ]
+      },
+      "note": "One directly elected chief executive per SAO for four years since the amendment of 2003; chosen by the council before. Synchronized nationally on 28 November 2021 and 11 January 2026 (with 15 SAOs in Kantharalak district, Sisaket, polled on 18 January 2026 because of the border conflict).",
+      "source": "sao_act",
+      "est_votes": 17000000,
+      "effort": 5,
+      "finest_note": "Polling unit; results are announced by each provincial election office",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "องค์การบริหารส่วนตำบล|อบต|Subdistrict Administrative Organi[sz]ation|SAO",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends or a vacancy arises)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-11-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-01-11",
+          "deferred": [
+            "2026-01-18"
+          ],
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "sao_council",
+      "tier": "sao",
+      "name": "การเลือกตั้งสมาชิกสภาองค์การบริหารส่วนตำบล",
+      "name_en": "Subdistrict administrative organization councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.sao"
+        ],
+        "fine": [
+          "th.village",
+          "th.polling_unit"
+        ]
+      },
+      "note": "One member per village since the amendment of 2019 (two per village before; six where a SAO has fewer than three villages), by plurality for four years.",
+      "source": "sao_act",
+      "est_votes": 17000000,
+      "effort": 5,
+      "finest_note": "Village and polling unit; results are announced by each provincial election office",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "สภาองค์การบริหารส่วนตำบล|ส\\.อบต|SAO council|Subdistrict Administrative Organi[sz]ation Council",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "runoff": "none",
+          "administered_by": "Election Commission of Thailand (provincial election directors)",
+          "source": "local_election_act",
+          "locator": "https://www.krisdika.go.th/ (Local Election Act 2019: an election within 45 days after a term ends)"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Election Commission of Thailand (ect.go.th)",
+          "url": "https://www.ect.go.th/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "source": "ect",
+          "evidence": "On 2026-11-17 www.ect.go.th and ectreport69.ect.go.th answered HTTP 403 to a scripted request; not bypassed. The Commission publishes constituency results and the polling-unit count sheets (ส.ส. 5/18) for recent elections; unverified here.",
+          "finest": "th.polling_unit"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-11-28",
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        },
+        {
+          "date": "2026-01-11",
+          "deferred": [
+            "2026-01-18"
+          ],
+          "election_kind": "local",
+          "note": "Polling day from the Election Commission's record; not re-read here because ect.go.th refused this environment."
+        }
+      ]
+    },
+    {
+      "key": "local_direct_democracy",
+      "tier": "sao",
+      "name": "การออกเสียงประชามติท้องถิ่นและการลงคะแนนเสียงถอดถอน",
+      "name_en": "Local referendums and recall votes",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "A local electorate may vote to remove a council member or executive on a petition of a quarter of its voters (1999 Act), and a local government may put a question on its affairs to its voters. Rarely held.",
+      "source": "local_direct_acts",
+      "est_votes": 10000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No central list of local referendums or recall votes is published; any results sit with the provincial election offices, which did not answer this environment.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum",
+            "recall"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "region",
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "kamnan",
+      "tier": "tambon",
+      "name": "การเลือกกำนัน",
+      "name_en": "Kamnan (subdistrict headmen)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.tambon"
+        ]
+      },
+      "note": "The tambon's voters elect its kamnan from among its village headmen, who then serve until age 60 (Local Administration Act 1914 as amended in 2008); an administrative official of the Ministry of Interior.",
+      "source": "locality_act",
+      "est_votes": 1000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "Run by each district office of the Department of Provincial Administration as vacancies arise, with no central publication of results.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "name_pattern": "กำนัน|[Kk]amnan",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "phuyaiban",
+      "tier": "village",
+      "name": "การเลือกผู้ใหญ่บ้าน",
+      "name_en": "Village headmen (phuyaiban)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "th.village"
+        ]
+      },
+      "note": "Each village's voters elect its headman, who then serves until age 60 (Local Administration Act 1914 as amended in 2008; five-year terms between 1992 and 2008).",
+      "source": "locality_act",
+      "est_votes": 3000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "Run by each district office as vacancies arise, with no central publication of results; about 75,000 villages.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special"
+          ],
+          "contest_kinds": [
+            "office"
+          ],
+          "name_pattern": "ผู้ใหญ่บ้าน|[Vv]illage head",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "sanitary_district",
+      "tier": "municipality",
+      "name": "การเลือกตั้งกรรมการสุขาภิบาล",
+      "name_en": "Sanitary district (sukhaphiban) committees",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1999-05-25",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Sanitary districts, semi-urban units under the Sanitary District Act of 1952, had committees partly elected by residents; all became subdistrict municipalities on 25 May 1999.",
+      "source": "municipality_act",
+      "disposition": "blocked",
+      "disposition_reason": "No published results located; the elections were run by district offices and the units were dissolved in 1999.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "name_pattern": "สุขาภิบาล|[Ss]anitary district",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "tambon_council",
+      "tier": "tambon",
+      "name": "การเลือกตั้งสมาชิกสภาตำบล",
+      "name_en": "Tambon councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Where no SAO was formed, a tambon council of the kamnan, village headmen, and one elected member per village (Tambon Council and SAO Act 1994); nearly all became SAOs or merged into municipalities.",
+      "source": "sao_act",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Only a handful survive, with one member per village elected by the district office; not a public election the Election Commission runs or publishes.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "name_pattern": "สภาตำบล|[Tt]ambon council",
+          "within": null
+        }
+      ]
+    }
+  ]
+}
