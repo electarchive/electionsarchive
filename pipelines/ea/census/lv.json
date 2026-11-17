@@ -247,6 +247,24 @@
    "publisher": "Saeima (Latvijas Vēstnesis)",
    "url": "https://www.vestnesis.lv/op/2023/109.2",
    "kind": "official_body"
+  },
+  "vsp_gg1920": {
+   "title": "Latvijas statistiskā gada grāmata 1920, IV nodaļa: Satversmes Sapulces un pašvaldības iestāžu vēlēšanu iznākumi",
+   "publisher": "Valsts statistiskā pārvalde",
+   "url": "https://gramatas.lndb.lv/periodika2-viewer/?lang=fr#issue:681826",
+   "kind": "official_body"
+  },
+  "vsp_mb1928": {
+   "title": "Mēneša biļetens 1928, Nr. 1, Tab. 43: 1927. g. 17./18. decembra tautas nobalsošanas rezultāti",
+   "publisher": "Valsts statistiskā pārvalde",
+   "url": "https://periodika.lv/periodika2-viewer/?lang=fr#issue:662414",
+   "kind": "official_body"
+  },
+  "vsp_mb1931": {
+   "title": "Mēneša biļetens 1931, Nr. 9: 1931. gada 5./6. septembra tautas nobalsošanas rezultāti",
+   "publisher": "Valsts statistiskā pārvalde",
+   "url": "https://periodika.lv/periodika2-viewer/?lang=fr#issue:662233",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -591,28 +609,36 @@
      "election_kind": "general",
      "source": "cvk_saeima",
      "quote": "1922.gada 7. un 8.oktobrī Latvijā notika 1.Saeimas vēlēšanas",
-     "note": "Two-day vote; constituency count not yet read from an official text."
+     "note": "Two-day vote; five constituencies (Saeimas vēlēšanu likums art. 10: Rīga, Vidzeme, Latgale, Kurzeme, Zemgale) and 100 deputies (Satversme art. 5). Results by list and constituency not yet digitized.",
+     "contests": 5,
+     "seats": 100
     },
     {
      "date": "1925-10-03",
      "election_kind": "general",
      "source": "cvk_saeima",
      "quote": "2.Saeimas vēlēšanas notika 1925.gada 3. un 4.oktobrī",
-     "note": "Two-day vote; constituency count not yet read from an official text."
+     "note": "Two-day vote; five constituencies (Saeimas vēlēšanu likums art. 10: Rīga, Vidzeme, Latgale, Kurzeme, Zemgale) and 100 deputies (Satversme art. 5). Results by list and constituency not yet digitized.",
+     "contests": 5,
+     "seats": 100
     },
     {
      "date": "1928-10-06",
      "election_kind": "general",
      "source": "cvk_saeima",
      "quote": "3.Saeimas vēlēšanas Latvijas Republikā notika 1928.gada 6. un 7.oktobrī",
-     "note": "Two-day vote; constituency count not yet read from an official text."
+     "note": "Two-day vote; five constituencies (Saeimas vēlēšanu likums art. 10: Rīga, Vidzeme, Latgale, Kurzeme, Zemgale) and 100 deputies (Satversme art. 5). Results by list and constituency not yet digitized.",
+     "contests": 5,
+     "seats": 100
     },
     {
      "date": "1931-10-03",
      "election_kind": "general",
      "source": "cvk_saeima",
      "quote": "4.Saeimas vēlēšanas Latvijas Republikā notika 1931.gada 3. un 4.oktobrī",
-     "note": "Two-day vote; constituency count not yet read from an official text."
+     "note": "Two-day vote; five constituencies (Saeimas vēlēšanu likums art. 10: Rīga, Vidzeme, Latgale, Kurzeme, Zemgale) and 100 deputies (Satversme art. 5). Results by list and constituency not yet digitized.",
+     "contests": 5,
+     "seats": 100
     }
    ]
   },
@@ -648,9 +674,11 @@
     {
      "date": "1920-04-17",
      "election_kind": "general",
-     "source": "saeima_hist",
-     "quote": "Satversmes sapulce (1920-1922)",
-     "note": "Constituency count not yet read from an official text."
+     "contests": 5,
+     "seats": 150,
+     "source": "vsp_gg1920",
+     "quote": "52. Satversmes Sapulces vēlēšanu iznākumi ... Rigas apgabals 22, Vidzemes apgabals 37, Kurzemes apgabals 26, Zemgales apgabals 26, Latgales apgabals 39; Pavisam Latvijā 150",
+     "note": "Two-day vote (17-18 April 1920) in five constituencies."
     }
    ]
   },
@@ -947,9 +975,31 @@
    "dates": [
     {
      "date": "1923-09-01",
-     "through": "1934-12-31",
      "election_kind": "referendum",
-     "note": "Interwar referendums under Satversme arts. 72-80 (on church property, citizenship, Riga Cathedral, and the insurance law); not yet counted from the State Statistical Bureau's official returns."
+     "contests": 1,
+     "source": "vsp_mb1931",
+     "quote": "Pirmā tautas nobalsošana notika 1923. gadā par Jēkaba baznīcu. Šinī nobalsošanā piedalījās 206.908 pilntiesīgi vēlētāji.",
+     "note": "Two-day vote (1-2 September 1923); only the turnout is printed in the bulletin."
+    },
+    {
+     "date": "1927-12-17",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "vsp_mb1928",
+     "quote": "Tab. 43. 1927. g. 17/18. decembra tautas nobalsošanas rezultati."
+    },
+    {
+     "date": "1931-09-05",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "vsp_mb1931",
+     "quote": "1931. gada 5./6. septembra tautas nobalsošanas rezultāti ... Nupat 5. un 6. septembrī notikusē tautas nobalsošana ir jau pēc kārtas trešā."
+    },
+    {
+     "date": "1932-01-01",
+     "through": "1934-05-15",
+     "election_kind": "referendum",
+     "note": "Any later interwar referendum before the coup of 15 May 1934; not yet counted from the State Statistical Bureau's returns."
     },
     {
      "date": "1998-10-03",
