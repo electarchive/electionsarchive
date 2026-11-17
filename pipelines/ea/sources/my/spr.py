@@ -70,7 +70,13 @@ STATE_DAYS = {
     "PILIHAN RAYA UMUM DEWAN UNDANGAN NEGERI TERENGGANU KE-15": date(2023, 8, 12),
     "PILIHAN RAYA UMUM DEWAN UNDANGAN PULAU PINANG KE-15": date(2023, 8, 12),
     "PILIHAN RAYA UMUM DEWAN UNDANGAN SABAH KE-17": date(2025, 11, 29),
+    # Media statement 18/2026 of the Election Commission (12 June 2026) sets both polling days.
+    "PILIHAN RAYA UMUM DEWAN NEGERI JOHOR KE-16": date(2026, 7, 11),
+    "PILIHAN RAYA UMUM DEWAN NEGERI, NEGERI SEMBILAN KE-16": date(2026, 8, 1),
 }
+# Polling days of by-elections, keyed by the contest's seat code and year, from the Commission's media statements
+# ("Menjelang hari mengundi" and "Keputusan"). A by-election not listed here is dated to its year.
+BY_DAYS: dict[tuple[str, int], date] = {}
 # Contests the source classes as by-elections that are postponed polls of the 2022 general election.
 POSTPONED = ("PILIHAN RAYA UMUM KE-15",)
 
@@ -335,7 +341,12 @@ def events() -> list[Event]:
             seat = row.assembly or row.parliament
             assert seat is not None
             postponed = any(row.event.startswith(prefix) for prefix in POSTPONED)
-            id = f"{row.year}-{'postponed' if postponed else 'by'}-{changeset.slug(seat[0] + ' ' + seat[1])}"
+            slug = f"{'postponed' if postponed else 'by'}-{changeset.slug(seat[0] + ' ' + seat[1])}"
+            day = BY_DAYS.get((seat[0], row.year))
+            id = f"{row.year}-{slug}"
+            if day is not None:
+                same = sum(d == day for d in BY_DAYS.values()) > 1
+                id = f"{day}-{slug}" if same else str(day)
             body = "state seat" if row.assembly else "parliamentary seat"
             label = (
                 f"{row.year} {title(seat[1])} {'postponed poll' if postponed else 'by-election'}"
@@ -348,7 +359,7 @@ def events() -> list[Event]:
                     id,
                     "general" if postponed else "by_election",
                     row.year,
-                    None,
+                    day,
                     label,
                     [],
                     f"Contest for the {body} {seat[0]} {title(seat[1])}, {STATES[row.state]}."
