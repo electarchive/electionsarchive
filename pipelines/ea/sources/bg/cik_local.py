@@ -1,4 +1,4 @@
-"""Bulgaria's local elections of 2015, 2019, and 2023 by polling section, from the CIK's open data.
+"""Bulgaria's local elections of 2011, 2015, 2019, and 2023 by polling section, from the CIK's open data.
 
 Every local election day elects, in each of the 265 municipalities, a municipal council (by list) and a mayor, and in
 the villages and towns with a mayoralty (a `kmetstvo`) a mayor of the mayoralty. The three cities of Sofia, Plovdiv,
@@ -6,8 +6,8 @@ and Varna are also divided into districts (`rayoni`) that elect their own mayors
 valid votes in the first round, or wins a runoff a week later between the two leaders. The CIK publishes one bundle of
 semicolon-separated text files for each round and each of the four kinds of election, and this module builds one
 package per election day from them, plus a `geo` package for the provinces, municipalities, districts, and
-mayoralties from the National Statistical Institute's register of places (EKATTE).
-"""
+mayoralties from the National Statistical Institute's register of places (EKATTE). The 2011 bundles have their own
+layout, read by the `*_2011` functions; they give each council list's seats but not the councillors who took them."""
 
 import functools
 import json
@@ -81,7 +81,8 @@ METHOD = (
     "the roll, ballots cast are the paper ballots found in the box plus the machine ballots, and valid ballots are "
     "those marked for one list or candidate or for the no-one-supported option, which was on the ballot from 2019. "
     "Votes cast by machine are added to the paper votes of the same section. Preference votes for candidates inside "
-    "a council list are in the same files and are not stored here yet."
+    "a council list are in the same files and are not stored here yet. In 2011 the ballots of the municipality of "
+    "Nevestino were counted by one experimental counting commission, whose protocols are stored as one unit."
 )
 
 
@@ -96,6 +97,10 @@ class Day(NamedTuple):
 
 Z = BASE + "/"
 DAYS = [
+    # The 2011 bundles hold no district mayors of Sofia, Plovdiv, and Varna; the president's rounds in the same
+    # bundles are read by `bg.cik`.
+    Day("mi-2011-10-23", date(2011, 10, 23), 1, Z + "mipvr2011/el2011_t1.zip", classes=(COUNCIL, MAYOR, VILLAGE)),
+    Day("mi-2011-10-30", date(2011, 10, 30), 2, Z + "mipvr2011/el2011_t2.zip", classes=(MAYOR, VILLAGE)),
     Day("mi-2015-10-25", date(2015, 10, 25), 1, Z + "minr2015/tur1/mi2015.zip"),
     Day("mi-2015-11-01", date(2015, 11, 1), 2, Z + "minr2015/tur2/mi2015.zip", classes=(MAYOR, DISTRICT, VILLAGE)),
     Day("mi-2019-10-27", date(2019, 10, 27), 1, Z + "mi2019/csv.zip", "TUR1"),
@@ -231,6 +236,8 @@ def _members(url: str, year: int) -> dict[tuple[str, str, str], str]:
 
 
 def rows(day: Day, cls: str, role: str) -> list[list[str]]:
+    if day.day.year == 2011:
+        return rows_2011(day, cls, role)
     name = _members(day.url, day.day.year).get((day.folder, cls, role))
     if name is None:
         return []
@@ -262,6 +269,8 @@ class Section(NamedTuple):
 
 @functools.cache
 def sections(day: Day, cls: str) -> dict[tuple[str, str], Section]:
+    if day.day.year == 2011:
+        return sections_2011(day, cls)
     out: dict[tuple[str, str], Section] = {}
     year = day.day.year
     for r in rows(day, cls, "sections"):
@@ -293,6 +302,8 @@ def cell(row: list[str], index: int) -> int:
 def protocols(day: Day, cls: str) -> dict[tuple[str, str], dict[str, int]]:
     """Per section and unit: reg, voters, box, inv, valid, and none; rows a section has twice are added up."""
     year = day.day.year
+    if year == 2011:
+        return protocols_2011(day, cls)
     out: dict[tuple[str, str], dict[str, int]] = defaultdict(dict)
     for r in rows(day, cls, "protocols"):
         figures = out[(r[1], r[2])]
@@ -321,6 +332,8 @@ def protocols(day: Day, cls: str) -> dict[tuple[str, str], dict[str, int]]:
 def votes(day: Day, cls: str) -> dict[tuple[str, str], dict[str, int]]:
     """Valid votes per section and unit, by the list's number inside its municipality's draw."""
     year = day.day.year
+    if year == 2011:
+        return votes_2011(day, cls)
     out: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: defaultdict(int))
     for r in rows(day, cls, "votes"):
         if year == 2023:
@@ -341,11 +354,14 @@ class Candidate(NamedTuple):
     position: int
     name: str
     flag: str
+    unit: str = ""  # the contest's unit id, where the files give it outright
 
 
 @functools.cache
 def candidates(day: Day, cls: str) -> list[Candidate]:
     """One row per candidate; a list's name may hold the field separator, so the fields are counted from the end."""
+    if day.day.year == 2011:
+        return candidates_2011(day, cls)
     out: list[Candidate] = []
     for r in rows(day, cls, "local_candidates"):
         r = [c.strip() for c in r]
@@ -366,6 +382,8 @@ def candidates(day: Day, cls: str) -> list[Candidate]:
 def lists(day: Day, cls: str) -> dict[tuple[int, str], dict[str, str]]:
     """(oik, unit name) -> {list number: name}, from the parties registered with the municipal commissions."""
     out: dict[tuple[int, str], dict[str, str]] = defaultdict(dict)
+    if day.day.year == 2011:
+        return out  # the 2011 files register lists by municipality, so a contest's lists come from its candidates
     for r in rows(day, cls, "local_parties"):
         out[(number(r[0]), r[1].strip())][r[2].strip()] = ";".join(r[3:]).strip()
     return out
@@ -386,6 +404,170 @@ def units(day: Day, cls: str) -> dict[str, tuple[int, str]]:
     for _, unit in (*protocols(day, cls), *votes(day, cls)):
         if unit not in out:
             raise ValueError(f"{day.id} {cls}: unit {unit} has results but no section")
+    return out
+
+
+# --- the 2011 bundles ----------------------------------------------------------------------------------------------
+# One folder per kind of election, each with semicolon-separated cp1251 files named `el2011_<kind>_<role>.txt`. A
+# section's code is province (2), municipality (2), city district (2), and section (3); its first four digits are the
+# municipality's CIK code. A row's first field marks the protocol: empty for a polling section, `П` for a mobile
+# ballot box, which in a mayoralty election carries the EKATTE code of the mayoralty in brackets, and `Е` for the
+# experimental counting commission that counted every ballot of the municipality of Nevestino in one place.
+
+FILES_2011 = {COUNCIL: "council", MAYOR: "mayor_munic", VILLAGE: "mayor_mrlty"}
+FOLDERS_2011 = {COUNCIL: "общински съветници", MAYOR: "кмет на община", VILLAGE: "кмет на кметство"}
+# Zero-based columns of registered voters, voters who signed, ballots in the box, invalid, and valid ballots in each
+# protocol form. Registered voters are those on the roll as handed to the commission, as `bg.cik` reads the
+# president's protocols of the same day.
+PROTOCOLS_2011 = {
+    "": {"reg": 2, "voters": 6, "box": 13, "inv": 19, "valid": 20},
+    "П": {"reg": 2, "voters": 4, "box": 10, "inv": 16, "valid": 17},
+    "Е": {"reg": 5, "voters": 9, "box": 16, "inv": 22, "valid": 23},
+}
+RESULT_FLAGS = {"И": "1", "Б": "2"}
+
+
+def rows_2011(day: Day, cls: str, role: str) -> list[list[str]]:
+    if cls not in FILES_2011:
+        return []
+    archive = _archive(day.url)
+    wanted = f"el2011_{FILES_2011[cls]}_{role}.txt"
+    for info in archive.infolist():
+        parts = _path(info)
+        if len(parts) == 2 and parts[0] == FOLDERS_2011[cls] and parts[1] == wanted:
+            text = archive.read(info.filename).decode("cp1251")
+            return [line.split(";") for line in text.replace("\r", "").split("\n") if line.strip()]
+    return []
+
+
+def _mark(field: str) -> tuple[str, str]:
+    """The protocol's form and, for a mobile box of a mayoralty election, the mayoralty's EKATTE code."""
+    match = re.fullmatch(r"(\w?)(?:\((\d+)\))?", field.strip())
+    if match is None:
+        raise ValueError(f"unknown protocol mark {field!r}")
+    return match.group(1), match.group(2) or ""
+
+
+@functools.cache
+def _rows_2011(day: Day, cls: str, role: str) -> list[tuple[str, str, list[str]]]:
+    """(section, unit, row) for every protocols or votes row; the unit is the municipality or the mayoralty."""
+    sections_ = sections_2011(day, cls)
+    by_section: dict[str, list[str]] = defaultdict(list)
+    for section, unit in sections_:
+        by_section[section].append(unit)
+    plain = [r for r in rows_2011(day, cls, role) if _mark(r[0])[0] != "Е"]
+    pooled = [r for r in rows_2011(day, cls, role) if _mark(r[0])[0] == "Е"]
+    out: list[tuple[str, str, list[str]]] = []
+    for r in plain:
+        form, ekatte = _mark(r[0])
+        section = r[1].strip()
+        if cls != VILLAGE:
+            out.append((section, str(oik_of(section)), r))
+            continue
+        if ekatte:
+            out.append((section, str(int(ekatte)), r))
+            continue
+        units_ = by_section.get(section, [])
+        if len(units_) != 1:
+            raise ValueError(f"{day.id}: section {section} of form {form!r} serves mayoralties {units_}")
+        out.append((section, units_[0], r))
+    # The counting commission files one protocol per mayoralty under one code, in the order of the sections file.
+    seen: dict[str, int] = defaultdict(int)
+    for r in pooled:
+        section = r[1].strip()
+        units_ = by_section.get(section, [])
+        if cls != VILLAGE:
+            out.append((section, str(oik_of(section)), r))
+            continue
+        out.append((section, units_[seen[section]], r))
+        seen[section] += 1
+    return out
+
+
+@functools.cache
+def sections_2011(day: Day, cls: str) -> dict[tuple[str, str], Section]:
+    out: dict[tuple[str, str], Section] = {}
+    for r in rows_2011(day, cls, "sections"):
+        r = [c.strip() for c in r]
+        section = r[1]
+        if cls == VILLAGE:
+            unit, name = str(int(r[7])), r[6]
+        else:
+            unit, name = str(oik_of(section)), r[3]
+        out[(section, unit)] = Section(section, unit, name, r[5], r[4], _mark(r[0])[0] == "П")
+    return out
+
+
+@functools.cache
+def protocols_2011(day: Day, cls: str) -> dict[tuple[str, str], dict[str, int]]:
+    out: dict[tuple[str, str], dict[str, int]] = defaultdict(dict)
+    for section, unit, r in _rows_2011(day, cls, "protocols"):
+        spec = PROTOCOLS_2011[_mark(r[0])[0]]
+        figures = out[(section, unit)]
+        for name, column in spec.items():
+            value = cell(r, column)
+            if name in ("reg", "voters") and name in figures:
+                continue
+            figures[name] = figures.get(name, 0) + value
+    return out
+
+
+@functools.cache
+def votes_2011(day: Day, cls: str) -> dict[tuple[str, str], dict[str, int]]:
+    out: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for section, unit, r in _rows_2011(day, cls, "votes"):
+        tail = r[2:]
+        for i in range(0, len(tail) - 1, 2):
+            if tail[i].strip().isdigit():
+                out[(section, unit)][tail[i].strip()] += number(tail[i + 1])
+    return out
+
+
+@functools.cache
+def coalitions_2011(day: Day) -> dict[tuple[int, str], str]:
+    """(oik, list number) -> the name of the party, coalition, or initiative committee in that municipality."""
+    out: dict[tuple[int, str], str] = {}
+    for r in rows_2011(day, MAYOR, "coalitions"):
+        out[(int(r[0]), r[1].strip())] = r[2].strip()
+    return out
+
+
+def oik_2011(text: str) -> int:
+    """The municipality's CIK code from the commission's number, which drops the province's leading zero."""
+    return int(text.strip())
+
+
+@functools.cache
+def candidates_2011(day: Day, cls: str) -> list[Candidate]:
+    names = coalitions_2011(day)
+    flags: dict[tuple[int, str, str], str] = {}
+    for r in rows_2011(day, cls, "result"):
+        r = [c.strip() for c in r]
+        if cls == MAYOR:
+            flags[(oik_2011(r[1]), "", r[3])] = RESULT_FLAGS[r[0]]
+        elif cls == VILLAGE:
+            flags[(oik_2011(r[1]), str(int(r[3])), r[5])] = RESULT_FLAGS[r[0]]
+    out: list[Candidate] = []
+    for r in rows_2011(day, cls, "candidates"):
+        r = [c.strip() for c in r]
+        oik = oik_2011(r[0])
+        if cls == COUNCIL:
+            party, position, name, unit, unit_name = r[1], int(r[2]), r[3], str(oik), ""
+        elif cls == MAYOR:
+            party, position, name, unit, unit_name = r[1], 0, r[2], str(oik), ""
+        else:
+            party, position, name, unit, unit_name = r[3], 0, r[4], str(int(r[1])), r[2]
+        flag = flags.get((oik, "" if cls == MAYOR else unit, party), "")
+        out.append(Candidate(oik, unit_name, party, names.get((oik, party), ""), position, name, flag, unit))
+    return out
+
+
+@functools.cache
+def seats_2011(day: Day) -> dict[str, dict[str, int]]:
+    """Council seats won by each list, by municipality unit, from the CIK's result file."""
+    out: dict[str, dict[str, int]] = defaultdict(dict)
+    for r in rows_2011(day, COUNCIL, "result"):
+        out[str(oik_2011(r[1]))][r[3].strip()] = int(r[4])
     return out
 
 
@@ -422,7 +604,7 @@ def places() -> Places:
         oik_of(s.code): s.unit_name.partition(". ")[2]
         for day in DAYS
         for (_, _), s in sections(day, MAYOR).items()
-        if day.round == 1
+        if day.round == 1 and day.day.year >= 2015
     }
     for code, row in out.municipalities.items():
         seen = names.get(int(code))
@@ -784,7 +966,7 @@ def build(day: Day) -> Package:
         by_unit: dict[str, list[Candidate]] = defaultdict(list)
         unit_of_name = {(oik, name): unit for unit, (oik, name) in contest_units.items()}
         for c in cands:
-            unit = unit_of_name.get((c.oik, c.unit_name))
+            unit = c.unit or unit_of_name.get((c.oik, c.unit_name))
             if unit is not None:
                 by_unit[unit].append(c)
         later = {}
@@ -792,7 +974,7 @@ def build(day: Day) -> Package:
             later_units = units(second, cls)
             later_of = {(oik, name): unit for unit, (oik, name) in later_units.items()}
             for c in candidates(second, cls):
-                unit = later_of.get((c.oik, c.unit_name))
+                unit = c.unit or later_of.get((c.oik, c.unit_name))
                 if unit is not None:
                     later.setdefault(unit, set()).add((norm(c.name), norm(c.party_name)))
         for unit, (oik, unit_name) in sorted(contest_units.items(), key=lambda kv: (kv[1][0], int(kv[0]))):
@@ -925,6 +1107,15 @@ def build(day: Day) -> Package:
                     )
                 if elected:
                     contests_[-1]["magnitude"] = sum(len(m) for m in elected.values())
+                elif day.day.year == 2011:  # the 2011 files give each list's seats but not who took them
+                    won = seats_2011(day).get(unit, {})
+                    outcomes.extend(
+                        {"result_set_id": rs, "option_id": option_of[n], "kind": "won", "seats": count}
+                        for n, count in sorted(won.items(), key=lambda kv: int(kv[0]))
+                        if count
+                    )
+                    if won:
+                        contests_[-1]["magnitude"] = sum(won.values())
             elif flags:
                 winner = any(f == "1" for f in flags.values())
                 for c in mine:
