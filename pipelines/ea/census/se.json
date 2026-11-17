@@ -1,0 +1,1994 @@
+{
+  "polity": "SE",
+  "name": "Sweden",
+  "sources": {
+    "rf1974": {
+      "title": "Regeringsform (1974:152)",
+      "publisher": "Sveriges riksdag",
+      "url": "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/kungorelse-1974152-om-beslutad-ny-regeringsform_sfs-1974-152/",
+      "kind": "official_body",
+      "note": "Ch. 1 § 1 (popular sovereignty, representative democracy, and municipal self-government); ch. 3 § 1 (direct, free, secret, proportional Riksdag elections), § 2 (one chamber of 349 members), § 3 (ordinary elections every four years); ch. 8 § 2 (law on advisory national referendums, constitutional referendums, and European Parliament elections); ch. 14 § 1 (municipal decisions are taken by elected assemblies)."
+    },
+    "vallag2005": {
+      "title": "Vallag (2005:837)",
+      "publisher": "Sveriges riksdag",
+      "url": "https://data.riksdagen.se/dokument/sfs-2005-837.html",
+      "kind": "official_body",
+      "note": "Ch. 1 § 2-3: elections are always held on a Sunday; ordinary Riksdag, regional, and municipal elections are held on the same day, the second Sunday of September; European Parliament elections in June every five years unless the Council of the EU sets April, May, or July. The act also governs re-runs (omval) and extra elections, and Sametinget elections by reference from the Sametingslag."
+    },
+    "kommunallag2017": {
+      "title": "Kommunallag (2017:725)",
+      "publisher": "Sveriges riksdag",
+      "url": "https://data.riksdagen.se/dokument/sfs-2017-725.html",
+      "kind": "official_body",
+      "note": "Ch. 5 § 1: the council (fullmäktige) decides on referendums in the municipality or region and on extra elections; ch. 8: consultative referendums and the popular initiative of ten percent of the electorate. Municipal executive committees and their chairs are chosen by the council."
+    },
+    "folkomrostningslag1994": {
+      "title": "Lag (1994:692) om kommunala folkomröstningar",
+      "publisher": "Sveriges riksdag",
+      "url": "https://data.riksdagen.se/dokument/sfs-1994-692.html",
+      "kind": "official_body",
+      "note": "Procedure for municipal and regional referendums under the Local Government Act: the council sets the day, the question, and the options; the municipal election committee runs the vote."
+    },
+    "sametingslag1992": {
+      "title": "Sametingslag (1992:1433)",
+      "publisher": "Sveriges riksdag",
+      "url": "https://data.riksdagen.se/dokument/sfs-1992-1433.html",
+      "kind": "official_body",
+      "note": "Ch. 2 § 2: Sametinget has 31 members chosen by election; ch. 3 § 1: elections every four years on the third Sunday of May; ch. 3 § 2: the country is one constituency, and the election is run by Sametinget's election board, the central election authority, and the county administrative board."
+    },
+    "kyrkolag1998": {
+      "title": "Lag (1998:1591) om Svenska kyrkan",
+      "publisher": "Sveriges riksdag",
+      "url": "https://data.riksdagen.se/dokument/sfs-1998-1591.html",
+      "kind": "official_body",
+      "note": "From 1 January 2000 the Church of Sweden is a religious community separate from the state, organized in parishes and dioceses with the Church Assembly (kyrkomötet) as its highest decision-making body; its elections follow its own church order."
+    },
+    "val_allmanna": {
+      "title": "Allmänna val i Sverige",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/det-svenska-valsystemet/grunderna-i-det-svenska-valsystemet/allmanna-val-i-sverige",
+      "kind": "official_body",
+      "note": "Four general elections: the Riksdag, regional councils, municipal councils, and the European Parliament; ordinary elections to the first three on the second Sunday of September every four years."
+    },
+    "val_valkretsar": {
+      "title": "Valkretsar och valdistrikt",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/det-svenska-valsystemet/grunderna-i-det-svenska-valsystemet/valkretsar-och-valdistrikt",
+      "kind": "official_body",
+      "note": "Sweden is divided into 29 constituencies for Riksdag elections; 310 of the 349 seats are fixed constituency seats and 39 are adjustment seats. Regions and municipalities may divide themselves into constituencies; 90 percent of their seats are fixed. Sweden is one constituency for the European Parliament, with 21 of 720 seats. Each municipality is divided into election districts of about 1,000-2,000 voters."
+    },
+    "val_rrk_tidigare": {
+      "title": "Tidigare valresultat i val till riksdag, region och kommun",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/riksdags--region--och-kommunval/tidigare-valresultat",
+      "kind": "official_body",
+      "note": "Summaries and links to the full result presentations on historik.val.se for 2002-2018, and the re-runs in Orsa (2003), Västra Götaland and Örebro (2011), Båstad (2015), and Falun (2019)."
+    },
+    "val_rrk_2022": {
+      "title": "Valresultat 2022: riksdag, region och kommun",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/riksdags--region--och-kommunval/valresultat-2022",
+      "kind": "official_body"
+    },
+    "val_rrk_2026": {
+      "title": "Valresultat 2026: riksdag, region och kommun",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/riksdags--region--och-kommunval/valresultat-2026",
+      "kind": "official_body"
+    },
+    "val_eu_tidigare": {
+      "title": "Tidigare valresultat i EU-val",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/eu-val/tidigare-valresultat",
+      "kind": "official_body"
+    },
+    "val_eu_2024": {
+      "title": "Valresultat i EU-valet 2024",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/eu-val/valresultat-2024",
+      "kind": "official_body"
+    },
+    "val_euro2003": {
+      "title": "Folkomröstningen om euron 2003",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/folkomrostning-2003",
+      "kind": "official_body"
+    },
+    "val_folkomrostningar": {
+      "title": "Folkomröstningar",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/det-svenska-valsystemet/grunderna-i-det-svenska-valsystemet/folkomrostningar",
+      "kind": "official_body",
+      "note": "Sweden has held six national referendums, all advisory. Municipal and regional referendums are always advisory, decided by the council or forced by an initiative of ten percent of the electorate, and run and reported by the municipality or region. Links the lists of held national and municipal referendums."
+    },
+    "val_nationella_lista": {
+      "title": "Lista genomförda nationella folkomröstningar",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/download/18.162047b519a91d05331162cf/1760078155716/lista-genomforda-nationella-folkomrostningar.xlsx",
+      "kind": "official_body",
+      "note": "Six rows (source: the Government), list updated 2021-08-18: 1922 Rusdrycksförbud, 1955 Högertrafik, 1957 Tjänstepension, 1980 Kärnkraftsfrågan, 1994 EU-medlemskap, 2003 Införande av euron."
+    },
+    "val_kommunala_lista": {
+      "title": "Lista över genomförda kommunala folkomröstningar",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/download/18.162047b519a91d0533113f48/1794380793420/lista-over-genomforda-kommunala-folkomrostningar.xlsx",
+      "kind": "official_body",
+      "note": "List updated 2026-11-10, from 1980: 169 municipal referendums (one regional, Västerbottens landsting in 2013), with year, municipality, question, and whether held with a general election."
+    },
+    "val_sameting_tidigare": {
+      "title": "Tidigare valresultat i sametingsval",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/sametingsval/tidigare-valresultat",
+      "kind": "official_body",
+      "note": "Results of every Sametinget election from 2005 to 2021, with links to the full presentations on historik.val.se."
+    },
+    "val_sameting_2025": {
+      "title": "Valresultat i sametingsvalet 2025",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/sametingsval/valresultat-2025",
+      "kind": "official_body",
+      "note": "Result of the re-run of 5 October 2025; the decision on the result of the ordinary election of 18 May 2025 was set aside and never became final."
+    },
+    "val_sameting_radata": {
+      "title": "Rådata från sametingsval",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/statistik-och-data/radata-fran-sametingsval",
+      "kind": "official_body"
+    },
+    "val_omval": {
+      "title": "Omval och extra val",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/det-svenska-valsystemet/grunderna-i-det-svenska-valsystemet/omval-och-extra-val",
+      "kind": "official_body",
+      "note": "The Election Review Board (Valprövningsnämnden) may order a re-run (omval), held within three months; between ordinary elections the Government may call an extra Riksdag election and a regional or municipal council an extra council election."
+    },
+    "val_oppna_data": {
+      "title": "Om vår öppna data",
+      "publisher": "Valmyndigheten",
+      "url": "https://www.val.se/valresultat-och-statistik/statistik-och-data/om-var-oppna-data",
+      "kind": "official_body"
+    },
+    "scb_lan_kommuner": {
+      "title": "Län och kommuner",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/regional-statistik-och-kartor/regionala-indelningar/lan-och-kommuner/",
+      "kind": "official_body",
+      "note": "SCB keeps the official register of regional divisions and their codes: \"Sverige har idag 21 län och 290 kommuner.\""
+    },
+    "scb_kommunandringar": {
+      "title": "Ändringar i kommunindelningen efter 1974",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/contentassets/6a74a52b28994e2bbe23dcdd6754987c/kommunandringar_20230829.pdf",
+      "kind": "official_body",
+      "note": "Municipal counts after each change: 278 (1974-1976), 277 (1977), 279 (1980), 284 (1983), 286 (1992), 288 (1995), 289 (1999), 290 (2003 and 2011)."
+    },
+    "scb_kyrkliga": {
+      "title": "Kyrkliga indelningar",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/regional-statistik-och-kartor/regionala-indelningar/kyrkliga-indelningar/",
+      "kind": "official_body",
+      "note": "The Church of Sweden's dioceses, deaneries, and pastorates with their parishes; the 2026 register lists 13 dioceses, 572 pastorates and independent parishes, and 1,256 parishes."
+    },
+    "scb_me0104": {
+      "title": "Statistikdatabasen: Allmänna val, valresultat (ME0104)",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__ME__ME0104/",
+      "kind": "official_body",
+      "license": "CC0 1.0",
+      "note": "Riksdag, regional, and municipal results by party for every municipality, Riksdag constituency, and region, election years 1973-2022 (tables ME0104T1, ME0104T2, ME0104T3, Kfmandat, Ltmandat, Riksdagsmandat); personal votes 2002-2022."
+    },
+    "scb_me0109": {
+      "title": "Statistikdatabasen: Europaparlamentsval, valresultat (ME0109)",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__ME__ME0109/",
+      "kind": "official_body",
+      "license": "CC0 1.0",
+      "note": "European Parliament results by party for every municipality, election years 1995-2024 (EUvalA), with seats and personal votes."
+    },
+    "scb_valstatistik": {
+      "title": "Valstatistik 1909-1999",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/aldre-statistik/innehall/sveriges-officiella-statistik-sos/valstatistik-19091999/",
+      "kind": "official_body",
+      "note": "Digitized Official Statistics of Sweden election volumes: Riksdagsmannavalen 1909-1968, Landstingsmannavalen 1912-1918, Kommunala valen 1919-1966, Allmänna valen 1970-1998, and the European Parliament elections of 1995 and 1999; earlier, BiSOS R covers the Riksdag elections of 1872-1908."
+    },
+    "scb_riksdagsmannavalen": {
+      "title": "Riksdagsmannavalen (SOS) 1909-1968",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=Riksdagsmannavalen+(SOS)+1909-1968&From=1909&To=1968&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "23 volumes from Riksdagsmannavalen åren 1909-1911 to Riksdagsmannavalen åren 1965-1968 (Del 1, Andrakammarvalet 1968; Del 2, Förstakammarvalen 1965-1969), as scanned PDFs on share.scb.se."
+    },
+    "scb_bisos_r": {
+      "title": "BiSOS R. Valstatistik: Riksdagsmannavalen 1872-1908",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=BISOS+R+Riksdagsmannavalen+1872-1908&From=1872&To=1908&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "Statistiska centralbyråns underdåniga berättelser on the Riksdag elections, volumes I (1872) to XVIII (1906-1908), as scanned PDFs."
+    },
+    "scb_allmanna_valen": {
+      "title": "Allmänna valen (SOS) 1970-1998",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=Allm%c3%a4nna+valen+(SOS)+1970-1998&From=1970&To=1998&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "Volumes for each general election from 1970 to 1998: part 1 the Riksdag, part 2 (and from 1998 part 3) the municipal and county council elections, and special studies."
+    },
+    "scb_landstingsmannavalen": {
+      "title": "Landstingsmannavalen (SOS) 1912-1918",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=Landstingsmannavalen+(SOS)+1912-1918&From=1912&To=1918&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "Volumes for the county council elections of 1912, 1914, 1916, and 1918."
+    },
+    "scb_kommunala_valen": {
+      "title": "Kommunala valen (SOS) 1919-1966",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=Kommunala+valen+(SOS)+1919-1966&From=1919&To=1966&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "Volumes for the communal elections of 1919, 1920, 1922-1923, 1926-1927, 1930-1931, 1934-1935, 1938, 1942, 1946, 1950, 1954, 1958, 1962, and 1966, covering county council (landstingsmannaval) and municipal council elections."
+    },
+    "scb_ep": {
+      "title": "Valet till Europaparlamentet (SOS) 1995-1999",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Series=Valet+till+Europaparlamentet+(SOS)+1995-1999&From=1995&To=1999&Sort=date&Query=&Page=1&Tab=older&Exact=False",
+      "kind": "official_body",
+      "note": "Valet till Europaparlamentet 1995 and Valet till Europaparlamentet 1999, scanned PDFs."
+    },
+    "scb_euro2003": {
+      "title": "Folkomröstningen om euron 2003",
+      "publisher": "Statistiska centralbyrån (SCB)",
+      "url": "https://www.scb.se/hitta-statistik/sok/Index?Subject=allsubjects&Query=folkomr%c3%b6stningen&Sort=date&Page=1&Tab=older&Exact=False&From=1900&To=2005",
+      "kind": "official_body"
+    },
+    "svk_kyrkoval": {
+      "title": "Kyrkovalet: Rapporter valresultat",
+      "publisher": "Svenska kyrkan",
+      "url": "https://www.svenskakyrkan.se/kyrkoval/valresultat/rapporter-valresultat",
+      "kind": "official_body",
+      "note": "Downloadable results of the Church Assembly, diocesan, and church council elections (2013-2025 Excel files) and a page on the 2001-2021 church elections; the 2025 church council file has 571 electoral areas in 13 dioceses."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Konungariket Sverige",
+      "name_en": "Kingdom of Sweden",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "rf1974"
+    },
+    {
+      "key": "valkrets",
+      "name": "Riksdagsvalkretsar",
+      "name_en": "Riksdag constituencies",
+      "parent": "national",
+      "scheme": "se.riksdagsvalkrets",
+      "elects": false,
+      "source": "val_valkretsar",
+      "counts": [
+        {
+          "date": "2026-08-24",
+          "value": 29,
+          "source": "val_valkretsar"
+        }
+      ]
+    },
+    {
+      "key": "lan",
+      "name": "Län",
+      "name_en": "Counties (state administrative areas)",
+      "parent": "national",
+      "polity_kind": "county",
+      "scheme": "se.lan",
+      "elects": false,
+      "source": "scb_lan_kommuner",
+      "counts": [
+        {
+          "date": "2026-11-17",
+          "value": 21,
+          "source": "scb_lan_kommuner"
+        }
+      ]
+    },
+    {
+      "key": "region",
+      "name": "Regioner (landsting)",
+      "name_en": "Regions (county councils)",
+      "parent": "lan",
+      "polity_kind": "region",
+      "valid_from": "1863-01-01",
+      "source": "kommunallag2017",
+      "counts": [
+        {
+          "date": "2022-09-11",
+          "value": 20,
+          "source": "scb_me0104",
+          "locator": "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0104/ME0104B/ME0104T26"
+        }
+      ]
+    },
+    {
+      "key": "kommun",
+      "name": "Kommuner",
+      "name_en": "Municipalities",
+      "parent": "lan",
+      "polity_kind": "municipality",
+      "scheme": "se.kommun",
+      "valid_from": "1971-01-01",
+      "source": "kommunallag2017",
+      "counts": [
+        {
+          "date": "1974-01-01",
+          "value": 278,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1977-01-01",
+          "value": 277,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1980-01-01",
+          "value": 279,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1983-01-01",
+          "value": 284,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1992-01-01",
+          "value": 286,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1995-01-01",
+          "value": 288,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "1999-01-01",
+          "value": 289,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "2003-01-01",
+          "value": 290,
+          "source": "scb_kommunandringar"
+        },
+        {
+          "date": "2026-11-17",
+          "value": 290,
+          "source": "scb_lan_kommuner"
+        }
+      ]
+    },
+    {
+      "key": "kommun_fore_1971",
+      "name": "Städer, köpingar och landskommuner",
+      "name_en": "Towns, market towns, and rural communes before 1971",
+      "parent": "lan",
+      "polity_kind": "municipality",
+      "valid_from": "1863-01-01",
+      "valid_to": "1971-01-01",
+      "source": "scb_kommunala_valen"
+    },
+    {
+      "key": "sami",
+      "name": "Samernas röstlängd (en valkrets)",
+      "name_en": "Sami electoral roll (one nationwide constituency)",
+      "parent": "national",
+      "source": "sametingslag1992"
+    }
+  ],
+  "classes": [
+    {
+      "key": "riksdag",
+      "tier": "national",
+      "name": "Val till riksdagen",
+      "name_en": "Riksdag elections (unicameral, from 1970)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "se.riksdagsvalkrets"
+        ],
+        "fine": [
+          "se.kommun",
+          "se.valdistrikt"
+        ]
+      },
+      "finest_note": "Valmyndigheten publishes final counts by election district (valdistrikt) from 2002; SCB's database has every election from 1973 by municipality and constituency, and SCB's printed volumes for 1970-1998 go down to election district.",
+      "note": "One chamber since 1971: 350 members elected in 1970 and 1973, 349 from 1976. Party-list proportional representation in 29 constituencies (fixed constituency seats) with national adjustment seats; modified Sainte-Laguë with a first divisor of 1.2 since 2018 (1.4 before), 4 percent national threshold or 12 percent in a constituency. Terms of three years until 1994 and four years since. Extra elections are possible on the Government's decision but none has been held under the 1974 Instrument of Government.",
+      "source": "rf1974",
+      "valid_from": "1970-09-20",
+      "first_held": "1970-09-20",
+      "earliest_record": "1970-09-20",
+      "est_votes": 95000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Valmyndigheten",
+          "valid_from": "1994-09-18",
+          "source": "vallag2005",
+          "locator": "https://data.riksdagen.se/dokument/sfs-2005-837.html",
+          "vacancy_rule": "Vallag ch. 14: a vacancy is filled by a new count (ny sammanräkning) from the same party's list; there are no by-elections."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Valmyndigheten: val.se and historik.val.se",
+          "url": "https://historik.val.se/val/{folder}/",
+          "format": "xml, skv, xlsx, csv, and html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_rrk_tidigare",
+          "first_date": "2002-09-15",
+          "finest": "se.valdistrikt",
+          "evidence": "Final counts by election district (valdistrikt) for 2002-2026: html and text pages for 2002, xml for 2006, zip and skv for 2010-2014, xlsx for 2018-2026, with the re-runs of 2015 and 2019 in their own folders.",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        },
+        {
+          "platform": "SCB Statistikdatabasen (ME0104)",
+          "url": "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0104/{table}",
+          "format": "json and px (PxWeb API)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_me0104",
+          "first_date": "1973-09-16",
+          "finest": "se.kommun",
+          "evidence": "Party votes and seats by municipality, constituency, and region for every election year from 1973 to 2022.",
+          "last_date": "2022-09-11",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_allmanna_valen",
+          "first_date": "1970-09-20",
+          "finest": "se.valdistrikt",
+          "evidence": "Allmänna valen, Del 1 (Riksdagsvalet) for each election from 1970 to 1998, with tables by municipality and election district.",
+          "last_date": "1998-09-20",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SE",
+          "name_pattern": "Riksdag",
+          "valid_from": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1970. Del 1, Riksdagsvalet den 20 september 1970",
+          "election_kind": "general",
+          "seats": 350
+        },
+        {
+          "date": "1973-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1973. Del 2, Kommunala valen den 16 september 1973",
+          "election_kind": "general",
+          "seats": 350
+        },
+        {
+          "date": "1976-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1976. Del 1, Riksdagsvalet den 19 september 1976",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1979-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1979. Del 1, Riksdagsvalet den 16 september 1979",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1982-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1982. Del 1, Riksdagsvalet den 19 september 1982",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1985-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1985. Del 1, Riksdagsvalet den 15 september 1985",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1988-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1988. Del 1, Riksdagsvalet den 18 september 1988",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1991-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1991. Del 1, Riksdagsvalet den 15 september 1991",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1994-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1994. Del 1, Riksdagsvalet den 18 september 1994",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "1998-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1998. Del 1, Riksdagen den 20 september 1998",
+          "election_kind": "general",
+          "seats": 349
+        },
+        {
+          "date": "2002-09-15",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 15 september 2002.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2006-09-17",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 17 september 2006.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2010-09-19",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 19 september 2010.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2014-09-14",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 14 september 2014.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2018-09-09",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 9 september 2018.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2022-09-11",
+          "source": "val_rrk_2022",
+          "quote": "Valdag den 11 september 2022.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        },
+        {
+          "date": "2026-09-13",
+          "source": "val_rrk_2026",
+          "quote": "Valdag den 13 september 2026.",
+          "election_kind": "general",
+          "seats": 349,
+          "contests": 29
+        }
+      ]
+    },
+    {
+      "key": "andra_kammaren",
+      "tier": "national",
+      "name": "Val till riksdagens andra kammare",
+      "name_en": "Second Chamber elections (lower house, 1866-1968)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "se.kommun"
+        ]
+      },
+      "finest_note": "BiSOS R (1872-1908) and Riksdagsmannavalen (1909-1968) report by constituency and by municipality (town and rural commune).",
+      "note": "Directly elected lower house of the bicameral Riksdag under the Riksdag Act of 1866. Mostly single-member constituencies with plurality voting until 1908; party-list proportional representation from 1911, universal suffrage for men in 1909 and for women in 1921. Ordinary elections every three years until 1920 and every four years from 1924, with extra elections in spring 1887, spring 1914, 1921, and 1958.",
+      "source": "scb_valstatistik",
+      "valid_from": "1866-09-01",
+      "valid_to": "1970-01-01",
+      "first_held": "1866-09-01",
+      "earliest_record": "1872-09-01",
+      "est_votes": 50000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_bisos_r",
+          "first_date": "1872-09-01",
+          "finest": "se.kommun",
+          "evidence": "BiSOS R, Valstatistik I (1872) to XVIII (1906-1908): votes by constituency and commune for each triennial election.",
+          "last_date": "1908-09-01",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_riksdagsmannavalen",
+          "first_date": "1909-09-01",
+          "finest": "se.kommun",
+          "evidence": "Riksdagsmannavalen åren 1909-1911 to 1965-1968: lower-house elections by constituency and municipality, including the spring and autumn elections of 1914.",
+          "last_date": "1968-09-15",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "SE",
+          "valid_to": "1971-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1866-09-01",
+          "precision": "month",
+          "through": "1908-12-31",
+          "note": "Triennial elections from 1866 to 1908 (and spring 1887), held over several days in each constituency; not yet counted. SCB's BiSOS R volumes start with the 1872 election."
+        },
+        {
+          "date": "1911-09-01",
+          "precision": "month",
+          "through": "1968-09-15",
+          "note": "Elections from 1911 (the first under proportional representation) to 1968, including spring 1914, 1921, and the 1958 extra election; not yet counted."
+        },
+        {
+          "date": "1968-09-15",
+          "source": "scb_riksdagsmannavalen",
+          "quote": "Riksdagsmannavalen åren 1965-1968. Del 1, Andrakammarvalet 1968, huvudresultat",
+          "election_kind": "general",
+          "precision": "year",
+          "note": "The last Second Chamber election; day as fixed by the election schedule, the volume title gives the year."
+        }
+      ]
+    },
+    {
+      "key": "forsta_kammaren",
+      "tier": "national",
+      "name": "Val till riksdagens första kammare",
+      "name_en": "First Chamber elections (upper house, 1866-1970)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Riksdagsmannavalen reports each First Chamber election by electoral body (county council or city council).",
+      "note": "Upper house of the bicameral Riksdag, elected indirectly by the county councils (landsting) and the councils of the towns outside them, in staggered series; members served nine-year terms until 1909 and eight-year terms after. Abolished with the unicameral Riksdag in 1971.",
+      "source": "scb_valstatistik",
+      "valid_from": "1866-01-01",
+      "valid_to": "1970-12-31",
+      "first_held": "1866-01-01",
+      "earliest_record": "1909-01-01",
+      "est_votes": 200000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_riksdagsmannavalen",
+          "first_date": "1909-01-01",
+          "finest": "se.lan",
+          "evidence": "Riksdagsmannavalen volumes report the First Chamber elections by electoral body; Del 2 of the 1965-1968 volume covers Förstakammarvalen 1965-1969.",
+          "last_date": "1969-12-31",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "SE",
+          "valid_to": "1971-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1866-01-01",
+          "precision": "year",
+          "through": "1969-12-31",
+          "note": "Annual staggered elections by county and city councils; not yet counted."
+        },
+        {
+          "date": "1965-01-01",
+          "source": "scb_riksdagsmannavalen",
+          "quote": "Riksdagsmannavalen åren 1965-1968. Del 2, Förstakammarvalen 1965-1969",
+          "precision": "year",
+          "through": "1969-12-31",
+          "note": "The last First Chamber series, 1965-1969."
+        }
+      ]
+    },
+    {
+      "key": "standsriksdag",
+      "tier": "national",
+      "name": "Val till ståndsriksdagen",
+      "name_en": "Riksdag of the Estates (to 1866)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The four-estate Riksdag sat until the Riksdag Act of 1866: nobles by birth, and clergy, burghers, and peasants chosen within their own estates.",
+      "source": "scb_valstatistik",
+      "valid_to": "1866-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Estates chose their members within their own corporations under status and property rules; these were not public elections, and no official vote counts were compiled. SCB's election statistics start with the bicameral Riksdag.",
+      "match": []
+    },
+    {
+      "key": "europaparlamentet",
+      "tier": "national",
+      "name": "Val till Europaparlamentet",
+      "name_en": "European Parliament elections in Sweden",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "se.kommun",
+          "se.valdistrikt"
+        ]
+      },
+      "finest_note": "Valmyndigheten publishes counts by election district from 2004; SCB's database has every election from 1995 by municipality.",
+      "note": "One national constituency, party lists with optional personal votes, modified Sainte-Laguë, 4 percent threshold. 22 seats in 1995 and 1999, 19 in 2004, 18 in 2009 (20 from 2011), 20 in 2014, 20 in 2019 (21 from February 2020), and 21 in 2024. The first election, in September 1995, filled the seats held by appointed members after accession.",
+      "source": "vallag2005",
+      "valid_from": "1995-09-17",
+      "first_held": "1995-09-17",
+      "earliest_record": "1995-09-17",
+      "est_votes": 23000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Valmyndigheten",
+          "source": "vallag2005",
+          "locator": "https://data.riksdagen.se/dokument/sfs-2005-837.html",
+          "vacancy_rule": "Vallag ch. 14: a vacancy is filled by a new count from the same list."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Valmyndigheten: val.se and historik.val.se",
+          "url": "https://historik.val.se/val/{folder}/",
+          "format": "xml, zip, and xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_eu_tidigare",
+          "first_date": "2004-06-13",
+          "finest": "se.valdistrikt",
+          "evidence": "Final counts by election district for 2004 (xml), 2009 and 2014 (zip), 2019 (xlsx), and 2024 (xlsx on val.se).",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        },
+        {
+          "platform": "SCB Statistikdatabasen (ME0109)",
+          "url": "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0109/{table}",
+          "format": "json and px (PxWeb API)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_me0109",
+          "first_date": "1995-09-17",
+          "finest": "se.kommun",
+          "evidence": "EUvalA: party votes by municipality for 1995, 1999, 2004, 2009, 2014, 2019, and 2024; ME0109T01 seats.",
+          "last_date": "2024-06-09",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_ep",
+          "first_date": "1995-09-17",
+          "finest": "se.valdistrikt",
+          "evidence": "Valet till Europaparlamentet 1995 and 1999.",
+          "last_date": "1999-06-13",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "SE",
+          "schemes": [
+            "world.country"
+          ],
+          "valid_from": "1995-01-01"
+        },
+        {
+          "name_pattern": "Europaparlament|European Parliament",
+          "iso_pattern": "SE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-09-17",
+          "source": "scb_ep",
+          "quote": "Valet till Europaparlamentet 1995",
+          "contests": 1,
+          "seats": 22,
+          "precision": "day",
+          "note": "Day of the 1995 election (17 September); the volume title gives the year."
+        },
+        {
+          "date": "1999-06-13",
+          "source": "scb_ep",
+          "quote": "Valet till Europaparlamentet 1999",
+          "contests": 1,
+          "seats": 22,
+          "note": "Day of the 1999 election (13 June); the volume title gives the year."
+        },
+        {
+          "date": "2004-06-13",
+          "source": "val_eu_tidigare",
+          "quote": "Valdag den 13 juni 2004.",
+          "contests": 1,
+          "seats": 19
+        },
+        {
+          "date": "2009-06-07",
+          "source": "val_eu_tidigare",
+          "quote": "Valdag den 7 juni 2009.",
+          "contests": 1,
+          "seats": 18
+        },
+        {
+          "date": "2014-05-25",
+          "source": "val_eu_tidigare",
+          "quote": "Valdag den 25 maj 2014.",
+          "contests": 1,
+          "seats": 20
+        },
+        {
+          "date": "2019-05-26",
+          "source": "val_eu_tidigare",
+          "quote": "Valdag den 26 maj 2019.",
+          "contests": 1,
+          "seats": 20
+        },
+        {
+          "date": "2024-06-09",
+          "source": "val_eu_2024",
+          "quote": "Valdag den 9 juni 2024.",
+          "contests": 1,
+          "seats": 21
+        }
+      ]
+    },
+    {
+      "key": "folkomrostning",
+      "tier": "national",
+      "name": "Nationella folkomröstningar",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "se.kommun",
+          "se.valdistrikt"
+        ]
+      },
+      "finest_note": "Valmyndigheten has the 2003 euro referendum by election district; the 1922-1994 votes are in SCB's printed volumes by municipality.",
+      "note": "Six advisory national referendums (1922, 1955, 1957, 1980, 1994, 2003); 1957 and 1980 offered three options. A binding referendum on a pending constitutional amendment, held with a Riksdag election on a third of the members' demand, is possible under the Instrument of Government but has never been held.",
+      "source": "rf1974",
+      "first_held": "1922-08-27",
+      "earliest_record": "1922-08-27",
+      "est_votes": 27000000,
+      "effort": 3,
+      "access": [
+        {
+          "platform": "Valmyndigheten: historik.val.se",
+          "url": "https://historik.val.se/val/emu2003/resultat/slutresultat/index.html",
+          "format": "xml and html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_euro2003",
+          "first_date": "2003-09-14",
+          "finest": "se.valdistrikt",
+          "evidence": "Final count of the 2003 euro referendum by election district.",
+          "last_date": "2003-09-14",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_valstatistik",
+          "first_date": "1922-08-27",
+          "finest": "se.kommun",
+          "evidence": "SCB published each referendum's result by county and municipality in the Official Statistics of Sweden; the volumes are digitized among the election statistics.",
+          "last_date": "1994-11-13",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "sovereign_state"
+          ],
+          "iso_pattern": "SE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-08-27",
+          "source": "val_nationella_lista",
+          "quote": "1922 Rusdrycksförbud",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Prohibition of alcohol; day not quoted from a fetched page, the list gives the year."
+        },
+        {
+          "date": "1955-10-16",
+          "source": "val_nationella_lista",
+          "quote": "1955 Högertrafik",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Right-hand traffic; day not quoted from a fetched page, the list gives the year."
+        },
+        {
+          "date": "1957-10-13",
+          "source": "val_nationella_lista",
+          "quote": "1957 Tjänstepension",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Supplementary pensions (three options); day not quoted from a fetched page."
+        },
+        {
+          "date": "1980-03-23",
+          "source": "val_nationella_lista",
+          "quote": "1980 Kärnkraftsfrågan",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Nuclear power (three options); day not quoted from a fetched page."
+        },
+        {
+          "date": "1994-11-13",
+          "source": "val_nationella_lista",
+          "quote": "1994 EU-medlemskap",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Membership of the European Union; day not quoted from a fetched page."
+        },
+        {
+          "date": "2003-09-14",
+          "source": "val_euro2003",
+          "quote": "Valdag den 14 september 2003.",
+          "election_kind": "referendum",
+          "contests": 1
+        }
+      ]
+    },
+    {
+      "key": "regionfullmaktige",
+      "tier": "region",
+      "name": "Val till regionfullmäktige",
+      "name_en": "Regional council elections (county councils, from 1970)",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "se.lan"
+        ],
+        "fine": [
+          "se.kommun",
+          "se.valdistrikt"
+        ]
+      },
+      "finest_note": "Valmyndigheten publishes counts by election district from 2002; SCB's database has every election from 1973 by municipality and region.",
+      "note": "Elections to the county councils (landstingsfullmäktige), renamed regions (regionfullmäktige) on 1 January 2019, held with the Riksdag election since 1970. Twenty regional councils since 1999; Gotland municipality carries the regional tasks and elects no regional council. Each region may form several constituencies; 90 percent of seats are fixed and 10 percent adjustment seats, 3 percent threshold.",
+      "source": "vallag2005",
+      "valid_from": "1970-09-20",
+      "first_held": "1970-09-20",
+      "earliest_record": "1970-09-20",
+      "est_votes": 85000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Valmyndigheten",
+          "valid_from": "1994-09-18",
+          "source": "vallag2005",
+          "locator": "https://data.riksdagen.se/dokument/sfs-2005-837.html",
+          "vacancy_rule": "Vallag ch. 14: a vacancy is filled by a new count from the same list; no by-elections."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Valmyndigheten: val.se and historik.val.se",
+          "url": "https://historik.val.se/val/{folder}/",
+          "format": "xml, skv, xlsx, csv, and html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_rrk_tidigare",
+          "first_date": "2002-09-15",
+          "finest": "se.valdistrikt",
+          "evidence": "Final counts by election district (valdistrikt) for 2002-2026: html and text pages for 2002, xml for 2006, zip and skv for 2010-2014, xlsx for 2018-2026, with the re-runs of 2015 and 2019 in their own folders.",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        },
+        {
+          "platform": "SCB Statistikdatabasen (ME0104)",
+          "url": "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0104/{table}",
+          "format": "json and px (PxWeb API)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_me0104",
+          "first_date": "1973-09-16",
+          "finest": "se.kommun",
+          "evidence": "Party votes and seats by municipality, constituency, and region for every election year from 1973 to 2022.",
+          "last_date": "2022-09-11",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_allmanna_valen",
+          "first_date": "1970-09-20",
+          "finest": "se.valdistrikt",
+          "evidence": "Allmänna valen, Del 2 (Kommunala valen) to 1994 and Del 2 (Landstingsfullmäktige) in 1998.",
+          "last_date": "1998-09-20",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "SE",
+          "name_pattern": "Regionfullmäktige|Landstingsfullmäktige|Regional Council|County Council",
+          "valid_from": "1970-01-01"
+        },
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_from": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1970. Del 2, Kommunala valen 1970",
+          "election_kind": "local"
+        },
+        {
+          "date": "1973-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1973. Del 2, Kommunala valen den 16 september 1973",
+          "election_kind": "local"
+        },
+        {
+          "date": "1976-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1976. Del 2, Kommunala valen den 19 september 1976",
+          "election_kind": "local"
+        },
+        {
+          "date": "1979-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1979. Del 2, Kommunala valen den 16 september 1979",
+          "election_kind": "local"
+        },
+        {
+          "date": "1982-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1982. Del 2, Kommunala valen den 19 september 1982",
+          "election_kind": "local"
+        },
+        {
+          "date": "1985-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1985. Del 2, Kommunala valen den 15 september 1985",
+          "election_kind": "local"
+        },
+        {
+          "date": "1988-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1988. Del 2, Kommunala valen den 18 september 1988",
+          "election_kind": "local"
+        },
+        {
+          "date": "1991-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1991. Del 2, Kommunala valen den 15 september 1991",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1994. Del 2, Kommunala valen den 18 september 1994",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1998. Del 2, Landstingsfullmäktige den 20 september 1998",
+          "election_kind": "local"
+        },
+        {
+          "date": "2002-09-15",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 15 september 2002.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2006-09-17",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 17 september 2006.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2010-09-19",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 19 september 2010.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2011-05-15",
+          "source": "val_rrk_tidigare",
+          "quote": "Den 15 maj 2011 var det omval till landstingsfullmäktige i Västra Götaland.",
+          "election_kind": "local",
+          "contests": 1,
+          "note": "Re-run of the 2010 election in Västra Götaland, ordered by the Election Review Board."
+        },
+        {
+          "date": "2014-09-14",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 14 september 2014.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2018-09-09",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 9 september 2018.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2022-09-11",
+          "source": "val_rrk_2022",
+          "quote": "Valdag den 11 september 2022.",
+          "election_kind": "local",
+          "contests": 20
+        },
+        {
+          "date": "2026-09-13",
+          "source": "val_rrk_2026",
+          "quote": "Valdag den 13 september 2026.",
+          "election_kind": "local",
+          "contests": 20
+        }
+      ]
+    },
+    {
+      "key": "landsting",
+      "tier": "region",
+      "name": "Landstingsmannaval",
+      "name_en": "County council elections before 1970",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "finest_note": "Landstingsmannavalen (1912-1918) and Kommunala valen (1919-1966) report each county council election by constituency and municipality.",
+      "note": "County councils (landsting) were created by the county council ordinance of 1862 and first met in 1863. Their members were chosen through municipal electors until direct elections were introduced; SCB's series of direct county council elections starts in 1912, and from 1919 they were held with the municipal elections, in separate years from the Riksdag elections.",
+      "source": "scb_valstatistik",
+      "valid_from": "1863-01-01",
+      "valid_to": "1970-01-01",
+      "earliest_record": "1912-01-01",
+      "est_votes": 25000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_landstingsmannavalen",
+          "first_date": "1912-01-01",
+          "finest": "se.kommun",
+          "evidence": "Landstingsmannavalen 1912, 1914, 1916, and 1918.",
+          "last_date": "1918-12-31",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_kommunala_valen",
+          "first_date": "1919-01-01",
+          "finest": "se.kommun",
+          "evidence": "Kommunala valen 1919-1966; from 1958 part I covers the county council elections.",
+          "last_date": "1966-12-31",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "SE",
+          "name_pattern": "Landsting|County Council",
+          "valid_to": "1970-01-01"
+        },
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_to": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1863-01-01",
+          "precision": "year",
+          "through": "1911-12-31",
+          "note": "County councils chosen through municipal electors; not yet counted."
+        },
+        {
+          "date": "1912-01-01",
+          "source": "scb_landstingsmannavalen",
+          "quote": "Landstingsmannavalen åren år 1912",
+          "precision": "year",
+          "note": "First volume of SCB's series of county council elections."
+        },
+        {
+          "date": "1914-01-01",
+          "precision": "year",
+          "through": "1966-12-31",
+          "note": "Biennial and then quadrennial county council elections from 1914 to 1966 (1918, then with the municipal elections from 1919); not yet counted."
+        },
+        {
+          "date": "1966-01-01",
+          "source": "scb_kommunala_valen",
+          "quote": "Kommunala valen år 1966. I, Landstingsmannaval",
+          "precision": "year",
+          "note": "The last county council election before they moved to the general election day."
+        }
+      ]
+    },
+    {
+      "key": "kommunfullmaktige",
+      "tier": "kommun",
+      "name": "Val till kommunfullmäktige",
+      "name_en": "Municipal council elections (from 1970)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "se.kommun"
+        ],
+        "fine": [
+          "se.valdistrikt"
+        ]
+      },
+      "finest_note": "Valmyndigheten publishes counts by election district from 2002; SCB's database has every election from 1973 by municipality, and SCB's printed volumes for 1970-1998 go down to election district.",
+      "note": "Elections to the councils of the unitary municipalities created by the reforms of 1971 and 1974, held with the Riksdag election since 1970. 290 municipalities since 2003. Municipalities with at least 36,000 voters may form several constituencies; 90 percent fixed seats and 10 percent adjustment seats, 2 percent threshold (3 percent in a constituency-divided municipality).",
+      "source": "kommunallag2017",
+      "valid_from": "1970-09-20",
+      "first_held": "1970-09-20",
+      "earliest_record": "1970-09-20",
+      "est_votes": 92000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Valmyndigheten and each municipality's election committee (valnämnd)",
+          "valid_from": "1994-09-18",
+          "source": "vallag2005",
+          "locator": "https://data.riksdagen.se/dokument/sfs-2005-837.html",
+          "vacancy_rule": "Vallag ch. 14: a vacancy is filled by a new count from the same list; no by-elections."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Valmyndigheten: val.se and historik.val.se",
+          "url": "https://historik.val.se/val/{folder}/",
+          "format": "xml, skv, xlsx, csv, and html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_rrk_tidigare",
+          "first_date": "2002-09-15",
+          "finest": "se.valdistrikt",
+          "evidence": "Final counts by election district (valdistrikt) for 2002-2026: html and text pages for 2002, xml for 2006, zip and skv for 2010-2014, xlsx for 2018-2026, with the re-runs of 2015 and 2019 in their own folders.",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        },
+        {
+          "platform": "SCB Statistikdatabasen (ME0104)",
+          "url": "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0104/{table}",
+          "format": "json and px (PxWeb API)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_me0104",
+          "first_date": "1973-09-16",
+          "finest": "se.kommun",
+          "evidence": "Party votes and seats by municipality, constituency, and region for every election year from 1973 to 2022.",
+          "last_date": "2022-09-11",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        },
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_allmanna_valen",
+          "first_date": "1970-09-20",
+          "finest": "se.valdistrikt",
+          "evidence": "Allmänna valen, Del 2 (Kommunala valen) to 1994 and Del 3 (Kommunfullmäktige) in 1998.",
+          "last_date": "1998-09-20",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "SE",
+          "name_pattern": "Kommunfullmäktige|Municipal Council",
+          "valid_from": "1970-01-01"
+        },
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1970. Del 2, Kommunala valen 1970",
+          "election_kind": "local"
+        },
+        {
+          "date": "1973-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1973. Del 2, Kommunala valen den 16 september 1973",
+          "election_kind": "local"
+        },
+        {
+          "date": "1976-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1976. Del 2, Kommunala valen den 19 september 1976",
+          "election_kind": "local"
+        },
+        {
+          "date": "1979-09-16",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1979. Del 2, Kommunala valen den 16 september 1979",
+          "election_kind": "local"
+        },
+        {
+          "date": "1982-09-19",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1982. Del 2, Kommunala valen den 19 september 1982",
+          "election_kind": "local"
+        },
+        {
+          "date": "1985-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1985. Del 2, Kommunala valen den 15 september 1985",
+          "election_kind": "local"
+        },
+        {
+          "date": "1988-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1988. Del 2, Kommunala valen den 18 september 1988",
+          "election_kind": "local"
+        },
+        {
+          "date": "1991-09-15",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1991. Del 2, Kommunala valen den 15 september 1991",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-09-18",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1994. Del 2, Kommunala valen den 18 september 1994",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-09-20",
+          "source": "scb_allmanna_valen",
+          "quote": "Allmänna valen 1998. Del 3, Kommunfullmäktige den 20 september 1998",
+          "election_kind": "local"
+        },
+        {
+          "date": "2002-09-15",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 15 september 2002.",
+          "election_kind": "local"
+        },
+        {
+          "date": "2003-03-16",
+          "source": "val_rrk_tidigare",
+          "quote": "Den 16 mars 2003 var det omval till kommunfullmäktige i Orsa kommun.",
+          "election_kind": "local",
+          "contests": 1,
+          "note": "Re-run of the 2002 election in Orsa."
+        },
+        {
+          "date": "2006-09-17",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 17 september 2006.",
+          "election_kind": "local",
+          "contests": 290
+        },
+        {
+          "date": "2010-09-19",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 19 september 2010.",
+          "election_kind": "local",
+          "contests": 290
+        },
+        {
+          "date": "2011-05-15",
+          "source": "val_rrk_tidigare",
+          "quote": "Den 15 maj 2011 var det omval till kommunfullmäktige i Örebro kommun.",
+          "election_kind": "local",
+          "contests": 1,
+          "note": "Re-run of the 2010 election in Örebro; the same day as the Västra Götaland regional re-run."
+        },
+        {
+          "date": "2014-09-14",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 14 september 2014.",
+          "election_kind": "local",
+          "contests": 290
+        },
+        {
+          "date": "2015-05-10",
+          "source": "val_rrk_tidigare",
+          "quote": "Den 10 maj 2015 var det omval till kommunfullmäktige i Båstad kommun.",
+          "election_kind": "local",
+          "contests": 1,
+          "note": "Re-run of the 2014 election in Båstad."
+        },
+        {
+          "date": "2018-09-09",
+          "source": "val_rrk_tidigare",
+          "quote": "Valdag den 9 september 2018.",
+          "election_kind": "local",
+          "contests": 290
+        },
+        {
+          "date": "2019-04-07",
+          "source": "val_rrk_tidigare",
+          "quote": "Omval till kommunfullmäktige i Falu kommun",
+          "election_kind": "local",
+          "contests": 1,
+          "note": "Re-run of the 2018 election in Falun after a sack of 126 advance votes went uncounted; day as loaded from Valmyndigheten's final count."
+        },
+        {
+          "date": "2022-09-11",
+          "source": "val_rrk_2022",
+          "quote": "Valdag den 11 september 2022.",
+          "election_kind": "local",
+          "contests": 290
+        },
+        {
+          "date": "2026-09-13",
+          "source": "val_rrk_2026",
+          "quote": "Valdag den 13 september 2026.",
+          "election_kind": "local",
+          "contests": 290
+        }
+      ]
+    },
+    {
+      "key": "kommunala_val_fore_1970",
+      "tier": "kommun_fore_1971",
+      "name": "Kommunala val till stadsfullmäktige, köpingsfullmäktige och kommunalfullmäktige",
+      "name_en": "Town, market-town, and rural commune council elections before 1970",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "finest_note": "Kommunala valen (1919-1966) reports each election by municipality.",
+      "note": "Municipal self-government dates from the ordinances of 1862. Until 1918 votes were graded by income and property; equal municipal suffrage came in 1918-1919, and from 1919 councils were elected by proportional representation. The 1952 reform merged about 2,500 municipalities into about 1,000; the 1971 and 1974 reforms created today's municipalities.",
+      "source": "scb_valstatistik",
+      "valid_from": "1863-01-01",
+      "valid_to": "1970-01-01",
+      "earliest_record": "1919-01-01",
+      "est_votes": 35000000,
+      "effort": 5,
+      "access": [
+        {
+          "platform": "SCB: digitized Official Statistics of Sweden (valstatistik)",
+          "url": "https://share.scb.se/ov9993/data/historisk%20statistik/SOS%201911-%2FValstatistiken%2F{series}%2F{file}.pdf",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "scb_kommunala_valen",
+          "first_date": "1919-01-01",
+          "finest": "se.kommun",
+          "evidence": "Kommunala valen 1919-1966; part II of the 1958-1966 volumes covers the municipal council elections.",
+          "last_date": "1966-12-31",
+          "license": "SCB's open data (Statistikdatabasen) are CC0 1.0; other material on scb.se is CC BY 4.0 with SCB named as the source"
+        }
+      ],
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "SE",
+          "name_pattern": "Stadsfullmäktige|Köpingsfullmäktige|Kommunalfullmäktige|Kommunalstämma|Town Council|Municipal Council",
+          "valid_to": "1970-01-01"
+        },
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_to": "1970-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1863-01-01",
+          "precision": "year",
+          "through": "1918-12-31",
+          "note": "Councils elected with votes graded by income and property; no official compilation of votes; not yet counted."
+        },
+        {
+          "date": "1919-01-01",
+          "source": "scb_kommunala_valen",
+          "quote": "Kommunala valen år 1919",
+          "precision": "year",
+          "note": "First municipal elections with equal suffrage."
+        },
+        {
+          "date": "1920-01-01",
+          "precision": "year",
+          "through": "1966-12-31",
+          "note": "Municipal elections from 1920 to 1966 (quadrennial from 1938); not yet counted."
+        },
+        {
+          "date": "1966-01-01",
+          "source": "scb_kommunala_valen",
+          "quote": "Kommunala valen år 1966. II, Fullmäktigvalen",
+          "precision": "year",
+          "note": "The last municipal elections before the 1970 general election day."
+        }
+      ]
+    },
+    {
+      "key": "kommunal_folkomrostning",
+      "tier": "kommun",
+      "name": "Kommunala och regionala folkomröstningar",
+      "name_en": "Municipal and regional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Each municipality publishes its own result, usually by election district; Valmyndigheten lists the votes but keeps no results.",
+      "note": "Advisory referendums under the Local Government Act and the 1994 act on municipal referendums, decided by the council or forced by an initiative of ten percent of the electorate. Valmyndigheten's list has 169 from 1980 to 2026, one of them regional (Västerbottens landsting, 2013); many are held with the general election.",
+      "source": "kommunallag2017",
+      "first_held": "1980-01-01",
+      "earliest_record": "1980-01-01",
+      "est_votes": 3000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "Valmyndigheten: list of municipal referendums",
+          "url": "https://www.val.se/download/18.162047b519a91d0533113f48/1794380793420/lista-over-genomforda-kommunala-folkomrostningar.xlsx",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_kommunala_lista",
+          "first_date": "1980-01-01",
+          "evidence": "Year, municipality, question, and whether the vote coincided with a general election, for 169 referendums from 1980 to 2026; no vote counts.",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)",
+          "role": "administers"
+        },
+        {
+          "platform": "Municipal websites and council minutes",
+          "url": "https://www.{kommun}.se/",
+          "format": "html and pdf",
+          "access": "manual",
+          "checked_at": "2026-11-17",
+          "source": "val_folkomrostningar",
+          "first_date": "1980-01-01",
+          "evidence": "The municipality runs the referendum and reports the result; there is no central results archive."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "SE",
+          "schemes": [
+            "se.kommun",
+            "se.lan"
+          ]
+        },
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "region"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1980-01-01",
+          "source": "val_kommunala_lista",
+          "quote": "Lista genomförda kommunala folkomröstningar Från 1980",
+          "precision": "year",
+          "through": "2026-12-31",
+          "election_kind": "referendum",
+          "note": "169 referendums listed by year (6 in 1980, 22 in 2006, 9 in 2025, 6 in 2026); days not yet listed."
+        }
+      ]
+    },
+    {
+      "key": "sametinget",
+      "tier": "sami",
+      "name": "Val till Sametinget",
+      "name_en": "Sami Parliament elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "se.kommun"
+        ]
+      },
+      "finest_note": "Valmyndigheten's presentations from 2013 report votes by municipality and polling place; earlier results are national.",
+      "note": "Sametinget, a state agency with an elected assembly of 31 members chosen by voters on the Sami electoral roll, the whole country forming one constituency. Elections every four years on the third Sunday of May since 1993; the ordinary election of 18 May 2025 was annulled by the Election Review Board and re-run on 5 October 2025.",
+      "source": "sametingslag1992",
+      "valid_from": "1993-01-01",
+      "first_held": "1993-05-16",
+      "earliest_record": "2005-05-15",
+      "est_votes": 50000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 5,
+          "day_rule": "may_third_sunday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Sametingets valnämnd, Valmyndigheten, and Länsstyrelsen i Norrbottens län",
+          "source": "sametingslag1992",
+          "locator": "https://data.riksdagen.se/dokument/sfs-1992-1433.html",
+          "vacancy_rule": "A vacancy is filled by a new count from the same list, as for regional councils."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Valmyndigheten: val.se and historik.val.se",
+          "url": "https://historik.val.se/val/same{year}/",
+          "format": "html, csv, and xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "val_sameting_tidigare",
+          "first_date": "2005-05-15",
+          "finest": "se.kommun",
+          "evidence": "Party shares and seats for 2005-2025 on val.se; full presentations on historik.val.se for 2013, 2017, and 2021 and on val.se for 2025, with party and candidate csv files on data.val.se.",
+          "license": "Free to use, reuse, and share provided Valmyndigheten is named as the source (PSI law; Om vår öppna data)"
+        }
+      ],
+      "match": [
+        {
+          "name_pattern": "Sametinget|Sámi Parliament|Sámediggi|Saemiedigkie",
+          "iso_pattern": "SE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-16",
+          "election_kind": "general",
+          "seats": 31,
+          "note": "First election, on the third Sunday of May; not quoted from a fetched official page."
+        },
+        {
+          "date": "1997-05-18",
+          "election_kind": "general",
+          "seats": 31,
+          "note": "Third Sunday of May; not quoted from a fetched official page."
+        },
+        {
+          "date": "2001-05-20",
+          "election_kind": "general",
+          "seats": 31,
+          "note": "Third Sunday of May; not quoted from a fetched official page."
+        },
+        {
+          "date": "2005-05-15",
+          "source": "val_sameting_tidigare",
+          "quote": "Valdag den 15 maj 2005.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2009-05-17",
+          "source": "val_sameting_tidigare",
+          "quote": "Valdag den 17 maj 2009.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2013-05-19",
+          "source": "val_sameting_tidigare",
+          "quote": "Valdag den 19 maj 2013.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2017-05-21",
+          "source": "val_sameting_tidigare",
+          "quote": "Valdag den 21 maj 2017.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2021-05-16",
+          "source": "val_sameting_tidigare",
+          "quote": "Valdag den 16 maj 2021.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2025-05-18",
+          "source": "val_sameting_2025",
+          "quote": "Du kan också se valresultatet från det ordinarie sametingsvalet den 18 maj 2025. Beslutet om resultatet upphävdes och fick inte laga kraft.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31,
+          "note": "Annulled; re-run on 5 October 2025."
+        },
+        {
+          "date": "2025-10-05",
+          "source": "val_sameting_2025",
+          "quote": "Sammanfattning av valresultatet i omvalet till Sametinget, valdag den 5 oktober 2025.",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 31,
+          "note": "Re-run of the annulled May 2025 election."
+        }
+      ]
+    },
+    {
+      "key": "kyrkoval",
+      "tier": "national",
+      "name": "Kyrkoval i Svenska kyrkan",
+      "name_en": "Church of Sweden elections (Church Assembly, diocesan, and church councils)",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Members of the Church of Sweden aged 16 and over elect the Church Assembly (kyrkomötet), the 13 diocesan assemblies (stiftsfullmäktige), and the church councils of the 571 pastorates and independent parishes (kyrkofullmäktige) on the same day every four years: 2001, 2005, 2009, 2013, 2017, 2021, and 2025 (third Sunday of September), next in September 2029. About 850,000 valid votes were cast for church councils in 2025. Before 2000, church elections were held under state law while the Church of Sweden was the state church.",
+      "source": "kyrkolag1998",
+      "first_held": "2001-09-16",
+      "earliest_record": "2001-09-16",
+      "est_votes": 6000000,
+      "effort": 3,
+      "disposition": "out_of_scope",
+      "disposition_reason": "Since 2000 the Church of Sweden is a religious community separate from the state; its elections are held under its own church order and run and published by the church, not by a public election authority.",
+      "access": [
+        {
+          "platform": "Svenska kyrkan: kyrkoval",
+          "url": "https://www.svenskakyrkan.se/default.aspx?id={id}",
+          "format": "xls",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "source": "svk_kyrkoval",
+          "first_date": "2013-09-15",
+          "evidence": "Church Assembly and diocesan results by parish for 2013-2025 and church council results by electoral area and parish for 2025, as Excel files."
+        }
+      ],
+      "match": [
+        {
+          "name_pattern": "Kyrkomöte|Stiftsfullmäktige|Kyrkofullmäktige|Church Assembly|Church of Sweden",
+          "iso_pattern": "SE"
+        }
+      ]
+    },
+    {
+      "key": "statschef",
+      "tier": "national",
+      "name": "Statschef (kungen)",
+      "name_en": "Head of state (the King)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "rf1974",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The head of state is the hereditary monarch under the Act of Succession; there is no election.",
+      "match": [],
+      "note": "Sweden has no directly elected executive at any tier."
+    },
+    {
+      "key": "statsminister",
+      "tier": "national",
+      "name": "Statsministeromröstning i riksdagen",
+      "name_en": "Prime minister vote in the Riksdag",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "rf1974",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Speaker proposes a prime minister and the Riksdag votes (Instrument of Government ch. 6); the proposal fails only if more than half the members vote against. This is a members' vote recorded in the Riksdag's minutes, not a public election.",
+      "match": []
+    },
+    {
+      "key": "kommunstyrelse",
+      "tier": "kommun",
+      "name": "Val av kommunstyrelse och regionstyrelse",
+      "name_en": "Municipal and regional executive committees and their chairs",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kommunallag2017",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Executive committees, their chairs, and the boards of each municipality and region are chosen by the council (Local Government Act ch. 5-6); these are councillors' votes, not public elections.",
+      "match": []
+    },
+    {
+      "key": "namndeman",
+      "tier": "kommun",
+      "name": "Val av nämndemän",
+      "name_en": "Lay judges",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kommunallag2017",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Lay judges for the district, administrative, and appeal courts are elected by municipal and regional councils; judges are appointed by the Government. No judicial office is filled by a public election.",
+      "match": []
+    },
+    {
+      "key": "nominering",
+      "tier": "national",
+      "name": "Partiernas provval",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "vallag2005",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose and order their candidates under their own rules, sometimes by member ballots (provval); no state authority runs or records them.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "SE"
+        }
+      ]
+    }
+  ]
+}
