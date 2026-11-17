@@ -1282,11 +1282,23 @@ const datedTogether = together(
     }
     for (const pair of unique) {
       const entry = found.get(`${pair.h}|${pair.id}|${pair.on ?? ""}`);
-      if (
-        entry?.native != null &&
-        (!LATIN.test(entry.label) || entry.label.endsWith(entry.native.text))
-      ) {
+      if (entry?.native == null) {
+        continue;
+      }
+      if (!LATIN.test(entry.label) || entry.label.endsWith(entry.native.text)) {
         entry.native = null;
+        continue;
+      }
+      const tail = /, [^,]+$/u.exec(entry.label)?.[0];
+      if (
+        tail != null &&
+        entry.native.text.endsWith(tail) &&
+        entry.native.text.length > tail.length
+      ) {
+        entry.native = {
+          ...entry.native,
+          text: entry.native.text.slice(0, -tail.length),
+        };
       }
     }
     if (version !== "" && version === datedMemo.version) {
@@ -11772,7 +11784,7 @@ export const contests = {
       const holder = (row: (typeof rows)[number]) =>
         row.current?.person ?? row.current?.party ?? null;
       const natives = await names(
-        [...new Set(rows.map(holder).filter((id) => id != null))],
+        [...new Set(rows.map((row) => holder(row)).filter((id) => id != null))],
         contest.date,
       );
       return withLogos(
