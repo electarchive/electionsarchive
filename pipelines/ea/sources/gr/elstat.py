@@ -544,7 +544,7 @@ def election(e: Election) -> Package:
             id=units[code],
             polity_id=GREECE,
             scheme_code=SCHEME,
-            code=f"{e.day}:{code}",
+            code=f"{e.day}:{e.name}:{code}",
             area_relation="equals" if territorial(code) else "unlocated",
             area_id=area(greek) if territorial(code) else None,
             kind="standard",
