@@ -13,10 +13,22 @@ from ea.changeset import Changeset
 from ea.store import DATA, Connection, connect
 
 SOURCE = "id.dpd_match"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Indonesian people on Wikidata, with their labels, aliases, descriptions, and positions held (P39)"
 WIKI_TITLE = "Members of the Regional Representative Council by term (Indonesian Wikipedia lists and categories)"
 TERMS = {
+    2004: (
+        "Kategori:Anggota DPD 2004-2009",
+        "Kategori:Anggota DPD RI 2004–2009",
+    ),
+    2009: (
+        "Kategori:Anggota DPD 2009-2014",
+        "Kategori:Anggota DPD RI 2009–2014",
+    ),
+    2014: (
+        "Kategori:Anggota DPD 2014-2019",
+        "Kategori:Anggota DPD RI 2014–2019",
+    ),
     2019: (
         "Daftar anggota Dewan Perwakilan Daerah Republik Indonesia 2019–2024",
         "Kategori:Anggota DPD 2019-2024",
@@ -58,6 +70,7 @@ OPTIONAL {{ ?item schema:description ?description FILTER(LANG(?description) IN (
 OPTIONAL {{ ?item wdt:P39 ?pos }}
 OPTIONAL {{ ?item ?claim ?statement . ?statement prov:wasDerivedFrom/pr:P248 wd:{dct} . BIND(wd:{dct} AS ?dct) }} }}"""
 MEMBER = re.compile(r"dewan perwakilan daerah|\bdpd\b|regional representative council|senator", re.IGNORECASE)
+PIPELINES = ["id.kpu_dpd_early", "id.kpu_dpd_2014", "id.kpu_dpd"]
 UNMATCHED = DATA / "tmp" / "id-dev" / "dpd_unmatched.tsv"
 
 
@@ -85,7 +98,14 @@ def runs(conn: Connection) -> list[Run]:
     return [
         Run(person, day, area, printed, core(printed), won)
         for person, day, area, printed, won in conn.execute(
-            """select cy.person_id, e.date_from, k.district_area_id, cy.ballot_name,
+            """select cy.person_id, e.date_from,
+                      coalesce(k.district_area_id,
+                               (select ac.area_id from external_id x
+                                join area_code ac on ac.code = split_part(x.value, ':', 3)
+                                join area a on a.id = ac.area_id and a.scheme_code = 'id.provinsi'
+                                where x.entity_id = k.id and x.scheme = 'id.contest' and x.value like '%%:dpd:%%'
+                                order by ac.area_id limit 1)),
+                      cy.ballot_name,
                       exists (select from outcome w join result_set r on r.id = w.result_set_id
                               where w.option_id = o.id and r.is_default and w.kind = 'elected')
                from candidacy cy
@@ -93,8 +113,9 @@ def runs(conn: Connection) -> list[Run]:
                join contest k on k.id = o.contest_id
                join election e on e.id = k.election_id
                join changeset c on c.id = k.changeset_id
-               where c.pipeline = 'id.kpu_dpd' and c.status = 'published'
-                 and not exists (select from entity_merge m where m.entity_id = cy.person_id)"""
+               where c.pipeline = any(%s) and c.status = 'published'
+                 and not exists (select from entity_merge m where m.entity_id = cy.person_id)""",
+            (PIPELINES,),
         ).fetchall()
     ]
 
@@ -186,7 +207,9 @@ def initialed(a: tuple[str, ...], b: tuple[str, ...]) -> bool:
 
 
 def papuan(names: dict[UUID, str], a: Run, b: Run) -> bool:
-    return names[a.province].startswith("Papua") and names[b.province].startswith("Papua")
+    return names[a.province].startswith(("Papua", "Irian Jaya")) and names[b.province].startswith(
+        ("Papua", "Irian Jaya")
+    )
 
 
 def groups(conn: Connection, every: list[Run]) -> dict[UUID, list[UUID]]:
@@ -362,9 +385,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Regional Representative Council (DPD) candidates of 2019 and 2024 matched across the two elections by "
+                "Regional Representative Council (DPD) candidates of 2004 through 2024 matched across the elections by "
                 "printed name without titles, degrees, or initials: in the same province, in a Papuan province split "
-                "from the 2019 one, as a sitting member under a lengthened name in the same province, or with a "
+                "from or renamed from an earlier one, as a sitting member under a lengthened name in the same province, or with a "
                 "name of two or more words that only one candidate bore in each election, or with initials for given "
                 "names in the same province; members elected given "
                 "the Wikidata item of their name, or of two or more words of it that no other member of the term "
