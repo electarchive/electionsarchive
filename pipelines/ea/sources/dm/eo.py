@@ -1,8 +1,9 @@
-"""Dominica's Electoral Office: every general election and by-election it publishes results for, 1970 to 2022."""
+"""Dominica's Electoral Office: every general election and by-election it publishes results for, 1970 to 2026."""
 
 import html
 import json
 import re
+import subprocess
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
@@ -39,7 +40,18 @@ ELECTIONS: dict[str, tuple[str, str, str]] = {
     "2019-12-06": ("general", "stations", "2019-general-elections-results"),
     "2021-11-25": ("by_election", "stations", "2021-grand-bay-by-election-results-final-count"),
     "2022-12-06": ("general", "stations", "2022-general-election-results"),
+    "2026-09-07": ("by_election", "stations", f"{SITE}/news/notice-roseau-north-by-election-results"),
 }
+# The 2026 Roseau North by-election is published as a PDF of results by polling station, with its own notices.
+PDF_DAY = "2026-09-07"
+PDF = f"{SITE}/images/docs/roseau_north_by_election_results_sep2026.pdf"
+NOTICES = [
+    f"{SITE}/news/{name}"
+    for name in (
+        "notice-writ-for-election-of-a-member-of-the-roseau-north-constituency",
+        "notice-of-grant-of-a-poll-the-roseau-north-constituency",
+    )
+]
 JSON_YEARS = ("2014", "2019", "2022")
 INDEX = [PAGE, f"{PAGE}?start=10"]
 UNIT_SCHEME = "dm.polling_station"
@@ -73,7 +85,8 @@ def url(name: str) -> str:
 
 
 def page_url(day: str) -> str:
-    return url(ELECTIONS[day][2])
+    name = ELECTIONS[day][2]
+    return name if name.startswith("http") else url(name)
 
 
 def json_url(year: str, name: str) -> str:
@@ -102,6 +115,10 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=".html")
     for day, (_, level, _) in ELECTIONS.items():
         raw.fetch(SOURCE, page_url(day), suffix=".html")
+        if day == PDF_DAY:
+            raw.fetch(SOURCE, PDF, suffix=".pdf")
+            for link in NOTICES:
+                raw.fetch(SOURCE, link, suffix=".html")
         year = day[:4]
         if level == "stations" and year in JSON_YEARS:
             raw.fetch(SOURCE, script_url(year), suffix=".js")
@@ -151,6 +168,7 @@ class Candidate:
     abbr: str | None = None
     votes: int | None = None
     elected: bool = False
+    party_unknown: bool = False  # the Office's results do not say whether the candidate ran for a party
 
 
 @dataclass
@@ -356,6 +374,56 @@ def page_seat(day: str, name: str) -> Seat:
     return seat
 
 
+def pdf_seat(day: str) -> Seat:
+    """The 2026 Roseau North by-election: a PDF table of polling stations, then the Office's totals."""
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, PDF).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    rows = [line.strip() for line in text.splitlines() if line.strip()]
+    head = re.split(r"\s{2,}", rows[0])
+    names = head[4:7]
+    seat = Seat("Roseau North", candidates=[Candidate(name, None, party_unknown=True) for name in names])
+    for row in rows[1:]:
+        found = re.fullmatch(
+            r"(\d+)\s+(N[O0]?\d+)\s+(.+?)\s{2,}([A-Z]-[A-Z])\s+(.+?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)",
+            row,
+        )
+        if not found:
+            continue
+        code, district, area, surnames, place = found.groups()[:5]
+        a, b, c, rejected, valid, registered = (int(x) for x in found.groups()[5:])
+        district = re.sub(r"^N[O0]?", "N", district)
+        district = f"N{int(district[1:]):02d}"
+        seat.stations.append(
+            Station(
+                f"{int(code):02d}",
+                f"{district} {area} | {place}",
+                surnames,
+                district,
+                registered,
+                rejected,
+                valid,
+                valid,
+                {"0": a, "1": b, "2": c},
+            )
+        )
+    totals = next(row for row in rows if re.fullmatch(r"(\d+\s+){5}\d+", row))
+    nums = [int(x) for x in totals.split()]
+    for position in range(3):
+        seat.declared_votes[position] = nums[position]
+        seat.candidates[position].votes = nums[position]
+    seat.declared_rejected = nums[3]
+    seat.registered = nums[5]
+    summary = {
+        m.group(1): int(m.group(2))
+        for m in re.finditer(r"^(Registered Voters|Votes Polled)\s+(\d+)", text, re.MULTILINE)
+    }
+    seat.cast = summary["Votes Polled"]
+    if summary["Registered Voters"] != seat.registered or nums[4] != sum(nums[:3]):
+        raise ValueError(f"{day}: the PDF's own totals disagree")
+    return seat
+
+
 # Loading ---------------------------------------------------------------------------------------------------------
 
 BY_ELECTION_SEAT = {"2016-06-07": "Soufriere", "2021-11-25": "Grand Bay"}
@@ -408,6 +476,8 @@ def load(day: str) -> tuple[list[Seat], dict[str, int]]:
         if day[:4] == "2022":
             seats += duly_elected(day)
         return seats, {}
+    if day == PDF_DAY:
+        return [pdf_seat(day)], {}
     return [page_seat(day, BY_ELECTION_SEAT[day])], {}
 
 
@@ -585,6 +655,9 @@ def build(day: str) -> Package:
     )
     p.external.add(DOMINICA)
     p.uses(raw.cached(SOURCE, page_url(day)))
+    if day == PDF_DAY:
+        for link in [PDF, *NOTICES]:
+            p.uses(raw.cached(SOURCE, link))
     if level == "stations" and day[:4] in JSON_YEARS:
         p.uses(raw.cached(SOURCE, script_url(day[:4])))
         for letter in letters(day):
@@ -606,6 +679,18 @@ def build(day: str) -> Package:
     )
     p.name(election, title(day, seats), "en", "official")
     p.add("slug", path=f"dm/{day}-{label}", entity_id=election, is_current=True)
+    if day == PDF_DAY:
+        p.add(
+            "note",
+            id=key("note", election, "candidates"),
+            entity_id=election,
+            kind="caveat",
+            body_md="The Office's results table names the candidates only by one name each (Boston, Danny, and Ashma) "
+            "and does not give their parties, so no party is stored. Its notice of the poll lists the candidates as "
+            "Boston Sherman, (Donty) Lugay Daniel, and Andrew Mc Dougall Ashma, without saying which name belongs "
+            "to which result. Polling was on September 7, 2026, and the count began on September 8.",
+            lang="en",
+        )
     elected = Counter(tidy_party(seat.candidates[winner_index(seat)].party) or "Independent" for seat in seats)
     printed = Counter({tidy_party(name) or "": count for name, count in summary.items()})
     if summary and printed != elected:
@@ -665,7 +750,7 @@ def build(day: str) -> Package:
                 role="head",
                 ballot_name=c.name,
                 member_of_party_id=party_id(party) if party else None,
-                is_independent=party is None,
+                is_independent=None if c.party_unknown else party is None,
             )
         winner = winner_index(seat)
         if tacit:
