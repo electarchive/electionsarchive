@@ -100,6 +100,22 @@ BODIES: dict[str, tuple[str, str | None, str, str, str, str]] = {
         "Conseils communaux",
         "fr",
     ),
+    "MunicipalDistrict": (
+        "antwerp-district-councils",
+        "council",
+        "Antwerp district councils",
+        "Districtsraden van Antwerpen",
+        "Conseils de district d'Anvers",
+        "fr",
+    ),
+    "OCMW": (
+        "social-welfare-councils",
+        "council",
+        "Social welfare councils (directly elected)",
+        "OCMW-raden (rechtstreeks verkozen)",
+        "Conseils de l'action sociale (élus directement)",
+        "fr",
+    ),
 }
 LOCAL = {"Province", "Municipality"}
 LANGS = {"fr": "fr", "nl": "nl", "de": "de", "en": "en"}
@@ -659,7 +675,7 @@ def per_unit(build: Builder, kind: str, name: str, slug: str, levels: tuple[Leve
             tier_slug = changeset.slug(tier)
             contest, options = build.contest(
                 tag,
-                kind,
+                tier if tier in BODIES else kind,
                 title,
                 level.seats,
                 f"{build.base}/{slug}/{tier_slug}/{changeset.slug(label)}",
