@@ -7,7 +7,8 @@ layer, so each number is read with its word box from `pdftotext -bbox` and store
 The 2003 memoria is a two-page file for each municipality, read in `gt.memoria2003`. The other four print their
 results in four layouts: 2007 a page of results for each municipality, department, and the Distrito Central; 2011 a
 table for each department, the district tables set sideways, and a block for each municipality; 2015 tables by
-department and mayoral blocks; 2019 one contest per page.
+department and mayoral blocks; 2019 one contest per page. The scanned memoria of the 1984 National Constituent
+Assembly election is read in `gt.memoria1984`.
 """
 
 import re
@@ -610,6 +611,13 @@ def _scans() -> ModuleType:
     return memoria_scan
 
 
+def _constituent() -> ModuleType:
+    """The reader of the 1984 Constituent Assembly memoria, which imports this module."""
+    from ea.sources.gt import memoria1984
+
+    return memoria1984
+
+
 def _files2003() -> ModuleType:
     """The reader of the 2003 memoria, which imports this module."""
     from ea.sources.gt import memoria2003
@@ -644,6 +652,7 @@ def fetch() -> None:
             _files2003().fetch()
         else:
             raw.fetch(SOURCE, url(m), suffix=".pdf")
+    _constituent().fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -1105,7 +1114,7 @@ def packages() -> list[str]:
         key_
         for m in MEMORIA_LIST
         for key_ in (f"{SOURCE}/{m.year}-registry", *(f"{SOURCE}/{day}" for day in days(m.year)))
-    ]
+    ] + _constituent().packages()
 
 
 def _family(contest: Contest) -> str:
@@ -1369,6 +1378,7 @@ def parse() -> None:
         registry(m.year).write()
         for day in days(m.year):
             election(m.year, day).write()
+    _constituent().parse()
 
 
 def emit() -> None:
