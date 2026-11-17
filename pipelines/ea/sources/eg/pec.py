@@ -11,19 +11,17 @@ for that election print no results, so the 2012 election is not built.
 
 import csv
 import io
-import json
 import re
 from dataclasses import dataclass
 from datetime import date
 from uuid import uuid5
 
 import polars as pl
-import shapely
-import shapely.geometry
 import xlrd
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.eg import nea
 
 SOURCE = "eg.pec"
 EGYPT = str(uuid5(package.NAMESPACE, "polity\x1fEG"))
@@ -33,43 +31,41 @@ STATEMENT = HOME + "images/pdfs/statement_of_results.pdf"
 DETAILED = HOME + "results/data/excels/pres2014-results-detailed.xls"
 NATIONAL = HOME + "results/data/csv/EG.csv"
 LISTING = HOME + "results/compact-listing.html"
-GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/EGY"
-GB_GOVERNORATES = f"{GEOBOUNDARIES}/ADM1/geoBoundaries-EGY-ADM1.geojson"
 FIRST, LAST = date(2014, 5, 15), date(2014, 5, 28)
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, VOTERS = 1, 2, 3, 4, 5, 14
 ABROAD = "الخارج"
 TOTAL = "الإجمالي"
 
-# The governorates by the name the Commission prints, with the English name and geoBoundaries' name for its shape.
-GOVERNORATES = {
-    "القاهرة": ("Cairo", "Cairo Governorate"),
-    "الأسكندرية": ("Alexandria", "Alexandria Governorate"),
-    "بورسعيد": ("Port Said", "Port Said Governorate"),
-    "السويس": ("Suez", "Suez Governorate"),
-    "دمياط": ("Damietta", "Damietta Governorate"),
-    "الدقهلية": ("Dakahlia", "Dakahlia Governorate"),
-    "الشرقية": ("Sharqia", "Al Sharqia Governorate"),
-    "القليوبية": ("Qalyubia", "Qalyubia Governorate"),
-    "كفر الشيخ": ("Kafr el-Sheikh", "Kafr el-Sheikh Governorate"),
-    "الغربية": ("Gharbia", "Gharbiyya Governorate"),
-    "المنوفية": ("Monufia", "Monufia Governorate"),
-    "البحيرة": ("Beheira", "Beheira Governorate"),
-    "الإسماعيلية": ("Ismailia", "Ismailia Governorate"),
-    "الجيزة": ("Giza", "Giza Governorate"),
-    "بني سويف": ("Beni Suef", "Beni Suef Governorate"),
-    "الفيوم": ("Faiyum", "Faiyum Governorate"),
-    "المنيا": ("Minya", "Minya Governate"),
-    "أسيوط": ("Asyut", "Asyut Governorate"),
-    "سوهاج": ("Sohag", "Sohag Governorate"),
-    "قنا": ("Qena", "Qena Governorate"),
-    "أسوان": ("Aswan", "Aswan Governorate"),
-    "الأقصر": ("Luxor", "Luxor Governate"),
-    "البحر الأحمر": ("Red Sea", "Red Sea Governorate"),
-    "الوادي الجديد": ("New Valley", "New Valley Governorate"),
-    "مرسى مطروح": ("Matrouh", "Matrouh Governorate"),
-    "شمال سيناء": ("North Sinai", "North Sinai Governorate"),
-    "جنوب سيناء": ("South Sinai", "South Sinai Governorate"),
-}
+# The governorates by the name the Commission prints.
+GOVERNORATES = (
+    "القاهرة",
+    "الأسكندرية",
+    "بورسعيد",
+    "السويس",
+    "دمياط",
+    "الدقهلية",
+    "الشرقية",
+    "القليوبية",
+    "كفر الشيخ",
+    "الغربية",
+    "المنوفية",
+    "البحيرة",
+    "الإسماعيلية",
+    "الجيزة",
+    "بني سويف",
+    "الفيوم",
+    "المنيا",
+    "أسيوط",
+    "سوهاج",
+    "قنا",
+    "أسوان",
+    "الأقصر",
+    "البحر الأحمر",
+    "الوادي الجديد",
+    "مرسى مطروح",
+    "شمال سيناء",
+    "جنوب سيناء",
+)
 CANDIDATES = (
     ("sisi", "Abdel Fattah el-Sisi", "عبد الفتاح السيسي", "عبد الفتاح السيسي"),
     ("sabahi", "Hamdeen Sabahi", "حمدين صباحي", "حمدين صباحى"),
@@ -102,11 +98,13 @@ def key(kind: str, *parts: object) -> str:
 
 
 def area(code: str) -> str:
-    return key("area", "eg.governorate", code)
+    """The governorate's area, which eg.nea/geo defines with the same codes the Commission uses."""
+    if code not in nea.GOVERNORATES:
+        raise ValueError(f"governorate {code} is not in eg.nea/geo")
+    return nea.governorate_area(code)
 
 
 PEC = key("source", "pec")
-GEO = key("source", "geoboundaries-adm1")
 PRESIDENCY = key("office", "president")
 SYSTEM = key("electoral_system", "president", 2014)
 
@@ -120,7 +118,6 @@ def fetch() -> None:
     raw.fetch(SOURCE, DETAILED, suffix=".xls")
     raw.fetch(SOURCE, NATIONAL, suffix=".csv")
     raw.fetch(SOURCE, LISTING, suffix=".html")
-    raw.fetch(SOURCE, GB_GOVERNORATES, suffix=".geojson")
 
 
 def parse() -> None:
@@ -144,72 +141,20 @@ def codes() -> dict[str, str]:
     return found
 
 
-def _shapes() -> dict[str, shapely.Geometry]:
-    found: dict[str, shapely.Geometry] = {}
-    for feature in json.loads(raw.cached(SOURCE, GB_GOVERNORATES).path.read_bytes())["features"]:
-        shape = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
-        parts = [part for part in shapely.get_parts(shape) if shapely.get_type_id(part) in (3, 6)]
-        parts = [piece for part in parts for piece in shapely.get_parts(part)]
-        found[feature["properties"]["shapeName"]] = shapely.set_srid(shapely.MultiPolygon(parts), 4326)
-    return found
-
-
 def geo() -> Package:
+    """The committee schemes. The governorates, their boundary set, and their shapes come from eg.nea/geo."""
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Egypt's 27 governorates, from OpenStreetMap through geoBoundaries",
+        "The general committees and sub-committees that counted Egypt's presidential votes",
+        depends=[f"{nea.SOURCE}/geo"],
     )
-    p.external |= {EGYPT, COUNTRY}
-    p.add(
-        "source",
-        id=GEO,
-        kind="academic",
-        publisher="geoBoundaries (William & Mary geoLab), from OpenStreetMap",
-        title="geoBoundaries gbOpen: Egypt ADM1 (governorates)",
-        url="https://www.geoboundaries.org/",
-        license="Open Data Commons Open Database License 1.0 (OpenStreetMap contributors)",
-        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
-        attribution="geoBoundaries; © OpenStreetMap contributors",
-        notes="Boundary year 2017, built December 2023. The twenty-seven governorates of 2014 are the same as these.",
-    )
-    artifact = raw.cached(SOURCE, GB_GOVERNORATES)
-    p.artifact(artifact, GEO)
+    p.external.add(EGYPT)
     for scheme, rank, kind, noun in (
-        ("eg.governorate", 1, "administrative", "governorate"),
         ("eg.general_committee", 2, "precinct", "general committee"),
         ("eg.subcommittee", 3, "precinct", "sub-committee"),
     ):
         p.add("scheme", code=scheme, polity_id=EGYPT, kind=kind, rank=rank, noun=noun, code_system=None)
-    p.add(
-        "boundary_set",
-        id=key("boundary_set", "eg.governorate", 2017),
-        scheme_code="eg.governorate",
-        vintage="2017",
-        valid_from=date(2017, 1, 1),
-        as_of=date(2023, 12, 12),
-    )
-    shapes = _shapes()
-    ids = codes()
-    for arabic, (english, shape_name) in GOVERNORATES.items():
-        id = area(ids[arabic])
-        shape = shapes[shape_name]
-        p.add("area", id=id, scheme_code="eg.governorate")
-        p.add("area_code", area_id=id, code=ids[arabic])
-        p.add("area_parent", area_id=id, parent_id=COUNTRY)
-        p.name(id, english, "en", "official")
-        p.name(id, arabic, "ar", "native", False)
-        p.add(
-            "area_geometry",
-            area_id=id,
-            valid_from=date(2017, 1, 1),
-            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
-            label_point=shapely.to_wkb(
-                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
-            ),
-            quality="osm",
-            source_id=GEO,
-        )
     return p
 
 
@@ -326,7 +271,7 @@ def election() -> Package:
         f"{SOURCE}/2014",
         SOURCE,
         "The 2014 Egyptian presidential election by sub-committee, from the Presidential Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{nea.SOURCE}/geo", f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {EGYPT, COUNTRY}
     _source(p)
