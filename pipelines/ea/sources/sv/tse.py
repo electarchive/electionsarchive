@@ -65,9 +65,10 @@ def _crawl(round_number: int, name: str) -> list[str]:
 
 
 def fetch() -> None:
-    from ea.sources.sv import assembly
+    from ea.sources.sv import assembly, concejos
 
     assembly.fetch()
+    concejos.fetch()
     for round_number in ROUNDS:
         _crawl(round_number, "pais")
         level = ["dep%02d" % n for n in range(1, 16)]
@@ -78,21 +79,24 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    from ea.sources.sv import assembly
+    from ea.sources.sv import assembly, concejos
 
     return [
         "sv.tse/geo",
         "sv.tse/registry",
         *(f"sv.tse/pres-{day}" for _, day in ROUNDS.values()),
         *assembly.packages(),
+        *concejos.packages(),
     ]
 
 
 def build(name: str) -> Package:
-    from ea.sources.sv import assembly
+    from ea.sources.sv import assembly, concejos
 
     if name in assembly.packages():
         return assembly.build(name)
+    if name in concejos.packages():
+        return concejos.build(name)
     return {"sv.tse/geo": geo, "sv.tse/registry": registry}.get(name, lambda n=name: president(n))()
 
 
