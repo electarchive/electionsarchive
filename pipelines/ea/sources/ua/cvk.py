@@ -163,6 +163,8 @@ def fetch() -> None:
             ]
         )
         _all([page(election.site, "wp610", election.id, f"lit={lit}current_row=1") for lit in letters(election)])
+        if election.kind == "general":
+            _all([page(election.site, "wp603", election.id)])
         numbers = districts(election)
         _all([page(election.site, name, election.id, f"pf7331={n}") for n in numbers for name in ("wp336", "wp338")])
         _all([page(election.site, "wp033", election.id, f"pf7331={n}") for n in numbers if n != ABROAD])
@@ -575,12 +577,25 @@ def declared_district(e: Parliament, n: int) -> dict[str, int]:
     return found
 
 
-def winners(e: Parliament) -> dict[int, tuple[str, int | None, bool]]:
-    """For each district, the leading candidate's squashed name, printed votes, and whether the page declares them elected."""
-    found: dict[int, tuple[str, int | None, bool]] = {}
-    for lit in [None, *letters(e)]:
+def general(e: Parliament) -> Parliament:
+    """The general election whose pages list a site's deputies: the lists run across the site's by-elections."""
+    return next(x for x in PARLIAMENT if x.site == e.site and x.kind == "general")
+
+
+def winners(e: Parliament) -> dict[int, set[str]]:
+    """For each district, the squashed names the commission declares elected there.
+
+    The site's list of sitting deputies (wp610, by letter) and its list of deputies who left (wp603) both name each
+    deputy's district, so together they cover every district's winner, including by-election winners; the by-election
+    results pages add the districts whose result column prints "Обран".
+    """
+    found: dict[int, set[str]] = {}
+    base = general(e)
+    for lit in [None, *letters(base)]:
         artifact = cached(
-            page(e.site, "wp610", e.id) if lit is None else page(e.site, "wp610", e.id, f"lit={lit}current_row=1")
+            page(base.site, "wp610", base.id)
+            if lit is None
+            else page(base.site, "wp610", base.id, f"lit={lit}current_row=1")
         )
         if artifact is None:
             continue
@@ -588,20 +603,26 @@ def winners(e: Parliament) -> dict[int, tuple[str, int | None, bool]]:
             for row in t:
                 where = re.search(r"ОВО\s*№\s*(\d+)", row[3]) if len(row) == 4 else None
                 if where:
-                    found[int(where.group(1))] = (squash(row[0]), None, True)
+                    found.setdefault(int(where.group(1)), set()).add(squash(row[0]))
+    left = cached(page(base.site, "wp603", base.id))
+    if left is not None:
+        for t in tables(left):
+            for row in t:
+                where = re.search(r"ОВО\s*№\s*(\d+)", row[4]) if len(row) == 5 else None
+                if where:
+                    found.setdefault(int(where.group(1)), set()).add(squash(row[0]))
     for name in ("wp039", "wp306_n"):
         artifact = cached(page(e.site, name, e.id))
         if artifact is None:
             continue
         for t in tables(artifact):
             for row in t:
-                if len(row) == 6 and row[0].startswith("ОВО"):
+                if len(row) == 6 and row[0].startswith("ОВО") and "Обран" in row[5]:
                     n = number(re.sub(r"\D", "", row[0]))
-                    leader = squash(row[1].rpartition(" , ")[0] or row[1])
                     if n is not None:
-                        found[n] = (leader, number(row[3]), "Обран" in row[5])
-                elif len(row) == 7 and row[0].isdigit() and int(row[0]) not in found:
-                    found[int(row[0])] = (squash(row[4]), None, "Обран" in row[6])
+                        found.setdefault(n, set()).add(squash(row[1].rpartition(" , ")[0] or row[1]))
+                elif len(row) == 7 and row[0].isdigit() and "Обран" in row[6]:
+                    found.setdefault(int(row[0]), set()).add(squash(row[4]))
     return found
 
 
@@ -702,7 +723,10 @@ def parliament(e: Parliament) -> Package:
     for n in held(e):
         pages += [page(e.site, name, e.id, f"pf7331={n}") for name in ("wp336", "wp338")]
         pages.append(page(e.site, "wp033", e.id, f"pf7331={n}"))
-    for url in pages:
+    base = general(e)
+    pages += [page(base.site, "wp610", base.id), page(base.site, "wp603", base.id)]
+    pages += [page(base.site, "wp610", base.id, f"lit={lit}current_row=1") for lit in letters(base)]
+    for url in dict.fromkeys(pages):
         artifact = cached(url)
         if artifact is not None:
             p.artifact(artifact, SOURCE_ID)
@@ -839,16 +863,13 @@ def parliament(e: Parliament) -> Package:
                 else None,
                 is_independent=independent if nominator else None,
             )
-        leader = leaders.get(n)
-        if leader is not None and leader[2] and leader[0] in by_name:
-            option = by_name[leader[0]]
-            p.add(
-                "outcome",
-                result_set_id=result_set,
-                option_id=option,
-                kind="elected",
-            )
-        for squashed, total in declared_district(e, n).items():
+        printed = declared_district(e, n)
+        # A candidate who lost here can win the district's later by-election, so the deputy lists may name two of
+        # this contest's candidates; the one with the most votes here is the one this contest elected.
+        named = sorted(leaders.get(n, set()) & by_name.keys(), key=lambda name: -printed.get(name, 0))
+        if named:
+            p.add("outcome", result_set_id=result_set, option_id=by_name[named[0]], kind="elected")
+        for squashed, total in printed.items():
             if squashed in by_name:
                 p.add("declared", result_set_id=result_set, option_id=by_name[squashed], measure=1, value=total)
         over += values(p, result_set, units, e.day, found_sheet, options)
