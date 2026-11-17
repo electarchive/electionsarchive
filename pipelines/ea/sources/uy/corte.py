@@ -865,9 +865,9 @@ def plebiscite(b: Builder, day: str) -> None:
                 polity_id=URUGUAY,
                 scheme_code="uy.departamento",
                 code=f"{day}:plebiscite:{dept}",
-                area_relation="equal",
+                area_relation="equals",
                 area_id=key("area", "uy.departamento", dept),
-                kind="standard",
+                kind="aggregate",
             )
             units.append(unit)
         b.values(result_set, found.select(UNIT=pl.Series(units), OPTION=pl.lit(yes), MEASURE=pl.lit(1), VALUE="SI"))
