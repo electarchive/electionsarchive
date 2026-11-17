@@ -798,6 +798,72 @@
       "url": "https://results.aec.gov.au/12246/introduction.htm",
       "kind": "official_body",
       "license": "CC BY 4.0"
+    },
+    "wa-parl-sessions": {
+      "title": "Parliamentary Sessions: Parliament, election date, opening date, dissolution date",
+      "publisher": "Parliament of Western Australia",
+      "url": "https://www.parliament.wa.gov.au/WebCMS/webcms.nsf/content/parliamentsession",
+      "kind": "official_body"
+    },
+    "tec-report-1995-1997": {
+      "title": "Report on Parliamentary Elections 1995 to 1997",
+      "publisher": "Tasmanian Electoral Commission",
+      "url": "https://www.tec.tas.gov.au/info/Publications/ElectionReports/1995-1997.pdf",
+      "kind": "official_body"
+    },
+    "tec-report-1998": {
+      "title": "Report on Parliamentary Elections 1998",
+      "publisher": "Tasmanian Electoral Commission",
+      "url": "https://www.tec.tas.gov.au/info/Publications/ElectionReports/1998.pdf",
+      "kind": "official_body"
+    },
+    "tec-report-1999-2002": {
+      "title": "Report on Parliamentary Elections 1999 to 2002",
+      "publisher": "Tasmanian Electoral Commission",
+      "url": "https://www.tec.tas.gov.au/info/Publications/ElectionReports/1999-2002.pdf",
+      "kind": "official_body"
+    },
+    "tec-report-2003-2006": {
+      "title": "Report on Parliamentary Elections 2003 to 2006",
+      "publisher": "Tasmanian Electoral Commission",
+      "url": "https://www.tec.tas.gov.au/info/Publications/ElectionReports/2003-2006/2003-2006ParlReportFull.pdf",
+      "kind": "official_body"
+    },
+    "ntec-report-2005": {
+      "title": "2005 Legislative Assembly General Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/elections/election-events/legislative-assembly-election-reports2/legislative-assembly-election-reports",
+      "kind": "official_body"
+    },
+    "ntec-report-2008": {
+      "title": "2008 Legislative Assembly General Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/elections/election-events/legislative-assembly-election-reports2/legislative-assembly-election-reports",
+      "kind": "official_body"
+    },
+    "ntec-report-2012": {
+      "title": "2012 Legislative Assembly General Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/elections/election-events/legislative-assembly-election-reports2/legislative-assembly-election-reports",
+      "kind": "official_body"
+    },
+    "ntec-report-2016": {
+      "title": "2016 Legislative Assembly General Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/elections/election-events/legislative-assembly-election-reports2/legislative-assembly-election-reports",
+      "kind": "official_body"
+    },
+    "ntec-report-2020": {
+      "title": "2020 Territory Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/elections/election-events/legislative-assembly-election-reports2/legislative-assembly-election-reports",
+      "kind": "official_body"
+    },
+    "ntec-report-2024": {
+      "title": "2024 Territory Election Report",
+      "publisher": "Northern Territory Electoral Commission",
+      "url": "https://ntec.nt.gov.au/__data/assets/pdf_file/0011/1655039/2024-Territory-Election-Report.pdf",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -5191,8 +5257,28 @@
         {
           "date": "1856-01-01",
           "precision": "year",
-          "through": "2006-12-31",
-          "note": "General elections 1856-2006; TEC reports cover 1909 on, not yet listed by day."
+          "through": "1992-12-31",
+          "note": "General elections 1856-1992; TEC reports cover 1909 on, but those before 1995 are scans without a text layer, so none is listed by day yet."
+        },
+        {
+          "date": "1996-02-24",
+          "source": "tec-report-1995-1997",
+          "quote": "A State general election for the House of Assembly was held on 24 February 1996"
+        },
+        {
+          "date": "1998-08-29",
+          "source": "tec-report-1998",
+          "quote": "A general election for the House of Assembly was held on 29 August 1998"
+        },
+        {
+          "date": "2002-07-20",
+          "source": "tec-report-1999-2002",
+          "quote": "A general election for the House of Assembly was held on 20 July 2002"
+        },
+        {
+          "date": "2006-03-18",
+          "source": "tec-report-2003-2006",
+          "quote": "A general election for the House of Assembly was held on 18 March 2006"
         },
         {
           "contests": 5,
@@ -5686,28 +5772,24 @@
           "quote": "Total Declared Seats 89"
         },
         {
+          "date": "2006-09-09",
           "source": "ecq-archive",
-          "quote": "State general elections 2004-2017",
-          "date": "2006-01-01",
-          "precision": "year"
+          "quote": "2006 State General Election : 9 September 2006"
         },
         {
+          "date": "2009-03-21",
           "source": "ecq-archive",
-          "quote": "State general elections 2004-2017",
-          "date": "2009-01-01",
-          "precision": "year"
+          "quote": "2009 State General Election : 21 March 2009"
         },
         {
+          "date": "2012-03-24",
           "source": "ecq-archive",
-          "quote": "State general elections 2004-2017",
-          "date": "2012-01-01",
-          "precision": "year"
+          "quote": "2012 State General Election : 24 March 2012"
         },
         {
+          "date": "2015-01-31",
           "source": "ecq-archive",
-          "quote": "State general elections 2004-2017",
-          "date": "2015-01-01",
-          "precision": "year"
+          "quote": "2015 State General Election : 31 January 2015"
         },
         {
           "date": "2017-11-25",
@@ -5983,7 +6065,7 @@
       },
       "source": "nt-ea",
       "first_held": "1974-10-19",
-      "note": "25 single-member divisions (s 9), full preferential voting; fixed four-year terms on the fourth Saturday in August (s 23). Election dates and results sit with the NT Electoral Commission, whose site refuses automated requests.",
+      "note": "25 single-member divisions (s 9), full preferential voting; fixed four-year terms on the fourth Saturday in August (s 23). Election dates from 2005 come from the NT Electoral Commission's election reports; earlier reports are scans.",
       "match": [
         {
           "election_kinds": [
@@ -6020,8 +6102,38 @@
         {
           "date": "1974-01-01",
           "precision": "year",
-          "through": "2024-12-31",
-          "note": "General elections 1974-2024, not yet listed."
+          "through": "2001-12-31",
+          "note": "General elections 1974-2001, not yet listed by day; the NTEC's reports for these years are scans without a text layer."
+        },
+        {
+          "date": "2005-06-18",
+          "source": "ntec-report-2005",
+          "quote": "GENERAL ELECTION 18 JUNE 2005"
+        },
+        {
+          "date": "2008-08-09",
+          "source": "ntec-report-2008",
+          "quote": "Polling day 9 August 2008"
+        },
+        {
+          "date": "2012-08-25",
+          "source": "ntec-report-2012",
+          "quote": "Polling day Saturday 25 August 2012"
+        },
+        {
+          "date": "2016-08-27",
+          "source": "ntec-report-2016",
+          "quote": "Election day Saturday, 27 August 2016"
+        },
+        {
+          "date": "2020-08-22",
+          "source": "ntec-report-2020",
+          "quote": "Election day Saturday 22 August 2020"
+        },
+        {
+          "date": "2024-08-24",
+          "source": "ntec-report-2024",
+          "quote": "The 2024 Territory Election was held on Saturday 24 August 2024"
         }
       ],
       "est_votes": 2500000,
@@ -6257,7 +6369,7 @@
       },
       "source": "waec-state",
       "first_held": "1890-01-01",
-      "note": "Single-member districts, full preferential; 30 members in 1890, 59 now. Fixed four-year terms since 2011 (second Saturday in March; next 10 March 2029 by the rule). The WAEC publishes results from 1993; its material is all rights reserved.",
+      "note": "Single-member districts, full preferential; 30 members in 1890, 59 now. Fixed four-year terms since 2011 (second Saturday in March; next 10 March 2029 by the rule). The WAEC publishes results from 1993; its material is all rights reserved. Election days from 1890 come from the Parliament of WA's sessions table.",
       "match": [
         {
           "election_kinds": [
@@ -6298,58 +6410,211 @@
       ],
       "dates": [
         {
-          "date": "1890-01-01",
-          "precision": "year",
-          "through": "1989-12-31",
-          "note": "General elections 1890-1989, not yet listed by day."
+          "date": "1890-12-10",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 10 Dec 1890"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "1993-01-01",
-          "precision": "year"
+          "date": "1894-06-14",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 14 Jun 1894"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "1996-01-01",
-          "precision": "year"
+          "date": "1897-05-05",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 5 May 1897"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "2001-01-01",
-          "precision": "year"
+          "date": "1901-04-24",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 24 Apr 1901"
+        },
+        {
+          "date": "1904-06-28",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 28 Jun 1904"
+        },
+        {
+          "date": "1905-10-27",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 27 Oct 1905"
+        },
+        {
+          "date": "1908-09-11",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 11 Sep 1908"
+        },
+        {
+          "date": "1911-10-03",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 3 Oct 1911"
+        },
+        {
+          "date": "1914-10-21",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 21 Oct 1914"
+        },
+        {
+          "date": "1917-09-29",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 29 Sep 1917"
+        },
+        {
+          "date": "1921-03-12",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 12 Mar 1921"
+        },
+        {
+          "date": "1924-03-22",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 22 Mar 1924"
+        },
+        {
+          "date": "1927-03-26",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 26 Mar 1927"
+        },
+        {
+          "date": "1930-04-12",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 12 Apr 1930"
+        },
+        {
+          "date": "1933-04-08",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 8 Apr 1933"
+        },
+        {
+          "date": "1936-02-15",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 15 Feb 1936"
+        },
+        {
+          "date": "1939-03-18",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 18 Mar 1939"
+        },
+        {
+          "date": "1943-11-20",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 20 Nov 1943"
+        },
+        {
+          "date": "1947-03-15",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 15 Mar 1947"
+        },
+        {
+          "date": "1950-03-25",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 25 Mar 1950"
+        },
+        {
+          "date": "1953-02-14",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 14 Feb 1953"
+        },
+        {
+          "date": "1956-04-07",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 7 Apr 1956"
+        },
+        {
+          "date": "1959-03-21",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 21 Mar 1959"
+        },
+        {
+          "date": "1962-03-31",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 31 Mar 1962"
+        },
+        {
+          "date": "1965-02-20",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 20 Feb 1965"
+        },
+        {
+          "date": "1968-03-23",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 23 Mar 1968"
+        },
+        {
+          "date": "1971-02-20",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 20 Feb 1971"
+        },
+        {
+          "date": "1974-03-30",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 30 Mar 1974"
+        },
+        {
+          "date": "1977-02-19",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 19 Feb 1977"
+        },
+        {
+          "date": "1980-02-23",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 23 Feb 1980"
+        },
+        {
+          "date": "1983-02-19",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 19 Feb 1983"
+        },
+        {
+          "date": "1986-02-08",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 8 Feb 1986"
+        },
+        {
+          "date": "1989-02-04",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 4 Feb 1989"
+        },
+        {
+          "date": "1993-02-06",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 6 Feb 1993"
+        },
+        {
+          "date": "1996-12-14",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 14 Dec 1996"
+        },
+        {
+          "date": "2001-02-10",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 10 Feb 2001"
         },
         {
           "source": "waec-past",
           "quote": "Past state elections",
           "date": "2005-01-01",
-          "precision": "year"
+          "precision": "year",
+          "note": "The WA Parliament's sessions table gives 19 Jun 2008 as the 37th Parliament's election date, which falls after its opening on 29 Mar 2005, so the day is not taken from it."
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "2008-01-01",
-          "precision": "year"
+          "date": "2008-09-06",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 6 Sep 2008"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "2013-01-01",
-          "precision": "year"
+          "date": "2013-03-09",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 9 Mar 2013"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "2017-01-01",
-          "precision": "year"
+          "date": "2017-03-11",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 11 Mar 2017"
         },
         {
-          "source": "waec-past",
-          "quote": "Past state elections",
-          "date": "2021-01-01",
-          "precision": "year"
+          "date": "2021-03-13",
+          "source": "wa-parl-sessions",
+          "quote": "Parliamentary Sessions: Election Date 13 Mar 2021"
         },
         {
           "date": "2025-03-08",
