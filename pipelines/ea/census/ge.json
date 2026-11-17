@@ -35,6 +35,13 @@
       "url": "https://cesko.ge/",
       "kind": "official_body",
       "note": "Not read for this survey: the site answered an automated client with a Cloudflare challenge on 2026-11-16. Cited only for where results are published."
+    },
+    "const1995": {
+      "title": "Constitution of Georgia (1995), consolidated version as amended through 2011 (Legislative Herald of Georgia)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/en/document/view/30346?publication=32",
+      "kind": "official_body",
+      "note": "The consolidated English text in force between the constitutional laws of 27 December 2011 and 2017; read on 2026-11-17."
     }
   },
   "tiers": [
@@ -208,11 +215,19 @@
         },
         {
           "date": "2012-10-01",
-          "note": "Not counted from a fetched source."
+          "contests": 74,
+          "seats": 150,
+          "source": "const1995",
+          "note": "One nationwide list contest for 77 seats and 73 single-member majoritarian districts.",
+          "quote": "Art. 49(1): \"Before the conditions laid down in Article 4 of the Constitution of Georgia have been created, the Parliament of Georgia shall consist of 77 members elected by a proportional voting system and 73 members elected by a majoritarian voting system.\""
         },
         {
           "date": "2016-10-08",
-          "note": "Majoritarian runoffs on 30 October 2016. Not counted from a fetched source."
+          "contests": 74,
+          "seats": 150,
+          "source": "const1995",
+          "note": "One nationwide list contest for 77 seats and 73 single-member majoritarian districts. Runoffs on 30 October 2016.",
+          "quote": "Art. 49(1): \"Before the conditions laid down in Article 4 of the Constitution of Georgia have been created, the Parliament of Georgia shall consist of 77 members elected by a proportional voting system and 73 members elected by a majoritarian voting system.\""
         },
         {
           "date": "2020-10-31",
@@ -357,7 +372,11 @@
           "date": "2008-01-05"
         },
         {
-          "date": "2013-10-27"
+          "date": "2013-10-27",
+          "contests": 1,
+          "seats": 1,
+          "source": "const1995",
+          "quote": "Art. 70(1): \"The President of Georgia shall be elected through universal, equal, and direct suffrage by secret ballot for a term of five years.\""
         },
         {
           "date": "2018-10-28"
