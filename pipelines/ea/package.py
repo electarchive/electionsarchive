@@ -1281,13 +1281,15 @@ def _minted(paths: Iterable[Path]) -> set[str]:
     return minted
 
 
-def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
+def _ordered(conn: Connection, items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
     keyed = {str(_manifest(path)["key"]): (path, accepted) for path, accepted in items}
     mints = {key: _minted([path]) for key, (path, _) in keyed.items()}
+    externals = {key: {str(value) for value in _manifest(path)["external"]} for key, (path, _) in keyed.items()}
+    absent = set(_missing(conn, sorted(set().union(*externals.values()))))
     needs: dict[str, set[str]] = {}
     for key, (path, _) in keyed.items():
         manifest = _manifest(path)
-        external = {str(value) for value in manifest["external"]}
+        external = externals[key] & absent
         needs[key] = {str(d) for d in manifest["depends"] if d in keyed} | {
             other for other, ids in mints.items() if other != key and not ids.isdisjoint(external)
         }
@@ -1302,7 +1304,7 @@ def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, di
 
 def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
     done: list[str] = []
-    for chunk in batched(_ordered(items), LOAD_CHUNK):
+    for chunk in batched(_ordered(conn, items), LOAD_CHUNK):
         with conn.transaction():
             conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
