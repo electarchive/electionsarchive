@@ -236,35 +236,35 @@
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://atlaselectoral.oep.org.bo/",
    "kind": "official_body",
-   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. OEP describes the Atlas as open data downloadable without a request; an indexed file (https://atlaselectoral.oep.org.bo/descarga/17/votos_totales.csv) has one row per mesa with department, province, municipality, recinto, and mesa codes. Print volumes: Tomo I (general elections 1979-2009), Tomo II (referendums), Tomo III (municipal elections 1985-2010), Tomo IV."
+   "note": "Reached on 2026-11-17 only as its JavaScript application shell, which holds no data; whether the download files (e.g. https://atlaselectoral.oep.org.bo/descarga/17/votos_totales.csv, one row per mesa with department, province, municipality, recinto, and mesa codes) are open was not confirmed. Print volumes: Tomo I (general elections 1979-2009), Tomo II (referendums), Tomo III (municipal elections 1985-2010), Tomo IV."
   },
   "oep_atlas_tomo1": {
    "title": "Atlas Electoral de Bolivia, Tomo I: Elecciones Generales 1979-2009",
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://web.oep.org.bo/informacion-publica/atlas-electoral-de-bolivia-tomo-i/",
    "kind": "official_body",
-   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+   "note": "Not read in this pass; the general-election dates attributed to it were not rechecked."
   },
   "oep_atlas_tomo2": {
    "title": "Atlas Electoral de Bolivia, Tomo II: Referendos (capítulos I y II)",
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-II_Cap_I-II.pdf",
    "kind": "official_body",
-   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+   "note": "Read for the 2004 hydrocarbons referendum, the 2006 autonomy referendum, the 2008 recall, and the 2009 referendums (chapters I and II of the print volume, with its summary table of referendums)."
   },
   "oep_atlas_tomo3": {
    "title": "Atlas Electoral de Bolivia, Tomo III: Elecciones Municipales 1985-2010",
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_I.pdf",
    "kind": "official_body",
-   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP."
+   "note": "Read for 1985-1993 (Capítulo I, the first municipal elections); the 1995-2010 chapters were not read."
   },
   "oep_computo": {
    "title": "Sistema de Cómputo Oficial del Órgano Electoral Plurinacional",
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://computo.oep.org.bo/",
    "kind": "official_body",
-   "note": "Every *.oep.org.bo host reset or refused connections from the cloud build environment that wrote this census on 2026-11-16, so this page was read through search-engine excerpts only; re-read it from a server that reaches OEP. The 2025 general election used https://computo2025-1v.oep.org.bo/ and https://computo2025-2v.oep.org.bo/."
+   "note": "Reached on 2026-11-17 only as its JavaScript application shell for the 2026 subnational count. The 2025 general election used https://computo2025-1v.oep.org.bo/ and https://computo2025-2v.oep.org.bo/."
   },
   "oep_historia": {
    "title": "Historia del Órgano Electoral Plurinacional",
@@ -500,11 +500,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "1979-07-01",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-02-21"
@@ -513,11 +513,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2020-10-18",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     },
@@ -724,11 +724,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "1979-07-01",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-02-21"
@@ -737,11 +737,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2020-10-18",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -898,11 +898,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "1979-07-01",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-02-21"
@@ -911,11 +911,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2020-10-18",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1081,11 +1081,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2020-10-18",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1163,11 +1163,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2006-07-02",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2006-07-02"
@@ -1235,11 +1235,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2017-12-03",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1319,11 +1319,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2017-12-03",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1404,11 +1404,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2017-12-03",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1487,11 +1487,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2017-12-03",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     }
@@ -1561,11 +1561,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "1931-01-11",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-02-21"
@@ -1583,7 +1583,8 @@
      "election_kind": "referendum",
      "source": "ds27449",
      "quote": "Referéndum vinculante sobre la política energética del país a realizarse el día 18 de julio de 2004",
-     "note": "Several questions on hydrocarbons policy; their number is set by a later decree not read here."
+     "note": "Five questions on hydrocarbons policy, all answered Yes (Atlas Tomo II).",
+     "contests": 5
     },
     {
      "date": "2006-07-02",
@@ -1597,7 +1598,8 @@
      "election_kind": "referendum",
      "contests": 2,
      "source": "ley3942",
-     "quote": "se convoca para el domingo 25 de enero de 2009 a Referéndum Dirimidor del Artículo 398° ... así como para refrendar el texto íntegro del proyecto"
+     "quote": "se convoca para el domingo 25 de enero de 2009 a Referéndum Dirimidor del Artículo 398° ... así como para refrendar el texto íntegro del proyecto",
+     "note": "The settling question on rural landholding (art. 398) and the approval of the constitution, as the Atlas Tomo II lists them."
     },
     {
      "date": "2016-02-21",
@@ -1647,11 +1649,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2008-08-10",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2008-08-10"
@@ -1780,11 +1782,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2010-04-04",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2015-03-29"
@@ -1793,11 +1795,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2021-03-07",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     },
@@ -1911,11 +1913,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2005-12-18",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2005-12-18"
@@ -1975,11 +1977,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2008-08-10",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2008-08-10"
@@ -1989,8 +1991,9 @@
     {
      "date": "2008-08-10",
      "election_kind": "recall",
-     "source": "ley3850",
-     "note": "One question per department that voted; the count of departments was not read from an official result."
+     "source": "oep_atlas_tomo2",
+     "note": "Eight departments voted on their prefect (La Paz, Cochabamba, Oruro, Potosí, Tarija, Santa Cruz, Beni, Pando; Chuquisaca did not); the Atlas records six prefects ratified and two revoked (Ley 3850 art. 7).",
+     "contests": 8
     }
    ],
    "cadence": []
@@ -2051,11 +2054,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2010-04-04",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2015-03-29"
@@ -2064,11 +2067,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2021-03-07",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     },
@@ -2151,11 +2154,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2009-12-06",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-11-20"
@@ -2545,8 +2548,8 @@
    "name_en": "Municipal councils",
    "category": "council",
    "goal": "local",
-   "first_held": "1985-11-17",
-   "earliest_record": "1985-11-17",
+   "first_held": "1985-07-14",
+   "earliest_record": "1985-07-14",
    "measure": {
     "unit": "contest",
     "grain": [
@@ -2591,11 +2594,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
-     "first_date": "1985-11-17",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1985-07-14",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2015-03-29"
@@ -2604,11 +2607,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2021-03-07",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     },
@@ -2627,16 +2630,16 @@
    ],
    "dates": [
     {
-     "date": "1985-11-17",
+     "date": "1985-07-14",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "Ley 716 of 1985 first set 16 June 1985 and a two-year cycle on the first Sunday of December; the actual 1985 polling day was not read from an official page."
+     "note": "Held on the day of the general election: Ley 679 of 14 December 1984 called general and municipal elections together, once only, and voters chose council members with the same vote as the president (Atlas Tomo III, Capítulo I). Ley 679 set 16 June 1985 and the general election of 14 July 1985 is the day this census holds for it. Councils served until 31 December 1987."
     },
     {
      "date": "1987-12-06",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "First Sunday of December under Ley 716; day not read from an official page."
+     "note": "First Sunday of December, as Ley 716 required of elections every two years; the Atlas gives the rule and that the 1985 mandate ran to 31 December 1987, not the day itself."
     },
     {
      "date": "1989-12-03",
@@ -2654,7 +2657,7 @@
      "date": "1993-12-05",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "First Sunday of December; day not read from an official page."
+     "note": "Called by Decreto Supremo 23560 of 21 July 1993 for the first Sunday of December, under the Ley Electoral of July 1991 (Atlas Tomo III); the Atlas gives the rule, not the day itself."
     },
     {
      "date": "1995-12-03",
@@ -2755,11 +2758,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2010-04-04",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2015-03-29"
@@ -2768,11 +2771,11 @@
      "platform": "OEP Sistema de Cómputo Oficial (computo.oep.org.bo)",
      "url": "https://computo.oep.org.bo/",
      "format": "html, csv, xlsx, scanned actas",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2021-03-07",
      "source": "oep_computo",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa. The official count lets users drill down by department, province, municipality, locality, and recinto and export Excel and CSV (TSE description of the 2021 count, not rechecked).",
+     "evidence": "The archive's own fetch reached the count site on 2026-11-17 as a JavaScript application shell (for the 2026 subnational count) with no data in the page; the result files behind it were not retrieved.",
      "finest": "bo.mesa",
      "role": "administers"
     },
@@ -2823,7 +2826,7 @@
    "category": "indirect",
    "goal": "local",
    "valid_to": "2010-04-04",
-   "first_held": "1985-11-17",
+   "first_held": "1985-07-14",
    "measure": {
     "unit": "contest"
    },
@@ -2889,11 +2892,11 @@
      "platform": "OEP Atlas Electoral de Bolivia (atlaselectoral.oep.org.bo)",
      "url": "https://atlaselectoral.oep.org.bo/descarga/{id}/votos_totales.csv",
      "format": "csv",
-     "access": "blocked",
-     "checked_at": "2026-11-16",
+     "access": "browser",
+     "checked_at": "2026-11-17",
      "first_date": "2009-12-06",
      "source": "oep_atlas",
-     "evidence": "Every *.oep.org.bo host reset or refused connections from a cloud build environment on 2026-11-16 (the proxy reported the tunnel closed or the gateway unable to connect); the production server has not tried yet. OEP describes the data as open and downloadable without a request, and an indexed votos_totales.csv has one row per mesa.",
+     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2016-11-20"
@@ -2903,8 +2906,9 @@
     {
      "date": "2009-12-06",
      "election_kind": "referendum",
-     "source": "ley4021",
-     "note": "Gran Chaco regional autonomy and municipal conversions to indigenous autonomy; the number of municipalities was not read from an official result."
+     "source": "oep_atlas_tomo2",
+     "note": "One question on the Gran Chaco regional autonomy and twelve municipal conversions to indigenous autonomy, Yes in eleven and No in one (Atlas Tomo II, summary table of referendums).",
+     "contests": 13
     },
     {
      "date": "2015-09-20",
