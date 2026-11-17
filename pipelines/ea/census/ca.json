@@ -755,6 +755,9 @@
       "name": "House of Commons general elections",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1867-08-07",
+      "earliest_record": "1867-08-07",
+      "note": "The first general election ran from 7 August to 20 September 1867, and the Library of Parliament's riding histories give results from it.",
       "measure": {
         "schemes": [
           "ca.fed"
@@ -1179,10 +1182,12 @@
       "name": "House of Commons by-elections",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1867-11-28",
+      "earliest_record": "1867-11-28",
       "measure": {
         "unit": "contest"
       },
-      "note": "Counted per by-election: each riding's by-election counts once, including those won by acclamation. The counts to 2010 come from the Library of Parliament's History of Federal Electoral Ridings, and those from 2011 from Elections Canada's by-election reports.",
+      "note": "Counted per by-election: each riding's by-election counts once, including those won by acclamation. The counts to 2010 come from the Library of Parliament's History of Federal Electoral Ridings, and those from 2011 from Elections Canada's by-election reports. The riding histories list by-elections from the first, on 28 November 1867.",
       "source": "lop-hfer",
       "match": [
         {
@@ -2324,13 +2329,15 @@
       "name": "Provincial and territorial general elections",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1867-08-01",
+      "earliest_record": "1867-08-01",
       "measure": {
         "unit": "polity",
         "schemes": [
           "ca.provincial_district"
         ]
       },
-      "note": "Counted per election, not per riding: each province's or territory's general election counts once, from the date list its elections agency or legislature publishes. An election counts once the archive holds its results. Yukon counts from 1909 and the Northwest Territories from 1975, when their councils became wholly elected. New Brunswick's agency lists its elections only from 1967, so its 24 earlier elections aren't counted yet. Where the official list gives only a month (Quebec in 1867 and 1871, Prince Edward Island in 1873), the election is dated to the first of that month.",
+      "note": "Counted per election, not per riding: each province's or territory's general election counts once, from the date list its elections agency or legislature publishes. An election counts once the archive holds its results. Yukon counts from 1909 and the Northwest Territories from 1975, when their councils became wholly elected. New Brunswick's agency lists its elections only from 1967, so its 24 earlier elections aren't counted yet. Where the official list gives only a month (Quebec in 1867 and 1871, Prince Edward Island in 1873), the election is dated to the first of that month. The first post-Confederation elections were Quebec's and Ontario's of August and September 1867; Élections Québec's list dates Quebec's to August 1867, so the date is the month only.",
       "source": "ca-prov-qc",
       "match": [
         {
@@ -6024,10 +6031,11 @@
       "name": "Provincial and territorial by-elections",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1867-12-16",
       "measure": {
         "unit": "contest"
       },
-      "note": "Each riding's by-election counts once. No national list of provincial by-elections exists; each agency lists its own, so this class has no enumerated dates yet.",
+      "note": "Each riding's by-election counts once. No national list of provincial by-elections exists; each agency lists its own, so this class has no enumerated dates yet. The earliest found is Quebec's in Champlain on 16 December 1867 (Assemblée nationale du Québec, Les élections partielles, https://www.assnat.qc.ca/fr/patrimoine/partielles.html).",
       "source": "ca-prov-qc",
       "match": [
         {
@@ -6049,6 +6057,8 @@
       "name": "Federal referendums and plebiscites",
       "category": "direct_democracy",
       "goal": "referendums",
+      "first_held": "1898-09-29",
+      "earliest_record": "1898-09-29",
       "measure": {
         "unit": "contest"
       },
@@ -6094,10 +6104,11 @@
       "name": "Provincial and territorial referendums and plebiscites",
       "category": "direct_democracy",
       "goal": "referendums",
+      "first_held": "1892-07-23",
       "measure": {
         "unit": "contest"
       },
-      "note": "Called by each legislature under its own referendum act, so there is no regular cycle. Each question counts once. Quebec's 1980 and 1995 sovereignty referendums, British Columbia's electoral-reform votes (2005, 2009, and 2018), and Prince Edward Island's (2005, 2016, and 2019) are among those not yet held.",
+      "note": "Called by each legislature under its own referendum act, so there is no regular cycle. Each question counts once. Quebec's 1980 and 1995 sovereignty referendums, British Columbia's electoral-reform votes (2005, 2009, and 2018), and Prince Edward Island's (2005, 2016, and 2019) are among those not yet held. The first was Manitoba's prohibition referendum, held with its general election on 23 July 1892 (Manitoba Historical Society, Manitoba Prohibition Referendum (1892), https://mhs.mb.ca/docs/events/prohibition1892.shtml).",
       "source": "ca-prov-qc",
       "match": [
         {

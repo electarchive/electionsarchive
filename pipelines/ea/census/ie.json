@@ -728,6 +728,8 @@
       "name": "Dáil by-elections",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1923-10-25",
+      "note": "The first was in Dublin South on 25 October 1923, the first under the Electoral Act 1923 (Michael Gallagher, Trinity College Dublin, https://www.tcd.ie/Political_Science/about/people/michael-gallagher/IPSByElections1996.pdf).",
       "measure": {
         "unit": "contest"
       },
@@ -1455,12 +1457,13 @@
       "name_en": "Seanad Éireann by-elections",
       "category": "indirect",
       "goal": "national",
+      "first_held": "1941-01-22",
       "measure": {
         "unit": "contest"
       },
       "valid_from": "1937-12-29",
       "source": "const-1937",
-      "note": "Casual vacancies among elected senators are filled by election as the law provides (Art. 18.10.3): panel vacancies by the members of the Oireachtas, university vacancies by the graduates.",
+      "note": "Casual vacancies among elected senators are filled by election as the law provides (Art. 18.10.3): panel vacancies by the members of the Oireachtas, university vacancies by the graduates. The first filled a Cultural and Educational Panel vacancy on 22 January 1941, under the Seanad Electoral (Panel Members) (Bye-Elections) Act 1940 (Seanad Éireann debate, 22 January 1941, https://www.oireachtas.ie/en/debates/debate/seanad/1941-01-22/2/).",
       "match": [
         {
           "election_kinds": [

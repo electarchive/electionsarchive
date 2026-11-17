@@ -1511,6 +1511,9 @@
    "name": "House of Commons by-elections",
    "category": "legislature",
    "goal": "national",
+   "first_held": "1801-01-01",
+   "earliest_record": "1833-02-27",
+   "note": "By-elections began with the first Parliament of the United Kingdom in 1801 (the year only). As with general elections, the record starts after the 1832 general election: Resul Umit's By-elections to the UK House of Commons (Durham University) begins with the by-election of 27 February 1833.",
    "measure": {
     "unit": "contest"
    },
@@ -2754,10 +2757,12 @@
    "name_en": "Senate of Northern Ireland elections",
    "category": "indirect",
    "goal": "subnational",
+   "first_held": "1921-06-11",
+   "earliest_record": "1921-06-11",
    "measure": {
     "unit": "contest"
    },
-   "note": "24 senators elected by the members of the House of Commons of Northern Ireland by single transferable vote, half every four years, plus the Lord Mayor of Belfast and the Mayor of Londonderry ex officio. Results are in the Stormont Hansard.",
+   "note": "24 senators elected by the members of the House of Commons of Northern Ireland by single transferable vote, half every four years, plus the Lord Mayor of Belfast and the Mayor of Londonderry ex officio. Results are in the Stormont Hansard. The first 24 senators were elected by the House of Commons of Northern Ireland on 11 June 1921, as recorded in its Parliamentary Debates (Official Report).",
    "source": "goi-1920",
    "valid_from": "1921-06-07",
    "valid_to": "1973-07-18",
@@ -2847,10 +2852,11 @@
    "name_en": "Elections of representative and hereditary peers to the House of Lords",
    "category": "indirect",
    "goal": "national",
+   "first_held": "1800-08-02",
    "measure": {
     "unit": "contest"
    },
-   "note": "Scottish representative peers (16, elected by the Scottish peers each Parliament, 1708 to 1963) and Irish representative peers (28, for life, 1801 to 1922); then the 92 hereditary peers kept by the House of Lords Act 1999: the 1999 elections and about 60 by-elections from 2003, by alternative vote among the peers of the party group or the whole House, with results published by the Clerk of the Parliaments. The House of Lords (Hereditary Peers) Act 2026 omitted section 2 of the 1999 Act from 29 April 2026, ending them.",
+   "note": "Scottish representative peers (16, elected by the Scottish peers each Parliament, 1708 to 1963) and Irish representative peers (28, for life, 1801 to 1922); then the 92 hereditary peers kept by the House of Lords Act 1999: the 1999 elections and about 60 by-elections from 2003, by alternative vote among the peers of the party group or the whole House, with results published by the Clerk of the Parliaments. The House of Lords (Hereditary Peers) Act 2026 omitted section 2 of the 1999 Act from 29 April 2026, ending them. The first election was of the 28 Irish representative peers on 2 August 1800, under the Union with Ireland Act 1800 (https://www.legislation.gov.uk/apgb/Geo3/39-40/67).",
    "source": "hla-1999-s2",
    "valid_to": "2026-04-29",
    "est_votes": 20000,

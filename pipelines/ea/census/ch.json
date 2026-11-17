@@ -2939,6 +2939,7 @@
       "name": "Nationalratswahlen",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1848-10-01",
       "measure": {
         "unit": "district",
         "schemes": [
@@ -2948,7 +2949,7 @@
           "ch.commune"
         ]
       },
-      "note": "Since 1919, each canton has been one constituency, Jura included from 1979. A canton whose candidates were elected unopposed (a tacit election) still counts as a contest.",
+      "note": "Since 1919, each canton has been one constituency, Jura included from 1979. A canton whose candidates were elected unopposed (a tacit election) still counts as a contest. The first National Council was elected in October 1848 on dates each canton set, before the Federal Assembly opened on 6 November 1848, so the date is the month only.",
       "source": "ch-parlament-1848",
       "match": [
         {
@@ -4636,13 +4637,14 @@
       "name": "Ständeratswahlen",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1848-01-01",
       "measure": {
         "schemes": [
           "ch.canton"
         ],
         "cycle": true
       },
-      "note": "Each canton is counted once per National Council term, using the Federal Assembly's list of National Council election years. Each canton and half-canton counts, so 25 until 1975 and 26 from 1979, when Jura became a canton. Cantons set their own terms and election dates: before the mid-1970s some elected their members every year or two, and in several the cantonal parliament elected them. Every such election, and every runoff, counts under the National Council election that follows it; an election held a year early, as Graubünden and Zug did until 2002 and 2006, counts with the next one. A show of hands at a Landsgemeinde, as in Appenzell Innerrhoden, leaves no vote count, and neither does an unopposed (tacit) election. So the archive counts both as complete once it records who was elected.",
+      "note": "Each canton is counted once per National Council term, using the Federal Assembly's list of National Council election years. Each canton and half-canton counts, so 25 until 1975 and 26 from 1979, when Jura became a canton. Cantons set their own terms and election dates: before the mid-1970s some elected their members every year or two, and in several the cantonal parliament elected them. Every such election, and every runoff, counts under the National Council election that follows it; an election held a year early, as Graubünden and Zug did until 2002 and 2006, counts with the next one. A show of hands at a Landsgemeinde, as in Appenzell Innerrhoden, leaves no vote count, and neither does an unopposed (tacit) election. So the archive counts both as complete once it records who was elected. The first members were chosen in the autumn of 1848 by cantonal parliaments or Landsgemeinden (Parlamentsdienste, Wie liefen die ersten Parlamentswahlen 1848 ab?, https://www.parlament.ch/de/%C3%BCber-das-parlament/Seiten/Ablauf-Wahlen-1848.aspx), so the date is the year only.",
       "source": "bv-1848",
       "match": [
         {
@@ -6485,6 +6487,8 @@
       "name": "Eidgenössische Volksabstimmungen",
       "category": "direct_democracy",
       "goal": "referendums",
+      "first_held": "1848-09-12",
+      "earliest_record": "1848-09-12",
       "measure": {
         "unit": "contest",
         "grain": [
@@ -6495,7 +6499,7 @@
           "ch.commune"
         ]
       },
-      "note": "Counter-proposals count as their own votes, as in the Federal Statistical Office's table (706 rows to 2026).",
+      "note": "Counter-proposals count as their own votes, as in the Federal Statistical Office's table (706 rows to 2026). The table starts with the adoption of the Federal Constitution, dated 12 September 1848.",
       "source": "bfs-votes-xlsx",
       "match": [
         {
@@ -9912,13 +9916,14 @@
       "name_en": "Cantonal popular votes",
       "category": "direct_democracy",
       "goal": "referendums",
+      "earliest_record": "1970-01-01",
       "measure": {
         "unit": "question",
         "fine": [
           "ch.commune"
         ]
       },
-      "note": "Every canton's constitution and its amendments need the people's approval (BV Art. 51), and every canton has the initiative and a mandatory or optional referendum on laws, many also on spending. Votes are mostly held on the four federal vote days. Recall of the parliament or government exists in several cantons but has not been used in modern times. Votes taken at the Landsgemeinde in Glarus and Appenzell Innerrhoden are a separate class.",
+      "note": "Every canton's constitution and its amendments need the people's approval (BV Art. 51), and every canton has the initiative and a mandatory or optional referendum on laws, many also on spending. Votes are mostly held on the four federal vote days. Recall of the parliament or government exists in several cantons but has not been used in modern times. Votes taken at the Landsgemeinde in Glarus and Appenzell Innerrhoden are a separate class. The earliest record that covers every canton is the referendum database of the Centre for Democracy Studies Aarau, which holds all cantonal votes since 1970 (https://zdaarau.ch/en/applications), so the date is the year only; earlier votes survive only in each canton's own records.",
       "source": "fedlex-bv",
       "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_51",
       "match": [

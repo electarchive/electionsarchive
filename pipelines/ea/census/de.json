@@ -1143,13 +1143,15 @@
       "name": "Landtag elections",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1946-10-13",
+      "earliest_record": "1946-10-13",
       "measure": {
         "unit": "polity",
         "schemes": [
           "de.landtag_wahlkreis"
         ]
       },
-      "note": "Counted per election, not per constituency: the Federal Returning Officer lists every Landtag election since 1946, but not how many constituencies each one had. An election counts once the archive holds its results. Bremen's first Bürgerschaft was chosen in a municipal election in October 1946, which the Federal Returning Officer doesn't treat as comparable, so it isn't counted.",
+      "note": "Counted per election, not per constituency: the Federal Returning Officer lists every Landtag election since 1946, but not how many constituencies each one had. An election counts once the archive holds its results. Bremen's first Bürgerschaft was chosen in a municipal election in October 1946, which the Federal Returning Officer doesn't treat as comparable, so it isn't counted. The first was Hamburg's Bürgerschaft election of 13 October 1946.",
       "source": "bwl-ltw",
       "match": [
         {
@@ -5142,11 +5144,13 @@
       "name_en": "Bavarian district assembly (Bezirkstag) elections",
       "category": "council",
       "goal": "local",
+      "first_held": "1954-11-28",
+      "earliest_record": "1954-11-28",
       "measure": {
         "unit": "bezirk"
       },
       "contests_per_unit": 1,
-      "note": "The seven Bezirkstage are elected for five years together with the Landtag, by Stimmkreis with first and second votes like the Landtag.",
+      "note": "The seven Bezirkstage are elected for five years together with the Landtag, by Stimmkreis with first and second votes like the Landtag. First elected with the Landtag on 28 November 1954 under the Bezirkswahlgesetz of 11 August 1954; the Bavarian State Office for Statistics publishes results from then (Bezirkswahlen in Bayern, Zeitreihe, https://www.statistik.bayern.de/mam/wahlen/bezirkswahlen/ergebnisse/b7610c_20235_bezirkswahlen_in_bayernzeitreihe_2023_.pdf).",
       "source": "by-bezwg",
       "match": [
         {

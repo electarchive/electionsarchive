@@ -1911,6 +1911,8 @@
    "name_en": "Superintendents of education",
    "category": "executive",
    "goal": "subnational",
+   "first_held": "2007-02-14",
+   "earliest_record": "2007-02-14",
    "measure": {
     "unit": "contest",
     "grain": [
@@ -1922,7 +1924,7 @@
      "kr.tupyogu"
     ]
    },
-   "note": "Elected by residents (Local Education Autonomy Act Art. 43, added 26 February 2010) with the nationwide local elections since 2010, without party labels, for four years and at most three terms (Art. 21). Superintendents were first elected directly one at a time as terms ended from 2007; before that school steering committee members chose them (out of scope, school_committee).",
+   "note": "Elected by residents (Local Education Autonomy Act Art. 43, added 26 February 2010) with the nationwide local elections since 2010, without party labels, for four years and at most three terms (Art. 21). Superintendents were first elected directly one at a time as terms ended from 2007; before that school steering committee members chose them (out of scope, school_committee). The first was Busan's on 14 February 2007, and the NEC's statistics system holds results from it.",
    "source": "leaa",
    "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=50993 (Arts. 21 and 43)",
    "est_votes": 26000000,
@@ -1957,9 +1959,9 @@
      "format": "html, xls",
      "access": "open",
      "checked_at": "2026-11-13",
-     "first_date": "2010-06-02",
+     "first_date": "2007-02-14",
      "source": "nec_results",
-     "evidence": "The 교육감선거 menu holds the simultaneous elections from 2010; earlier individual elections unchecked"
+     "evidence": "The 교육감선거 menu lists the individual elections from 2007-02-14 (Busan), the simultaneous elections from 2010, and the by-elections up to 2025-04-02; 18 election days, 100 contests in all"
     },
     {
      "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
@@ -1974,11 +1976,81 @@
    ],
    "dates": [
     {
+     "date": "2007-02-14",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20070214: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2007-12-19",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20071219: 4 시·도",
+     "contests": 4,
+     "seats": 4
+    },
+    {
+     "date": "2008-06-25",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20080625: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2008-07-23",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20080723: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2008-07-30",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20080730: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2008-12-17",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20081217: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2009-04-08",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20090408: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2009-04-29",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20090429: 2 시·도",
+     "contests": 2,
+     "seats": 2
+    },
+    {
      "date": "2010-06-02",
      "source": "nec_seats",
      "quote": "교육감: 16 | 16 (선거구수 | 정수)",
      "contests": 16,
      "seats": 16
+    },
+    {
+     "date": "2012-04-11",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20120411: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2012-12-19",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20121219: 1 시·도",
+     "contests": 1,
+     "seats": 1
     },
     {
      "date": "2014-06-04",
@@ -2000,6 +2072,27 @@
      "quote": "교육감: 17 | 17 (선거구수 | 정수)",
      "contests": 17,
      "seats": 17
+    },
+    {
+     "date": "2023-04-05",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20230405: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2024-10-16",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20241016: 1 시·도",
+     "contests": 1,
+     "seats": 1
+    },
+    {
+     "date": "2025-04-02",
+     "source": "nec_results",
+     "quote": "교육감선거 개표현황, 선거일 20250402: 1 시·도",
+     "contests": 1,
+     "seats": 1
     },
     {
      "date": "2026-06-03",

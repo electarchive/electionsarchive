@@ -590,9 +590,11 @@
       "name": "U.S. Senate",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1913-07-15",
+      "earliest_record": "1913-07-15",
       "source": "constitution",
       "locator": "U.S. Const. art. I, § 3, cl. 1-2 and amend. XVII",
-      "note": "Two senators per state in three classes, one class elected every second year for six-year terms; popular election from 1914 under the Seventeenth Amendment.",
+      "note": "Two senators per state in three classes, one class elected every second year for six-year terms; popular election under the Seventeenth Amendment, in every state from 1914. The first popular election under the amendment was Georgia's on 15 July 1913 (U.S. Senate Historical Office, Direct Election of Senators, https://www.senate.gov/artandhistory/history/common/briefing/Direct_Election_Senators.htm).",
       "match": [{"within": null, "body": "us.body:senate"}],
       "senate": {
         "phases": {"I": 2, "II": 4, "III": 0},
@@ -608,9 +610,11 @@
       "name": "U.S. House of Representatives",
       "category": "legislature",
       "goal": "national",
+      "first_held": "1788-11-26",
+      "earliest_record": "1788-11-26",
       "source": "constitution",
       "locator": "U.S. Const. art. I, § 2, cl. 1; 2 U.S.C. § 7",
-      "note": "Every seat every second year; the seats per state follow each decennial apportionment.",
+      "note": "Every seat every second year; the seats per state follow each decennial apportionment. The first was Pennsylvania's at-large election of 26 November 1788 (A New Nation Votes, Pennsylvania 1788 U.S. House of Representatives, https://elections.lib.tufts.edu/catalog/8g84mn39v).",
       "match": [{"within": null, "body": "us.body:house"}],
       "cadence": [
         {"government_kind": null, "function": null, "body": "us.body:house", "period_years": 2, "phase": 0, "month": 11, "day_rule": "nov_tuesday_after_first_monday", "term_years": 2, "source": "usc2", "locator": "2 U.S.C. § 7: the Tuesday next after the first Monday in November in every even numbered year; U.S. Const. art. I, § 2, cl. 1: members chosen every second year"}
@@ -776,6 +780,7 @@
       "name": "Governors",
       "category": "executive",
       "goal": "subnational",
+      "earliest_record": "1776-01-01",
       "source": "bots-governors",
       "laws": {
         "AZ": {"source": "gov-law-az", "locator": "Art. 5, § 1(A): the governor holds office for four years"},
@@ -830,7 +835,7 @@
         "WY": {"source": "gov-law-wy", "locator": "Art. 4, § 1: the governor holds office for the term of four years"},
         "PR": {"source": "gov-law-pr", "locator": "Art. IV, § 2: the governor holds office for four years from January 2 of the year after the election"}
       },
-      "note": "Four-year terms everywhere but New Hampshire and Vermont; the year in the four-year cycle differs by state.",
+      "note": "Four-year terms everywhere but New Hampshire and Vermont; the year in the four-year cycle differs by state. Official returns by state and county are compiled from 1776 in Michael J. Dubin, United States Gubernatorial Elections, 1776-1860 (McFarland, 2003), so the date is the year only.",
       "match": [{"within": null, "office_kinds": ["governor"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "governors": [
         {"states": "AL AK AZ CA CO CT FL GA HI ID IA KS ME MD MA MI MN NE NV NM NY OH OK OR PA SC SD TN TX WI WY GU VI", "period_years": 4, "phase": 2, "term_years": 4},
@@ -855,6 +860,7 @@
       "name": "Other statewide executive offices",
       "category": "executive",
       "goal": "subnational",
+      "first_held": "1777-01-01",
       "source": "bots-executives",
       "laws": {
         "AZ": {"source": "gov-law-az", "locator": "Art. 5, § 1: the secretary of state, attorney general, treasurer, and superintendent of public instruction are chosen at the general election with the governor, for four-year terms"},
@@ -917,7 +923,7 @@
         {"states": "LA", "period_years": 4, "phase": 3, "term_years": 4, "day_rule": null, "month": 10},
         {"states": "VT", "period_years": 2, "phase": 0, "term_years": 2}
       ],
-      "note": "Lieutenant governors, attorneys general, secretaries of state, treasurers, auditors, and other offices elected statewide, plus the Council of the District of Columbia.",
+      "note": "Lieutenant governors, attorneys general, secretaries of state, treasurers, auditors, and other offices elected statewide, plus the Council of the District of Columbia. New York's Constitution of 1777 had the lieutenant governor elected with the governor, first in 1777 (art. XX, https://avalon.law.yale.edu/18th_century/ny01.asp), so the date is the year only.",
       "dates": [
         {
           "date": "2025-11-04",
@@ -936,8 +942,9 @@
       "name": "State supreme courts",
       "category": "judicial",
       "goal": "subnational",
+      "first_held": "1833-01-01",
       "source": "bots-courts",
-      "note": "Justices chosen by partisan or nonpartisan election, or retained by retention election; appointed courts hold no elections.",
+      "note": "Justices chosen by partisan or nonpartisan election, or retained by retention election; appointed courts hold no elections. Mississippi's Constitution of 1832 made judges elective, and the first High Court of Errors and Appeals was elected in 1833 (Mississippi Department of Archives and History, https://mshistory.mdah.ms.gov/issue/the-mississippi-constitution-of-1832), so the date is the year only.",
       "match": [{"within": null, "name_pattern": "justice|judge|court", "polity_kinds": ["federal_unit", "region"]}],
       "laws": {
         "AZ": {"source": "const-az", "locator": "Ariz. Const. art. VI, §§ 37-38: justices are appointed from nominating commission lists and face retention elections"},
@@ -989,6 +996,8 @@
       "name": "State senates and unicameral legislatures",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1776-08-13",
+      "note": "The first chambers elected under a state constitution after independence include New Jersey's Legislative Council, chosen on 13 August 1776 (art. II, Constitution of New Jersey, 1776, https://avalon.law.yale.edu/18th_century/nj15.asp).",
       "source": "bots-legislators",
       "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "laws": {
@@ -1062,6 +1071,8 @@
       "name": "State houses and assemblies",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1776-08-13",
+      "note": "The first chambers elected under a state constitution after independence include New Jersey's General Assembly, chosen on 13 August 1776 (art. II, Constitution of New Jersey, 1776, https://avalon.law.yale.edu/18th_century/nj15.asp).",
       "source": "bots-legislators",
       "match": [{"within": null, "body_kinds": ["lower_house"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "laws": {
@@ -1131,6 +1142,8 @@
       "name": "Statewide ballot measures",
       "category": "direct_democracy",
       "goal": "referendums",
+      "first_held": "1778-01-01",
+      "note": "The first was the vote of the Massachusetts towns that rejected the draft constitution of 1778 (Secretary of the Commonwealth of Massachusetts, https://www.sec.state.ma.us/divisions/commonwealth-museum/exhibits/online/massachusetts-votes/elections-in-ma_3.htm), so the date is the year only.",
       "source": "ncsl-measures",
       "match": [{"within": null, "contest_kinds": ["ballot_question"], "polity_kinds": ["sovereign_state", "federal_unit", "region"], "precedence": 4}]
     },
@@ -1141,7 +1154,7 @@
       "category": "nominating",
       "goal": "subnational",
       "source": "ncsl-primaries",
-      "note": "State and county party committee members and convention delegates chosen on the primary ballot.",
+      "note": "State and county party committee members and convention delegates chosen on the primary ballot. No start year: state-run elections of party committee members and convention delegates began with each state's primary law, and no source found dates the first or gathers early results.",
       "match": [{"within": null, "name_pattern": "\\mParty\\M"}]
     },
     {
@@ -1150,6 +1163,8 @@
       "name": "County offices",
       "category": "council",
       "goal": "local",
+      "first_held": "1776-08-13",
+      "note": "Sheriffs and coroners were elected under state constitutions from New Jersey's first election on 13 August 1776 (arts. II and XIII, Constitution of New Jersey, 1776, https://avalon.law.yale.edu/18th_century/nj15.asp).",
       "source": "cog",
       "match": [{"within": null, "polity_kinds": ["county"]}]
     },
@@ -1159,6 +1174,7 @@
       "name": "Municipal offices",
       "category": "council",
       "goal": "local",
+      "note": "No start year: cities, villages, and boroughs elected their officers before independence and gained elected mayors charter by charter, so the class has no single first election, and the earliest records are each place's own.",
       "source": "cog",
       "dates": [
         {
@@ -1181,7 +1197,7 @@
       "goal": "local",
       "source": "cog",
       "match": [{"within": null, "polity_kinds": ["municipality"], "name_pattern": "\\mTown(ship)?\\M"}],
-      "note": "The archive files towns and townships as municipalities, so the class takes a municipal contest whose body or office name says town or township; the class carries the Census roster and its cadence."
+      "note": "The archive files towns and townships as municipalities, so the class takes a municipal contest whose body or office name says town or township; the class carries the Census roster and its cadence. No start year: towns and townships elected their officers at annual meetings before independence and went on doing so under the states, so the class has no single first election, and the earliest records are each town's own."
     },
     {
       "key": "school",
@@ -1189,6 +1205,7 @@
       "name": "School boards",
       "category": "special_purpose",
       "goal": "local",
+      "note": "No start year: elected school committees and boards began town by town and district by district under each state's school laws, and no source dates the first election or gathers early results.",
       "source": "cog",
       "dates": [
         {
@@ -1212,6 +1229,7 @@
       "name": "Special district boards",
       "category": "special_purpose",
       "goal": "local",
+      "note": "No start year: each special district's board dates from its own enabling act, and no source dates the first elected board or gathers early results.",
       "source": "cog",
       "match": [{"within": null, "polity_kinds": ["special_district"]}]
     },
@@ -1221,6 +1239,7 @@
       "name": "Trial and district courts",
       "category": "judicial",
       "goal": "local",
+      "note": "No start year: elected trial and local judgeships began state by state, and no source found dates the first election or gathers early results.",
       "source": "bots-courts",
       "match": [{"within": null, "polity_kinds": ["judicial_district"]}]
     },
@@ -1230,6 +1249,7 @@
       "name": "Local ballot measures",
       "category": "direct_democracy",
       "goal": "referendums",
+      "note": "No start year: towns, counties, and cities have put questions to their voters since before independence, and no source dates the first or gathers early results.",
       "source": "cog",
       "match": [{"within": null, "contest_kinds": ["ballot_question"], "precedence": 3}]
     },
@@ -1244,7 +1264,7 @@
       },
       "source": "bia-fr",
       "match": [{"within": null, "office_kinds": ["head_of_state"], "polity_kinds": ["tribal_nation"], "precedence": 2}, {"within": null, "name_pattern": "Principal Chief|Second Chief|Lieutenant Governor", "polity_kinds": ["tribal_nation"]}],
-      "note": "Chair, president, principal chief, or governor, with the deputy where elected. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+      "note": "Chair, president, principal chief, or governor, with the deputy where elected. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load. No start year: each nation's own constitution and election code set when its elections began, so the class has no single first election, and a start year belongs with each nation's load."
     },
     {
       "key": "tribal_council",
@@ -1257,7 +1277,7 @@
       },
       "source": "bia-fr",
       "match": [{"within": null, "body_kinds": ["council", "unicameral"], "polity_kinds": ["tribal_nation"]}],
-      "note": "Council or legislature. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+      "note": "Council or legislature. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load. No start year: each nation's own constitution and election code set when its elections began, so the class has no single first election, and a start year belongs with each nation's load."
     },
     {
       "key": "tribal_subunit",
@@ -1270,7 +1290,7 @@
       },
       "source": "bia-fr",
       "match": [{"within": null, "name_pattern": "Board|Chapter|Commissioner", "polity_kinds": ["tribal_nation"]}],
-      "note": "Navajo chapters, school boards, and the Board of Election Supervisors; Cherokee Nation districts; Eastern Band townships and school board. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+      "note": "Navajo chapters, school boards, and the Board of Election Supervisors; Cherokee Nation districts; Eastern Band townships and school board. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load. No start year: each nation's own constitution and election code set when its elections began, so the class has no single first election, and a start year belongs with each nation's load."
     },
     {
       "key": "tribal_referendum",
@@ -1283,7 +1303,7 @@
       },
       "source": "bia-fr",
       "match": [{"within": null, "contest_kinds": ["ballot_question"], "polity_kinds": ["tribal_nation"], "precedence": 4}],
-      "note": "Constitutional and referendum votes the nation itself runs. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+      "note": "Constitutional and referendum votes the nation itself runs. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load. No start year: each nation's own constitution and election code set when its elections began, so the class has no single first election, and a start year belongs with each nation's load."
     },
     {
       "key": "tribal_judicial",
@@ -1296,7 +1316,7 @@
       },
       "source": "bia-fr",
       "match": [{"within": null, "name_pattern": "Justice|Judge", "polity_kinds": ["tribal_nation"]}],
-      "note": "Chief justice, associate justices, and judges a nation's own courts put to its voters, by retention or by election. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+      "note": "Chief justice, associate justices, and judges a nation's own courts put to its voters, by retention or by election. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load. No start year: each nation's own constitution and election code set when its elections began, so the class has no single first election, and a start year belongs with each nation's load."
     },
     {
       "key": "bia_secretarial",
@@ -1323,8 +1343,9 @@
       "name": "Guam Legislature, Education Board, and Consolidated Commission on Utilities",
       "category": "legislature",
       "goal": "subnational",
+      "first_held": "1950-11-07",
       "source": "gov-law-gu-leg",
-      "note": "The unicameral Legislature of 15 senators elected at large, and the two boards the island's voters also elect: the Guam Education Board and the Consolidated Commission on Utilities.",
+      "note": "The unicameral Legislature of 15 senators elected at large, and the two boards the island's voters also elect: the Guam Education Board and the Consolidated Commission on Utilities. The first Legislature under the Organic Act was elected on 7 November 1950 (Guampedia, Guam Legislature, https://www.guampedia.com/guam-legislature/).",
       "match": [
         {"within": "US-GU", "body": "edfe1dd7-7690-5a9b-881b-0d3b1f38170c", "precedence": 3},
         {"within": "US-GU", "body": "ffd51339-d7f5-5e9b-8ad3-d7278d85a849", "precedence": 3},
@@ -1337,9 +1358,10 @@
       "name": "Guam mayors and vice mayors",
       "category": "council",
       "goal": "local",
+      "first_held": "1931-01-01",
       "source": "gca-5-40",
       "locator": "5 GCA § 40104",
-      "note": "One mayor and one vice mayor for each of the 19 villages, elected at the island's regular general election in November every fourth year.",
+      "note": "One mayor and one vice mayor for each of the 19 villages, elected at the island's regular general election in November every fourth year. Municipal commissioners, now mayors, and their deputies were first elected at the general election of 1931 (Guampedia, History of Democracy in Guam, https://www.guampedia.com/history-of-democracy-on-guam/), so the date is the year only.",
       "match": [{"within": "US-GU", "office_kinds": ["mayor", "deputy_mayor"], "polity_kinds": ["municipality"], "precedence": 3}],
       "cadence": [
         {"within": "US-GU", "government_kind": "municipality", "period_years": 4, "phase": 0, "month": 11, "day_rule": "nov_tuesday_after_first_monday", "term_years": 4, "source": "gca-5-40", "locator": "5 GCA § 40104: an election of Mayors and Vice Mayors at the regular general election in November 1952 and in every fourth year thereafter, for a term of four years; § 40111(a): the term begins on the first Monday in January after the election"}
