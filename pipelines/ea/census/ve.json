@@ -1,0 +1,2277 @@
+{
+ "polity": "VE",
+ "name": "Venezuela",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Venezuela",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "República Bolivariana de Venezuela",
+    "lang": "es",
+    "kind": "native"
+   }
+  ],
+  "slug": "ve",
+  "wikidata": "Q717",
+  "source": "crbv"
+ },
+ "sources": {
+  "crbv": {
+   "title": "Constitución de la República Bolivariana de Venezuela (Gaceta Oficial Extraordinaria N° 5.908 de 19 de febrero de 2009, con la Enmienda N° 1)",
+   "publisher": "Tribunal Supremo de Justicia (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.tsj.gob.ve/constitucion",
+   "kind": "official_body",
+   "note": "Approved by referendum on 15 December 1999 (G.O. 36.860, reprinted in G.O. Ext. 5.453 of 24 March 2000) and amended by Enmienda N° 1 of 15 February 2009. Arts. 16 and 18: states, Distrito Capital, federal dependencies, and municipalities; art. 62-63: suffrage; arts. 70-74: consultative, recall, approving, and abrogating referendums; art. 125: indigenous representation; arts. 160 and 162: state governor and consejo legislativo, elected for four years; arts. 168, 173-175: municipalities, parishes, mayor and concejo municipal; art. 186: the Asamblea Nacional; art. 230: a six-year presidential term; art. 258: justices of the peace elected by universal, direct, and secret vote; arts. 292-298: the Poder Electoral; art. 293(6): the CNE may organize union, guild, and civil-society elections; arts. 340-350: amendment, reform, and the Asamblea Nacional Constituyente."
+  },
+  "lopre": {
+   "title": "Ley Orgánica de Procesos Electorales (Gaceta Oficial Extraordinaria N° 5.928 de 12 de agosto de 2009)",
+   "publisher": "Consejo Nacional Electoral (CNE)",
+   "url": "http://www.cne.gob.ve/web/normativa_electoral/ley_organica_procesos_electorales/indice.php",
+   "kind": "official_body",
+   "note": "Regulates elections to the Asamblea Nacional, consejos legislativos, concejos municipales and other collegiate bodies by a parallel system of nominal (first-past-the-post) and list (D'Hondt) seats, with three indigenous deputies to the Asamblea Nacional elected in the Occidente, Oriente, and Sur regions, and indigenous seats in the consejos legislativos and concejos of states and municipalities with indigenous population. The host did not answer from this session's checks on 2026-11-17."
+  },
+  "lopoe": {
+   "title": "Ley Orgánica del Poder Electoral (Gaceta Oficial N° 37.573 de 19 de noviembre de 2002)",
+   "publisher": "Consejo Nacional Electoral (CNE)",
+   "url": "http://www.cne.gob.ve/web/normativa_electoral/ley_organica_poder_electoral/indice.php",
+   "kind": "official_body",
+   "note": "The CNE organizes, administers, and supervises every election to public office and every referendum, and may organize union, guild, and civil-society elections on request."
+  },
+  "lospp": {
+   "title": "Ley Orgánica del Sufragio y Participación Política (Gaceta Oficial Extraordinaria N° 5.233 de 28 de mayo de 1998)",
+   "publisher": "Consejo Nacional Electoral (CNE)",
+   "url": "http://www.cne.gob.ve/web/normativa_electoral/ley_organica_sufragio/indice.php",
+   "kind": "official_body",
+   "note": "Electoral law of the 1998 and 2000-2005 elections (repealed by the 2009 LOPRE); renamed the Consejo Supremo Electoral the Consejo Nacional Electoral; governed the elections of the Congreso, the asambleas legislativas, governors, mayors, concejos, and juntas parroquiales."
+  },
+  "estatuto2000": {
+   "title": "Estatuto Electoral del Poder Público (Gaceta Oficial N° 36.884 de 3 de febrero de 2000)",
+   "publisher": "Asamblea Nacional Constituyente",
+   "url": "http://www.cne.gob.ve/web/normativa_electoral/estatuto_electoral/indice.php",
+   "kind": "official_body",
+   "note": "Transitional statute of the 2000 'megaelecciones' (30 July 2000) for the President, the Asamblea Nacional, the Andean and Latin American Parliaments, governors, consejos legislativos, the Alcalde Metropolitano de Caracas and its Cabildo, mayors, and (3 December 2000) concejos municipales and juntas parroquiales."
+  },
+  "loppm": {
+   "title": "Ley de Reforma de la Ley Orgánica del Poder Público Municipal (Gaceta Oficial Extraordinaria N° 6.015 de 28 de diciembre de 2010)",
+   "publisher": "Asamblea Nacional (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Replaced the elected juntas parroquiales with juntas parroquiales comunales chosen by the voceros of the communal councils; its second transitional provision ended the terms of the members elected in August 2005. The Asamblea Nacional host answered 503 on 2026-11-17."
+  },
+  "lorm1989": {
+   "title": "Ley Orgánica de Régimen Municipal (Gaceta Oficial Extraordinaria N° 4.109 de 15 de junio de 1989)",
+   "publisher": "Congreso de la República (Gaceta Oficial de la República de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Created the directly elected mayor (alcalde) separate from the concejo municipal and the junta parroquial of each parish (art. 73), first applied in the elections of 3 December 1989."
+  },
+  "ley_gobernadores": {
+   "title": "Ley sobre Elección y Remoción de los Gobernadores de Estado (1989)",
+   "publisher": "Congreso de la República (Gaceta Oficial de la República de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Replaced presidential appointment of state governors with direct election for three years, first held on 3 December 1989; the 1999 Constitution set a four-year term (art. 160)."
+  },
+  "ley_esequiba": {
+   "title": "Ley Orgánica para la Defensa de la Guayana Esequiba (Gaceta Oficial, 3 de abril de 2024)",
+   "publisher": "Asamblea Nacional (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Creates the state of Guayana Esequiba over the territory Venezuela claims west of the Essequibo River, administered by Guyana; its governor and consejo legislativo were first elected on 25 May 2025 by voters registered in the Sifontes municipality of Bolívar."
+  },
+  "ley_dmc": {
+   "title": "Ley Especial sobre el Régimen del Distrito Metropolitano de Caracas (Gaceta Oficial N° 36.906 de 8 de marzo de 2000)",
+   "publisher": "Asamblea Nacional Constituyente (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Created the Distrito Metropolitano de Caracas over the Libertador municipality and four Miranda municipalities, with an elected Alcalde Metropolitano and Cabildo Metropolitano; replaced in 2009 by the Ley Especial del Régimen Municipal a Dos Niveles del Área Metropolitana de Caracas (G.O. 39.276)."
+  },
+  "ley_alto_apure": {
+   "title": "Ley Especial que crea el Distrito del Alto Apure (Gaceta Oficial N° 37.326 de 16 de noviembre de 2001)",
+   "publisher": "Asamblea Nacional (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Created the Distrito del Alto Apure over the Páez and Rómulo Gallegos municipalities of Apure, with an elected district mayor and council."
+  },
+  "decreto_anc_2017": {
+   "title": "Decreto Constituyente mediante el cual se suprimen y liquidan el Distrito Metropolitano de Caracas y el Distrito del Alto Apure (20 de diciembre de 2017)",
+   "publisher": "Asamblea Nacional Constituyente (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Abolished the two metropolitan-district tiers and their elected mayors and councils; the Alcalde Metropolitano elected in 2013 and the councils left office."
+  },
+  "ley_paz_comunal": {
+   "title": "Ley Orgánica de la Jurisdicción Especial de la Justicia de Paz Comunal (Gaceta Oficial Extraordinaria N° 6.079 de 15 de junio de 2012)",
+   "publisher": "Asamblea Nacional (Gaceta Oficial de la República Bolivariana de Venezuela)",
+   "url": "http://www.asambleanacional.gob.ve/leyes/sancionadas",
+   "kind": "official_body",
+   "note": "Justices of the peace (jueces de paz comunal) are elected by the residents of each communal peace circuit for six years, with the CNE's technical support; replaced the 1994 Ley Orgánica de Tribunales y Procedimientos de Paz, under which municipalities organized the votes."
+  },
+  "cne_stats": {
+   "title": "Resultados electorales (estadísticas electorales del Consejo Nacional Electoral)",
+   "publisher": "Consejo Nacional Electoral (CNE)",
+   "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+   "kind": "official_body",
+   "note": "The CNE's index of result divulgations by election, by state, municipality, parish, voting center, and table (mesa). www.cne.gob.ve did not answer from this session's checks on 2026-11-17 (the gateway could not connect over HTTPS and the name did not resolve over HTTP); the host has been unreliable since July 2024."
+  },
+  "cne_compendio": {
+   "title": "Los Partidos Políticos y sus Estadísticas Electorales 1946-2004",
+   "publisher": "Consejo Nacional Electoral (CNE)",
+   "url": "http://www.cne.gob.ve/web/index.php",
+   "kind": "official_body",
+   "note": "The CNE's printed two-volume compendium of every national, regional, and municipal election from the 1946 Constituent Assembly to the 2004 regional elections, with votes by party and state."
+  },
+  "ine_mun2011": {
+   "title": "Estructura Poblacional por Sexo Según Grupos de Edad, Entidad Federal y Municipios, Censo 2011",
+   "publisher": "Instituto Nacional de Estadística (INE)",
+   "url": "https://ine.gob.ve/wp-content/uploads/2025/09/POBLACION-POR-MUNICIPIOS-CENSO-2011.pdf",
+   "kind": "official_body",
+   "note": "One table for the nation, one for each of the 23 states, the Distrito Capital, and the Dependencias Federales, and one for each of the 335 municipalities, in the operative political-territorial division of the 2011 census."
+  },
+  "ine_dc2011": {
+   "title": "Distrito Capital, Censo 2011: Resultados Básicos (Cuadro 1, Población y Viviendas, según Parroquia)",
+   "publisher": "Instituto Nacional de Estadística (INE)",
+   "url": "https://ine.gob.ve/wp-content/uploads/2025/09/CCENSO-2011-RESULTADOS-BASICOS.pdf",
+   "kind": "official_body",
+   "note": "Basic results of the 2011 census by entity; parishes are tabulated for the Distrito Capital and municipalities for the states. 'La estructura parroquial corresponde a la Ley Político Territorial de la Entidad, vigente para el momento del empadronamiento.'"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "República Bolivariana de Venezuela",
+   "name_en": "Bolivarian Republic of Venezuela",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "crbv"
+  },
+  {
+   "key": "estado",
+   "name": "Estados",
+   "name_en": "States",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "ve.estado",
+   "source": "crbv",
+   "counts": [
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "value": 23,
+     "source": "ine_mun2011",
+     "locator": "https://ine.gob.ve/wp-content/uploads/2025/09/POBLACION-POR-MUNICIPIOS-CENSO-2011.pdf (one table for each of the 23 states, Amazonas to Zulia, besides the Distrito Capital and the Dependencias Federales)"
+    },
+    {
+     "date": "2024-04-03",
+     "value": 24,
+     "source": "ley_esequiba",
+     "locator": "Ley Orgánica para la Defensa de la Guayana Esequiba (2024): the 23 states and the new state of Guayana Esequiba"
+    }
+   ]
+  },
+  {
+   "key": "distrito_capital",
+   "name": "Distrito Capital",
+   "name_en": "Capital District",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "ve.estado",
+   "elects": false,
+   "source": "crbv",
+   "counts": [
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "value": 1,
+     "source": "ine_mun2011",
+     "locator": "https://ine.gob.ve/wp-content/uploads/2025/09/POBLACION-POR-MUNICIPIOS-CENSO-2011.pdf (table for the Distrito Capital, with its single municipality, Libertador)"
+    }
+   ]
+  },
+  {
+   "key": "dependencias",
+   "name": "Dependencias Federales",
+   "name_en": "Federal Dependencies",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "ve.estado",
+   "elects": false,
+   "source": "crbv",
+   "counts": [
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "value": 1,
+     "source": "ine_mun2011",
+     "locator": "https://ine.gob.ve/wp-content/uploads/2025/09/POBLACION-POR-MUNICIPIOS-CENSO-2011.pdf (table for the Dependencias Federales, the islands governed directly by the national government)"
+    }
+   ]
+  },
+  {
+   "key": "municipio",
+   "name": "Municipios",
+   "name_en": "Municipalities",
+   "parent": "estado",
+   "polity_kind": "municipality",
+   "scheme": "ve.municipio",
+   "source": "crbv",
+   "counts": [
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "value": 335,
+     "source": "ine_mun2011",
+     "locator": "https://ine.gob.ve/wp-content/uploads/2025/09/POBLACION-POR-MUNICIPIOS-CENSO-2011.pdf (335 municipal tables, from Amazonas, Alto Orinoco to Zulia, Valmore Rodríguez, including Libertador of the Distrito Capital)"
+    }
+   ]
+  },
+  {
+   "key": "parroquia",
+   "name": "Parroquias",
+   "name_en": "Parishes",
+   "parent": "municipio",
+   "polity_kind": "submunicipal",
+   "scheme": "ve.parroquia",
+   "source": "lorm1989",
+   "valid_from": "1989-06-15"
+  },
+  {
+   "key": "distrito_metropolitano",
+   "name": "Distritos metropolitanos (Caracas y Alto Apure)",
+   "name_en": "Metropolitan districts (Caracas and Alto Apure)",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "scheme": "ve.distrito_metropolitano",
+   "source": "ley_dmc",
+   "valid_from": "2000-03-08",
+   "valid_to": "2017-12-20",
+   "counts": [
+    {
+     "date": "2017-12-20",
+     "value": 2,
+     "source": "decreto_anc_2017",
+     "locator": "Decreto Constituyente of 20 December 2017 suppressing the Distrito Metropolitano de Caracas and the Distrito del Alto Apure"
+    }
+   ]
+  },
+  {
+   "key": "region_indigena",
+   "name": "Regiones de representación indígena",
+   "name_en": "Indigenous representation regions",
+   "parent": "national",
+   "scheme": "ve.region_indigena",
+   "source": "lopre",
+   "counts": [
+    {
+     "date": "2009-08-12",
+     "value": 3,
+     "source": "lopre",
+     "locator": "Ley Orgánica de Procesos Electorales (2009), indigenous representation to the Asamblea Nacional: the Occidente, Oriente, and Sur regions"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Elección de Presidente o Presidenta de la República",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "The CNE published results by state, municipality, parish, voting center, and table (acta) for 1998-2018; for 28 July 2024 it published only national bulletins, with no breakdown below the nation.",
+   "note": "Elected by plurality in a single round (Constitution art. 228) for six years (art. 230) since 2000, five years 1958-1998; unlimited re-election since the 2009 amendment. Direct universal suffrage dates from the 1947 Constitution; the 1952-1957 regime held the 1957 plebiscite instead of a presidential election. Venezuelans abroad vote only in this class.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (arts. 228 and 230)",
+   "valid_from": "1947-07-05",
+   "first_held": "1947-12-14",
+   "earliest_record": "1947-12-14",
+   "est_votes": 117000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "VE",
+     "valid_from": "1947-07-05"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 12,
+     "term_years": 5,
+     "called": false,
+     "valid_from": "1958-01-23",
+     "valid_to": "1999-12-30",
+     "administered_by": "Consejo Supremo Electoral (CSE), the CNE's predecessor to 1997",
+     "source": "cne_compendio",
+     "locator": "Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (presidential elections every five years, 1958-1998, under the 1961 Constitution)"
+    },
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 230: six-year term; art. 233: an absolute vacancy in the first four years calls a new election within 30 days)",
+     "vacancy_rule": "An absolute vacancy in the first four years of the term is filled by a new universal, direct election within 30 days; in the last two the Vice-President completes the term (art. 233)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-12-06"
+    },
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-12-14",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1958-12-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1963-12-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1968-12-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1973-12-09",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1978-12-03",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1983-12-04",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1988-12-04",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1993-12-05",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_compendio"
+    },
+    {
+     "date": "1998-12-06",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2000-07-30",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "'Megaelecciones' under the 2000 Estatuto Electoral, relegitimizing every office after the new Constitution."
+    },
+    {
+     "date": "2006-12-03",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2012-10-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2013-04-14",
+     "election_kind": "special",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "Election after the death of the President-elect on 5 March 2013 (art. 233)."
+    },
+    {
+     "date": "2018-05-20",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "Held early, together with the consejos legislativos."
+    },
+    {
+     "date": "2024-07-28",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "The CNE declared a result by national bulletin only and published no breakdown by state, center, or table."
+    }
+   ]
+  },
+  {
+   "key": "presidente_indirecto",
+   "tier": "national",
+   "name": "Elección indirecta del Presidente (1830-1945)",
+   "name_en": "Indirect presidential elections, 1830-1945",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the constitutions from 1830 to 1945 the President was chosen by provincial electoral colleges or by the Congress, never by a popular vote; the 1946-1947 Constituent Assembly introduced direct universal suffrage.",
+   "source": "cne_compendio",
+   "valid_from": "1830-09-22",
+   "valid_to": "1947-07-05",
+   "disposition": "blocked",
+   "disposition_reason": "Chosen by electoral colleges or the Congress; no official election authority published these ballots, which survive only in congressional journals not yet located online.",
+   "est_votes": 5000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "VE",
+     "valid_to": "1947-07-05"
+    }
+   ]
+  },
+  {
+   "key": "congreso_indirecto",
+   "tier": "national",
+   "name": "Congreso Nacional por sufragio indirecto o restringido (1830-1945)",
+   "name_en": "Congress by indirect or restricted suffrage, 1830-1945",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Deputies and senators were chosen by electoral colleges, state legislatures, or municipal councils, or by restricted male suffrage, until the 1945-1947 reforms.",
+   "source": "cne_compendio",
+   "valid_from": "1830-09-22",
+   "valid_to": "1946-10-27",
+   "disposition": "blocked",
+   "disposition_reason": "No official returns: the CNE's statistics start with the 1946 Constituent Assembly, and earlier lists of members sit in congressional journals.",
+   "est_votes": 50000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "VE",
+     "valid_to": "1946-10-27",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "constituyente",
+   "tier": "national",
+   "name": "Elección de la Asamblea Nacional Constituyente",
+   "name_en": "Constituent Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "1999 and 2017 results by state, municipality, parish, center, and table on the CNE's site; 1946 and 1952 by state in the CNE's compendium. The 2017 sectoral constituencies (workers, peasants, students, pensioners, the disabled, communal councils, business owners) voted nationally from sectoral rolls.",
+   "note": "Four constituent assemblies: 1946 (the first election by universal suffrage, 160 members by state list PR), 1952 (counting halted, results proclaimed by the junta), 1999 (131 members, 24 national, 104 by state, 3 indigenous), and 2017 (545 members, 364 territorial by municipality, 173 sectoral, 8 indigenous).",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (arts. 347-349)",
+   "first_held": "1946-10-27",
+   "earliest_record": "1946-10-27",
+   "est_votes": 25000000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "VE"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1999-07-25"
+    },
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1946-10-27",
+     "election_kind": "general",
+     "seats": 160,
+     "note": "First election by universal direct suffrage, including women and those over 18."
+    },
+    {
+     "date": "1952-11-30",
+     "election_kind": "general",
+     "seats": 104,
+     "note": "Results were suspended by the government junta after early returns; the Consejo Supremo Electoral proclaimed the figures later."
+    },
+    {
+     "date": "1999-07-25",
+     "election_kind": "general",
+     "seats": 131
+    },
+    {
+     "date": "2017-07-30",
+     "election_kind": "general",
+     "seats": 545,
+     "note": "Territorial members by municipality and state capital, plus sectoral and indigenous members, under bases set by presidential decree."
+    }
+   ]
+  },
+  {
+   "key": "senado",
+   "tier": "national",
+   "name": "Elección del Senado del Congreso de la República",
+   "name_en": "Senate elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "Votes by state and party in the CNE's compendium for 1947-1993; the 1998 election by state, municipality, and parish on the CNE's site.",
+   "note": "Two senators per state and the Distrito Federal by list PR, plus additional senators for minority representation and former Presidents as senators for life; abolished by the 1999 Constitution's unicameral Asamblea Nacional.",
+   "source": "cne_compendio",
+   "valid_from": "1947-07-05",
+   "valid_to": "1999-12-30",
+   "first_held": "1947-12-14",
+   "earliest_record": "1947-12-14",
+   "est_votes": 60000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "VE",
+     "valid_from": "1947-07-05",
+     "valid_to": "1999-12-30"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 12,
+     "term_years": 5,
+     "called": false,
+     "valid_from": "1958-01-23",
+     "valid_to": "1999-12-30",
+     "administered_by": "Consejo Supremo Electoral (CSE), the CNE's predecessor to 1997",
+     "source": "cne_compendio",
+     "locator": "Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (Congress elected with the President every five years 1958-1993; in 1998 a month earlier, on 8 November)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    },
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.parroquia",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-11-08"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-12-14",
+     "election_kind": "general"
+    },
+    {
+     "date": "1958-12-07",
+     "election_kind": "general"
+    },
+    {
+     "date": "1963-12-01",
+     "election_kind": "general"
+    },
+    {
+     "date": "1968-12-01",
+     "election_kind": "general"
+    },
+    {
+     "date": "1973-12-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "1978-12-03",
+     "election_kind": "general"
+    },
+    {
+     "date": "1983-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1988-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1993-12-05",
+     "election_kind": "general"
+    },
+    {
+     "date": "1998-11-08",
+     "election_kind": "general",
+     "note": "Separated from the presidential election of 6 December 1998 and held with the governors and asambleas legislativas."
+    }
+   ]
+  },
+  {
+   "key": "camara_diputados",
+   "tier": "national",
+   "name": "Elección de la Cámara de Diputados del Congreso de la República",
+   "name_en": "Chamber of Deputies elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "Votes by state and party in the CNE's compendium for 1947-1993; the 1998 election by state, municipality, and parish on the CNE's site.",
+   "note": "Deputies by state list PR (closed lists to 1988; mixed member with single-member districts from 1993), plus additional seats for national minority representation; abolished in 1999.",
+   "source": "cne_compendio",
+   "valid_from": "1947-07-05",
+   "valid_to": "1999-12-30",
+   "first_held": "1947-12-14",
+   "earliest_record": "1947-12-14",
+   "est_votes": 60000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "VE",
+     "valid_from": "1947-07-05",
+     "valid_to": "1999-12-30"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 12,
+     "term_years": 5,
+     "called": false,
+     "valid_from": "1958-01-23",
+     "valid_to": "1999-12-30",
+     "administered_by": "Consejo Supremo Electoral (CSE), the CNE's predecessor to 1997",
+     "source": "cne_compendio",
+     "locator": "Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (Congress elected with the President every five years 1958-1993; in 1998 a month earlier, on 8 November)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    },
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.parroquia",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-11-08"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-12-14",
+     "election_kind": "general"
+    },
+    {
+     "date": "1958-12-07",
+     "election_kind": "general"
+    },
+    {
+     "date": "1963-12-01",
+     "election_kind": "general"
+    },
+    {
+     "date": "1968-12-01",
+     "election_kind": "general"
+    },
+    {
+     "date": "1973-12-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "1978-12-03",
+     "election_kind": "general"
+    },
+    {
+     "date": "1983-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1988-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1993-12-05",
+     "election_kind": "general"
+    },
+    {
+     "date": "1998-11-08",
+     "election_kind": "general",
+     "note": "Separated from the presidential election of 6 December 1998 and held with the governors and asambleas legislativas."
+    }
+   ]
+  },
+  {
+   "key": "asamblea_nacional",
+   "tier": "national",
+   "name": "Elección de diputados y diputadas a la Asamblea Nacional",
+   "name_en": "National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ve.circunscripcion",
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "Results by state list and by nominal circunscripción, down to parish, center, and table, on the CNE's site for 2000-2020; the 2025 results were published as bulletins by state.",
+   "note": "Unicameral since 2000 (Constitution art. 186): deputies by a parallel system of nominal seats in multi- or single-member circunscripciones and state lists (D'Hondt), three indigenous deputies (see an_indigena), five-year terms. Seats: 165 (2000), 167 (2005), 165 (2010), 167 (2015), 277 (2020), 285 (2025, including Guayana Esequiba).",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 186; art. 192: five-year term)",
+   "valid_from": "1999-12-30",
+   "first_held": "2000-07-30",
+   "earliest_record": "2000-07-30",
+   "est_votes": 70000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "VE",
+     "valid_from": "1999-12-30"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "term_years": 5,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 192: deputies serve five years and may be re-elected)",
+     "vacancy_rule": "A vacant seat passes to the deputy's elected substitute (suplente)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-07-30",
+     "election_kind": "general",
+     "seats": 165
+    },
+    {
+     "date": "2005-12-04",
+     "election_kind": "general",
+     "seats": 167,
+     "note": "Most opposition parties withdrew days before the vote."
+    },
+    {
+     "date": "2010-09-26",
+     "election_kind": "general",
+     "seats": 165
+    },
+    {
+     "date": "2015-12-06",
+     "election_kind": "general",
+     "seats": 167
+    },
+    {
+     "date": "2020-12-06",
+     "election_kind": "general",
+     "seats": 277
+    },
+    {
+     "date": "2025-05-25",
+     "election_kind": "general",
+     "seats": 285,
+     "note": "Held with the governors and consejos legislativos."
+    }
+   ]
+  },
+  {
+   "key": "an_indigena",
+   "tier": "region_indigena",
+   "name": "Representación indígena a la Asamblea Nacional",
+   "name_en": "Indigenous representation in the National Assembly",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.region_indigena"
+    ]
+   },
+   "finest_note": "By indigenous region and state on the CNE's site to 2015; from 2020 the deputies were chosen by delegates of community assemblies, with only the delegates' tallies announced.",
+   "note": "Three deputies, one each for the Occidente (Zulia, Mérida, Trujillo), Oriente (Anzoátegui, Monagas, Sucre), and Sur (Amazonas, Apure, Bolívar, Delta Amacuro) regions (Constitution art. 125 and 186). Elected on a separate ballot by all voters of those states to 2015; since 2020 by voice vote of delegates chosen in community assemblies (CNE special regulation).",
+   "source": "lopre",
+   "valid_from": "1999-12-30",
+   "first_held": "2000-07-30",
+   "earliest_record": "2000-07-30",
+   "contests_per_unit": 1,
+   "est_votes": 5000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "indirect"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "VE",
+     "name_pattern": "(ind[ií]gena|Indigenous)",
+     "valid_from": "1999-12-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-07-30",
+     "election_kind": "general"
+    },
+    {
+     "date": "2005-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "2010-09-26",
+     "election_kind": "general"
+    },
+    {
+     "date": "2015-12-06",
+     "election_kind": "general"
+    },
+    {
+     "date": "2020-12-08",
+     "election_kind": "indirect",
+     "note": "Delegates of indigenous community assemblies chose the three deputies by voice vote, two days after the general vote."
+    },
+    {
+     "date": "2025-01-01",
+     "precision": "year",
+     "through": "2025-12-31",
+     "note": "Chosen again by delegates of indigenous community assemblies with the 2025 legislative election."
+    }
+   ]
+  },
+  {
+   "key": "parlamentos_internacionales",
+   "tier": "national",
+   "name": "Elección de representantes al Parlamento Andino y al Parlamento Latinoamericano",
+   "name_en": "Andean and Latin American Parliament elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "National list results by state and below on the CNE's site.",
+   "note": "Venezuela elected its five Andean Parliament members by national list from 1998 until it left the Andean Community in 2006, and its twelve Latin American Parliament (Parlatino) members by national list in 2000, 2005, and 2010; the CNE did not call the Parlatino seats in 2015 and the Asamblea Nacional has named them since.",
+   "source": "estatuto2000",
+   "valid_from": "1998-01-01",
+   "valid_to": "2015-12-06",
+   "first_held": "1998-11-08",
+   "earliest_record": "1998-11-08",
+   "est_votes": 20000000,
+   "effort": 3,
+   "match": [
+    {
+     "iso_pattern": "VE",
+     "name_pattern": "(Parlamento Andino|Parlamento Latinoamericano|Parlatino|Andean Parliament|Latin American Parliament)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-11-08"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1998-11-08",
+     "election_kind": "general",
+     "note": "Andean Parliament, held with the Congress."
+    },
+    {
+     "date": "2000-07-30",
+     "election_kind": "general",
+     "note": "Andean and Latin American Parliaments."
+    },
+    {
+     "date": "2005-12-04",
+     "election_kind": "general",
+     "note": "Andean and Latin American Parliaments, with the Asamblea Nacional."
+    },
+    {
+     "date": "2010-09-26",
+     "election_kind": "general",
+     "note": "Latin American Parliament only, with the Asamblea Nacional."
+    }
+   ]
+  },
+  {
+   "key": "referendo_nacional",
+   "tier": "national",
+   "name": "Referendos y consultas nacionales",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "Results by state, municipality, parish, center, and table on the CNE's site from 1999; the 1957 plebiscite only by state.",
+   "note": "Consultative (art. 71), approving (art. 73), abrogating (art. 74), and constitutional amendment and reform referendums (arts. 341-346). Questions: 1957 plebiscite 1; 25 April 1999 2 (convening the Constituent Assembly and its bases); 15 December 1999 1 (the Constitution); 3 December 2000 1 (renewal of union leadership); 2 December 2007 2 (reform blocks A and B, both rejected); 15 February 2009 1 (amendment); 3 December 2023 5 (Guayana Esequiba).",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (arts. 71-74 and 341-346)",
+   "first_held": "1957-12-15",
+   "earliest_record": "1957-12-15",
+   "est_votes": 70000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "VE"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1999-04-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1957-12-15",
+     "election_kind": "referendum",
+     "note": "Plebiscite on the continuation of the President in office, in place of an election; foreigners resident two years could vote."
+    },
+    {
+     "date": "1999-04-25",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cne_stats"
+    },
+    {
+     "date": "1999-12-15",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2000-12-03",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "Consultative referendum on suspending and renewing union leadership, held with the municipal elections."
+    },
+    {
+     "date": "2007-12-02",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2009-02-15",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2023-12-03",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "cne_stats"
+    }
+   ]
+  },
+  {
+   "key": "revocatorio_presidencial",
+   "tier": "national",
+   "name": "Referendo revocatorio del mandato presidencial",
+   "name_en": "Presidential recall referendum",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By state, municipality, parish, center, and table on the CNE's site.",
+   "note": "Any elected office can be recalled after half its term on a petition of 20% of its electorate (art. 72). The only presidential recall vote, on 15 August 2004, kept the President; the 2016 petition was suspended by the CNE.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 72)",
+   "valid_from": "1999-12-30",
+   "first_held": "2004-08-15",
+   "earliest_record": "2004-08-15",
+   "est_votes": 10000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "VE",
+     "office_kinds": [
+      "head_of_state"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2004-08-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-08-15",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cne_stats"
+    }
+   ]
+  },
+  {
+   "key": "revocatorio_regional_local",
+   "tier": "estado",
+   "name": "Referendos revocatorios de gobernadores, legisladores, alcaldes y concejales",
+   "name_en": "Recall referendums of state and municipal officials",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "note": "Recalls under art. 72 of governors, state legislators, mayors, and concejales; the CNE held a round of recalls of deputies, governors, and mayors in 2004 and of mayors and municipal officials in October 2007; none since.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 72)",
+   "valid_from": "1999-12-30",
+   "first_held": "2004-01-01",
+   "est_votes": 2000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "VE-*"
+    },
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "VE",
+     "office_kinds": [
+      "mayor",
+      "governor",
+      "other"
+     ]
+    },
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "VE",
+     "body_kinds": [
+      "unicameral",
+      "council"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "through": "2007-12-31",
+     "note": "Recall votes of state and municipal officials held in 2004 and on 7 October 2007; their number awaits the CNE's own lists."
+    }
+   ]
+  },
+  {
+   "key": "consultas_comunales",
+   "tier": "national",
+   "name": "Consultas populares nacionales de proyectos comunales",
+   "name_en": "National consultations on communal projects",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Votes held since April 2024 in each of the communal circuits to choose which community projects the government funds, organized by the Ministry of Communes with the CNE's technical support.",
+   "source": "lopoe",
+   "valid_from": "2024-01-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chooses funding priorities among community projects, not an office, a law, or a constitutional question, and is run by a ministry rather than as a CNE election."
+  },
+  {
+   "key": "primarias",
+   "tier": "national",
+   "name": "Elecciones primarias e internas de organizaciones con fines políticos",
+   "name_en": "Party primaries and internal elections",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties choose candidates by their own rules (Constitution art. 67); the CNE may lend technical support on request, as it did for the opposition coalition's presidential primary of 12 February 2012 and for some governing-party primaries, while the 2023 opposition primary was run by its own national commission.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 67; art. 293(6))",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Not state-run: the parties administer and certify their primaries, and the CNE only lends machines and staff on request."
+  },
+  {
+   "key": "sindicales_gremiales",
+   "tier": "national",
+   "name": "Elecciones sindicales, gremiales y de la sociedad civil",
+   "name_en": "Union, guild, and civil-society elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The CNE organizes elections of unions, professional guilds, universities, and civil-society organizations on request or court order (Constitution art. 293(6)).",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 293(6))",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elect officers of private or professional organizations, not public office."
+  },
+  {
+   "key": "poderes_designados",
+   "tier": "national",
+   "name": "Designación de magistrados del TSJ, rectores del CNE y titulares del Poder Ciudadano",
+   "name_en": "Selection of Supreme Tribunal justices, electoral rectors, and Citizen Power officers",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "office"
+   },
+   "note": "Supreme Tribunal justices, CNE rectors, the Attorney General, the Comptroller General, and the Ombudsman are chosen by a two-thirds vote of the Asamblea Nacional after nomination committees (arts. 264, 279, 296).",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (arts. 264, 279, and 296)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the Asamblea Nacional, not by a popular vote."
+  },
+  {
+   "key": "jueces_paz",
+   "tier": "municipio",
+   "name": "Elección de jueces y juezas de paz",
+   "name_en": "Justice of the peace elections",
+   "category": "judicial",
+   "goal": "local",
+   "measure": {
+    "unit": "office"
+   },
+   "note": "The Constitution (art. 258) requires justices of the peace to be elected by universal, direct, and secret vote. Municipalities held the votes under the 1994 Ley Orgánica de Tribunales y Procedimientos de Paz; since 2012 the residents of each communal peace circuit elect them for six years with the CNE's technical support.",
+   "source": "ley_paz_comunal",
+   "valid_from": "1994-12-21",
+   "disposition": "blocked",
+   "disposition_reason": "No authority publishes these results centrally: votes are held circuit by circuit with results posted locally, and the CNE's site, which would hold any it supported, did not answer on 2026-11-17.",
+   "est_votes": 1000000,
+   "effort": 5,
+   "match": [
+    {
+     "iso_pattern": "VE",
+     "name_pattern": "(Juez|Jueza|Jueces) de [Pp]az|Justice of the Peace"
+    }
+   ]
+  },
+  {
+   "key": "consejos_comunales",
+   "tier": "parroquia",
+   "name": "Elección de voceros de consejos comunales y comunas",
+   "name_en": "Communal council and commune spokesperson elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Spokespersons of the communal councils (Ley Orgánica de los Consejos Comunales, 2009) and the communes' parliaments are chosen in citizens' assemblies of each community, which since 2010 also name the juntas parroquiales comunales.",
+   "source": "loppm",
+   "valid_from": "2006-04-10",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by community assemblies registered with a ministry, not in public elections administered by the CNE."
+  },
+  {
+   "key": "gobernador",
+   "tier": "estado",
+   "name": "Elección de gobernadores y gobernadoras de estado",
+   "name_en": "State governor elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By municipality, parish, center, and table on the CNE's site from 1998; 1989-1995 by state and municipality in the CNE's compendium. The 2025 results were published as state bulletins.",
+   "note": "Governors were appointed by the President until the 1989 law; elected by plurality for three years (1989-1998) and four years since the 1999 Constitution (art. 160). The Distrito Capital's Jefe de Gobierno is appointed (2009 law), and the Dependencias Federales have no governor. 20 states voted in 1989 (Amazonas and Delta Amacuro were federal territories), 22 in 1992 and 1995, 23 from 1998 (Vargas, later La Guaira, created 1998), and 24 in 2025 with Guayana Esequiba. Barinas re-ran its election on 9 January 2022 after the TSJ annulled the November 2021 count.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 160)",
+   "valid_from": "1989-04-14",
+   "first_held": "1989-12-03",
+   "earliest_record": "1989-12-03",
+   "est_votes": 80000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special",
+      "by_election"
+     ],
+     "office_kinds": [
+      "governor"
+     ],
+     "iso_pattern": "VE-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-04-14",
+     "valid_to": "1999-12-30",
+     "administered_by": "Consejo Supremo Electoral (CSE), the CNE's predecessor to 1997",
+     "source": "ley_gobernadores",
+     "locator": "Ley sobre Elección y Remoción de los Gobernadores de Estado (1989): three-year term"
+    },
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 160: four-year term, re-electable)",
+     "vacancy_rule": "An absolute vacancy is filled by the consejo legislativo's designee until a new election, which the CNE calls when more than half the term remains."
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-11-08"
+    },
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-01-01",
+     "precision": "year",
+     "through": "2008-12-31",
+     "note": "Elections of 3 December 1989, 6 December 1992, 3 December 1995, 8 November 1998, 30 July 2000, 31 October 2004, and 23 November 2008; their state counts await the CNE's lists."
+    },
+    {
+     "date": "2012-12-16",
+     "election_kind": "general",
+     "contests": 23,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2017-10-15",
+     "election_kind": "general",
+     "contests": 23,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2021-11-21",
+     "election_kind": "general",
+     "contests": 23,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2022-01-09",
+     "election_kind": "special",
+     "contests": 1,
+     "source": "cne_stats",
+     "note": "Barinas re-run after the TSJ annulled the 21 November 2021 count."
+    },
+    {
+     "date": "2025-05-25",
+     "election_kind": "general",
+     "contests": 24,
+     "source": "cne_stats",
+     "note": "Includes the first election for Guayana Esequiba."
+    }
+   ]
+  },
+  {
+   "key": "consejo_legislativo",
+   "tier": "estado",
+   "name": "Elección de legisladores y legisladoras a los consejos legislativos de los estados",
+   "name_en": "State legislative council elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.circunscripcion",
+     "ve.estado"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By nominal circunscripción and state list, down to the table, on the CNE's site.",
+   "note": "Unicameral consejos legislativos of 7 to 15 members (art. 162), by the same parallel system as the Asamblea Nacional, with indigenous seats where there are indigenous peoples; four-year terms.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 162)",
+   "valid_from": "1999-12-30",
+   "first_held": "2000-07-30",
+   "earliest_record": "2000-07-30",
+   "est_votes": 70000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "VE-*",
+     "valid_from": "1999-12-30"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 162)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "through": "2012-12-31",
+     "note": "Elections of 30 July 2000, 31 October 2004, 23 November 2008, and 16 December 2012 with the governors; their state counts await the CNE's lists."
+    },
+    {
+     "date": "2018-05-20",
+     "election_kind": "general",
+     "contests": 23,
+     "source": "cne_stats",
+     "note": "Held with the presidential election."
+    },
+    {
+     "date": "2021-11-21",
+     "election_kind": "general",
+     "contests": 23,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2025-05-25",
+     "election_kind": "general",
+     "contests": 24,
+     "source": "cne_stats"
+    }
+   ]
+  },
+  {
+   "key": "asamblea_legislativa",
+   "tier": "estado",
+   "name": "Elección de las asambleas legislativas de los estados (1947-1998)",
+   "name_en": "State legislative assembly elections, 1947-1998",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.estado"
+    ]
+   },
+   "finest_note": "Votes by state and party in the CNE's compendium.",
+   "note": "The asambleas legislativas of the states were elected by list PR with the President and Congress (1947-1993) and with the governors in 1998; replaced by the consejos legislativos in 2000.",
+   "source": "cne_compendio",
+   "valid_from": "1947-07-05",
+   "valid_to": "1999-12-30",
+   "first_held": "1947-12-14",
+   "est_votes": 50000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "VE-*",
+     "valid_to": "1999-12-30"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    },
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.parroquia",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "1998-11-08"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-01-01",
+     "precision": "year",
+     "through": "1998-12-31",
+     "note": "Elections with every general election from 14 December 1947 to 5 December 1993 and with the governors on 8 November 1998."
+    }
+   ]
+  },
+  {
+   "key": "alcalde",
+   "tier": "municipio",
+   "name": "Elección de alcaldes y alcaldesas",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.municipio"
+    ],
+    "fine": [
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By parish, center, and table on the CNE's site from 2000; the 2025 results were published as municipal bulletins.",
+   "note": "The directly elected mayor dates from the 1989 municipal law; elected by plurality for three years (1989-1995), then four years (art. 174). Municipalities grew from 269 in 1989 to 335; by-elections fill vacancies, as in San Cristóbal and San Diego on 25 May 2014.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 174)",
+   "valid_from": "1989-06-15",
+   "first_held": "1989-12-03",
+   "earliest_record": "1989-12-03",
+   "est_votes": 80000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-06-15",
+     "valid_to": "1999-12-30",
+     "administered_by": "Consejo Supremo Electoral (CSE), the CNE's predecessor to 1997",
+     "source": "lorm1989",
+     "locator": "Ley Orgánica de Régimen Municipal (1989): three-year term"
+    },
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 174: four-year term, re-electable)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    },
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-01-01",
+     "precision": "year",
+     "through": "2008-12-31",
+     "note": "Elections of 3 December 1989, 6 December 1992, 3 December 1995, 30 July 2000, 31 October 2004, and 23 November 2008; their municipal counts await the CNE's lists."
+    },
+    {
+     "date": "2013-12-08",
+     "election_kind": "general",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "by_election",
+     "contests": 2,
+     "source": "cne_stats",
+     "note": "San Cristóbal (Táchira) and San Diego (Carabobo) after their mayors were jailed."
+    },
+    {
+     "date": "2017-12-10",
+     "election_kind": "general",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2021-11-21",
+     "election_kind": "general",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2025-07-27",
+     "election_kind": "general",
+     "contests": 335,
+     "source": "cne_stats"
+    }
+   ]
+  },
+  {
+   "key": "concejo_municipal",
+   "tier": "municipio",
+   "name": "Elección de concejales y concejalas a los concejos municipales",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.circunscripcion",
+     "ve.municipio"
+    ],
+    "fine": [
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By nominal circunscripción (usually a parish) and municipal list, down to the table, on the CNE's site from 2000.",
+   "note": "Councils were elected by list PR with the national elections (1948 separately, then 1958-1973), separately from 1979, and since 1989 by a mixed system; 2,471 concejales including 69 indigenous were due in 2025.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 175)",
+   "first_held": "1948-05-09",
+   "earliest_record": "1948-05-09",
+   "est_votes": 90000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1999-12-30",
+     "administered_by": "Consejo Nacional Electoral (CNE)",
+     "source": "crbv",
+     "locator": "http://www.tsj.gob.ve/constitucion (art. 175)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-12-03"
+    },
+    {
+     "platform": "CNE, Los Partidos Políticos y sus Estadísticas Electorales 1946-2004 (print)",
+     "url": "http://www.cne.gob.ve/web/index.php",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1946-10-27",
+     "last_date": "2004-10-31",
+     "finest": "ve.estado",
+     "source": "cne_compendio",
+     "evidence": "Printed compendium of votes by party and state for every election 1946-2004; no machine-readable copy on the CNE's site."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-05-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "1958-01-01",
+     "precision": "year",
+     "through": "1973-12-31",
+     "note": "Councils elected on a separate small ballot with each general election of 1958, 1963, 1968, and 1973."
+    },
+    {
+     "date": "1979-06-03",
+     "election_kind": "local"
+    },
+    {
+     "date": "1984-05-27",
+     "election_kind": "local"
+    },
+    {
+     "date": "1989-12-03",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-12-06",
+     "election_kind": "local"
+    },
+    {
+     "date": "1995-12-03",
+     "election_kind": "local"
+    },
+    {
+     "date": "2000-12-03",
+     "election_kind": "local"
+    },
+    {
+     "date": "2005-08-07",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-12-08",
+     "election_kind": "local",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2018-12-09",
+     "election_kind": "local",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2021-11-21",
+     "election_kind": "local",
+     "contests": 335,
+     "source": "cne_stats"
+    },
+    {
+     "date": "2025-07-27",
+     "election_kind": "local",
+     "contests": 335,
+     "source": "cne_stats"
+    }
+   ]
+  },
+  {
+   "key": "alcalde_metropolitano",
+   "tier": "distrito_metropolitano",
+   "name": "Elección del Alcalde Metropolitano de Caracas y del Alcalde del Distrito del Alto Apure",
+   "name_en": "Metropolitan mayor elections (Caracas and Alto Apure)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.distrito_metropolitano"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By municipality, parish, center, and table on the CNE's site.",
+   "note": "The Alcalde Metropolitano de Caracas (2000-2017) and the mayor of the Distrito del Alto Apure (2001-2017), each elected for four years; both posts were abolished by the Constituent Assembly on 20 December 2017.",
+   "source": "ley_dmc",
+   "valid_from": "2000-03-08",
+   "valid_to": "2017-12-20",
+   "first_held": "2000-07-30",
+   "earliest_record": "2000-07-30",
+   "est_votes": 6000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "(Metropolitan|Alto Apure)",
+     "valid_from": "2000-03-08",
+     "valid_to": "2017-12-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-07-30",
+     "election_kind": "local",
+     "note": "Caracas only."
+    },
+    {
+     "date": "2004-10-31",
+     "election_kind": "local"
+    },
+    {
+     "date": "2008-11-23",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-12-08",
+     "election_kind": "local"
+    }
+   ]
+  },
+  {
+   "key": "cabildo_metropolitano",
+   "tier": "distrito_metropolitano",
+   "name": "Elección del Cabildo Metropolitano de Caracas y del Concejo del Distrito del Alto Apure",
+   "name_en": "Metropolitan council elections (Caracas and Alto Apure)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.distrito_metropolitano"
+    ],
+    "fine": [
+     "ve.municipio",
+     "ve.parroquia",
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "note": "The Cabildo Metropolitano de Caracas and the Alto Apure district council, elected with the concejos municipales; abolished on 20 December 2017.",
+   "source": "ley_dmc",
+   "valid_from": "2000-03-08",
+   "valid_to": "2017-12-20",
+   "first_held": "2000-07-30",
+   "est_votes": 5000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(Cabildo|Metropolitan|Alto Apure)",
+     "valid_from": "2000-03-08",
+     "valid_to": "2017-12-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-07-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "through": "2013-12-31",
+     "note": "Elections of 30 July 2000, 7 August 2005, and 8 December 2013."
+    }
+   ]
+  },
+  {
+   "key": "junta_parroquial",
+   "tier": "parroquia",
+   "name": "Elección de miembros de las juntas parroquiales",
+   "name_en": "Parish board elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ve.parroquia"
+    ],
+    "fine": [
+     "ve.centro",
+     "ve.mesa"
+    ]
+   },
+   "finest_note": "By parish, center, and table on the CNE's site for 2000 and 2005.",
+   "note": "Parish boards of three to five members (Ley Orgánica de Régimen Municipal art. 73), elected with the concejos municipales; the 2010 reform of the municipal law replaced them with juntas parroquiales comunales named by communal-council spokespersons, ending the terms of the members elected in 2005.",
+   "source": "lorm1989",
+   "valid_from": "1989-06-15",
+   "valid_to": "2010-12-28",
+   "first_held": "1992-12-06",
+   "earliest_record": "2000-12-03",
+   "est_votes": 20000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "valid_to": "2010-12-28"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales (www.cne.gob.ve)",
+     "url": "http://www.cne.gob.ve/web/estadisticas/index_resultados_elecciones.php",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "finest": "ve.mesa",
+     "source": "cne_stats",
+     "evidence": "The CNE's result divulgations by state, municipality, parish, voting center, and table; www.cne.gob.ve did not answer on 2026-11-17 (HTTPS CONNECT refused by the gateway, HTTP name not resolved), so results must come from snapshots of the CNE's own pages.",
+     "first_date": "2000-12-03"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-01-01",
+     "precision": "year",
+     "through": "1995-12-31",
+     "note": "Parish boards voted with the municipal elections of 6 December 1992 and 3 December 1995."
+    },
+    {
+     "date": "2000-12-03",
+     "election_kind": "local"
+    },
+    {
+     "date": "2005-08-07",
+     "election_kind": "local"
+    }
+   ]
+  },
+  {
+   "key": "referendo_local",
+   "tier": "municipio",
+   "name": "Referendos consultivos y abrogatorios estadales y municipales",
+   "name_en": "State and municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Consultative referendums on matters of special state or municipal importance may be called by the consejo legislativo, the concejo municipal, the governor, the mayor, or 10% of the electorate (art. 71); few have been held.",
+   "source": "crbv",
+   "locator": "http://www.tsj.gob.ve/constitucion (art. 71)",
+   "valid_from": "1999-12-30",
+   "disposition": "blocked",
+   "disposition_reason": "No official list of state or municipal referendums exists outside the CNE's site, which did not answer on 2026-11-17.",
+   "est_votes": 300000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "VE-*"
+    },
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ]
+  }
+ ]
+}
