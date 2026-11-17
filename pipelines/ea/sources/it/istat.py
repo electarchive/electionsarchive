@@ -307,7 +307,7 @@ def emit() -> Path:
         extinct: dict[str, UUID] = {}
         for key, area in conn.execute(
             """select e.value, a.id from area a join external_id e on e.entity_id = a.id
-               where a.scheme_code = 'it.comune' and e.scheme = 'it.eligendo.comune'"""
+               where a.scheme_code = 'it.comune' and e.scheme = 'it.eligendo_comune'"""
         ).fetchall():
             region, name = key.split(":")
             code = by_name.get((region, name.lower()))

@@ -228,9 +228,9 @@ def geo() -> Package:
         p.artifact(raw.cached(SOURCE, url(day)), source)
     regions, provinces, towns = _places()
     for code, rank, noun in (
-        ("it.eligendo.regione", 1, "region"),
-        ("it.eligendo.provincia", 2, "province"),
-        ("it.eligendo.comune", 3, "municipality"),
+        ("it.eligendo_regione", 1, "region"),
+        ("it.eligendo_provincia", 2, "province"),
+        ("it.eligendo_comune", 3, "municipality"),
     ):
         p.add("scheme", code=code, polity_id=ITALY, kind="administrative", rank=rank, noun=noun)
     p.external.add(ITALY)
@@ -244,20 +244,20 @@ def geo() -> Package:
         p.name(id, _title(text), "it", "official")
 
     for region_key, text in sorted(regions.items()):
-        place("it.eligendo.regione", region_key, text, None)
+        place("it.eligendo_regione", region_key, text, None)
     for (region_key, province_key), text in sorted(provinces.items()):
         place(
-            "it.eligendo.provincia",
+            "it.eligendo_provincia",
             f"{region_key}|{province_key}",
             text,
-            area("it.eligendo.regione", region_key),
+            area("it.eligendo_regione", region_key),
         )
     for (region_key, province_key, comune_key), text in sorted(towns.items()):
         place(
-            "it.eligendo.comune",
+            "it.eligendo_comune",
             f"{region_key}|{province_key}|{comune_key}",
             text,
-            area("it.eligendo.provincia", f"{region_key}|{province_key}"),
+            area("it.eligendo_provincia", f"{region_key}|{province_key}"),
         )
     return p
 
@@ -392,19 +392,19 @@ def election(day: date) -> Package:
             code = f"{day}:{SPECIAL}:{province_key}:{comune_key}:{row['circ_key']}"
             found = by_name.get((where[0], comune_key), []) if where else []
             if len(found) == 1 and where is not None:
-                relation, place = "within", area("it.eligendo.comune", f"{where[0]}|{found[0]}|{comune_key}")
+                relation, place = "within", area("it.eligendo_comune", f"{where[0]}|{found[0]}|{comune_key}")
             else:
                 relation, place = "unlocated", None
         else:
             code = f"{day}:{region_key}:{province_key}:{comune_key}"
-            relation, place = "equals", area("it.eligendo.comune", f"{region_key}|{province_key}|{comune_key}")
+            relation, place = "equals", area("it.eligendo_comune", f"{region_key}|{province_key}|{comune_key}")
         unit = key("unit", code)
         ids.append(unit)
         unit_rows.append(
             {
                 "id": unit,
                 "polity_id": ITALY,
-                "scheme_code": "it.eligendo.comune",
+                "scheme_code": "it.eligendo_comune",
                 "code": code,
                 "area_relation": relation,
                 "area_id": place,
