@@ -69,7 +69,7 @@ ELECTIONS = (
     Election(date(2013, 7, 13), "na", "general", ("2013 National Assembly general election", "na")),
     Election(date(2018, 9, 15), "na", "primary", ("2018 National Assembly primary round", "na-primary")),
     Election(date(2018, 10, 18), "na", "general", ("2018 National Assembly general election", "na")),
-    Election(date(2023, 4, 23), "nc", "general", ("2023 National Council election", "nc")),
+    Election(date(2023, 4, 20), "nc", "general", ("2023 National Council election", "nc")),
     Election(date(2023, 11, 30), "na", "primary", ("2023 National Assembly primary round", "na-primary")),
 )
 
