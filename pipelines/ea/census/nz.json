@@ -1,0 +1,2120 @@
+{
+ "polity": "NZ",
+ "name": "New Zealand",
+ "sources": {
+  "constitution_act": {
+   "title": "Constitution Act 1986",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/1986/0114/latest/whole.html",
+   "kind": "official_body"
+  },
+  "electoral_act": {
+   "title": "Electoral Act 1993",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html",
+   "kind": "official_body"
+  },
+  "cir_act": {
+   "title": "Citizens Initiated Referenda Act 1993",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/1993/0101/latest/whole.html",
+   "kind": "official_body"
+  },
+  "referenda_postal_act": {
+   "title": "Referenda (Postal Voting) Act 2000",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2000/0007/latest/whole.html",
+   "kind": "official_body"
+  },
+  "local_electoral_act": {
+   "title": "Local Electoral Act 2001",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html",
+   "kind": "official_body"
+  },
+  "lga2002": {
+   "title": "Local Government Act 2002",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2002/0084/latest/whole.html",
+   "kind": "official_body"
+  },
+  "lga_auckland": {
+   "title": "Local Government (Auckland Council) Act 2009",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2009/0032/latest/whole.html",
+   "kind": "official_body"
+  },
+  "nzphd_act": {
+   "title": "New Zealand Public Health and Disability Act 2000",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2000/0091/latest/whole.html",
+   "kind": "official_body"
+  },
+  "pae_ora_act": {
+   "title": "Pae Ora (Healthy Futures) Act 2022",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2022/0030/latest/whole.html",
+   "kind": "official_body"
+  },
+  "ssaa": {
+   "title": "Sale and Supply of Alcohol Act 2012",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2012/0120/latest/whole.html",
+   "kind": "official_body"
+  },
+  "education_act": {
+   "title": "Education and Training Act 2020",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2020/0038/latest/whole.html",
+   "kind": "official_body"
+  },
+  "senior_courts_act": {
+   "title": "Senior Courts Act 2016",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/2016/0048/latest/whole.html",
+   "kind": "official_body"
+  },
+  "letters_patent": {
+   "title": "Letters Patent Constituting the Office of Governor-General of New Zealand 1983",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/regulation/public/1983/0225/latest/whole.html",
+   "kind": "official_body"
+  },
+  "lc_abolition": {
+   "title": "Legislative Council Abolition Act 1950",
+   "publisher": "Parliamentary Counsel Office (New Zealand Legislation)",
+   "url": "https://www.legislation.govt.nz/act/public/1950/0002/latest/whole.html",
+   "kind": "official_body"
+  },
+  "ec_history": {
+   "title": "Historical events: general elections, by-elections, and referendums",
+   "publisher": "Electoral Commission (Te Kaitiaki Take Kōwhiri)",
+   "url": "https://elections.nz/democracy-in-nz/historical-events/",
+   "kind": "official_body"
+  },
+  "ec_results": {
+   "title": "Official election results since 2002",
+   "publisher": "Electoral Commission (Te Kaitiaki Take Kōwhiri)",
+   "url": "https://electionresults.govt.nz/",
+   "kind": "official_body"
+  },
+  "ajhr": {
+   "title": "Appendix to the Journals of the House of Representatives (returns of general elections, by-elections, and licensing polls)",
+   "publisher": "National Library of New Zealand, Papers Past",
+   "url": "https://paperspast.natlib.govt.nz/parliamentary",
+   "kind": "official_body"
+  },
+  "mcert_stats": {
+   "title": "Local Authority Election Statistics",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "mcert_role": {
+   "title": "Our role in local elections",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/our-role-in-local-elections/",
+   "kind": "official_body"
+  },
+  "mcert_2025": {
+   "title": "2025 Local Authority Election Data (CSV)",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2025/2025-Local-Authority-Election-Data.csv",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "mcert_2022": {
+   "title": "2022 Local Authority Election Data, updated September 2025 (CSV)",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2022/2022-Local-Authority-Election-Data-Updated-in-September-2025.csv",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "mcert_2019": {
+   "title": "2019 local elections statistics (CSV)",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "mcert_2013": {
+   "title": "2013 Local Authority Election Data (CSV)",
+   "publisher": "Ministry for Cities, Environment, Regions and Transport (formerly Department of Internal Affairs)",
+   "url": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2013/2013-Local-Authority-Election-Data.csv",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "New Zealand",
+   "name_en": "New Zealand",
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution_act",
+   "parent": null
+  },
+  {
+   "key": "province",
+   "name": "Provinces",
+   "name_en": "Provinces (1853-1876)",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1853-01-17",
+   "valid_to": "1876-11-01",
+   "source": "constitution_act"
+  },
+  {
+   "key": "region",
+   "name": "Regions (regional councils)",
+   "name_en": "Regions",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1989-11-01",
+   "source": "lga2002",
+   "counts": [
+    {
+     "date": "2025-10-11",
+     "value": 11,
+     "source": "mcert_2025",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2025/2025-Local-Authority-Election-Data.csv (Regional Councils Summary: 11 rows, Bay of Plenty to West Coast; the five unitary authorities, Auckland, Gisborne, Marlborough, Nelson, and Tasman, hold the regional functions of the other five regions)"
+    },
+    {
+     "date": "2019-10-12",
+     "value": 11,
+     "source": "mcert_2019",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv (REGIONAL COUNCILS - SUMMARY: 11 rows)"
+    }
+   ]
+  },
+  {
+   "key": "territorial",
+   "name": "Territorial authorities (city and district councils)",
+   "name_en": "Territorial authorities",
+   "parent": "region",
+   "polity_kind": "municipality",
+   "valid_from": "1989-11-01",
+   "source": "lga2002",
+   "counts": [
+    {
+     "date": "2022-10-08",
+     "value": 67,
+     "source": "mcert_2022",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2022/2022-Local-Authority-Election-Data-Updated-in-September-2025.csv (Mayor section TOTAL row: Positions (N) 67, one mayor for each city and district council, Auckland Council, and the Chatham Islands Council)"
+    },
+    {
+     "date": "2019-10-12",
+     "value": 67,
+     "source": "mcert_2019",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv (MAYOR section TOTAL row: Positions (N) 67)"
+    }
+   ]
+  },
+  {
+   "key": "local_board",
+   "name": "Auckland local boards",
+   "name_en": "Auckland local boards",
+   "parent": "territorial",
+   "polity_kind": "submunicipal",
+   "valid_from": "2010-11-01",
+   "source": "lga_auckland",
+   "counts": [
+    {
+     "date": "2025-10-11",
+     "value": 21,
+     "source": "mcert_2025",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2025/2025-Local-Authority-Election-Data.csv (Local Boards section: 21 distinct local boards of Auckland Council, Albert-Eden to Whau)"
+    }
+   ]
+  },
+  {
+   "key": "community_board",
+   "name": "Community boards",
+   "name_en": "Community boards",
+   "parent": "territorial",
+   "polity_kind": "submunicipal",
+   "valid_from": "1989-11-01",
+   "source": "local_electoral_act",
+   "counts": [
+    {
+     "date": "2025-10-11",
+     "value": 111,
+     "source": "mcert_2025",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2025/2025-Local-Authority-Election-Data.csv (Community Boards section: 111 distinct boards in 39 city and district councils)"
+    },
+    {
+     "date": "2022-10-08",
+     "value": 111,
+     "source": "mcert_2022",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2022/2022-Local-Authority-Election-Data-Updated-in-September-2025.csv (Community Boards section: 111 distinct boards in 39 councils)"
+    },
+    {
+     "date": "2019-10-12",
+     "value": 109,
+     "source": "mcert_2019",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv (COMMUNITY BOARDS section: 109 distinct boards in 40 councils)"
+    }
+   ]
+  },
+  {
+   "key": "health_district",
+   "name": "District health boards",
+   "name_en": "District health boards (2001-2022)",
+   "parent": "national",
+   "polity_kind": "special_district",
+   "valid_from": "2001-01-01",
+   "valid_to": "2022-07-01",
+   "source": "nzphd_act",
+   "counts": [
+    {
+     "date": "2019-10-12",
+     "value": 20,
+     "source": "mcert_2019",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv (DISTRICT HEALTH BOARDS section: 20 boards, Auckland to Whanganui)"
+    },
+    {
+     "date": "2013-10-12",
+     "value": 20,
+     "source": "mcert_2013",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2013/2013-Local-Authority-Election-Data.csv (rows of Type DHB: 20 boards)"
+    }
+   ]
+  },
+  {
+   "key": "licensing_trust",
+   "name": "Licensing trust districts",
+   "name_en": "Licensing trust districts",
+   "parent": "national",
+   "polity_kind": "special_district",
+   "source": "ssaa",
+   "counts": [
+    {
+     "date": "2019-10-12",
+     "value": 16,
+     "source": "mcert_2019",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2019/2019-local-elections-statistics.csv (OTHER section: 16 licensing trusts, Ashburton to Wiri, beside 6 other elected trusts)"
+    },
+    {
+     "date": "2013-10-12",
+     "value": 18,
+     "source": "mcert_2013",
+     "locator": "https://www.mcert.govt.nz/assets/Uploads/Local-government-documents/Local-elections-and-voting/Local-election-statistics/2013/2013-Local-Authority-Election-Data.csv (rows of Type LT: 18 trusts, Ashburton to Wiri, counting Porirua Community Trust)"
+    }
+   ]
+  },
+  {
+   "key": "local_pre1989",
+   "name": "Counties, boroughs, cities, and town districts",
+   "name_en": "Local authorities before the 1989 reform",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "valid_to": "1989-11-01",
+   "source": "mcert_stats",
+   "locator": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/local-authority-election-statistics-2025/ (the 2025 local election was the thirteenth since the restructuring of local government in 1989)"
+  },
+  {
+   "key": "ad_hoc_district",
+   "name": "Ad hoc board districts (hospital, harbour, power, catchment, and other boards)",
+   "name_en": "Ad hoc board districts",
+   "parent": "national",
+   "polity_kind": "special_district",
+   "valid_to": "1989-11-01",
+   "source": "mcert_stats"
+  }
+ ],
+ "classes": [
+  {
+   "key": "house",
+   "tier": "national",
+   "name": "General elections to the House of Representatives",
+   "name_en": "General elections to the House of Representatives",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "nz.electorate"
+    ],
+    "fine": [
+     "nz.voting_place"
+    ]
+   },
+   "source": "electoral_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html (Parts 1, 6, and 7; s 191 and Schedule 2: allocation of list seats by the Sainte-Laguë formula)",
+   "first_held": "1853-07-14",
+   "earliest_record": "1853-07-14",
+   "note": "First past the post in single- and multi-member electorates from 1853 to 1993 (second ballots in 1908 and 1911; four Māori electorates from 1868); mixed-member proportional representation since 1996, with a party vote for 120 seats less overhang, a 5 percent or one-electorate threshold, and electorate seats by first past the post in general and Māori electorates. Unicameral since the Legislative Council was abolished on 1 January 1951. Terms run three years from the return of the writs (Constitution Act 1986 s 17) and an election may be called early. The archive holds 2002-2023 from the Electoral Commission's results (2017-2023 by voting place, 2002-2014 party votes by electorate). Contest counts per election are not yet taken from an official table, because the Electoral Commission's sites refused scripted requests.",
+   "est_votes": 95000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "NZ"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "term_years": 3,
+     "called": true,
+     "administered_by": "Electoral Commission (Te Kaitiaki Take Kōwhiri)",
+     "source": "constitution_act",
+     "locator": "https://www.legislation.govt.nz/act/public/1986/0114/latest/whole.html (s 17: the term of Parliament is three years from the day fixed for the return of the writs)",
+     "vacancy_rule": "By-election for an electorate seat (Electoral Act 1993 s 129); the next candidate on the party list for a list seat (s 137)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission election results",
+     "url": "https://electionresults.govt.nz/electionresults_{year}/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2002-07-27",
+     "last_date": "2023-10-14",
+     "finest": "nz.voting_place",
+     "source": "ec_results",
+     "evidence": "Per-election CSV statistics (overall summary, electorate, and voting-place party and candidate votes) for 2002-2023; the archive's nz.ec packages were built from these files. The host answered HTTP 403 to a cloud session on 2026-11-17."
+    },
+    {
+     "platform": "Electoral Commission historical events",
+     "url": "https://elections.nz/democracy-in-nz/historical-events/",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "source": "ec_history",
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    },
+    {
+     "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
+     "url": "https://paperspast.natlib.govt.nz/parliamentary",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "last_date": "1999-11-27",
+     "source": "ajhr",
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1853-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "First general election, polled electorate by electorate between July and October 1853. 1855, 1860-61, 1866, 1871, 1875-76, and 1879 also polled over several weeks; the Electoral Commission's history lists each election's polling dates."
+    },
+    {
+     "date": "1855-01-01",
+     "precision": "year",
+     "election_kind": "general"
+    },
+    {
+     "date": "1860-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "Polled from December 1860 to March 1861."
+    },
+    {
+     "date": "1866-01-01",
+     "precision": "year",
+     "election_kind": "general"
+    },
+    {
+     "date": "1871-01-01",
+     "precision": "year",
+     "election_kind": "general"
+    },
+    {
+     "date": "1875-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "Polled from December 1875 to January 1876."
+    },
+    {
+     "date": "1879-01-01",
+     "precision": "year",
+     "election_kind": "general"
+    },
+    {
+     "date": "1881-12-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "1884-07-22",
+     "election_kind": "general"
+    },
+    {
+     "date": "1887-09-26",
+     "election_kind": "general"
+    },
+    {
+     "date": "1890-12-05",
+     "election_kind": "general"
+    },
+    {
+     "date": "1893-11-28",
+     "election_kind": "general",
+     "note": "The first general election at which women voted."
+    },
+    {
+     "date": "1896-12-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1899-12-06",
+     "election_kind": "general"
+    },
+    {
+     "date": "1902-11-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1905-12-06",
+     "election_kind": "general"
+    },
+    {
+     "date": "1908-11-17",
+     "election_kind": "general",
+     "note": "Second ballots on 24 November and 1 December where no candidate won a majority (Second Ballot Act 1908)."
+    },
+    {
+     "date": "1911-12-07",
+     "election_kind": "general",
+     "note": "Second ballots on 14 December; the second ballot was repealed in 1913."
+    },
+    {
+     "date": "1914-12-10",
+     "election_kind": "general"
+    },
+    {
+     "date": "1919-12-17",
+     "election_kind": "general"
+    },
+    {
+     "date": "1922-12-07",
+     "election_kind": "general"
+    },
+    {
+     "date": "1925-11-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1928-11-14",
+     "election_kind": "general"
+    },
+    {
+     "date": "1931-12-02",
+     "election_kind": "general"
+    },
+    {
+     "date": "1935-11-27",
+     "election_kind": "general"
+    },
+    {
+     "date": "1938-10-15",
+     "election_kind": "general"
+    },
+    {
+     "date": "1943-09-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1946-11-27",
+     "election_kind": "general"
+    },
+    {
+     "date": "1949-11-30",
+     "election_kind": "general"
+    },
+    {
+     "date": "1951-09-01",
+     "election_kind": "general",
+     "note": "Snap election after the waterfront dispute; the first general election after the Legislative Council was abolished."
+    },
+    {
+     "date": "1954-11-13",
+     "election_kind": "general"
+    },
+    {
+     "date": "1957-11-30",
+     "election_kind": "general"
+    },
+    {
+     "date": "1960-11-26",
+     "election_kind": "general"
+    },
+    {
+     "date": "1963-11-30",
+     "election_kind": "general"
+    },
+    {
+     "date": "1966-11-26",
+     "election_kind": "general"
+    },
+    {
+     "date": "1969-11-29",
+     "election_kind": "general"
+    },
+    {
+     "date": "1972-11-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1975-11-29",
+     "election_kind": "general"
+    },
+    {
+     "date": "1978-11-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1981-11-28",
+     "election_kind": "general"
+    },
+    {
+     "date": "1984-07-14",
+     "election_kind": "general",
+     "note": "Snap election."
+    },
+    {
+     "date": "1987-08-15",
+     "election_kind": "general"
+    },
+    {
+     "date": "1990-10-27",
+     "election_kind": "general"
+    },
+    {
+     "date": "1993-11-06",
+     "election_kind": "general"
+    },
+    {
+     "date": "1996-10-12",
+     "election_kind": "general",
+     "note": "The first general election under mixed-member proportional representation (MMP)."
+    },
+    {
+     "date": "1999-11-27",
+     "election_kind": "general"
+    },
+    {
+     "date": "2002-07-27",
+     "election_kind": "general"
+    },
+    {
+     "date": "2005-09-17",
+     "election_kind": "general"
+    },
+    {
+     "date": "2008-11-08",
+     "election_kind": "general"
+    },
+    {
+     "date": "2011-11-26",
+     "election_kind": "general"
+    },
+    {
+     "date": "2014-09-20",
+     "election_kind": "general"
+    },
+    {
+     "date": "2017-09-23",
+     "election_kind": "general"
+    },
+    {
+     "date": "2020-10-17",
+     "election_kind": "general"
+    },
+    {
+     "date": "2023-10-14",
+     "election_kind": "general",
+     "note": "Port Waikato's poll was cancelled after a candidate died; its seat was filled at a by-election on 25 November 2023 (house_by)."
+    },
+    {
+     "date": "2026-11-07",
+     "election_kind": "general",
+     "note": "Polling day of the 2026 general election; the official result had not been declared when this census was taken."
+    }
+   ]
+  },
+  {
+   "key": "house_by",
+   "tier": "national",
+   "name": "By-elections to the House of Representatives",
+   "name_en": "By-elections to the House of Representatives",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "nz.electorate"
+    ],
+    "fine": [
+     "nz.voting_place"
+    ]
+   },
+   "source": "electoral_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html (ss 129-131: a vacancy in an electorate seat is filled by a by-election unless the House resolves otherwise within six months of a general election)",
+   "note": "First past the post in the vacant electorate. Since 1996 only electorate vacancies go to a by-election; list vacancies are filled from the party list. The Electoral Commission publishes results with voting-place detail for recent by-elections.",
+   "est_votes": 3000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "NZ"
+    }
+   ],
+   "cadence": [
+    {
+     "called": true,
+     "administered_by": "Electoral Commission (Te Kaitiaki Take Kōwhiri)",
+     "source": "electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html (s 129)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission election results",
+     "url": "https://electionresults.govt.nz/electionresults_{year}/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2004-07-10",
+     "last_date": "2025-09-06",
+     "finest": "nz.voting_place",
+     "source": "ec_results",
+     "evidence": "By-election results pages and CSVs sit beside the general elections on the same host, which answered HTTP 403 to a cloud session on 2026-11-17."
+    },
+    {
+     "platform": "Electoral Commission historical events",
+     "url": "https://elections.nz/democracy-in-nz/historical-events/",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "source": "ec_history",
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    },
+    {
+     "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
+     "url": "https://paperspast.natlib.govt.nz/parliamentary",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "last_date": "1999-11-27",
+     "source": "ajhr",
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1854-01-01",
+     "precision": "year",
+     "through": "1997-12-31",
+     "election_kind": "by_election",
+     "note": "By-elections from the first Parliament to the first MMP Parliament; listed in the Electoral Commission's history and returned in the Appendix to the Journals, not yet counted here."
+    },
+    {
+     "date": "1998-04-11",
+     "election_kind": "by_election",
+     "note": "Taranaki-King Country."
+    },
+    {
+     "date": "2004-07-10",
+     "election_kind": "by_election",
+     "note": "Te Tai Hauāuru."
+    },
+    {
+     "date": "2009-06-13",
+     "election_kind": "by_election",
+     "note": "Mount Albert."
+    },
+    {
+     "date": "2010-11-20",
+     "election_kind": "by_election",
+     "note": "Mana."
+    },
+    {
+     "date": "2011-03-05",
+     "election_kind": "by_election",
+     "note": "Botany."
+    },
+    {
+     "date": "2011-06-25",
+     "election_kind": "by_election",
+     "note": "Te Tai Tokerau."
+    },
+    {
+     "date": "2013-06-29",
+     "election_kind": "by_election",
+     "note": "Ikaroa-Rāwhiti."
+    },
+    {
+     "date": "2013-11-30",
+     "election_kind": "by_election",
+     "note": "Christchurch East."
+    },
+    {
+     "date": "2015-03-28",
+     "election_kind": "by_election",
+     "note": "Northland."
+    },
+    {
+     "date": "2016-12-03",
+     "election_kind": "by_election",
+     "note": "Mount Roskill."
+    },
+    {
+     "date": "2017-02-25",
+     "election_kind": "by_election",
+     "note": "Mount Albert."
+    },
+    {
+     "date": "2022-06-18",
+     "election_kind": "by_election",
+     "note": "Tauranga."
+    },
+    {
+     "date": "2022-12-10",
+     "election_kind": "by_election",
+     "note": "Hamilton West."
+    },
+    {
+     "date": "2023-11-25",
+     "election_kind": "by_election",
+     "note": "Port Waikato, in place of the poll cancelled at the 2023 general election."
+    },
+    {
+     "date": "2025-09-06",
+     "election_kind": "by_election",
+     "note": "Tāmaki Makaurau."
+    }
+   ]
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "National referendums",
+   "name_en": "National referendums (government and citizens initiated)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "nz.electorate"
+    ]
+   },
+   "source": "cir_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1993/0101/latest/whole.html (indicative citizens-initiated referendums on a petition of 10 percent of electors); government referendums are set by their own Acts",
+   "first_held": "1949-03-09",
+   "note": "Referendums the Government puts by statute (binding or indicative) and indicative citizens-initiated referendums since 1995. Postal referendums run under the Referenda (Postal Voting) Act 2000. Licensing polls on liquor, held with general elections until 1987, are their own class. The archive holds the 2011 voting-system referendum by voting place.",
+   "est_votes": 45000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NZ"
+    }
+   ],
+   "cadence": [
+    {
+     "called": true,
+     "administered_by": "Electoral Commission (Te Kaitiaki Take Kōwhiri)",
+     "source": "referenda_postal_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2000/0007/latest/whole.html"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission election results",
+     "url": "https://electionresults.govt.nz/electionresults_{year}/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2011-11-26",
+     "last_date": "2020-10-17",
+     "finest": "nz.voting_place",
+     "source": "ec_results",
+     "evidence": "Referendum results for 2011, the 2015-16 flag referendums, and 2020 by electorate and voting place; the host answered HTTP 403 to a cloud session on 2026-11-17."
+    },
+    {
+     "platform": "Electoral Commission historical events",
+     "url": "https://elections.nz/democracy-in-nz/historical-events/",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "source": "ec_history",
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    },
+    {
+     "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
+     "url": "https://paperspast.natlib.govt.nz/parliamentary",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "last_date": "1999-11-27",
+     "source": "ajhr",
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1949-03-09",
+     "election_kind": "referendum",
+     "note": "Two questions: hotel closing hours and off-course betting."
+    },
+    {
+     "date": "1949-08-03",
+     "election_kind": "referendum",
+     "note": "Compulsory military training."
+    },
+    {
+     "date": "1967-09-23",
+     "election_kind": "referendum",
+     "note": "Term of Parliament (four years rejected)."
+    },
+    {
+     "date": "1990-10-27",
+     "election_kind": "referendum",
+     "note": "Term of Parliament, held with the general election."
+    },
+    {
+     "date": "1992-09-19",
+     "election_kind": "referendum",
+     "note": "Indicative referendum on the electoral system, in two parts."
+    },
+    {
+     "date": "1993-11-06",
+     "election_kind": "referendum",
+     "note": "Binding referendum adopting MMP, held with the general election."
+    },
+    {
+     "date": "1995-12-02",
+     "election_kind": "referendum",
+     "note": "Citizens-initiated referendum on the number of professional firefighters (postal)."
+    },
+    {
+     "date": "1997-09-26",
+     "election_kind": "referendum",
+     "note": "Compulsory retirement savings scheme (postal; voting closed 26 September)."
+    },
+    {
+     "date": "1999-11-27",
+     "election_kind": "referendum",
+     "note": "Two citizens-initiated referendums (reducing the House to 99 members; justice reform), held with the general election."
+    },
+    {
+     "date": "2009-08-21",
+     "election_kind": "referendum",
+     "note": "Citizens-initiated referendum on parental correction (postal; voting closed 21 August)."
+    },
+    {
+     "date": "2011-11-26",
+     "election_kind": "referendum",
+     "note": "Referendum on the voting system, in two parts, held with the general election."
+    },
+    {
+     "date": "2013-12-13",
+     "election_kind": "referendum",
+     "note": "Citizens-initiated referendum on the sale of state assets (postal; voting closed 13 December)."
+    },
+    {
+     "date": "2015-12-11",
+     "election_kind": "referendum",
+     "note": "First flag referendum, a preferential choice among five designs (postal; voting closed 11 December)."
+    },
+    {
+     "date": "2016-03-24",
+     "election_kind": "referendum",
+     "note": "Second flag referendum (postal; voting closed 24 March)."
+    },
+    {
+     "date": "2020-10-17",
+     "election_kind": "referendum",
+     "note": "End of Life Choice Act 2019 (binding) and cannabis legalisation (indicative), held with the general election."
+    }
+   ]
+  },
+  {
+   "key": "licensing_polls",
+   "tier": "national",
+   "name": "Licensing polls",
+   "name_en": "Liquor licensing polls (local option and national)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "nz.electorate"
+    ]
+   },
+   "source": "ajhr",
+   "valid_to": "1989-12-01",
+   "first_held": "1894-01-01",
+   "note": "Local option polls in each licensing district from 1894 (continuance, reduction, or no-licence) and national polls on continuance, state purchase and control, or prohibition with every general election from 1911 to 1987, plus a special poll on 10 April 1919. Returned in the Appendix to the Journals. Ended by the Sale of Liquor Act 1989. No selector: a loaded licensing poll would fall to the referendums class until a pipeline gives it its own election kind.",
+   "est_votes": 25000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
+     "url": "https://paperspast.natlib.govt.nz/parliamentary",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1853-01-01",
+     "last_date": "1999-11-27",
+     "source": "ajhr",
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1894-01-01",
+     "precision": "year",
+     "through": "1987-12-31",
+     "election_kind": "referendum",
+     "note": "Polls held with each general election from 1894 to 1987, and a special national poll on 10 April 1919; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "head_of_state",
+   "tier": "national",
+   "name": "Sovereign, Governor-General, and Prime Minister",
+   "name_en": "Head of state and government",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "source": "letters_patent",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Sovereign is hereditary; the Governor-General is appointed by the Sovereign on the Prime Minister's advice (Letters Patent 1983, clause II), and the Prime Minister and ministers are appointed from the House. No executive is elected by voters."
+  },
+  {
+   "key": "legislative_council",
+   "tier": "national",
+   "name": "Legislative Council",
+   "name_en": "Legislative Council (upper house, 1853-1950)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "lc_abolition",
+   "valid_to": "1951-01-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Members were appointed by the Governor for life and from 1891 for seven years; the elective scheme of the Legislative Council Act 1914 never came into force, and the Council was abolished from 1 January 1951."
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Judges",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "senior_courts_act",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed by the Governor-General on the Attorney-General's advice (Senior Courts Act 2016); none is elected."
+  },
+  {
+   "key": "party_selection",
+   "tier": "national",
+   "name": "Party candidate selection",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "electoral_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html (s 71: registered parties must follow democratic procedures in selecting candidates)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties select electorate candidates and rank their lists under their own rules; the state runs no primary and publishes no nominating vote."
+  },
+  {
+   "key": "provincial_councils",
+   "tier": "province",
+   "name": "Provincial councils",
+   "name_en": "Provincial council elections (1853-1876)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1986/0114/latest/whole.html (s 26 and Schedule 1: repeal of the New Zealand Constitution Act 1852, which set up the elected provincial councils)",
+   "valid_from": "1853-01-17",
+   "valid_to": "1876-11-01",
+   "disposition": "blocked",
+   "disposition_reason": "Returns survive only in the provincial government gazettes and newspapers of the day; no official body publishes them as a register or data, and Papers Past refused scripted requests.",
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_to": "1877-01-01"
+    }
+   ]
+  },
+  {
+   "key": "superintendents",
+   "tier": "province",
+   "name": "Provincial superintendents",
+   "name_en": "Provincial superintendent elections (1853-1876)",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution_act",
+   "locator": "https://www.legislation.govt.nz/act/public/1986/0114/latest/whole.html (Schedule 1: repeal of the New Zealand Constitution Act 1852)",
+   "valid_from": "1853-01-17",
+   "valid_to": "1876-11-01",
+   "disposition": "blocked",
+   "disposition_reason": "Each province's electors chose its superintendent directly; the returns survive only in provincial gazettes and newspapers, with no official register or data.",
+   "match": [
+    {
+     "office_kinds": [
+      "governor",
+      "other"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_to": "1877-01-01"
+    }
+   ]
+  },
+  {
+   "key": "regional_councils",
+   "tier": "region",
+   "name": "Regional council elections",
+   "name_en": "Regional council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Councillors are elected by constituency, including Māori constituencies; candidate votes are declared per constituency by each council.",
+   "source": "local_electoral_act",
+   "valid_from": "1989-10-14",
+   "first_held": "1989-10-14",
+   "note": "Eleven regional councils (Auckland Regional Council too until 2010), elected triennially by postal vote, by first past the post or single transferable vote as each council resolves (Local Electoral Act 2001 ss 27-33). Canterbury's elected councillors were replaced by commissioners from 2010; seven were elected again in 2019 and a full council in 2022. Māori constituencies since 2004 (Bay of Plenty).",
+   "est_votes": 16000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_from": "1989-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-10-14",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1989-10-14",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1995-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1998-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "2001-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2004-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2007-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local",
+     "contests": 63,
+     "source": "mcert_2019",
+     "quote": "REGIONAL COUNCILS, TOTAL row: 52 contested and 11 uncontested constituencies; Positions (N) 127",
+     "seats": 127
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local",
+     "contests": 69,
+     "source": "mcert_2022",
+     "quote": "Regional Council, TOTAL row: 56 contested and 13 uncontested constituencies; Positions (N) 131",
+     "seats": 131
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local",
+     "contests": 70,
+     "source": "mcert_2025",
+     "quote": "Regional Council, TOTAL row: 57 contested and 13 uncontested constituencies; Positions (N) 132",
+     "seats": 132
+    }
+   ]
+  },
+  {
+   "key": "mayors",
+   "tier": "territorial",
+   "name": "Mayoral elections",
+   "name_en": "Mayors of city and district councils",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Elected at large across the district; declared by each council.",
+   "source": "local_electoral_act",
+   "valid_from": "1989-10-14",
+   "first_held": "1989-10-14",
+   "note": "Every territorial authority elects its mayor at large (the Mayor of Auckland since 2010), by first past the post or STV as the council resolves; 13 mayors were elected by STV in 2025. Mayors of boroughs and cities before 1989 are in local_pre1989.",
+   "est_votes": 17000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "valid_from": "1989-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-10-14",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1989-10-14",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision; mayoral turnout and candidates. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1995-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1998-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "2001-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2004-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2007-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local",
+     "contests": 67,
+     "source": "mcert_2019",
+     "quote": "MAYOR, TOTAL row: Positions (N) 67",
+     "seats": 67
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local",
+     "contests": 67,
+     "source": "mcert_2022",
+     "quote": "Mayor, TOTAL row: Positions (N) 67",
+     "seats": 67
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local",
+     "contests": 66,
+     "source": "mcert_2025",
+     "quote": "Mayor, TOTAL row: Positions (N) 66",
+     "seats": 66,
+     "note": "Tauranga City Council, under Crown commissioners from 2021, elected its mayor and council on 20 July 2024 and did not vote in 2025."
+    }
+   ]
+  },
+  {
+   "key": "territorial_councils",
+   "tier": "territorial",
+   "name": "City and district council elections",
+   "name_en": "City and district councils, Auckland Council governing body, and Chatham Islands Council",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Councillors are elected by ward (including Māori wards) or at large; candidate votes are declared per ward by each council.",
+   "source": "local_electoral_act",
+   "valid_from": "1989-10-14",
+   "first_held": "1989-10-14",
+   "note": "67 territorial authorities (13 city and 53 district councils, and Auckland Council since 2010, with the Chatham Islands Council), elected triennially by postal vote, by first past the post or STV. Tauranga, under commissioners from 2021, elected its council on 20 July 2024. Binding polls on Māori wards were held in 42 councils with the 2025 elections (local_polls).",
+   "est_votes": 17000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "1989-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-10-14",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1989-10-14",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1995-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1998-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "2001-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2004-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2007-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local",
+     "contests": 243,
+     "source": "mcert_2019",
+     "quote": "TERRITORIAL AUTHORITIES, TOTAL row: 207 contested and 36 uncontested wards; Positions (N) 710",
+     "seats": 710
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local",
+     "contests": 263,
+     "source": "mcert_2022",
+     "quote": "TA Wards, TOTAL row: Contested Wards (N) 227, Uncontested Wards (N) 36, Positions (N) 713",
+     "seats": 713
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local",
+     "contests": 274,
+     "source": "mcert_2025",
+     "quote": "TA Wards, TOTAL row: Contested Wards (N) 224, Uncontested Wards (N) 50, Positions (N) 709",
+     "seats": 709
+    }
+   ]
+  },
+  {
+   "key": "local_boards",
+   "tier": "local_board",
+   "name": "Auckland local board elections",
+   "name_en": "Auckland local boards",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Members are elected by local board subdivision; Auckland Council's electoral officer publishes the declared votes for every board.",
+   "source": "lga_auckland",
+   "valid_from": "2010-10-09",
+   "first_held": "2010-10-09",
+   "note": "21 local boards of Auckland Council, elected with the council by first past the post.",
+   "est_votes": 2500000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "Local Board"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "2010-10-09",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Auckland Council electoral officer (declaration of results)",
+     "url": "https://www.aucklandcouncil.govt.nz/elections/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "2010-10-09",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2010-10-09",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local",
+     "contests": 32,
+     "source": "mcert_2022",
+     "quote": "Local Boards, Total row: Contested Local Boards (N) 30, Uncontested Local Boards (N) 2, Positions (N) 149",
+     "seats": 149
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local",
+     "contests": 32,
+     "source": "mcert_2025",
+     "quote": "Local Boards, Total row: Contested Local Boards (N) 32, Uncontested Local Boards (N) 0, Positions (N) 137",
+     "seats": 137
+    }
+   ]
+  },
+  {
+   "key": "community_boards",
+   "tier": "community_board",
+   "name": "Community board elections",
+   "name_en": "Community boards",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Members are elected by board or subdivision; declared by the parent council.",
+   "source": "local_electoral_act",
+   "valid_from": "1989-10-14",
+   "first_held": "1989-10-14",
+   "note": "About 110 community boards in some 40 city and district councils, elected with the council.",
+   "est_votes": 4000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1989-10-14",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1989-10-14",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1995-10-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1998-10-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "2001-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2004-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2007-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local",
+     "contests": 148,
+     "source": "mcert_2019",
+     "quote": "COMMUNITY BOARDS: 148 subdivision rows (102 contested, 46 uncontested) in 109 boards; TOTAL Positions (N) 552",
+     "seats": 552
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local",
+     "contests": 152,
+     "source": "mcert_2022",
+     "quote": "Community Boards, TOTAL row: Contested Subdivisions (N) 102, Uncontested Subdivisions (N) 50, Positions (N) 548",
+     "seats": 548
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local",
+     "contests": 154,
+     "source": "mcert_2025",
+     "quote": "Community Boards, TOTAL row: Contested Subdivisions (N) 108, Uncontested Subdivisions (N) 46, Positions (N) 546",
+     "seats": 546
+    }
+   ]
+  },
+  {
+   "key": "local_polls",
+   "tier": "territorial",
+   "name": "Local polls",
+   "name_en": "Local polls (electoral system, Māori wards, and council polls)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "local_electoral_act",
+   "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (ss 9 and 29-33: binding polls on the electoral system, demanded by 5 percent of electors or called by the council; Part 1A of the Local Government Act 2002 provisions on Māori wards)",
+   "note": "Binding polls on the electoral system (FPP or STV) and on establishing Māori wards and constituencies (42 councils polled with the 2025 elections), and non-binding polls a council calls. Liquor licensing trust and restoration polls under the licensing Acts belong here too.",
+   "est_votes": 3000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "local"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "region",
+      "submunicipal"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "1989-10-14",
+     "source": "local_electoral_act",
+     "evidence": "Each council's electoral officer declares its poll results (Local Electoral Act 2001 s 86); no national compilation."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-01-01",
+     "precision": "year",
+     "through": "2025-12-31",
+     "election_kind": "referendum",
+     "note": "Council polls, mostly held with the triennial elections; not yet listed from councils' declarations."
+    }
+   ]
+  },
+  {
+   "key": "dhb",
+   "tier": "health_district",
+   "name": "District health board elections",
+   "name_en": "District health boards (2001-2019)",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Seven members of each board were elected at large or by constituency; declared by the electoral officer acting for the board.",
+   "source": "nzphd_act",
+   "valid_from": "2001-10-13",
+   "valid_to": "2022-07-01",
+   "first_held": "2001-10-13",
+   "note": "Seven elected members of each of 21 (from 2010, 20) district health boards, by STV, with the local elections from 2001 to 2019. The boards were disestablished on 1 July 2022 (Pae Ora (Healthy Futures) Act 2022).",
+   "est_votes": 8000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "District Health Board"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "valid_from": "2001-10-13",
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "nzphd_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2000/0091/latest/whole.html (Schedule 2: elections of board members with the triennial local elections)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)",
+     "valid_to": "2022-07-01"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "first_date": "2001-10-13",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists.",
+     "last_date": "2019-10-12"
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2019-10-12",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision; district health board turnout and candidates for 2007-2019. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2001-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2004-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2007-10-13",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2016-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local",
+     "contests": 21,
+     "source": "mcert_2019",
+     "quote": "DISTRICT HEALTH BOARDS: 21 rows for 20 boards; TOTAL Positions (N) 133",
+     "seats": 133,
+     "note": "The last DHB elections; the boards were disestablished on 1 July 2022."
+    }
+   ]
+  },
+  {
+   "key": "licensing_trusts",
+   "tier": "licensing_trust",
+   "name": "Licensing trust elections",
+   "name_en": "Licensing trusts and other elected trusts",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "ssaa",
+   "locator": "https://www.legislation.govt.nz/act/public/2012/0120/latest/whole.html (Part 3: licensing trusts and their elections)",
+   "note": "Members of the licensing trusts (16 in 2019, from Invercargill, 1944, onward) and of a few other statutory trusts (Masterton and Greytown Trust Lands, Hutt Mana, West Coast Development, Montfort Trimble) are elected with the local elections, by ward or at large.",
+   "est_votes": 2000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "name_pattern": "Trust"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_saturday",
+     "term_years": 3,
+     "called": false,
+     "administered_by": "Each local authority's electoral officer, under the Local Electoral Act 2001 (postal voting)",
+     "source": "local_electoral_act",
+     "locator": "https://www.legislation.govt.nz/act/public/2001/0035/latest/whole.html (s 10: triennial general elections on the second Saturday in October)",
+     "vacancy_rule": "By-election, unless the vacancy arises within 12 months of the next triennial election (ss 117-118)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Each council's electoral officer (declaration of results)",
+     "url": "https://www.lgnz.co.nz/local-government-in-nz/councils-in-nz/",
+     "format": "pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17",
+     "source": "local_electoral_act",
+     "evidence": "Every council's electoral officer declares the result with each candidate's votes (Local Electoral Act 2001 s 86) and posts it on the council's own site, mostly as PDF; no national compilation of candidate votes exists."
+    },
+    {
+     "platform": "Local Authority Election Statistics",
+     "url": "https://www.mcert.govt.nz/our-work/local-government/local-elections-and-voting/local-authority-election-statistics/",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2007-10-13",
+     "last_date": "2025-10-11",
+     "license": "CC BY 4.0",
+     "source": "mcert_stats",
+     "evidence": "CSV and XLSX for 2013, 2016, 2019, 2022, and 2025 (the 2013 release also carries 2007 and 2010), fetched with HTTP 200 on 2026-11-17: electors, voters, turnout, candidates, and members elected per ward, constituency, and subdivision; licensing trust turnout and candidates. Candidate votes are not in it."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1944-01-01",
+     "precision": "year",
+     "through": "2016-12-31",
+     "election_kind": "local",
+     "note": "Licensing trust elections from the first trust (Invercargill, 1944), triennially with the local elections since 1989; not yet counted."
+    },
+    {
+     "date": "2019-10-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2022-10-08",
+     "election_kind": "local"
+    },
+    {
+     "date": "2025-10-11",
+     "election_kind": "local"
+    }
+   ]
+  },
+  {
+   "key": "local_pre1989",
+   "tier": "local_pre1989",
+   "name": "County, borough, city, and town district elections",
+   "name_en": "Councils and mayors before the 1989 reform",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "mcert_stats",
+   "valid_to": "1989-10-14",
+   "disposition": "blocked",
+   "disposition_reason": "Results were declared by each of some 200 territorial bodies and survive only in their minutes and in newspapers; no official compilation exists, and the national local statistics start in 1989.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "county"
+     ],
+     "valid_to": "1989-01-01"
+    },
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "valid_to": "1989-01-01"
+    }
+   ]
+  },
+  {
+   "key": "hospital_boards",
+   "tier": "ad_hoc_district",
+   "name": "Hospital and area health board elections",
+   "name_en": "Hospital boards and area health boards",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "mcert_stats",
+   "valid_to": "1993-07-01",
+   "disposition": "blocked",
+   "disposition_reason": "Elected hospital boards (and the partly elected area health boards of 1983-1991) declared their own results; they survive only in board records and newspapers, with no official register.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(Hospital|Area Health) Board"
+    }
+   ]
+  },
+  {
+   "key": "ad_hoc_boards",
+   "tier": "ad_hoc_district",
+   "name": "Harbour, power, catchment, and other board elections",
+   "name_en": "Other elected ad hoc boards",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "mcert_stats",
+   "valid_to": "1993-07-01",
+   "disposition": "blocked",
+   "disposition_reason": "Harbour, electric power, catchment, drainage, road, and similar boards declared their own results; no official compilation exists.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(Harbour|Power|Catchment|Drainage|Road|Rabbit|River) Board"
+    }
+   ]
+  },
+  {
+   "key": "school_boards",
+   "tier": "national",
+   "name": "School board elections",
+   "name_en": "School boards (boards of trustees)",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "source": "education_act",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parent representatives on each of some 2,500 state school boards are elected by that school's parents, not by a public electorate, and each school runs and keeps its own election."
+  },
+  {
+   "key": "maori_bodies",
+   "tier": "national",
+   "name": "Iwi, Māori trust board, and Māori land trust elections",
+   "name_en": "Iwi and Māori organisation elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "electoral_act",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Iwi authorities, Māori trust boards, and land trusts elect under their own deeds and rules for their own members; these are not public elections. Māori political representation in Parliament is through the Māori electorates of the house class."
+  }
+ ]
+}
