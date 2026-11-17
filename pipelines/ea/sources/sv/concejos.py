@@ -10,12 +10,13 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
+from functools import cache
 
 import polars as pl
 
 from ea import raw
 from ea.package import Package
-from ea.sources.sv import assembly, tse
+from ea.sources.sv import assembly, presidents, tse
 
 SOURCE = tse.SOURCE
 DOCS = assembly.DOCS
@@ -131,8 +132,40 @@ def key(kind: str, *parts: object) -> str:
     return tse.key(kind, "council", *parts)
 
 
+@cache
+def held() -> dict[str, str]:
+    """The party codes that loaded sv.tse packages already declare, each with the package declaring it.
+
+    Every sv.tse package gives a printed code the same source-wide id, so a council option of a held code takes that
+    id and the council registry leaves the code to the package that holds it.
+    """
+    out = dict.fromkeys(tse.PARTIES, "sv.tse/registry")
+    for code in sorted({code for e in presidents.ELECTIONS.values() for code in e.parties}):
+        out.setdefault(code, presidents.REGISTRY)
+    return out
+
+
 def party(code: str) -> str:
-    return key("party", code)
+    """A party's id: the source-wide id that every sv.tse package uses for the same printed code."""
+    return tse.key("party", code)
+
+
+def holders() -> list[str]:
+    """The earlier packages that declare parties on the council ballots."""
+    found = {held()[code] for code in council_codes() if code in held()}
+    return sorted(found)
+
+
+@cache
+def council_codes() -> tuple[str, ...]:
+    codes: dict[str, None] = {}
+    for election in ELECTIONS.values():
+        for department in tables(election)[0]:
+            for row in department.rows:
+                for code in ballot(row):
+                    if "/" not in code:
+                        codes.setdefault(code)
+    return tuple(codes)
 
 
 def count(token: str) -> int:
@@ -370,7 +403,7 @@ def registry() -> Package:
         REGISTRY,
         SOURCE,
         "The municipal councils of El Salvador, their electoral systems, and the parties on their ballots, 1994 to 2015",
-        depends=["sv.tse/geo"],
+        depends=["sv.tse/geo", *holders()],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     for era, since, until, rules, text in SYSTEMS:
@@ -393,14 +426,9 @@ def registry() -> Package:
             title = names[code]
             p.name(id, f"Municipal council of {title}", "en", "official")
             p.name(id, f"Concejo Municipal de {title}", "es", "native", False)
-    codes: dict[str, None] = {}
-    for election in ELECTIONS.values():
-        for department in tables(election)[0]:
-            for row in department.rows:
-                for code in ballot(row):
-                    if "/" not in code:
-                        codes.setdefault(code)
-    for code in codes:
+    for code in council_codes():
+        if code in held():
+            continue  # an earlier sv.tse package already declares this party and its code
         id = party(code)
         p.add("party", id=id, kind="party", polity_id=tse.EL_SALVADOR)
         p.add("external_id", entity_id=id, scheme="sv.tse.party", value=code)
@@ -482,7 +510,7 @@ def build_election(day: date) -> Package:
         SOURCE,
         f"The {day.year} election of municipal councils of El Salvador, by municipality, from the Tribunal Supremo "
         "Electoral",
-        depends=["sv.tse/geo", REGISTRY],
+        depends=["sv.tse/geo", *holders(), REGISTRY],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     source = key("source", day)
