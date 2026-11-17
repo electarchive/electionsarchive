@@ -174,6 +174,8 @@ def summary_urls(year: int) -> list[str]:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, GB_COUNTIES, suffix=".geojson")
+    raw.fetch(SOURCE, GB_TOWNS, suffix=".geojson")
     for year in YEARS:
         raw.fetch(SOURCE, zip_url(year), suffix=".zip")
         raw.fetch(SOURCE, dao_url(year), suffix=".js")
