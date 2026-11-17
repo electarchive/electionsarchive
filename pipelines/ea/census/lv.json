@@ -193,6 +193,60 @@
    "publisher": "Saeima (Latvijas Vēstnesis)",
    "url": "https://www.vestnesis.lv/op/2023/104A.1",
    "kind": "official_body"
+  },
+  "saeima_steno1993": {
+   "title": "Latvijas Republikas 5.Saeimas pirmās sēdes stenogramma (1993. gada 6. un 7. jūlijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/steno/st_93/060793.html",
+   "kind": "official_body"
+  },
+  "saeima_steno1996": {
+   "title": "Latvijas Republikas 6.Saeimas ārkārtas sesijas sēdes stenogramma (1996. gada 18. jūnijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/steno/st_96/st1806.html",
+   "kind": "official_body"
+  },
+  "saeima_steno1999": {
+   "title": "Latvijas Republikas 7.Saeimas sēdes turpinājuma stenogramma (1999. gada 17. jūnijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/steno/1999/st1706.html",
+   "kind": "official_body"
+  },
+  "saeima_steno2003": {
+   "title": "Latvijas Republikas 8.Saeimas ārkārtas sesijas pirmās sēdes stenogramma (2003. gada 20. jūnijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/steno/2002_8/st_030620/st2006.htm",
+   "kind": "official_body"
+  },
+  "saeima_steno2007": {
+   "title": "Latvijas Republikas 9.Saeimas pavasara sesijas astotās sēdes stenogramma (2007. gada 31. maijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/lv/sasaukumi/9-saeima/stenogrammas/latvijas-republikas-9-saeimas-pavasara-sesijas-astota-sede-2007-gada-31-maija/",
+   "kind": "official_body"
+  },
+  "saeima_steno2011": {
+   "title": "Latvijas Republikas 10.Saeimas pavasara sesijas astotās sēdes stenogramma (2011. gada 2. jūnijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/lv/transcripts/view/62",
+   "kind": "official_body"
+  },
+  "saeima_steno2015": {
+   "title": "Latvijas Republikas 12.Saeimas pavasara sesijas devītās (ārkārtas) sēdes stenogramma (2015. gada 3. jūnijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/lv/transcripts/view/303",
+   "kind": "official_body"
+  },
+  "saeima_steno2019": {
+   "title": "Latvijas Republikas 13.Saeimas pavasara sesijas septītās (ārkārtas) sēdes stenogramma (2019. gada 29. maijs)",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/lv/transcripts/view/539",
+   "kind": "official_body"
+  },
+  "saeima_steno2023": {
+   "title": "Latvijas Republikas 14.Saeimas pavasara sesijas ārkārtas sēdes stenogramma (2023. gada 31. maijs; Latvijas Vēstnesis)",
+   "publisher": "Saeima (Latvijas Vēstnesis)",
+   "url": "https://www.vestnesis.lv/op/2023/109.2",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -613,7 +667,7 @@
    "note": "The Saeima elects the President by at least 51 votes, in rounds until a candidate has them (Satversme arts. 35-36); secret ballot until 2019, open since.",
    "source": "satversme",
    "first_held": "1922-11-14",
-   "earliest_record": "1993-07-07",
+   "earliest_record": "1993-07-06",
    "contests_per_unit": 1,
    "est_votes": 2400,
    "effort": 3,
@@ -649,29 +703,69 @@
      "note": "Five elections of the first republic (1922, 1925, 1927, 1930, 1933); not yet counted from the Saeima's records."
     },
     {
-     "date": "1993-07-07",
-     "through": "2011-12-31",
+     "date": "1993-07-06",
      "election_kind": "indirect",
-     "note": "Six elections (1993, 1996, 1999, 2003, 2007, 2011); not yet counted from the Saeima's statements."
+     "contests": 3,
+     "source": "saeima_steno1993",
+     "quote": "pret - 26, par - 53. Līdz ar to Balsu skaitīšanas komisija paziņo, ka par Valsts Prezidentu ir ievēlēts Guntis Ulmanis",
+     "note": "Three rounds: 6 July (3 candidates) and 7 July (2 candidates, then Guntis Ulmanis alone)."
+    },
+    {
+     "date": "1996-06-18",
+     "election_kind": "indirect",
+     "contests": 1,
+     "source": "saeima_steno1996",
+     "quote": "par Gunti Ulmani nodotas 53 balsis"
+    },
+    {
+     "date": "1999-06-17",
+     "election_kind": "indirect",
+     "contests": 6,
+     "source": "saeima_steno1999",
+     "quote": "Neviena no izvirzītajām kandidatūrām nav saņēmusi ievēlēšanai nepieciešamo balsu skaitu",
+     "note": "Two elections the same day: five rounds without a result in the 12th sitting, then Vaira Vīķe-Freiberga elected at the extraordinary sitting at 21.00 (stenogram https://www.saeima.lv/steno/1999/sp1706.html)."
+    },
+    {
+     "date": "2003-06-20",
+     "election_kind": "indirect",
+     "contests": 1,
+     "source": "saeima_steno2003",
+     "quote": "Vaira Vīķe-Freiberga ievēlēta ar 88 balsīm par Valsts prezidenti"
+    },
+    {
+     "date": "2007-05-31",
+     "election_kind": "indirect",
+     "contests": 1,
+     "source": "saeima_steno2007",
+     "quote": "Saskaņā ar Saeimas kārtības ruļļa 26.pantu par Valsts prezidentu ievēlēts Valdis Zatlers"
+    },
+    {
+     "date": "2011-06-02",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "saeima_steno2011",
+     "quote": "par Latvijas Valsts prezidentu ievēlēts Andris Bērziņš"
     },
     {
      "date": "2015-06-03",
      "election_kind": "indirect",
-     "contests": 1,
-     "source": "lv_vp2015",
-     "quote": "Valsts prezidenta vēlēšanas: Saeima 2015. gada 3. jūnijā ievēlēja Raimondu Vējoni"
+     "contests": 5,
+     "source": "saeima_steno2015",
+     "quote": "par Latvijas Valsts prezidentu ievēlēts Raimonds Vējonis"
     },
     {
      "date": "2019-05-29",
      "election_kind": "indirect",
-     "note": "Egils Levits; not yet counted from the Saeima's statement."
+     "contests": 1,
+     "source": "saeima_steno2019",
+     "quote": "par Latvijas Republikas Valsts prezidentu ievēlēts Egils Levits"
     },
     {
      "date": "2023-05-31",
      "election_kind": "indirect",
-     "contests": 1,
-     "source": "lv_vp2023",
-     "quote": "Par Valsts prezidenta ievēlēšanu: Saeima ... ievēlēja Edgaru Rinkēviču"
+     "contests": 3,
+     "source": "saeima_steno2023",
+     "quote": "par vienpadsmito Latvijas Republikas Valsts prezidentu ievēlēts Edgars Rinkēvičs"
     }
    ]
   },
