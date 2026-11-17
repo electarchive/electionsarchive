@@ -395,7 +395,7 @@ def measure_of(label: str) -> int | None:
 
 PROVINCE = re.compile(r"^PROVINCIA\b")
 CANTON = re.compile(r"^CANTON:?\s*(\d+)?\s*(.*)$")
-DISTRICT = re.compile(r"^DISTRITO:?\s*(\d+)?\s*(.*)$")
+DISTRICT = re.compile(r"^DISTRI+TO:?\s*(\d+)?\s*(.*)$")
 SCOPE = re.compile(r"^CUADRO\s*(\d+)\.\s*(\d+)\s+(.*?)(?::|\s+JUNTAS)")
 
 
@@ -447,7 +447,7 @@ def tree(table: Table, province: int, totals: dict[int, dict[str, float]] | None
             district = (districts, "")
         elif found := DISTRICT.match(label):
             districts += 1
-            district = (int(found[1]) if found[1] else districts, re.sub(r"^DISTRITO:?\s*\d*\s*", "", shown.upper()))
+            district = (int(found[1]) if found[1] else districts, re.sub(r"^DISTRI+TO:?\s*\d*\s*", "", shown.upper()))
         else:
             if canton is None or district is None:
                 raise ValueError(f"{table.sheet}: {row.path[0]} sits outside a district")
@@ -2050,6 +2050,96 @@ def all_pieces() -> dict[date, list[Piece]]:
     return {m.day: pieces(m) for m in MUNICIPAL}
 
 
+@dataclass
+class Centro:
+    """One province table of a municipal workbook: the votes of every voting center for one contest family."""
+
+    family: str
+    province: int
+    table: Table
+    leaves: list[Leaf]  # one for each voting center, under its canton and administrative district
+
+
+CENTRO_FROM = date(2020, 2, 2)
+"""The first municipal workbook whose chapters print a table of voting centers for each province."""
+
+
+CENTRO_DISTRICTS = {(2, "LOS CHILES", "ROSARIO"): "LOS CHILES"}
+"""Districts that a province table prints for a canton that the canton's own table counts under another district, by
+province, canton, and folded name: the 2020 tables of Alajuela print the voting centers of Los Chiles that sit in
+Rosario under their own district, and the canton tables count them in Los Chiles."""
+
+
+def centro_leaves(day: date) -> dict[tuple[str, str], list[tuple[str, Leaf]]]:
+    """The voting centers of each contest of a municipal election, by family and the code of the canton (for the
+    mayor and the council) or of the administrative district (for the district council). Each center has the code
+    that the national tables of voting centers give it: the day, its district, and its folded name, with a number
+    after it when a district holds several centers of one name."""
+    found: dict[tuple[str, str], list[tuple[str, Leaf]]] = {}
+    for item in all_centros()[day]:
+        counts: Counter[str] = Counter()
+        for leaf in item.leaves:
+            assert leaf.canton is not None and leaf.district is not None
+            base = f"{day}:{code_of(leaf)}:{fold(leaf.name)}"
+            counts[base] += 1
+            code = base if counts[base] == 1 else f"{base}#{counts[base]}"
+            here = f"{leaf.province}{leaf.canton[0]:02d}"
+            seat_code = here if item.family in (MAYOR, COUNCIL) else f"{here}{leaf.district[0]:02d}"
+            found.setdefault((item.family, seat_code), []).append((code, leaf))
+    return found
+
+
+def centro_pieces(m: Municipal) -> list[Centro]:
+    """The province tables of a municipal workbook that print a row for each voting center, for the mayors, the
+    councils, and the districts' councils."""
+    if m.day < CENTRO_FROM:
+        return []
+    found = numbers()
+    out: list[Centro] = []
+    for name, raw_frame in book(m.book.zip, m.book.member).items():
+        caption = heading(raw_frame)
+        if not caption.startswith("CUADRO"):
+            continue
+        try:
+            chapter, _, where = scope(caption)
+        except ValueError:
+            continue
+        if chapter not in TABLES_OF or not where.startswith("PROVINCIA "):
+            continue
+        province = province_of(where.removeprefix("PROVINCIA ").strip())
+        frame = sheet_of(raw_frame)
+        for r in range(3, min(frame.height, 12)):  # a total row that prints its label in the second column
+            if not cell(frame, r, 0) and fold(cell(frame, r, 1)).startswith("TOTAL "):
+                frame[r, 0] = cell(frame, r, 1)
+                frame[r, 1] = ""
+        table = read(name, frame)
+        if not province or table is None or table.labels != 3:
+            continue  # a province's summary table, which prints no voting centers
+        table.rows = [
+            Row(
+                (
+                    row.path[0],
+                    CENTRO_DISTRICTS.get((province, fold(row.path[0]), fold(row.path[1])), row.path[1]),
+                    row.path[2],
+                ),
+                row.values,
+            )
+            for row in table.rows
+            if not fold(row.path[0]).startswith("TOTAL")
+        ]
+        out.append(Centro(TABLES_OF[chapter], province, table, centers(table, found, province)))
+    if Counter((c.family, c.province) for c in out) != Counter((f, p) for f in TABLES_OF.values() for p in range(1, 8)):
+        raise ValueError(
+            f"{m.day}: the workbook does not hold one table of voting centers for each province and contest"
+        )
+    return out
+
+
+@functools.cache
+def all_centros() -> dict[date, list[Centro]]:
+    return {m.day: centro_pieces(m) for m in MUNICIPAL}
+
+
 def printed(frame: pl.DataFrame) -> dict[str, float]:
     """The national column of a table of totals: for each row, its label and the figure printed for Costa Rica."""
     top = next(r for r in range(2, 8) if fold(cell(frame, r, 1)) == "TOTAL")
@@ -2173,6 +2263,11 @@ MUNICIPAL_METHOD = (
     "administrative district. Valid votes exclude the blank votes. The number of polling tables (juntas) is not "
     "stored. Voters mark a party for each office, so the options are the parties' candidacies and lists."
 )
+CENTRO_METHOD = (
+    " The tables of each province, which print the voting centers (centros de votación) under each canton and "
+    "administrative district, give a finer count of the same contest. Each voting center is a unit of that "
+    "result set, which supersedes the one by electoral district, and every center's figures are stored as printed."
+)
 DISTRICT_NOTE = (
     " The tables print each party that ran in the canton for the district councils; a party with no votes in a "
     "district is left out of that district's contest."
@@ -2202,8 +2297,7 @@ def inconsistent(p: Package, values: pl.DataFrame) -> None:
         if not found.is_empty():
             p.accept(
                 code,
-                f"{found.height} electoral district(s) print {what}; the figures are the Tribunal's own and are "
-                "stored as printed",
+                f"{found.height} unit(s) print {what}; the figures are the Tribunal's own and are stored as printed",
             )
 
 
@@ -2233,6 +2327,11 @@ def municipal(m: Municipal) -> Package:
     comparison: dict[str, object] = {}
     national_sums: dict[str, Counter[str | int]] = {family: Counter() for family in AREAS}
     gaps: dict[str, object] = {}
+    finer = centro_leaves(day)
+    centro_sums: dict[str, Counter[str | int]] = {family: Counter() for family in AREAS}
+    centro_units: dict[str, str] = {}
+    centro_rows: list[dict[str, object]] = []
+    differ: dict[str, object] = {}
     for piece in all_pieces()[day]:
         code = f"{piece.province}{piece.canton:02d}"
         if piece.family in (MAYOR, COUNCIL):
@@ -2279,8 +2378,8 @@ def municipal(m: Municipal) -> Package:
                 stage="official",
                 kind="counted",
                 source_id=TSE_SOURCE,
-                status="active",
-                is_default=True,
+                status="superseded" if (family, seat_code) in finer else "active",
+                is_default=(family, seat_code) not in finer,
                 completeness=1.0,
             )
             p.add(
@@ -2382,11 +2481,114 @@ def municipal(m: Municipal) -> Package:
             for (option_id, measure), count in mine.items():
                 label = next((c for c, o in options.items() if o == option_id), "") if option_id else measure
                 national_sums[family][label] += count
+            if (family, seat_code) not in finer:
+                continue
+            finer_set = key("result_set", day, family, seat_code, "centro")
+            p.add(
+                "result_set",
+                id=finer_set,
+                election_id=election_id,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                source_id=TSE_SOURCE,
+                status="active",
+                is_default=True,
+                supersedes_id=result_set,
+                completeness=1.0,
+            )
+            p.add(
+                "note",
+                id=key("note", finer_set),
+                entity_id=finer_set,
+                kind="methodology",
+                body_md=MUNICIPAL_METHOD + CENTRO_METHOD + (DISTRICT_NOTE if family == DISTRICT_COUNCIL else ""),
+                lang="en",
+            )
+            by_column = {option: column for column, option in options.items()}
+            tally_here: Counter[tuple[str | None, int]] = Counter()
+            for center, leaf in finer.pop((family, seat_code)):
+                assert leaf.canton is not None and leaf.district is not None
+                if center not in centro_units:
+                    unit = centro_units[center] = key("unit", center)
+                    centro_rows.append(
+                        {
+                            "id": unit,
+                            "polity_id": COSTA_RICA,
+                            "scheme_code": "cr.centro",
+                            "code": center,
+                            "area_relation": "within",
+                            "area_id": area("cr.distrito", code_of(leaf)),
+                            "kind": "standard",
+                            "name": title(leaf.name),
+                        }
+                    )
+                for column, value in leaf.values.items():
+                    measure = measure_of(column)
+                    if measure == 0:
+                        continue
+                    if measure is None and column not in options:
+                        if value:
+                            raise ValueError(f"{day} {center}: {column} has {value} votes but is not on the ballot")
+                        continue
+                    count = whole(value)
+                    option_id = options[column] if measure is None else None
+                    tally_here[(option_id, 1 if measure is None else measure)] += count
+                    values.append(
+                        {
+                            "result_set_id": finer_set,
+                            "unit_id": centro_units[center],
+                            "option_id": option_id,
+                            "measure": 1 if measure is None else measure,
+                            "value": count,
+                        }
+                    )
+            for (option_id, measure), count in tally_here.items():
+                label = by_column[option_id] if option_id else measure
+                centro_sums[family][label] += count
+            off = {
+                (by_column[spot[0]] if spot[0] else str(spot[1])): (tally_here[spot], mine[spot])
+                for spot in {*mine, *tally_here}
+                if mine[spot] != tally_here[spot]
+            }
+            if off:
+                differ[f"{family}:{seat_code}"] = off
+            if any(
+                tally_here[(str(row["option_id"]) if row["option_id"] else None, int(str(row["measure"])))]
+                != row["value"]
+                for row in declared_rows
+            ):
+                p.add(
+                    "note",
+                    id=key("note", finer_set, "printed"),
+                    entity_id=finer_set,
+                    kind="caveat",
+                    body_md="The figures the Tribunal prints for the voting centers of this contest do not add up to "
+                    "the totals its canton table prints for the "
+                    + ("canton" if family in (MAYOR, COUNCIL) else "administrative district")
+                    + ". The figures of the voting centers are stored as printed, and the printed totals are not "
+                    "stored as declared.",
+                    lang="en",
+                )
+            else:
+                for row in declared_rows:
+                    p.add("declared", **{**row, "result_set_id": finer_set})
+    if finer:
+        raise LookupError(f"{day}: voting centers of contests that have no table by canton: {sorted(finer)[:5]}")
     comparison["gaps"] = gaps
     comparison["national"] = {
         family: compare(m, chapter, national_sums[family]) for chapter, family in {**TABLES_OF, 5: INTENDANT}.items()
     }
     comparison["units"] = len(unit_rows)
+    if centro_rows:
+        if overlap := {str(row["id"]) for row in centro_rows} & {str(row["id"]) for row in unit_rows}:
+            raise ValueError(f"{day}: voting centers and electoral districts share {len(overlap)} unit ids")
+        comparison["centro"] = {
+            "units": len(centro_rows),
+            "differ_from_districts": differ,
+            "national": {family: compare(m, chapter, centro_sums[family]) for chapter, family in TABLES_OF.items()},
+        }
+        unit_rows += centro_rows
     COMPARE[str(day)] = comparison
     p.frame("reporting_unit", pl.DataFrame(unit_rows, infer_schema_length=None).drop("name"))
     for row in unit_rows:
