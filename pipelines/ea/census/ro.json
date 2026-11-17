@@ -1,0 +1,1955 @@
+{
+ "polity": "RO",
+ "name": "Romania",
+ "sources": {
+  "constitutie": {
+   "title": "Constituția României (republicată în Monitorul Oficial nr. 767 din 31 octombrie 2003)",
+   "publisher": "Camera Deputaților",
+   "url": "https://www.cdep.ro/pls/dic/site.page?id=339",
+   "kind": "official_body"
+  },
+  "constitutie1991": {
+   "title": "Constituția României din 1991 (Monitorul Oficial nr. 233 din 21 noiembrie 1991), aprobată prin referendumul național din 8 decembrie 1991",
+   "publisher": "Camera Deputaților",
+   "url": "https://www.cdep.ro/pls/dic/site.page?den=act1_1",
+   "kind": "official_body"
+  },
+  "lege208": {
+   "title": "Legea nr. 208/2015 privind alegerea Senatului și a Camerei Deputaților, precum și pentru organizarea și funcționarea Autorității Electorale Permanente (consolidată)",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://roaep.ro/legislatie/wp-content/uploads/2024/10/Legea-nr.-208-2015-consolidata.pdf",
+   "kind": "official_body"
+  },
+  "lege370": {
+   "title": "Legea nr. 370/2004 pentru alegerea Președintelui României (republicată în Monitorul Oficial nr. 650 din 12 septembrie 2011)",
+   "publisher": "Ministerul Justiției, Portal legislativ",
+   "url": "https://legislatie.just.ro/Public/DetaliiDocumentAfis/217753",
+   "kind": "official_body"
+  },
+  "lege33": {
+   "title": "Legea nr. 33/2007 privind organizarea și desfășurarea alegerilor pentru Parlamentul European (republicată în Monitorul Oficial nr. 627 din 31 august 2012)",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://www.roaep.ro/legislatie/",
+   "kind": "official_body"
+  },
+  "lege115": {
+   "title": "Legea nr. 115/2015 pentru alegerea autorităților administrației publice locale (Monitorul Oficial nr. 349 din 20 mai 2015)",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://www.roaep.ro/legislatie/",
+   "kind": "official_body"
+  },
+  "lege67": {
+   "title": "Legea nr. 67/2004 pentru alegerea autorităților administrației publice locale (republicată), modificată prin Legea nr. 129/2011",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://www.roaep.ro/legislatie/",
+   "kind": "official_body"
+  },
+  "lege3_2000": {
+   "title": "Legea nr. 3/2000 privind organizarea și desfășurarea referendumului",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://www.roaep.ro/legislatie/",
+   "kind": "official_body"
+  },
+  "lege2_1968": {
+   "title": "Legea nr. 2/1968 privind organizarea administrativă a teritoriului României (republicată)",
+   "publisher": "Ministerul Justiției, Portal legislativ",
+   "url": "https://legislatie.just.ro/Public/DetaliiDocument/1200",
+   "kind": "official_body"
+  },
+  "ins_cifre2023": {
+   "title": "România în cifre 2023",
+   "publisher": "Institutul Național de Statistică",
+   "url": "https://insse.ro/cms/sites/default/files/field/publicatii/romania_in_cifre_2023.pdf",
+   "kind": "official_body"
+  },
+  "aep_istoric": {
+   "title": "Alegeri: arhiva rezultatelor alegerilor din România",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://alegeri.roaep.ro/",
+   "kind": "official_body"
+  },
+  "aep_prezenta": {
+   "title": "Prezență și rezultate la vot (date pe secții de votare)",
+   "publisher": "Autoritatea Electorală Permanentă",
+   "url": "https://prezenta.roaep.ro/",
+   "kind": "official_body"
+  },
+  "aep_opendata": {
+   "title": "Autoritatea Electorală Permanentă: seturi de date pe data.gov.ro",
+   "publisher": "Autoritatea Electorală Permanentă (data.gov.ro)",
+   "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+   "kind": "official_body",
+   "license": "Open Government Licence 1.0 (data.gov.ro)"
+  },
+  "mo": {
+   "title": "Monitorul Oficial al României și Buletinul Oficial: arhiva publicațiilor oficiale",
+   "publisher": "Regia Autonomă Monitorul Oficial",
+   "url": "https://www.monitoruloficial.ro/",
+   "kind": "official_body"
+  },
+  "constitutie1866": {
+   "title": "Constituțiunea din 1866 (Monitorul Oficial nr. 142 din 1 iulie 1866)",
+   "publisher": "Camera Deputaților",
+   "url": "https://www.cdep.ro/pls/legis/legis_pck.htp_act?ida=1",
+   "kind": "official_body"
+  },
+  "constitutie1965": {
+   "title": "Constituția Republicii Socialiste România din 1965 (Buletinul Oficial nr. 1 din 21 august 1965)",
+   "publisher": "Camera Deputaților",
+   "url": "https://www.cdep.ro/pls/legis/legis_pck.htp_act?ida=36",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "România",
+   "name_en": "Romania",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitutie"
+  },
+  {
+   "key": "judet",
+   "name": "Județe",
+   "name_en": "Counties (județe)",
+   "parent": "national",
+   "polity_kind": "county",
+   "source": "lege2_1968",
+   "counts": [
+    {
+     "date": "2022-12-31",
+     "value": 41,
+     "source": "ins_cifre2023",
+     "locator": "https://insse.ro/cms/sites/default/files/field/publicatii/romania_in_cifre_2023.pdf (organizarea administrativă a teritoriului: 41 de județe și municipiul București)"
+    }
+   ]
+  },
+  {
+   "key": "bucuresti",
+   "name": "Municipiul București",
+   "name_en": "Municipality of Bucharest",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "source": "lege2_1968",
+   "counts": [
+    {
+     "date": "2022-12-31",
+     "value": 1,
+     "source": "ins_cifre2023",
+     "locator": "https://insse.ro/cms/sites/default/files/field/publicatii/romania_in_cifre_2023.pdf (municipiul București, cu rang de județ, împărțit în 6 sectoare)"
+    }
+   ]
+  },
+  {
+   "key": "uat",
+   "name": "Comune, orașe și municipii; sectoarele municipiului București",
+   "name_en": "Communes, towns, and municipalities; the sectors of Bucharest",
+   "parent": "judet",
+   "polity_kind": "municipality",
+   "source": "lege2_1968",
+   "counts": [
+    {
+     "date": "2022-12-31",
+     "value": 3181,
+     "source": "ins_cifre2023",
+     "locator": "https://insse.ro/cms/sites/default/files/field/publicatii/romania_in_cifre_2023.pdf (320 de orașe, din care 103 municipii, și 2.862 de comune; without the municipality of Bucharest, whose six sectors elect their own mayors and local councils)"
+    }
+   ]
+  },
+  {
+   "key": "sat",
+   "name": "Sate",
+   "name_en": "Villages",
+   "parent": "uat",
+   "polity_kind": "submunicipal",
+   "elects": false,
+   "source": "lege2_1968",
+   "counts": [
+    {
+     "date": "2022-12-31",
+     "value": 12957,
+     "source": "ins_cifre2023",
+     "locator": "https://insse.ro/cms/sites/default/files/field/publicatii/romania_in_cifre_2023.pdf (12.957 sate)"
+    }
+   ]
+  },
+  {
+   "key": "rpr_rsr",
+   "name": "Republica Populară Română / Republica Socialistă România",
+   "name_en": "People's Republic and Socialist Republic of Romania (1947–1989)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1947-12-30",
+   "valid_to": "1989-12-22",
+   "source": "constitutie1965"
+  },
+  {
+   "key": "regat",
+   "name": "Principatele Unite și Regatul României",
+   "name_en": "United Principalities and Kingdom of Romania (1859–1947)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1859-01-24",
+   "valid_to": "1947-12-30",
+   "source": "constitutie1866"
+  }
+ ],
+ "classes": [
+  {
+   "key": "camera_deputatilor",
+   "tier": "national",
+   "name": "Alegeri pentru Camera Deputaților",
+   "name_en": "Chamber of Deputies elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Published by polling station (secție de votare) since 2016 in the AEP's open data and on prezenta.roaep.ro, with postal votes from abroad counted apart; earlier years by county and locality on the AEP archive.",
+   "note": "Lower house, elected for four years (Constitution arts. 62–63). Closed-list PR in 43 constituencies (the 41 counties, Bucharest, and Romanians abroad), with a 5% threshold for parties and higher ones for alliances, and the D'Hondt method at the national stage (Law 208/2015). Organizations of national minorities that win no seat get one each if they reach 5% of the average votes per deputy (Constitution art. 62(2)). 1990 was the Assembly of Deputies of the Constituent Assembly; 2008 and 2012 used single-member colleges.",
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 61–63)",
+   "valid_from": "1990-03-18",
+   "first_held": "1990-05-20",
+   "earliest_record": "2016-12-11",
+   "est_votes": 85000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1992-01-01",
+     "administered_by": "Biroul Electoral Central and the Autoritatea Electorală Permanentă",
+     "source": "constitutie",
+     "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (art. 63: mandat de 4 ani)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list in the same constituency (Law 208/2015); a seat with no candidate left stays vacant, and partial elections were held for single-member colleges in 2008–2016."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2016 and 2020 elections (Chamber and Senate, with postal votes and the seats per constituency); the ro.aep pipeline reads them.",
+     "first_date": "2016-12-11",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024.",
+     "first_date": "2020-12-06",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county from 1990, with downloadable tables for later years.",
+     "first_date": "1990-05-20"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1990-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-05-20",
+     "election_kind": "general",
+     "seats": 396,
+     "note": "Assembly of Deputies of the Constituent Assembly (387 elected by list PR in 41 counties and Bucharest, plus 9 national-minority seats), under Decree-Law 92/1990."
+    },
+    {
+     "date": "1992-09-27",
+     "election_kind": "general",
+     "seats": 341,
+     "note": "First election under the 1991 Constitution: list PR in 42 constituencies (41 counties and Bucharest)."
+    },
+    {
+     "date": "1996-11-03",
+     "election_kind": "general",
+     "seats": 343
+    },
+    {
+     "date": "2000-11-26",
+     "election_kind": "general",
+     "seats": 345
+    },
+    {
+     "date": "2004-11-28",
+     "election_kind": "general",
+     "seats": 332
+    },
+    {
+     "date": "2008-11-30",
+     "election_kind": "general",
+     "seats": 334,
+     "note": "Mixed member system under Law 35/2008: single-member colleges (315 for the Chamber) within 43 constituencies including the one for Romanians abroad, with seats allocated proportionally."
+    },
+    {
+     "date": "2012-12-09",
+     "election_kind": "general",
+     "seats": 412,
+     "note": "Second election under Law 35/2008; compensatory seats raised the Chamber to 412."
+    },
+    {
+     "date": "2016-12-11",
+     "election_kind": "general",
+     "contests": 44,
+     "seats": 329,
+     "note": "Return to list PR under Law 208/2015: 43 constituencies (42 at home and one abroad) plus the national-minority organizations' seats, counted as one nationwide contest.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2020-12-06",
+     "election_kind": "general",
+     "contests": 44,
+     "seats": 330,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2024-12-01",
+     "election_kind": "general",
+     "contests": 44,
+     "seats": 331,
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "senat",
+   "tier": "national",
+   "name": "Alegeri pentru Senat",
+   "name_en": "Senate elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Published by polling station since 2016, like the Chamber.",
+   "note": "Upper house, elected with the Chamber on the same day and by the same system in the same 43 constituencies (Constitution arts. 61–63; Law 208/2015). The Senate of the Constituent Assembly of 1990 is included.",
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 61–63)",
+   "valid_from": "1990-03-18",
+   "first_held": "1990-05-20",
+   "earliest_record": "2016-12-11",
+   "est_votes": 85000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1992-01-01",
+     "administered_by": "Biroul Electoral Central and the Autoritatea Electorală Permanentă",
+     "source": "lege208",
+     "locator": "https://roaep.ro/legislatie/wp-content/uploads/2024/10/Legea-nr.-208-2015-consolidata.pdf"
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of 2016 and 2020; the ro.aep pipeline reads them.",
+     "first_date": "2016-12-11",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024.",
+     "first_date": "2020-12-06",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county from 1990.",
+     "first_date": "1990-05-20"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1990-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-05-20",
+     "election_kind": "general",
+     "seats": 119,
+     "note": "Senate of the Constituent Assembly, under Decree-Law 92/1990."
+    },
+    {
+     "date": "1992-09-27",
+     "election_kind": "general",
+     "seats": 143
+    },
+    {
+     "date": "1996-11-03",
+     "election_kind": "general",
+     "seats": 143
+    },
+    {
+     "date": "2000-11-26",
+     "election_kind": "general",
+     "seats": 140
+    },
+    {
+     "date": "2004-11-28",
+     "election_kind": "general",
+     "seats": 137
+    },
+    {
+     "date": "2008-11-30",
+     "election_kind": "general",
+     "seats": 137,
+     "note": "Single-member colleges (137) within 43 constituencies under Law 35/2008."
+    },
+    {
+     "date": "2012-12-09",
+     "election_kind": "general",
+     "seats": 176
+    },
+    {
+     "date": "2016-12-11",
+     "election_kind": "general",
+     "seats": 136,
+     "contests": 43,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2020-12-06",
+     "election_kind": "general",
+     "seats": 136,
+     "contests": 43,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2024-12-01",
+     "election_kind": "general",
+     "seats": 134,
+     "contests": 43,
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "presedinte",
+   "tier": "national",
+   "name": "Alegeri pentru Președintele României",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Polling-station results on prezenta.roaep.ro from 2019; earlier rounds by county and locality on the AEP archive.",
+   "note": "Direct election for five years (four until the 2003 revision), at most two terms (Constitution arts. 81, 83). A candidate needs a majority of the voters on the permanent lists in the first round; otherwise the top two meet two weeks later and the one with more votes wins.",
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 81 and 83)",
+   "valid_from": "1990-03-18",
+   "first_held": "1990-05-20",
+   "earliest_record": "2019-11-10",
+   "est_votes": 160000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Elected in the first round with a majority of the votes of the voters on the electoral lists; otherwise the two leading candidates meet in a second round two weeks later, and the one with more votes wins (Constitution art. 81).",
+     "administered_by": "Biroul Electoral Central",
+     "valid_from": "1992-01-01",
+     "valid_to": "2005-01-01",
+     "source": "constitutie1991",
+     "locator": "https://www.cdep.ro/pls/dic/site.page?den=act1_1 (art. 83: mandat de 4 ani)"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Elected in the first round with a majority of the votes of the voters on the electoral lists; otherwise the two leading candidates meet in a second round two weeks later, and the one with more votes wins (Constitution art. 81; Law 370/2004).",
+     "administered_by": "Biroul Electoral Central and the Autoritatea Electorală Permanentă",
+     "valid_from": "2005-01-01",
+     "source": "lege370",
+     "locator": "https://legislatie.just.ro/Public/DetaliiDocumentAfis/217753",
+     "vacancy_rule": "The President of the Senate, then of the Chamber, serves as interim, and a new election is held within three months (Constitution arts. 97–98)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2019, 2024, and 2025, including votes abroad and by post.",
+     "first_date": "2019-11-10",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1990.",
+     "first_date": "1990-05-20"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-05-20",
+     "election_kind": "general",
+     "contests": 1,
+     "note": "Elected in one round under Decree-Law 92/1990.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "1992-09-27",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "1992-10-11",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "1996-11-03",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "1996-11-17",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2000-11-26",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2000-12-10",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2004-11-28",
+     "election_kind": "general",
+     "contests": 1,
+     "note": "First election for a five-year term (2003 revision of the Constitution).",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2004-12-12",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2009-11-22",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2009-12-06",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2014-11-02",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2014-11-16",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2019-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2019-11-24",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2024-11-24",
+     "election_kind": "general",
+     "contests": 1,
+     "note": "The Constitutional Court annulled the whole electoral process on 6 December 2024, before the runoff set for 8 December (Hotărârea nr. 32/2024); the first round was held and its results published.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2025-05-04",
+     "election_kind": "general",
+     "contests": 1,
+     "note": "Rerun of the annulled 2024 election.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "parlamentul_european",
+   "tier": "national",
+   "name": "Alegeri pentru Parlamentul European",
+   "name_en": "European Parliament elections",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "One national constituency; polling-station results from 2019 in the AEP's open data and on prezenta.roaep.ro.",
+   "note": "One nationwide constituency, closed-list PR by the D'Hondt method with a 5% threshold for lists and a quota for independents (Law 33/2007). 35 seats in 2007, 33 in 2009 and 2024, 32 in 2014 and 2019.",
+   "source": "lege33",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 33/2007, republicată)",
+   "valid_from": "2007-01-01",
+   "first_held": "2007-11-25",
+   "earliest_record": "2019-05-26",
+   "est_votes": 30000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "administered_by": "Biroul Electoral Central and the Autoritatea Electorală Permanentă",
+     "valid_from": "2009-01-01",
+     "source": "lege33",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 33/2007)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of 2019, at home and abroad; the ro.aep pipeline reads them.",
+     "first_date": "2019-05-26",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2019 and 2024.",
+     "first_date": "2019-05-26",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county for 2007, 2009, and 2014.",
+     "first_date": "2007-11-25"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "2007-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2007-11-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 35,
+     "note": "Held with the referendum on single-member voting.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2009-06-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 33,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 32,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 32,
+     "note": "Held with the national referendum on justice.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 33,
+     "note": "Held with the local elections.",
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "referendum_national",
+   "tier": "national",
+   "name": "Referendum național",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "note": "Called by the President on matters of national interest after consulting Parliament (Constitution art. 90), held on a constitutional revision (art. 151), or on the removal of a suspended President (art. 95). Valid with a turnout of 30% of the voters on the permanent lists and 25% valid votes for the winning option since 2013 (Law 3/2000, as amended by Law 341/2013); a majority of registered voters before.",
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 90, 95, 151)",
+   "valid_from": "1990-01-01",
+   "first_held": "1991-12-08",
+   "earliest_record": "2019-05-26",
+   "est_votes": 60000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of the 2018 and 2019 referendums.",
+     "first_date": "2018-10-06",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county of the referendums from 1991.",
+     "first_date": "1991-12-08"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-12-08",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Adoption of the Constitution.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2003-10-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Revision of the Constitution; voting over two days, 18 and 19 October.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2007-05-19",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Removal of President Traian Băsescu, suspended by Parliament; not adopted.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2007-11-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Single-member voting for Parliament; held with the European Parliament election; invalid for low turnout.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2009-11-22",
+     "election_kind": "referendum",
+     "contests": 2,
+     "note": "A unicameral Parliament and at most 300 members; two questions, held with the presidential election; consultative.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2012-07-29",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Removal of President Traian Băsescu; invalid for low turnout (Constitutional Court).",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2018-10-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "note": "Revision of the Constitution's definition of the family; voting over two days, 6 and 7 October; invalid for low turnout.",
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "referendum",
+     "contests": 2,
+     "note": "Justice (two questions), held with the European Parliament election; consultative.",
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "consiliu_local",
+   "tier": "uat",
+   "name": "Alegeri pentru consiliile locale",
+   "name_en": "Local council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Polling-station results from 2020 in the AEP's open data; council seats by party per locality on the AEP archive.",
+   "note": "Councils of 9 to 31 members by population in every commune, town, and municipality and in the six sectors of Bucharest, elected for four years by closed-list PR with a 5% threshold (Law 115/2015). The general local elections of 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020 (27 September, postponed from June for the pandemic), and 2024 (9 June, held with the European Parliament election).",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015)",
+   "valid_from": "1991-11-28",
+   "first_held": "1992-02-09",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 75000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "1992-01-01",
+     "source": "lege115",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 1 and 6)",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the same list; a vacant mayoralty or a dissolved council is filled in a partial election (alegeri locale parțiale), held twice a year."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, by council; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, by council.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, by council.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "local council|consiliile locale|consiliul local",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1991-01-01"
+    },
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null,
+     "valid_from": "1991-01-01"
+    }
+   ]
+  },
+  {
+   "key": "primar",
+   "tier": "uat",
+   "name": "Alegeri pentru primari",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Polling-station results from 2020 in the AEP's open data.",
+   "note": "Mayors of every commune, town, and municipality and of the six sectors of Bucharest, elected directly for four years. Two rounds until 2008 (a majority of valid votes, else a runoff two weeks later); one round by plurality since 2012 (Law 129/2011, kept by Law 115/2015), with a second round only to break a tie. The general local elections of 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020 (27 September, postponed from June for the pandemic), and 2024 (9 June, held with the European Parliament election).",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 101)",
+   "valid_from": "1991-11-28",
+   "first_held": "1992-02-09",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 100000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Elected in the first round with a majority of valid votes; otherwise the two leading candidates meet two weeks later (Law 70/1991; Law 67/2004).",
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "1992-01-01",
+     "valid_to": "2011-07-01",
+     "source": "lege67",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 67/2004)"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "runoff_rule": "Elected in one round by plurality; a tie for first place is settled by a second round between the tied candidates two weeks later (Law 115/2015, art. 101).",
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "2011-07-01",
+     "source": "lege115",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 101)",
+     "vacancy_rule": "A partial election (alegeri locale parțiale) fills a mayoralty that falls vacant."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, by mayoralty; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, by mayoralty.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, by mayoralty.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "^mayor of a|^primar$",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1991-01-01"
+    },
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null,
+     "valid_from": "1991-01-01"
+    }
+   ]
+  },
+  {
+   "key": "consiliu_judetean",
+   "tier": "judet",
+   "name": "Alegeri pentru consiliile județene",
+   "name_en": "County council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Polling-station results from 2020 in the AEP's open data.",
+   "note": "Councils of 31 to 37 members in each of the 41 counties, elected directly for four years by closed-list PR with a 5% threshold since 1996 (Law 115/2015). In 1992 the county councils were chosen by an electoral college of the local councillors (Law 70/1991).",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015)",
+   "valid_from": "1991-11-28",
+   "first_held": "1996-06-02",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 65000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "1996-01-01",
+     "source": "lege115",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 1 and 6)",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the same list; a vacant mayoralty or a dissolved council is filled in a partial election (alegeri locale parțiale), held twice a year."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, by county council; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, by county council.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, by county council.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "county council|consiliile jude|consiliul jude",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1991-01-01"
+    },
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "within": null,
+     "valid_from": "1991-01-01"
+    }
+   ]
+  },
+  {
+   "key": "presedinte_consiliu_judetean",
+   "tier": "judet",
+   "name": "Alegeri pentru președinții consiliilor județene",
+   "name_en": "County council president elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "finest_note": "Polling-station results from 2020 in the AEP's open data.",
+   "note": "Elected directly by plurality in one round in 2008 and 2012 (Law 35/2008) and again since 2020 (Law 115/2015 as amended by Law 57/2019); chosen by the county council from its members until 2004 and in 2016 (see alegeri_indirecte).",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015)",
+   "valid_from": "2008-03-13",
+   "first_held": "2008-06-01",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 32000000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, by county council president; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, by county council president.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, by county council president.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "other"
+     ],
+     "name_pattern": "president of a county council|președinte.*consiliu.*jude",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "2008-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-06-01",
+     "election_kind": "local",
+     "contests": 41,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2012-06-10",
+     "election_kind": "local",
+     "contests": 41,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2020-09-27",
+     "election_kind": "local",
+     "contests": 41,
+     "source": "aep_istoric"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "local",
+     "contests": 41,
+     "source": "aep_istoric"
+    }
+   ]
+  },
+  {
+   "key": "consiliul_general_bucuresti",
+   "tier": "bucuresti",
+   "name": "Alegeri pentru Consiliul General al Municipiului București",
+   "name_en": "General Council of Bucharest elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "note": "55 members elected for four years by closed-list PR across the whole city, with the local elections (Law 115/2015).",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015)",
+   "valid_from": "1991-11-28",
+   "first_held": "1992-02-09",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 7000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "1992-01-01",
+     "source": "lege115",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 1 and 6)",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the same list; a vacant mayoralty or a dissolved council is filled in a partial election (alegeri locale parțiale), held twice a year."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, for the General Council; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, for the General Council.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, for the General Council.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "general council of bucharest|consiliul general al municipiului",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1991-01-01"
+    }
+   ]
+  },
+  {
+   "key": "primar_general_bucuresti",
+   "tier": "bucuresti",
+   "name": "Alegeri pentru Primarul General al Municipiului București",
+   "name_en": "General Mayor of Bucharest elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ro.sv"
+    ]
+   },
+   "note": "Elected directly for four years, under the same rules as the other mayors (two rounds until 2008, one since 2012). Partial elections fill a vacancy, as after the General Mayor's election as President in 2025.",
+   "source": "lege115",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015)",
+   "valid_from": "1991-11-28",
+   "first_held": "1992-02-09",
+   "earliest_record": "2020-09-27",
+   "contests_per_unit": 1,
+   "est_votes": 9000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "month": 6,
+     "administered_by": "Biroul Electoral Central, birourile electorale de circumscripție și Autoritatea Electorală Permanentă",
+     "valid_from": "1992-01-01",
+     "source": "lege115",
+     "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 115/2015, art. 1 and 6)",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the same list; a vacant mayoralty or a dissolved council is filled in a partial election (alegeri locale parțiale), held twice a year."
+    }
+   ],
+   "access": [
+    {
+     "platform": "data.gov.ro (Autoritatea Electorală Permanentă)",
+     "url": "https://data.gov.ro/organization/autoritatea-electorala-permanenta",
+     "format": "csv and xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_opendata",
+     "evidence": "Polling-station results of the 2020 local elections and the partial elections of 24 January 2021, for the General Mayor; the ro.aep pipeline reads them.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv",
+     "license": "Open Government Licence 1.0 (data.gov.ro)"
+    },
+    {
+     "platform": "Prezență și rezultate (AEP)",
+     "url": "https://prezenta.roaep.ro/",
+     "format": "csv and json",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_prezenta",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Polling-station results of 2020 and 2024, for the General Mayor.",
+     "first_date": "2020-09-27",
+     "finest": "ro.sv"
+    },
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. Results by county and locality from 1992, for the General Mayor.",
+     "first_date": "1992-02-09"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "name_pattern": "general mayor|primarul general",
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1991-01-01"
+    }
+   ]
+  },
+  {
+   "key": "referendum_local",
+   "tier": "uat",
+   "name": "Referendum local",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Called by a local or county council, or by the mayor or county council president, on matters of local interest, including the dismissal of a mayor and boundary changes between localities (Law 3/2000, chapter III; Law 115/2015 for mayors' dismissal). Run by local electoral bureaus, which publish the result locally; the AEP keeps a list.",
+   "source": "lege3_2000",
+   "locator": "https://www.roaep.ro/legislatie/ (Legea nr. 3/2000, cap. III)",
+   "valid_from": "2000-02-24",
+   "est_votes": 2000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Arhiva alegerilor (AEP)",
+     "url": "https://alegeri.roaep.ro/",
+     "format": "html and xls",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "aep_istoric",
+     "evidence": "prezenta.roaep.ro answered automated requests from a cloud host on 2026-11-17 with HTTP 418 and www.roaep.ro and alegeri.roaep.ro with a reCAPTCHA challenge; data.gov.ro reset the connection. The AEP lists local referendums by date and locality; results sit in the decisions of local electoral bureaus.",
+     "first_date": "2000-02-24"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal",
+      "county"
+     ],
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "marea_adunare_nationala",
+   "tier": "rpr_rsr",
+   "name": "Alegeri pentru Marea Adunare Națională",
+   "name_en": "Great National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The unicameral Great National Assembly of the People's and Socialist Republic, elected in single-member districts on the single list of the Front (Popular Democratic Front, then Front of Socialist Unity and Democracy); several candidates per district only from 1975. The 1948 Assembly adopted the 1948 Constitution. Official results notices in the Buletinul Oficial.",
+   "source": "constitutie1965",
+   "locator": "https://www.cdep.ro/pls/legis/legis_pck.htp_act?ida=36 (arts. 43–45)",
+   "valid_from": "1947-12-30",
+   "valid_to": "1989-12-22",
+   "first_held": "1948-03-28",
+   "est_votes": 120000000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "Monitorul Oficial / Buletinul Oficial",
+     "url": "https://www.monitoruloficial.ro/",
+     "format": "scanned issues",
+     "access": "manual",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "mo",
+     "evidence": "Results notices of the central election commission in the Buletinul Oficial, national and by region or county; no machine-readable official return.",
+     "first_date": "1948-03-28",
+     "last_date": "1985-03-17"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1948-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-03-28",
+     "election_kind": "general"
+    },
+    {
+     "date": "1952-11-30",
+     "election_kind": "general"
+    },
+    {
+     "date": "1957-02-03",
+     "election_kind": "general"
+    },
+    {
+     "date": "1961-03-05",
+     "election_kind": "general"
+    },
+    {
+     "date": "1965-03-07",
+     "election_kind": "general"
+    },
+    {
+     "date": "1969-03-02",
+     "election_kind": "general"
+    },
+    {
+     "date": "1975-03-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "1980-03-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "1985-03-17",
+     "election_kind": "general"
+    }
+   ]
+  },
+  {
+   "key": "consilii_populare",
+   "tier": "rpr_rsr",
+   "name": "Alegeri pentru consiliile populare",
+   "name_en": "People's council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Regional, district, county, town, and commune people's councils elected on single Front lists from 1950 until December 1989.",
+   "source": "constitutie1965",
+   "locator": "https://www.cdep.ro/pls/legis/legis_pck.htp_act?ida=36",
+   "valid_from": "1950-01-01",
+   "valid_to": "1989-12-22",
+   "first_held": "1950-12-03",
+   "disposition": "blocked",
+   "disposition_reason": "Only national summaries were printed in the Buletinul Oficial; returns by council survive only in county branches of the National Archives, with no official digital copy.",
+   "est_votes": 150000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1948-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ]
+  },
+  {
+   "key": "parlament_regat",
+   "tier": "regat",
+   "name": "Alegeri pentru Adunarea Deputaților și Senat (1859–1946)",
+   "name_en": "Parliamentary elections of the United Principalities and the Kingdom",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The elective assemblies of the United Principalities from 1859 and, under the Constitutions of 1866 and 1923, the Assembly of Deputies and the Senate, chosen by census colleges until 1918 and by universal male suffrage from 1919; parliament was dissolved in 1938. The Assembly of Deputies of 19 November 1946 (unicameral; the Senate was abolished in 1946) is the last election of the Kingdom. Results by county in the Monitorul Oficial and the parliamentary records.",
+   "source": "constitutie1866",
+   "locator": "https://www.cdep.ro/pls/legis/legis_pck.htp_act?ida=1",
+   "valid_from": "1859-01-24",
+   "valid_to": "1947-12-30",
+   "est_votes": 40000000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "Monitorul Oficial / Buletinul Oficial",
+     "url": "https://www.monitoruloficial.ro/",
+     "format": "scanned issues",
+     "access": "manual",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "mo",
+     "evidence": "Results by county and college in the Monitorul Oficial; no machine-readable official return.",
+     "first_date": "1866-01-01",
+     "last_date": "1946-11-19"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1850-01-01",
+     "valid_to": "1948-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1859-01-01",
+     "note": "Elections from 1859 to 1937 (with the last one, of December 1937) are known to exist and are not yet listed.",
+     "precision": "year",
+     "through": "1937-12-31"
+    },
+    {
+     "date": "1946-11-19",
+     "election_kind": "general",
+     "note": "Assembly of Deputies; the Senate had been abolished."
+    }
+   ]
+  },
+  {
+   "key": "plebiscite_istorice",
+   "tier": "regat",
+   "name": "Plebiscite și referendumuri istorice (1864–1986)",
+   "name_en": "Historical plebiscites and referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The plebiscites of May 1864 (Cuza's Statute) and April 1866 (Prince Carol), of 24 February 1938 (the Constitution of Carol II), and of March 1941 (approval of Ion Antonescu's rule), and the referendum of 23 November 1986 on cutting military spending, held under the Socialist Republic.",
+   "source": "mo",
+   "valid_from": "1864-01-01",
+   "valid_to": "1989-12-22",
+   "first_held": "1864-05-14",
+   "est_votes": 40000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Monitorul Oficial / Buletinul Oficial",
+     "url": "https://www.monitoruloficial.ro/",
+     "format": "scanned issues",
+     "access": "manual",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "source": "mo",
+     "evidence": "Results in the Monitorul Oficial and the Buletinul Oficial, national and by county.",
+     "first_date": "1864-05-14",
+     "last_date": "1986-11-23"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "RO",
+     "valid_from": "1850-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1864-05-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "precision": "month",
+     "source": "mo"
+    },
+    {
+     "date": "1866-04-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "precision": "month",
+     "source": "mo"
+    },
+    {
+     "date": "1938-02-24",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "mo"
+    },
+    {
+     "date": "1941-03-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "precision": "month",
+     "source": "mo"
+    },
+    {
+     "date": "1986-11-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "mo"
+    }
+   ]
+  },
+  {
+   "key": "consilii_judetene_comunale_regat",
+   "tier": "regat",
+   "name": "Alegeri pentru consiliile județene și comunale (1864–1938)",
+   "name_en": "County and commune council elections of the Kingdom",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "County and commune councils elected under the communal and county laws of 1864 and the administrative laws of 1925 and 1929, until the 1938 regime replaced them with appointed bodies.",
+   "source": "mo",
+   "valid_from": "1864-03-31",
+   "valid_to": "1938-02-27",
+   "disposition": "blocked",
+   "disposition_reason": "No official consolidated record: results were announced locally and survive in county archives and local press, not in the national official gazette.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "RO",
+     "within": null,
+     "valid_from": "1850-01-01",
+     "valid_to": "1948-01-01"
+    }
+   ]
+  },
+  {
+   "key": "alegeri_indirecte",
+   "tier": "national",
+   "name": "Alegeri indirecte",
+   "name_en": "Indirect elections",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 64, 103, 142)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers chosen by elected bodies, with no electorate voting: the Prime Minister and government by a vote of confidence in Parliament, the presidents of the chambers, Constitutional Court judges appointed by the chambers and the President, deputy mayors and county council vice presidents by their councils, county council presidents by their councils until 2004 and in 2016, and the 1992 county councils by an electoral college of local councillors. Prefects are appointed by the government.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "RO",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "justitie",
+   "tier": "national",
+   "name": "Puterea judecătorească",
+   "name_en": "Judiciary",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (arts. 125, 133)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judge, prosecutor, or police officer is elected by voters: judges are appointed by the President on the proposal of the Superior Council of Magistracy (Constitution art. 125), whose magistrate members are elected by the general assemblies of judges and prosecutors (art. 133), not by the public."
+  },
+  {
+   "key": "nominalizari",
+   "tier": "national",
+   "name": "Desemnarea candidaților",
+   "name_en": "Candidate nomination",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "lege208",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No state-run primaries: parties, alliances, and minority organizations choose their candidates by their own rules, and independents qualify by supporters' signatures (Law 208/2015; Law 370/2004)."
+  },
+  {
+   "key": "minoritati_si_camere",
+   "tier": "national",
+   "name": "Alegeri neteritoriale",
+   "name_en": "Non-territorial elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitutie",
+   "locator": "https://www.cdep.ro/pls/dic/site.page?id=339 (art. 62(2))",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The national-minority seats are won in the Chamber of Deputies election, on the general ballot, and are counted in camera_deputatilor; there is no separate minority roll. Elections inside professional bodies, universities, and trade unions are run privately by those bodies."
+  },
+  {
+   "key": "organisme_speciale",
+   "tier": "national",
+   "name": "Organisme cu scop special",
+   "name_en": "Special-purpose bodies",
+   "category": "special_purpose",
+   "goal": "national",
+   "measure": {},
+   "source": "lege115",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Romania has no publicly elected school, water, or other special-purpose boards: school boards, inter-community development associations, and agencies are appointed or formed by the local councils (Law 115/2015 and the Administrative Code)."
+  }
+ ]
+}
