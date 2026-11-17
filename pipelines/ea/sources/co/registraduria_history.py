@@ -264,7 +264,9 @@ def _empty(schema: dict[str, pl.DataType]) -> pl.DataFrame:
 
 def _seats(labels: pl.DataFrame) -> pl.DataFrame:
     lists = labels.filter(pl.col("corp").is_in([ASSEMBLY, COUNCIL, BOARD]) & (pl.col("cand") != "0"))
-    return lists.group_by("corp", "district", "party").agg(seats=pl.col("elected").sum().cast(pl.Int32))
+    return lists.group_by("corp", "district", "party").agg(
+        seats=pl.col("cand").filter(pl.col("elected")).n_unique().cast(pl.Int32)
+    )
 
 
 def parse_1997() -> None:
@@ -635,22 +637,9 @@ def parse_2003() -> None:
         elected=pl.col("won").fill_null(False)
     )
     labels = _modern_districts(labels)
-    seats = _modern_districts(
-        pl.concat(
-            [
-                table(name).select(
-                    corp=pl.col("CODI_COR").replace_strict(SHORT_2003, default=None),
-                    dep="CODI_DEP",
-                    mun=pl.col("CODI_MUN") if "CODI_MUN" in table(name).columns else pl.lit("000"),
-                    jal=pl.lit("00"),
-                    party=_num("CODI_PAR"),
-                    seats=_int("CURU_PAR").cast(pl.Int32),
-                )
-                for name in ("ELEG_ASA", "ELEG_CON")
-            ]
-        )
-    )
-    board_seats = _seats(labels.filter(pl.col("corp") == BOARD).with_columns(elected=pl.col("elected")))
+    # The seat column (CURU_PAR) of the 2003 tables of winners disagrees with their own rows for some lists, so a
+    # list's seats are its elected candidates.
+    seats = _seats(labels)
     places = pl.concat(
         [
             table("PUESTOS").select(
@@ -670,7 +659,7 @@ def parse_2003() -> None:
         code=pl.concat_str("CODI_DEP", "CODI_MUN", "CODI_JAL", separator=":"),
         name="NOMB_JAL",
     )
-    _write(2003, votes_frame, labels, pl.concat([seats.select(*SEATS), board_seats.select(*SEATS)]), places)
+    _write(2003, votes_frame, labels, seats, places)
     comunas.write_parquet(PARSED / str(DAYS[2003]) / "names.parquet")
 
 
