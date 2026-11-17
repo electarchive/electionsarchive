@@ -723,7 +723,10 @@ def parliament(e: Parliament) -> Package:
     for n in held(e):
         pages += [page(e.site, name, e.id, f"pf7331={n}") for name in ("wp336", "wp338")]
         pages.append(page(e.site, "wp033", e.id, f"pf7331={n}"))
-    for url in pages:
+    base = general(e)
+    pages += [page(base.site, "wp610", base.id), page(base.site, "wp603", base.id)]
+    pages += [page(base.site, "wp610", base.id, f"lit={lit}current_row=1") for lit in letters(base)]
+    for url in dict.fromkeys(pages):
         artifact = cached(url)
         if artifact is not None:
             p.artifact(artifact, SOURCE_ID)
