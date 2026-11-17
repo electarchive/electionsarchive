@@ -1,4 +1,4 @@
-"""Canada's federal by-elections of 2007 to 2026, by polling division, from Elections Canada's official voting results.
+"""Canada's federal by-elections of 2007 to 2014, by polling division, from Elections Canada's official voting results.
 
 Elections Canada's poll-by-poll files for these by-elections list candidates by name only, so each candidate's party
 and each printed total come from the report's own tables. A candidate's poll sums must equal the votes the report
@@ -40,8 +40,6 @@ class Event:
     report: str
     synopsis: str
     files: dict[str, str]
-    table: str | None = None
-    page: str | None = None
 
 
 def _csv(folder: str, pattern: str, feds: tuple[str, ...]) -> dict[str, str]:
@@ -50,19 +48,6 @@ def _csv(folder: str, pattern: str, feds: tuple[str, ...]) -> dict[str, str]:
 
 def _synopsis(folder: str, document: str) -> str:
     return f"{HOST}/content.aspx?section=res&dir=rep/off/{folder}&document={document}&lang=e"
-
-
-def _recent(folder: str, number: int, feds: tuple[str, ...]) -> Event:
-    """A by-election from 2016 on: poll-by-poll files, and the candidate table that names each party."""
-    base = f"res/rep/off/{folder}"
-    data = f"{HOST}/{base}/{number}/data_donnees"
-    return Event(
-        folder,
-        f"{HOST}/{base}/csv_e.html",
-        {fed: f"{data}/pollbypoll_bureauparbureau{fed}.csv" for fed in feds},
-        f"{data}/table_tableau12.csv",
-        f"{HOST}/{base}/home.html",
-    )
 
 
 EVENTS: dict[date, Event] = {
@@ -116,24 +101,6 @@ EVENTS: dict[date, Event] = {
         _synopsis("ovr_2014b", "p2"),
         _csv("res/rep/off/ovr_2014b/csv", "{}.csv", ("35099", "48028")),
     ),
-    date(2016, 10, 24): _recent("ovr_2016", 43, ("48027",)),
-    date(2017, 4, 3): _recent("ovr_2017b", 44, ("24068", "35055", "35078", "48007", "48008")),
-    date(2017, 10, 23): _recent("ovr_2017c", 45, ("24035", "48033")),
-    date(2017, 12, 11): _recent("ovr_2017d", 46, ("10002", "35093", "47001", "59030")),
-    date(2018, 6, 18): _recent("ovr_2018", 47, ("24022",)),
-    date(2018, 12, 3): _recent("ovr_2018b", 48, ("35050",)),
-    date(2019, 2, 25): _recent("ovr_2019", 49, ("24054", "35119", "59003")),
-    date(2019, 5, 6): _recent("ovr_2019b", 50, ("59018",)),
-    date(2020, 10, 26): _recent("ovr_2020", 52, ("35108", "35118")),
-    date(2022, 12, 12): _recent("ovr_2022", 54, ("35061",)),
-    date(2023, 6, 19): _recent("ovr_2023", 55, ("24053", "35080", "46007", "46014")),
-    date(2023, 7, 24): _recent("ovr_2023b", 56, ("48007",)),
-    date(2024, 3, 4): _recent("ovr_2024", 57, ("35023",)),
-    date(2024, 6, 24): _recent("ovr_2024b", 58, ("35090",)),
-    date(2024, 9, 16): _recent("ovr_2024c", 59, ("24037", "46005")),
-    date(2024, 12, 16): _recent("ovr_2024d", 60, ("59007",)),
-    date(2025, 8, 18): _recent("ovr_2025", 63, ("48002",)),
-    date(2026, 4, 13): _recent("ovr_2026", 64, ("24073", "35096", "35112")),
 }
 PARTY_NAMES = {
     "bloc quebecois": "Bloc Québécois",
@@ -163,8 +130,6 @@ def packages() -> list[str]:
 def fetch() -> None:
     for event in EVENTS.values():
         raw.fetch(SOURCE, event.synopsis, suffix=".html")
-        if event.table:
-            raw.fetch(SOURCE, event.table, suffix=".csv")
         for url in event.files.values():
             raw.fetch(SOURCE, url, suffix=".csv")
 
@@ -220,23 +185,6 @@ def listed(page: str) -> list[Listed]:
             if name and party and votes is not None:
                 found.append(Listed(index, name, party, votes))
             break
-    return found
-
-
-def listed_table(text: str, candidates: list[str]) -> list[Listed]:
-    """Candidate lines of the report's own candidate table, whose name and party cell is split at the known name."""
-    found: list[Listed] = []
-    for index, row in enumerate(list(csv.reader(io.StringIO(text)))[1:]):
-        if len(row) < 7 or not row[6].strip().isdigit():
-            continue
-        cell = row[3].split("/")[0].strip()
-        name = next(
-            (c for c in sorted(candidates, key=len, reverse=True) if norm(cell).startswith(norm(c) + " ")), None
-        )
-        if name is None:
-            raise ValueError(f"{row[2]}: {cell!r} starts with no candidate of the poll files")
-        party = cell[len(name) :].strip() if cell.startswith(name) else norm(cell)[len(norm(name)) :].strip()
-        found.append(Listed(index, name, party, int(row[6])))
     return found
 
 
@@ -302,8 +250,6 @@ def district(fed: str, text: str) -> District:
                 status = "void"
             elif lowered.startswith("no poll"):
                 status = "none"
-            elif grouped := re.match(r"Electors voted by special ballot in Group (\d+)", cells[0]):
-                status, host = "merged", f"S/R {grouped.group(1)}"
             else:
                 found = HOST_NUMBER.search(cells[0])
                 if found is None:
@@ -349,12 +295,8 @@ def is_independent(text: str) -> bool:
 
 def load(day: date) -> tuple[Event, list[District], list[Listed], dict[str, tuple[int, int, int]]]:
     event = EVENTS[day]
-    districts = [district(fed, decoded(raw.cached(SOURCE, url).path.read_bytes())) for fed, url in event.files.items()]
-    if event.table:
-        table = decoded(raw.cached(SOURCE, event.table).path.read_bytes())
-        names = [name for item in districts for name in item.candidates]
-        return event, districts, listed_table(table, names), {}
     page = decoded(raw.cached(SOURCE, event.synopsis).path.read_bytes())
+    districts = [district(fed, decoded(raw.cached(SOURCE, url).path.read_bytes())) for fed, url in event.files.items()]
     return event, districts, listed(page), totals(page)
 
 
@@ -382,7 +324,7 @@ def registry() -> Package:
         "ca.ec/registry",
         SOURCE,
         "The House of Commons, its electoral system, and the parties on the ballot in Canada's federal by-elections of "
-        "2007 to 2026",
+        "2007 to 2014",
     )
     p.external.add(CANADA)
     p.add("body", id=BODY, polity_id=CANADA, kind="lower_house")
@@ -422,12 +364,12 @@ def by_election(day: date) -> Package:
         kind="official_body",
         publisher=SOURCE_NAME,
         title=f"Official Voting Results, federal by-election{'s' if len(districts) > 1 else ''} of {spoken}",
-        url=event.page or f"{HOST}/content.aspx?section=res&dir=rep/off/{event.report}&document=index&lang=e",
+        url=f"{HOST}/content.aspx?section=res&dir=rep/off/{event.report}&document=index&lang=e",
         license=LICENSE,
         license_url=LICENSE_URL,
         attribution="Elections Canada",
     )
-    for url in (event.synopsis, *([event.table] if event.table else []), *event.files.values()):
+    for url in (event.synopsis, *event.files.values()):
         p.artifact(raw.cached(SOURCE, url), results)
     election = key("election", day)
     p.add("election", id=election, polity_id=CANADA, kind="by_election", date_from=day, date_to=day, status="held")
@@ -599,10 +541,26 @@ def by_election(day: date) -> Package:
     return p
 
 
+def overlapping() -> list[date]:
+    """By-elections that ca.elections already loads by polling division, whose units this pipeline must not repeat."""
+    from ea.sources.ca.elections import BYELECTIONS
+
+    return sorted(set(EVENTS) & set(BYELECTIONS))
+
+
 def parse() -> None:
-    registry().write()
-    for day in EVENTS:
-        by_election(day).write()
+    if shared := overlapping():
+        raise ValueError(f"ca.elections already loads the by-elections of {', '.join(map(str, shared))}")
+    built = [registry(), *(by_election(day) for day in EVENTS)]
+    seen: dict[tuple[object, object, object, object], str] = {}
+    for p in built:
+        for row in p.rows.get("reporting_unit", []):
+            unit = (row["scheme_code"], row["code"], row["valid_from"], row["valid_to"])
+            if unit in seen:
+                raise ValueError(f"{p.key}: the reporting unit {unit} is also emitted by {seen[unit]}")
+            seen[unit] = p.key
+    for p in built:
+        p.write()
 
 
 def emit() -> None:
@@ -621,5 +579,4 @@ def compare() -> None:
                 sum(poll.rejected or 0 for poll in counted),
             )
             figures = printed.get(norm(item.name))
-            if figures is not None:
-                print(day, item.fed, item.name, "polls", sums, "printed", figures, "OK" if figures == sums else "DIFF")
+            print(day, item.fed, item.name, "polls", sums, "printed", figures, "OK" if figures == sums else "DIFF")
