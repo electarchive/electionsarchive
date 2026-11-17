@@ -12,13 +12,13 @@ from ea.sources.jm import boxread, scanned
 SHARE = "1997-12-18"
 
 
-def page(args: tuple[str, int, dict[str, int], str]) -> dict[str, object]:
-    pdf, number, counts, out = args
+def page(args: tuple[str, int, dict[str, int], str] | tuple[str, int, dict[str, int], str, str]) -> dict[str, object]:
+    pdf, number, counts, out = args[:4]
     target = Path(out) / f"{number:04d}.json"
-    if target.exists():
+    if target.exists() and len(args) == 4:
         return json.loads(target.read_text())
     loaded = boxread.load(Path(pdf), number)
-    name = boxread.match(loaded.title, list(counts))
+    name = boxread.match(loaded.title, list(counts)) if len(args) == 4 else args[4]
     result: dict[str, object] = {"page": number, "title": loaded.title, "angle": loaded.angle, "name": name}
     if name is not None:
         try:
@@ -42,7 +42,33 @@ def page(args: tuple[str, int, dict[str, int], str]) -> dict[str, object]:
     return result
 
 
+def fill(day: str, pdf: str, out: Path) -> None:
+    """Reads again, as the constituency of the page before, the pages whose heading named no constituency: the
+    continuation pages of a table whose heading the reader garbled."""
+    counts = {c.name: len(c.candidates) for c in scanned.read(day).constituencies}
+    pages = sorted((json.loads(f.read_text()) for f in out.glob("0*.json")), key=lambda p: p["page"])
+    named = [p["page"] for p in pages if p.get("name") and p.get("rows")]
+    if not named:
+        return
+    jobs = []
+    previous = None
+    for p in pages:
+        if p.get("name") and p.get("rows") or p.get("name"):
+            previous = p["name"]
+        elif previous and named[0] < p["page"] < named[-1] and not p.get("filled"):
+            jobs.append((pdf, p["page"], counts, str(out), previous))
+    with ProcessPoolExecutor(4) as pool:
+        for result in pool.map(page, jobs):
+            result["filled"] = True
+            (out / f"{result['page']:04d}.json").write_text(json.dumps(result))
+            rows = result.get("rows")
+            print(result["page"], result["name"], len(rows) if isinstance(rows, list) else None, flush=True)
+
+
 def main() -> None:
+    if sys.argv[1] == "fill":
+        fill(sys.argv[2], sys.argv[3], Path(sys.argv[4]))
+        return
     if sys.argv[1] == "assemble":
         day, pdf, out = sys.argv[2], Path(sys.argv[3]), Path(sys.argv[4])
         result = assemble(day, pdf, out)
