@@ -29,10 +29,6 @@ URLS = {
 }
 REGISTRY = "ro.aep/ref-registry"
 SYSTEM = key("electoral_system", "referendum")
-QUOTA = {
-    "2012": "50% of the voters on the lists",
-    "2018": "30% of the voters on the lists",
-}
 
 
 @dataclass(frozen=True)
@@ -91,7 +87,7 @@ DAYS = {
             ),
         ),
         "A revision of the Constitution takes effect only when voters approve it in a referendum. The vote ran on two "
-        "days. Turnout was below the threshold of a third of the voters on the lists that the law then set, so the "
+        "days. Turnout was below the threshold of 30% of the voters on the lists that the law then set, so the "
         "referendum was not valid.",
     ),
     "2019": Day(
