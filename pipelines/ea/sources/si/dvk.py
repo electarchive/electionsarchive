@@ -2,7 +2,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
 
@@ -14,6 +14,7 @@ from ea.package import Package
 
 SOURCE = "si.dvk"
 BASE = "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve"
+ARCHIVE = "https://www.dvk-rs.si/arhivi"
 SLOVENIA = str(uuid5(package.NAMESPACE, "polity\x1fSI"))
 ELECTORAL_UNITS = range(1, 9)
 DISTRICTS = range(1, 12)
@@ -31,10 +32,11 @@ class Vote:
     native: str
     round: int = 1
     note: str = ""
+    layout: str = "table"
 
     @property
     def url(self) -> str:
-        return f"{BASE}/{self.path}"
+        return self.path if self.path.startswith("https://") else f"{BASE}/{self.path}"
 
 
 VOTES = [
@@ -71,6 +73,34 @@ VOTES = [
         "Volitve v Državni zbor 2022",
     ),
     Vote(
+        "dz",
+        date(2026, 3, 22),
+        f"{ARCHIVE}/dz2026/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2026 Slovenian parliamentary election",
+        "Volitve v Državni zbor 2026",
+        layout="izvoz",
+    ),
+    Vote(
+        "pres",
+        date(2022, 10, 23),
+        f"{ARCHIVE}/volitve2022/vp2022/data/prvikrog/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2022 Slovenian presidential election, first round",
+        "Volitve predsednika republike 2022, 1. krog",
+        layout="izvoz",
+    ),
+    Vote(
+        "pres",
+        date(2022, 11, 13),
+        f"{ARCHIVE}/volitve2022/vp2022/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2022 Slovenian presidential election, second round",
+        "Volitve predsednika republike 2022, 2. krog",
+        round=2,
+        layout="izvoz",
+    ),
+    Vote(
         "pres",
         date(2017, 10, 22),
         "predsednika_2017/Koncni-izid_volitev-predsednika_prvi_krog_stanje_2.11.2017.xlsx",
@@ -94,6 +124,15 @@ VOTES = [
         "Vsi",
         "2014 European Parliament election in Slovenia",
         "Volitve poslancev iz Republike Slovenije v Evropski parlament 2014",
+    ),
+    Vote(
+        "ep",
+        date(2024, 6, 9),
+        f"{ARCHIVE}/ep2024/data/izvoz.xlsx",
+        "Podatki po voliščih",
+        "2024 European Parliament election in Slovenia",
+        "Volitve poslancev iz Republike Slovenije v Evropski parlament 2024",
+        layout="izvoz",
     ),
     Vote(
         "ref",
@@ -154,7 +193,7 @@ VOTES = [
 
 def fetch() -> None:
     for vote in VOTES:
-        raw.fetch(SOURCE, vote.url, suffix=vote.path.rsplit(".", 1)[1])
+        raw.fetch(SOURCE, vote.url, suffix="xlsx" if vote.layout == "izvoz" else vote.path.rsplit(".", 1)[1])
 
 
 def plain(text: str) -> str:
@@ -195,6 +234,7 @@ class Sheet:
     rows: list[Row]
     total: Row | None
     options: list[str]
+    titles: dict[int, str] = field(default_factory=dict)
 
 
 def find(names: list[str], *candidates: str, prefix: bool = False) -> int | None:
@@ -206,6 +246,8 @@ def find(names: list[str], *candidates: str, prefix: bool = False) -> int | None
 
 
 def load(vote: Vote) -> Sheet:
+    if vote.layout == "izvoz":
+        return load_izvoz(vote)
     artifact = raw.cached(SOURCE, vote.url)
     book = fastexcel.read_excel(str(artifact.path))
     frame = book.load_sheet_by_name(vote.sheet, header_row=0, dtypes="string").to_polars()
@@ -271,6 +313,149 @@ def load(vote: Vote) -> Sheet:
             continue
         rows.append(row)
     return Sheet(rows, total, [header[position] for position in options])
+
+
+TITLES = re.compile(r"^(?:(?:dr|mag|prof|doc)\.\s*)+", re.IGNORECASE)
+IZVOZ_COLUMNS = (
+    "Volilna enota",
+    "Volilni okraj",
+    "ID Volišča",
+    "Volišče",
+    "Št. volilnih upr.",
+    "Udeležba",
+    "Odstotek udeležbe",
+    "Št. oddanih glasovnic",
+    "Št. veljavnih glasovnic",
+    "Št. neveljavnih glasovnic",
+    "Odstotek preštetih glasovnic",
+)
+AREA_CELL = re.compile(r"^(?:VE|VO)\s+(\d+)\s*-\s*(.*)$")
+VOTES_CELL = re.compile(r"\s*-\s*št\. glasov$")
+PREFERENCES_CELL = re.compile(r"\s*-\s*št\. pref\. glasov$")
+
+
+def bare(name: str) -> str:
+    """A ballot name without its academic titles, which the commission adds to some files and not others."""
+    return TITLES.sub("", clean(name))
+
+
+def count(cell: object) -> int | None:
+    text = None if cell is None else str(cell).strip()
+    return None if text in (None, "", "NULL") else int(float(text.replace(",", ".")))
+
+
+def grid(book: fastexcel.ExcelReader, sheet: str) -> list[tuple[object, ...]]:
+    return book.load_sheet_by_name(sheet, header_row=None, dtypes="string").to_polars().rows()
+
+
+def header_row(rows: list[tuple[object, ...]], sheet: str) -> int:
+    for position, line in enumerate(rows):
+        if line[0] == "Volilna enota":
+            return position
+    raise LookupError(f"{sheet} has no header row")
+
+
+def load_izvoz(vote: Vote) -> Sheet:
+    """Read the commission's izvoz.xlsx export: a Podatki sheet of printed totals, a Kandidati sheet, and a sheet of
+    figures by polling station with one '<party or candidate>- št. glasov' column per ballot line."""
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, vote.url).path))
+    stations = grid(book, "Podatki po voliščih")
+    top = header_row(stations, "Podatki po voliščih")
+    header = [clean(None if cell is None else str(cell)) for cell in stations[top]]
+    if tuple(header[: len(IZVOZ_COLUMNS)]) != IZVOZ_COLUMNS:
+        raise LookupError(f"{vote.url} has unexpected station columns: {header[:12]}")
+    names: list[str] = []
+    positions: list[int] = []
+    titles: dict[int, str] = {}
+    lists = 0
+    in_list = False
+    nested = any(PREFERENCES_CELL.search(cell) for cell in header)
+    for position in range(len(IZVOZ_COLUMNS), len(header)):
+        cell = header[position]
+        if VOTES_CELL.search(cell):
+            name = VOTES_CELL.sub("", cell)
+            lists += 1
+            in_list = True
+            if nested:
+                if top and stations[0][position]:
+                    titles[len(names)] = clean(str(stations[0][position]))
+                name = f"{lists}. {name}"
+            names.append(name)
+            positions.append(position)
+        elif PREFERENCES_CELL.search(cell):
+            if in_list:
+                in_list = False  # the first preference column of a list is the list's own total
+                continue
+            names.append(PREFERENCES_CELL.sub("", cell))
+            positions.append(position)
+    if not names:
+        raise LookupError(f"{vote.url} has no ballot columns")
+    rows: list[Row] = []
+    for line in stations[top + 1 :]:
+        if not any(cell not in (None, "") for cell in line) or str(line[0]).startswith("*"):
+            continue  # a blank line, or a footnote beneath the table
+        unit, vo = AREA_CELL.match(clean(str(line[0]))), AREA_CELL.match(clean(str(line[1])))
+        if unit is None or vo is None:
+            raise ValueError(f"{vote.url}: unreadable area in {line[:4]}")
+        rows.append(
+            Row(
+                ve=unit.group(1),
+                vo=vo.group(1),
+                stv=clean(str(line[2])),
+                place=clean(str(line[3])).rstrip("* "),
+                ve_name=clean(unit.group(2)),
+                vo_name=clean(vo.group(2)),
+                registered=count(line[4]),
+                voters=count(line[5]),
+                cast=count(line[7]),
+                invalid=count(line[9]),
+                valid=count(line[8]),
+                options=[count(line[position]) for position in positions],
+            )
+        )
+    return Sheet(rows, izvoz_total(vote, book, names), names, titles)
+
+
+def izvoz_total(vote: Vote, book: fastexcel.ExcelReader, names: list[str]) -> Row:
+    """The national row of the Podatki sheet, with candidate totals from the Kandidati sheet where the list totals
+    are all the Podatki sheet prints."""
+    printed = grid(book, "Podatki")
+    top = header_row(printed, "Podatki")
+    heads = [clean(None if cell is None else str(cell)) for cell in printed[top]]
+    line = next(row for row in printed[top + 1 :] if not clean(str(row[0] or "")) and not clean(str(row[1] or "")))
+    by_name = {
+        bare(VOTES_CELL.sub("", head)): count(line[position])
+        for position, head in enumerate(heads)
+        if VOTES_CELL.search(head)
+    }
+    candidates: dict[str, list[int | None]] = {}
+    if any(PREFERENCES_CELL.search(name) for name in names) or any(re.match(r"\d+\.", name) for name in names):
+        sheet = grid(book, "Kandidati")
+        candidates = {"": [count(row[4]) for row in sheet[1:] if row[1] and count(row[4]) is not None]}
+    options: list[int | None] = []
+    queue = iter(candidates.get("", []))
+    for name in names:
+        listed = re.match(r"\d+\.\s*(.*)", name)
+        if listed:
+            options.append(by_name[bare(listed.group(1))])
+        elif candidates:
+            options.append(next(queue))
+        else:
+            options.append(by_name[bare(name)])
+    return Row(
+        ve="",
+        vo="",
+        stv="",
+        place="",
+        ve_name="",
+        vo_name="",
+        registered=count(line[2]),
+        voters=count(line[3]),
+        cast=count(line[5]),
+        invalid=count(line[7]),
+        valid=count(line[6]),
+        options=options,
+    )
 
 
 def key(kind: str, *parts: object) -> str:
@@ -380,6 +565,8 @@ def station_kind(place: str) -> str:
         return "postal_district"
     if "DKP" in text or "AMBASADA" in text:
         return "abroad_mission"
+    if "PO POŠTI" in text:
+        return "postal_district"
     if "OMNIA" in text or "POSEBNI VOLILNI" in text or "PREDČASNO" in text:
         return "aggregate"
     return "standard"
@@ -603,11 +790,18 @@ def _facts(
 
 def _units(p: Package, vote: Vote, sheet: Sheet) -> list[str]:
     counts = Counter((row.ve, row.vo, row.stv) for row in sheet.rows)
+    named = Counter((row.ve, row.vo, row.stv, changeset.slug(row.place)) for row in sheet.rows)
+    seen: Counter[tuple[str, str, str, str]] = Counter()
     units: list[str] = []
     for row in sheet.rows:
         code = f"{vote.day}:{row.ve}:{row.vo}:{row.stv}"
         if counts[(row.ve, row.vo, row.stv)] > 1:
             code += f":{changeset.slug(row.place)}"
+            # Missions abroad with too few voters to print are anonymized into several rows under one name.
+            same = (row.ve, row.vo, row.stv, changeset.slug(row.place))
+            if named[same] > 1:
+                seen[same] += 1
+                code += f":{seen[same]}"
         unit = key("unit", code)
         units.append(unit)
         electoral_unit, seat = district(row.ve, row.vo)
@@ -805,7 +999,7 @@ def president(vote: Vote, sheet: Sheet) -> Package:
     options: dict[int, str] = {}
     for index, name in enumerate(sheet.options):
         name = clean(name)
-        person = key("person", f"pres:{vote.day.year}:{name}")
+        person = key("person", f"pres:{vote.day.year}:{bare(name) if vote.layout == 'izvoz' else name}")
         option = options[index] = key("option", vote.day, index + 1, name)
         if vote.round == 1:
             p.add("person", id=person)
@@ -858,8 +1052,11 @@ def european(vote: Vote, sheet: Sheet) -> Package:
         if re.match(r"\d+\.", label):
             text, number = _ballot_line(label, index)
             party = key("party", vote.day, number, text)
+            official = sheet.titles.get(index, text)
             p.add("party", id=party, kind="party", polity_id=SLOVENIA)
-            p.name(party, text, "sl", "official")
+            p.name(party, official, "sl", "official")
+            if official != text:
+                p.name(party, text, "sl", "short", False)
             current = options[index] = key("option", vote.day, number, text)
             p.add(
                 "contest_option",
