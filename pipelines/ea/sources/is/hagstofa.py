@@ -4,6 +4,7 @@ import importlib
 import json
 import os
 import re
+import subprocess
 import unicodedata
 from collections import Counter
 from collections.abc import Iterator
@@ -25,6 +26,10 @@ NOTICES = {
     "count": "https://island.is/s/landskjorstjorn/frett/tilkynning-um-nidurstodu-talningar-vid-thjodaratkvaedagreidslu-29-agust-2026",
     "final": "https://island.is/s/landskjorstjorn/frett/landskjorstjorn-tilkynnir-nidurstodu-thjodaratkvaedagreidslu",
 }
+REPORT = (
+    "https://assets.ctfassets.net/8k0h54kbe6bj/79iCOCyZXCBCCV8k6jz0QG/5ef76afbf75aebefad481fdc853f5ae3/"
+    "0ae957db-7952-4e0b-bfbc-5992a7fdcbb4.pdf"
+)
 TABLES = {
     # Althing
     "KOS02121": "althingi/althurslit",
@@ -108,6 +113,7 @@ def body(table: str) -> dict[str, object]:
 def fetch() -> None:
     for notice in NOTICES.values():
         raw.fetch(COMMISSION, notice, suffix=".html")
+    raw.fetch(COMMISSION, REPORT, suffix=".pdf")
     for table in TABLES:
         raw.fetch(SOURCE, url(table), suffix=".json")
         raw.fetch(SOURCE, url(table), suffix=".json", body=body(table))
@@ -618,6 +624,7 @@ def registry() -> Package:
     )
     for notice in NOTICES.values():
         p.artifact(raw.cached(COMMISSION, notice), COMMISSION_SOURCE)
+    p.artifact(raw.cached(COMMISSION, REPORT), COMMISSION_SOURCE)
     for table in TABLES:
         p.artifact(raw.cached(SOURCE, url(table)), STATS)
         p.artifact(raw.cached(SOURCE, url(table), body(table)), STATS)
@@ -1546,10 +1553,67 @@ def notice_number(text: str, pattern: str) -> int:
     return int(match.group(1).replace(".", ""))
 
 
+# the report's constituency columns, left to right
+REPORT_COLUMNS = [
+    ("Norðvestur-", "northwest-2003"),
+    ("Norðaustur-", "northeast-2003"),
+    ("Suður-", "south-2003"),
+    ("Suðvestur-", "southwest-2003"),
+    ("Reykjavíkur-", "reykjavik-south-2003"),
+    ("Reykjavíkur-", "reykjavik-north-2003"),
+]
+REPORT_ROWS = {
+    "registered": "Fjöldi kjósenda á kjörskrá",
+    "yes": "Fjöldi atkvæða greidd Já",
+    "no": "Fjöldi atkvæða greidd Nei",
+    "blank": "Fjöldi auðra seðla",
+    "void": "Fjöldi ógildra seðla (ekki auðir)",
+    "cast": "Fjöldi greiddra atkvæða",
+    "valid": "Fjöldi gildra atkvæða",
+}
+
+
+def report_tables() -> tuple[dict[str, int], dict[str, dict[str, int]]]:
+    """The commission's report: the national figures, and the figures of each constituency by its code."""
+    path = raw.cached(COMMISSION, REPORT).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    lines = text.splitlines()
+    split = next(i for i, line in enumerate(lines) if "eftir kjördæmum" in line)
+    header = " ".join(lines[split : split + 8])
+    at = 0
+    for name, _ in REPORT_COLUMNS:
+        at = header.find(name, at)
+        if at < 0:
+            raise LookupError("the report's constituency columns are not in the expected order")
+        at += len(name)
+    if header.find("suður", at) < 0 or header.find("norður", header.find("suður", at)) < 0:
+        raise LookupError("the report's Reykjavík columns are not in the expected order")
+
+    def row(block: list[str], label: str) -> list[int]:
+        found = [line.split(label, 1)[1] for line in block if label in line]
+        if len(found) != 1:
+            raise LookupError(f"the report has {len(found)} rows for {label}")
+        rest = re.sub(r"\d+(?:,\d+)?%", "", found[0])
+        return [int(t.replace(".", "")) for t in re.findall(r"\d{1,3}(?:\.\d{3})*|\d+", rest)]
+
+    national: dict[str, int] = {}
+    by_unit: dict[str, dict[str, int]] = {code: {} for _, code in REPORT_COLUMNS}
+    for name, label in REPORT_ROWS.items():
+        top = row(lines[:split], label)
+        cells = row(lines[split:], label)
+        if len(top) != 1 or len(cells) != len(REPORT_COLUMNS):
+            raise LookupError(f"the report's figures for {label} are not one national and six constituency values")
+        national[name] = top[0]
+        for (_, code), value in zip(REPORT_COLUMNS, cells, strict=True):
+            by_unit[code][name] = value
+    return national, by_unit
+
+
 def referendum_2026(event: Event) -> Package:
     b = Build(event, "The 29 August 2026 Icelandic referendum on resuming accession negotiations, national totals")
     for notice in NOTICES.values():
         b.p.uses(raw.cached(COMMISSION, notice))
+    b.p.uses(raw.cached(COMMISSION, REPORT))
     counted, final = notice_text("count"), notice_text("final")
     registered = notice_number(counted, r"Fjöldi kjósenda á kjörskrá var ([\d.]+)")
     cast = notice_number(counted, r"Greidd atkvæði voru ([\d.]+)")
@@ -1605,6 +1669,7 @@ def referendum_2026(event: Event) -> Package:
         "votes cast, which the count notice gives. The result is advisory.",
         source=COMMISSION_SOURCE,
         supersedes=first,
+        default=False,
     )
     for option, v in ((yes_option, yes), (no_option, no)):
         b.value(last, unit, option, 1, v)
@@ -1619,6 +1684,40 @@ def referendum_2026(event: Event) -> Package:
     )
     b.outcome(last, yes_option, None, "won" if yes > no else "lost")
     b.outcome(last, no_option, None, "won" if no > yes else "lost")
+    # the commission's report of 22 September 2026 gives every figure by constituency
+    national, by_unit = report_tables()
+    mismatch(b, "2026 report yes votes", national["yes"], yes)
+    mismatch(b, "2026 report no votes", national["no"], no)
+    mismatch(b, "2026 report blank and void ballots", national["blank"] + national["void"], combined)
+    mismatch(b, "2026 report ballots", national["cast"], cast)
+    mismatch(b, "2026 report valid votes", national["valid"], yes + no)
+    for what in ("yes", "no", "blank", "void", "cast", "valid", "registered"):
+        mismatch(b, f"2026 report {what} by constituency", sum(v[what] for v in by_unit.values()), national[what])
+    by_constituency = b.result_set(
+        "constituency",
+        contest,
+        "The National Electoral Commission's report of 22 September 2026, which gives the declared result by "
+        "constituency. It supersedes the national ruling with the same totals, and gives blank and void ballots "
+        "separately. Its count of voters on the electoral roll, 272,543, is lower than the 272,591 of the count notice, "
+        "which the roll's corrections after 24 July account for.",
+        source=COMMISSION_SOURCE,
+        supersedes=last,
+    )
+    measures = {"registered": 2, "cast": 3, "valid": 4, "void": 5, "blank": 6}
+    for code, figures in by_unit.items():
+        mismatch(b, f"2026 {code} ballots", figures["valid"] + figures["blank"] + figures["void"], figures["cast"])
+        mismatch(b, f"2026 {code} valid votes", figures["yes"] + figures["no"], figures["valid"])
+        constituency_unit = b.constituency(code)
+        b.value(by_constituency, constituency_unit, yes_option, 1, figures["yes"])
+        b.value(by_constituency, constituency_unit, no_option, 1, figures["no"])
+        for name, measure in measures.items():
+            b.value(by_constituency, constituency_unit, None, measure, figures[name])
+    b.declare(by_constituency, yes_option, 1, national["yes"])
+    b.declare(by_constituency, no_option, 1, national["no"])
+    for name, measure in measures.items():
+        b.declare(by_constituency, None, measure, national[name])
+    b.outcome(by_constituency, yes_option, None, "won" if national["yes"] > national["no"] else "lost")
+    b.outcome(by_constituency, no_option, None, "won" if national["no"] > national["yes"] else "lost")
     return b.finish()
 
 
