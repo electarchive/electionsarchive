@@ -700,6 +700,8 @@ COUNTED = {"2015-dangriga"}
 
 
 CAST_KEYS = {"1998", "2003-cayo-south"}
+# The House each scanned general election returned, by party; the ELECTED remarks read from the return must add up to it.
+HOUSE_SEATS = {"1998": {"PUP": 26, "UDP": 3}}
 SCANS = json.loads(Path(__file__).with_name("ebc_scans.json").read_text())
 
 
@@ -721,6 +723,10 @@ def scanned(key: str) -> list[Race]:
         found.append(race)
         _check_division(key, race)
     _check_national(key, data["printed"], found)
+    if key in HOUSE_SEATS:
+        won = Counter(party_of(c[1]) for race in found for c in race.cands if c[3])
+        if dict(won) != HOUSE_SEATS[key]:
+            raise ValueError(f"{key}: the elected candidates hold {dict(won)}, not the House's {HOUSE_SEATS[key]}")
     return found
 
 
