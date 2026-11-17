@@ -44,6 +44,14 @@ BUNDLE_YEARS = (1999, 2002, 2005, 2008, 2011, 2014)
 BUNDLE_MARK = "### SOURCE: "
 E9_YEARS = (2002, 2005, 2008, 2011, 2014)
 E9_PARTS = ("e9_part1.csv", "e9_part4.csv", "e9_part6.csv", "e9_part9_1.csv", "e9_part9_2.csv")
+# The 1999 statistics are named by their part in roman numerals: the summary (I), the party votes by electorate (V),
+# the party and informal votes with the electors on the roll (IX), and the two citizens-initiated referendums (XIII, XIV).
+FILES_1999 = {"e9_part1.csv": "parti.csv", "e9_part4.csv": "partv.csv"}
+PARTS_1999 = ("parti.csv", "partv.csv", "partix.csv", "partxiii.csv", "partxiv.csv")
+REFERENDUMS_1999 = (
+    ("partxiii.csv", "size", "reduce-house-size", "Reduce the size of the House of Representatives"),
+    ("partxiv.csv", "justice", "criminal-justice-reform", "Reform of the criminal justice system"),
+)
 SUMMARIES = (
     "overall-results-summary.csv",
     "winning-electorate-candidates.csv",
@@ -150,6 +158,8 @@ def index_url(year: int) -> str:
 
 
 def e9_url(year: int, name: str) -> str:
+    if year == 1999:
+        name = FILES_1999.get(name, name)
     return f"{SITE}/electionresults_{year}/e9/csv/{name}"
 
 
@@ -162,6 +172,8 @@ def fetch() -> None:
         _try(home_url(year), ".html")
         for name in E9_PARTS:
             _try(e9_url(year, name), ".csv")
+    for name in PARTS_1999:
+        _try(e9_url(1999, name), ".csv")
     for year in FETCH_YEARS:
         for url in (
             f"{SITE}/electionresults_{year}/index.html",
@@ -252,7 +264,7 @@ class Cells(HTMLParser):
 
 
 def number(text: str) -> int:
-    return int(text.replace(",", "").rstrip("*"))
+    return int(text.replace(",", "").strip().rstrip("*").removesuffix(".00"))
 
 
 @dataclass
@@ -555,6 +567,8 @@ def summary(year: int) -> Summary:
         return _derived_summary(year)
     if url is None:
         raise LookupError(f"{year}: no summary of overall results is cached")
+    if year == 1999 and url == e9_url(year, "e9_part1.csv"):
+        return _summary_1999(url)
     if url.endswith(".html"):
         return _home_summary(year, url)
     seats: dict[str, int] = {}
@@ -588,6 +602,45 @@ def summary(year: int) -> Summary:
     if sum(votes.values()) != totals[1]:
         raise ValueError(f"{url}: the party votes sum to {sum(votes.values())}, but the total is {totals[1]}")
     return Summary(url, seats, votes, totals[1], totals[2], magnitude)
+
+
+def _summary_1999(url: str) -> Summary:
+    """The 1999 summary (part I): each party's list seats and votes, the electorate seats and votes beside them, the
+    valid and informal party votes, and the state of the parties with the seats of both kinds together."""
+    seats: dict[str, int] = {}
+    votes: dict[str, int] = {}
+    state: dict[str, int] = {}
+    valid = informal = magnitude = None
+    group = ""
+    in_state = False
+    for row in rows_of(url):
+        row = [*row, *[""] * (12 - len(row))]
+        name = row[1]
+        if name == "State of the Parties":
+            in_state = True
+        elif in_state and row[3] == "Seats":
+            magnitude = number(row[10])
+            break
+        elif in_state and name:
+            state[name] = number(row[10])
+        elif name in GROUPS:
+            group = name
+        elif name == "Valid Votes":
+            valid = number(row[3])
+        elif name == "Informal Votes":
+            informal = number(row[3])
+        elif group == GROUPS[0] and name and row[3]:
+            votes[name] = number(row[3])
+            won = number(row[2] or "0") + number(row[8] or "0")
+            if won:
+                seats[name] = won
+    if valid is None or informal is None or magnitude is None:
+        raise ValueError(f"{url}: the summary prints no valid, informal, or seat total")
+    if seats != state or sum(seats.values()) != magnitude:
+        raise ValueError(f"{url}: the seats {seats} disagree with the state of the parties {state} ({magnitude})")
+    if sum(votes.values()) != valid:
+        raise ValueError(f"{url}: the party votes sum to {sum(votes.values())}, but the total is {valid}")
+    return Summary(url, seats, votes, valid, informal, magnitude)
 
 
 def _derived_summary(year: int) -> Summary:
@@ -757,6 +810,8 @@ def party_columns(year: int) -> tuple[list[str], dict[str, list[int]], list[int]
     votes, then valid and informal), and the combined totals row."""
     rows = rows_of(e9_url(year, "e9_part4.csv"))
     names = list(summary(year).votes)
+    if year == 1999:
+        return _party_columns_1999(rows, names)
     columns = []
     for header in rows[1][1:-2]:
         found = [name for name in names if name.casefold().startswith(header.casefold())]
@@ -784,6 +839,66 @@ def party_columns(year: int) -> tuple[list[str], dict[str, list[int]], list[int]
     if sums != combined:
         raise ValueError(f"{year}: the electorates sum to {sums}, but the combined totals are {combined}")
     return columns, electorate_rows, combined
+
+
+def _party_columns_1999(rows: list[list[str]], names: list[str]) -> tuple[list[str], dict[str, list[int]], list[int]]:
+    """The 1999 table of party votes by electorate (part V): the party columns are named in capitals, a blank column
+    separates them from the valid total, and another from the informal total. The two totals rows that split the
+    electorates into general and Māori are checked, and the Māori electorates' total includes the Tangata Whenua votes,
+    so the electorates are reconciled against the combined totals."""
+    headers = rows[1]
+    last = headers.index("Total Valid Party Votes")
+    columns = []
+    for header in headers[1:last]:
+        if not header:
+            continue
+        found = [name for name in names if name.casefold().startswith(header.casefold())]
+        exact = [name for name in found if name.casefold() == header.casefold()]
+        if len(exact or found) != 1:
+            raise ValueError(f"1999: the party column {header!r} matches {found} in the summary")
+        columns.append((exact or found)[0])
+    if len(columns) != len(names):
+        raise ValueError(f"1999: the table lists {len(columns)} parties, the summary {len(names)}")
+    # The file spells its last header "Inforaml Party Votes"; it is the first one after the valid total.
+    informal = next(i for i, header in enumerate(headers) if i > last and header)
+    at = [*range(1, 1 + len(columns)), last, informal]
+    electorate_rows: dict[str, list[int]] = {}
+    totals: dict[str, list[int]] = {}
+    for row in rows[2:]:
+        row = [*row, *[""] * (informal + 1 - len(row))]
+        if not row[0] or not row[1].replace(",", "").isdigit():
+            continue
+        values = [number(row[i]) for i in at]
+        if row[0].startswith(("General Electorate Totals", "Maori Electorate Totals", "Combined Totals")):
+            totals[row[0].split(" Totals")[0].split()[0]] = values
+        else:
+            electorate_rows[row[0]] = values
+    for values in electorate_rows.values():
+        if sum(values[:-2]) != values[-2]:
+            raise ValueError("1999: an electorate's party votes do not sum to its valid total")
+    sums = [sum(values[i] for values in electorate_rows.values()) for i in range(len(at))]
+    parts = [a + b for a, b in zip(totals["General"], totals["Maori"], strict=True)]
+    if sums != totals["Combined"] or parts != totals["Combined"]:
+        raise ValueError(f"1999: the electorates sum to {sums}, but the combined totals are {totals['Combined']}")
+    return columns, electorate_rows, totals["Combined"]
+
+
+def _electorate_table_1999(name: str) -> tuple[list[list[str]], dict[str, list[str]]]:
+    """The rows of a 1999 part by electorate, keyed by the electorate's name with punctuation folded, so that the
+    hyphen of West Coast-Tasman is no mismatch, and the rows of totals set aside."""
+    rows = rows_of(e9_url(1999, name))
+    found: dict[str, list[str]] = {}
+    for row in rows:
+        if (
+            row
+            and row[0]
+            and len(row) > 3
+            and row[1]
+            and not row[0].startswith(("Electoral", "General", "Maori", "Combined", "Total", "Question"))
+        ):
+            # Part IX goes on to further tables of the same electorates; the first is the one of party votes.
+            found.setdefault(slug(row[0]), row)
+    return rows, found
 
 
 def registry() -> Package:
@@ -1072,9 +1187,11 @@ def general(day: str) -> Package:
     elif how == "electorate":
         p.uses(art(e9_url(year, "e9_part4.csv")))
         _, electorate_rows, _ = party_columns(year)
-        for number, (name, values) in enumerate(electorate_rows.items(), 1):
+        roll = _roll_1999(electorate_rows) if year == 1999 else {}
+        made: dict[str, str] = {}
+        for name, values in electorate_rows.items():
             code = f"{year}:{name}"
-            unit = key("unit", "electorate", code)
+            unit = made[name] = key("unit", "electorate", code)
             p.add(
                 "reporting_unit",
                 id=unit,
@@ -1090,6 +1207,9 @@ def general(day: str) -> Package:
                 _put(p, party_set, unit, 0, options[label], VOTES, value)
             _put(p, party_set, unit, 0, None, VALID, values[-2])
             _put(p, party_set, unit, 0, None, INVALID, values[-1])
+            _put(p, party_set, unit, 0, None, REGISTERED, roll.get(name))
+        if year == 1999:
+            _referendums_1999(p, first, made, roll)
         p.add(
             "note",
             id=key("note", party_set, "electorates"),
@@ -1130,6 +1250,106 @@ def general(day: str) -> Package:
             lang="en",
         )
     return p
+
+
+def _roll_1999(electorate_rows: dict[str, list[int]]) -> dict[str, int]:
+    """The electors on the master roll of each electorate (part IX), after checking that part's party votes against
+    the party table's: valid, informal, and the combined totals."""
+    rows, found = _electorate_table_1999("partix.csv")
+    if set(found) != {slug(name) for name in electorate_rows}:
+        raise ValueError("1999: part IX and the party table list different electorates")
+    roll: dict[str, int] = {}
+    for name, values in electorate_rows.items():
+        row = found[slug(name)]
+        valid, informal, on_roll = number(row[3]), number(row[6]), number(row[10])
+        if [valid, informal] != values[-2:]:
+            raise ValueError(f"1999: part IX gives {name} {valid} valid and {informal} informal, not {values[-2:]}")
+        roll[name] = on_roll
+    combined = next(row for row in rows if row and row[0] == "Combined Totals")
+    if [number(combined[3]), number(combined[6]), number(combined[10])] != [
+        sum(values[-2] for values in electorate_rows.values()),
+        sum(values[-1] for values in electorate_rows.values()),
+        sum(roll.values()),
+    ]:
+        raise ValueError("1999: part IX's combined totals disagree with the electorates")
+    return roll
+
+
+def _referendums_1999(p: Package, first: date, made: dict[str, str], roll: dict[str, int]) -> None:
+    """The two citizens-initiated referendums held with the 1999 general election, by electorate, from parts XIII and
+    XIV, each reconciled against its printed total of all votes cast."""
+    election = _election(
+        p,
+        f"referendums-{first}",
+        first,
+        "referendum",
+        "1999 New Zealand citizens-initiated referendums",
+        f"nz/{first}-referendums",
+    )
+    for name, letter, path, english in REFERENDUMS_1999:
+        p.uses(art(e9_url(1999, name)))
+        rows, found = _electorate_table_1999(name)
+        question = next(row[1] for row in rows if row and row[0] == "Question:")
+        contest = _contest(
+            p,
+            f"referendum-{first}-{letter}",
+            election,
+            "ballot_question",
+            f"1999 New Zealand referendum: {english}",
+            f"nz/{first}-referendums/{path}",
+            electoral_system_id=SYSTEM_REFERENDUM,
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.add(
+            "note",
+            id=key("note", contest, "question"),
+            entity_id=contest,
+            kind="context",
+            body_md=f"The referendum asked the question: \u201c{question}\u201d Voters answered Yes or No.",
+            lang="en",
+        )
+        result_set = _result_set(p, election, contest, f"referendum-{first}-{letter}", REFERENDUM_1999_METHOD)
+        options = []
+        for position, label in enumerate(("Yes", "No"), 1):
+            option = key("option", f"referendum-{first}-{letter}", label)
+            options.append(option)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        if set(found) != {slug(electorate) for electorate in made}:
+            raise ValueError(f"{name}: the electorates differ from those of the party table")
+        sums = [0] * 5
+        for electorate, unit in made.items():
+            row = found[slug(electorate)]
+            yes, no, valid, informal, cast, on_roll = (number(row[i]) for i in (1, 3, 5, 7, 9, 11))
+            if yes + no != valid or valid + informal != cast or on_roll != roll[electorate]:
+                raise ValueError(f"{name}: {electorate} does not add up")
+            _put(p, result_set, unit, 0, options[0], VOTES, yes)
+            _put(p, result_set, unit, 0, options[1], VOTES, no)
+            _put(p, result_set, unit, 0, None, CAST, cast)
+            _put(p, result_set, unit, 0, None, VALID, valid)
+            _put(p, result_set, unit, 0, None, INVALID, informal)
+            sums = [a + b for a, b in zip(sums, (yes, no, valid, informal, cast), strict=True)]
+        total = next(row for row in rows if row and row[0] == "Total Votes Cast")
+        printed = [number(total[i]) for i in (1, 3, 5, 7, 9)]
+        if sums != printed:
+            raise ValueError(f"{name}: the electorates sum to {sums}, but the printed total is {printed}")
+        for option, value in zip(options, printed[:2], strict=True):
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=printed[2])
+        p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=printed[3])
+        p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=printed[4])
+
+
+REFERENDUM_1999_METHOD = (
+    "Counted by electorate and published by the Electoral Commission. The count of each of the six Māori "
+    "electorates includes its share of the Tangata Whenua votes, as the Commission's total for them does."
+)
 
 
 def _local_parties(p: Package, year: int) -> None:
