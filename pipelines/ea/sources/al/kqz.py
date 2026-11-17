@@ -1,9 +1,13 @@
-"""Albania's parliamentary elections from the Central Election Commission (KQZ).
+"""Albania's parliamentary and local elections from the Central Election Commission (KQZ).
 
 The Commission's results platform serves each election as JSON files: the national totals, the totals of each of the 12
 counties (qarqe) with the seats declared, and the list votes at each voting center (QV). The 2025 files also print each
 center's accounting and its place, and the votes cast abroad by county. The 2021 files hold the votes by center, and a
 separate structure file holds the places and the voters registered at each center.
+
+The local elections of 14 May 2023 are on the same platform: each of the 61 municipalities elects a mayor and a council,
+and the platform prints both ballots' votes at each voting center, with each municipality's declared totals and the
+council seats.
 """
 
 import functools
@@ -21,12 +25,18 @@ from uuid import uuid5
 
 import httpx
 import polars as pl
+import shapely
 
 from ea import package, raw
 from ea.package import Package
 
 SOURCE = "al.kqz"
 SITE = "https://kqz.gov.al"
+COUNTIES = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ALB/ADM1/"
+    "geoBoundaries-ALB-ADM1.geojson"
+)
+COUNTIES_FROM = date(2021, 1, 1)  # the year the county shapes represent
 ALBANIA = str(uuid5(package.NAMESPACE, "polity\x1fAL"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fALB"))
 VOTES, REGISTERED, VALID, INVALID, VOTERS = 1, 2, 4, 5, 14
@@ -108,12 +118,12 @@ def package_key(e: Election) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e) for e in ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e) for e in ELECTIONS), local_key()]
 
 
 def _data(path: Path) -> None:
-    if not path.read_bytes().lstrip().startswith(b"{"):
-        raise ValueError(f"{path.name} is not JSON data (a challenge page?)")
+    if path.read_bytes().lstrip().startswith(b"<"):
+        raise ValueError(f"{path.name} is not data (a challenge page?)")
 
 
 def fetch() -> None:
@@ -128,6 +138,16 @@ def fetch() -> None:
                     time.sleep(5 * (attempt + 1))
             else:
                 raise RuntimeError(f"{url(e, name)} could not be fetched")
+    for address in (COUNTIES, *local_urls()):
+        for attempt in range(8):
+            try:
+                raw.fetch(SOURCE, address, suffix=Path(address).suffix, check=_data)
+                break
+            except (ValueError, httpx.HTTPError) as failure:
+                print(f"{address}: {failure}; attempt {attempt + 1}", flush=True)
+                time.sleep(3 * (attempt + 1))
+        else:
+            raise RuntimeError(f"{address} could not be fetched")
 
 
 def parse() -> None:
@@ -135,6 +155,7 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         election(e).write()
+    local_election().write()
 
 
 def emit() -> None:
@@ -399,6 +420,10 @@ def places() -> tuple[set[str], set[tuple[str, str]], set[tuple[str, str, str]]]
             if unit.bashkia and unit.njesia:
                 towns.add((unit.qarku, unit.bashkia))
                 units.add((unit.qarku, unit.bashkia, unit.njesia))
+    for center in read_local().centers.values():
+        qarqe.add(center.qarku)
+        towns.add((center.qarku, center.bashkia))
+        units.add((center.qarku, center.bashkia, center.njesia))
     return qarqe, towns, units
 
 
@@ -423,6 +448,21 @@ def geo() -> Package:
     )
     for e in ELECTIONS:
         p.artifact(raw.cached(SOURCE, url(e, place_file(e))), SOURCE_ID)
+    p.artifact(raw.cached(SOURCE, local_url(STRUCTURE)), SOURCE_ID)
+    shapes = key("source", "geoboundaries-adm1")
+    p.add(
+        "source",
+        id=shapes,
+        kind="academic",
+        publisher="geoBoundaries (William & Mary geoLab)",
+        title="geoBoundaries gbOpen: Albania ADM1 (counties)",
+        url="https://www.geoboundaries.org/",
+        license="Public Domain",
+        license_url="https://www.geoboundaries.org/",
+        attribution="geoBoundaries (William & Mary geoLab)",
+        notes="Boundary year 2021, built December 2023, from Wikimedia Commons. Generalized shapes.",
+    )
+    p.artifact(raw.cached(SOURCE, COUNTIES), shapes)
     for scheme, rank, kind, noun in (
         ("al.qarku", 1, "administrative", "county"),
         ("al.bashkia", 2, "administrative", "municipality"),
@@ -431,9 +471,32 @@ def geo() -> Package:
     ):
         p.add("scheme", code=scheme, polity_id=ALBANIA, kind=kind, rank=rank, noun=noun, code_system=None)
     qarqe, towns, units = places()
+    outlines: dict[str, shapely.Geometry] = {}
+    for feature in json.loads(raw.cached(SOURCE, COUNTIES).path.read_bytes())["features"]:
+        found = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
+        polygons = [
+            q
+            for part in shapely.get_parts(found)
+            if shapely.get_type_id(part) in (3, 6)
+            for q in shapely.get_parts(part)
+        ]
+        outlines[fold(feature["properties"]["shapeName"])] = shapely.set_srid(shapely.MultiPolygon(polygons), 4326)
+    if missing := qarqe - set(outlines):
+        raise ValueError(f"no shape for the counties {sorted(missing)}")
     for name in sorted(qarqe):
         id = area("al.qarku", name)
         p.add("area", id=id, scheme_code="al.qarku")
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=COUNTIES_FROM,
+            geom=shapely.to_wkb(outlines[name], hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(outlines[name]), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=shapes,
+        )
         p.add("area_code", area_id=id, code=name)
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, title(name), "sq", "official")
@@ -481,14 +544,42 @@ def registry() -> Package:
         rules_version=1,
     )
     p.add("note", id=key("note", SYSTEM), entity_id=SYSTEM, kind="methodology", body_md=SYSTEM_NOTE, lang="en")
+    local = read_local()
+    for id, rules, note in (
+        (MAYOR_SYSTEM, {"formula": "fptp"}, MAYOR_NOTE),
+        (COUNCIL_SYSTEM, {"formula": "dhondt"}, COUNCIL_NOTE),
+    ):
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=ALBANIA,
+            valid_from=date(2023, 1, 1),
+            valid_to=None,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
+    for town_ in local.towns.values():
+        council, mayor = council_body(town_), mayor_office(town_)
+        p.add("body", id=council, polity_id=ALBANIA, kind="council")
+        p.name(council, f"Municipal Council of {title(town_.name)}", "en", "official")
+        p.name(council, f"Këshilli Bashkiak {title(town_.name)}", "sq", "native", False)
+        p.add("office", id=mayor, polity_id=ALBANIA, kind="mayor")
+        p.name(mayor, f"Mayor of {title(town_.name)}", "en", "official")
+        p.name(mayor, f"Kryetar i Bashkisë {title(town_.name)}", "sq", "native", False)
     names: dict[str, set[str]] = defaultdict(set)
+    blocs: set[str] = set()
     for e in ELECTIONS:
         for abbreviation, name in read(e).parties.values():
             if abbreviation:
                 names[abbreviation].add(name)
+    for abbreviation, name, is_bloc in local.parties:
+        names[abbreviation].add(name)
+        if is_bloc:
+            blocs.add(abbreviation)
     for abbreviation, spellings in sorted(names.items()):
         id = party(abbreviation)
-        bloc = any(s.lower().startswith("koalicioni") for s in spellings)
+        bloc = abbreviation in blocs or any(s.lower().startswith("koalicioni") for s in spellings)
         p.add("party", id=id, kind="bloc" if bloc else "party", polity_id=ALBANIA)
         p.add("external_id", entity_id=id, scheme="al.kqz.party", value=fold(abbreviation))
         for name in sorted(spellings):
@@ -681,3 +772,360 @@ def compare(e: Election, data: Data) -> None:
         if total != n:
             raise ValueError(f"{e.day}: measure {measure} sums to {total} in the counties and {n} nationally")
     print(f"{e.day}: counties sum to the national votes and {seats} seats as printed", flush=True)
+
+
+# The local elections of 14 May 2023.
+
+LOCAL_DAY = date(2023, 5, 14)
+LOCAL_FOLDER = "results2023"
+STRUCTURE, CANDIDATES = "js/json_strukture9.js", "js/json_subjekte8.js"
+MAYOR_FILES = ("json_all_summary_0_qv_lh", "json_all_summary_0_bashki_lh")
+COUNCIL_FILES = ("json_all_summary_1_qv", "json_all_summary_1_bashki")
+LOCAL_NAMES = ("2023 Albanian local elections", "Zgjedhjet vendore, 2023")
+MAYOR_SYSTEM = key("electoral_system", "mayor")
+COUNCIL_SYSTEM = key("electoral_system", "council")
+MAYOR_NOTE = "Each of the 61 municipalities elects its mayor in one round, and the candidate with the most votes wins."
+COUNCIL_NOTE = (
+    "Each municipality's council, of 15 to 61 members, is elected by proportional representation from party and "
+    "coalition lists and independent candidates. These rules were fitted to the seats the Commission declared in "
+    "2023: the D'Hondt highest-average method reproduces them in 60 of the 61 councils. The declared seats of the "
+    "other council, Kurbin, differ by one seat between two lists, which the method does not explain."
+)
+LOCAL_METHOD = (
+    "Votes by voting center (QV) as the Commission's results platform publishes them for the mayoral and the council "
+    "ballots, which are counted separately. Each municipality is one contest on each ballot. The platform declares "
+    "each municipality's votes, accounting figures, and council seats, and those figures are stored as declared. "
+    "Registered voters at each center come from the platform's structure file. Every center's figures add up to its "
+    "administrative unit's, but a municipality's declared total can exceed the sum of its centers; the difference is "
+    "stored as one aggregate unit for the municipality, because the platform does not place those votes at a "
+    "center. A few centers have registered voters and no results, and are stored with only their registered voters. "
+    "The platform declares no mayor, so no winner is stored for the mayoral contests."
+)
+
+
+def local_key() -> str:
+    return f"{SOURCE}/{LOCAL_DAY}"
+
+
+def local_url(name: str) -> str:
+    if name.startswith("js/"):
+        return f"https://iemis.kqz.gov.al/{LOCAL_FOLDER}/{name}"
+    return f"https://iemis.kqz.gov.al/{LOCAL_FOLDER}/input/results/{name}.txt"
+
+
+def local_urls() -> list[str]:
+    return [local_url(name) for name in (STRUCTURE, CANDIDATES, *MAYOR_FILES, *COUNCIL_FILES)]
+
+
+@dataclass(frozen=True)
+class Center:
+    code: str
+    qarku: str
+    bashkia: str
+    njesia: str
+    registered: int
+
+
+@dataclass(frozen=True)
+class Town:
+    ident: str
+    qarku: str
+    name: str
+    registered: int
+
+
+@dataclass
+class Ballot:
+    """One ballot's figures: by center and by municipality, and its ballot lines."""
+
+    lines: dict[str, dict[int, tuple[str, str]]] = field(default_factory=dict)  # town -> position -> (name, party)
+    accounting: dict[str, dict[int, int]] = field(default_factory=dict)  # center id -> measure -> value
+    votes: dict[str, dict[int, int]] = field(default_factory=dict)  # center id -> position -> votes
+    declared_accounting: dict[str, dict[int, int]] = field(default_factory=dict)  # town -> measure -> value
+    declared_votes: dict[str, dict[int, int]] = field(default_factory=dict)  # town -> position -> votes
+    seats: dict[str, dict[int, int]] = field(default_factory=dict)  # town -> position -> seats
+
+
+@dataclass
+class Local:
+    towns: dict[str, Town]
+    centers: dict[str, Center]  # center id -> center
+    town_of: dict[str, str]  # center id -> town id
+    mayor: Ballot
+    council: Ballot
+    parties: list[tuple[str, str, bool]]  # abbreviation, name, whether it is a coalition
+
+
+def _script(text: str, name: str) -> Any:
+    """The value a platform script assigns to a variable."""
+    return json.JSONDecoder().raw_decode(text[text.index(f"{name}=") + len(name) + 1 :])[0]
+
+
+def _file(name: str) -> str:
+    return raw.cached(SOURCE, local_url(name)).path.read_bytes().decode("utf-8")
+
+
+def _accounting(row: dict[str, Any]) -> dict[int, int]:
+    return {VOTERS: number(row["v8"]), VALID: number(row["v10"]), INVALID: number(row["v11"])}
+
+
+def _ballot(files: tuple[str, str], seats: bool) -> Ballot:
+    ballot = Ballot()
+    by_center, by_town = (json.loads(_file(name))["data_main"] for name in files)
+    for row in by_center[0]["data"]:
+        ballot.accounting[clean(row["v1"])] = _accounting(row)
+    for row in by_center[1]["data"]:
+        ballot.votes.setdefault(clean(row["v1"]), {})[number(row["v2"])] = number(row["v3"])
+    for row in by_town[0]["data"]:
+        ballot.declared_accounting[clean(row["v1"])] = _accounting(row)
+    for row in by_town[1]["data"]:
+        town_ = clean(row["v1"])
+        ballot.declared_votes.setdefault(town_, {})[number(row["v2"])] = number(row["v3"])
+        if seats and number(row["v4"]):
+            ballot.seats.setdefault(town_, {})[number(row["v2"])] = number(row["v4"])
+    return ballot
+
+
+@functools.cache
+def read_local() -> Local:
+    tree = json.loads(_file(STRUCTURE).split("=", 1)[1].rstrip().rstrip(";"))
+    towns: dict[str, Town] = {}
+    centers: dict[str, Center] = {}
+    town_of: dict[str, str] = {}
+    seen: set[tuple[str, str, str]] = set()
+    for top in tree["data"]:
+        if not top["child"]:
+            continue
+        qarku = fold(str(top["qarku"]))
+        for bashkia in top["child"]:
+            name = fold(str(bashkia["bashkia"]))
+            ident = clean(bashkia["v1"]).removeprefix("st")
+            towns[ident] = Town(ident, qarku, name, number(bashkia["v3"]))
+            for njesia in bashkia["child"]:
+                unit = fold(str(njesia["njesi"]))
+                if (qarku, name, unit) in seen:
+                    raise ValueError(f"{name} has two administrative units named {unit}")
+                seen.add((qarku, name, unit))
+                for center in njesia["child"]:
+                    ident_ = clean(center["v1"]).removeprefix("st")
+                    centers[ident_] = Center(clean(center["qv"]), qarku, name, unit, number(center["v3"]))
+                    town_of[ident_] = ident
+    script = _file(CANDIDATES)
+    mayor, council = _ballot(MAYOR_FILES, False), _ballot(COUNCIL_FILES, True)
+    parties: dict[str, tuple[str, bool]] = {}
+    for row in _script(script, "json_bashkia_lh_array_fiks_2023")["data"]:
+        abbreviation = clean(row["v5"])
+        mayor.lines.setdefault(clean(row["v1"]), {})[number(row["v2"])] = (clean(row["v3"]), abbreviation)
+        if abbreviation != "PAVARUR":
+            parties.setdefault(abbreviation, (clean(row["v4"]), False))
+    for row in _script(script, "json_bashkia_fiks_array_2023")["data"]:
+        abbreviation, name = clean(row["v3"]), clean(row["v4"])
+        council.lines.setdefault(clean(row["v1"]), {})[number(row["v2"])] = (name, abbreviation)
+        if abbreviation:
+            parties[abbreviation] = (name, parties.get(abbreviation, ("", False))[1] or clean(row["v5"]) == name)
+    listed = [(abbreviation, name, bloc) for abbreviation, (name, bloc) in sorted(parties.items())]
+    return Local(towns, centers, town_of, mayor, council, listed)
+
+
+def town_area(t: Town) -> str:
+    return area("al.bashkia", t.qarku, t.name)
+
+
+def council_body(t: Town) -> str:
+    return key("body", "council", t.qarku, t.name)
+
+
+def mayor_office(t: Town) -> str:
+    return key("office", "mayor", t.qarku, t.name)
+
+
+def local_election() -> Package:
+    data = read_local()
+    p = Package(
+        local_key(),
+        SOURCE,
+        f"The {LOCAL_NAMES[0]} by voting center from the Central Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {ALBANIA, COUNTRY}
+    p.uses(raw.cached(SOURCE, local_url(STRUCTURE)))  # the geo package cites it
+    for name in (CANDIDATES, *MAYOR_FILES, *COUNCIL_FILES):
+        p.artifact(raw.cached(SOURCE, local_url(name)), SOURCE_ID)
+    day = LOCAL_DAY
+    election_id = key("election", day)
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=ALBANIA,
+        kind="local",
+        date_from=day,
+        date_to=day,
+        status="held",
+    )
+    p.name(election_id, LOCAL_NAMES[0], "en", "official")
+    p.name(election_id, LOCAL_NAMES[1], "sq", "native", False)
+    path = f"al/{day}-local"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.add(
+        "note", id=key("note", election_id), entity_id=election_id, kind="methodology", body_md=LOCAL_METHOD, lang="en"
+    )
+    values = Facts()
+    for center_id, center in sorted(data.centers.items(), key=lambda item: int(item[0])):
+        unit = key("unit", f"{day}:{center.code}")
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=ALBANIA,
+            scheme_code="al.qv",
+            code=f"{day}:{center.code}",
+            area_relation="within",
+            area_id=area("al.njesia", center.qarku, center.bashkia, center.njesia),
+            kind="standard",
+        )
+    over: set[str] = set()
+    for ballot_name, ballot in (("mayor", data.mayor), ("council", data.council)):
+        mayoral = ballot_name == "mayor"
+        for ident, town_ in sorted(data.towns.items(), key=lambda item: int(item[0])):
+            slug = f"{path}/{plain(town_.qarku).replace(' ', '-')}/{plain(town_.name).replace(' ', '-')}/{ballot_name}"
+            contest = key("contest", day, ballot_name, ident)
+            result_set = key("result_set", day, ballot_name, ident)
+            lines = ballot.lines[ident]
+            declared_seats = ballot.seats.get(ident, {})
+            nice = title(town_.name)
+            p.add(
+                "contest",
+                id=contest,
+                election_id=election_id,
+                kind="office" if mayoral else "list_allocation",
+                office_id=mayor_office(town_) if mayoral else None,
+                body_id=None if mayoral else council_body(town_),
+                district_area_id=town_area(town_),
+                magnitude=1 if mayoral else sum(declared_seats.values()),
+                round_number=1,
+                electoral_system_id=MAYOR_SYSTEM if mayoral else COUNCIL_SYSTEM,
+                default_result_kind="counted",
+            )
+            if mayoral:
+                p.name(contest, f"{LOCAL_NAMES[0]}, Mayor of {nice}", "en", "official")
+                p.name(contest, f"Zgjedhjet vendore, Kryetar i Bashkisë {nice}", "sq", "native", False)
+            else:
+                p.name(contest, f"{LOCAL_NAMES[0]}, {nice} Municipal Council", "en", "official")
+                p.name(contest, f"Zgjedhjet vendore, Këshilli Bashkiak {nice}", "sq", "native", False)
+            p.add("slug", path=slug, entity_id=contest, is_current=True)
+            p.add(
+                "result_set",
+                id=result_set,
+                election_id=election_id,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                source_id=SOURCE_ID,
+                status="active",
+                is_default=True,
+                completeness=1.0,
+            )
+            options: dict[int, str] = {}
+            for position, (name, abbreviation) in sorted(lines.items()):
+                option = options[position] = key("option", day, ballot_name, ident, position)
+                independent = abbreviation in ("", "PAVARUR")
+                if mayoral:
+                    p.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None if independent else party(abbreviation),
+                        ballot_position=position,
+                        ballot_label=name,
+                    )
+                    who = key("person", day, ident, position)
+                    p.add("person", id=who)
+                    p.name(who, name[:1].upper() + name[1:], "sq", "official")
+                    p.add(
+                        "candidacy",
+                        id=key("candidacy", day, ident, position),
+                        person_id=who,
+                        option_id=option,
+                        role="head",
+                        ballot_name=name,
+                        member_of_party_id=None if independent else party(abbreviation),
+                        is_independent=independent,
+                    )
+                else:
+                    p.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="independents" if independent else "list",
+                        party_id=None if independent else party(abbreviation),
+                        ballot_position=position,
+                        ballot_label=name,
+                    )
+            for position, seats in sorted(declared_seats.items()):
+                p.add("outcome", result_set_id=result_set, option_id=options[position], kind="won", seats=seats)
+            centers_here = [c for c, t in data.town_of.items() if t == ident]
+            sums: dict[int, int] = defaultdict(int)
+            totals: dict[int, int] = defaultdict(int)
+            for center_id in sorted(centers_here, key=int):
+                center = data.centers[center_id]
+                unit = key("unit", f"{day}:{center.code}")
+                values.add(result_set, unit, None, REGISTERED, center.registered)
+                reported = ballot.accounting.get(center_id)
+                if reported is None:
+                    continue
+                for measure, n in reported.items():
+                    values.add(result_set, unit, None, measure, n)
+                    totals[measure] += n
+                if reported[VOTERS] > center.registered:
+                    over.add(f"{center.code} ({reported[VOTERS]} voters, {center.registered} registered)")
+                for position, n in ballot.votes.get(center_id, {}).items():
+                    values.add(result_set, unit, options[position], VOTES, n)
+                    sums[position] += n
+            declared = ballot.declared_accounting[ident]
+            rest = {m: declared[m] - totals[m] for m in declared}
+            rest_votes = {pos: ballot.declared_votes[ident].get(pos, 0) - sums[pos] for pos in options}
+            if any(v < 0 for v in (*rest.values(), *rest_votes.values())):
+                raise ValueError(f"{town_.name} {ballot_name}: the centers exceed the declared totals")
+            if any((*rest.values(), *rest_votes.values())):
+                unit = key("unit", f"{day}:rest:{ballot_name}:{ident}")
+                p.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=ALBANIA,
+                    scheme_code="al.qv",
+                    code=f"{day}:{ballot_name}:rest:{ident}",
+                    area_relation="within",
+                    area_id=town_area(town_),
+                    kind="aggregate",
+                )
+                for measure, n in rest.items():
+                    values.add(result_set, unit, None, measure, n)
+                for position, n in rest_votes.items():
+                    values.add(result_set, unit, options[position], VOTES, n)
+            for position, n in sorted(ballot.declared_votes[ident].items()):
+                p.add("declared", result_set_id=result_set, option_id=options[position], measure=VOTES, value=n)
+            for measure, n in {REGISTERED: town_.registered, **declared}.items():
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=n)
+    p.frame("result_value", values.frame())
+    if over:
+        p.accept(
+            "accounting.turnout",
+            "The Commission's own results table prints more voters than registered voters at "
+            + ", ".join(sorted(over)),
+        )
+    compare_local(data)
+    print(f"{local_key()}: {len(data.centers)} centers, {len(data.towns)} municipalities", flush=True)
+    return p
+
+
+def compare_local(data: Local) -> None:
+    """The municipalities' declared votes against the sum of the centers, which a municipality may exceed."""
+    for name, ballot in (("mayor", data.mayor), ("council", data.council)):
+        votes = sum(sum(v.values()) for v in ballot.votes.values())
+        declared = sum(sum(v.values()) for v in ballot.declared_votes.values())
+        valid = sum(a[VALID] for a in ballot.declared_accounting.values())
+        print(
+            f"{LOCAL_DAY} {name}: centers hold {votes} votes, municipalities declare {declared} "
+            f"({valid} valid), seats {sum(sum(v.values()) for v in ballot.seats.values())}",
+            flush=True,
+        )
