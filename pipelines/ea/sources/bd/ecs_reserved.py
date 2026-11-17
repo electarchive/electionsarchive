@@ -305,7 +305,7 @@ def election(spec: Election) -> Package:
         source_id=ECS,
         status="active",
         is_default=True,
-        completeness=sum(g.seats for g in spec.groups) / spec.magnitude,
+        completeness=0.0,
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=spec.method, lang="en")
     for index, group in enumerate(spec.groups, start=1):
@@ -325,9 +325,10 @@ def election(spec: Election) -> Package:
             person = key("person", day, index, place)
             p.add("person", id=person)
             p.name(person, name, "bn", "official")
+            candidacy = key("candidacy", day, index, place)
             p.add(
                 "candidacy",
-                id=key("candidacy", day, index, place),
+                id=candidacy,
                 person_id=person,
                 option_id=option,
                 role="list_member",
@@ -335,4 +336,13 @@ def election(spec: Election) -> Package:
                 member_of_party_id=None if solo else party(group.party or ""),
                 is_independent=solo,
             )
+            p.add(
+                "outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected", seats=1
+            )
+    if sum(g.seats for g in spec.groups) != spec.magnitude:
+        p.accept(
+            "outcomes.seats_magnitude",
+            "The gazette declares 49 of the 50 reserved seats filled; the Bangladesh Nationalist Party's alliance "
+            "left one vacant, which the Commission's notice of 2 November 2026 filled.",
+        )
     return p
