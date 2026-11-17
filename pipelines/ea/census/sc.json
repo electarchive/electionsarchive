@@ -1,0 +1,913 @@
+{
+ "polity": "SC",
+ "name": "Seychelles",
+ "sources": {
+  "const": {
+   "title": "Constitution of the Republic of Seychelles, Chapter 42 (consolidated to 1 June 2020)",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf",
+   "kind": "official_body",
+   "note": "Revised Laws edition of the 1993 Constitution as posted on the commission's regulations page.",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "amend11": {
+   "title": "Constitution of the Republic of Seychelles (Eleventh Amendment) (No.2) Act, 2024 (Act 14 of 2024)",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2025/07/Act-14-2024-Constitution-of-the-Republic-of-Seychelles-Eleventh-Amendment-No.2-Act-2024.pdf",
+   "kind": "official_body",
+   "note": "Official Gazette supplement of 28 October 2024; in force 31 March 2025 (2025 First Ballot Election Report, Introduction).",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "elections-act": {
+   "title": "Elections Act, Chapter 262 (Revised Edition as at 31 August 2024)",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2025/04/Ch.-262-Elections-Act.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "delimitation": {
+   "title": "Recommendation for Delimitation of Electoral Boundaries Exercise for 2023-2024",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2026/06/Delimitation-of-Boundaries-Report.pdf",
+   "kind": "official_body",
+   "note": "Dated January 2024; reproduces S.I. 29 of 2016 (Names and Boundaries of Electoral Areas).",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "report2020": {
+   "title": "2020 Election Report (January 2021)",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/2020-Election-Report-January-2021.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "report2025": {
+   "title": "2025 First Ballot Election Report",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2025/12/2025-First-Ballot-Election-Report.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "report2025b": {
+   "title": "2025 Second Ballot Election Report",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2026/02/2025-Second-Ballot-Election-Report.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "past": {
+   "title": "Other Past Elections",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/other-past-elections/",
+   "kind": "official_body",
+   "note": "Result PDFs for the 2015 presidential election (both rounds) and the 2016 National Assembly election.",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "pres2015-1": {
+   "title": "Presidential Results Election 2015 1st Round",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/Presidential-Results-Election-2015-1st-Round.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "pres2015-2": {
+   "title": "Presidential Results Election 2015 2nd Round",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/Presidential-Results-Election-2015-2nd-Round.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "na2016": {
+   "title": "Results National Assembly 2016",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/RESULTS-NAT-ASSB2016-2.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "results2020": {
+   "title": "2020 Election Results",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/2020-election-results/",
+   "kind": "official_body",
+   "note": "Presidential and National Assembly results by electoral area (PDF).",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "pres2020": {
+   "title": "Presidential Election 2020: Results by Political Party, Candidate and Electoral Area",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/Presidential_2020-Result-Detail-2.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "na2020": {
+   "title": "National Assembly Election 2020: Results by Political Party, Candidate and Electoral Area",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/wp-content/uploads/2024/12/ELECTION-2020_-National_Assembly-detail-.pdf",
+   "kind": "official_body",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "results2025": {
+   "title": "2025 Election Results",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/2025-election-results/",
+   "kind": "official_body",
+   "note": "Presidential first ballot and National Assembly results by party and electoral area, published as images (one slide per electoral area).",
+   "license": "Official publication; reuse terms are not stated"
+  },
+  "results2025b": {
+   "title": "2025 Presidential 2nd Round Results",
+   "publisher": "Electoral Commission of Seychelles",
+   "url": "https://ecs.sc/2025-presidential-2nd-round-results/",
+   "kind": "official_body",
+   "note": "Second-ballot results by electoral area, published as images (one slide per electoral area plus a national total).",
+   "license": "Official publication; reuse terms are not stated"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republic of Seychelles",
+   "name_en": "Seychelles",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "const"
+  },
+  {
+   "key": "electoral_area",
+   "name": "Electoral areas",
+   "name_en": "Electoral areas (single-member National Assembly constituencies)",
+   "parent": "national",
+   "scheme": "sc.area",
+   "source": "const",
+   "counts": [
+    {
+     "date": "1993-06-21",
+     "value": 22,
+     "source": "const",
+     "locator": "Schedule 7 para 10(1)(b): \"Seychelles shall consist of twenty-two electoral areas made up of nineteen electoral areas on Mahe, two electoral areas on Praslin and the islands of La Digue, ... shall constitute one electoral area\""
+    },
+    {
+     "date": "2016-09-10",
+     "value": 25,
+     "source": "na2016",
+     "locator": "One results page per electoral area, Anse Aux Pins to Takamaka: 25 areas, Inner Islands among them"
+    },
+    {
+     "date": "2020-10-24",
+     "value": 26,
+     "source": "na2020",
+     "locator": "Rows 1 to 26, Anse Aux Pins to Takamaka, with Ile Perseverance as row 16"
+    },
+    {
+     "date": "2024-01-01",
+     "precision": "month",
+     "value": 26,
+     "source": "delimitation",
+     "locator": "s.3.3: \"Seychelles is currently divided into twenty-six (26) electoral areas. Twenty- three (23) on Mahe, two (2) on Praslin and one (1) for the Inner Islands. Annex 2, Schedule A and B of SI 29 of 2016.\""
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Presidential elections",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "sc.area"
+    ]
+   },
+   "valid_from": "1993-06-21",
+   "earliest_record": "2015-12-03",
+   "finest_note": "The commission publishes each candidate's votes by electoral area for 2015 (both rounds), 2020, and 2025 (both rounds, as images). It publishes nothing below the electoral area and no result for 1993 to 2011.",
+   "note": "The President is directly elected by secret ballot (Schedule 3 para 1) and must win more than half of the votes, with further ballots as the Electoral Commission directs (Schedule 3 para 5); a sole candidate is declared elected without a ballot (para 6). The term is five years, at most two terms since 2016 (art. 52). Since the Eleventh Amendment (in force 31 March 2025) the election is held on the Saturday in the fifth week before the term expires, on the same days as the Assembly's general election (Schedule 3 para 4, art. 79(1)). Polling runs over three days, the first two for the Inner Islands and other categories of voters. The one-party presidential elections of 1979 to 1989 are class president_1979.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 51-52; Schedule 3)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "valid_from": "1993-06-21"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-01-01",
+     "precision": "year",
+     "through": "2011-12-31",
+     "source": "report2025",
+     "quote": "\"The 2025 Presidential and National Assembly Elections marked the twelfth multiparty elections conducted under the 1993 Constitution of the Republic of Seychelles\"",
+     "note": "Presidential elections under the 1993 Constitution before 2015; the commission publishes no result for them online."
+    },
+    {
+     "date": "2015-12-03",
+     "contests": 1,
+     "seats": 1,
+     "source": "pres2015-1",
+     "quote": "\"Presidential Election 1st round 3-5th December 2015\"; Eligible Voters 70,943, Vote Cast 62,004, Valid Vote 60,538; 25 electoral areas"
+    },
+    {
+     "date": "2015-12-16",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "pres2015-2",
+     "quote": "\"Presidential Election 2nd Round 16th-18th December 2015\"; James Alix Michel 31,512 50.15%, Wavel John Charles Ramkalawan 31,319 49.85%",
+     "note": "Second ballot, counted as a second contest."
+    },
+    {
+     "date": "2020-10-22",
+     "contests": 1,
+     "seats": 1,
+     "source": "pres2020",
+     "quote": "PRESIDENTIAL ELECTION 2020, RESULTS BY POLITICAL PARTY, CANDIDATE & ELECTORAL AREA; 26 electoral areas; polling on 22, 23, and 24 October 2020 (2020 Election Report)"
+    },
+    {
+     "date": "2025-09-25",
+     "contests": 1,
+     "seats": 1,
+     "source": "report2025",
+     "quote": "\"the Executive announced the dates of 25th, 26th and 27th September 2025 for the first ballot\"; Table 40: eligible voters 77,045, votes cast 64,809, valid 62,939"
+    },
+    {
+     "date": "2025-10-09",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "report2025b",
+     "quote": "\"The second ballot for the Presidential election was held on 9th, 10th and 11th October 2025.\"",
+     "note": "Second ballot, counted as a second contest."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 52(1); Schedule 3 para 4-5)",
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "A candidate needs more than half of the votes; otherwise further ballots are held as the Electoral Commission directs (Schedule 3 para 5), the commission holds a second ballot (Elections Act s.37(1)).",
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "1993-06-21",
+     "valid_to": "2025-03-31",
+     "vacancy_rule": "Election within three months of a vacancy (Schedule 3 para 4(b))."
+    },
+    {
+     "source": "amend11",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/07/Act-14-2024-Constitution-of-the-Republic-of-Seychelles-Eleventh-Amendment-No.2-Act-2024.pdf (s.13: Schedule 3 para 4(1)(a) \"on the Saturday in the fifth week prior to the expiration of the term of the President\"; para 4A: next election 27 September 2025)",
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "day_rule": "Saturday in the fifth week before the President's term expires",
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "More than half of the votes; otherwise a second ballot (Schedule 3 para 5; Elections Act s.37).",
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "2025-03-31",
+     "vacancy_rule": "Election within three months of a vacancy by resignation or removal; on death the Vice-President serves out the term (art. 55 as substituted in 2024)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/other-past-elections/",
+     "source": "past",
+     "first_date": "2015-12-03",
+     "last_date": "2015-12-16",
+     "finest": "sc.area",
+     "evidence": "Text PDFs of both 2015 rounds, one row per electoral area with eligible, cast, valid, and rejected votes and each candidate's votes"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/2020-election-results/",
+     "source": "results2020",
+     "first_date": "2020-10-22",
+     "last_date": "2020-10-22",
+     "finest": "sc.area",
+     "evidence": "Text PDF, one row per electoral area with each candidate's votes"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "jpg",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/2025-election-results/",
+     "source": "results2025",
+     "first_date": "2025-09-25",
+     "last_date": "2025-09-25",
+     "finest": "sc.area",
+     "evidence": "Images: a national table by party and electoral area plus one slide per electoral area"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "jpg",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/2025-presidential-2nd-round-results/",
+     "source": "results2025b",
+     "first_date": "2025-10-09",
+     "last_date": "2025-10-09",
+     "finest": "sc.area",
+     "evidence": "Images: one slide per electoral area (Slide4 to Slide29) and a national total (Slide31)"
+    }
+   ],
+   "est_votes": 64000,
+   "effort": 2
+  },
+  {
+   "key": "assembly",
+   "tier": "national",
+   "name": "National Assembly general elections (directly elected members)",
+   "name_en": "National Assembly general elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "sc.area"
+    ]
+   },
+   "valid_from": "1993-06-21",
+   "earliest_record": "2016-09-08",
+   "finest_note": "Each candidate's votes by electoral area for 2016, 2020, and 2025 (2025 as images); nothing below the electoral area and no result for 1993 to 2011.",
+   "note": "One member is directly elected by plurality in each electoral area (art. 78(a), 112(1)): 22 areas in 1993 (Schedule 7 para 10), 25 by 2016, and 26 since Ile Perseverance was added (S.I. 29 of 2016). A sole candidate is declared elected unopposed (art. 79(4)). Until 2025 a general election fell in the 57th to 59th month of a session or followed a dissolution; since the Eleventh Amendment it is held with the presidential election (art. 79(1) as substituted). The proportionally elected members are class assembly_pr, by-elections class assembly_by, and the one-party Assembly of 1979 to 1993 class assembly_1979.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 78-79, 112)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "valid_from": "1993-06-21"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-01-01",
+     "precision": "year",
+     "through": "2011-12-31",
+     "source": "report2025",
+     "quote": "\"The 2025 Presidential and National Assembly Elections marked the twelfth multiparty elections conducted under the 1993 Constitution of the Republic of Seychelles\"",
+     "note": "National Assembly general elections under the 1993 Constitution before 2016, with 22 electoral areas in 1993 (Schedule 7 para 10); the commission publishes no result for them online."
+    },
+    {
+     "date": "2016-09-08",
+     "contests": 25,
+     "seats": 25,
+     "source": "na2016",
+     "quote": "\"10th SEPTEMBER 2016\"; one page per electoral area, 25 areas; Total elegible voters 71932, Total votes cast 62939",
+     "note": "Polling ran from 8 to 10 September 2016; 10 September was the main day."
+    },
+    {
+     "date": "2020-10-22",
+     "contests": 26,
+     "seats": 26,
+     "source": "na2020",
+     "quote": "NATIONAL ASSEMBLY ELECTION 2020, RESULTS BY POLITICAL PARTY, CANDIDATE & ELECTORAL AREA; rows 1 to 26; TOTAL 74,634 eligible, 65,978 cast"
+    },
+    {
+     "date": "2025-09-25",
+     "contests": 26,
+     "seats": 26,
+     "source": "report2025",
+     "quote": "\"United Seychelles won 15 seats and Linyon Demokratik Seselwa 11 seats\"; Table 42: eligible voters 77,045, votes cast 64,787, valid 62,837"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 79(1): \"A general election shall be held during the period starting at the beginning of the fifty-seventh month and ending at the end of the fifty-ninth month of a session of the National Assembly\"; art. 110-111: dissolution)",
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "1993-06-21",
+     "valid_to": "2025-03-31",
+     "vacancy_rule": "By-election within 30 days unless within three months of the general-election window (art. 79(2))."
+    },
+    {
+     "source": "amend11",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/07/Act-14-2024-Constitution-of-the-Republic-of-Seychelles-Eleventh-Amendment-No.2-Act-2024.pdf (s.11: art. 79(1) \"a general election shall be held at the same time as the election of the President\")",
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "day_rule": "Same days as the presidential election",
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "2025-03-31",
+     "vacancy_rule": "By-election within 30 days of a directly elected member's seat falling vacant (art. 79(9), formerly 79(2))."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/other-past-elections/",
+     "source": "past",
+     "first_date": "2016-09-08",
+     "last_date": "2016-09-08",
+     "finest": "sc.area",
+     "evidence": "PDF with one page per electoral area listing each candidate's votes, and the seat summary"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/2020-election-results/",
+     "source": "results2020",
+     "first_date": "2020-10-22",
+     "last_date": "2020-10-22",
+     "finest": "sc.area",
+     "evidence": "Text PDF, one row per electoral area with each candidate's votes"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "jpg",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/2025-election-results/",
+     "source": "results2025",
+     "first_date": "2025-09-25",
+     "last_date": "2025-09-25",
+     "finest": "sc.area",
+     "evidence": "Images: a national table by party and electoral area plus one slide per electoral area (Slide5 to Slide30)"
+    }
+   ],
+   "est_votes": 64000,
+   "effort": 2
+  },
+  {
+   "key": "assembly_pr",
+   "tier": "national",
+   "name": "National Assembly proportionally elected members",
+   "name_en": "Proportionally elected members of the National Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1993-06-21",
+   "earliest_record": "2016-09-08",
+   "finest_note": "National only: the commission publishes each party's directly elected and nominated seats with its national vote.",
+   "note": "Up to ten members (art. 78(b)) allocated after each general election: since 21 February 1998 a party that polls 10% or more of the votes cast for its Assembly candidates nominates one member for each 10% (Schedule 4 para 2), the commission determines the entitlement and gazettes the names (paras 3-4). The first Assembly had eleven such members under the original scheme (Schedule 7 para 10(3)). No separate ballot is cast: the allocation is a declared outcome of the directly elected contests' party totals, so it adds seats but no votes.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 78(b); Schedule 4)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "valid_from": "1993-06-21"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-01-01",
+     "precision": "year",
+     "through": "2011-12-31",
+     "source": "const",
+     "quote": "Schedule 7 para 10(3): \"There shall be twenty-two directly elected members ... and eleven proportionately elected members of the first National Assembly\"",
+     "note": "Allocations at the general elections of 1993 to 2011, not published by the commission online."
+    },
+    {
+     "date": "2016-09-08",
+     "contests": 1,
+     "seats": 8,
+     "source": "na2016",
+     "quote": "ELECTION 2016 RESULTS, Party/Candidates Seats Nominated: PARTI LEPEP 10 4 14, LINYON DEMOKRATIK SESELWA 15 4 19"
+    },
+    {
+     "date": "2020-10-22",
+     "contests": 1,
+     "seats": 9,
+     "source": "report2020",
+     "quote": "Table 2: Linyon Demokratik Seselwa 20 elected, 5 nominated, 25 seats; United Seychelles 6 elected, 4 nominated, 10 seats"
+    },
+    {
+     "date": "2025-09-25",
+     "contests": 1,
+     "seats": 8,
+     "source": "report2025",
+     "quote": "\"Both parties were each allocated 4 proportional seats, in accordance with the 10% requirements of the Constitution\""
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 4 para 2: \"may nominate a proportionally elected members for each 10% of the votes polled\")",
+     "selection": "elected",
+     "partisan": true,
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "1993-06-21",
+     "valid_to": "2025-03-31"
+    },
+    {
+     "source": "amend11",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/07/Act-14-2024-Constitution-of-the-Republic-of-Seychelles-Eleventh-Amendment-No.2-Act-2024.pdf (s.11: art. 79(1))",
+     "selection": "elected",
+     "partisan": true,
+     "period_years": 5,
+     "day_rule": "Allocated after each general election, held on the same days as the presidential election",
+     "administered_by": "Electoral Commission of Seychelles",
+     "valid_from": "2025-03-31"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/other-past-elections/",
+     "source": "past",
+     "first_date": "2016-09-08",
+     "last_date": "2016-09-08",
+     "finest": "sc.area",
+     "evidence": "Seat summary page: seats won, seats nominated, and total by party"
+    },
+    {
+     "platform": "Electoral Commission of Seychelles (ecs.sc)",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "Official publication; reuse terms are not stated",
+     "url": "https://ecs.sc/election-reports/",
+     "source": "report2020",
+     "first_date": "2020-10-22",
+     "last_date": "2025-09-25",
+     "finest": "sc.area",
+     "evidence": "Election reports: tables of directly elected and nominated seats by party (2020 Table 2; 2025 Table 43)"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 1
+  },
+  {
+   "key": "assembly_by",
+   "tier": "national",
+   "name": "National Assembly by-elections",
+   "name_en": "National Assembly by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "sc.area"
+    ]
+   },
+   "valid_from": "1993-06-21",
+   "note": "When a directly elected member's seat falls vacant, a by-election is held within 30 days unless the vacancy falls within three months of the general-election window (art. 79(2), renumbered 79(9) in 2024); the Elections Act provides for the closing of the register before a by-election (s.9). A vacancy among the proportionally elected members is filled by the nominating party's notice to the Speaker, not by election (art. 81(4)). A tie for first place in an area is resolved by a second ballot there (Elections Act s.37(2)).",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 79(2))",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "valid_from": "1993-06-21"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "const",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 79(2))",
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Electoral Commission of Seychelles",
+     "vacancy_rule": "Within 30 days of the vacancy unless it falls within three months of the general-election window."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "The commission's site and reports list no by-election and publish no by-election result; results are gazetted (Elections Act s.38(2)), but the Official Gazette's online archive (gazette.sc) starts in 2020.",
+   "est_votes": 2500,
+   "effort": 3
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "National referendums",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "sc.area"
+    ]
+   },
+   "note": "An Act provides for referendums (art. 164); Part IV of the Elections Act (s.54-) has the President refer an issue to the commission, which sets the date and the question. Alterations of Chapter I, Chapter III, art. 91, 110, or 111 need at least 60% in a referendum (art. 91(1)), and a referendum can also resolve a deadlock between the President and the Assembly (art. 110). The Constitution was prepared under the Constitution of Seychelles (Preparation and Promulgation) Act, 1992 (Schedule 7 para 1), outside the Elections Act; the commission's reports and site record no referendum since it came into force.",
+   "source": "elections-act",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/Ch.-262-Elections-Act.pdf (Part IV, s.54-56)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "elections-act",
+     "locator": "https://ecs.sc/wp-content/uploads/2025/04/Ch.-262-Elections-Act.pdf (s.54: \"Where any issue is required to be determined at a referendum, the President shall refer the issue to the Electoral Commission\"; s.55: date by Gazette notice within seven days)",
+     "called": true,
+     "administered_by": "Electoral Commission of Seychelles"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No referendum is recorded under the 1993 Constitution on the commission's site or in its reports; polls on the draft constitution under the 1992 Act were run by the Constitutional Commission, and no official host publishes their results online.",
+   "est_votes": 45000,
+   "effort": 4
+  },
+  {
+   "key": "constitutional_commission",
+   "tier": "national",
+   "name": "Constitutional Commission election (1992)",
+   "name_en": "Election of the Constitutional Commission under the 1992 Act",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_to": "1993-06-21",
+   "note": "The 1993 Constitution was drafted by a Constitutional Commission under the Constitution of Seychelles (Preparation and Promulgation) Act, 1992; its chairman was the Director of Elections for the first elections of 1993 (Schedule 7 para 1, para 11). The class ended when the Constitution came into force on 21 June 1993.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 7 para 1: \"'Director of Elections' means the person holding office as Chairman of the Constitutional Commission immediately before the date of coming into force of this Constitution\")",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "valid_to": "1993-06-21"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Abolished class with one election in 1992; no official host publishes its result online.",
+   "est_votes": 45000,
+   "effort": 5
+  },
+  {
+   "key": "assembly_1979",
+   "tier": "national",
+   "name": "People's Assembly elections under the one-party constitution (1979-1993)",
+   "name_en": "National Assembly elections of the one-party state",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1979-06-05",
+   "valid_to": "1993-06-21",
+   "note": "Under the Constitution of the Republic of Seychelles Decree, 1979 (the \"existing Constitution\" the 1993 Constitution replaced, Schedule 7 para 1), the Assembly was elected from candidates of the sole lawful party. The class ended with the 1993 Constitution.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 7 para 1: \"'existing Constitution' means the Constitution contained in the Schedule to the Constitution of the Republic of Seychelles Decree, 1979\")",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "valid_from": "1979-06-05",
+     "valid_to": "1993-06-21"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Abolished class; no official host publishes results for the one-party Assembly elections online.",
+   "est_votes": 30000,
+   "effort": 5
+  },
+  {
+   "key": "president_1979",
+   "tier": "national",
+   "name": "Presidential elections under the one-party constitution (1979-1993)",
+   "name_en": "Presidential elections of the one-party state",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_from": "1979-06-05",
+   "valid_to": "1993-06-21",
+   "note": "Under the 1979 Constitution the President was elected by the voters with a single candidate nominated by the sole lawful party. The class ended with the 1993 Constitution.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 7 para 1, definition of the existing Constitution of 1979)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "valid_from": "1979-06-05",
+     "valid_to": "1993-06-21"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Abolished class; no official host publishes results for the single-candidate presidential elections online.",
+   "est_votes": 30000,
+   "effort": 5
+  },
+  {
+   "key": "legislature_colonial",
+   "tier": "national",
+   "name": "Colonial legislature elections (to 1976)",
+   "name_en": "Legislative Council, Governing Council, and Legislative Assembly elections before independence",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "valid_to": "1976-06-29",
+   "note": "Before independence on 29 June 1976 the colony elected members of its Legislative Council and later its Governing Council and Legislative Assembly. The class ended at independence.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 2 para 1: \"'Independence Day' means the 29th day of June, 1976\")",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "council"
+     ],
+     "valid_to": "1976-06-29"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Abolished class; the colonial returns are in the Seychelles Government Gazette and colonial reports, which no official host has online.",
+   "est_votes": 15000,
+   "effort": 5
+  },
+  {
+   "key": "mayor_victoria",
+   "tier": "national",
+   "name": "Mayor of Victoria (proposed)",
+   "name_en": "Mayor of Victoria",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "In 2025 the commission planned a Mayor of Victoria election alongside the presidential and Assembly elections, as announced by the then President, but the government told it the law had not yet been passed, and no such Act appears in the Official Gazette's 2024 to 2026 lists. No other local office or council is elected in Seychelles under the Constitution or the Elections Act, which provide only for presidential, National Assembly, and referendum polls.",
+   "source": "report2025",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/12/2025-First-Ballot-Election-Report.pdf (s.28: \"the Electoral Commission was also planning to conduct the Mayoral election in concurrence with the Presidential and National Assembly elections ... informed that the law was yet to be passed for the Mayoral elections\")",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "office_kinds": [
+      "mayor"
+     ]
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Not established: no law provides for the election, and none has been held. Reopen if an Act creating the office passes."
+  },
+  {
+   "key": "speaker",
+   "tier": "national",
+   "name": "Speaker, Deputy Speaker, and Leader of the Opposition",
+   "name_en": "Officers elected by the National Assembly",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Speaker and Deputy Speaker are elected by the Assembly (art. 83), and the Leader of the Opposition by the opposition members (art. 84).",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 83-84)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "indirect"
+     ]
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Votes of members of the Assembly, not public elections."
+  },
+  {
+   "key": "vice_president",
+   "tier": "national",
+   "name": "Vice-President",
+   "name_en": "Vice-President (designated running mate)",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Each presidential candidate designates a Vice-President on nomination (Schedule 3 para 2(1)(a)); the running mate is not voted on separately, and a mid-term vacancy is filled by the President with the Assembly's approval.",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (Schedule 3 para 2(1)(a))",
+   "match": [],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elected on the President's ticket, with no separate ballot; held as the running mate of the presidential contest."
+  },
+  {
+   "key": "judiciary",
+   "tier": "national",
+   "name": "Judges",
+   "name_en": "Judges of the Court of Appeal and the Supreme Court",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The President appoints the Justices of Appeal and the Judges of the Supreme Court from candidates proposed by the Constitutional Appointments Authority (art. 123, 127).",
+   "source": "const",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/CAP42-Constituion.pdf (art. 123, 127)",
+   "match": [],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed, not elected."
+  },
+  {
+   "key": "candidate_selection",
+   "tier": "national",
+   "name": "Party candidate selection",
+   "name_en": "Candidate selection by political parties",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Candidates file nominations with the commission on nomination day (Elections Act s.14-15); parties choose their candidates under their own rules, and the state runs no primaries.",
+   "source": "elections-act",
+   "locator": "https://ecs.sc/wp-content/uploads/2025/04/Ch.-262-Elections-Act.pdf (s.14-15)",
+   "match": [
+    {
+     "iso_pattern": "SC",
+     "election_kinds": [
+      "primary"
+     ]
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Internal party processes, not run by the state."
+  }
+ ]
+}
