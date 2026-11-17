@@ -452,6 +452,7 @@ class Day(hv.Day):
         self.reasons = {}
         self.cited = set()
         self.elections = set()
+        self.contest_ids = {}
         self.slugs: dict[str, str] = {}
 
     def cite(self, name: str) -> None:
@@ -584,7 +585,7 @@ class Day(hv.Day):
                 "reporting_unit",
                 id=found,
                 polity_id=HUNGARY,
-                scheme_code="hu.idokozi.szavazokor",
+                scheme_code="hu.idokozi_szavazokor",
                 code=code,
                 area_relation=relation,
                 area_id=key("area", "settlement", area_code),
@@ -601,7 +602,7 @@ class Day(hv.Day):
                 "reporting_unit",
                 id=found,
                 polity_id=HUNGARY,
-                scheme_code="hu.idokozi.telepules",
+                scheme_code="hu.idokozi_telepules",
                 code=code,
                 area_relation="equals",
                 area_id=key("area", "settlement", area_code),
@@ -1088,7 +1089,7 @@ def parliament_card(d: Day, tree: Tree, card: Card, book: dict[str, list[list[st
         "reporting_unit",
         id=unit,
         polity_id=HUNGARY,
-        scheme_code="hu.idokozi.oevk",
+        scheme_code="hu.idokozi_oevk",
         code=f"{d.day}:{code}",
         area_relation="equals",
         area_id=area,
@@ -1166,29 +1167,29 @@ def geo() -> Package:
     )
     p.external |= {HUNGARY, TERRITORY}
     for code, rank, kind, noun in (
-        ("hu.idokozi.megye", 1, "administrative", "county"),
-        ("hu.idokozi.oevk", 2, "electoral_district", "parliamentary constituency"),
-        ("hu.idokozi.telepules", 3, "administrative", "settlement"),
-        ("hu.idokozi.szavazokor", 4, "precinct", "polling station"),
+        ("hu.idokozi_megye", 1, "administrative", "county"),
+        ("hu.idokozi_oevk", 2, "electoral_district", "parliamentary constituency"),
+        ("hu.idokozi_telepules", 3, "administrative", "settlement"),
+        ("hu.idokozi_szavazokor", 4, "precinct", "polling station"),
     ):
         p.add("scheme", code=code, polity_id=HUNGARY, kind=kind, rank=rank, noun=noun, code_system=None)
     for maz in sorted(STATE.counties):
         id = key("area", "county", maz)
-        p.add("area", id=id, scheme_code="hu.idokozi.megye")
+        p.add("area", id=id, scheme_code="hu.idokozi_megye")
         p.add("area_code", area_id=id, code=maz)
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         name = hv.COUNTIES[maz]
         p.name(id, "Budapest" if maz == "01" else f"{name} vármegye", "hu", "official")
     for code, (maz, name) in sorted(STATE.places.items()):
         id = key("area", "settlement", code)
-        p.add("area", id=id, scheme_code="hu.idokozi.telepules")
+        p.add("area", id=id, scheme_code="hu.idokozi_telepules")
         p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=key("area", "county", maz))
         p.add("external_id", entity_id=id, scheme="hu.telepules", value=code)
         p.name(id, hv.person_text(name) if name.isupper() else name, "hu", "official")
     for code, (maz, number_, name) in sorted(STATE.districts.items()):
         id = key("area", "oevk", code)
-        p.add("area", id=id, scheme_code="hu.idokozi.oevk")
+        p.add("area", id=id, scheme_code="hu.idokozi_oevk")
         p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=key("area", "county", maz))
         p.name(id, name, "hu", "official")
