@@ -6,6 +6,7 @@ count as HTML result pages. One package holds each election, plus a `geo` and a 
 
 import functools
 import re
+from collections.abc import Callable
 from datetime import date
 from html import unescape
 from html.parser import HTMLParser
@@ -759,8 +760,8 @@ def registry() -> Package:
 # Build ---------------------------------------------------------------------------------------------------------------
 
 
-def builders() -> dict[str, callable]:  # type: ignore[valid-type]
-    out: dict[str, callable] = {}  # type: ignore[valid-type]
+def builders() -> dict[str, Callable[[], Package]]:
+    out: dict[str, Callable[[], Package]] = {}
     for election in HA_ELECTIONS:
         out[f"{SOURCE}/ha-{election.day}"] = functools.partial(ha_election, election)
     for held in lc_held():
@@ -1095,10 +1096,24 @@ def lg_election(year: int) -> Package:
 
 LC = f"{ROOT}/legislative-council"
 LC_SUMMARIES = ["1981-1996", "1997-1998", "1999-2008", "2009-2017", "2018-present"]
-MONTHS = {
-    m: i
-    for i, m in enumerate(
-        "January February March April May June July August September October November December".split(), 1
+MONTHS: dict[str, int] = {
+    name: number_
+    for number_, name in enumerate(
+        [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ],
+        1,
     )
 }
 
