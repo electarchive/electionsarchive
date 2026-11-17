@@ -1,0 +1,2868 @@
+{
+ "polity": "NL",
+ "name": "Netherlands",
+ "sources": {
+  "grondwet": {
+   "title": "Grondwet voor het Koninkrijk der Nederlanden",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0001840",
+   "kind": "official_body"
+  },
+  "kieswet": {
+   "title": "Kieswet",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0004627",
+   "kind": "official_body"
+  },
+  "gemeentewet": {
+   "title": "Gemeentewet",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0005416",
+   "kind": "official_body"
+  },
+  "provinciewet": {
+   "title": "Provinciewet",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0005645",
+   "kind": "official_body"
+  },
+  "waterschapswet": {
+   "title": "Waterschapswet",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0005108",
+   "kind": "official_body"
+  },
+  "wol_bes": {
+   "title": "Wet openbare lichamen Bonaire, Sint Eustatius en Saba",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0028142",
+   "kind": "official_body"
+  },
+  "wrr": {
+   "title": "Wet raadgevend referendum (ingetrokken)",
+   "publisher": "Overheid.nl (wetten.overheid.nl)",
+   "url": "https://wetten.overheid.nl/BWBR0036443",
+   "kind": "official_body"
+  },
+  "databank": {
+   "title": "Databank Verkiezingsuitslagen: verkiezingen",
+   "publisher": "Kiesraad",
+   "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+   "kind": "official_body",
+   "license": "CC0 1.0",
+   "note": "The Kiesraad's results database, with results back to 1848; CC0 per its copyright page (https://www.verkiezingsuitslagen.nl/Info/Copyright)."
+  },
+  "databank_over": {
+   "title": "Over Databank verkiezingsuitslagen",
+   "publisher": "Kiesraad",
+   "url": "https://www.verkiezingsuitslagen.nl/Info/Over",
+   "kind": "official_body"
+  },
+  "dataoverheid": {
+   "title": "Verkiezingsuitslag Tweede Kamer 2023 (EML)",
+   "publisher": "Kiesraad, data.overheid.nl",
+   "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+   "kind": "official_body",
+   "note": "One of the Kiesraad's EML result datasets on data.overheid.nl; each election since the 2009 European election has its own dataset there."
+  },
+  "kr_uitslagen": {
+   "title": "Verkiezingsuitslagen",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/verkiezingsuitslagen",
+   "kind": "official_body"
+  },
+  "kr_tk": {
+   "title": "Tweede Kamer",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/tweede-kamer",
+   "kind": "official_body"
+  },
+  "kr_ps": {
+   "title": "Provinciale Staten",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/provinciale-staten",
+   "kind": "official_body"
+  },
+  "kr_ep": {
+   "title": "Europees Parlement",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/europees-parlement",
+   "kind": "official_body"
+  },
+  "kr_er": {
+   "title": "Eilandsraden",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/eilandsraden",
+   "kind": "official_body"
+  },
+  "kr_kc": {
+   "title": "Kiescolleges",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/kiescolleges",
+   "kind": "official_body"
+  },
+  "kr_herindeling": {
+   "title": "Herindelingsverkiezingen",
+   "publisher": "Kiesraad",
+   "url": "https://www.kiesraad.nl/verkiezingen/herindelingen",
+   "kind": "official_body"
+  },
+  "cbs2026": {
+   "title": "Gemeentelijke indeling op 1 januari 2026",
+   "publisher": "Centraal Bureau voor de Statistiek (CBS)",
+   "url": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2026",
+   "kind": "official_body"
+  },
+  "cbs2019": {
+   "title": "Gemeentelijke indeling op 1 januari 2019",
+   "publisher": "Centraal Bureau voor de Statistiek (CBS)",
+   "url": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2019",
+   "kind": "official_body"
+  },
+  "cbs2010": {
+   "title": "Gemeentelijke indeling op 1 januari 2010",
+   "publisher": "Centraal Bureau voor de Statistiek (CBS)",
+   "url": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2010",
+   "kind": "official_body"
+  },
+  "rotterdam_wijkraden": {
+   "title": "Wijkraden",
+   "publisher": "Gemeente Rotterdam",
+   "url": "https://www.rotterdam.nl/wijkraden",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Nederland",
+   "name_en": "Netherlands",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "grondwet"
+  },
+  {
+   "key": "provincie",
+   "name": "Provincies",
+   "name_en": "Provinces",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "nl.provincie",
+   "source": "provinciewet",
+   "counts": [
+    {
+     "date": "2023-03-15",
+     "value": 12,
+     "source": "kr_ps",
+     "locator": "https://www.kiesraad.nl/verkiezingen/provinciale-staten (Het overzicht van het totale aantal Statenzetels was in 2023 als volgt: twelve provinces, Drenthe 43 through Zuid-Holland 55)"
+    },
+    {
+     "date": "1982-03-24",
+     "value": 11,
+     "source": "databank",
+     "locator": "https://www.verkiezingsuitslagen.nl/verkiezingen/detail/PS19820324 (eleven provinces with results; Flevoland was formed on 1 January 1986)"
+    }
+   ]
+  },
+  {
+   "key": "gemeente",
+   "name": "Gemeenten",
+   "name_en": "Municipalities",
+   "parent": "provincie",
+   "polity_kind": "municipality",
+   "scheme": "nl.gemeente",
+   "source": "gemeentewet",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 342,
+     "source": "cbs2026",
+     "locator": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2026 (Het aantal gemeenten in Nederland blijft dan ook 342 op deze datum)"
+    },
+    {
+     "date": "2019-01-01",
+     "value": 355,
+     "source": "cbs2019",
+     "locator": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2019 (zodat het aantal gemeenten in Nederland 355 bedraagt)"
+    },
+    {
+     "date": "2010-01-01",
+     "value": 431,
+     "source": "cbs2010",
+     "locator": "https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2010 (zodat het aantal gemeenten in Nederland 431 bedraagt)"
+    },
+    {
+     "date": "1918-07-02",
+     "value": 1118,
+     "source": "databank",
+     "locator": "https://www.verkiezingsuitslagen.nl/verkiezingen/detail/TK19180702 (1,118 municipalities with results for the 1918 Tweede Kamer election)"
+    }
+   ]
+  },
+  {
+   "key": "deelgemeente",
+   "name": "Stadsdelen, wijken en deelgemeenten",
+   "name_en": "Submunicipal districts",
+   "parent": "gemeente",
+   "polity_kind": "submunicipal",
+   "source": "gemeentewet",
+   "counts": [
+    {
+     "date": "2026-04-22",
+     "value": 39,
+     "source": "rotterdam_wijkraden",
+     "locator": "https://www.rotterdam.nl/wijkraden (In Rotterdam zijn 37 wijkraden en 2 dorpsraden; installed on 22 April 2026). Rotterdam only: Amsterdam's stadsdeelcommissies are not in this count."
+    }
+   ]
+  },
+  {
+   "key": "waterschap",
+   "name": "Waterschappen",
+   "name_en": "Water boards",
+   "parent": "national",
+   "polity_kind": "special_district",
+   "scheme": "nl.waterschap",
+   "source": "waterschapswet",
+   "counts": [
+    {
+     "date": "2023-03-15",
+     "value": 21,
+     "source": "databank",
+     "locator": "https://www.verkiezingsuitslagen.nl/verkiezingen/detail/WS20230315 (21 water boards, Aa en Maas through Zuiderzeeland)"
+    },
+    {
+     "date": "2015-03-18",
+     "value": 22,
+     "source": "databank",
+     "locator": "https://www.verkiezingsuitslagen.nl/verkiezingen/detail/WS20150318 (22 water boards)"
+    }
+   ]
+  },
+  {
+   "key": "openbaar_lichaam",
+   "name": "Openbare lichamen Bonaire, Sint Eustatius en Saba",
+   "name_en": "Caribbean public bodies",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "source": "wol_bes",
+   "valid_from": "2010-10-10",
+   "counts": [
+    {
+     "date": "2023-03-15",
+     "value": 3,
+     "source": "kr_er",
+     "locator": "https://www.kiesraad.nl/verkiezingen/eilandsraden (Bonaire: 9 zetels, Sint Eustatius: 5 zetels, Saba: 5 zetels)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "tweede_kamer",
+   "tier": "national",
+   "name": "Tweede Kamerverkiezingen",
+   "name_en": "House of Representatives elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "nl.kieskring",
+     "nl.gemeente",
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "One nationwide list-PR contest. The Kiesraad's database gives party votes by municipality for every election since 1918 (1918-1929 collected by the Kiesraad from party, municipal, and provincial archives); polling-station and candidate votes are in the EML files on data.overheid.nl from 2010 on.",
+   "note": "150 members (100 until 1956) elected by open-list PR in one nationwide district; the 20 kieskringen (electoral districts) are only units for lodging lists and counting. Four-year term; the chamber can be dissolved, and early elections are frequent.",
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 51: De Tweede Kamer bestaat uit honderdvijftig leden; artikel 53: evenredige vertegenwoordiging)",
+   "valid_from": "1918-07-02",
+   "first_held": "1918-07-02",
+   "earliest_record": "1918-07-02",
+   "contests_per_unit": 1,
+   "est_votes": 224000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 3,
+     "term_years": 4,
+     "called": true,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Kiesraad (central electoral committee) with the municipal and principal electoral committees",
+     "source": "kieswet",
+     "locator": "https://wetten.overheid.nl/BWBR0004627 (artikel C 1: De leden van de Tweede Kamer worden gekozen voor vier jaren; zij treden af op de woensdag in de periode van 29 maart tot en met 4 april)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list (Kieswet, hoofdstuk W)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1918-07-02",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Party votes by municipality, province, and nation for every Tweede Kamer election since 1918, downloadable as CSV.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-06-09",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files (candidate and party votes by polling station, municipality, and electoral district) for every Tweede Kamer election since 2010.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NL",
+     "valid_from": "1918-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1918-07-02",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 2 juli 1918; uitgebrachte stemmen: 1.341.744",
+     "note": "First election under nationwide list PR (Grondwet 1917); the Kiesraad took the municipal figures from the SDAP's archive because the CBS published no statistics for 1918."
+    },
+    {
+     "date": "1922-07-05",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 5 juli 1922; uitgebrachte stemmen: 2.876.354"
+    },
+    {
+     "date": "1925-07-01",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 1 juli 1925; uitgebrachte stemmen: 2.779.399"
+    },
+    {
+     "date": "1929-07-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 3 juli 1929; uitgebrachte stemmen: 3.215.235"
+    },
+    {
+     "date": "1933-04-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 26 april 1933; uitgebrachte stemmen: 3.897.510"
+    },
+    {
+     "date": "1937-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 26 mei 1937; uitgebrachte stemmen: 4.212.873"
+    },
+    {
+     "date": "1946-05-17",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 17 mei 1946; uitgebrachte stemmen: 4.760.711"
+    },
+    {
+     "date": "1948-07-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 7 juli 1948; uitgebrachte stemmen: 4.931.499"
+    },
+    {
+     "date": "1952-06-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 25 juni 1952; uitgebrachte stemmen: 5.335.456"
+    },
+    {
+     "date": "1956-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 13 juni 1956; uitgebrachte stemmen: 5.849.607",
+     "note": "First election for the enlarged 150-seat chamber."
+    },
+    {
+     "date": "1959-03-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 12 maart 1959; uitgebrachte stemmen: 6.143.409"
+    },
+    {
+     "date": "1963-05-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 mei 1963; uitgebrachte stemmen: 6.419.446"
+    },
+    {
+     "date": "1967-02-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 februari 1967; uitgebrachte stemmen: 7.077.798"
+    },
+    {
+     "date": "1971-04-28",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 28 april 1971; uitgebrachte stemmen: 6.366.579"
+    },
+    {
+     "date": "1972-11-29",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 29 november 1972; uitgebrachte stemmen: 7.445.287"
+    },
+    {
+     "date": "1977-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 25 mei 1977; uitgebrachte stemmen: 8.365.829"
+    },
+    {
+     "date": "1981-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 26 mei 1981; uitgebrachte stemmen: 8.738.238"
+    },
+    {
+     "date": "1982-09-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 8 september 1982; uitgebrachte stemmen: 8.273.631"
+    },
+    {
+     "date": "1986-05-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 21 mei 1986; uitgebrachte stemmen: 9.199.621"
+    },
+    {
+     "date": "1989-09-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 6 september 1989; uitgebrachte stemmen: 8.902.903"
+    },
+    {
+     "date": "1994-05-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 3 mei 1994; uitgebrachte stemmen: 9.021.283"
+    },
+    {
+     "date": "1998-05-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 6 mei 1998; uitgebrachte stemmen: 8.622.222"
+    },
+    {
+     "date": "2002-05-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 mei 2002; uitgebrachte stemmen: 9.515.226"
+    },
+    {
+     "date": "2003-01-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 22 januari 2003; uitgebrachte stemmen: 9.666.602"
+    },
+    {
+     "date": "2006-11-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 22 november 2006; uitgebrachte stemmen: 9.854.998"
+    },
+    {
+     "date": "2010-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 9 juni 2010; uitgebrachte stemmen: 9.442.977"
+    },
+    {
+     "date": "2012-09-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 12 september 2012; uitgebrachte stemmen: 9.462.223"
+    },
+    {
+     "date": "2017-03-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 maart 2017; uitgebrachte stemmen: 10.563.456"
+    },
+    {
+     "date": "2021-03-17",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 17 maart 2021; uitgebrachte stemmen: 10.462.677",
+     "note": "Voting spread over 15-17 March 2021 under the temporary COVID-19 act."
+    },
+    {
+     "date": "2023-11-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 22 november 2023; uitgebrachte stemmen: 10.475.203"
+    },
+    {
+     "date": "2025-10-29",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 150,
+     "source": "databank",
+     "quote": "Tweede Kamer 29 oktober 2025; uitgebrachte stemmen: 10.640.324"
+    }
+   ]
+  },
+  {
+   "key": "tweede_kamer_districten",
+   "tier": "national",
+   "name": "Tweede Kamerverkiezingen in kiesdistricten (1848-1917)",
+   "name_en": "House of Representatives district elections (1848-1917)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "district"
+   },
+   "finest_note": "Candidate votes by electoral district (kiesdistrict) for each polling day, including runoffs (herstemmingen) and by-elections, in the Kiesraad's database; no municipal breakdown.",
+   "note": "Direct census-suffrage elections from the 1848 constitution: members chosen in districts by absolute majority with a runoff, half the chamber renewed every two years until 1888, then single-member districts with four-year terms; suffrage widened in 1887 and 1896. Replaced by list PR in 1918.",
+   "source": "databank_over",
+   "locator": "https://www.verkiezingsuitslagen.nl/Info/Over (de verkiezingsuitslagen voor de Tweede Kamer uit de periode 1848-1917, from the Instituut voor Nederlandse Geschiedenis)",
+   "valid_from": "1848-11-03",
+   "valid_to": "1918-07-02",
+   "first_held": "1848-11-30",
+   "earliest_record": "1848-11-30",
+   "est_votes": 4500000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1848-11-30",
+     "license": "CC0 1.0",
+     "evidence": "Candidate votes by district for each polling day from 1848 to 1917, collected by the Instituut voor Nederlandse Geschiedenis.",
+     "source": "databank",
+     "last_date": "1917-06-15"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NL",
+     "valid_to": "1918-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1848-11-30",
+     "election_kind": "general",
+     "contests": 68,
+     "source": "databank",
+     "quote": "Tweede Kamer 30 november 1848; uitgebrachte stemmen: 44.805",
+     "note": "68 districts voted on the first day; the Kiesraad's page for this election holds 36 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1850-08-27",
+     "election_kind": "general",
+     "contests": 38,
+     "source": "databank",
+     "quote": "Tweede Kamer 27 augustus 1850; uitgebrachte stemmen: 55.579",
+     "note": "38 districts voted on the first day; the Kiesraad's page for this election holds 23 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1852-06-08",
+     "election_kind": "general",
+     "contests": 32,
+     "source": "databank",
+     "quote": "Tweede Kamer 8 juni 1852; uitgebrachte stemmen: 36.446",
+     "note": "32 districts voted on the first day; the Kiesraad's page for this election holds 7 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1853-05-17",
+     "election_kind": "general",
+     "contests": 38,
+     "source": "databank",
+     "quote": "Tweede Kamer 17 mei 1853; uitgebrachte stemmen: 60.432",
+     "note": "38 districts voted on the first day; the Kiesraad's page for this election holds 14 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1854-06-13",
+     "election_kind": "general",
+     "contests": 32,
+     "source": "databank",
+     "quote": "Tweede Kamer 13 juni 1854; uitgebrachte stemmen: 39.033",
+     "note": "32 districts voted on the first day; the Kiesraad's page for this election holds 15 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1856-06-10",
+     "election_kind": "general",
+     "contests": 33,
+     "source": "databank",
+     "quote": "Tweede Kamer 10 juni 1856; uitgebrachte stemmen: 39.464",
+     "note": "33 districts voted on the first day; the Kiesraad's page for this election holds 20 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1858-06-08",
+     "election_kind": "general",
+     "contests": 32,
+     "source": "databank",
+     "quote": "Tweede Kamer 8 juni 1858; uitgebrachte stemmen: 34.011",
+     "note": "32 districts voted on the first day; the Kiesraad's page for this election holds 23 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1860-06-12",
+     "election_kind": "general",
+     "contests": 34,
+     "source": "databank",
+     "quote": "Tweede Kamer 12 juni 1860; uitgebrachte stemmen: 35.296",
+     "note": "34 districts voted on the first day; the Kiesraad's page for this election holds 10 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1862-06-10",
+     "election_kind": "general",
+     "source": "databank",
+     "quote": "Tweede Kamer 10 juni 1862; uitgebrachte stemmen: 2.060",
+     "note": "The Kiesraad's page for this election opens on a single-district vote and holds 25 polling days; the number of districts renewed on the main day is not counted here."
+    },
+    {
+     "date": "1864-06-14",
+     "election_kind": "general",
+     "contests": 34,
+     "source": "databank",
+     "quote": "Tweede Kamer 14 juni 1864; uitgebrachte stemmen: 46.371",
+     "note": "34 districts voted on the first day; the Kiesraad's page for this election holds 19 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1866-06-12",
+     "election_kind": "general",
+     "source": "databank",
+     "quote": "Tweede Kamer 12 juni 1866; uitgebrachte stemmen: 3.161",
+     "note": "The Kiesraad's page for this election opens on a single-district vote and holds 6 polling days; the number of districts renewed on the main day is not counted here."
+    },
+    {
+     "date": "1866-10-30",
+     "election_kind": "general",
+     "contests": 39,
+     "source": "databank",
+     "quote": "Tweede Kamer 30 oktober 1866; uitgebrachte stemmen: 71.908",
+     "note": "39 districts voted on the first day; the Kiesraad's page for this election holds 6 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1868-01-22",
+     "election_kind": "general",
+     "contests": 39,
+     "source": "databank",
+     "quote": "Tweede Kamer 22 januari 1868; uitgebrachte stemmen: 65.532",
+     "note": "39 districts voted on the first day; the Kiesraad's page for this election holds 16 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1869-06-08",
+     "election_kind": "general",
+     "contests": 38,
+     "source": "databank",
+     "quote": "Tweede Kamer 8 juni 1869; uitgebrachte stemmen: 65.535",
+     "note": "38 districts voted on the first day; the Kiesraad's page for this election holds 13 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1871-06-13",
+     "election_kind": "general",
+     "contests": 38,
+     "source": "databank",
+     "quote": "Tweede Kamer 13 juni 1871; uitgebrachte stemmen: 60.443",
+     "note": "38 districts voted on the first day; the Kiesraad's page for this election holds 11 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1873-06-10",
+     "election_kind": "general",
+     "contests": 36,
+     "source": "databank",
+     "quote": "Tweede Kamer 10 juni 1873; uitgebrachte stemmen: 60.884",
+     "note": "36 districts voted on the first day; the Kiesraad's page for this election holds 19 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1875-06-08",
+     "election_kind": "general",
+     "source": "databank",
+     "quote": "Tweede Kamer 8 juni 1875; uitgebrachte stemmen: 2.794",
+     "note": "The Kiesraad's page for this election opens on a single-district vote and holds 12 polling days; the number of districts renewed on the main day is not counted here."
+    },
+    {
+     "date": "1877-06-12",
+     "election_kind": "general",
+     "contests": 36,
+     "source": "databank",
+     "quote": "Tweede Kamer 12 juni 1877; uitgebrachte stemmen: 61.024",
+     "note": "36 districts voted on the first day; the Kiesraad's page for this election holds 23 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1879-06-10",
+     "election_kind": "general",
+     "contests": 40,
+     "source": "databank",
+     "quote": "Tweede Kamer 10 juni 1879; uitgebrachte stemmen: 66.213",
+     "note": "40 districts voted on the first day; the Kiesraad's page for this election holds 20 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1881-06-14",
+     "election_kind": "general",
+     "contests": 38,
+     "source": "databank",
+     "quote": "Tweede Kamer 14 juni 1881; uitgebrachte stemmen: 67.623",
+     "note": "38 districts voted on the first day; the Kiesraad's page for this election holds 21 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1883-06-12",
+     "election_kind": "general",
+     "contests": 40,
+     "source": "databank",
+     "quote": "Tweede Kamer 12 juni 1883; uitgebrachte stemmen: 76.056",
+     "note": "40 districts voted on the first day; the Kiesraad's page for this election holds 14 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1884-10-28",
+     "election_kind": "general",
+     "contests": 43,
+     "source": "databank",
+     "quote": "Tweede Kamer 28 oktober 1884; uitgebrachte stemmen: 88.806",
+     "note": "43 districts voted on the first day; the Kiesraad's page for this election holds 11 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1886-06-15",
+     "election_kind": "general",
+     "contests": 43,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 juni 1886; uitgebrachte stemmen: 102.971",
+     "note": "43 districts voted on the first day; the Kiesraad's page for this election holds 8 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1887-09-01",
+     "election_kind": "general",
+     "contests": 45,
+     "source": "databank",
+     "quote": "Tweede Kamer 1 september 1887; uitgebrachte stemmen: 74.431",
+     "note": "45 districts voted on the first day; the Kiesraad's page for this election holds 7 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1888-03-06",
+     "election_kind": "general",
+     "contests": 84,
+     "source": "databank",
+     "quote": "Tweede Kamer 6 maart 1888; uitgebrachte stemmen: 238.785",
+     "note": "84 districts voted on the first day; the Kiesraad's page for this election holds 25 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1891-06-09",
+     "election_kind": "general",
+     "contests": 84,
+     "source": "databank",
+     "quote": "Tweede Kamer 9 juni 1891; uitgebrachte stemmen: 214.547",
+     "note": "84 districts voted on the first day; the Kiesraad's page for this election holds 29 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1894-04-10",
+     "election_kind": "general",
+     "contests": 84,
+     "source": "databank",
+     "quote": "Tweede Kamer 10 april 1894; uitgebrachte stemmen: 171.267",
+     "note": "84 districts voted on the first day; the Kiesraad's page for this election holds 23 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1897-06-15",
+     "election_kind": "general",
+     "contests": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 juni 1897; uitgebrachte stemmen: 418.630",
+     "note": "100 districts voted on the first day; the Kiesraad's page for this election holds 29 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1901-06-14",
+     "election_kind": "general",
+     "source": "databank",
+     "quote": "Tweede Kamer 14 juni 1901",
+     "note": "The Kiesraad's page for this election opens on a single-district vote and holds 38 polling days; the number of districts renewed on the main day is not counted here."
+    },
+    {
+     "date": "1905-06-16",
+     "election_kind": "general",
+     "contests": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 16 juni 1905; uitgebrachte stemmen: 591.458",
+     "note": "100 districts voted on the first day; the Kiesraad's page for this election holds 24 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1909-06-11",
+     "election_kind": "general",
+     "contests": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 11 juni 1909; uitgebrachte stemmen: 604.702",
+     "note": "100 districts voted on the first day; the Kiesraad's page for this election holds 24 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1913-06-17",
+     "election_kind": "general",
+     "contests": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 17 juni 1913; uitgebrachte stemmen: 780.371",
+     "note": "100 districts voted on the first day; the Kiesraad's page for this election holds 37 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    },
+    {
+     "date": "1917-06-15",
+     "election_kind": "general",
+     "contests": 100,
+     "source": "databank",
+     "quote": "Tweede Kamer 15 juni 1917; uitgebrachte stemmen: 230.310",
+     "note": "100 districts voted on the first day; the Kiesraad's page for this election holds 11 polling days (first rounds, runoffs, and by-elections until the next general renewal)."
+    }
+   ]
+  },
+  {
+   "key": "europees_parlement",
+   "tier": "national",
+   "name": "Verkiezing van de Nederlandse leden van het Europees Parlement",
+   "name_en": "European Parliament elections in the Netherlands",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "nl.kieskring",
+     "nl.gemeente",
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "One nationwide list-PR contest. Party votes by municipality since 1979 in the Kiesraad's database; polling-station and candidate votes in EML since 2009.",
+   "note": "The Netherlands elects its members of the European Parliament in one nationwide list-PR district on a Thursday in June (Kieswet, afdeling Y). 31 seats since 2024.",
+   "source": "kieswet",
+   "locator": "https://wetten.overheid.nl/BWBR0004627 (afdeling Y: verkiezing van de leden van het Europees Parlement)",
+   "valid_from": "1979-06-07",
+   "first_held": "1979-06-07",
+   "earliest_record": "1979-06-07",
+   "est_votes": 50000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 6,
+     "term_years": 5,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Kiesraad (central electoral committee) with the municipal and principal electoral committees",
+     "source": "kr_ep",
+     "locator": "https://www.kiesraad.nl/verkiezingen/europees-parlement (Verkiezingen voor het Europees Parlement vonden voor het eerst plaats in 1979; Nederland wordt nu vertegenwoordigd door 31 leden)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1979-06-07",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Party votes by municipality for every European Parliament election since 1979.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2009-06-04",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files with candidate and party votes by polling station for every European election since 2009.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null,
+     "precedence": 3
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "NL",
+     "valid_from": "1979-01-01",
+     "precedence": -1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-06-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 25,
+     "source": "databank",
+     "quote": "Europees Parlement 7 juni 1979; uitgebrachte stemmen: 5.700.603"
+    },
+    {
+     "date": "1984-06-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 25,
+     "source": "databank",
+     "quote": "Europees Parlement 14 juni 1984; uitgebrachte stemmen: 5.334.582"
+    },
+    {
+     "date": "1989-06-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 25,
+     "source": "databank",
+     "quote": "Europees Parlement 15 juni 1989; uitgebrachte stemmen: 5.270.374"
+    },
+    {
+     "date": "1994-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 31,
+     "source": "databank",
+     "quote": "Europees Parlement 9 juni 1994; uitgebrachte stemmen: 4.146.730"
+    },
+    {
+     "date": "1999-06-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 31,
+     "source": "databank",
+     "quote": "Europees Parlement 10 juni 1999; uitgebrachte stemmen: 3.560.764"
+    },
+    {
+     "date": "2004-06-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 27,
+     "source": "databank",
+     "quote": "Europees Parlement 10 juni 2004; uitgebrachte stemmen: 4.777.121"
+    },
+    {
+     "date": "2009-06-04",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 25,
+     "source": "databank",
+     "quote": "Europees Parlement 4 juni 2009; uitgebrachte stemmen: 4.573.743",
+     "note": "The Lisbon Treaty later gave the Netherlands a 26th seat, filled from this election's result (Kiesraad note)."
+    },
+    {
+     "date": "2014-05-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 26,
+     "source": "databank",
+     "quote": "Europees Parlement 22 mei 2014; uitgebrachte stemmen: 4.782.251"
+    },
+    {
+     "date": "2019-05-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 26,
+     "source": "databank",
+     "quote": "Europees Parlement 23 mei 2019; uitgebrachte stemmen: 5.519.776",
+     "note": "After the United Kingdom left on 31 January 2020 the Netherlands received three more seats, filled from this election's result (Kiesraad note)."
+    },
+    {
+     "date": "2024-06-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 31,
+     "source": "databank",
+     "quote": "Europees Parlement 6 juni 2024; uitgebrachte stemmen: 6.253.467"
+    }
+   ]
+  },
+  {
+   "key": "eerste_kamer",
+   "tier": "national",
+   "name": "Eerste Kamerverkiezingen",
+   "name_en": "Senate elections",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "nl.provincie"
+    ]
+   },
+   "finest_note": "One nationwide list-PR contest among the members of the Provincial Councils and the electoral colleges, each vote weighted by population; the Kiesraad's database gives the weighted votes by province and electoral college since 2003, and EML files exist from 2011.",
+   "note": "75 senators elected by the members of the twelve Provincial Councils, the three Caribbean electoral colleges, and (since 2023) the electoral college for non-residents, about two to three months after the provincial elections; votes are weighted by population (Kieswet, artikel U 2). The whole chamber has been renewed at once since 1983; before that it was renewed in parts.",
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 55: De leden van de Eerste Kamer worden gekozen door de leden van provinciale staten en de leden van de kiescolleges)",
+   "earliest_record": "2003-05-26",
+   "est_votes": 330000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 5,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Kiesraad (central electoral committee)",
+     "source": "grondwet",
+     "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 52: De zittingsduur van beide kamers is vier jaren; artikel 55)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2003-05-26",
+     "finest": "nl.provincie",
+     "license": "CC0 1.0",
+     "evidence": "Weighted votes by party per province and electoral college for the Senate elections since 2003.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2011-05-23",
+     "finest": "nl.provincie",
+     "license": "CC0 1.0",
+     "evidence": "EML result files for the Senate elections since 2011.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "NL"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1849-01-01",
+     "precision": "year",
+     "through": "1999-12-31",
+     "election_kind": "indirect",
+     "note": "Senate elections by the Provincial Councils before 2003 (in parts until 1983, then the whole chamber after each provincial election); not in the Kiesraad's database and not yet counted."
+    },
+    {
+     "date": "2003-05-26",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 26 mei 2003; uitgebrachte stemmen: 161.644"
+    },
+    {
+     "date": "2007-05-29",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 29 mei 2007; uitgebrachte stemmen: 163.562"
+    },
+    {
+     "date": "2011-05-23",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 23 mei 2011; uitgebrachte stemmen: 566"
+    },
+    {
+     "date": "2015-05-26",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 26 mei 2015; uitgebrachte stemmen: 570"
+    },
+    {
+     "date": "2019-05-27",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 27 mei 2019; uitgebrachte stemmen: 589"
+    },
+    {
+     "date": "2023-05-30",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 75,
+     "source": "databank",
+     "quote": "Eerste Kamer 30 mei 2023; uitgebrachte stemmen: 616"
+    }
+   ]
+  },
+  {
+   "key": "provinciale_staten",
+   "tier": "provincie",
+   "name": "Provinciale Statenverkiezingen",
+   "name_en": "Provincial Council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "nl.provincie"
+    ],
+    "fine": [
+     "nl.kieskring",
+     "nl.gemeente",
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "Party votes by municipality since 1931 in the Kiesraad's database; polling-station and candidate votes in EML from 2015. The PR elections of 1919, 1923, and 1927 are missing from the database.",
+   "note": "Each of the twelve Provincial Councils (eleven until 1986) is elected by list PR for four years, 39 to 55 members by population (Provinciewet artikel 8); held on the same day as the water board elections since 2015. The councils in turn elect the Senate.",
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 129: De leden van provinciale staten en van de gemeenteraad worden rechtstreeks gekozen)",
+   "valid_from": "1919-01-01",
+   "earliest_record": "1931-04-22",
+   "contests_per_unit": 1,
+   "est_votes": 145000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Kiesraad (central electoral committee) with the municipal and principal electoral committees",
+     "source": "kieswet",
+     "locator": "https://wetten.overheid.nl/BWBR0004627 (artikel C 4: De leden van provinciale staten, de algemene besturen, onderscheidenlijk gemeenteraden worden gekozen voor vier jaren)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1931-04-22",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Party votes by municipality and province for every Provincial Council election since 1931.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-03-18",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files with candidate and party votes by polling station since 2015.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.provincie"
+     ],
+     "valid_from": "1919-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-01-01",
+     "precision": "year",
+     "through": "1927-12-31",
+     "election_kind": "local",
+     "note": "The list-PR provincial elections of 1919, 1923, and 1927 are not in the Kiesraad's database; not yet counted."
+    },
+    {
+     "date": "1931-04-22",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 22 april 1931; uitgebrachte stemmen: 3.577.018"
+    },
+    {
+     "date": "1935-04-17",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 17 april 1935; uitgebrachte stemmen: 3.945.801"
+    },
+    {
+     "date": "1939-04-19",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 19 april 1939; uitgebrachte stemmen: 4.320.821"
+    },
+    {
+     "date": "1946-05-29",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 29 mei 1946; uitgebrachte stemmen: 4.832.957"
+    },
+    {
+     "date": "1950-04-26",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 26 april 1950; uitgebrachte stemmen: 4.843.620"
+    },
+    {
+     "date": "1954-04-21",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 21 april 1954; uitgebrachte stemmen: 5.328.978"
+    },
+    {
+     "date": "1958-03-26",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 26 maart 1958; uitgebrachte stemmen: 5.967.795"
+    },
+    {
+     "date": "1962-03-28",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 28 maart 1962; uitgebrachte stemmen: 6.221.324"
+    },
+    {
+     "date": "1966-03-23",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 23 maart 1966; uitgebrachte stemmen: 6.961.800"
+    },
+    {
+     "date": "1970-03-18",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 18 maart 1970; uitgebrachte stemmen: 5.442.283"
+    },
+    {
+     "date": "1974-03-27",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 27 maart 1974; uitgebrachte stemmen: 6.800.098"
+    },
+    {
+     "date": "1978-03-29",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 29 maart 1978; uitgebrachte stemmen: 7.621.239"
+    },
+    {
+     "date": "1982-03-24",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Provinciale Staten 24 maart 1982; uitgebrachte stemmen: 6.904.881"
+    },
+    {
+     "date": "1987-03-18",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 18 maart 1987; uitgebrachte stemmen: 7.148.128"
+    },
+    {
+     "date": "1991-03-06",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 6 maart 1991; uitgebrachte stemmen: 5.877.150"
+    },
+    {
+     "date": "1995-03-08",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 8 maart 1995; uitgebrachte stemmen: 5.767.812"
+    },
+    {
+     "date": "1999-03-03",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 3 maart 1999; uitgebrachte stemmen: 5.386.552"
+    },
+    {
+     "date": "2003-03-11",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 11 maart 2003; uitgebrachte stemmen: 5.741.154"
+    },
+    {
+     "date": "2007-03-07",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 7 maart 2007; uitgebrachte stemmen: 5.679.364"
+    },
+    {
+     "date": "2011-03-02",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 2 maart 2011; uitgebrachte stemmen: 7.013.929"
+    },
+    {
+     "date": "2015-03-18",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 18 maart 2015; uitgebrachte stemmen: 6.102.435"
+    },
+    {
+     "date": "2019-03-20",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Provinciale Staten 20 maart 2019; uitgebrachte stemmen: 7.319.650"
+    },
+    {
+     "date": "2023-03-15",
+     "election_kind": "local",
+     "contests": 12,
+     "seats": 572,
+     "source": "databank",
+     "quote": "Provinciale Staten 15 maart 2023; uitgebrachte stemmen: 7.800.795"
+    }
+   ]
+  },
+  {
+   "key": "provinciale_staten_districten",
+   "tier": "provincie",
+   "name": "Provinciale Statenverkiezingen in kiesdistricten (1850-1917)",
+   "name_en": "Provincial Council district elections (1850-1917)",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "district"
+   },
+   "note": "Before list PR, provincial councillors were chosen in districts by majority vote under the Provinciewet of 1850, with partial renewals.",
+   "source": "databank_over",
+   "locator": "https://www.verkiezingsuitslagen.nl/Info/Over (the database's provincial series starts in 1931)",
+   "valid_from": "1850-01-01",
+   "valid_to": "1919-01-01",
+   "est_votes": 3000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official body publishes these district results; they survive only in the provincial archives and the provincial gazettes, which are not digitized as results.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.provincie"
+     ],
+     "valid_to": "1919-01-01"
+    }
+   ]
+  },
+  {
+   "key": "gemeenteraad",
+   "tier": "gemeente",
+   "name": "Gemeenteraadsverkiezingen",
+   "name_en": "Municipal Council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "nl.gemeente"
+    ],
+    "fine": [
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "Party votes by municipality since 1931 in the Kiesraad's database, including reorganization, postponed, and new elections; polling-station and candidate votes in EML from 2012 (the 2022 general set is the Kiesraad's pre-publication of the municipalities' own files). The PR elections of 1919, 1923, and 1927 are missing.",
+   "note": "Every municipal council is elected by list PR for four years, all on one day in March; a municipality formed by a merger elects its new council in November before the merger takes effect (herindelingsverkiezing), and its next regular election may be skipped. Non-Dutch residents may vote under conditions.",
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 129: De leden van provinciale staten en van de gemeenteraad worden rechtstreeks gekozen)",
+   "valid_from": "1919-01-01",
+   "earliest_record": "1931-06-17",
+   "est_votes": 160000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "The municipalities (municipal central electoral committee), with the Kiesraad publishing results",
+     "source": "kieswet",
+     "locator": "https://wetten.overheid.nl/BWBR0004627 (artikel C 4: De leden van provinciale staten, de algemene besturen, onderscheidenlijk gemeenteraden worden gekozen voor vier jaren)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1931-06-17",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Party votes by municipality for every general municipal election since 1931 and the reorganization elections in between.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2012-11-21",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files with candidate and party votes by polling station since the 2012 reorganization elections.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.gemeente"
+     ],
+     "valid_from": "1919-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-01-01",
+     "precision": "year",
+     "through": "1927-12-31",
+     "election_kind": "local",
+     "note": "The list-PR municipal elections of 1919, 1923, and 1927 are not in the Kiesraad's database; not yet counted."
+    },
+    {
+     "date": "1931-06-17",
+     "election_kind": "local",
+     "contests": 1077,
+     "source": "databank",
+     "quote": "Gemeenteraad 17 juni 1931; uitgebrachte stemmen: 3.451.970"
+    },
+    {
+     "date": "1935-06-26",
+     "election_kind": "local",
+     "contests": 1070,
+     "source": "databank",
+     "quote": "Gemeenteraad 26 juni 1935; uitgebrachte stemmen: 3.794.196"
+    },
+    {
+     "date": "1939-06-14",
+     "election_kind": "local",
+     "contests": 1054,
+     "source": "databank",
+     "quote": "Gemeenteraad 14 juni 1939; uitgebrachte stemmen: 4.067.326"
+    },
+    {
+     "date": "1946-07-26",
+     "election_kind": "local",
+     "contests": 995,
+     "source": "databank",
+     "quote": "Gemeenteraad 26 juli 1946; uitgebrachte stemmen: 4.463.917"
+    },
+    {
+     "date": "1949-06-22",
+     "election_kind": "local",
+     "contests": 980,
+     "source": "databank",
+     "quote": "Gemeenteraad 22 juni 1949; uitgebrachte stemmen: 4.975.152"
+    },
+    {
+     "date": "1953-05-27",
+     "election_kind": "local",
+     "contests": 941,
+     "source": "databank",
+     "quote": "Gemeenteraad 27 mei 1953; uitgebrachte stemmen: 5.430.537"
+    },
+    {
+     "date": "1953-12-09",
+     "election_kind": "local",
+     "contests": 10,
+     "source": "databank",
+     "quote": "Gemeenteraad 9 december 1953 (herindelingsverkiezing); uitgebrachte stemmen: 152.904",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1953-12-31",
+     "election_kind": "local",
+     "contests": 24,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1953 (uitgestelde verkiezing); uitgebrachte stemmen: 28.253",
+     "note": "Postponed election (uitgestelde verkiezing)."
+    },
+    {
+     "date": "1954-12-31",
+     "election_kind": "local",
+     "contests": 11,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1954 (uitgestelde verkiezing); uitgebrachte stemmen: 9.532",
+     "note": "Postponed election (uitgestelde verkiezing)."
+    },
+    {
+     "date": "1955-12-31",
+     "election_kind": "local",
+     "contests": 8,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1955 (herindelingsverkiezing); uitgebrachte stemmen: 45.645",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1956-03-21",
+     "election_kind": "local",
+     "contests": 5,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 maart 1956 (herindelingsverkiezing); uitgebrachte stemmen: 18.938",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1956-06-20",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 20 juni 1956 (uitgestelde verkiezing); uitgebrachte stemmen: 823",
+     "note": "Postponed election (uitgestelde verkiezing)."
+    },
+    {
+     "date": "1957-12-31",
+     "election_kind": "local",
+     "contests": 4,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1957 (herindelingsverkiezing); uitgebrachte stemmen: 13.509",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1958-05-28",
+     "election_kind": "local",
+     "contests": 983,
+     "source": "databank",
+     "quote": "Gemeenteraad 28 mei 1958; uitgebrachte stemmen: 5.806.448"
+    },
+    {
+     "date": "1961-11-15",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 15 november 1961 (herindelingsverkiezing); uitgebrachte stemmen: 2.771",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1962-05-02",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 2 mei 1962 (herindelingsverkiezing); uitgebrachte stemmen: 11.913",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1962-05-30",
+     "election_kind": "local",
+     "contests": 963,
+     "source": "databank",
+     "quote": "Gemeenteraad 30 mei 1962; uitgebrachte stemmen: 6.071.264"
+    },
+    {
+     "date": "1965-11-18",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Gemeenteraad 18 november 1965 (herindelingsverkiezing); uitgebrachte stemmen: 14.072",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1966-06-01",
+     "election_kind": "local",
+     "contests": 931,
+     "source": "databank",
+     "quote": "Gemeenteraad 1 juni 1966; uitgebrachte stemmen: 6.663.586"
+    },
+    {
+     "date": "1966-12-31",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1966 (herindelingsverkiezing); uitgebrachte stemmen: 13.981",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1970-06-03",
+     "election_kind": "local",
+     "contests": 853,
+     "source": "databank",
+     "quote": "Gemeenteraad 3 juni 1970; uitgebrachte stemmen: 5.238.164"
+    },
+    {
+     "date": "1973-12-31",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1973 (herindelingsverkiezing); uitgebrachte stemmen: 105.541",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1974-05-29",
+     "election_kind": "local",
+     "contests": 836,
+     "source": "databank",
+     "quote": "Gemeenteraad 29 mei 1974; uitgebrachte stemmen: 6.126.486"
+    },
+    {
+     "date": "1974-06-26",
+     "election_kind": "local",
+     "contests": 2,
+     "source": "databank",
+     "quote": "Gemeenteraad 26 juni 1974 (herindelingsverkiezing); uitgebrachte stemmen: 16.062",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1978-05-31",
+     "election_kind": "local",
+     "contests": 826,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 mei 1978; uitgebrachte stemmen: 7.051.013"
+    },
+    {
+     "date": "1978-12-31",
+     "election_kind": "local",
+     "contests": 16,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1978 (herindelingsverkiezing); uitgebrachte stemmen: 100.815",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1979-05-16",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 16 mei 1979 (nieuwe verkiezing); uitgebrachte stemmen: 9.167",
+     "note": "New election (nieuwe verkiezing) in a single municipality."
+    },
+    {
+     "date": "1979-12-31",
+     "election_kind": "local",
+     "contests": 6,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1979 (herindelingsverkiezing); uitgebrachte stemmen: 40.583",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1981-10-21",
+     "election_kind": "local",
+     "contests": 20,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 oktober 1981 (herindelingsverkiezing); uitgebrachte stemmen: 256.903",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1982-06-02",
+     "election_kind": "local",
+     "contests": 752,
+     "source": "databank",
+     "quote": "Gemeenteraad 2 juni 1982; uitgebrachte stemmen: 6.680.801"
+    },
+    {
+     "date": "1982-09-15",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 15 september 1982 (nieuwe verkiezing); uitgebrachte stemmen: 727",
+     "note": "New election (nieuwe verkiezing) in a single municipality."
+    },
+    {
+     "date": "1983-12-31",
+     "election_kind": "local",
+     "contests": 17,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1983 (herindelingsverkiezing); uitgebrachte stemmen: 140.149",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1984-12-31",
+     "election_kind": "local",
+     "contests": 6,
+     "source": "databank",
+     "quote": "Gemeenteraad 31 december 1984 (herindelingsverkiezing); uitgebrachte stemmen: 33.553",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1985-11-27",
+     "election_kind": "local",
+     "contests": 7,
+     "source": "databank",
+     "quote": "Gemeenteraad 27 november 1985 (herindelingsverkiezing); uitgebrachte stemmen: 48.982",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "1986-03-19",
+     "election_kind": "local",
+     "contests": 691,
+     "source": "databank",
+     "quote": "Gemeenteraad 19 maart 1986; uitgebrachte stemmen: 7.880.169"
+    },
+    {
+     "date": "1986-11-26",
+     "election_kind": "local",
+     "contests": 16,
+     "source": "databank",
+     "quote": "Gemeenteraad 26 november 1986 (uitgestelde verkiezing); uitgebrachte stemmen: 57.956",
+     "note": "Postponed election (uitgestelde verkiezing)."
+    },
+    {
+     "date": "1990-03-21",
+     "election_kind": "local",
+     "contests": 647,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 maart 1990; uitgebrachte stemmen: 7.103.984"
+    },
+    {
+     "date": "1994-03-02",
+     "election_kind": "local",
+     "contests": 630,
+     "source": "databank",
+     "quote": "Gemeenteraad 2 maart 1994; uitgebrachte stemmen: 7.634.059"
+    },
+    {
+     "date": "1998-03-04",
+     "election_kind": "local",
+     "contests": 532,
+     "source": "databank",
+     "quote": "Gemeenteraad 4 maart 1998; uitgebrachte stemmen: 7.000.941"
+    },
+    {
+     "date": "2002-03-06",
+     "election_kind": "local",
+     "contests": 458,
+     "source": "databank",
+     "quote": "Gemeenteraad 6 maart 2002; uitgebrachte stemmen: 6.456.532"
+    },
+    {
+     "date": "2006-03-07",
+     "election_kind": "local",
+     "contests": 419,
+     "source": "databank",
+     "quote": "Gemeenteraad 7 maart 2006; uitgebrachte stemmen: 6.939.990"
+    },
+    {
+     "date": "2009-11-22",
+     "election_kind": "local",
+     "contests": 6,
+     "source": "databank",
+     "quote": "Gemeenteraad 22 november 2009 (herindelingsverkiezing); uitgebrachte stemmen: 113.564",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2010-03-03",
+     "election_kind": "local",
+     "contests": 393,
+     "source": "databank",
+     "quote": "Gemeenteraad 3 maart 2010; uitgebrachte stemmen: 6.613.134"
+    },
+    {
+     "date": "2010-11-24",
+     "election_kind": "local",
+     "contests": 17,
+     "source": "databank",
+     "quote": "Gemeenteraad 24 november 2010 (herindelingsverkiezing); uitgebrachte stemmen: 189.438",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2011-11-23",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 23 november 2011 (herindelingsverkiezing); uitgebrachte stemmen: 14.965",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2012-11-21",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 november 2012 (herindelingsverkiezing); uitgebrachte stemmen: 50.695",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2013-11-13",
+     "election_kind": "local",
+     "contests": 4,
+     "source": "databank",
+     "quote": "Gemeenteraad 13 november 2013 (herindelingsverkiezing); uitgebrachte stemmen: 106.834",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2014-03-19",
+     "election_kind": "local",
+     "contests": 380,
+     "source": "databank",
+     "quote": "Gemeenteraad 19 maart 2014; uitgebrachte stemmen: 6.744.390"
+    },
+    {
+     "date": "2014-11-19",
+     "election_kind": "local",
+     "contests": 6,
+     "source": "databank",
+     "quote": "Gemeenteraad 19 november 2014 (herindelingsverkiezing); uitgebrachte stemmen: 179.246",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2015-11-18",
+     "election_kind": "local",
+     "contests": 2,
+     "source": "databank",
+     "quote": "Gemeenteraad 18 november 2015 (herindelingsverkiezing); uitgebrachte stemmen: 32.196",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2016-11-23",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 23 november 2016 (herindelingsverkiezing); uitgebrachte stemmen: 26.009",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2017-11-22",
+     "election_kind": "local",
+     "contests": 6,
+     "source": "databank",
+     "quote": "Gemeenteraad 22 november 2017 (herindelingsverkiezing); uitgebrachte stemmen: 127.271",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2018-03-21",
+     "election_kind": "local",
+     "contests": 335,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 maart 2018; uitgebrachte stemmen: 6.849.788"
+    },
+    {
+     "date": "2018-11-21",
+     "election_kind": "local",
+     "contests": 12,
+     "source": "databank",
+     "quote": "Gemeenteraad 21 november 2018 (herindelingsverkiezing); uitgebrachte stemmen: 335.425",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2020-11-18",
+     "election_kind": "local",
+     "contests": 4,
+     "source": "databank",
+     "quote": "Gemeenteraad 18 november 2020 (herindelingsverkiezing); uitgebrachte stemmen: 53.373",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2021-11-24",
+     "election_kind": "local",
+     "contests": 4,
+     "source": "databank",
+     "quote": "Gemeenteraad 24 november 2021 (herindelingsverkiezing); uitgebrachte stemmen: 105.634",
+     "note": "Municipal reorganization election (herindelingsverkiezing) in the merging municipalities."
+    },
+    {
+     "date": "2022-03-16",
+     "election_kind": "local",
+     "contests": 333,
+     "source": "databank",
+     "quote": "Gemeenteraad 16 maart 2022; uitgebrachte stemmen: 6.934.881"
+    },
+    {
+     "date": "2022-11-23",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Gemeenteraad 23 november 2022 (nieuwe verkiezing); uitgebrachte stemmen: 23.264",
+     "note": "New election (nieuwe verkiezing) in a single municipality."
+    },
+    {
+     "date": "2026-03-18",
+     "election_kind": "local",
+     "contests": 340,
+     "source": "databank",
+     "quote": "Gemeenteraad 18 maart 2026; uitgebrachte stemmen: 7.673.235"
+    },
+    {
+     "date": "1956-11-23",
+     "election_kind": "local",
+     "source": "databank",
+     "quote": "Gemeenteraad 23 november 1956 (herindelingsverkiezing)",
+     "note": "Municipal reorganization election listed in the Kiesraad's database without results."
+    },
+    {
+     "date": "2026-11-18",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "kr_herindeling",
+     "quote": "Op 18 november 2026 vinden herindelingsverkiezingen plaats in de gemeenten Hilversum en Wijdemeren.",
+     "note": "Reorganization election for the merged municipality of Hilversum (with Wijdemeren) from 1 January 2027 (CBS)."
+    }
+   ]
+  },
+  {
+   "key": "gemeenteraad_districten",
+   "tier": "gemeente",
+   "name": "Gemeenteraadsverkiezingen in kiesdistricten (1851-1917)",
+   "name_en": "Municipal Council majority elections (1851-1917)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "municipality"
+   },
+   "note": "Under the Gemeentewet of 1851 councillors were chosen by majority vote, in larger towns by district, with a third of each council renewed every two years.",
+   "source": "databank_over",
+   "locator": "https://www.verkiezingsuitslagen.nl/Info/Over (the database's municipal series starts in 1931)",
+   "valid_from": "1851-01-01",
+   "valid_to": "1919-01-01",
+   "est_votes": 8000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Results were kept by each of the roughly 1,100 municipalities; no official compilation exists, and the municipal archives are not digitized as results.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.gemeente"
+     ],
+     "valid_to": "1919-01-01"
+    }
+   ]
+  },
+  {
+   "key": "waterschap",
+   "tier": "waterschap",
+   "name": "Waterschapsverkiezingen (algemeen bestuur)",
+   "name_en": "Water board elections",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "nl.waterschap"
+    ],
+    "fine": [
+     "nl.gemeente",
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "Party votes by water board and municipality since 2015 in the Kiesraad's database; polling-station and candidate votes in EML from 2015. The first list election, by post in November 2008, is not in the database.",
+   "note": "Residents elect most of each water board's general board (algemeen bestuur) by list PR for four years, on the same day as the provincial elections since 2015; the seats for unbuilt land and nature areas are appointed by designated organizations (Waterschapswet artikelen 12-14) and are not elected.",
+   "source": "waterschapswet",
+   "locator": "https://wetten.overheid.nl/BWBR0005108 (artikel 12: categorieën van belanghebbenden; artikel 14: de vertegenwoordigers van de categorieën b en c worden benoemd)",
+   "valid_from": "2008-01-01",
+   "earliest_record": "2015-03-18",
+   "est_votes": 25000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Kiesraad (central electoral committee) with the municipal and principal electoral committees",
+     "source": "kieswet",
+     "locator": "https://wetten.overheid.nl/BWBR0004627 (artikel C 4: De leden van provinciale staten, de algemene besturen, onderscheidenlijk gemeenteraden worden gekozen voor vier jaren)",
+     "valid_from": "2015-01-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-03-18",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Party votes by water board and municipality for the water board elections since 2015.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-03-18",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files (published as AB, algemeen bestuur) with candidate and party votes by polling station since 2015.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.waterschap"
+     ],
+     "valid_from": "2008-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-11-01",
+     "precision": "month",
+     "election_kind": "local",
+     "note": "First list election of the water boards, by postal vote in November 2008; not in the Kiesraad's database and not yet counted."
+    },
+    {
+     "date": "2015-03-18",
+     "election_kind": "local",
+     "contests": 22,
+     "source": "databank",
+     "quote": "Waterschap 18 maart 2015; uitgebrachte stemmen: 5.574.320"
+    },
+    {
+     "date": "2019-03-20",
+     "election_kind": "local",
+     "contests": 21,
+     "source": "databank",
+     "quote": "Waterschap 20 maart 2019; uitgebrachte stemmen: 7.140.518"
+    },
+    {
+     "date": "2023-03-15",
+     "election_kind": "local",
+     "contests": 21,
+     "source": "databank",
+     "quote": "Waterschap 15 maart 2023; uitgebrachte stemmen: 7.748.429"
+    }
+   ]
+  },
+  {
+   "key": "waterschap_personen",
+   "tier": "waterschap",
+   "name": "Waterschapsverkiezingen vóór 2008 (personenstelsel)",
+   "name_en": "Water board elections before 2008",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "water board"
+   },
+   "note": "Before 2008 each water board elected its board members as persons, by category of stakeholders (residents, owners, and businesses), under its own regulations, often by post and with low turnout.",
+   "source": "waterschapswet",
+   "valid_to": "2008-01-01",
+   "est_votes": 10000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Each board ran and recorded its own elections; no official body compiled or publishes the results, and the boards themselves have since merged into 21.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "schemes": [
+      "nl.waterschap"
+     ],
+     "valid_to": "2008-01-01"
+    }
+   ]
+  },
+  {
+   "key": "eilandsraad",
+   "tier": "openbaar_lichaam",
+   "name": "Eilandsraadsverkiezingen",
+   "name_en": "Island Council elections (Caribbean Netherlands)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "island"
+   },
+   "finest_note": "Party and candidate votes per island from the official reports (processen-verbaal); polling-station figures only for the 2020 Sint Eustatius election. The 2023 results are CSV files on data.overheid.nl, not yet in the database.",
+   "note": "Bonaire (9 seats), Sint Eustatius (5), and Saba (5) each elect an island council by list PR for four years, on the provincial election day; non-Dutch residents of five years' legal residence may vote.",
+   "source": "kr_er",
+   "locator": "https://www.kiesraad.nl/verkiezingen/eilandsraden (De eilandsraad ... wordt ook net als die raad voor 4 jaar rechtstreeks gekozen; Bonaire: 9 zetels, Sint Eustatius: 5 zetels, Saba: 5 zetels)",
+   "valid_from": "2010-10-10",
+   "first_held": "2011-03-02",
+   "earliest_record": "2011-03-02",
+   "est_votes": 40000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "The central electoral committee of each island, chaired by the gezaghebber",
+     "source": "kieswet",
+     "locator": "https://wetten.overheid.nl/BWBR0004627 (afdeling Ya, § 3: De verkiezing van de leden van de eilandsraad)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2011-03-02",
+     "license": "CC0 1.0",
+     "evidence": "Party and candidate votes per island from the official reports, 2011-2023.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad CSV)",
+     "url": "https://www.kiesraad.nl/verkiezingen/verkiezingsuitslagen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-03-15",
+     "evidence": "De uitslagen van de eilandsraad en kiescolleges van 15 maart 2023 ... zijn in CSV-formaat gepubliceerd op data.overheid.nl.",
+     "source": "kr_uitslagen"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "name_pattern": "Eilandsraad|Island Council",
+     "valid_from": "2010-10-10"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2011-03-02",
+     "election_kind": "local",
+     "contests": 3,
+     "seats": 19,
+     "source": "databank",
+     "quote": "Eilandsraad 2 maart 2011; uitgebrachte stemmen: 9.964"
+    },
+    {
+     "date": "2015-03-18",
+     "election_kind": "local",
+     "contests": 3,
+     "seats": 19,
+     "source": "databank",
+     "quote": "Eilandsraad 18 maart 2015; uitgebrachte stemmen: 12.192"
+    },
+    {
+     "date": "2019-03-20",
+     "election_kind": "local",
+     "contests": 2,
+     "seats": 14,
+     "source": "databank",
+     "quote": "Eilandsraad 20 maart 2019; uitgebrachte stemmen: 10.053",
+     "note": "Sint Eustatius did not vote: its island council had been dissolved under the 2018 intervention act."
+    },
+    {
+     "date": "2020-10-21",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 5,
+     "source": "databank",
+     "quote": "Eilandsraad 21 oktober 2020; uitgebrachte stemmen: 1.616",
+     "note": "Sint Eustatius only, after the intervention."
+    },
+    {
+     "date": "2023-03-15",
+     "election_kind": "local",
+     "contests": 3,
+     "seats": 19,
+     "source": "databank",
+     "quote": "Eilandsraad 15 maart 2023; uitgebrachte stemmen: 13.351"
+    }
+   ]
+  },
+  {
+   "key": "kiescollege_bes",
+   "tier": "openbaar_lichaam",
+   "name": "Verkiezing van de kiescolleges voor de Eerste Kamer (Bonaire, Sint Eustatius en Saba)",
+   "name_en": "Caribbean electoral college elections",
+   "category": "special_purpose",
+   "goal": "national",
+   "measure": {
+    "unit": "island"
+   },
+   "finest_note": "Party and candidate votes per island from the official reports in the Kiesraad's database (2019 and 2023).",
+   "note": "Since 2019 the voters of each Caribbean public body directly elect an electoral college (kiescollege) whose only task is to vote in the Senate election, as the Provincial Councils do in the European Netherlands; elected on the provincial election day.",
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 132a, derde lid, with artikel 55: de leden van de kiescolleges)",
+   "first_held": "2019-03-20",
+   "earliest_record": "2019-03-20",
+   "est_votes": 16000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "The central electoral committee of each island",
+     "source": "kr_kc",
+     "locator": "https://www.kiesraad.nl/verkiezingen/kiescolleges (Voor de verkiezingen in Caribisch Nederland is ieder eiland één kieskring; per eiland één centraal stembureau)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-03-20",
+     "license": "CC0 1.0",
+     "evidence": "Party and candidate votes per island from the official reports (P 22-2).",
+     "source": "databank"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "NL",
+     "name_pattern": "[Kk]iescollege (Bonaire|Sint Eustatius|Saba)|Electoral College (of )?(Bonaire|Sint Eustatius|Saba)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-03-20",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Kiescollege 20 maart 2019; uitgebrachte stemmen: 8.248"
+    },
+    {
+     "date": "2023-03-15",
+     "election_kind": "local",
+     "contests": 3,
+     "source": "databank",
+     "quote": "Kiescollege 15 maart 2023; uitgebrachte stemmen: 36.832",
+     "note": "Bonaire, Saba, and Sint Eustatius; the same page also holds the non-resident college."
+    }
+   ]
+  },
+  {
+   "key": "kiescollege_niet_ingezetenen",
+   "tier": "national",
+   "name": "Verkiezing van het kiescollege niet-ingezetenen",
+   "name_en": "Electoral college for non-residents",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "One contest; party and candidate votes from the official report (P 22-3) in the Kiesraad's database.",
+   "note": "Dutch citizens living abroad who register with The Hague elect, by post only, an electoral college of 9 to 55 members (25 in 2023) that votes in the Senate election. First held in 2023.",
+   "source": "kr_kc",
+   "locator": "https://www.kiesraad.nl/verkiezingen/kiescolleges (Kiescollege niet-ingezetenen; Voor de Eerste Kamerverkiezing van 2023 telde het kiescollege niet-ingezetenen 25 leden; Kiezers kunnen alleen per brief stemmen)",
+   "first_held": "2023-03-15",
+   "earliest_record": "2023-03-15",
+   "est_votes": 30000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Municipality of The Hague (postal voting office) and the central electoral committee for non-residents",
+     "source": "kr_kc",
+     "locator": "https://www.kiesraad.nl/verkiezingen/kiescolleges (Het centraal stembureau is gevestigd in Zuid-Holland; de burgemeester van Den Haag)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-03-15",
+     "license": "CC0 1.0",
+     "evidence": "Party and candidate votes for the non-resident electoral college from the official report (P 22-3).",
+     "source": "databank"
+    }
+   ],
+   "match": [
+    {
+     "iso_pattern": "NL",
+     "name_pattern": "[Kk]iescollege niet-ingezetenen|non-resident"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2023-03-15",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 25,
+     "source": "databank",
+     "quote": "Kiescollege 15 maart 2023; uitgebrachte stemmen: 36.832"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Nationale referenda",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "nl.gemeente",
+     "nl.stembureau"
+    ]
+   },
+   "finest_note": "Votes by municipality in the Kiesraad's database for all three; polling-station counts in EML for 2016 and 2018.",
+   "note": "Three national referendums, all non-binding: 2005 (consultative, by a one-off act) and 2016 and 2018 (advisory, under the Wet raadgevend referendum of 2015, repealed with effect to 10 July 2018). The constitution has no binding referendum.",
+   "source": "wrr",
+   "locator": "https://wetten.overheid.nl/BWBR0036443 (Regeling vervallen per 12-07-2018 met terugwerkende kracht tot en met 10-07-2018)",
+   "first_held": "2005-06-01",
+   "earliest_record": "2005-06-01",
+   "est_votes": 18600000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Databank Verkiezingsuitslagen (Kiesraad)",
+     "url": "https://www.verkiezingsuitslagen.nl/verkiezingen",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2005-06-01",
+     "finest": "nl.gemeente",
+     "license": "CC0 1.0",
+     "evidence": "Votes for and against by municipality for the 2005, 2016, and 2018 referendums.",
+     "source": "databank"
+    },
+    {
+     "platform": "data.overheid.nl (Kiesraad EML)",
+     "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-tweede-kamer-2023",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2016-04-06",
+     "finest": "nl.stembureau",
+     "license": "CC0 1.0",
+     "evidence": "EML result files with counts by polling station for the 2016 and 2018 advisory referendums.",
+     "source": "dataoverheid"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NL",
+     "polity_kinds": [
+      "sovereign_state"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "2005-06-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Nationaal referendum 1 juni 2005; uitgebrachte stemmen: 7.705.156",
+     "note": "Consultative referendum on the treaty establishing a Constitution for Europe, under its own act."
+    },
+    {
+     "date": "2016-04-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Nationaal referendum 6 april 2016; uitgebrachte stemmen: 4.151.613",
+     "note": "Advisory referendum under the Wet raadgevend referendum on the EU-Ukraine Association Agreement."
+    },
+    {
+     "date": "2018-03-21",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "databank",
+     "quote": "Nationaal referendum 21 maart 2018; uitgebrachte stemmen: 6.734.225",
+     "note": "Advisory referendum under the Wet raadgevend referendum on the Intelligence and Security Services Act 2017; held with the municipal elections."
+    }
+   ]
+  },
+  {
+   "key": "wijkraden_stadsdeelcommissies",
+   "tier": "deelgemeente",
+   "name": "Wijkraden en stadsdeelcommissies",
+   "name_en": "Neighborhood and borough committees",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "district"
+   },
+   "finest_note": "Published by each municipality, not by the Kiesraad: Rotterdam posts its neighborhood council results on its own site; Amsterdam's borough committee results come from its research office.",
+   "note": "Under Gemeentewet artikel 83 a council may set up district committees; Amsterdam's stadsdeelcommissies and Rotterdam's 37 wijkraden and 2 dorpsraden (7 to 11 members each) are elected directly on the municipal election day. They replaced the borough councils abolished in 2014.",
+   "source": "gemeentewet",
+   "locator": "https://wetten.overheid.nl/BWBR0005416 (artikel 83: De raad ... kan bestuurscommissies instellen)",
+   "valid_from": "2014-03-19",
+   "est_votes": 4000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "The municipality (Amsterdam, Rotterdam)",
+     "source": "rotterdam_wijkraden",
+     "locator": "https://www.rotterdam.nl/wijkraden (Op 22 april 2026 zijn de nieuwe wijk- en dorpsraadsleden geïnstalleerd)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Gemeente Rotterdam",
+     "url": "https://www.rotterdam.nl/wijkraden",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The wijkraden page links to the neighborhood council results (Uitslagen) and a map of the districts.",
+     "source": "rotterdam_wijkraden"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "name_pattern": "[Ww]ijkraad|[Dd]orpsraad|[Ss]tadsdeelcommissie|[Bb]estuurscommissie|[Gg]ebiedscommissie",
+     "valid_from": "2014-03-19"
+    }
+   ]
+  },
+  {
+   "key": "deelgemeenteraden",
+   "tier": "deelgemeente",
+   "name": "Deelraadsverkiezingen (stadsdeelraden en deelgemeenteraden)",
+   "name_en": "Borough council elections (abolished 2014)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "borough"
+   },
+   "note": "Amsterdam's stadsdeelraden and Rotterdam's deelgemeenteraden were directly elected borough councils with delegated powers, elected with the municipal councils; abolished in 2014 when the Gemeentewet dropped the deelgemeente.",
+   "source": "gemeentewet",
+   "valid_to": "2014-03-19",
+   "est_votes": 6000000,
+   "effort": 4,
+   "disposition": "blocked",
+   "disposition_reason": "Results were published only by the two municipalities; amsterdam.nl refuses automated requests and Rotterdam's archive of these results was not located on its site, so no source is reachable yet.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NL",
+     "name_pattern": "[Dd]eelraad|[Ss]tadsdeelraad|[Dd]eelgemeenteraad",
+     "valid_to": "2014-03-20"
+    }
+   ]
+  },
+  {
+   "key": "gemeentelijk_referendum",
+   "tier": "gemeente",
+   "name": "Gemeentelijke referenda",
+   "name_en": "Municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Municipalities may hold advisory or consultative referendums under their own referendum ordinances, made under their general power to regulate (Gemeentewet artikel 147); the results bind no one.",
+   "source": "gemeentewet",
+   "est_votes": 3000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Each municipality runs and publishes its own referendums; the Kiesraad keeps no register or results, so there is no official list to start from.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NL",
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "provinciaal_referendum",
+   "tier": "provincie",
+   "name": "Provinciale referenda",
+   "name_en": "Provincial referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "A province may hold an advisory referendum under its own ordinance (Provinciewet artikel 143); none is recorded centrally.",
+   "source": "provinciewet",
+   "est_votes": 500000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official register of provincial referendums exists; any results sit with the province that held one.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NL",
+     "polity_kinds": [
+      "region"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "burgemeestersreferendum",
+   "tier": "gemeente",
+   "name": "Raadplegend burgemeestersreferendum",
+   "name_en": "Consultative mayoral referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "For some years after 2001 the Gemeentewet let a council put its two shortlisted mayoral candidates to a consultative vote of the residents before recommending one; the provision has since been repealed and the mayor is appointed (artikel 61).",
+   "source": "gemeentewet",
+   "locator": "https://wetten.overheid.nl/BWBR0005416 (artikel 61: De burgemeester wordt bij koninklijk besluit ... benoemd voor de tijd van zes jaar)",
+   "valid_from": "2001-01-01",
+   "est_votes": 300000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "The few votes held were run and published by the municipalities themselves; no official central record lists them.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "NL",
+     "name_pattern": "[Bb]urgemeester|[Mm]ayor"
+    }
+   ]
+  },
+  {
+   "key": "koning",
+   "tier": "national",
+   "name": "Koning",
+   "name_en": "Monarch",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 24: Het koningschap wordt erfelijk vervuld)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The King is head of state by hereditary succession (Grondwet artikel 24); no election."
+  },
+  {
+   "key": "commissaris_van_de_koning",
+   "tier": "provincie",
+   "name": "Commissaris van de Koning",
+   "name_en": "King's Commissioner",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {},
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 131: De commissaris van de Koning en de burgemeester worden aangesteld)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the Crown (Grondwet artikel 131); no election."
+  },
+  {
+   "key": "burgemeester",
+   "tier": "gemeente",
+   "name": "Burgemeester",
+   "name_en": "Mayor",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "gemeentewet",
+   "locator": "https://wetten.overheid.nl/BWBR0005416 (artikel 61)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by royal decree for six years on the council's recommendation (Gemeentewet artikel 61); no election."
+  },
+  {
+   "key": "gezaghebber",
+   "tier": "openbaar_lichaam",
+   "name": "Gezaghebber",
+   "name_en": "Island governor",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "wol_bes",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by royal decree (Wet openbare lichamen BES); no election."
+  },
+  {
+   "key": "dijkgraaf",
+   "tier": "waterschap",
+   "name": "Dijkgraaf",
+   "name_en": "Water board chair",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "waterschapswet",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the Crown on the board's recommendation (Waterschapswet); no election."
+  },
+  {
+   "key": "colleges",
+   "tier": "gemeente",
+   "name": "Wethouders, gedeputeerden en dagelijkse besturen",
+   "name_en": "Aldermen and executive boards",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "gemeentewet",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Aldermen, provincial executives, island deputies, and water board executives are appointed by their councils from their own resolutions; the archive records councils, not these appointments."
+  },
+  {
+   "key": "tweede_kamer_1815",
+   "tier": "national",
+   "name": "Tweede Kamer gekozen door Provinciale Staten (1815-1848)",
+   "name_en": "House of Representatives chosen by the Provincial States (1815-1848)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "databank_over",
+   "valid_to": "1848-11-03",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Before 1848 the Provincial States chose the members, who were themselves chosen through estates; no popular vote, and the Kiesraad's records start with the first direct election of 1848."
+  },
+  {
+   "key": "rechters",
+   "tier": "national",
+   "name": "Rechterlijke macht",
+   "name_en": "Judiciary",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "grondwet",
+   "locator": "https://wetten.overheid.nl/BWBR0001840 (artikel 117)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed for life by royal decree (Grondwet artikel 117); no judicial elections."
+  },
+  {
+   "key": "kandidaatstelling",
+   "tier": "national",
+   "name": "Kandidaatstelling binnen partijen",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "kieswet",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "NL"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties select candidates and list leaders internally (member ballots in some parties); the state runs no primaries and publishes no results. Lists are lodged under Kieswet hoofdstuk H."
+  },
+  {
+   "key": "medezeggenschap",
+   "tier": "national",
+   "name": "Ondernemingsraden en medezeggenschapsraden",
+   "name_en": "Works councils and participation councils",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "grondwet",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Works councils, school participation councils, and similar bodies are elected inside private and public institutions under sector laws; no official body publishes results."
+  }
+ ]
+}
