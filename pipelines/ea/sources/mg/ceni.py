@@ -154,9 +154,42 @@ def districts_2024() -> list[read.Sheet]:
     return list(read.district_sheets_2024(path("leg2024-districts")))
 
 
+# Councillor sheets whose vote figure is printed glued to a wrapped party name or percent, so the layout reader cannot
+# tell where the figure ends. Each entry gives the candidates' votes and parties as the printed sheet reads, by ballot
+# order; `_repair` checks them against the sheet's own total before they are used.
+GLUED: dict[tuple[str, str], list[tuple[int, str]]] = {
+    ("VANGAINDRANO", "LOHAFARY"): [
+        (773, "GROUPEMENT DE P.P GROUPEMENT DE P.P ISIKA REHETRA MIARAKA @ ANDR"),
+        (482, "GROUPEMENT DE P.P MANARANARA FANILO"),
+        (474, "GROUPEMENT DE P.P GROUPEMENT DE P.P PARTI VERT HASIN'I MADAGASIKA"),
+    ],
+    ("AMBALAVAO", "ANJOMA"): [
+        (1334, "INDEPENDANT NY OLO RO MAGNOVA NY TANY FA NY TANY TSA MBA MAGNOVA"),
+        (1222, "IRD"),
+    ],
+    ("IFANADIANA", "TSARATANANA"): [
+        (911, "IRD"),
+        (1399, "INDEPENDANT RAMIANDRISOA HARIMANGA JEAN PAUL"),
+    ],
+}
+
+
+def _repair(sheet: read.Sheet) -> read.Sheet:
+    fixed = GLUED.get((sheet.place["district"], sheet.place["commune"]))
+    if fixed is None or _sound(sheet) or len(fixed) != len(sheet.candidates):
+        return sheet
+    for candidate, (votes, party) in zip(sheet.candidates, fixed, strict=True):
+        candidate.votes, candidate.party = votes, party
+    if not _sound(sheet):
+        raise ValueError(f"{sheet.place}: repaired votes do not add up to the sheet's total")
+    return sheet
+
+
 @cache
 def communal_2019(office: str) -> list[read.Sheet]:
     sheets = read.commune_sheets_2019(path(f"{office}2019"))
+    if office == "councillor":
+        sheets = (_repair(s) for s in sheets)
     return [s for s in sheets if s.candidates and all(c.votes >= 0 for c in s.candidates) and _sound(s)]
 
 
