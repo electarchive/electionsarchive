@@ -395,6 +395,23 @@ def label(code: str) -> str:
     return code.title() if code in INDEPENDENTS else code
 
 
+# The packages that already declare a reporting unit for every municipality on an election day, with the key
+# namespace that declares them (None for the plain source-wide key). An assembly package reuses their units, and
+# depends on the package, instead of declaring the same "<day>:<municipality>" codes again.
+UNIT_HOLDERS: dict[date, tuple[str, str | None]] = {
+    date(1994, 3, 20): ("sv.tse/pres-1994-03-20", None),
+    date(2012, 3, 11): ("sv.tse/council-2012-03-11", "council"),
+    date(2015, 3, 1): ("sv.tse/council-2015-03-01", "council"),
+}
+
+
+def unit_key(day: date, code: str) -> str:
+    holder = UNIT_HOLDERS.get(day)
+    if holder is None:
+        return key("unit", day, code)
+    return tse.key("unit", day, code) if holder[1] is None else tse.key("unit", holder[1], day, code)
+
+
 def assembly(day: date) -> Package:
     election = ELECTIONS[day]
     deps, artifacts = tables(election)
@@ -406,7 +423,7 @@ def assembly(day: date) -> Package:
         SOURCE,
         f"The {day.year} election of deputies to the Legislative Assembly of El Salvador, by municipality, from the "
         "Tribunal Supremo Electoral",
-        depends=["sv.tse/geo", "sv.tse/registry", REGISTRY],
+        depends=["sv.tse/geo", "sv.tse/registry", REGISTRY, *([UNIT_HOLDERS[day][0]] if day in UNIT_HOLDERS else [])],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     source = key("source", day)
@@ -525,18 +542,19 @@ def assembly(day: date) -> Package:
         for row in department.rows:
             code = locate(department.number, row.name, known)
             if code not in units:
-                unit = units[code] = key("unit", day, code)
-                p.add(
-                    "reporting_unit",
-                    id=unit,
-                    polity_id=tse.EL_SALVADOR,
-                    scheme_code="sv.municipio",
-                    code=f"{day}:{code.removeprefix('mun')}",
-                    area_relation="equals",
-                    area_id=tse.area("sv.municipio", code),
-                    kind="aggregate",
-                )
-                p.name(unit, row.name.title(), "es", "official")
+                unit = units[code] = unit_key(day, code)
+                if day not in UNIT_HOLDERS:
+                    p.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=tse.EL_SALVADOR,
+                        scheme_code="sv.municipio",
+                        code=f"{day}:{code.removeprefix('mun')}",
+                        area_relation="equals",
+                        area_id=tse.area("sv.municipio", code),
+                        kind="aggregate",
+                    )
+                    p.name(unit, row.name.title(), "es", "official")
             unit = units[code]
             counts = apportion(row, running)
             for option_code, option in options.items():
