@@ -1140,7 +1140,7 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         "The Croatian Parliament, the presidency, Croatia's members of the European Parliament, their electoral systems, and the parties and coalitions on the "
-        "State Electoral Commission's results since 2000",
+        "State Electoral Commission's results since 1991",
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {CROATIA}
