@@ -635,6 +635,12 @@
       "url": "https://www.argentina.gob.ar/normativa/nacional/norma-309949/texto",
       "kind": "official_body"
     },
+    "ley19905": {
+      "title": "Ley 19.905: convocatoria a elecciones provinciales y municipales (11 de marzo de 1973)",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://www.argentina.gob.ar/normativa/nacional/norma-302433/texto",
+      "kind": "official_body"
+    },
     "argentina_1951": {
       "title": "11 de noviembre de 1951-2021, hace 70 años las argentinas votaban por primera vez",
       "publisher": "Presidencia de la Nación",
@@ -1911,6 +1917,12 @@
         }
       ],
       "dates": [
+        {
+          "date": "1973-03-11",
+          "source": "ley19905",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios en todo el territorio del país para la elección de las autoridades de las provincias y municipalidades; Art. 2º - A tal efecto se elegirán: a) Gobernadores y vicegobernadores de las provincias",
+          "note": "Held in every province under Ley 19.905; not yet counted by province."
+        },
         {
           "date": "1983-10-30",
           "contests": 22,
@@ -3308,6 +3320,12 @@
         }
       ],
       "dates": [
+        {
+          "date": "1973-03-11",
+          "source": "ley19905",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios en todo el territorio del país para la elección de las autoridades de las provincias y municipalidades; Art. 2º - A tal efecto se elegirán: c) Diputados provinciales",
+          "note": "Held in every province under Ley 19.905; not yet counted by province."
+        },
         {
           "date": "1983-10-30",
           "contests": 22,
@@ -4955,6 +4973,12 @@
       ],
       "dates": [
         {
+          "date": "1973-03-11",
+          "source": "ley19905",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios en todo el territorio del país para la elección de las autoridades de las provincias y municipalidades; Art. 2º - A tal efecto se elegirán: b) Senadores provinciales",
+          "note": "Held where the provincial constitution provides a senate (Ley 19.905, art. 2); not yet counted by province."
+        },
+        {
           "date": "1983-10-30",
           "contests": 9,
           "regions": {
@@ -6172,6 +6196,12 @@
       ],
       "dates": [
         {
+          "date": "1973-03-11",
+          "source": "ley19905",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios en todo el territorio del país para la elección de las autoridades de las provincias y municipalidades; Art. 2º - A tal efecto se elegirán: d) Miembros electivos municipales de las provincias",
+          "note": "Held in every province under Ley 19.905; not yet counted by province."
+        },
+        {
           "date": "1983-10-30",
           "through": "2023-12-31",
           "note": "Municipal elections before 2024 are not yet enumerated by province; the 24 jurisdictions set their own days, and most hold them with the provincial election."
@@ -6362,6 +6392,12 @@
         }
       ],
       "dates": [
+        {
+          "date": "1973-03-11",
+          "source": "ley19905",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios en todo el territorio del país para la elección de las autoridades de las provincias y municipalidades; Art. 2º - A tal efecto se elegirán: d) Miembros electivos municipales de las provincias",
+          "note": "Held in every province under Ley 19.905; not yet counted by province."
+        },
         {
           "date": "1983-10-30",
           "through": "2023-12-31",
