@@ -1,8 +1,10 @@
 import re
 import subprocess
+import time
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 import fastexcel
@@ -43,6 +45,12 @@ FILES = {
     "par2020-final": f"{MEDIA}/parlamentarni/2020/konacni_2020.pdf",
     "pres2008-final": f"{MEDIA}/predsjednicki/2008/20080410%20konacni-2008.pdf",
     "pres2013-final": f"{MEDIA}/predsjednicki/2013/20130421_KONACNI-rezultati.pdf",
+    "lists2006": f"{MEDIA}/parlamentarni/2006/zbirna_izborna_lista_2006.pdf",
+    "lists2009": f"{MEDIA}/parlamentarni/2009/ZBIRNA-IZBORNA-LISTA-2009.pdf",
+    "lists2012": f"{MEDIA}/parlamentarni/2012/Zbirna-izborna-lista-2012.pdf",
+    "lists2016": f"{MEDIA}/parlamentarni/2016/ZBIRNA-IZBORNA-LISTA.pdf",
+    "lists2020": f"{MEDIA}/parlamentarni/2020/zbirna-izborna-lista-2020-2.pdf",
+    "lists2023": f"{MEDIA}/parlamentarni/2023/Zbirna-izborna-lista.pdf",
 }
 
 CYRILLIC = dict(
@@ -81,9 +89,22 @@ def place_of(text: str) -> str | None:
     return CANON.get(key)
 
 
+def _not_a_page(path: Path) -> None:
+    """The site sometimes answers a data request with a self-reloading challenge page; refuse to keep one."""
+    if path.open("rb").read(200).lstrip().lower().startswith((b"<!doctype html", b"<html")):
+        raise ValueError(f"{path.name} is a web page, not the data file")
+
+
 def fetch() -> None:
     for url in FILES.values():
-        raw.fetch(SOURCE, url, suffix=url.rsplit(".", 1)[1])
+        for attempt in range(5):
+            try:
+                raw.fetch(SOURCE, url, suffix=url.rsplit(".", 1)[1], check=_not_a_page)
+                break
+            except ValueError:
+                time.sleep(10 * (attempt + 1))
+        else:
+            raise ValueError(f"{url} keeps answering with a web page")
 
 
 def key(kind: str, *parts: object) -> str:
@@ -888,6 +909,101 @@ def seats_for(name: str) -> dict[int, int]:
     return found
 
 
+ITEM = re.compile(r"^(\d+)\.\s+(\S.*)$")
+HEADING = re.compile(r"^(\d+)(?:\.\s*|\s+)(\S.*)$")
+CELL = re.compile(r"(?:(?<=\s{2})|^)\d+\.(?=\s*\S)")
+TITLE_LINES = 9  # the longest coalition names wrap onto this many lines
+
+
+@dataclass
+class Slate:
+    """One list on the consolidated list: its printed title and its candidates in list order."""
+
+    title: str
+    names: dict[int, str] = field(default_factory=dict)
+
+
+def _cells(text: str) -> list[str]:
+    """Split a layout line into its numbered cells, so `1. A   17. B` gives two; leading text is kept as a cell."""
+    cuts = [m.start() for m in CELL.finditer(text)]
+    if not cuts:
+        return [text]
+    cells = [text[a:b].strip() for a, b in zip(cuts, [*cuts[1:], len(text)], strict=True)]
+    if cuts[0] > 0:
+        cells.insert(0, text[: cuts[0]].strip())
+    return [re.sub(r"^(\d+)\.\s*", r"\1. ", cell) for cell in cells]
+
+
+def pdf_lines(name: str) -> list[str]:
+    path = raw.cached(SOURCE, FILES[name]).path
+    out = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    return out.replace("\f", "\n").splitlines()
+
+
+def read_slates(name: str) -> list[Slate]:
+    """The candidates of every list on the commission's consolidated list, in the order the lists are printed.
+
+    A list starts at a line holding only its number and title, where the next numbered line is candidate 1. The
+    candidates sit in two columns, and a name that wraps leaves its tail in front of the next row's right column."""
+    rows = [
+        _cells(line)
+        for line in (raw_line.strip() for raw_line in pdf_lines(name))
+        if line and not re.fullmatch(r"\d+", line)
+    ]
+    slates: list[Slate] = []
+    last = 0
+    index = 0
+    while index < len(rows):
+        row = rows[index]
+        found = HEADING.match(row[0]) if len(row) == 1 else None
+        if found and int(found.group(1)) == len(slates) + 1:
+            title = [found.group(2)]
+            after = index + 1
+            while after < len(rows) and not ITEM.match(rows[after][0]) and after < index + TITLE_LINES:
+                title.append(rows[after][0])
+                after += 1
+            first = ITEM.match(rows[after][0]) if after < len(rows) else None
+            if first is not None and first.group(1) == "1":
+                slates.append(Slate(clean(" ".join(title))))
+                index, last = after, 0
+                continue
+        if slates:
+            for position, cell in enumerate(row):
+                entry = ITEM.match(cell)
+                if entry is None:
+                    if position == 0 and len(row) > 1 and last:
+                        slates[-1].names[last] = clean(f"{slates[-1].names[last]} {cell}")
+                    continue
+                number = int(entry.group(1))
+                if number in slates[-1].names:
+                    raise ValueError(f"{name}: candidate {number} appears twice on list {len(slates)}")
+                slates[-1].names[number] = entry.group(2)
+                if position == 0:
+                    last = number
+        index += 1
+    for number, slate in enumerate(slates, 1):
+        if sorted(slate.names) != list(range(1, len(slate.names) + 1)):
+            raise ValueError(f"{name}: list {number} has gaps in its numbering")
+    return slates
+
+
+def _score(text: str, label: str) -> float:
+    left, right = _tokens(text), _tokens(label)
+    return len(left & right) / max(1, len(left | right))
+
+
+def slates_for(name: str, labels: list[str]) -> list[Slate]:
+    """The consolidated list's lists, checked against the ballot lines of the results in the same order."""
+    slates = read_slates(name.replace("par", "lists"))
+    if len(slates) != len(labels):
+        raise ValueError(f"{name}: {len(slates)} lists on the consolidated list against {len(labels)} ballot lines")
+    for position, slate in enumerate(slates):
+        best = max(range(len(labels)), key=lambda i: _score(slate.title, labels[i]))
+        if best != position:
+            raise ValueError(f"{name}: list {position + 1} {slate.title!r} is closest to {labels[best]!r}")
+    return slates
+
+
 DAYS = {
     "2006-05-21": date(2006, 5, 21),
     "2006-09-10": date(2006, 9, 10),
@@ -945,9 +1061,12 @@ def person_key(label: str) -> str:
     return text
 
 
+HONORIFICS = r"^(?:mr|dr|doc|docent|prof|мр|др|доц|проф)(?=[\s.])\.?\s*"
+
+
 def person_name(label: str) -> str:
     text = clean(label)
-    while (shorter := re.sub(r"^(?:mr|dr|docent|prof)\b\.?\s*", "", text, flags=re.IGNORECASE)) != text:
+    while (shorter := re.sub(HONORIFICS, "", text, flags=re.IGNORECASE)) != text:
         text = shorter.strip()
     return text.title() if text.isupper() else text
 
@@ -1356,6 +1475,33 @@ def build_referendum(day: str) -> Package:
     return p
 
 
+LIST_NOTE = (
+    "The candidates of each list are from the State Election Commission's consolidated list of lists, in the order "
+    "the list printed them; the number is the candidate's place on the list. Names are as printed, with academic "
+    "titles kept in the ballot name. The commission published the lists before the vote and did not publish who "
+    "took the seats of each list, so no candidate is marked as elected."
+)
+
+
+def _candidates(p: Package, name: str, contest: str, options: list[str], labels: list[str]) -> None:
+    """Every list's candidates as list members, each a person of this election's own."""
+    for number, (slate, option) in enumerate(zip(slates_for(name, labels), options, strict=True), 1):
+        for position, text in sorted(slate.names.items()):
+            person = key("person", name, number, position)
+            p.add("person", id=person)
+            p.name(person, person_name(text), "sr", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", name, number, position),
+                person_id=person,
+                option_id=option,
+                role="list_member",
+                list_position=position,
+                ballot_name=text,
+            )
+    p.add("note", id=key("note", contest, "list"), entity_id=contest, kind="methodology", body_md=LIST_NOTE, lang="en")
+
+
 def build_parliament(day: str) -> Package:
     first = DAYS[day]
     name = PARLIAMENTARY[day]
@@ -1367,7 +1513,8 @@ def build_parliament(day: str) -> Package:
         depends=["me.dik/registry"],
     )
     p.external.add(MONTENEGRO)
-    _uses(p, name, *([f"{name}-final"] if name in ("par2006", "par2009", "par2016", "par2020", "par2023") else []))
+    _uses(p, name, name.replace("par", "lists"))
+    _uses(p, *([f"{name}-final"] if name in ("par2006", "par2009", "par2016", "par2020", "par2023") else []))
     if name == "par2023":
         _uses(p, "par2023-prelim")
     election = _election(
@@ -1393,6 +1540,7 @@ def build_parliament(day: str) -> Package:
     )
     t = table(name)
     options = _list_options(p, name, contest, t.labels)
+    _candidates(p, name, contest, options, t.labels)
     official = national(name)
     units = Units(p, day)
     seats = seats_for(name)
