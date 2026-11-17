@@ -19,6 +19,7 @@ from xml.etree import ElementTree
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.be import nis
 
 SOURCE = "be.ibz"
 BASE = "https://resultatselection.belgium.be"
@@ -157,6 +158,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, INDEX, suffix=".html")
     for name in names():
         raw.fetch(SOURCE, url(name), suffix=".xml")
+    nis.fetch(dated())
 
 
 def clean(text: str | None) -> str:
@@ -222,10 +224,11 @@ def dated() -> dict[date, list[str]]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in dated())]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in dated())]
 
 
 def parse() -> None:
+    nis.geo().write()
     registry().write()
     for day, files in dated().items():
         election(day, files).write()
@@ -257,6 +260,18 @@ def registry() -> Package:
     p.external.add(BELGIUM)
     add_source(p)
     p.artifact(raw.cached(SOURCE, INDEX), SOURCE_ID)
+    p.add(
+        "source",
+        id=nis.API_SOURCE,
+        kind="official_body",
+        publisher="FOD Binnenlandse Zaken / SPF Intérieur",
+        title="Resultaten verkiezingen / Résultats électoraux: JSON API",
+        url=nis.API,
+        attribution="FOD Binnenlandse Zaken, Directie Verkiezingen",
+    )
+    for day in dated():
+        if nis.coded(day):
+            p.artifact(raw.cached(SOURCE, nis.api_url(day)), nis.API_SOURCE)
     p.add(
         "scheme",
         code=SCHEME,
@@ -339,6 +354,7 @@ class Builder:
         self.valid_mismatch: Counter[str] = Counter()
         self.turnout: Counter[str] = Counter()
         self.ballots: Counter[str] = Counter()
+        self.placed: Counter[str] = Counter()
 
     def slug(self, path: str) -> str:
         self.paths[path] += 1
@@ -406,20 +422,38 @@ class Builder:
         )
         return result_set
 
-    def unit(self, code: str, level: Level, parent: str | None = None) -> str:
+    def unit(self, code: str, level: Level, kind: str, parent: str | None = None) -> str:
+        """A reporting unit. A municipality is its own NIS municipality. A canton is placed in the municipality its
+        NIS code names, as an approximate membership, because the canton has no shape of its own here."""
         p = self.p
         unit = p.id("unit", code)
+        town, how = (None, "none")
+        if level.tier == "Municipality":
+            town, how = nis.town_code(self.day, kind, level.tier, level.labels)
+        seat = nis.canton_seat(self.day, kind, level.labels) if level.tier == "Canton" else None
+        place = nis.link_area(town, self.day) if town else None
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=BELGIUM,
             scheme_code=SCHEME,
             code=code,
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="equals" if place else "unlocated",
+            area_id=place,
             kind=unit_kind(level),
             parent_id=parent,
         )
+        if seat:
+            p.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=nis.link_area(seat, self.day),
+                approximate=True,
+                partial=False,
+                method="source_code",
+            )
+        if level.tier in ("Municipality", "Canton"):
+            self.placed[f"{level.tier}:{how if town else 'seat' if seat else 'none'}"] += 1
         seen: set[tuple[str, str]] = set()
         for language, text in level.labels.items():
             if text and (language, text) not in seen:
@@ -544,9 +578,11 @@ def election(day: date, files: list[str]) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The {day} Belgian elections by reporting unit from the federal election service",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.add(BELGIUM)
+    if nis.coded(day):
+        p.uses(raw.cached(SOURCE, nis.api_url(day)))
     for name in files:
         p.uses(raw.cached(SOURCE, url(name)))
     kinds = {parse_file(name)[1] for name in files}
@@ -625,7 +661,7 @@ def one_contest(
     tag = f"{kind}"
     result_set = build.result_set(f"{slug}:{primary[0]}", contest, True, best)
     for index, level in enumerate(chosen, 1):
-        unit = build.unit(f"{day}:{kind}:{primary[0]}:{index:04d}", level)
+        unit = build.unit(f"{day}:{kind}:{primary[0]}:{index:04d}", level, kind)
         build.values(result_set, unit, level, options, tag, resolve)
     build.won(result_set, top, options)
     declared: Counter[str] = Counter()
@@ -660,7 +696,7 @@ def one_contest(
     for tier, found, share in extras:
         extra = build.result_set(f"{slug}:{tier}", contest, False, share)
         for index, level in enumerate(found, 1):
-            unit = build.unit(f"{day}:{kind}:{tier}:{index:04d}", level)
+            unit = build.unit(f"{day}:{kind}:{tier}:{index:04d}", level, kind)
             build.values(extra, unit, level, options, tag + ":" + tier, resolve)
 
 
@@ -682,6 +718,6 @@ def per_unit(build: Builder, kind: str, name: str, slug: str, levels: tuple[Leve
                 order_of([level]),
             )
             result_set = build.result_set(tag, contest, True, 1.0)
-            unit = build.unit(f"{day}:{kind}:{tier}:{index:04d}", level)
+            unit = build.unit(f"{day}:{kind}:{tier}:{index:04d}", level, kind)
             build.values(result_set, unit, level, options, kind)
             build.won(result_set, level, options)
