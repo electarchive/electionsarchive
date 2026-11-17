@@ -1,0 +1,2038 @@
+{
+ "polity": "PK",
+ "name": "Pakistan",
+ "sources": {
+  "constitution": {
+   "title": "The Constitution of the Islamic Republic of Pakistan, as modified up to the Constitution (Twenty-seventh Amendment) Act, 2025",
+   "publisher": "Ministry of Law and Justice, Government of Pakistan (copy hosted by the Provincial Assembly of Khyber Pakhtunkhwa)",
+   "url": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf",
+   "kind": "official_body",
+   "note": "Arts. 41 (President elected by an electoral college of both Houses and the Provincial Assemblies, under the Second Schedule), 51 (336 seats in the National Assembly: 266 general seats, 60 for women, and 10 for non-Muslims), 52 (five-year term), 59 (96 senators, elected by the Provincial Assemblies by the single transferable vote, half retiring every three years), 106 (Provincial Assemblies of Balochistan 65, Khyber Pakhtunkhwa 145, Punjab 371, and Sindh 168 seats), 140A (each Province establishes local government by law; its elections are held by the Election Commission), 218 to 226 (the Election Commission; general elections within 60 days of an Assembly's term or 90 days of a dissolution; by-elections within 60 days; Senate seats filled within 30 days), and 48(6) (referendums)."
+  },
+  "elections_act": {
+   "title": "The Elections Act, 2017 (Act No. XXXIII of 2017), updated",
+   "publisher": "Election Commission of Pakistan",
+   "url": "https://ecp.gov.pk/storage/files/2/Elections%20Act%202017%20updated/Updated%20Elections%20Act%202017-231011-105435.pdf",
+   "kind": "official_body",
+   "note": "The election law for the National Assembly, the Provincial Assemblies, the Senate, and the local governments held by the Commission: delimitation, rolls, polling, the count at each polling station (Form-45), consolidation by the returning officer (Form-49), and reserved seats allocated to parties by their general seats. Not read here: ecp.gov.pk refused this environment."
+  },
+  "pbs_ncr": {
+   "title": "Population and Housing Census 2023: National Census Report",
+   "publisher": "Pakistan Bureau of Statistics, Government of Pakistan",
+   "url": "https://www.pbs.gov.pk/wp-content/uploads/2020/07/National-Census-Report-2023-1.pdf",
+   "kind": "official_body",
+   "note": "Table 1.1 (Administrative Units of Pakistan, source: Provincial Revenue / Local Government Departments): Pakistan 30 divisions, 136 districts, 591 tehsils/talukas, 46,697 villages/mauzas, and 615 urban areas (metropolitan and municipal corporations, municipal and town committees, and cantonments), by Punjab, Khyber Pakhtunkhwa, Sindh, Balochistan, and ICT; Table 1.2 (National Assembly seats by province) and Table 1.3 (Senate composition); s. 1.5.3 (district, tehsil, and union councils under the provincial local government acts). Read on 2026-11-17."
+  },
+  "ecp": {
+   "title": "Election Commission of Pakistan, results, reports, and notifications",
+   "publisher": "Election Commission of Pakistan",
+   "url": "https://www.ecp.gov.pk/",
+   "kind": "official_body",
+   "note": "Administers every election in this census held in the four provinces and the Islamabad Capital Territory, including local government elections since the Eighteenth Amendment (Art. 140A(2)) and cantonment boards. On 2026-11-17 the site answered every request from this environment with a firewall page, so nothing here was read from it."
+  },
+  "kp_lga": {
+   "title": "The Khyber Pakhtunkhwa Local Government Act, 2013 (Khyber Pakhtunkhwa Act No. XXVIII of 2013)",
+   "publisher": "Provincial Assembly of Khyber Pakhtunkhwa",
+   "url": "https://www.pakp.gov.pk/wp-content/uploads/2024/04/The-Khyber-Pakhtunkhwa-Local-Government-Act-2013-Act-No-XXVIII-2013.pdf",
+   "kind": "official_body",
+   "note": "Local councils are district, tehsil, town, village, and neighbourhood councils (s. 2(m)); a village council for each village in rural areas and a neighbourhood council in areas with urban characteristics (ss. 5 and 6). Amendments of 2019 abolished the district councils and made tehsil and city local governments with directly elected chairmen and mayors, in force for the 2021-22 elections."
+  },
+  "lgkp": {
+   "title": "City/Tehsil Local Governments, Local Government, Elections and Rural Development Department",
+   "publisher": "Local Government, Elections and Rural Development Department, Government of Khyber Pakhtunkhwa",
+   "url": "https://lgkp.gov.pk/pages/city-tehsil-local-governments",
+   "kind": "official_body",
+   "note": "The department's list of city and tehsil local governments, read on 2026-11-17."
+  },
+  "sindh_lga": {
+   "title": "The Sindh Local Government Act, 2013 (Sindh Act No. XLII of 2013), as amended",
+   "publisher": "Sindh Law Department (Sindh Code)",
+   "url": "https://www.sindhlaws.gov.pk/Setup/Publications_SindhCode/PUB-NEW-18-000156.pdf",
+   "kind": "official_body",
+   "note": "Union councils (rural) and union committees (urban) of four wards each, delimited by the Election Commission (s. 10(4)); town and municipal committees, district councils, and municipal and metropolitan corporations; four-year term from the first meeting (s. 20(1)); mayors and chairmen elected by the councils."
+  },
+  "balochistan_lga": {
+   "title": "The Balochistan Local Government Act, 2010 (Balochistan Act No. V of 2010)",
+   "publisher": "Government of Balochistan",
+   "url": "https://balochistan.gov.pk/wp-content/uploads/2024/10/Balochistan-Local-Government-Act-2010.pdf",
+   "kind": "official_body",
+   "note": "Union councils and district councils in rural areas and municipal committees and corporations in urban areas, with directly elected ward members and indirectly elected heads. The host answered HTTP 522 on 2026-11-17, so the text was not re-read here."
+  },
+  "punjab_lga": {
+   "title": "The Punjab Local Government Bill, 2025 (Bill No. 26 of 2025), as introduced",
+   "publisher": "Provincial Assembly of the Punjab",
+   "url": "https://pap.gov.pk/bills/details/en/22/362",
+   "kind": "official_body",
+   "note": "Replaces the Punjab Local Government Acts of 2013, 2019, and 2022 with municipal corporations, tehsil councils, and town committees over union councils, and abolishes district councils. www.pap.gov.pk reset the connection from this environment on 2026-11-17, so the text was not read here."
+  },
+  "ajkec": {
+   "title": "Azad Jammu and Kashmir Election Commission, home, party position, and local bodies 2022",
+   "publisher": "Azad Jammu and Kashmir Election Commission",
+   "url": "https://ec.ajk.gov.pk/",
+   "kind": "official_body",
+   "note": "Created under Art. 50 of the AJK Interim Constitution, 1974; announced the Legislative Assembly general election of 27 July 2026; party position of the outgoing Assembly (Pakistan Tehreek-e-Insaf AJK 25, Pakistan Peoples Party AJK 11, Pakistan Muslim League (N) 6, All Jammu and Kashmir Muslim Conference 1, Jammu Kashmir Peoples Party 1) and 3,220,793 registered voters; local bodies 2022 results by division (Muzaffarabad, Poonch, Mirpur). Read on 2026-11-17."
+  },
+  "ajk_gov": {
+   "title": "Azad Government of the State of Jammu and Kashmir, home page",
+   "publisher": "Azad Government of the State of Jammu and Kashmir",
+   "url": "https://ajk.gov.pk/",
+   "kind": "official_body",
+   "note": "AJK has its own elected President, Prime Minister, Legislative Assembly, and Kashmir Council; the 23rd President was sworn in after election by the Legislative Assembly on 24 September 2026. Read on 2026-11-17."
+  },
+  "gbec": {
+   "title": "Gilgit-Baltistan Election Commission",
+   "publisher": "Gilgit-Baltistan Election Commission",
+   "url": "https://gbec.gov.pk/",
+   "kind": "official_body",
+   "note": "Holds the elections to the Gilgit-Baltistan Assembly (Gilgit-Baltistan (Empowerment and Self-Governance) Order 2009 and Gilgit-Baltistan Government Order 2018) and its local councils. The host did not connect from this environment on 2026-11-17 (gateway 502), and gba.gov.pk failed TLS, so nothing here was read from them."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "اسلامی جمہوریہ پاکستان",
+   "name_en": "Islamic Republic of Pakistan",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "pk.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "province",
+   "name": "صوبہ",
+   "name_en": "Provinces (Balochistan, Khyber Pakhtunkhwa, Punjab, Sindh)",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "pk.province",
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 4,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): rows Punjab, Khyber Pakhtunkhwa, Sindh, and Balochistan"
+    }
+   ]
+  },
+  {
+   "key": "ict",
+   "name": "اسلام آباد وفاقی دارالحکومت",
+   "name_en": "Islamabad Capital Territory (federal capital)",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "pk.province",
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 1,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): row ICT, 1 district and 1 tehsil"
+    }
+   ]
+  },
+  {
+   "key": "ajk",
+   "name": "آزاد جموں و کشمیر",
+   "name_en": "Azad Jammu and Kashmir (self-governing territory with its own interim constitution)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "pk.ajk",
+   "source": "ajk_gov"
+  },
+  {
+   "key": "gb",
+   "name": "گلگت بلتستان",
+   "name_en": "Gilgit-Baltistan (formerly the Northern Areas)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "pk.gb",
+   "source": "gbec"
+  },
+  {
+   "key": "division",
+   "name": "ڈویژن",
+   "name_en": "Divisions (administrative only)",
+   "parent": "province",
+   "polity_kind": "region",
+   "scheme": "pk.division",
+   "elects": false,
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 30,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): Pakistan, Divisions 30"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "ضلع",
+   "name_en": "Districts (zila): district councils where the provincial law provides them",
+   "parent": "division",
+   "polity_kind": "county",
+   "scheme": "pk.district",
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 136,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): Pakistan, Districts 136 (Punjab 36, Khyber Pakhtunkhwa 35, Sindh 30, Balochistan 34, ICT 1)"
+    }
+   ]
+  },
+  {
+   "key": "tehsil",
+   "name": "تحصیل / تعلقہ",
+   "name_en": "Tehsils and talukas: tehsil councils and tehsil and city local governments",
+   "parent": "district",
+   "polity_kind": "municipality",
+   "scheme": "pk.tehsil",
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 591,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): Pakistan, Tehsils/Talukas 591 (Punjab 146, Khyber Pakhtunkhwa 148, Sindh 138, Balochistan 158, ICT 1)"
+    }
+   ]
+  },
+  {
+   "key": "urban",
+   "name": "میٹروپولیٹن و میونسپل کارپوریشن، میونسپل و ٹاؤن کمیٹی",
+   "name_en": "Urban local governments: metropolitan and municipal corporations, municipal and town committees",
+   "parent": "district",
+   "polity_kind": "municipality",
+   "scheme": "pk.urban_council",
+   "source": "pbs_ncr",
+   "counts": [
+    {
+     "date": "2023-03-01",
+     "value": 615,
+     "source": "pbs_ncr",
+     "locator": "Table 1.1 (Administrative Units of Pakistan): Pakistan, Urban Areas 615, which the report defines as metropolitan and municipal corporations, municipal committees, town committees, and cantonments"
+    }
+   ]
+  },
+  {
+   "key": "union_council",
+   "name": "یونین کونسل / ویلج و نیبرہڈ کونسل",
+   "name_en": "Union councils and committees (Punjab, Sindh, Balochistan, ICT) and village and neighbourhood councils (Khyber Pakhtunkhwa)",
+   "parent": "tehsil",
+   "polity_kind": "submunicipal",
+   "scheme": "pk.union_council",
+   "source": "pbs_ncr"
+  },
+  {
+   "key": "ward",
+   "name": "وارڈ",
+   "name_en": "Wards of union councils and urban councils",
+   "parent": "union_council",
+   "polity_kind": "submunicipal",
+   "scheme": "pk.ward",
+   "elects": false,
+   "source": "sindh_lga"
+  },
+  {
+   "key": "cantonment",
+   "name": "کنٹونمنٹ",
+   "name_en": "Cantonments (military stations with elected civilian boards)",
+   "parent": "district",
+   "polity_kind": "special_district",
+   "scheme": "pk.cantonment",
+   "source": "pbs_ncr"
+  }
+ ],
+ "classes": [
+  {
+   "key": "national_assembly",
+   "tier": "national",
+   "name": "قومی اسمبلی کے عام انتخابات",
+   "name_en": "National Assembly general elections: the general seats",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1970-12-07",
+   "earliest_record": "1970-12-07",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.na"
+    ],
+    "fine": [
+     "pk.polling_station"
+    ]
+   },
+   "note": "Single-member territorial constituencies by plurality (Art. 51(6)(a)): 266 general seats under Art. 51(3) since 2018, 272 from 2002, 207 from 1985, 200 in 1977, and 300 in 1970. The Assembly sits five years from its first meeting unless dissolved (Art. 52); the general election falls within 60 days after the term or 90 days after a dissolution (Art. 224). Until 1997 the seats of the Federally Administered Tribal Areas were elected by their maliks; adult franchise reached them in 1997. Earlier assemblies were chosen indirectly (classes constituent_assembly and assemblies_basic_democracies).",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 51(1) and (3): \"three hundred and thirty-six seats\"; General Seats 266)",
+   "est_votes": 370000000,
+   "effort": 3,
+   "finest_note": "Polling station: the presiding officer's count (Form-45) at each station is consolidated by the returning officer (Form-49), and the Commission has posted Form-45 images for recent elections; unverified here",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "PK",
+     "valid_from": "1970-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Election Commission of Pakistan",
+     "source": "constitution",
+     "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 52: five years from its first meeting; Art. 224(1) and (2))",
+     "vacancy_rule": "A by-election within 60 days of the vacancy (Art. 224(4); class national_assembly_by)."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.na",
+     "first_date": "1970-12-07"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1970-12-07",
+     "election_kind": "general",
+     "note": "First general election under adult franchise, for the Assembly of all Pakistan (300 general seats, 162 in East Pakistan and 138 in West Pakistan). Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1977-03-07",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1985-02-25",
+     "election_kind": "general",
+     "note": "Held on a non-party basis under martial law. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1988-11-16",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1990-10-24",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1993-10-06",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1997-02-03",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2002-10-10",
+     "election_kind": "general",
+     "note": "272 general seats. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2008-02-18",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2013-05-11",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2018-07-25",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2024-02-08",
+     "election_kind": "general",
+     "contests": 266,
+     "seats": 266,
+     "source": "constitution",
+     "quote": "Art. 51(3): General Seats ... Total 266",
+     "note": "General seats as Art. 51(3) allocates them after the Twenty-fifth Amendment of 2018 merged the tribal areas into Khyber Pakhtunkhwa; polling in NA-8 Bajaur was postponed."
+    }
+   ]
+  },
+  {
+   "key": "national_assembly_by",
+   "tier": "national",
+   "name": "قومی اسمبلی کے ضمنی انتخابات",
+   "name_en": "National Assembly by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.na"
+    ],
+    "fine": [
+     "pk.polling_station"
+    ]
+   },
+   "note": "A general seat that falls vacant more than 120 days before the Assembly's term ends is filled within 60 days (Art. 224(4)) under the rules of a general election; candidates elected to several seats must keep one, so by-elections follow every general election.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 224(4))",
+   "est_votes": 15000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "PK"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.na"
+    }
+   ]
+  },
+  {
+   "key": "national_assembly_reserved",
+   "tier": "national",
+   "name": "قومی اسمبلی کی مخصوص نشستیں",
+   "name_en": "National Assembly seats reserved for women and non-Muslims, allocated to parties",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2002-08-21",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "60 seats for women, allocated by Province, and 10 for non-Muslims, nationwide, filled from party lists in proportion to each party's general seats (Art. 51(6)(d) and (e)); no ballot is cast for them. Earlier reserved women's seats (1973-1990) were elected by the Assembly's members.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 51(1), (3), and (4))",
+   "est_votes": 0,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "PK"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null
+    }
+   ]
+  },
+  {
+   "key": "national_assembly_nonmuslim",
+   "tier": "national",
+   "name": "قومی اسمبلی کی غیر مسلم نشستیں (جداگانہ طریقِ انتخاب)",
+   "name_en": "National Assembly non-Muslim seats by separate electorates, 1985-1997",
+   "category": "non_territorial",
+   "goal": "national",
+   "valid_from": "1985-01-01",
+   "valid_to": "2002-08-21",
+   "first_held": "1985-02-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.na_nonmuslim"
+    ]
+   },
+   "note": "From 1985 to 1997 voters on the non-Muslim rolls elected the non-Muslim members of the National Assembly in nationwide community constituencies (Christians, Hindus and scheduled castes, Sikhs, Buddhists, and Parsis, Ahmadis), not in the territorial seats; joint electorates returned in 2002 and the seats became list seats (class national_assembly_reserved).",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 51(4) and its amendment notes)",
+   "est_votes": 2000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "schemes": [
+      "pk.na_nonmuslim"
+     ],
+     "iso_pattern": "PK",
+     "valid_to": "2002-08-21"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null,
+     "first_date": "1985-02-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "through": "1997-12-31",
+     "note": "Polled with the general elections of 1985, 1988, 1990, 1993, and 1997; not counted here."
+    }
+   ]
+  },
+  {
+   "key": "senate",
+   "tier": "national",
+   "name": "سینیٹ کے انتخابات",
+   "name_en": "Senate elections by the Provincial Assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1973-01-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "96 senators: from each Province 14 general, 4 women, 4 technocrats including ulema, and 1 non-Muslim, elected by the members of its Provincial Assembly by the single transferable vote, and 4 from the Federal Capital elected by the members of the National Assembly (Art. 59(1) and (2)); six-year terms with half retiring every three years (Art. 59(3)); the seats of the tribal areas ended with their merger in 2018. Elections fall within 30 days before the vacancies (Art. 224(3)).",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 59: \"proportional representation by means of the single transferable vote\")",
+   "est_votes": 15000,
+   "effort": 3,
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "PK"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "term_years": 6,
+     "classes": 2,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Election Commission of Pakistan",
+     "source": "constitution",
+     "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 59(3); Art. 224(3))",
+     "vacancy_rule": "A by-election by the same electorate within 30 days (Art. 224(5))."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "1973-01-01",
+     "precision": "year",
+     "through": "2009-12-31",
+     "note": "The first Senate in 1973 and the triennial elections from 1975 (suspended 1977-1985 and 1999-2002); not counted here."
+    },
+    {
+     "date": "2012-03-02",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2015-03-05",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2018-03-03",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2021-03-03",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2024-04-02",
+     "election_kind": "indirect",
+     "note": "Deferred from March 2024 until after the general election. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "صدارتی انتخاب",
+   "name_en": "Presidential elections by the electoral college",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1973-08-10",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "\"elected in accordance with the provisions of the Second Schedule by the members of an electoral college consisting of the members of both Houses and the members of the Provincial Assemblies\" (Art. 41(3)), with each Provincial Assembly's vote scaled to the smallest one's size, not earlier than 60 and not later than 30 days before the term ends (Art. 41(4)), for five years. The Chief Election Commissioner is returning officer.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 41(3) and (4); Second Schedule)",
+   "est_votes": 15000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect",
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PK",
+     "valid_from": "1970-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Chief Election Commissioner as returning officer",
+     "source": "constitution",
+     "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 41(4) and (5))",
+     "vacancy_rule": "An election within 30 days of the vacancy (Art. 41(5))."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "1973-01-01",
+     "precision": "year",
+     "through": "2007-12-31",
+     "note": "Elections of 1973, 1978, 1988, 1993, 1997, and 2007 by the electoral college; not counted here."
+    },
+    {
+     "date": "2008-09-06",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2013-07-30",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2018-09-04",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2024-03-09",
+     "election_kind": "indirect",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "ریفرنڈم",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1960-02-14",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "pk.district"
+    ]
+   },
+   "note": "Art. 48(6) lets the President, on the Prime Minister's advice, put a matter of national importance to a referendum. Three have been held, each a vote of confidence in a military head of state: 14 February 1960 (Ayub Khan, by the 80,000 Basic Democrats), 19 December 1984 (Zia-ul-Haq, on Islamization), and 30 April 2002 (Pervez Musharraf, five more years as President).",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 48(6))",
+   "est_votes": 80000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "PK"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null,
+     "first_date": "1984-12-19"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1960-02-14",
+     "election_kind": "referendum",
+     "note": "Vote of confidence in President Ayub Khan by the members of the Basic Democracies."
+    },
+    {
+     "date": "1984-12-19",
+     "election_kind": "referendum",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2002-04-30",
+     "election_kind": "referendum",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "provincial_assembly",
+   "tier": "province",
+   "name": "صوبائی اسمبلیوں کے عام انتخابات",
+   "name_en": "Provincial Assembly general elections: the general seats",
+   "category": "legislature",
+   "goal": "subnational",
+   "first_held": "1951-03-10",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.pa"
+    ],
+    "fine": [
+     "pk.polling_station"
+    ]
+   },
+   "note": "Single-member territorial constituencies by plurality (Art. 106(3)(a)): Balochistan 51, Khyber Pakhtunkhwa 115, Punjab 297, and Sindh 130 general seats (Art. 106(1)), polled with the National Assembly since 1997 and three days after it before; five-year terms (Art. 107). The Punjab assembly was dissolved in January 2023 and Khyber Pakhtunkhwa's too, but both were elected with the others on 8 February 2024. The Assembly of East Pakistan (1954 as East Bengal, 1970) belongs to this class until 1971.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 106(1) and (3))",
+   "est_votes": 360000000,
+   "effort": 3,
+   "finest_note": "Polling station (Form-45), as for the National Assembly; unverified here",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "PK-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Election Commission of Pakistan",
+     "source": "constitution",
+     "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 107; Art. 224(1) and (2))",
+     "vacancy_rule": "A by-election within 60 days (Art. 224(4); class provincial_assembly_by)."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.pa",
+     "first_date": "1970-12-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1951-01-01",
+     "precision": "year",
+     "through": "1954-12-31",
+     "note": "First Provincial Assembly elections under adult franchise: the Punjab (March 1951), the North-West Frontier Province (December 1951), Sindh (May 1953), and East Bengal (March 1954); not counted here."
+    },
+    {
+     "date": "1970-12-17",
+     "election_kind": "general",
+     "note": "Provincial Assemblies of East Pakistan, the Punjab, Sindh, the North-West Frontier Province, and Balochistan (the first in Balochistan). Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1977-03-10",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1985-02-28",
+     "election_kind": "general",
+     "note": "Non-party basis. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1988-11-19",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1990-10-27",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1993-10-09",
+     "election_kind": "general",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "1997-02-03",
+     "election_kind": "general",
+     "note": "Polled with the National Assembly. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2002-10-10",
+     "election_kind": "general",
+     "note": "Polled with the National Assembly. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2008-02-18",
+     "election_kind": "general",
+     "note": "Polled with the National Assembly. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2013-05-11",
+     "election_kind": "general",
+     "note": "Polled with the National Assembly. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2018-07-25",
+     "election_kind": "general",
+     "note": "Polled with the National Assembly. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2024-02-08",
+     "election_kind": "general",
+     "contests": 4,
+     "source": "constitution",
+     "quote": "Art. 106(1): Balochistan 51, Khyber Pakhtunkhwa 115, Punjab 297, Sindh 130 general seats",
+     "note": "One general election in each of the four Provinces, polled with the National Assembly: 593 general seats in all."
+    }
+   ]
+  },
+  {
+   "key": "provincial_assembly_by",
+   "tier": "province",
+   "name": "صوبائی اسمبلیوں کے ضمنی انتخابات",
+   "name_en": "Provincial Assembly by-elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.pa"
+    ]
+   },
+   "note": "Vacant general seats filled within 60 days (Art. 224(4)), including the 16 seats of the merged tribal districts first elected to the Khyber Pakhtunkhwa Assembly on 20 July 2019.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 224(4))",
+   "est_votes": 20000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "PK-*"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.pa"
+    }
+   ]
+  },
+  {
+   "key": "provincial_assembly_reserved",
+   "tier": "province",
+   "name": "صوبائی اسمبلیوں کی مخصوص نشستیں",
+   "name_en": "Provincial Assembly seats reserved for women and non-Muslims, allocated to parties",
+   "category": "indirect",
+   "goal": "subnational",
+   "valid_from": "2002-08-21",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "132 women's and 24 non-Muslim seats in the four Assemblies (Art. 106(1)), filled from party lists in proportion to general seats (Art. 106(3)(c)); no ballot is cast.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 106(1) and (3)(c))",
+   "est_votes": 0,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "PK-*"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": null
+    }
+   ]
+  },
+  {
+   "key": "ajk_assembly",
+   "tier": "ajk",
+   "name": "قانون ساز اسمبلی آزاد جموں و کشمیر کے عام انتخابات",
+   "name_en": "Azad Jammu and Kashmir Legislative Assembly general elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "first_held": "1970-10-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.ajk_constituency"
+    ]
+   },
+   "note": "45 members elected by plurality in single-member constituencies, 33 in AJK and 12 for refugees from Jammu and Kashmir settled in Pakistan, plus reserved seats filled by the members; five-year term under the AJK Interim Constitution, 1974. Held by the AJK Election Commission (Art. 50).",
+   "source": "ajkec",
+   "est_votes": 12000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "PK-JK",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Azad Jammu and Kashmir Election Commission",
+     "source": "ajkec"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Azad Jammu and Kashmir Election Commission (ec.ajk.gov.pk)",
+     "url": "https://ec.ajk.gov.pk/",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "source": "ajkec",
+     "evidence": "On 2026-11-17 ec.ajk.gov.pk answered (HTTP 200) with a party position of the Legislative Assembly and links to its result systems; ermis.admin.gok.pk answered 423 for the 2026 general election and served the 2022 local bodies pages by division, and election-results.ajk.gov.pk did not connect.",
+     "finest": "pk.ajk_constituency"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1970-01-01",
+     "precision": "year",
+     "through": "2016-12-31",
+     "note": "Elections of 1970, 1975, 1985, 1990, 1991, 1996, 2001, 2006, 2011, and 2016; not counted here."
+    },
+    {
+     "date": "2021-07-25",
+     "election_kind": "general",
+     "note": "The outgoing Assembly whose party position the Commission posts (44 seats listed)."
+    },
+    {
+     "date": "2026-07-27",
+     "election_kind": "general",
+     "source": "ajkec",
+     "quote": "General Elections 2026 will be held on 27 July 2026",
+     "note": "Results not read: the Commission's results system answered HTTP 423."
+    }
+   ]
+  },
+  {
+   "key": "ajk_president",
+   "tier": "ajk",
+   "name": "صدر آزاد جموں و کشمیر کا انتخاب",
+   "name_en": "President of Azad Jammu and Kashmir",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected by the Legislative Assembly (directly by voters in 1970 and 1975 under the Act of 1970); the 23rd President was elected and sworn in on 24 September 2026.",
+   "source": "ajk_gov",
+   "est_votes": 1000,
+   "effort": 3,
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state",
+      "head_of_government",
+      "other"
+     ],
+     "iso_pattern": "PK-JK",
+     "precedence": 1
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Azad Jammu and Kashmir Election Commission (ec.ajk.gov.pk)",
+     "url": "https://ec.ajk.gov.pk/",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "source": "ajkec",
+     "evidence": "On 2026-11-17 ec.ajk.gov.pk answered (HTTP 200) with a party position of the Legislative Assembly and links to its result systems; ermis.admin.gok.pk answered 423 for the 2026 general election and served the 2022 local bodies pages by division, and election-results.ajk.gov.pk did not connect.",
+     "finest": "pk.ajk_constituency"
+    }
+   ]
+  },
+  {
+   "key": "ajk_local",
+   "tier": "ajk",
+   "name": "آزاد جموں و کشمیر بلدیاتی انتخابات",
+   "name_en": "Azad Jammu and Kashmir local bodies elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.ajk_ward"
+    ]
+   },
+   "note": "District councils, municipal corporations and committees, town committees, and union councils, held in 2022 in three phases by division (Muzaffarabad, Poonch, Mirpur) after a gap since 1991.",
+   "source": "ajkec",
+   "est_votes": 4000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "iso_pattern": "PK-JK",
+     "polity_kinds": [
+      "county",
+      "municipality",
+      "submunicipal"
+     ],
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "schemes": [
+      "pk.ajk_ward"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "AJK Election Commission, Local Bodies 2022 results (ermis.admin.gok.pk)",
+     "url": "https://ermis.admin.gok.pk/local-bodies-2022/home",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "source": "ajkec",
+     "evidence": "On 2026-11-17 the page answered (HTTP 200) with council-wise party position and links to division results for Poonch and Mirpur; Muzaffarabad's link points back to ec.ajk.gov.pk.",
+     "finest": "pk.ajk_ward",
+     "first_date": "2022-11-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-01-01",
+     "precision": "year",
+     "through": "2022-12-31",
+     "note": "Three phases by division, from 27 November 2022; not counted here."
+    }
+   ]
+  },
+  {
+   "key": "gb_assembly",
+   "tier": "gb",
+   "name": "گلگت بلتستان اسمبلی کے عام انتخابات",
+   "name_en": "Gilgit-Baltistan Assembly general elections (Northern Areas Council and Legislative Council before 2009)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.gb_constituency"
+    ]
+   },
+   "note": "24 members elected by plurality in single-member constituencies plus reserved seats, five-year term under the Gilgit-Baltistan orders of 2009 and 2018; the Northern Areas Council and Legislative Council were elected from 1970 to 2004.",
+   "source": "gbec",
+   "est_votes": 2500000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house",
+      "council"
+     ],
+     "iso_pattern": "PK-GB",
+     "precedence": 1
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Gilgit-Baltistan Election Commission (gbec.gov.pk)",
+     "url": "https://gbec.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "gbec",
+     "evidence": "On 2026-11-17 gbec.gov.pk and www.gbelection.gov.pk did not connect (gateway 502) and gba.gov.pk failed TLS from this environment; not bypassed.",
+     "finest": "pk.gb_constituency"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "through": "2004-12-31",
+     "note": "Northern Areas Legislative Council elections of 1994, 1999, and 2004; not counted here."
+    },
+    {
+     "date": "2009-11-12",
+     "election_kind": "general",
+     "note": "First Gilgit-Baltistan Legislative Assembly; not re-read here because the Commission's host did not connect."
+    },
+    {
+     "date": "2015-06-08",
+     "election_kind": "general",
+     "note": "Not re-read here because the Commission's host did not connect."
+    },
+    {
+     "date": "2020-11-15",
+     "election_kind": "general",
+     "note": "Not re-read here because the Commission's host did not connect."
+    }
+   ]
+  },
+  {
+   "key": "gb_local",
+   "tier": "gb",
+   "name": "گلگت بلتستان بلدیاتی انتخابات",
+   "name_en": "Gilgit-Baltistan local council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "District and union councils of the Northern Areas were elected under the local government orders (last in the 2000s); none has been elected under the Gilgit-Baltistan Local Government Act, 2014.",
+   "source": "gbec",
+   "disposition": "blocked",
+   "disposition_reason": "The Gilgit-Baltistan Election Commission's host did not connect from this environment, and no official list of the councils' elections could be read.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "PK-GB",
+     "polity_kinds": [
+      "county",
+      "municipality",
+      "submunicipal"
+     ],
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "kp_local_councils",
+   "tier": "union_council",
+   "name": "خیبر پختونخوا ویلج و نیبرہڈ کونسل انتخابات",
+   "name_en": "Khyber Pakhtunkhwa village and neighbourhood councils (and district and tehsil councils in 2015)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2015-05-30",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.kp_vc_nc"
+    ]
+   },
+   "note": "Village councils in rural areas and neighbourhood councils in urban ones (KP LGA 2013, ss. 5 and 6), each with a directly elected chairman and general, women's, youth, peasant or worker, and minority members; in 2015 voters also elected district and tehsil council members. Held by the Election Commission on 30 May 2015 and in two phases on 19 December 2021 and 31 March 2022.",
+   "source": "kp_lga",
+   "est_votes": 25000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "schemes": [
+      "pk.kp_vc_nc",
+      "pk.kp_tehsil",
+      "pk.kp_district"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.kp_vc_nc",
+     "first_date": "2015-05-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-05-30",
+     "election_kind": "local",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2021-12-19",
+     "election_kind": "local",
+     "note": "First phase, 17 districts. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment.",
+     "deferred": [
+      "2022-03-31"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "kp_tehsil_heads",
+   "tier": "tehsil",
+   "name": "خیبر پختونخوا تحصیل چیئرمین و سٹی میئر",
+   "name_en": "Khyber Pakhtunkhwa tehsil chairmen and city mayors, elected directly",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2019-05-03",
+   "first_held": "2021-12-19",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.tehsil"
+    ]
+   },
+   "note": "The 2019 amendments to the KP Local Government Act made each tehsil and city local government's head directly elected by plurality; first polled with the village and neighbourhood councils in December 2021 and March 2022.",
+   "source": "lgkp",
+   "est_votes": 10000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "other"
+     ],
+     "name_pattern": "(?i)tehsil|city local government|mayor",
+     "valid_from": "2019-05-03"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.tehsil",
+     "first_date": "2021-12-19"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2021-12-19",
+     "election_kind": "local",
+     "note": "First phase. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment.",
+     "deferred": [
+      "2022-03-31"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "punjab_local",
+   "tier": "union_council",
+   "name": "پنجاب بلدیاتی انتخابات",
+   "name_en": "Punjab local government elections (union councils and urban councils)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2015-10-31",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.pb_union_council"
+    ]
+   },
+   "note": "Under the Punjab Local Government Act 2013, union councils (a chairman and vice chairman on a joint ticket and ward councillors) and the wards of municipal committees were polled in three phases (31 October, 19 November, and 5 December 2015), and the councils then elected district chairmen and mayors. The councils were dissolved in 2019; laws of 2019, 2021, 2022, and 2025 have replaced one another without a further poll.",
+   "source": "punjab_lga",
+   "est_votes": 30000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "schemes": [
+      "pk.pb_union_council",
+      "pk.pb_ward"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.pb_union_council",
+     "first_date": "2015-10-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-10-31",
+     "election_kind": "local",
+     "note": "First of three phases. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment.",
+     "deferred": [
+      "2015-11-19",
+      "2015-12-05"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "sindh_local",
+   "tier": "union_council",
+   "name": "سندھ بلدیاتی انتخابات",
+   "name_en": "Sindh local government elections (union councils and committees, town and municipal committees)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2015-10-31",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.sd_union_council"
+    ]
+   },
+   "note": "Union councils and union committees of four wards each (Sindh LGA 2013, s. 10(4)) with a chairman and vice chairman on a joint ticket, and ward members of town and municipal committees, for four years (s. 20); mayors and chairmen are elected by the councils. Polled in three phases in 2015 and in two phases in 2022-23 (26 June 2022; 15 January 2023 for Karachi and Hyderabad divisions).",
+   "source": "sindh_lga",
+   "est_votes": 15000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "schemes": [
+      "pk.sd_union_council",
+      "pk.sd_ward"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Election Commission of Pakistan",
+     "source": "sindh_lga",
+     "locator": "https://www.sindhlaws.gov.pk/Setup/Publications_SindhCode/PUB-NEW-18-000156.pdf (s. 20(1): \"the term of office of a Council shall be four years commencing on the date on which it holds its first meeting\")"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.sd_union_council",
+     "first_date": "2015-10-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-10-31",
+     "election_kind": "local",
+     "note": "First of three phases. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment.",
+     "deferred": [
+      "2015-11-19",
+      "2015-12-05"
+     ]
+    },
+    {
+     "date": "2022-06-26",
+     "election_kind": "local",
+     "note": "First phase, 14 districts of Sukkur, Larkana, Shaheed Benazirabad, and Mirpurkhas divisions. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment.",
+     "deferred": [
+      "2023-01-15"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "balochistan_local",
+   "tier": "union_council",
+   "name": "بلوچستان بلدیاتی انتخابات",
+   "name_en": "Balochistan local government elections (union councils and urban councils)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2013-12-07",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.ba_union_council"
+    ]
+   },
+   "note": "Ward members of union councils, municipal committees, and corporations under the Balochistan Local Government Act 2010, polled on 7 December 2013 and on 29 May 2022 (Quetta and Lasbela later); district chairmen and mayors are elected by the councils.",
+   "source": "balochistan_lga",
+   "est_votes": 4000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "schemes": [
+      "pk.ba_union_council",
+      "pk.ba_ward"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.ba_union_council",
+     "first_date": "2013-12-07"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-12-07",
+     "election_kind": "local",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2022-05-29",
+     "election_kind": "local",
+     "note": "32 districts; Quetta and Lasbela polled later. Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "ict_local",
+   "tier": "ict",
+   "name": "اسلام آباد بلدیاتی انتخابات",
+   "name_en": "Islamabad Capital Territory local government elections",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2015-11-30",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.is_union_council"
+    ]
+   },
+   "note": "Union councils of the Islamabad Capital Territory Local Government Act 2015, whose chairmen form the Metropolitan Corporation Islamabad and elect its mayor; polled on 30 November 2015. Later polls were scheduled and cancelled as the number of union councils changed.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Art. 140A(2): \"Elections to the local governments shall be held by the Election Commission of Pakistan\")",
+   "est_votes": 400000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "schemes": [
+      "pk.is_union_council"
+     ]
+    },
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "iso_pattern": "PK-IS",
+     "valid_from": "2015-01-01"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.is_union_council",
+     "first_date": "2015-11-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-11-30",
+     "election_kind": "local",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "cantonment_boards",
+   "tier": "cantonment",
+   "name": "کنٹونمنٹ بورڈز کے انتخابات",
+   "name_en": "Cantonment boards: elected civilian members",
+   "category": "special_purpose",
+   "goal": "local",
+   "first_held": "2015-04-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.cantonment_ward"
+    ]
+   },
+   "note": "Each cantonment board has members elected from its civilian wards alongside ex officio and nominated members (Cantonments Act 1924 and Cantonments Ordinance 2002); the Election Commission held the polls in 42 cantonments on 25 April 2015 and in 42 on 12 September 2021. Cantonments count among the PBS urban areas.",
+   "source": "pbs_ncr",
+   "locator": "https://www.pbs.gov.pk/wp-content/uploads/2020/07/National-Census-Report-2023-1.pdf (s. 1.3: urban localities include cantonments)",
+   "est_votes": 2500000,
+   "effort": 4,
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(?i)cantonment",
+     "precedence": 2
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.cantonment_ward",
+     "first_date": "2015-04-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-04-25",
+     "election_kind": "local",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    },
+    {
+     "date": "2021-09-12",
+     "election_kind": "local",
+     "note": "Polling day as the Commission's records give it; not re-read here because ecp.gov.pk refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "local_councils_2001",
+   "tier": "union_council",
+   "name": "مقامی حکومت آرڈیننس 2001 کے انتخابات",
+   "name_en": "Local governments under the Local Government Ordinances 2001: union nazims and councillors",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "2000-01-01",
+   "valid_to": "2010-01-01",
+   "first_held": "2000-12-31",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.union_council"
+    ]
+   },
+   "note": "The devolution plan's union councils, each with a nazim and naib nazim on a joint ticket and ward councillors, elected directly on a non-party basis in five phases from 31 December 2000 to July 2001 and in two phases in August 2005; union councillors elected the district and tehsil nazims. Superseded by the provincial acts after the councils' term ended in 2009-10.",
+   "source": "pbs_ncr",
+   "locator": "https://www.pbs.gov.pk/wp-content/uploads/2020/07/National-Census-Report-2023-1.pdf (s. 1.5.3, the three-tier system of district, tehsil, and union councils)",
+   "est_votes": 60000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "polity_kinds": [
+      "county",
+      "municipality",
+      "submunicipal"
+     ],
+     "valid_from": "2000-01-01",
+     "valid_to": "2010-01-01"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission of Pakistan (ecp.gov.pk)",
+     "url": "https://www.ecp.gov.pk/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-17",
+     "source": "ecp",
+     "evidence": "On 2026-11-17 www.ecp.gov.pk and ecp.gov.pk answered every scripted request from this environment, including the files under /storage/files/, with a firewall page (\"The URL you requested has been blocked\", HTTP 500); not bypassed. The Commission posts results by constituency (Form-47 provisional and Form-49 consolidated results, Form-45 polling-station counts for recent elections) and its general election reports; unverified here.",
+     "finest": "pk.union_council",
+     "first_date": "2000-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "through": "2001-12-31",
+     "note": "Five phases from 31 December 2000 to July 2001; not counted here."
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "through": "2005-12-31",
+     "note": "Two phases in August 2005; not counted here."
+    }
+   ]
+  },
+  {
+   "key": "local_councils_1979",
+   "tier": "union_council",
+   "name": "بلدیاتی انتخابات 1979-1991",
+   "name_en": "Local councils under the provincial Local Government Ordinances of 1979",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "1979-01-01",
+   "valid_to": "2000-01-01",
+   "first_held": "1979-09-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "pk.union_council"
+    ]
+   },
+   "note": "Union, town, and district councils and municipal committees and corporations elected on a non-party basis in 1979, 1983, and 1987, and in some provinces 1991; dissolved in the 1990s. Held by the provincial governments, not the Election Commission.",
+   "source": "pbs_ncr",
+   "locator": "https://www.pbs.gov.pk/wp-content/uploads/2020/07/National-Census-Report-2023-1.pdf (s. 1.5.3)",
+   "est_votes": 50000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "polity_kinds": [
+      "county",
+      "municipality",
+      "submunicipal"
+     ],
+     "valid_from": "1979-01-01",
+     "valid_to": "2000-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-01-01",
+     "precision": "year",
+     "through": "1991-12-31",
+     "note": "Elections of 1979, 1983, 1987, and 1991; not counted here."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of these provincial council elections was found; the provincial local government departments did not post them, and the Election Commission did not hold them."
+  },
+  {
+   "key": "basic_democracies",
+   "tier": "union_council",
+   "name": "بنیادی جمہوریتیں",
+   "name_en": "Basic Democracies: union councils and their members, 1959-1969",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "1959-01-01",
+   "valid_to": "1969-03-25",
+   "first_held": "1959-12-26",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Basic Democracies Order 1959 created about 80,000 directly elected members of union councils and town and union committees in East and West Pakistan (December 1959 - January 1960, and October-November 1964), who formed the electoral college for the President and the Assemblies under the 1962 Constitution; abolished with it in 1969.",
+   "source": "constitution",
+   "est_votes": 30000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "valid_from": "1959-01-01",
+     "valid_to": "1970-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-01-01",
+     "precision": "year",
+     "through": "1960-12-31",
+     "note": "First elections, December 1959 to January 1960; not counted here."
+    },
+    {
+     "date": "1964-01-01",
+     "precision": "year",
+     "through": "1964-12-31",
+     "note": "Second elections, October and November 1964; not counted here."
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "The results were gazetted unit by unit and survive only in print; no official digital publication was found."
+  },
+  {
+   "key": "assemblies_basic_democracies",
+   "tier": "national",
+   "name": "قومی و صوبائی اسمبلی اور صدارتی انتخابات 1962-1965",
+   "name_en": "National and Provincial Assembly and presidential elections by the Basic Democrats, 1962-1965",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1962-01-01",
+   "valid_to": "1969-03-25",
+   "first_held": "1962-04-28",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the 1962 Constitution the 80,000 Basic Democrats elected the National Assembly (April 1962 and March 1965), the Provincial Assemblies of East and West Pakistan (May 1962 and May 1965), and the President (2 January 1965, Ayub Khan against Fatima Jinnah).",
+   "source": "constitution",
+   "est_votes": 320000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "iso_pattern": "PK",
+     "valid_from": "1962-01-01",
+     "valid_to": "1970-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1962-01-01",
+     "precision": "year",
+     "through": "1962-12-31",
+     "note": "National Assembly (28 April) and Provincial Assemblies (May); not counted here."
+    },
+    {
+     "date": "1965-01-02",
+     "election_kind": "indirect",
+     "note": "Presidential election by the Basic Democrats."
+    },
+    {
+     "date": "1965-01-01",
+     "precision": "year",
+     "through": "1965-12-31",
+     "note": "National Assembly (March) and Provincial Assemblies (May); not counted here."
+    }
+   ]
+  },
+  {
+   "key": "constituent_assembly",
+   "tier": "national",
+   "name": "دستور ساز اسمبلی",
+   "name_en": "Constituent Assemblies of 1947 and 1955, elected by the provincial assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "valid_to": "1956-03-23",
+   "first_held": "1946-07-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The first Constituent Assembly was made of members elected in 1946 by the provincial legislatures of British India for the areas that became Pakistan; the second (1955) was elected by the provincial assemblies and adopted the 1956 Constitution.",
+   "source": "constitution",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PK"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the members of provincial legislatures, with no public vote; the 1946 provincial elections that seated them belong to British India's census."
+  },
+  {
+   "key": "local_indirect_heads",
+   "tier": "district",
+   "name": "میئر، ڈسٹرکٹ چیئرمین اور ناظمین کے بالواسطہ انتخابات",
+   "name_en": "Mayors, district chairmen, and nazims elected by councillors",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Heads of metropolitan and municipal corporations, district councils, and (2001-2009) district and tehsil nazims are elected by the councillors (Sindh LGA 2013, s. 18 and Second Schedule; Balochistan LGA 2010; Punjab LGA 2013).",
+   "source": "sindh_lga",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "polity_kinds": [
+      "county",
+      "municipality"
+     ]
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Votes of a few dozen councillors in each council, recorded as notifications of the returned candidate rather than as a public count."
+  },
+  {
+   "key": "prime_minister",
+   "tier": "national",
+   "name": "وزیر اعظم و وزرائے اعلیٰ کا انتخاب",
+   "name_en": "Prime Minister and Chief Ministers, elected by their assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The National Assembly elects the Prime Minister and each Provincial Assembly its Chief Minister by a majority of its total membership (Arts. 91(3) and 130(3)).",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Arts. 91(3) and 130(3))",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_government"
+     ],
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "PK*"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "A division of the assembly's members recorded in its proceedings, not an election held by the Election Commission."
+  },
+  {
+   "key": "primaries",
+   "tier": "national",
+   "name": "پارٹی ٹکٹ اور انٹرا پارٹی انتخابات",
+   "name_en": "Party nominations and intra-party elections",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties issue tickets through their own boards and hold intra-party elections under their constitutions; the Commission only receives the party's certificate (Elections Act 2017, s. 208-209).",
+   "source": "elections_act",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "PK*"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the parties themselves; no state-run nominating contest exists."
+  },
+  {
+   "key": "judiciary",
+   "tier": "national",
+   "name": "عدلیہ",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Judges of the Federal Constitutional Court, the Supreme Court, and the High Courts are appointed by the President on the Judicial Commission's nomination (Arts. 175A and 175C); no judge or law-enforcement officer is elected.",
+   "source": "constitution",
+   "locator": "https://www.pakp.gov.pk/wp-content/uploads/2024/07/CoP27thA.pdf (Arts. 175A and 175C)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judicial or law-enforcement office is elected."
+  },
+  {
+   "key": "non_territorial",
+   "tier": "national",
+   "name": "بار کونسلز اور پیشہ ورانہ ادارے",
+   "name_en": "Bar councils, professional bodies, and student unions",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Pakistan Bar Council and the provincial bar councils are elected by advocates, and chambers of commerce and professional councils by their members.",
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of private or professional electorates run by the bodies themselves, not public elections held by the Election Commission."
+  }
+ ]
+}
