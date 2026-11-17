@@ -1,0 +1,1452 @@
+{
+  "polity": "ZM",
+  "name": "Zambia",
+  "sources": {
+    "constitution-2016": {
+      "title": "Constitution of Zambia (Amendment) Act, No. 2 of 2016",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/02/Constitution-of-Zambia-Amendment-2016-Act-No.-2.pdf",
+      "kind": "official_body",
+      "note": "Articles 45-47 (electoral systems), 56 (general elections on the second Thursday of August every five years), 57 (by-elections within ninety days), 58-59 (constituencies, wards, and delimitation), 68 (156 directly elected members of the National Assembly), 101 (election of the President by more than half of the valid votes), 153-154 (councillors, and mayors and council chairpersons elected directly), and 169 (House of Chiefs). Assented to on 5 January 2016; published by the Commission on its legal framework page."
+    },
+    "constitution-2025": {
+      "title": "Speech by the Chairperson of the Electoral Commission of Zambia at the first quarter stakeholder meeting, 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/SPEECH-BY-THE-CHAIRPERSON-Q-1-STAKEHOLDER-MEETING.pdf",
+      "kind": "official_body",
+      "note": "States that the Constitution of Zambia (Amendment) Act No. 13 of 2025 raised the constituency-based seats from 156 to 226 and introduced a Mixed Member Proportional Representation system for elections to the National Assembly and the councils under Article 47."
+    },
+    "delimitation-2026": {
+      "title": "Speech by the Chairperson of the Electoral Commission of Zambia during the announcement of the 70 new constituencies, 16 April 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/20260416-ECZ-CHAIRPERSONS-SPEECH-ANNOUNCEMENT-OF-70-NEW-CONSTITUENCIES.pdf",
+      "kind": "official_body",
+      "note": "Gives the history of the constituency count: 75 at independence, 105 from 1968, 125 from 1973, 150 from 1991, 156 from 2016, and 226 from 2026."
+    },
+    "epa-2016": {
+      "title": "Electoral Process Act, No. 35 of 2016",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/02/The-Electoral-Process-Act-No-35-2016.pdf",
+      "kind": "official_body",
+      "note": "Conduct of presidential, parliamentary, mayoral, council chairperson, and councillor elections and by-elections, nominations, counting and announcement of results."
+    },
+    "epa-bill-2026": {
+      "title": "The Electoral Process (Amendment) Bill, 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/02.05.26-THE-ELECTORAL-PROCESS-AMENDMENT-BILL-2026.pdf",
+      "kind": "official_body",
+      "note": "New Part IVA (sections 36A-36F): election of Members of Parliament and councillors under the proportional representation electoral system, with party lists of women, youths, and persons with disabilities."
+    },
+    "referendum-act": {
+      "title": "Referendum (Amendment) Act, No. 5 of 2015",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/02/zam2015ReferendumActAmend.pdf",
+      "kind": "official_body",
+      "note": "Amends the Referendum Act (Cap. 14) for the referendum held with the 2016 general election."
+    },
+    "ecz-mandate": {
+      "title": "Mandate of the Electoral Commission of Zambia",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/?page_id=4532",
+      "kind": "official_body",
+      "note": "The Commission is established under Article 229 of the Constitution and came into existence as the electoral management body in 1996."
+    },
+    "ecz-results": {
+      "title": "General Election Results",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/?page_id=4293",
+      "kind": "official_body",
+      "note": "Public notices of presidential results since 1996, National Assembly and councillor results since 2011, and mayoral and council chairperson results since 2016.",
+      "license": "No license stated; published by the electoral authority for public use"
+    },
+    "ecz-by": {
+      "title": "By-Election Results",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/?page_id=4581",
+      "kind": "official_body",
+      "note": "Public notices of by-election results from October 2021 to April 2025.",
+      "license": "No license stated; published by the electoral authority for public use"
+    },
+    "ecz-referendum": {
+      "title": "Referendum",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/?page_id=2050",
+      "kind": "official_body",
+      "note": "Links the full results of the 2016 referendum on the Commission's results site."
+    },
+    "notice-2006": {
+      "title": "2006 Presidential Election Results, public notice",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2023/07/2006-Presidential-Election-Results.pdf",
+      "kind": "official_body"
+    },
+    "notice-2011-na": {
+      "title": "2011 National Assembly Elections Results, public notice",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/09/2011-National-Assembly-Elections-Results.pdf",
+      "kind": "official_body"
+    },
+    "notice-2011-lge": {
+      "title": "2011 Local Government Elections Results, public notice",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/09/2011-LGE-Results.pdf",
+      "kind": "official_body"
+    },
+    "notice-2016-mayor": {
+      "title": "2016 Mayoral / Council Chairperson Election Results, public notice",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2022/11/2016MayoralResults.pdf",
+      "kind": "official_body"
+    },
+    "notice-2026": {
+      "title": "2026 Presidential Election Results, public notice of 25 August 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/2026-Presidential-Election-Results-By-Constituency-FINAL.pdf",
+      "kind": "official_body"
+    },
+    "pd-2021": {
+      "title": "Registered Voters per Polling Station, 2021",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/PDListing2021v4.pdf",
+      "kind": "official_body",
+      "note": "Register of polling stations by province, district, constituency, and ward for the 2021 general election: 10 provinces, 116 districts, 156 constituencies, and 1,858 wards."
+    },
+    "pd-2026": {
+      "title": "Registered Voters per Polling Station, 2026",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/rptPDListing20260508.pdf",
+      "kind": "official_body",
+      "note": "Compiled from the Final Register of Voters for 2026."
+    },
+    "ertc-2025": {
+      "title": "Report of the Electoral Reform Technical Committee, 2025",
+      "publisher": "Electoral Commission of Zambia",
+      "url": "https://www.elections.org.zm/wp-content/uploads/FINAL-ERTC-REPORT_3rd-JUNE-2025.pdf",
+      "kind": "official_body"
+    },
+    "parliament-history": {
+      "title": "History of the National Assembly of Zambia",
+      "publisher": "National Assembly of Zambia",
+      "url": "https://www.parliament.gov.zm/",
+      "kind": "official_body",
+      "note": "The Legislative Council of Northern Rhodesia (1924-1964), its elected members from 1926, the Legislative Assembly elected in January 1964, and the National Assembly from independence on 24 October 1964. The host failed TLS verification from this session on 2026-11-17."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Zambia",
+      "name_en": "Zambia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "zm.national",
+      "source": "constitution-2016",
+      "counts": [
+        {
+          "date": "2026-05-08",
+          "value": 1,
+          "source": "pd-2026",
+          "locator": "Report Totals of the 2026 register: one Republic, 8,786,300 registered voters"
+        }
+      ]
+    },
+    {
+      "key": "province",
+      "name": "Province",
+      "name_en": "Provinces",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "zm.province",
+      "source": "constitution-2016",
+      "elects": false,
+      "counts": [
+        {
+          "date": "2021-08-12",
+          "value": 10,
+          "source": "pd-2021",
+          "locator": "Registered Voters per Polling Station 2021: totals for each of 10 provinces"
+        },
+        {
+          "date": "2026-05-08",
+          "value": 10,
+          "source": "pd-2026",
+          "locator": "Report Totals: Number of Provinces 10"
+        }
+      ]
+    },
+    {
+      "key": "council",
+      "name": "District (city, municipal, or district council)",
+      "name_en": "Districts and their councils",
+      "parent": "province",
+      "polity_kind": "county",
+      "scheme": "zm.district",
+      "source": "constitution-2016",
+      "counts": [
+        {
+          "date": "2021-08-12",
+          "value": 116,
+          "source": "pd-2021",
+          "locator": "Registered Voters per Polling Station 2021: totals for each of 116 districts"
+        },
+        {
+          "date": "2026-05-08",
+          "value": 116,
+          "source": "pd-2026",
+          "locator": "Report Totals: Number of Districts 116"
+        }
+      ]
+    },
+    {
+      "key": "constituency",
+      "name": "Constituency",
+      "name_en": "National Assembly constituencies",
+      "parent": "council",
+      "scheme": "zm.constituency",
+      "source": "constitution-2016",
+      "counts": [
+        {
+          "date": "2006-09-28",
+          "value": 150,
+          "source": "notice-2006",
+          "locator": "the presidential elections that took place in 150 Constituencies on 28th October 2006"
+        },
+        {
+          "date": "2021-08-12",
+          "value": 156,
+          "source": "pd-2021",
+          "locator": "Registered Voters per Polling Station 2021: totals for each of 156 constituencies"
+        },
+        {
+          "date": "2026-05-08",
+          "value": 226,
+          "source": "pd-2026",
+          "locator": "Report Totals: Number of Constituencies 226"
+        }
+      ]
+    },
+    {
+      "key": "ward",
+      "name": "Ward",
+      "name_en": "Council wards",
+      "parent": "constituency",
+      "scheme": "zm.ward",
+      "source": "constitution-2016",
+      "counts": [
+        {
+          "date": "2011-09-20",
+          "value": 1422,
+          "source": "notice-2011-lge",
+          "locator": "Local Government Elections that took place in 1376 wards on Tuesday, 20th September 2011. Elections in 35 wards were postponed while 11 wards were unopposed."
+        },
+        {
+          "date": "2021-08-12",
+          "value": 1858,
+          "source": "pd-2021",
+          "locator": "Registered Voters per Polling Station 2021: 1,858 distinct ward codes"
+        },
+        {
+          "date": "2026-05-08",
+          "value": 1858,
+          "source": "pd-2026",
+          "locator": "Report Totals: Number of Wards 1858"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidential election",
+      "name_en": "President",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.national"
+        ],
+        "fine": [
+          "zm.constituency"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "Constitution of Zambia (Amendment) Act No. 2 of 2016, arts. 47(1) and 101",
+      "valid_from": "1964-10-24",
+      "first_held": "1968-12-19",
+      "earliest_record": "1996-11-18",
+      "finest_note": "Constituency in the Commission's public notices; polling-station results are announced but not published as files",
+      "note": "Elected directly since 1968 (Kenneth Kaunda was first chosen through the January 1964 election to the Legislative Assembly). By plurality until 2016; since the 2016 amendment a candidate needs more than half of the valid votes, with a second round between the top two otherwise. Since 2016 each candidate names a running mate who becomes Vice-President, on the same ballot. A vacancy was filled by presidential by-elections in 2008 and 2015; since 2016 the Vice-President succeeds.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "second round between the two leading candidates within 37 days when no candidate wins more than half of the valid votes",
+          "vacancy_rule": "the Vice-President becomes President for the rest of the term",
+          "source": "constitution-2016",
+          "locator": "arts. 56, 101, and 106"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "valid_to": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia (from 1996) and before it the Electoral Commission under the Electoral Act",
+          "runoff": "none",
+          "vacancy_rule": "presidential by-election within ninety days",
+          "valid_from": "1991-08-30",
+          "source": "ecz-results",
+          "locator": "presidential notices of 1996-2015, including the 2008 and 2015 by-elections"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, General Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4293",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "1996-11-18",
+          "last_date": "2026-08-13",
+          "finest": "zm.constituency",
+          "source": "ecz-results",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "PDF public notices with every candidate's votes and the rejected ballots, registered voters, and turnout for each constituency; the page and a 2021 notice answered 200 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1968-12-19",
+          "note": "First direct presidential election; not yet counted from an official record."
+        },
+        {
+          "date": "1973-12-05",
+          "note": "Single-candidate yes-or-no vote under the one-party state; not yet counted from an official record."
+        },
+        {
+          "date": "1978-12-12",
+          "note": "Single-candidate yes-or-no vote; not yet counted from an official record."
+        },
+        {
+          "date": "1983-10-27",
+          "note": "Single-candidate yes-or-no vote; not yet counted from an official record."
+        },
+        {
+          "date": "1988-10-26",
+          "note": "Single-candidate yes-or-no vote; not yet counted from an official record."
+        },
+        {
+          "date": "1991-10-31",
+          "note": "Not published by the Commission, which was established in 1996."
+        },
+        {
+          "date": "1996-11-18",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results"
+        },
+        {
+          "date": "2001-12-27",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results"
+        },
+        {
+          "date": "2006-09-28",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "notice-2006"
+        },
+        {
+          "date": "2008-10-30",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results",
+          "note": "Presidential by-election on the death of the President in office."
+        },
+        {
+          "date": "2011-09-20",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results"
+        },
+        {
+          "date": "2015-01-20",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results",
+          "note": "First election under the majoritarian rule of Article 47(1); no second round was needed."
+        },
+        {
+          "date": "2016-08-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results"
+        },
+        {
+          "date": "2021-08-12",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "ecz-results"
+        },
+        {
+          "date": "2026-08-13",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "notice-2026",
+          "quote": "the Presidential Election that took place in 226 Constituencies on Thursday, 13th August 2026"
+        }
+      ],
+      "est_votes": 5100000,
+      "effort": 2
+    },
+    {
+      "key": "national_assembly",
+      "tier": "constituency",
+      "name": "Parliamentary elections (constituency members of the National Assembly)",
+      "name_en": "National Assembly, constituency members",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.constituency"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "arts. 47(2), 58, and 68(2)(a)",
+      "valid_from": "1964-01-20",
+      "first_held": "1964-01-20",
+      "earliest_record": "2001-12-27",
+      "finest_note": "Constituency in the Commission's public notices; the 2001 notice is part of the presidential file, and the 1996 and 2006 parliamentary results are not on the Commission's site",
+      "boundary_source": "delimitation-2026",
+      "note": "Single-member constituencies by first past the post. The National Assembly also holds up to eight members nominated by the President, the Vice-President, the Speaker, and the Deputy Speakers; since 2026, also members elected from party lists (class national_assembly_pr).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "valid_from": "1964-01-01",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days, none in the 180 days before a general election",
+          "source": "constitution-2016",
+          "locator": "arts. 56, 57, and 68"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "valid_to": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia (from 1996) and before it the Electoral Commission under the Electoral Act",
+          "runoff": "none",
+          "vacancy_rule": "by-election in the constituency",
+          "valid_from": "1964-01-01",
+          "source": "delimitation-2026",
+          "locator": "history of the constituency count from independence to 2016"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, General Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4293",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2001-12-27",
+          "last_date": "2021-08-12",
+          "finest": "zm.constituency",
+          "source": "ecz-results",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "PDF public notices for 2001 (with the presidential notice), 2011, 2016, and 2021 with every candidate's votes by constituency; the 2026 parliamentary notice was not yet posted on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-01-20",
+          "contests": 75,
+          "seats": 75,
+          "source": "delimitation-2026",
+          "quote": "At independence there were 75 constituencies.",
+          "note": "General election to the Legislative Assembly of Northern Rhodesia (20-21 January 1964), which became the National Assembly at independence; 65 main-roll and 10 reserved-roll (European) seats."
+        },
+        {
+          "date": "1968-12-19",
+          "contests": 105,
+          "seats": 105,
+          "source": "delimitation-2026",
+          "quote": "In 1968 the constituencies were increased by 30 to 105."
+        },
+        {
+          "date": "1973-12-05",
+          "contests": 125,
+          "seats": 125,
+          "source": "delimitation-2026",
+          "quote": "In 1973 the constituencies were increased by 20 to 125.",
+          "note": "First election of the one-party state; candidates were United National Independence Party members."
+        },
+        {
+          "date": "1978-12-12",
+          "contests": 125,
+          "seats": 125,
+          "source": "delimitation-2026",
+          "quote": "In 1973 the constituencies were increased by 20 to 125."
+        },
+        {
+          "date": "1983-10-27",
+          "contests": 125,
+          "seats": 125,
+          "source": "delimitation-2026",
+          "quote": "In 1973 the constituencies were increased by 20 to 125."
+        },
+        {
+          "date": "1988-10-26",
+          "contests": 125,
+          "seats": 125,
+          "source": "delimitation-2026",
+          "quote": "In 1973 the constituencies were increased by 20 to 125."
+        },
+        {
+          "date": "1991-10-31",
+          "contests": 150,
+          "seats": 150,
+          "source": "delimitation-2026",
+          "quote": "In 1991, there was another increase by 25 making a total of 150.",
+          "note": "First multiparty election since 1968."
+        },
+        {
+          "date": "1996-11-18",
+          "contests": 150,
+          "seats": 150,
+          "source": "delimitation-2026",
+          "quote": "In 1991, there was another increase by 25 making a total of 150."
+        },
+        {
+          "date": "2001-12-27",
+          "contests": 150,
+          "seats": 150,
+          "source": "delimitation-2026",
+          "quote": "In 1991, there was another increase by 25 making a total of 150."
+        },
+        {
+          "date": "2006-09-28",
+          "contests": 150,
+          "seats": 150,
+          "source": "delimitation-2026",
+          "quote": "In 1991, there was another increase by 25 making a total of 150."
+        },
+        {
+          "date": "2011-09-20",
+          "contests": 150,
+          "seats": 150,
+          "source": "delimitation-2026",
+          "quote": "In 1991, there was another increase by 25 making a total of 150.",
+          "note": "The Commission's notice reports polls in 148 constituencies on the day; two were postponed."
+        },
+        {
+          "date": "2016-08-11",
+          "contests": 156,
+          "seats": 156,
+          "source": "delimitation-2026",
+          "quote": "In 2014, six constituencies were added through the creation of six districts which became effective in 2016."
+        },
+        {
+          "date": "2021-08-12",
+          "contests": 156,
+          "seats": 156,
+          "source": "delimitation-2026",
+          "quote": "In 2014, six constituencies were added through the creation of six districts which became effective in 2016."
+        },
+        {
+          "date": "2026-08-13",
+          "contests": 226,
+          "seats": 226,
+          "source": "constitution-2025",
+          "quote": "the Constitution has increased the number of constituency-based seats from one hundred and fifty-six (156) to two hundred and twenty-six (226)"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 2
+    },
+    {
+      "key": "national_assembly_by",
+      "tier": "constituency",
+      "name": "Parliamentary by-elections",
+      "name_en": "National Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.constituency"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "art. 57",
+      "valid_from": "1964-01-21",
+      "earliest_record": "2021-10-21",
+      "note": "Held within ninety days of a vacancy, and not in the 180 days before a general election.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days of the vacancy",
+          "administered_by": "Electoral Commission of Zambia",
+          "source": "constitution-2016",
+          "locator": "art. 57"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, By-Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4581",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2021-10-21",
+          "last_date": "2025-04-24",
+          "finest": "zm.constituency",
+          "source": "ecz-by",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "One PDF notice per by-election day, from October 2021 to April 2025; earlier by-elections are not on the Commission's site."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-01-21",
+          "through": "2021-08-11",
+          "note": "By-elections before October 2021 are not yet counted from official records."
+        },
+        {
+          "date": "2021-08-13",
+          "through": "2026-11-17",
+          "note": "By-elections since the 2021 general election, published by the Commission as one notice per polling day; not yet counted."
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 2
+    },
+    {
+      "key": "national_assembly_pr",
+      "tier": "national",
+      "name": "Election of Members of Parliament under the proportional representation electoral system",
+      "name_en": "National Assembly, party-list members (women, youths, persons with disabilities)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.national"
+        ]
+      },
+      "source": "constitution-2025",
+      "locator": "Constitution of Zambia (Amendment) Act No. 13 of 2025, art. 47, as described by the Commission",
+      "valid_from": "2025-12-01",
+      "first_held": "2026-08-13",
+      "note": "Mixed member proportional representation introduced by Act No. 13 of 2025. Each party contesting the presidency submits lists of twenty women, fifteen youths, and five persons with disabilities (Electoral Process (Amendment) Bill 2026, s. 36C); seats are distributed in proportion to party votes. The number of seats and how the Commission publishes the allocation are not yet confirmed from an official text.",
+      "match": [
+        {
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "valid_from": "2025-12-01",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2025-12-01",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "none",
+          "vacancy_rule": "filled from the party list",
+          "source": "epa-bill-2026",
+          "locator": "Part IVA, ss. 36A-36F"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2026-08-13",
+          "note": "First allocation of list seats; the count of seats is not yet taken from an official record."
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 4
+    },
+    {
+      "key": "councillor",
+      "tier": "ward",
+      "name": "Local government elections (ward councillors)",
+      "name_en": "Ward councillors",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.ward"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "arts. 47(3), 47(4), and 153",
+      "valid_from": "1964-10-24",
+      "earliest_record": "2011-09-20",
+      "finest_note": "Ward in the Commission's public notices of 2011, 2016, and 2021",
+      "note": "One councillor per ward by first past the post. Held on the same day as the presidential and parliamentary elections since 2001 (tripartite elections); before that in separate local government elections (1992 and 1998 under the Local Government Act 1991). Each council also seats up to three chiefs elected by the district's chiefs (class council_chiefs), and since 2026 list councillors (class council_pr).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days, none in the 180 days before a general election",
+          "source": "constitution-2016",
+          "locator": "arts. 56, 57, and 153(6)"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "valid_to": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia (from 1996) and before it the Electoral Commission under the Electoral Act",
+          "runoff": "none",
+          "valid_from": "2001-12-27",
+          "source": "ecz-results",
+          "locator": "2011 Local Government Elections notice, held with the general election"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, General Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4293",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2011-09-20",
+          "last_date": "2021-08-12",
+          "finest": "zm.ward",
+          "source": "ecz-results",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "PDF notices of councillor results by ward for 2011, 2016, and 2021 (contested wards only; unopposed and postponed wards are not listed); the 2026 notice was not yet posted on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-10-24",
+          "through": "1991-12-31",
+          "note": "Council elections before the Local Government Act 1991 are not yet counted from official records."
+        },
+        {
+          "date": "1992-11-30",
+          "election_kind": "local",
+          "note": "Not yet counted from an official record."
+        },
+        {
+          "date": "1998-12-30",
+          "election_kind": "local",
+          "note": "Not yet counted from an official record."
+        },
+        {
+          "date": "2001-12-27",
+          "note": "First tripartite election; not yet counted from an official record."
+        },
+        {
+          "date": "2006-09-28",
+          "note": "Not yet counted from an official record."
+        },
+        {
+          "date": "2011-09-20",
+          "contests": 1422,
+          "seats": 1422,
+          "source": "notice-2011-lge",
+          "quote": "Local Government Elections that took place in 1376 wards on Tuesday, 20th September 2011. Elections in 35 wards were postponed while 11 wards were unopposed."
+        },
+        {
+          "date": "2016-08-11",
+          "note": "Ward count not yet taken from an official record of this election."
+        },
+        {
+          "date": "2021-08-12",
+          "contests": 1858,
+          "seats": 1858,
+          "source": "pd-2021"
+        },
+        {
+          "date": "2026-08-13",
+          "contests": 1858,
+          "seats": 1858,
+          "source": "pd-2026",
+          "quote": "Number of Wards 1858"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 2
+    },
+    {
+      "key": "councillor_by",
+      "tier": "ward",
+      "name": "Local government by-elections (ward councillors)",
+      "name_en": "Ward councillor by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.ward"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "art. 57",
+      "valid_from": "1964-10-24",
+      "earliest_record": "2021-10-21",
+      "note": "Held within ninety days of a vacancy, usually on the same day as other by-elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days of the vacancy",
+          "administered_by": "Electoral Commission of Zambia",
+          "source": "constitution-2016",
+          "locator": "art. 57"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, By-Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4581",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2021-10-21",
+          "last_date": "2025-04-24",
+          "finest": "zm.ward",
+          "source": "ecz-by",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "Ward by-elections are in the same per-day notices as the parliamentary ones."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-10-24",
+          "through": "2021-08-11",
+          "note": "Ward by-elections before October 2021 are not yet counted from official records."
+        },
+        {
+          "date": "2021-08-13",
+          "through": "2026-11-17",
+          "note": "Ward by-elections since 2021, published by the Commission; not yet counted."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 2
+    },
+    {
+      "key": "council_pr",
+      "tier": "council",
+      "name": "Election of councillors under the proportional representation electoral system",
+      "name_en": "Council party-list members (women, youths, persons with disabilities)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.district"
+        ]
+      },
+      "source": "constitution-2025",
+      "locator": "Constitution of Zambia (Amendment) Act No. 13 of 2025, art. 47, as described by the Commission",
+      "valid_from": "2025-12-01",
+      "first_held": "2026-08-13",
+      "note": "Each council gains four to nine list seats by its number of wards: two women, one youth, and one person with a disability for twenty wards or fewer; three, two, and one for 21-30; four, three, and two for 31 or more (Electoral Process (Amendment) Bill 2026, s. 36D).",
+      "match": [
+        {
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_from": "2025-12-01",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2025-12-01",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "none",
+          "vacancy_rule": "filled from the party list (s. 36F)",
+          "source": "epa-bill-2026",
+          "locator": "Part IVA, ss. 36D and 36F"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2026-08-13",
+          "contests": 116,
+          "source": "pd-2026",
+          "quote": "Number of Districts 116",
+          "note": "One list allocation per council; the seats depend on each council's ward count."
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 4
+    },
+    {
+      "key": "mayor",
+      "tier": "council",
+      "name": "Mayoral and council chairperson elections",
+      "name_en": "Mayors and council chairpersons",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.district"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "art. 154(2)",
+      "valid_from": "2016-01-05",
+      "first_held": "2016-08-11",
+      "earliest_record": "2016-08-11",
+      "finest_note": "District in the Commission's public notices; ward and constituency tallies are not published",
+      "note": "Every council's mayor (city and municipal councils) or council chairperson (district councils) is elected directly by first past the post on the day of the councillor elections, for at most two five-year terms. The deputy is elected by the councillors.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "valid_from": "2016-01-05",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 8,
+          "day_rule": "aug_second_thursday",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "valid_from": "2016-01-05",
+          "administered_by": "Electoral Commission of Zambia",
+          "certify_days": 7,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days, none in the 180 days before a general election",
+          "source": "constitution-2016",
+          "locator": "arts. 56, 57, and 154"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, General Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4293",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2016-08-11",
+          "last_date": "2021-08-12",
+          "finest": "zm.district",
+          "source": "ecz-results",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "PDF notices of mayoral and council chairperson results by district for 2016 and 2021; the 2026 notice was not yet posted on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2016-08-11",
+          "contests": 101,
+          "seats": 101,
+          "source": "notice-2016-mayor",
+          "quote": "MAYORAL / COUNCIL CHAIRPERSON Election that took place in.101 DISTRICTS on Thursday, 11th August 2016"
+        },
+        {
+          "date": "2021-08-12",
+          "contests": 116,
+          "seats": 116,
+          "source": "pd-2021"
+        },
+        {
+          "date": "2026-08-13",
+          "contests": 116,
+          "seats": 116,
+          "source": "pd-2026",
+          "quote": "Number of Districts 116"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 2
+    },
+    {
+      "key": "mayor_by",
+      "tier": "council",
+      "name": "Mayoral and council chairperson by-elections",
+      "name_en": "Mayor and council chairperson by-elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.district"
+        ]
+      },
+      "source": "constitution-2016",
+      "locator": "art. 57",
+      "valid_from": "2016-01-05",
+      "earliest_record": "2021-10-21",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election within ninety days of the vacancy",
+          "administered_by": "Electoral Commission of Zambia",
+          "source": "constitution-2016",
+          "locator": "art. 57"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia, By-Election Results",
+          "url": "https://www.elections.org.zm/?page_id=4581",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2021-10-21",
+          "last_date": "2025-04-24",
+          "finest": "zm.district",
+          "source": "ecz-by",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "Mayoral and council chairperson by-elections are in the per-day by-election notices."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2016-08-12",
+          "through": "2026-11-17",
+          "note": "Not yet counted; the Commission publishes those since October 2021."
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 2
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "National referendum",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "zm.national"
+        ],
+        "fine": [
+          "zm.constituency"
+        ]
+      },
+      "source": "referendum-act",
+      "locator": "Referendum Act (Cap. 14), as amended by Act No. 5 of 2015",
+      "valid_from": "1964-10-24",
+      "first_held": "1969-06-17",
+      "earliest_record": "2016-08-11",
+      "finest_note": "Constituency on the Commission's results site (offline when checked)",
+      "note": "Required to amend the Bill of Rights or the amendment article itself. Held in 1969, removing the referendum requirement from most amendments, and on 11 August 2016 with the general election on a new Bill of Rights and Article 79, which failed because fewer than half of the registered voters took part.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ZM"
+        },
+        {
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Zambia results site",
+          "url": "http://results.elections.org.zm/results/2016_referendum",
+          "format": "html",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "first_date": "2016-08-11",
+          "last_date": "2016-08-11",
+          "finest": "zm.constituency",
+          "source": "ecz-referendum",
+          "license": "No license stated; published by the electoral authority for public use",
+          "evidence": "Linked from the Commission's referendum page; the results host answered 503 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1969-06-17",
+          "note": "Not yet published online by an official body."
+        },
+        {
+          "date": "2016-08-11",
+          "contests": 1,
+          "source": "ecz-referendum",
+          "quote": "Do you agree to the amendment to the Constitution to enhance the Bill of rights contained in Part III of the Constitution of Zambia and to repeal and replace Article 79 of the Constitution of Zambia?"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 3
+    },
+    {
+      "key": "mayor_indirect",
+      "tier": "council",
+      "name": "Election of mayors and council chairpersons by the councillors",
+      "name_en": "Mayors and council chairpersons chosen by councils (before 2016)",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-2016",
+      "locator": "art. 154(2), which made the election direct",
+      "valid_to": "2016-01-05",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council elected its mayor or chairperson from among the councillors at a council meeting; the Commission neither ran nor published these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "valid_to": "2016-01-05",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "council_chiefs",
+      "tier": "council",
+      "name": "Election of chiefs to councils by the chiefs in the district",
+      "name_en": "Chiefs' seats on councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-2016",
+      "locator": "art. 153(2)(c)",
+      "valid_from": "2016-01-05",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Up to three chiefs per council are chosen by the district's chiefs, not by registered voters, and no results are published.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "house_of_chiefs",
+      "tier": "province",
+      "name": "Election of members of the House of Chiefs",
+      "name_en": "House of Chiefs",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-2016",
+      "locator": "art. 169",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Five chiefs from each province are chosen among the chiefs themselves, not by registered voters; the house advises and does not legislate, and no results are published.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "name_pattern": "House of Chiefs",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker and Deputy Speakers of the National Assembly",
+      "name_en": "Speaker of the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-2016",
+      "locator": "art. 68(2)(d)-(e)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An internal vote of the National Assembly at its first sitting, recorded in its own proceedings rather than run or published as an election.",
+      "match": [
+        {
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "ZM"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "party_adoptions",
+      "tier": "national",
+      "name": "Party adoption of candidates",
+      "name_en": "Party nominations",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "epa-bill-2026",
+      "locator": "s. 2, definition of the adoption certificate signed by a party's secretary-general",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties adopt their candidates under their own constitutions and file an adoption certificate; the state neither runs nor publishes any nominating vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "ZM*",
+          "within": null
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Legislative Council of Northern Rhodesia",
+      "name_en": "Legislative Council of Northern Rhodesia (elected members)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament-history",
+      "valid_from": "1924-04-01",
+      "valid_to": "1964-01-01",
+      "first_held": "1926-01-01",
+      "note": "Elected members on a restricted, mostly European roll from 1926; the 1959 and 1962 elections added seats for qualified African voters on separate rolls.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the colonial Legislative Council results online; the records sit with the National Archives of Zambia and the National Assembly library, and the National Assembly's host failed TLS verification from here.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "valid_to": "1964-01-01",
+          "iso_pattern": "ZM"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1926-01-01",
+          "precision": "year",
+          "through": "1962-12-10",
+          "note": "Legislative Council elections from 1926 to the October and December 1962 polls; not yet counted."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 5
+    },
+    {
+      "key": "federal_assembly",
+      "tier": "national",
+      "name": "Federal Assembly of Rhodesia and Nyasaland, Northern Rhodesia seats",
+      "name_en": "Federal Assembly of Rhodesia and Nyasaland (Northern Rhodesia constituencies)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament-history",
+      "valid_from": "1953-10-23",
+      "valid_to": "1963-12-31",
+      "first_held": "1953-12-15",
+      "note": "Northern Rhodesia elected members to the federal parliament in 1953, 1958, and 1962.",
+      "disposition": "blocked",
+      "disposition_reason": "The federation's election records are not published online by any official body of Zambia; they sit in the national archives of Zambia, Zimbabwe, and Malawi.",
+      "match": [
+        {
+          "name_pattern": "Federal Assembly",
+          "within": null,
+          "valid_from": "1953-01-01",
+          "valid_to": "1964-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1953-12-15",
+          "note": "Not yet counted from an official record."
+        },
+        {
+          "date": "1958-11-12",
+          "note": "Not yet counted from an official record."
+        },
+        {
+          "date": "1962-04-27",
+          "note": "Not yet counted from an official record."
+        }
+      ],
+      "est_votes": 50000,
+      "effort": 5
+    }
+  ]
+}
