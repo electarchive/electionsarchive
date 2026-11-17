@@ -1,0 +1,1136 @@
+{
+ "polity": "PA",
+ "name": "Panama",
+ "sources": {
+  "constitucion": {
+   "title": "Constitución Política de la República de Panamá (texto único de 2004, edición de 2016)",
+   "publisher": "Ministerio Público, Procuraduría General de la Nación",
+   "url": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf",
+   "kind": "official_body",
+   "note": "The Procuraduría's 2016 edition of the texto único published in Gaceta Oficial 25176 of 15 November 2004 (the 1972 Constitution as reformed in 1978, 1983, 1993, 1994, and 2004)."
+  },
+  "codigo_electoral": {
+   "title": "Acuerdo 7-1 de 15 de febrero de 2022, por el que se aprueba el Texto Único del Código Electoral",
+   "publisher": "Gaceta Oficial de la República de Panamá",
+   "url": "https://www.gacetaoficial.gob.pa/pdfTemp/29482_A/90301.pdf",
+   "kind": "official_body",
+   "note": "Gaceta Oficial 29482-A; amended by Law 356 of 1 February 2023 (Gaceta Oficial 29713-B) and by Law 403 of 13 October 2023."
+  },
+  "te_generales": {
+   "title": "Eventos electorales: Elecciones Generales 1994-2024",
+   "publisher": "Tribunal Electoral de Panamá",
+   "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+   "kind": "official_body"
+  },
+  "da_presidente2024": {
+   "title": "TE - Elecciones Generales - Presidente - 2024 (Cuadro No. 1)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/f50c57bb-e115-4b64-93f8-0a623207c095/resource/2fe06acf-6696-4d55-84c0-1fe03ea836f0/download/cuadro-01-presidente-3-2.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_diputados2024": {
+   "title": "TE - Proclamados - Diputados - 2024 (Cuadro No. 6)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/8c4c4aef-f154-4f83-86a8-ed261afab29a/resource/9eee83e4-4928-4350-9a55-98cbbc1b23e2/download/cuadro-06-diputado-proclamados.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_curules2024": {
+   "title": "TE - Curules - Diputados - 2024 (Cuadro No. 7)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/2ece770c-024f-437e-ae81-7b210cd542fd/resource/f839d11d-862d-457d-b51f-3973ac87e266/download/cuadro-07-diputado-curules.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_alcaldes2024": {
+   "title": "TE - Elecciones Generales - Alcaldes - 2024 (Cuadro No. 8)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/31b60ba4-3258-4ff0-b694-b30ddad84e68/resource/47617ab4-f4dc-4d09-bd26-48b94d80ce0f/download/cuadro-08-alcalde-pp.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_alcaldes_proc2024": {
+   "title": "TE - Proclamados - Alcaldes - 2024 (Cuadro No. 10)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/329a411a-07ae-47c7-b4fd-8845e4a01040/resource/a22562c8-c8f3-4664-bb35-9c335aad820a/download/cuadro-10-alcaldes-proclamados.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_representantes2024": {
+   "title": "TE - Elecciones Generales - Representantes - 2024 (Cuadro No. 11)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/5a7c4003-e18d-4a48-80ef-5199db91ee9d/resource/e08b2a51-087d-42bd-98e2-b9a2c9adeed4/download/cuadro-11-representantes-pp.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_representantes_proc2024": {
+   "title": "TE - Proclamados - Representantes - 2024 (Cuadro No. 13)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/bc2d1bae-f82c-4115-b549-81cd14fd1e46/resource/eacf99a3-d823-4727-b79e-3ff7f461fdc4/download/cuadro-13-representantes-proclamados.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_concejales2024": {
+   "title": "TE - Proclamados - Concejal - 2024 (Cuadro No. 16)",
+   "publisher": "Tribunal Electoral de Panamá (Portal de Datos Abiertos de Panamá)",
+   "url": "https://www.datosabiertos.gob.pa/dataset/2c144de6-f27c-49de-b42b-4308bb901386/resource/8f15014c-dbcf-4226-aa5f-80145a48bca1/download/cuadro-16-concejal-proclamados-1.csv",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "da_te": {
+   "title": "Tribunal Electoral: conjuntos de datos",
+   "publisher": "Portal de Datos Abiertos de Panamá",
+   "url": "https://www.datosabiertos.gob.pa/organization/tribunal-electoral",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "go_referendum2006": {
+   "title": "Gaceta Oficial 25676: proclamación de los resultados del referéndum del 22 de octubre de 2006",
+   "publisher": "Gaceta Oficial de la República de Panamá",
+   "url": "https://www.gacetaoficial.gob.pa/storage/gacetas/2006/11/25676/2027.pdf",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "República de Panamá",
+   "name_en": "Republic of Panama",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2004-11-15",
+     "value": 1,
+     "source": "constitucion",
+     "locator": "Constitution art. 1 (texto único, Gaceta Oficial 25176 of 15 November 2004)"
+    }
+   ]
+  },
+  {
+   "key": "provincia",
+   "name": "Provincias y comarcas de nivel provincial",
+   "name_en": "Provinces and province-level indigenous comarcas",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "pa.provincia",
+   "elects": false,
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2024-05-05",
+     "value": 13,
+     "source": "da_alcaldes2024",
+     "locator": "Cuadro No. 8 province rows Bocas del Toro, Coclé, Colón, Chiriquí, Darién, Herrera, Los Santos, Panamá, Veraguas, Comarca Emberá, Comarca Ngäbe Buglé, and Panamá Oeste (12), with Comarca Kuna Yala, which has no district or mayor, from Cuadro No. 1 (circuits 10.1 and 10.2): 10 provinces and 3 comarcas"
+    }
+   ]
+  },
+  {
+   "key": "circuito",
+   "name": "Circuitos electorales",
+   "name_en": "Electoral circuits, the constituencies of the National Assembly",
+   "parent": "provincia",
+   "scheme": "pa.circuito",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2024-05-05",
+     "value": 39,
+     "source": "da_diputados2024",
+     "locator": "Cuadro No. 6, rows 1.1 to 13.4: 39 electoral circuits, 26 \"Uninominal\" and 13 \"Plurinominal (n)\", whose seats sum to 71; Cuadro No. 1 lists the same 39 circuits under Bocas del Toro, Coclé, Colón, Chiriquí, Darién, Herrera, Los Santos, Panamá, Veraguas, Comarca Kuna Yala, Comarca Ngäbe Buglé, and Panamá Oeste"
+    }
+   ]
+  },
+  {
+   "key": "distrito",
+   "name": "Distritos (municipios)",
+   "name_en": "Districts and their municipalities",
+   "parent": "provincia",
+   "polity_kind": "municipality",
+   "scheme": "pa.distrito",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2024-05-05",
+     "value": 81,
+     "source": "da_alcaldes_proc2024",
+     "locator": "Cuadro No. 10, \"VOTOS OBTENIDOS POR ALCALDES PROCLAMADOS, SEGÚN DISTRITO\": 81 district rows with a proclaimed mayor (Bocas del Toro 4, Coclé 6, Colón 6, Chiriquí 14, Darién 3, Herrera 7, Los Santos 7, Panamá 6, Veraguas 12, Comarca Emberá 2, Comarca Ngäbe Buglé 9, Panamá Oeste 5)"
+    }
+   ]
+  },
+  {
+   "key": "corregimiento",
+   "name": "Corregimientos",
+   "name_en": "Corregimientos",
+   "parent": "distrito",
+   "polity_kind": "submunicipal",
+   "scheme": "pa.corregimiento",
+   "source": "constitucion",
+   "counts": [
+    {
+     "date": "2024-05-05",
+     "value": 701,
+     "source": "da_representantes_proc2024",
+     "locator": "Cuadro No. 13, \"VOTOS OBTENIDOS POR REPRESENTANTES PROCLAMADOS EN LA REPÚBLICA, SEGÚN CORREGIMIENTO\": 701 corregimiento rows with a proclaimed representative, including the corregimientos of Comarca Kuna Yala, which lie in no district"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Presidente y Vicepresidente de la República",
+   "name_en": "President and vice president",
+   "category": "executive",
+   "goal": "national",
+   "valid_from": "1983-04-24",
+   "first_held": "1984-05-06",
+   "earliest_record": "1994-05-08",
+   "measure": {
+    "schemes": [
+     "pa.provincia"
+    ],
+    "fine": [
+     "pa.circuito"
+    ]
+   },
+   "finest_note": "Votes by electoral circuit, with special and early-vote tables, in the Tribunal's general election tables 1994-2024; the 2024 open-data table adds voting centers and polling tables by circuit.",
+   "note": "Elected by direct popular vote and simple plurality for five years on one ticket with a vice president (two vice presidents until the 2004 reform); no re-election for the two following terms (Constitution arts. 177 and 178). Elections fall on the first Sunday of May every five years, with the Assembly, mayors, and representatives. The 1984 election was the first direct presidential vote since 1968; the 1989 election was annulled by the Tribunal of the day. Presidents before 1968 are the abolished class presidente_1904; those chosen in 1972 and 1978 by the Asamblea Nacional de Representantes de Corregimientos are in asamblea_representantes.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 177 and 178)",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PA",
+     "valid_from": "1983-04-24"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1983-04-24",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 177 and 178)",
+     "runoff": "none",
+     "vacancy_rule": "The vice president completes the term; if both offices fall vacant, the Assembly elects a successor from its members (Constitution art. 189)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales: Elecciones Generales 1994-2024",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+     "format": "pdf, xls",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1994-05-08",
+     "last_date": "2024-05-05",
+     "source": "te_generales",
+     "finest": "pa.circuito",
+     "evidence": "Presidential tables by province, comarca, and circuit for each general election 1994-2024; the site answers 403 to scripted requests"
+    },
+    {
+     "platform": "Portal de Datos Abiertos de Panamá, Tribunal Electoral: Elecciones Generales - Presidente 2024",
+     "url": "https://www.datosabiertos.gob.pa/dataset/f50c57bb-e115-4b64-93f8-0a623207c095/resource/2fe06acf-6696-4d55-84c0-1fe03ea836f0/download/cuadro-01-presidente-3-2.csv",
+     "format": "csv, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "CC0 1.0",
+     "first_date": "2024-05-05",
+     "last_date": "2024-05-05",
+     "finest": "pa.circuito",
+     "source": "da_presidente2024",
+     "evidence": "Voting centers, polling tables, registered, cast, valid, blank, and null votes by circuit (Cuadro 1) and votes by ticket (Cuadro 2) for 5 May 2024"
+    }
+   ],
+   "est_votes": 15000000,
+   "effort": 2
+  },
+  {
+   "key": "asamblea",
+   "tier": "circuito",
+   "name": "Diputados a la Asamblea Nacional",
+   "name_en": "National Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1983-04-24",
+   "first_held": "1984-05-06",
+   "earliest_record": "1994-05-08",
+   "measure": {
+    "schemes": [
+     "pa.circuito"
+    ],
+    "fine": [
+     "pa.distrito",
+     "pa.corregimiento"
+    ]
+   },
+   "finest_note": "Votes by party and candidate by circuit in the Tribunal's tables; 2024 open data adds proclaimed deputies and their type of proclamation (quotient, half quotient, remainder, most voted).",
+   "note": "Unicameral, called the Asamblea Legislativa until the 2004 reform. Seventy-one deputies since 2009 (Constitution art. 147), with 67 in 1984 and 1989, 72 in 1994, 71 in 1999, and 78 in 2004; elected for five years on the presidential ballot day (art. 148) in single-member circuits by plurality and multi-member circuits by quotient, half quotient, and remainder, each deputy with a personal alternate. In 2024 there were 26 single-member and 13 multi-member circuits. The 1991 partial elections replaced deputies of circuits whose 1989 results had been annulled.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 146-148)",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PA",
+     "valid_from": "1983-04-24"
+    }
+   ],
+   "contests_per_unit": 1,
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1983-04-24",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 147 and 148)",
+     "vacancy_rule": "The personal alternate elected with the deputy takes the seat (Constitution art. 147); parties may revoke their deputies' mandates (art. 151)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales: Elecciones Generales 1994-2024",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+     "format": "pdf, xls",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1994-05-08",
+     "last_date": "2024-05-05",
+     "source": "te_generales",
+     "finest": "pa.circuito",
+     "evidence": "Deputy tables by circuit, party, and candidate for each general election 1994-2024"
+    },
+    {
+     "platform": "Portal de Datos Abiertos de Panamá, Tribunal Electoral: Elecciones Generales - Diputados 2024",
+     "url": "https://www.datosabiertos.gob.pa/dataset/8c4c4aef-f154-4f83-86a8-ed261afab29a/resource/9eee83e4-4928-4350-9a55-98cbbc1b23e2/download/cuadro-06-diputado-proclamados.csv",
+     "format": "csv, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "CC0 1.0",
+     "first_date": "2024-05-05",
+     "last_date": "2024-05-05",
+     "finest": "pa.circuito",
+     "source": "da_diputados2024",
+     "evidence": "Votes by party and by candidate (Cuadros 4 and 5), proclaimed deputies (Cuadro 6), and seats by type of proclamation (Cuadro 7) for 5 May 2024"
+    }
+   ],
+   "est_votes": 14000000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "1984-01-01",
+     "precision": "year",
+     "through": "2019-12-31",
+     "note": "General elections of the 1983 Constitution before 2024 (1984, 1989, 1994, 1999, 2004, 2009, 2014, and 2019); the Tribunal's results page covers 1994 on, and its open-data portal holds only 2024, so contest counts are not yet taken from an official table."
+    },
+    {
+     "date": "2024-05-05",
+     "election_kind": "general",
+     "contests": 39,
+     "seats": 71,
+     "source": "da_diputados2024",
+     "quote": "Cuadro No. 6, rows 1.1 to 13.4: 39 electoral circuits, 26 \"Uninominal\" and 13 \"Plurinominal (n)\", whose seats sum to 71; Cuadro No. 1 lists the same 39 circuits under Bocas del Toro, Coclé, Colón, Chiriquí, Darién, Herrera, Los Santos, Panamá, Veraguas, Comarca Kuna Yala, Comarca Ngäbe Buglé, and Panamá Oeste"
+    }
+   ]
+  },
+  {
+   "key": "parlacen",
+   "tier": "national",
+   "name": "Diputados al Parlamento Centroamericano",
+   "name_en": "Central American Parliament",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Panama's twenty deputies to the Central American Parliament, each with an alternate, are proclaimed by the Tribunal's national count board after each general election from party lists, allotted by the votes their parties won for president; there is no separate ballot. The Supreme Court has since struck down the closed national list used to allot them.",
+   "source": "codigo_electoral",
+   "match": [
+    {
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "locator": "https://www.gacetaoficial.gob.pa/pdfTemp/29482_A/90301.pdf"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 2
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referéndum nacional",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "1972-10-11",
+   "first_held": "1977-10-23",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "pa.provincia"
+    ],
+    "fine": [
+     "pa.circuito"
+    ]
+   },
+   "note": "Constitutional reforms passed by two consecutive legislatures go to a referendum three to six months later (Constitution art. 313(2)); a new constitution adopted by a parallel constituent assembly goes to a referendum (art. 314); canal treaties, a third set of locks, a sea-level canal, or any new canal go to a national referendum (art. 325). Held on 23 October 1977 (the canal treaties), 24 April 1983 (constitutional reforms), 15 November 1992 (constitutional reforms, rejected), 30 August 1998 (presidential re-election, rejected), and 22 October 2006 (canal expansion, approved).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 313, 314, and 325)",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 313, 314, and 325)",
+     "called": true,
+     "partisan": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1972-10-11"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "source": "te_generales",
+     "evidence": "The Tribunal's site answers 403 to scripted requests; whether it holds the referendum tables is unverified"
+    }
+   ],
+   "est_votes": 4000000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "1977-10-23",
+     "election_kind": "referendum",
+     "note": "Torrijos-Carter canal treaties."
+    },
+    {
+     "date": "1983-04-24",
+     "election_kind": "referendum",
+     "note": "Constitutional reforms of 1983."
+    },
+    {
+     "date": "1992-11-15",
+     "election_kind": "referendum",
+     "note": "Constitutional reforms, rejected."
+    },
+    {
+     "date": "1998-08-30",
+     "election_kind": "referendum",
+     "note": "Reform allowing immediate presidential re-election, rejected."
+    },
+    {
+     "date": "2006-10-22",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "go_referendum2006",
+     "quote": "Votantes: 924,029; Votos SÍ: 705,284; Votos NO: 201,105; Votos en blanco: 9,967; Votos nulos: 7,673",
+     "note": "Expansion of the canal with a third set of locks, called by Law 28 of 17 July 2006."
+    }
+   ]
+  },
+  {
+   "key": "constituyente_paralela",
+   "tier": "national",
+   "name": "Asamblea Constituyente Paralela",
+   "name_en": "Parallel constituent assembly",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2004-11-15",
+   "measure": {
+    "schemes": [
+     "pa.provincia"
+    ]
+   },
+   "note": "Sixty constituents elected in proportion to the electorate of every province and comarca, with party and independent candidacies, under a system the Tribunal sets in its call, when the Executive with the Assembly's ratification, two thirds of the Assembly, or 20 percent of registered electors call one (Constitution art. 314). None has been elected.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 314)",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PA",
+     "valid_from": "2004-11-15"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 314)",
+     "called": true,
+     "partisan": true,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "2004-11-15"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 3
+  },
+  {
+   "key": "asamblea_representantes",
+   "tier": "corregimiento",
+   "name": "Asamblea Nacional de Representantes de Corregimientos",
+   "name_en": "National Assembly of Corregimiento Representatives (1972-1983)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1972-08-06",
+   "valid_to": "1984-10-11",
+   "first_held": "1972-08-06",
+   "measure": {
+    "schemes": [
+     "pa.corregimiento"
+    ]
+   },
+   "note": "Under the original 1972 Constitution, the 505 representatives elected one per corregimiento on 6 August 1972 and again on 6 August 1978 formed the national assembly, which chose the president and vice president. The 1983 reforms replaced it with the Asamblea Legislativa. The representatives' own local office continues as the class representante, which carries those elections; this class holds the assembly's indirect presidential votes.",
+   "source": "constitucion",
+   "match": [
+    {
+     "body_kinds": [
+      "electoral_college"
+     ],
+     "iso_pattern": "PA",
+     "valid_to": "1984-10-11"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "The Tribunal publishes no results for the 1972 and 1978 elections or the assembly's votes on its results pages, which begin in 1994.",
+   "est_votes": 1200000,
+   "effort": 5,
+   "dates": [
+    {
+     "date": "1972-08-06",
+     "election_kind": "general"
+    },
+    {
+     "date": "1978-08-06",
+     "election_kind": "general"
+    }
+   ]
+  },
+  {
+   "key": "consejo_legislacion_1980",
+   "tier": "national",
+   "name": "Consejo Nacional de Legislación (miembros electos)",
+   "name_en": "Elected members of the National Legislative Council (1980)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1978-10-05",
+   "valid_to": "1983-04-24",
+   "first_held": "1980-09-28",
+   "measure": {
+    "schemes": [
+     "pa.provincia"
+    ]
+   },
+   "note": "The 1978 constitutional reform added members elected by popular vote to the National Legislative Council; they were elected on 28 September 1980 alongside members chosen by the representatives' assembly. Abolished by the 1983 reforms.",
+   "source": "constitucion",
+   "match": [
+    {
+     "body_kinds": [
+      "appointed_assembly"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No official results for the 1980 election are published by the Tribunal Electoral.",
+   "est_votes": 400000,
+   "effort": 5,
+   "dates": [
+    {
+     "date": "1980-09-28",
+     "election_kind": "general"
+    }
+   ]
+  },
+  {
+   "key": "presidente_1904",
+   "tier": "national",
+   "name": "Presidente de la República (1904-1968)",
+   "name_en": "President under the 1904, 1941, and 1946 constitutions",
+   "category": "executive",
+   "goal": "national",
+   "valid_from": "1903-11-03",
+   "valid_to": "1968-10-11",
+   "first_held": "1904-02-15",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The first president was chosen by the Convención Nacional Constituyente in 1904; presidents were then elected by popular vote every four years under the 1904 and 1941 constitutions and for four-year terms under the 1946 Constitution, the last on 12 May 1968 before the October 1968 coup.",
+   "source": "constitucion",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PA",
+     "valid_to": "1968-10-11"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "Run by the electoral boards of the time; the Tribunal Electoral publishes no results before 1994, so a source must be found in printed official records.",
+   "est_votes": 2500000,
+   "effort": 5,
+   "dates": [
+    {
+     "date": "1904-01-01",
+     "precision": "year",
+     "through": "1968-12-31",
+     "note": "Presidential elections of 1904-1968; dates and counts not yet taken from an official record."
+    }
+   ]
+  },
+  {
+   "key": "asamblea_1904",
+   "tier": "national",
+   "name": "Asamblea Nacional (1904-1968) y convenciones constituyentes",
+   "name_en": "National Assembly and constituent conventions before 1968",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1903-11-03",
+   "valid_to": "1968-10-11",
+   "measure": {
+    "schemes": [
+     "pa.provincia"
+    ]
+   },
+   "note": "The unicameral National Assembly elected by province under the 1904, 1941, and 1946 constitutions, with the constituent conventions of 1904 and 1945 (the latter elected on 6 May 1945). Dissolved after the October 1968 coup.",
+   "source": "constitucion",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PA",
+     "valid_to": "1968-10-11"
+    },
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PA",
+     "valid_to": "1968-10-11"
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No official results are published online for elections before 1994.",
+   "est_votes": 2000000,
+   "effort": 5,
+   "dates": [
+    {
+     "date": "1904-01-01",
+     "precision": "year",
+     "through": "1968-12-31",
+     "note": "Assembly and constituent elections of 1904-1968; dates and counts not yet taken from an official record."
+    }
+   ]
+  },
+  {
+   "key": "alcalde",
+   "tier": "distrito",
+   "name": "Alcaldes y vicealcaldes",
+   "name_en": "Mayors",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "1994-05-08",
+   "earliest_record": "1994-05-08",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "pa.corregimiento"
+    ]
+   },
+   "finest_note": "Votes by party by district in the Tribunal's tables 1994-2024; candidate votes by district in the 2024 open data.",
+   "note": "Each district elects a mayor, head of the municipal administration, and a deputy mayor by direct popular vote and plurality for five years (Constitution art. 241), on the general election day. The 1994 general election is the earliest in the Tribunal's published tables with mayoral results for every district. Comarca Kuna Yala has no districts and elects no mayor.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 241)",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1994-01-01",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 241)",
+     "vacancy_rule": "The deputy mayor elected with the mayor completes the term (Constitution art. 241)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales: Elecciones Generales 1994-2024",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+     "format": "pdf, xls",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1994-05-08",
+     "last_date": "2024-05-05",
+     "source": "te_generales",
+     "finest": "pa.distrito",
+     "evidence": "Mayoral tables by district for each general election 1994-2024"
+    },
+    {
+     "platform": "Portal de Datos Abiertos de Panamá, Tribunal Electoral: Elecciones Generales - Alcaldes 2024",
+     "url": "https://www.datosabiertos.gob.pa/dataset/31b60ba4-3258-4ff0-b694-b30ddad84e68/resource/47617ab4-f4dc-4d09-bd26-48b94d80ce0f/download/cuadro-08-alcalde-pp.csv",
+     "format": "csv, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "CC0 1.0",
+     "first_date": "2024-05-05",
+     "last_date": "2024-05-05",
+     "finest": "pa.distrito",
+     "source": "da_alcaldes2024",
+     "evidence": "Votes by party (Cuadro 8), by candidate (Cuadro 9), and proclaimed mayors (Cuadro 10) by district for 5 May 2024"
+    }
+   ],
+   "est_votes": 12000000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "through": "2019-12-31",
+     "note": "Mayoral elections with the general elections of 1994-2019; counts not yet taken from an official table."
+    },
+    {
+     "date": "2024-05-05",
+     "election_kind": "general",
+     "contests": 81,
+     "seats": 81,
+     "source": "da_alcaldes_proc2024",
+     "quote": "Cuadro No.10 VOTOS OBTENIDOS POR ALCALDES PROCLAMADOS, SEGÚN DISTRITO: ELECCIÓN GENERAL DEL 5 DE MAYO DE 2024; 81 district rows"
+    }
+   ]
+  },
+  {
+   "key": "representante",
+   "tier": "corregimiento",
+   "name": "Representantes de Corregimiento",
+   "name_en": "Corregimiento representatives",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "1972-08-06",
+   "first_held": "1972-08-06",
+   "earliest_record": "1994-05-08",
+   "measure": {
+    "unit": "polity"
+   },
+   "finest_note": "Votes by party by corregimiento in the Tribunal's tables 1994-2024; candidate votes by corregimiento in the 2024 open data.",
+   "note": "Each corregimiento elects a representative and alternate by direct popular vote for five years, with indefinite re-election (Constitution art. 225). The representative presides over the junta comunal (art. 251) and sits on the district's municipal council (art. 237) and the provincial council (art. 254). Elected separately in 1972 and 1978, and with the general elections since 1984.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 225, 237, 251, and 254)",
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "other"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1983-04-24",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 225)",
+     "vacancy_rule": "The alternate takes office; if both seats fall vacant, an election is held within six months (Constitution art. 228). Recall is provided by law (art. 227)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales: Elecciones Generales 1994-2024",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+     "format": "pdf, xls",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1994-05-08",
+     "last_date": "2024-05-05",
+     "source": "te_generales",
+     "finest": "pa.corregimiento",
+     "evidence": "Representative tables by corregimiento for each general election 1994-2024"
+    },
+    {
+     "platform": "Portal de Datos Abiertos de Panamá, Tribunal Electoral: Elecciones Generales - Representantes 2024",
+     "url": "https://www.datosabiertos.gob.pa/dataset/5a7c4003-e18d-4a48-80ef-5199db91ee9d/resource/e08b2a51-087d-42bd-98e2-b9a2c9adeed4/download/cuadro-11-representantes-pp.csv",
+     "format": "csv, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "CC0 1.0",
+     "first_date": "2024-05-05",
+     "last_date": "2024-05-05",
+     "finest": "pa.corregimiento",
+     "source": "da_representantes2024",
+     "evidence": "Votes by party (Cuadro 11), by candidate (Cuadro 12), and proclaimed representatives (Cuadro 13) by corregimiento for 5 May 2024"
+    }
+   ],
+   "est_votes": 13000000,
+   "effort": 3,
+   "dates": [
+    {
+     "date": "1972-01-01",
+     "precision": "year",
+     "through": "2019-12-31",
+     "note": "Representative elections of 1972 and 1978 and with the general elections of 1984-2019; counts not yet taken from an official table."
+    },
+    {
+     "date": "2024-05-05",
+     "election_kind": "general",
+     "contests": 701,
+     "seats": 701,
+     "source": "da_representantes_proc2024",
+     "quote": "Cuadro No.13 VOTOS OBTENIDOS POR REPRESENTANTES PROCLAMADOS EN LA REPÚBLICA, SEGÚN CORREGIMIENTO: ELECCIÓN GENERAL DEL 5 DE MAYO DE 2024; 701 corregimiento rows"
+    }
+   ]
+  },
+  {
+   "key": "concejal",
+   "tier": "distrito",
+   "name": "Concejales",
+   "name_en": "Elected municipal councilors",
+   "category": "council",
+   "goal": "local",
+   "earliest_record": "1994-05-08",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pa.corregimiento"
+    ]
+   },
+   "finest_note": "Votes by party and candidate by district in the Tribunal's tables; 2024 open data gives proclaimed councilors.",
+   "note": "The municipal council is made up of the district's corregimiento representatives; where a district has fewer than five corregimientos, councilors are elected by direct popular vote and proportional representation to bring the council to five (Constitution art. 237). In 2024 this applied to Omar Torrijos Herrera, Taboga, Cémaco, and Sambú, which elected 11 councilors.",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 237)",
+   "match": [
+    {
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitucion",
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "day_rule": "may_first_sunday",
+     "term_years": 5,
+     "partisan": true,
+     "called": false,
+     "administered_by": "Tribunal Electoral",
+     "valid_from": "1983-04-24",
+     "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 237)",
+     "vacancy_rule": "Filled by the councilor's alternate."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales: Elecciones Generales 1994-2024",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/elecciones-generales-1994-2024/",
+     "format": "pdf, xls",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "1994-05-08",
+     "last_date": "2024-05-05",
+     "source": "te_generales",
+     "finest": "pa.distrito",
+     "evidence": "Councilor tables by district for each general election 1994-2024"
+    },
+    {
+     "platform": "Portal de Datos Abiertos de Panamá, Tribunal Electoral: Proclamados - Concejal 2024",
+     "url": "https://www.datosabiertos.gob.pa/dataset/2c144de6-f27c-49de-b42b-4308bb901386/resource/8f15014c-dbcf-4226-aa5f-80145a48bca1/download/cuadro-16-concejal-proclamados-1.csv",
+     "format": "csv, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "license": "CC0 1.0",
+     "first_date": "2024-05-05",
+     "last_date": "2024-05-05",
+     "finest": "pa.distrito",
+     "source": "da_concejales2024",
+     "evidence": "Votes by party (Cuadro 14), by candidate (Cuadro 15), and proclaimed councilors (Cuadro 16) for 5 May 2024"
+    }
+   ],
+   "est_votes": 60000,
+   "effort": 2,
+   "dates": [
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "through": "2019-12-31",
+     "note": "Councilor elections with the general elections of 1994-2019; counts not yet taken from an official table."
+    },
+    {
+     "date": "2024-05-05",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 11,
+     "source": "da_concejales2024",
+     "quote": "Cuadro No.16 VOTOS OBTENIDOS POR CONCEJALES PROCLAMADOS, SEGÚN DISTRITO: Omar Torrijos Herrera (2), Taboga (2), Cémaco (2), Sambú (3); 11 proclaimed councilors"
+    }
+   ]
+  },
+  {
+   "key": "referendum_municipal",
+   "tier": "distrito",
+   "name": "Referéndum e iniciativa municipal",
+   "name_en": "Municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "1972-10-11",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Citizens hold the rights of initiative and referendum on matters assigned to the municipal councils (Constitution art. 239), and two or more municipalities may merge or associate by popular initiative and council vote (art. 238).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 238 and 239)",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "PA",
+     "schemes": [
+      "pa.distrito"
+     ]
+    }
+   ],
+   "disposition": "blocked",
+   "disposition_reason": "No municipal referendum is listed among the Tribunal's electoral events or open datasets; any held would need the municipality's own records.",
+   "est_votes": 0,
+   "effort": 4
+  },
+  {
+   "key": "primarias",
+   "tier": "national",
+   "name": "Elecciones primarias de los partidos políticos",
+   "name_en": "Party primaries",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties choose candidates for president and other posts in primaries held before each general election under the Código Electoral, with the Tribunal Electoral's organization and support; candidates by free nomination qualify by signatures instead.",
+   "source": "codigo_electoral",
+   "match": [
+    {
+     "election_kinds": [
+      "primary"
+     ],
+     "iso_pattern": "PA*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Tribunal Electoral, Eventos electorales",
+     "url": "https://www.tribunal-electoral.gob.pa/eventos-electorales/",
+     "format": "pdf",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "source": "te_generales",
+     "evidence": "The site answers 403 to scripted requests; the open-data portal has no primary datasets"
+    }
+   ],
+   "est_votes": 1500000,
+   "effort": 4
+  },
+  {
+   "key": "revocatoria",
+   "tier": "national",
+   "name": "Revocatoria de mandato",
+   "name_en": "Recall of deputies and representatives",
+   "category": "direct_democracy",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties may revoke the mandates of their own deputies by internal procedure (Constitution art. 151), and the law provides recall of corregimiento representatives (art. 227(3)).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 151 and 227)",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Party recalls are internal party decisions, not public ballots, and no popular recall vote is published by the Tribunal Electoral."
+  },
+  {
+   "key": "juntas_comunales",
+   "tier": "corregimiento",
+   "name": "Miembros de las Juntas Comunales",
+   "name_en": "Community board members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Each junta comunal has the representative and four residents chosen as the law determines (Constitution art. 251).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 251)",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "PA",
+     "name_pattern": "junta comunal"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "The four members are chosen in community assemblies, not on a ballot the Tribunal runs or publishes."
+  },
+  {
+   "key": "autoridades_comarcales",
+   "tier": "provincia",
+   "name": "Caciques y congresos comarcales",
+   "name_en": "Indigenous comarca chiefs and congresses",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The comarcas' general congresses and caciques are chosen under each comarca's organic law and charter (the law may create special regimes, Constitution art. 5).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (art. 5)",
+   "match": [
+    {
+     "office_kinds": [
+      "other"
+     ],
+     "iso_pattern": "PA",
+     "name_pattern": "cacique"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Customary authorities chosen in the comarcas' own congresses; the Tribunal publishes no results for them."
+  },
+  {
+   "key": "gobernador",
+   "tier": "provincia",
+   "name": "Gobernadores y Concejos Provinciales",
+   "name_en": "Governors and provincial councils",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Governors are freely appointed and removed by the Executive (Constitution art. 252); provincial councils are made up of the province's corregimiento representatives (art. 254).",
+   "source": "constitucion",
+   "locator": "https://ministeriopublico.gob.pa/wp-content/uploads/2016/09/constitucion-politica-con-indice-analitico.pdf (arts. 252 and 254)",
+   "match": [
+    {
+     "office_kinds": [
+      "governor"
+     ],
+     "iso_pattern": "PA"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Not elected: governors are appointed and provincial councils sit ex officio."
+  },
+  {
+   "key": "magistrados",
+   "tier": "national",
+   "name": "Magistrados de la Corte Suprema y del Tribunal Electoral",
+   "name_en": "Supreme Court and Electoral Tribunal magistrates",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Supreme Court magistrates are appointed by the Cabinet Council and approved by the Assembly; the Tribunal Electoral's three magistrates are designated one each by the Legislative, Executive, and Judicial branches.",
+   "source": "constitucion",
+   "match": [
+    {
+     "office_kinds": [
+      "other"
+     ],
+     "iso_pattern": "PA",
+     "name_pattern": "magistrad"
+    }
+   ],
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed, not elected."
+  }
+ ]
+}
