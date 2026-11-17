@@ -154,6 +154,7 @@ class Station:
     votes: dict[str, int] = field(default_factory=dict)  # ballot name -> votes
     figures: dict[int, int] = field(default_factory=dict)  # measure -> count
     flags: int = 0
+    scheme: str = "xk.vendvotimi"
 
 
 @dataclass
@@ -686,10 +687,21 @@ def dec_2010() -> Count:
 
 # Parties.
 
-INDEPENDENTS = {"esmirkasi", "hasangashi", "nedzmidinsejdilar", "fatmirbytyqi"}
+INDEPENDENTS = {
+    "esmirkasi",
+    "hasangashi",
+    "nedzmidinsejdilar",
+    "fatmirbytyqi",
+    "naserkuka",
+    "cemilluma",
+    "latifkryeziu",
+    "xhevdetrexhaj",
+    "xuncetta",
+}
+BLOC_KEYS = {"lddpshdk", "vakat"}
 MERGED = {
-    "pdk": ("pdk", "partiademokratikeekosovespdk", "partiademokratikeekosoves"),
-    "ldk": ("ldk", "lidhjademokratikeekosovesldk", "lidhjademokratikeekosoves"),
+    "pdk": ("pdk", "pdkpartiademokratikeekosoves", "partiademokratikeekosovespdk", "partiademokratikeekosoves"),
+    "ldk": ("ldk", "ldklidhjademokratikeekosoves", "lidhjademokratikeekosovesldk", "lidhjademokratikeekosoves"),
     "vv": ("vetevendosje", "levizjavetevendosje"),
     "aak": (
         "aak",
@@ -699,23 +711,40 @@ MERGED = {
     ),
     "nisma": ("nismaperkosoven", "nismasocialdemokratenisma"),
     "srpska_lista": ("srpskalista", "gradanskainicijativasrpskalista"),
-    "samostalna_liberalna_stranka": ("sls", "samostalnaliberalnastranka"),
-    "vakat": ("vakat", "koalicijavakat"),
-    "kdtp": ("kdtp", "kosovademokratikturkpartisi", "kosovademokratikturkpartisikdtp"),
+    "samostalna_liberalna_stranka": ("sls", "samostalnaliberalnastrankasls", "samostalnaliberalnastranka"),
+    "akr": ("akr", "aleancakosovaere", "akraleancakosovaere"),
+    "gig": ("gig", "gradanskainicijativagore", "gradanskainicijativagoregig"),
+    "sns": ("sns", "srpskanarodnastrankasns"),
+    "skms": ("skms", "srpskakosovskometohijskastrankaskms"),
+    "sdskim": ("sdskim", "srpskademokratskastrankakosovaimetohijesdskim"),
+    "vakat": ("vakat", "koalicijavakat", "vakatkoalicijavakat"),
+    "kdtp": (
+        "kdtp",
+        "kdtpkosovademokratikturkpartisi",
+        "kosovademokratikturkpartisi",
+        "kosovademokratikturkpartisikdtp",
+    ),
     "irdk": ("irdk", "iniciativaeredemokratikeekosoves", "iniciativaeredemokratikeekosovesirdk"),
     "nds": ("nds", "novademokratskastranka", "novademokratskastrankands"),
     "ple": ("partialiberaleegjiptiane", "partialiberaleegjiptianeple"),
     "pai": ("pai", "partiaeashkalinjeveperintegrim", "partiaeashkalinjeveperintegrimpai"),
     "pdak": ("pdak", "partiademokratikeeashkanlivetekosoves", "partiademokratikeeashkanlivetekosovespdak"),
-    "prebk": ("prebk", "partiaromeebashkuarekosoves", "partiaromeebashkuarekosovesprebk"),
+    "lddpshdk": ("lddpshdk",),
+    "lkck": ("lkcklevizjakombetareperclirimineekosoves", "levizjakombetareperclirimineekosoveslkck"),
+    "prebk": (
+        "prebk",
+        "partiaromeebashkuarekosoves",
+        "partiaromeebashkuarekosovesprebk",
+        "prebkpartiaromeebashkuarekosoves",
+    ),
     "lprk": ("levizjaperparimtareeromevetekosoves", "levizjaperparimtareeromevetekosoveslprk"),
     "ythp": ("yenilikciturkhareketpartisi", "yenilikciturkhareketpartisiythp"),
     "gi_spo": ("zaslobodupravduiopstanak", "gizaslobodupravduiopstanakgispo"),
     "knrp": ("knrp", "kosovakineviromanipartia", "kosovakineviromanipartiaknrp"),
     "jgp": ("jedinstvenagoranskapartija", "jedinstvenagoranskapartijajgp"),
     "sdu": ("socijaldemokratskaunijasdu", "socialdemokratskaunijasdu"),
-    "bsdak": ("bsdak", "bosnjackastrankademokratskeakcijekosova"),
-    "sda": ("sda", "strankademokratskeakcije"),
+    "bsdak": ("bsdak", "bosnjackastrankademokratskeakcijekosova", "bsdakbosnjackastrankademokratskeakcijekosova"),
+    "sda": ("sda", "sdastrankademokratskeakcije", "strankademokratskeakcije"),
     "ktap": ("kosovaturkadaletpartisi", "kosovaadaletturkpartisi"),
     "pokret_za_gora": ("pokretzagora",),
 }
@@ -742,7 +771,7 @@ def party_key(name: str) -> tuple[str | None, str]:
             return key, "bloc"
     for key, forms in MERGED.items():
         if folded in forms:
-            return key, "party"
+            return key, "bloc" if key in BLOC_KEYS else "party"
     return folded, "bloc" if "koalic" in folded or "pdaklpb" in folded else "party"
 
 
@@ -758,6 +787,9 @@ ASSEMBLY = kqz.key("body", "assembly")
 SYSTEM_UNMIK = kqz.key("electoral_system", "assembly", "unmik")
 SYSTEM_LAW = kqz.key("electoral_system", "assembly", "law-2008")
 DAYS = (
+    "2001-11-17",
+    "2004-10-23",
+    "2007-11-17",
     "2010-12-12",
     "2014-06-08",
     "2017-06-11",
@@ -768,14 +800,17 @@ DAYS = (
     "2026-06-07",
 )
 LOADERS = {
-    "2010-12-12": dec_2010,
-    "2014-06-08": jun_2014,
-    "2017-06-11": jun_2017,
-    "2019-10-06": oct_2019,
-    "2021-02-14": feb_2021,
-    "2025-02-09": feb_2025,
-    "2025-12-28": dec_2025,
-    "2026-06-07": jun_2026,
+    "2001-11-17": "nov_2001",
+    "2004-10-23": "oct_2004",
+    "2007-11-17": "nov_2007",
+    "2010-12-12": "dec_2010",
+    "2014-06-08": "jun_2014",
+    "2017-06-11": "jun_2017",
+    "2019-10-06": "oct_2019",
+    "2021-02-14": "feb_2021",
+    "2025-02-09": "feb_2025",
+    "2025-12-28": "dec_2025",
+    "2026-06-07": "jun_2026",
 }
 SHAPE_NAMES = {
     "Municipality of Partesh": "36",
@@ -826,7 +861,7 @@ def party(name: str) -> str | None:
 
 @functools.cache
 def counts() -> dict[str, Count]:
-    return {day: loader() for day, loader in LOADERS.items()}
+    return {day: globals()[loader]() for day, loader in LOADERS.items()}
 
 
 def fetch_all() -> None:
@@ -932,9 +967,9 @@ def extend_registry(p: Package) -> None:
     names: dict[str, dict[str, str]] = defaultdict(dict)  # key -> day -> name
     kinds: dict[str, str] = {}
     for day, count in counts().items():
-        for name in count.printed:
+        for name in [*count.printed, *count.seats]:
             key, kind = party_key(name)
-            if key is not None:
+            if key is not None and name != OTHER_2004[0]:
                 names[key][day] = name
                 kinds[key] = kind
     for key, by_day in sorted(names.items()):
@@ -947,6 +982,7 @@ def extend_registry(p: Package) -> None:
 
 
 UNIT_KIND = {
+    "municipal": "aggregate",
     "regular": "standard",
     "conditional": "standard",
     "special": "mobile",
@@ -968,6 +1004,50 @@ METHOD = (
     "separate files, and the station votes add up to the national total of every entity. Entities stand on a single "
     "nationwide list; the elected members and the preference votes of candidates are not stored here."
 )
+
+
+NOTES = {
+    "2001-11-17": (
+        "The Commission's detailed table gives each entity's votes in the 30 municipalities of the time and in three "
+        "columns outside Kosovo: voting centers in Serbia, voting centers in Montenegro, and postal and special-needs "
+        "voting. Municipal boundaries were redrawn in 2008, so each municipality's unit is placed in the municipality "
+        "of today with the same name; the old municipality of Mitrovica spans two of today's and is placed in neither. "
+        "The ballot of the Povratak coalition is printed in Cyrillic and its name is transliterated here."
+    ),
+    "2004-10-23": (
+        "The Commission's published overall result is a set of charts that name ten lists and group the votes of all "
+        "the others. The lists that won set-aside seats among those others are stored with their seats and no votes, "
+        "and the grouped votes are stored as one option. The chart of regular seats abbreviates Koalicija Vakat as KV, "
+        "and the two are treated as one list. The result is held for the whole of Kosovo only."
+    ),
+    "2007-11-17": (
+        "The Commission's table gives each entity's votes in the 30 municipalities of the time, with conditional "
+        "ballots counted in the municipalities, and in a column of postal ballots. Municipal boundaries were redrawn "
+        "in 2008, so each municipality's unit is placed in the municipality of today with the same name; the old "
+        "municipality of Mitrovica spans two of today's and is placed in neither. The seats are read from the "
+        "Commission's chart of seats."
+    ),
+    "2010-12-12": (
+        "The Commission's station file covers the regular polling stations only. Votes cast outside them are stored as "
+        "one derived unit for each municipality, equal to the municipal table minus the stations, where the municipal "
+        "table is at least as large as the stations for every entity. The national table and the municipal tables "
+        "carry the date 30 January 2011."
+    ),
+    "2014-06-08": (
+        "The Commission's station file covers the regular polling stations and the conditional-ballot stations. "
+        "Postal ballots are published only for the whole of Kosovo and are stored as one unit. The Commission "
+        "recounted several stations on the Election Complaints and Appeals Panel's orders, and its national table "
+        "shows the result after the recount."
+    ),
+    "2021-02-14": (
+        "The Commission's station file covers the regular polling stations, the conditional-ballot stations (codes "
+        "starting CB), and the postal-ballot stations (codes starting BM)."
+    ),
+    "2019-10-06": (
+        "The Commission's station file covers the regular polling stations, the conditional-ballot stations (codes "
+        "starting CB), and the postal-ballot stations (codes starting BM)."
+    ),
+}
 
 
 def station_unit(day: str, code: str) -> str:
@@ -1096,7 +1176,7 @@ def election_package(day: str) -> Package:
         body_id=ASSEMBLY,
         magnitude=120,
         round_number=1,
-        electoral_system_id=SYSTEM_LAW,
+        electoral_system_id=SYSTEM_UNMIK if when < date(2008, 6, 15) else SYSTEM_LAW,
         default_result_kind="counted",
     )
     p.name(contest, "Assembly of Kosovo", "en", "official")
@@ -1117,23 +1197,34 @@ def election_package(day: str) -> Package:
     )
     p.add("note", id=kqz.key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
     options: dict[str, str] = {}
-    for name in count.printed:
-        option = options[name] = kqz.key("option", "assembly", day, fold_name(name))
+    for name in [*count.printed, *(n for n in count.seats if n not in count.printed)]:
+        option = options[name] = kqz.key("option", "assembly", day, fold_name(name) or name)
         key, _ = party_key(name)
         ballot = count.numbers.get(name)
+        other = name == OTHER_2004[0]
         p.add(
             "contest_option",
             id=option,
             contest_id=contest,
-            kind="candidate" if key is None else "list",
-            party_id=party(name),
+            kind="others" if other else ("candidate" if key is None else "list"),
+            party_id=None if other else party(name),
             ballot_position=int(ballot) if ballot else None,
             ballot_label=name,
         )
         seats = count.seats.get(name, 0)
         if seats:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
-        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=count.printed[name])
+        if name in count.printed:
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=count.printed[name])
+    if day in NOTES:
+        p.add(
+            "note",
+            id=kqz.key("note", result_set, "source"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=NOTES[day],
+            lang="en",
+        )
     if any(VALID in station.figures for station in count.stations.values()):
         p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=sum(count.printed.values()))
     caveats(p, count, result_set)
@@ -1142,13 +1233,15 @@ def election_package(day: str) -> Package:
     for station in sorted(count.stations.values(), key=lambda s: s.code):
         unit = station_unit(day, station.code)
         m = station.municipality
+        if when < date(2008, 6, 15) and m == "11":
+            m = None  # the old municipality of Mitrovica spans two of today's
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=kqz.KOSOVO,
-            scheme_code="xk.vendvotimi",
+            scheme_code=station.scheme,
             code=f"{day}:{station.code}",
-            area_relation="within" if m else "unlocated",
+            area_relation=("equals" if station.scheme == "xk.komuna" else "within") if m else "unlocated",
             area_id=kqz.municipality(m) if m else None,
             kind=UNIT_KIND[station.kind],
         )
@@ -1167,3 +1260,228 @@ def election_package(day: str) -> Package:
         facts.rows = rows
         p.frame("result_value", facts.frame().with_columns(flags=pl.lit(flags, pl.Int16)))
     return p
+
+
+def pdf_words(day: str, name: str) -> list[tuple[float, float, float, float, str]]:
+    """Every word of a one-page PDF with its box, from `pdftotext -bbox`."""
+    USED[day].add(name)
+    path = raw.cached(kqz.SOURCE, url(day, name)).path
+    out = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    found = re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>', out)
+    return [
+        (float(a), float(b), float(c), float(d), t.replace("&amp;", "&").replace("&quot;", '"'))
+        for a, b, c, d, t in found
+    ]
+
+
+def table_2007() -> tuple[dict[str, str], dict[str, list[int]]]:
+    """Each entity's ballot number and name, and its votes in the total column, the 30 municipalities, and by mail."""
+    words = pdf_words("2007-11-17", "6.-Rezultatet-e-subjekteve-sipas-komunave-2007.pdf")
+    lines: dict[int, list[tuple[float, float, str]]] = defaultdict(list)
+    for x0, y0, x1, _, text in words:
+        lines[round(y0)].append((x0, x1, text))
+    data = {
+        y: items
+        for y, items in ((y, sorted(items)) for y, items in lines.items())
+        if items[0][0] < 35 and re.fullmatch(r"\d+", items[0][2]) and sum(1 for i in items if i[0] > 150) >= 30
+    }
+    names: dict[int, list[str]] = {y: [] for y in data}
+    for y in sorted(lines):
+        if y in data:
+            names[y] += [t for x0, _, t in sorted(lines[y]) if 35 <= x0 < 168]
+        elif 170 < y < 530:
+            text = [t for x0, _, t in sorted(lines[y]) if x0 < 168]
+            if text:
+                near = min(sorted(data), key=lambda d: (abs(d - y), -d))
+                names[near] += text
+    # A line between two entities belongs to the one below it.
+    result: dict[str, str] = {}
+    votes: dict[str, list[int]] = {}
+    for y in sorted(data):
+        items = data[y]
+        ballot = items[0][2]
+        label = " ".join(names[y])
+        result[ballot] = kqz.clean(label)
+        votes[ballot] = [int(t) for x0, _, t in items if x0 > 150 and re.fullmatch(r"\d+", t)]
+    return result, votes
+
+
+SEATS_2007 = {
+    "71": 37,
+    "89": 25,
+    "61": 13,
+    "117": 11,
+    "76": 10,
+    "79": 3,
+    "50": 3,
+    "100": 3,
+    "99": 3,
+    "109": 3,
+    "86": 2,
+    "38": 1,
+    "95": 1,
+    "54": 1,
+    "41": 1,
+    "34": 1,
+    "31": 1,
+    "118": 1,
+}
+
+
+def nov_2007() -> Count:
+    day = "2007-11-17"
+    count = Count(day)
+    names, votes = table_2007()
+    for ballot, name in names.items():
+        count.printed[name] = votes[ballot][0]
+        count.numbers[name] = ballot
+        if ballot in SEATS_2007:
+            count.seats[name] = SEATS_2007[ballot]
+    for column in range(1, 32):
+        m = str(column) if column <= 30 else None
+        station = Station(
+            str(column) if m else "MAIL",
+            "municipal" if m else "postal",
+            m,
+            scheme="xk.komuna" if m else "xk.vendvotimi",
+        )
+        for ballot, name in names.items():
+            station.votes[name] = votes[ballot][column]
+        count.stations[station.code] = station
+    return count
+
+
+def table_2001() -> tuple[dict[str, str], dict[str, list[int]], dict[str, int]]:
+    """Each entity's ballot number and name, its votes in the 30 municipalities and the three out-of-Kosovo columns,
+    and its seats, from the one-page table of detailed results."""
+    day, name = "2001-11-17", "6.-Rezultatet-e-subjekteve-sipas-komunave-2001-1.pdf"
+    lines: dict[int, list[tuple[float, float, str]]] = defaultdict(list)
+    for x0, y0, x1, _, text in pdf_words(day, name):
+        lines[round(y0)].append((x0, x1, text.replace("\x0f", ",").replace("\x08", "%")))
+    ys = sorted(lines)
+    numeric = re.compile(r"[\d,]+")
+    heads = [
+        (y, sorted(lines[y]))
+        for y in ys
+        if min(lines[y])[0] < 40
+        and re.fullmatch(r"\d+", min(lines[y])[2])
+        and sum(1 for i in lines[y] if i[0] > 300) > 8
+    ]
+    edges = [x1 for x0, x1, t in heads[0][1] if x0 >= 300 and numeric.fullmatch(t)]
+    if len(edges) != 33:
+        raise ValueError(f"{name}: {len(edges)} columns in the first row")
+    names: dict[str, str] = {}
+    votes: dict[str, list[int]] = {}
+    seats: dict[str, int] = {}
+    for y, items in heads:
+        ballot, abbreviation = items[0][2], items[1][2]
+        columns: list[int | None] = [None] * 33
+        for x0, x1, t in items:
+            if x0 >= 300 and numeric.fullmatch(t):
+                columns[min(range(33), key=lambda k: abs(edges[k] - x1))] = int(t.replace(",", ""))
+        total = next(
+            int(t.replace(",", ""))
+            for y2 in ys
+            if y < y2 <= y + 4
+            for x0, _, t in lines[y2]
+            if 200 < x0 < 260 and numeric.fullmatch(t)
+        )
+        missing = [k for k, c in enumerate(columns) if c is None]
+        if missing or sum(c or 0 for c in columns) != total:
+            raise ValueError(f"{name}: entity {ballot} does not add up to its total {total}")
+        words = [t for x0, _, t in items if 70 <= x0 < 230 and not numeric.fullmatch(t)]
+        for y2 in ys:
+            if y < y2 <= y + 20 and not any(x0 < 40 for x0, _, _ in lines[y2]):
+                words += [
+                    t for x0, _, t in sorted(lines[y2]) if 70 <= x0 < 215 and not numeric.fullmatch(t) and "%" not in t
+                ]
+        label = kqz.clean(" ".join(words))
+        names[ballot] = label if label else abbreviation
+        votes[ballot] = [c or 0 for c in columns]
+        seat = [t for x0, _, t in items if 240 <= x0 < 305]
+        seats[ballot] = int(seat[-1]) if seat and seat[-1].isdigit() else 0
+        names[ballot] = f"{abbreviation} {names[ballot]}" if label else abbreviation
+    return names, votes, seats
+
+
+NAMES_2001 = {
+    "22": "KP KOALICIJA POVRATAK",
+    "34": "BSDAK BOŠNJAČKA STRANKA DEMOKRATSKE AKCIJE KOSOVA",
+    "35": "KDTP KOSOVA DEMOKRATİK TÜRK PARTİSİ",
+}
+
+
+def nov_2001() -> Count:
+    day = "2001-11-17"
+    count = Count(day)
+    names, votes, seats = table_2001()
+    for ballot, name in names.items():
+        name = NAMES_2001.get(ballot, name)
+        count.printed[name] = sum(votes[ballot])
+        count.numbers[name] = ballot
+        count.seats[name] = seats[ballot]
+        for column, value in enumerate(votes[ballot]):
+            if column < 30:
+                code, kind, m, scheme = str(column + 1), "municipal", str(column + 1), "xk.komuna"
+            else:
+                code, kind, m, scheme = (
+                    ("SE", "diplomatic", None, "xk.vendvotimi")
+                    if column == 30
+                    else (
+                        ("MN", "diplomatic", None, "xk.vendvotimi")
+                        if column == 31
+                        else ("MS", "postal", None, "xk.vendvotimi")
+                    )
+                )
+            station = count.stations.setdefault(code, Station(code, kind, m, scheme=scheme))
+            station.votes[name] = value
+    count.seats = {name: n for name, n in count.seats.items() if n}
+    return count
+
+
+NAMES_2004 = (
+    ("LDK", 313437, 47),
+    ("PDK", 199112, 30),
+    ("AAK", 57931, 9),
+    ("ORA", 43017, 7),
+    ("PSHDK", 12427, 2),
+    ("KDTP", 8353, 3),
+    ("PD", 7013, 1),
+    ("KOALICIJA VAKAT", 4972, 3),
+    ("LPK", 4526, 1),
+    ("PLK", 3542, 1),
+)
+SEATS_ONLY_2004 = (
+    ("SLKM", 8),
+    ("IRDK", 2),
+    ("GRAÐANSKA INCIJATIVA SRBIJA", 2),
+    ("PDAK", 1),
+    ("SDA", 1),
+    ("GIG", 1),
+    ("PREBK", 1),
+)
+OTHER_2004 = ("Other", 35759)
+
+
+def oct_2004() -> Count:
+    """The overall result as the Commission published it in charts: ten named lists, the lists with set-aside seats
+    that the chart leaves among the others, and the votes of all the others together."""
+    day = "2004-10-23"
+    count = Count(day)
+    for name in (
+        "1.-Rezultatet-e-përgjithshme-sipas-Subjekteve-2004.pdf",
+        "1.-Statistikat-e-përgjithshme-2004.pdf",
+        "1.1.-Shpërndarja-e-ulëseve-sipas-Subjekteve-Politike-2004.pdf",
+    ):
+        USED[day].add(name)
+    total = Station("TOTAL", "aggregate", None, scheme="xk.vendvotimi")
+    for name, votes, seats in NAMES_2004:
+        count.printed[name] = votes
+        count.seats[name] = seats
+        total.votes[name] = votes
+    for name, seats in SEATS_ONLY_2004:
+        count.seats[name] = seats
+    count.printed[OTHER_2004[0]] = OTHER_2004[1]
+    total.votes[OTHER_2004[0]] = OTHER_2004[1]
+    count.stations["TOTAL"] = total
+    return count
