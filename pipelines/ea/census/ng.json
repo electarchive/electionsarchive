@@ -1,0 +1,1673 @@
+{
+ "polity": "NG",
+ "name": "Nigeria",
+ "sources": {
+  "constitution": {
+   "title": "Constitution of the Federal Republic of Nigeria, 1999",
+   "publisher": "National Human Rights Commission",
+   "url": "https://nigeriarights.gov.ng/files/constitution.pdf",
+   "kind": "official_body",
+   "note": "The Commission's copy of the 1999 text as enacted, without the alterations of 2010-2023. Ss. 3 and First Schedule (36 states, 768 LGAs, and 6 FCT area councils), 7 (elected local government councils), 8 (referendums on new states and LGAs), 48-49 (Senate and House), 69 and 110 (recall), 71 and 112-115 (constituencies), 76-77, 116-117, 132-134, and 178-179 (elections), 91 (Houses of Assembly), 231 (judges appointed), and Third Schedule Part II, para. 4 (State Independent Electoral Commissions)."
+  },
+  "electoral_act": {
+   "title": "Electoral Act, 2026",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf",
+   "kind": "official_body",
+   "note": "Repeals the Electoral Act No. 13, 2022. Part IV (procedure at election, ss. 24-82), ss. 84-87 (party nominations by direct primaries or consensus), Part VI (FCT Area Council elections, ss. 103-117)."
+  },
+  "report_2019": {
+   "title": "Report of the 2019 General Election",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+   "kind": "official_body",
+   "note": "Table 1 (p. 3): 774 LGAs, 8,809 registration areas, 119,973 polling units, and the vacancies for President (1), Governor (29), Senate (109), House of Representatives (360), State Houses of Assembly (991), and the FCT (68). Table 2 (p. 17): end-of-tenure, off-cycle, re-run, and bye-elections 2015-2018. Annexures: national presidential votes per candidate and the declared winning party of every other constituency."
+  },
+  "pu_distribution": {
+   "title": "Distribution of Polling Units Nationwide",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/documents/resources/downloads/National-Distribution-of-PU-in-Nigeria.pdf",
+   "kind": "official_body",
+   "note": "Maps of polling units per state: 119,974 before the 2021 conversion of voting points, 56,872 voting points and settlements converted, 176,846 polling units after."
+  },
+  "about": {
+   "title": "About INEC: INEC History and Quick Timelines of Nigeria's Electoral Commissions (1959 - Date)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/about",
+   "kind": "official_body",
+   "note": "ECN (1959 federal elections), FEC (1964 federal and 1965 regional elections), FEDECO (1979 and 1983), NEC (1987-1993: local, state, parliamentary, and the 12 June 1993 presidential election), NECON (1995-1998: local government council elections), INEC (1998-: general elections 1999-2023)."
+  },
+  "calendar": {
+   "title": "Full Election Calendar & Timetable",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/elections/calendar",
+   "kind": "official_body",
+   "note": "Lists the bye-elections of 19 September 2026 and the 2027 general election: Presidential and National Assembly on 16 January 2027, Governorship and State House of Assembly on 6 February 2027."
+  },
+  "ge2027": {
+   "title": "2027 General Elections Update",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/elections/2027-general-elections-update",
+   "kind": "official_body",
+   "note": "Final and updated lists of candidates of 31 October 2026 for President, Senate, House of Representatives, Governor (28 states), and State Houses of Assembly."
+  },
+  "offcycle_2026": {
+   "title": "2026 Off-Cycle Election Update",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecnigeria.org/elections/off-cycle-2026",
+   "kind": "official_body",
+   "note": "Ekiti governorship election of Saturday 20 June 2026 (2,445 polling units in 16 LGAs) and Osun governorship election of Saturday 15 August 2026."
+  },
+  "irev": {
+   "title": "INEC Result Viewing Portal (IReV)",
+   "publisher": "Independent National Electoral Commission (INEC)",
+   "url": "https://www.inecelectionresults.ng/",
+   "kind": "official_body",
+   "note": "Images of polling-unit result sheets (Form EC8A) uploaded from each polling unit, by election. The page is a browser application; its data host (lv001-r.inecelectionresults.ng) refused this session's proxy (HTTP 502) on 2026-11-17."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Federal Republic of Nigeria",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "ng.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "region",
+   "name": "Regions",
+   "name_en": "Regions of the First Republic (Northern, Eastern, Western, and from 1963 Mid-Western)",
+   "parent": "national",
+   "valid_to": "1967-05-27",
+   "source": "about"
+  },
+  {
+   "key": "state",
+   "name": "States and the Federal Capital Territory",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "ng.state",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1999-05-29",
+     "value": 37,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 3(1) and First Schedule Part I: 36 states, Abia to Zamfara; s. 3(4) and Part II: the Federal Capital Territory, Abuja)"
+    },
+    {
+     "date": "2019-02-23",
+     "value": 37,
+     "source": "report_2019",
+     "locator": "p. 1: polling took place across ... 774 LGAs, and 36 states and the Federal Capital Territory (FCT)"
+    }
+   ]
+  },
+  {
+   "key": "senatorial_district",
+   "name": "Senatorial districts",
+   "parent": "state",
+   "scheme": "ng.senatorial",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1999-05-29",
+     "value": 109,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 48: three Senators from each State and one from the Federal Capital Territory)"
+    },
+    {
+     "date": "2019-02-23",
+     "value": 109,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: Senate, 109 vacancies"
+    }
+   ]
+  },
+  {
+   "key": "federal_constituency",
+   "name": "Federal constituencies",
+   "name_en": "Federal constituencies (House of Representatives districts)",
+   "parent": "state",
+   "scheme": "ng.federal",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1999-05-29",
+     "value": 360,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 49: three hundred and sixty members; s. 71: 360 Federal constituencies)"
+    },
+    {
+     "date": "2019-02-23",
+     "value": 360,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: House of Representatives, 360 vacancies"
+    }
+   ]
+  },
+  {
+   "key": "state_constituency",
+   "name": "State constituencies",
+   "name_en": "State constituencies (House of Assembly districts)",
+   "parent": "state",
+   "scheme": "ng.state_constituency",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2019-03-09",
+     "value": 991,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: State House of Assembly, 991 vacancies"
+    }
+   ]
+  },
+  {
+   "key": "lga",
+   "name": "Local government areas and FCT area councils",
+   "parent": "state",
+   "polity_kind": "municipality",
+   "scheme": "ng.lga",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "1999-05-29",
+     "value": 774,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 3(6): 768 Local Government Areas in Part I of the First Schedule and six area councils in Part II)"
+    },
+    {
+     "date": "2019-02-23",
+     "value": 774,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: LGAs 774"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "Wards (registration areas)",
+   "parent": "lga",
+   "scheme": "ng.ward",
+   "source": "report_2019",
+   "counts": [
+    {
+     "date": "2019-02-23",
+     "value": 8809,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: Registration Areas 8,809; p. 1: 8,809 wards"
+    }
+   ]
+  },
+  {
+   "key": "polling_unit",
+   "name": "Polling units",
+   "parent": "ward",
+   "scheme": "ng.polling_unit",
+   "elects": false,
+   "source": "report_2019",
+   "counts": [
+    {
+     "date": "2019-02-23",
+     "value": 119973,
+     "source": "report_2019",
+     "locator": "Table 1, p. 3: Polling Units 119,973 (and 57,023 voting points)"
+    },
+    {
+     "date": "2021-01-01",
+     "precision": "year",
+     "value": 176846,
+     "source": "pu_distribution",
+     "locator": "New Polling Units, Total 176,846 (after the 2021 conversion of 56,872 voting points and settlements)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Presidential election",
+   "name_en": "President, direct, with a vice-president as running mate",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ng.nation"
+    ],
+    "grain": [
+     "ng.state"
+    ],
+    "fine": [
+     "ng.lga",
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 134(2): the most votes and not less than one-quarter of the votes in each of at least two-thirds of all the States and the FCT; else a second election under s. 134(3)-(4))",
+   "first_held": "1979-08-11",
+   "earliest_record": "2019-02-23",
+   "note": "Second Republic presidents were elected in 1979 and 1983 (FEDECO). NEC's presidential election of 12 June 1993 was annulled before a result was declared. The Fourth Republic presidency has been elected every fourth year since 27 February 1999. No second-round election has been needed. Nigerians abroad cannot vote.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "NG"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_threshold": 0.25,
+     "runoff_rule": "s. 134(2)-(4): the most votes and a quarter of the votes in two-thirds of the States and the FCT; else a second election between the leader and the candidate with a majority of votes in the most States, then a third by simple majority",
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 132(1)-(2): on a date appointed by INEC not earlier than sixty and not later than thirty days before the term expires, as enacted; s. 135(2): four-year term)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.nation",
+     "source": "report_2019",
+     "evidence": "Annexure 1: votes for each of the 73 candidates, national totals only"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2023-02-25",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the presidential elections of 2023; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1993-06-12",
+     "note": "NEC's presidential election of 12 June 1993 (named on INEC's history page); annulled before declaration."
+    },
+    {
+     "date": "1999-02-27",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2003-04-19",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2007-04-21",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2011-04-16",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-03-28",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2019-02-23",
+     "contests": 1,
+     "seats": 1,
+     "source": "report_2019",
+     "quote": "Table 1: President, vacancy 1, contestants 73"
+    },
+    {
+     "date": "2023-02-25",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2027-01-16",
+     "source": "calendar",
+     "quote": "Presidential / National Assembly Election, Nationwide (36 States & FCT), General Election, January 16, 2027"
+    }
+   ],
+   "est_votes": 200000000,
+   "effort": 3
+  },
+  {
+   "key": "senate",
+   "tier": "national",
+   "name": "Senate election",
+   "name_en": "Senate, three senators per state and one for the FCT, single-member senatorial districts",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.senatorial"
+    ],
+    "fine": [
+     "ng.lga",
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 48: three Senators from each State and one from the FCT; s. 71: senatorial districts)",
+   "first_held": "1979-01-01",
+   "earliest_record": "2019-02-23",
+   "note": "The First Republic Senate (1960-1966) was appointed by the regions, not elected. Elected Senates sat in 1979-1983 and, briefly, 1992-1993; NECON's National Assembly elections of 25 April 1998 produced no sitting Senate. The Fourth Republic Senate has been elected with the House since 20 February 1999.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "NG"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 64(1): each House stands dissolved four years from its first sitting; s. 76: elections on a date appointed by INEC)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.senatorial",
+     "source": "report_2019",
+     "evidence": "Annexure 3: the winning party in each of the 109 senatorial districts; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2023-02-25",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the National Assembly elections of 2023; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1992-01-01",
+     "note": "Year only: the NEC returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1998-04-25",
+     "note": "NECON's National Assembly election; the Assembly never sat. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1999-02-20",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2003-04-12",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2007-04-21",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2011-04-09",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-03-28",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2019-02-23",
+     "contests": 109,
+     "seats": 109,
+     "source": "report_2019",
+     "quote": "Table 1: Senate, vacancy 109, contestants 1,904"
+    },
+    {
+     "date": "2023-02-25",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2027-01-16",
+     "source": "calendar",
+     "quote": "Presidential / National Assembly Election, Nationwide (36 States & FCT), General Election, January 16, 2027"
+    }
+   ],
+   "est_votes": 180000000,
+   "effort": 4
+  },
+  {
+   "key": "house",
+   "tier": "national",
+   "name": "House of Representatives election",
+   "name_en": "House of Representatives, 360 single-member federal constituencies",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.federal"
+    ],
+    "fine": [
+     "ng.lga",
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 49: 360 members representing constituencies of nearly equal population; s. 71: 360 Federal constituencies)",
+   "first_held": "1959-12-12",
+   "earliest_record": "2019-02-23",
+   "note": "The federal House was first elected directly by the ECN in December 1959 and again by the FEC in December 1964 (with deferred constituencies in March 1965); then by FEDECO in 1979 and 1983, by NEC in 1992, and by NECON in April 1998 (never seated). Its size changed with each constitution; it has had 360 seats since 1999.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NG"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 64(1): four-year term; s. 76: elections on a date appointed by INEC)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.federal",
+     "source": "report_2019",
+     "evidence": "Annexure 4: the winning party in each of the 360 federal constituencies; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2023-02-25",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the National Assembly elections of 2023; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-12-12",
+     "note": "ECN's pre-independence federal election (INEC history page gives the year). Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1964-12-30",
+     "note": "FEC's federal election (INEC history page gives the year). Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1979-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1992-01-01",
+     "note": "Year only: the NEC returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1998-04-25",
+     "note": "NECON's National Assembly election; the Assembly never sat. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1999-02-20",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2003-04-12",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2007-04-21",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2011-04-09",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-03-28",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2019-02-23",
+     "contests": 360,
+     "seats": 360,
+     "source": "report_2019",
+     "quote": "Table 1: House of Representatives, vacancy 360, contestants 4,681"
+    },
+    {
+     "date": "2023-02-25",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2027-01-16",
+     "source": "calendar",
+     "quote": "Presidential / National Assembly Election, Nationwide (36 States & FCT), General Election, January 16, 2027"
+    }
+   ],
+   "est_votes": 180000000,
+   "effort": 4
+  },
+  {
+   "key": "governor",
+   "tier": "state",
+   "name": "Governorship election",
+   "name_en": "State governors, direct, with a deputy governor as running mate",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.state"
+    ],
+    "fine": [
+     "ng.lga",
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 179(2): the most votes and not less than one-quarter of the votes in each of at least two-thirds of the State's local government areas; else a second election)",
+   "first_held": "1979-01-01",
+   "earliest_record": "2019-03-09",
+   "note": "Governors were elected in 1979 and 1983 (FEDECO) and in December 1991 (NEC). Since 1999, court rulings on disputed terms have moved eight states off the general-election calendar: Anambra, Bayelsa, Edo, Ekiti, Kogi, Ondo, and Osun before 2019, and Imo from 2023, each now electing in its own year. The FCT has no governor.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "governor"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_threshold": 0.25,
+     "runoff_rule": "s. 179(2)-(4): the most votes and a quarter of the votes in two-thirds of the LGAs; else a second election, then a third by simple majority",
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 178(1)-(2): on a date appointed by INEC; s. 180(2): four-year term; 28 states hold it with the general election in 2027)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.state",
+     "source": "report_2019",
+     "evidence": "Annexure 2: the winning party in each of the 29 governorship elections; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-09-19",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for governorship elections since 2020; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1991-12-14",
+     "note": "NEC's governorship elections of the Third Republic. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1999-01-09",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2003-04-19",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2007-04-14",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2011-04-26",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-04-11",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-01-01",
+     "precision": "year",
+     "election_kind": "special",
+     "contests": 2,
+     "seats": 2,
+     "source": "report_2019",
+     "quote": "Table 2: 2015, Governorship 2 (end-of-tenure and off-cycle elections)"
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "election_kind": "special",
+     "contests": 2,
+     "seats": 2,
+     "source": "report_2019",
+     "quote": "Table 2: 2016, Governorship 2"
+    },
+    {
+     "date": "2017-01-01",
+     "precision": "year",
+     "election_kind": "special",
+     "contests": 1,
+     "seats": 1,
+     "source": "report_2019",
+     "quote": "Table 2: 2017, Governorship 1"
+    },
+    {
+     "date": "2018-01-01",
+     "precision": "year",
+     "election_kind": "special",
+     "contests": 2,
+     "seats": 2,
+     "source": "report_2019",
+     "quote": "Table 2: 2018, Governorship 2"
+    },
+    {
+     "date": "2019-03-09",
+     "contests": 29,
+     "seats": 29,
+     "source": "report_2019",
+     "quote": "Table 1: Governor, vacancy 29, contestants 1,066"
+    },
+    {
+     "date": "2023-03-18",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2023-11-11",
+     "note": "Off-cycle elections in Bayelsa, Imo, and Kogi. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019).",
+     "election_kind": "special"
+    },
+    {
+     "date": "2024-09-21",
+     "note": "Off-cycle election in Edo. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019).",
+     "election_kind": "special"
+    },
+    {
+     "date": "2024-11-16",
+     "note": "Off-cycle election in Ondo. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019).",
+     "election_kind": "special"
+    },
+    {
+     "date": "2025-11-08",
+     "note": "Off-cycle election in Anambra. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019).",
+     "election_kind": "special"
+    },
+    {
+     "date": "2026-06-20",
+     "election_kind": "special",
+     "source": "offcycle_2026",
+     "quote": "Notice of Election for Ekiti State Governorship Election 2026: Saturday 20th June 2026"
+    },
+    {
+     "date": "2026-08-15",
+     "election_kind": "special",
+     "source": "offcycle_2026",
+     "quote": "the Osun State Governorship Election scheduled for Saturday, 15th August 2026"
+    },
+    {
+     "date": "2027-02-06",
+     "source": "calendar",
+     "quote": "Governorship / State House Of Assembly Election, Participating States & State Constituencies, February 6, 2027"
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 4
+  },
+  {
+   "key": "house_of_assembly",
+   "tier": "state",
+   "name": "State House of Assembly election",
+   "name_en": "State Houses of Assembly, single-member state constituencies",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.state_constituency"
+    ],
+    "fine": [
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 91: three or four times the State's federal constituencies, between 24 and 40 members; s. 112-117: state constituencies and elections)",
+   "first_held": "1979-01-01",
+   "earliest_record": "2019-03-09",
+   "note": "Houses of Assembly were elected in 1979 and 1983 (FEDECO), in December 1991 (NEC), and in December 1997 (NECON; dissolved in 1998), and since January 1999 by INEC. All 36 states elect them on the general election calendar, including the states whose governors elect off-cycle.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "source": "constitution",
+     "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 105(1): four-year term; s. 116(1): elections on a date appointed by INEC)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.state_constituency",
+     "source": "report_2019",
+     "evidence": "Annexure 5: the winning party in each of the 991 state constituencies; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2023-03-18",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the State House of Assembly elections of 2023; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "note": "Year only: the FEDECO returns for it are not published by INEC, and no official notice was reachable.",
+     "precision": "year"
+    },
+    {
+     "date": "1991-12-14",
+     "note": "NEC's state assembly elections of the Third Republic. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1997-12-06",
+     "note": "NECON's state assembly elections; the Houses were dissolved in 1998. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "1999-01-09",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2003-05-03",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2007-04-14",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2011-04-26",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2015-04-11",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2019-03-09",
+     "contests": 991,
+     "seats": 991,
+     "source": "report_2019",
+     "quote": "Table 1: State House of Assembly, vacancy 991, contestants 14,581"
+    },
+    {
+     "date": "2023-03-18",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2027-02-06",
+     "source": "calendar",
+     "quote": "Governorship / State House Of Assembly Election, Participating States & State Constituencies, February 6, 2027"
+    }
+   ],
+   "est_votes": 140000000,
+   "effort": 5
+  },
+  {
+   "key": "national_assembly_by",
+   "tier": "national",
+   "name": "National Assembly bye-elections and re-run elections",
+   "name_en": "Senate and House of Representatives bye-elections and court-ordered re-runs",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.senatorial",
+     "ng.federal"
+    ],
+    "fine": [
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 76(2): an election to fill a vacancy occurring more than three months before dissolution not later than one month after it)",
+   "earliest_record": "2015-01-01",
+   "note": "Bye-elections fill vacancies from death or resignation; re-run elections are ordered by election petition tribunals in some polling units or a whole constituency. INEC counted 14 senatorial and 29 federal constituency contests of both kinds from August 2015 to November 2018.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "upper_house",
+      "lower_house"
+     ],
+     "iso_pattern": "NG"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "called": true,
+     "vacancy_rule": "bye-election not later than one month after a vacancy occurring more than three months before dissolution (s. 76(2)); re-runs within three months of the final judgment (Electoral Act 2026, First Schedule para. 28(3))",
+     "source": "electoral_act",
+     "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 28(3): notice of a bye-election not later than 14 days before it)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.federal",
+     "source": "report_2019",
+     "evidence": "Table 29: the 2019 court-ordered re-runs with their winners; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-08-08",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for bye-elections since 2020; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-01-01",
+     "precision": "year",
+     "contests": 2,
+     "seats": 2,
+     "source": "report_2019",
+     "quote": "Table 2: 2015, Senatorial District 1, Federal Constituency 1"
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "contests": 31,
+     "seats": 31,
+     "source": "report_2019",
+     "quote": "Table 2: 2016, Senatorial District 10, Federal Constituency 21"
+    },
+    {
+     "date": "2017-01-01",
+     "precision": "year",
+     "contests": 4,
+     "seats": 4,
+     "source": "report_2019",
+     "quote": "Table 2: 2017, Senatorial District 1, Federal Constituency 3"
+    },
+    {
+     "date": "2018-01-01",
+     "precision": "year",
+     "contests": 6,
+     "seats": 6,
+     "source": "report_2019",
+     "quote": "Table 2: 2018, Senatorial District 2, Federal Constituency 4"
+    },
+    {
+     "date": "2026-09-19",
+     "contests": 1,
+     "seats": 1,
+     "source": "calendar",
+     "quote": "GOMBE (Gombe/Kwami/Funakaye Federal Constituencies) Bye-Election, Federal Constituency, Gombe State, September 19, 2026, Concluded"
+    }
+   ],
+   "est_votes": 4000000,
+   "effort": 4
+  },
+  {
+   "key": "house_of_assembly_by",
+   "tier": "state",
+   "name": "State House of Assembly bye-elections and re-run elections",
+   "name_en": "State constituency bye-elections and court-ordered re-runs",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.state_constituency"
+    ],
+    "fine": [
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 116(2): an election to fill a vacancy occurring more than three months before dissolution not later than one month after it)",
+   "earliest_record": "2015-01-01",
+   "note": "INEC counted 71 state constituency contests of both kinds from August 2015 to November 2018.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "called": true,
+     "vacancy_rule": "bye-election not later than one month after a vacancy occurring more than three months before dissolution (s. 116(2))",
+     "source": "electoral_act",
+     "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 28(3): notice of a bye-election not later than 14 days before it)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.state_constituency",
+     "source": "report_2019",
+     "evidence": "Table 28: supplementary elections of 23 March 2019 by state constituency; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2020-08-08",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for bye-elections since 2020; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-01-01",
+     "precision": "year",
+     "contests": 2,
+     "seats": 2,
+     "source": "report_2019",
+     "quote": "Table 2: 2015, State Constituency 2"
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "contests": 60,
+     "seats": 60,
+     "source": "report_2019",
+     "quote": "Table 2: 2016, State Constituency 60"
+    },
+    {
+     "date": "2017-01-01",
+     "precision": "year",
+     "contests": 4,
+     "seats": 4,
+     "source": "report_2019",
+     "quote": "Table 2: 2017, State Constituency 4"
+    },
+    {
+     "date": "2018-01-01",
+     "precision": "year",
+     "contests": 5,
+     "seats": 5,
+     "source": "report_2019",
+     "quote": "Table 2: 2018, State Constituency 5"
+    },
+    {
+     "date": "2026-09-19",
+     "contests": 4,
+     "seats": 4,
+     "source": "calendar",
+     "quote": "BAUCHI (Disina and Sakwa State Constituencies), DELTA (Udu State Constituency), KANO (Dawakin Kudu State Constituency) Bye-Elections, September 19, 2026"
+    }
+   ],
+   "est_votes": 2000000,
+   "effort": 4
+  },
+  {
+   "key": "fct_chairman",
+   "tier": "lga",
+   "name": "FCT Area Council chairmanship election",
+   "name_en": "Chairmen of the six FCT area councils, direct, with a vice-chairman as running mate",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.area_council"
+    ],
+    "fine": [
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "electoral_act",
+   "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 103(1): a Chairman and Vice-Chairman for each Area Council; s. 110: the most votes and 25% in two-thirds of the wards, else a second election within 14 days)",
+   "first_held": "1998-12-05",
+   "earliest_record": "2019-03-09",
+   "note": "INEC runs the FCT area council elections; the states' local government elections are run by the State Independent Electoral Commissions. The six councils are Abaji, Abuja Municipal, Bwari, Gwagwalada, Kuje, and Kwali.",
+   "match": [
+    {
+     "name_pattern": "Area Council",
+     "office_kinds": [
+      "other",
+      "mayor"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_threshold": 0.25,
+     "runoff_rule": "s. 110: the most votes and 25% in two-thirds of the wards, else a second election within 14 days",
+     "source": "electoral_act",
+     "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 107(1): all Area Councils on the same day; s. 107(3): not earlier than 150 and not later than 30 days before the term expires; s. 112(1): four-year term)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.area_council",
+     "source": "report_2019",
+     "evidence": "Annexure 6: the winning party in each of the 6 chairmanship elections; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2022-02-12",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the FCT area council elections since 2022; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1998-12-05",
+     "note": "INEC's first local government elections, including the FCT. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "contests": 6,
+     "seats": 6,
+     "source": "report_2019",
+     "quote": "Table 2: 2016, FCT Area Council Chairmen 6"
+    },
+    {
+     "date": "2019-03-09",
+     "contests": 6,
+     "seats": 6,
+     "source": "report_2019",
+     "quote": "Table 1: FCT (Chairmanship and Councillorship), vacancy 68; p. 1: 806 candidates for the 68 Chairmanship and Councillorship positions"
+    },
+    {
+     "date": "2022-02-12",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2026-01-01",
+     "through": "2026-12-31",
+     "note": "Due in 2026, four years after the 2022 councils; the date was not confirmed from an official source in this session."
+    }
+   ],
+   "est_votes": 2500000,
+   "effort": 3
+  },
+  {
+   "key": "fct_councillor",
+   "tier": "ward",
+   "name": "FCT Area Council councillorship election",
+   "name_en": "Councillors of the FCT area councils, one per ward",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.ward"
+    ],
+    "fine": [
+     "ng.polling_unit"
+    ]
+   },
+   "source": "electoral_act",
+   "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 103(2): a Councillor for each Electoral Ward in an Area Council)",
+   "first_held": "1998-12-05",
+   "earliest_record": "2019-03-09",
+   "note": "62 wards in the six area councils in 2019.",
+   "match": [
+    {
+     "name_pattern": "Area Council",
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Independent National Electoral Commission",
+     "valid_from": "1999-05-29",
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "source": "electoral_act",
+     "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 107(1): all Area Councils on the same day; s. 112(1): four-year term)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INEC, Report of the 2019 General Election",
+     "url": "https://www.inecnigeria.org/documents/resources/downloads/REPORT-OF-THE-2019-GENERAL-ELECTION.pdf",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17",
+     "first_date": "2019-02-23",
+     "last_date": "2019-03-23",
+     "finest": "ng.ward",
+     "source": "report_2019",
+     "evidence": "Annexure 7: the winning party in each of the 62 wards; no votes"
+    },
+    {
+     "platform": "INEC Result Viewing Portal (IReV)",
+     "url": "https://www.inecelectionresults.ng/",
+     "format": "jpg/pdf (scanned result sheets)",
+     "access": "browser",
+     "checked_at": "2026-11-17",
+     "first_date": "2022-02-12",
+     "finest": "ng.polling_unit",
+     "source": "irev",
+     "evidence": "Form EC8A from each polling unit for the FCT area council elections since 2022; the data host lv001-r.inecelectionresults.ng refused this session (proxy 502) on 2026-11-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1998-12-05",
+     "note": "INEC's first local government elections, including the FCT. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "contests": 62,
+     "seats": 62,
+     "source": "report_2019",
+     "quote": "Table 2: 2016, FCT Area Council Councillorship 62"
+    },
+    {
+     "date": "2019-03-09",
+     "contests": 62,
+     "seats": 62,
+     "source": "report_2019",
+     "quote": "Table 1: FCT (Chairmanship and Councillorship), vacancy 68 (6 chairmen and 62 councillors)"
+    },
+    {
+     "date": "2022-02-12",
+     "note": "Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019)."
+    },
+    {
+     "date": "2026-01-01",
+     "through": "2026-12-31",
+     "note": "Due in 2026, four years after the 2022 councils; the date was not confirmed from an official source in this session."
+    }
+   ],
+   "est_votes": 2500000,
+   "effort": 4
+  },
+  {
+   "key": "lga_chairman",
+   "tier": "lga",
+   "name": "Local government chairmanship election",
+   "name_en": "Chairmen of the 768 state local government councils",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.lga"
+    ],
+    "fine": [
+     "ng.ward",
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 7(1): democratically elected local government councils; Third Schedule Part II, para. 4(a): each State Independent Electoral Commission organizes the elections to the local government councils within the State)",
+   "first_held": "1976-01-01",
+   "note": "Run since 1999 by 36 State Independent Electoral Commissions, each on its own date and term (two to four years by state law); several states went years under appointed caretaker committees. Before 1999 NEC (1987-1993) and NECON (1996-1997) ran them nationally.",
+   "disposition": "blocked",
+   "disposition_reason": "No official source publishes the state commissions' returns together; INEC publishes none, and the commissions' own sites tried (Lagos, Kano, Kaduna, Oyo, Osun, Ekiti, Delta) did not resolve or answered 403 on 2026-11-17.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "other"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 5
+  },
+  {
+   "key": "lga_councillor",
+   "tier": "ward",
+   "name": "Local government councillorship election",
+   "name_en": "Councillors of the state local government councils, one per ward",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ng.ward"
+    ],
+    "fine": [
+     "ng.polling_unit"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (Third Schedule Part II, para. 4(a): each State Independent Electoral Commission organizes the elections to the local government councils within the State)",
+   "first_held": "1976-01-01",
+   "note": "One councillor per ward in each of the 768 state LGAs, on the state commission's calendar.",
+   "disposition": "blocked",
+   "disposition_reason": "No official source publishes the state commissions' returns together; INEC publishes none, and the commissions' own sites tried did not resolve or answered 403 on 2026-11-17.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 5
+  },
+  {
+   "key": "regional_assembly",
+   "tier": "region",
+   "name": "Regional House of Assembly election",
+   "name_en": "Houses of Assembly of the Northern, Eastern, Western, and Mid-Western Regions (to 1966)",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_to": "1966-01-15",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "about",
+   "locator": "https://www.inecnigeria.org/about (FEC: 1960-1966: conducted the 1964 federal and 1965 regional elections)",
+   "note": "Regional assemblies were elected in the 1950s and 1960s; the military government suspended them in January 1966 and replaced the regions with 12 states in May 1967.",
+   "disposition": "blocked",
+   "disposition_reason": "INEC publishes no returns of the ECN or FEC regional elections, and no official copy of their gazetted results was reachable.",
+   "match": [
+    {
+     "polity_kinds": [
+      "region"
+     ],
+     "iso_pattern": "NG*",
+     "valid_to": "1966-01-15"
+    }
+   ],
+   "est_votes": 15000000,
+   "effort": 5
+  },
+  {
+   "key": "constitutional_conference",
+   "tier": "national",
+   "name": "National Constitutional Conference delegates election",
+   "name_en": "Elected delegates to the National Constitutional Conference (1994)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1994-01-01",
+   "valid_to": "1995-12-31",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "about",
+   "locator": "https://www.inecnigeria.org/about (NEC: 1987-1993; NECON: 1995-1998)",
+   "note": "Delegates were elected by constituency in May 1994 alongside members nominated by the government; the conference sat in 1994-1995. The 1977 and 1988 Constituent Assemblies were chosen indirectly by local government councils.",
+   "disposition": "blocked",
+   "disposition_reason": "No official return of the 1994 delegate elections is published by INEC or reachable elsewhere.",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "NG"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-05-01",
+     "note": "Month only: the delegate elections of May 1994. Date as widely recorded; no official notice or return for it was reachable in this session (INEC's site keeps no results archive before 2019).",
+     "precision": "month"
+    }
+   ],
+   "est_votes": 2000000,
+   "effort": 5
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referendum",
+   "name_en": "Referendums on the creation of a state or local government area",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 8(1)(b) and (3)(b): a request for a new State or LGA must be approved in a referendum by at least two-thirds of the people of the area)",
+   "note": "Constitutional amendments under s. 9 need the National Assembly and two-thirds of the state Houses, not a popular vote. INEC is charged with any referendum the Constitution requires.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No referendum has been held under the 1999 Constitution: no new state or LGA has passed the s. 8 procedure, and Nigeria has never held a national referendum.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ]
+  },
+  {
+   "key": "recall",
+   "tier": "national",
+   "name": "Recall referendum",
+   "name_en": "Recall of members of the National Assembly, Houses of Assembly, and FCT area councils",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (ss. 69 and 110: a petition of more than half of the registered voters of the constituency, then a referendum by INEC within ninety days; Electoral Act 2026, s. 117 for area councillors)",
+   "note": "INEC has received and verified recall petitions, but none has reached the referendum stage.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No recall referendum has ever been held; petitions have failed at INEC's signature verification.",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ]
+  },
+  {
+   "key": "party_primaries",
+   "tier": "national",
+   "name": "Party primaries",
+   "name_en": "Party primaries and consensus nominations",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "electoral_act",
+   "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (s. 84: nominations by direct primaries or consensus; s. 86: direct primaries under each party's guidelines; s. 87: consensus candidates)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties run their own primaries; INEC only monitors them and receives the nominees, and publishes no primary returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ]
+  },
+  {
+   "key": "presiding_officers",
+   "tier": "national",
+   "name": "Presiding officers",
+   "name_en": "Senate President, Speakers, and other officers elected by their own houses",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (s. 50: the Senate and House elect their presiding officers from among their members; s. 92: the same for each House of Assembly)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the members of each house, not by voters.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "NG*"
+    }
+   ]
+  },
+  {
+   "key": "traditional_rulers",
+   "tier": "lga",
+   "name": "Traditional rulers",
+   "name_en": "Emirs, obas, obis, and other traditional rulers",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (no provision elects traditional rulers; their selection is governed by state chieftaincy laws)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Selected by kingmakers and approved by state governments under state chieftaincy laws, not by public election."
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Judges",
+   "name_en": "Judicial offices",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://nigeriarights.gov.ng/files/constitution.pdf (ss. 231, 238, 250, and 271: the President or Governor appoints judges on the recommendation of the National Judicial Council)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Nigeria elects no judges; all are appointed."
+  },
+  {
+   "key": "external_voting",
+   "tier": "national",
+   "name": "Voting abroad",
+   "name_en": "Diaspora or out-of-country representation",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "electoral_act",
+   "locator": "https://www.inecnigeria.org/documents/Electoral-Act-2026.pdf (Part III: registration and voting only in person at a polling unit in Nigeria)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Nigeria has no out-of-country voting and no seats for citizens abroad or for any non-territorial group."
+  }
+ ]
+}
