@@ -257,7 +257,7 @@
    "publisher": "Órgano Electoral Plurinacional, Tribunal Supremo Electoral",
    "url": "https://web.oep.org.bo/wp-content/uploads/2017/03/Atlas_Electoral_tomo-III_Cap_I.pdf",
    "kind": "official_body",
-   "note": "Read for 1985-1993 (Capítulo I, the first municipal elections); the 1995-2010 chapters were not read."
+   "note": "Read for 1985-1993 (Capítulo I) and 1995, 1999, and 2004 (Capítulo II)."
   },
   "oep_computo": {
    "title": "Sistema de Cómputo Oficial del Órgano Electoral Plurinacional",
@@ -2568,12 +2568,14 @@
    "effort": 3,
    "match": [
     {
+     "election_kinds": [
+      "local"
+     ],
      "body_kinds": [
       "council"
      ],
-     "polity_kinds": [
-      "municipality"
-     ]
+     "iso_pattern": "BO",
+     "name_pattern": "[Mm]unicipal"
     }
    ],
    "cadence": [
@@ -2596,9 +2598,9 @@
      "format": "csv",
      "access": "browser",
      "checked_at": "2026-11-17",
-     "first_date": "1985-07-14",
+     "first_date": "1999-12-05",
      "source": "oep_atlas",
-     "evidence": "The archive's own fetch reached the Atlas site on 2026-11-17 as an Angular application shell with no data in the page; the download files behind it were not retrieved, so whether they are open is unconfirmed.",
+     "evidence": "The digital Atlas's process 1 file (https://atlaselectoral.oep.org.bo/descarga/1/votos_totales.csv) is the 1999 municipal election, pipe-separated with one row per mesa: 17,561 rows with department, province, municipality, recinto, and mesa codes, valid, blank, and null votes, and the ballots cast, across 314 municipalities. It is open and its totals match the national totals in Tomo III. The Atlas holds no per-process file for the municipal elections before 1999 or for 1995; those and 2004 appear only in Tomo III's municipal tables.",
      "finest": "bo.mesa",
      "role": "administers",
      "last_date": "2015-03-29"
@@ -2633,49 +2635,52 @@
      "date": "1985-07-14",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "Held on the day of the general election: Ley 679 of 14 December 1984 called general and municipal elections together, once only, and voters chose council members with the same vote as the president (Atlas Tomo III, Capítulo I). Ley 679 set 16 June 1985 and the general election of 14 July 1985 is the day this census holds for it. Councils served until 31 December 1987."
+     "note": "Held on the day of the general election: Ley 679 of 14 December 1984 called general and municipal elections together, once only, and voters chose council members with the same vote as the president (Atlas Tomo III, Capítulo I, which says the call was for 16 June 1985; Atlas Tomo I, Capítulo I-II, says the elections were brought forward to July 1985). The Atlas gives the month but not the day, so this census holds the general-election day of 14 July 1985. Councils served until 31 December 1987. Tomo III prints results for the capital cities and totals by department."
     },
     {
      "date": "1987-12-06",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "First Sunday of December, as Ley 716 required of elections every two years; the Atlas gives the rule and that the 1985 mandate ran to 31 December 1987, not the day itself."
+     "note": "First Sunday of December, as Ley 716 required of elections every two years; Atlas Tomo III, Capítulo I, quotes the rule ('el primer domingo del mes de diciembre', art. 17) and says the 1985 mandate ran to 31 December 1987, so the vote fell on the first Sunday of December 1987. The Atlas prints no day for this election."
     },
     {
      "date": "1989-12-03",
      "election_kind": "local",
      "source": "ley1110",
-     "quote": "Elecciones Municipales del 3 de diciembre de 1989"
+     "quote": "Elecciones Municipales del 3 de diciembre de 1989",
+     "note": "The Atlas (Tomo III, Capítulo I) says Decreto Supremo 22278 of 2 August 1989 called the vote at the legal limit of 120 days before the first Sunday of December, which was 3 December 1989; the quote is from Ley 1110."
     },
     {
      "date": "1991-12-01",
      "election_kind": "local",
      "source": "ds22883",
-     "quote": "domingo 1ro. de diciembre de 1991"
+     "quote": "domingo 1ro. de diciembre de 1991",
+     "note": "The Atlas (Tomo III, Capítulo I) says Decreto Supremo 22883 of 31 July 1991 called the vote; the decree's day is the one quoted."
     },
     {
      "date": "1993-12-05",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "Called by Decreto Supremo 23560 of 21 July 1993 for the first Sunday of December, under the Ley Electoral of July 1991 (Atlas Tomo III); the Atlas gives the rule, not the day itself."
+     "note": "Called by Decreto Supremo 23560 of 21 July 1993 for the first Sunday of December, under the Ley Electoral of July 1991 (Atlas Tomo III, Capítulo I); the Atlas gives the rule, not the day itself, and the first Sunday of December 1993 was the 5th."
     },
     {
      "date": "1995-12-03",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "Day not read from an official page."
+     "note": "Atlas Tomo III, Capítulo II, says Decreto Supremo 24074 of 21 July 1995 called the municipal elections for December and that the rule is the first Sunday of December; the Atlas prints no day, and the first Sunday of December 1995 was the 3rd."
     },
     {
      "date": "1999-12-05",
      "election_kind": "local",
      "source": "oep_atlas_tomo3",
-     "note": "Day not read from an official page."
+     "note": "Atlas Tomo III, Capítulo II, says the parties met in April 1999 to ratify the date of the municipal elections in December and describes the 1999 Código Electoral, which keeps the first Sunday of December; the Atlas prints no day, and the first Sunday of December 1999 was the 5th."
     },
     {
      "date": "2004-12-05",
      "election_kind": "local",
      "source": "ds27616",
-     "quote": "Se Convoca a Elecciones Municipales a realizarse el día domingo 5 de diciembre del 2004"
+     "quote": "Se Convoca a Elecciones Municipales a realizarse el día domingo 5 de diciembre del 2004",
+     "note": "Atlas Tomo III, Capítulo II, describes the 2004 municipal elections without printing a day; the decree's day is the one quoted."
     },
     {
      "date": "2010-04-04",
