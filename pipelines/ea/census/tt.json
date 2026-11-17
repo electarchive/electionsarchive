@@ -1,0 +1,1422 @@
+{
+  "polity": "TT",
+  "name": "Trinidad and Tobago",
+  "sources": {
+    "const": {
+      "kind": "official_body",
+      "publisher": "Ministry of the Attorney General and Legal Affairs, Trinidad and Tobago",
+      "title": "The Constitution of the Republic of Trinidad and Tobago (unofficial revision updated to 31 December 2016)",
+      "url": "https://laws.gov.tt/pdf/Constitution.pdf"
+    },
+    "rpa": {
+      "kind": "official_body",
+      "publisher": "Ministry of the Attorney General and Legal Affairs, Trinidad and Tobago",
+      "title": "Representation of the People Act, Chapter 2:01",
+      "url": "https://laws.gov.tt/ttdll-web2/revision/download/105687?type=act"
+    },
+    "tha-act": {
+      "kind": "official_body",
+      "publisher": "Ministry of the Attorney General and Legal Affairs, Trinidad and Tobago",
+      "title": "Tobago House of Assembly Act, Chapter 25:03 (unofficial revision updated to 31 December 2016)",
+      "url": "https://laws.gov.tt/ttdll-web2/revision/download/106026?type=act"
+    },
+    "mca": {
+      "kind": "official_body",
+      "publisher": "Ministry of the Attorney General and Legal Affairs, Trinidad and Tobago",
+      "title": "Municipal Corporations Act, Chapter 25:04 (unofficial revision updated to 31 December 2016)",
+      "url": "https://laws.gov.tt/ttdll-web2/revision/download/106028?type=act"
+    },
+    "ebc-ge2025": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Report of the Elections and Boundaries Commission on the Parliamentary Elections held on Monday 28th April 2025",
+      "url": "https://ebctt.com/wp-content/uploads/Parliamentary_Elections_Report_2025_20260713_secured.pdf"
+    },
+    "ebc-lge2023": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Report of the Elections and Boundaries Commission on the Local Government Elections held on Monday 14th August, 2023",
+      "url": "https://ebctt.com/wp-content/uploads/EBC-Local-Government-Elections-Report-2023.pdf"
+    },
+    "ebc-tha2026": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Report of the Elections and Boundaries Commission on the Tobago House of Assembly Elections held on Monday 12th January, 2026",
+      "url": "https://ebctt.com/wp-content/uploads/EBC-Report-THA-Elections-2026.pdf"
+    },
+    "ebc-tha-boundaries-2025": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Fourteenth Report of the Elections and Boundaries Commission on the Boundaries of the Electoral Districts in the Electoral Area of Tobago, 29th August 2025",
+      "url": "https://ebctt.com/wp-content/uploads/THA_2025_14th_Report_Review_of_Electoral_Districts_20250829.pdf"
+    },
+    "ebc-boundaries-2024": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Year 2024 Report of the Elections and Boundaries Commission on the Review of Constituency Boundaries Pursuant to Section 72 of the Constitution",
+      "url": "https://ebctt.com/wp-content/uploads/Year_2024_Review_of-_Constituency_Boundaries_20240313.pdf"
+    },
+    "ebc-milestones": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Milestones in the Evolution of the Electoral System",
+      "url": "https://ebctt.com/about-us/milestones/"
+    },
+    "ebc-history": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Our History",
+      "url": "https://ebctt.com/about-us/our-history/"
+    },
+    "ebc-results-table": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Parliamentary election results by constituency, 1946-2015 (the data table behind the Commission's results charts)",
+      "url": "https://ebctt.com/wp-content/plugins/charts/data/parliamentary-results.tsv",
+      "note": "Tab-separated: year, constituency, turnout, electors, accepted and rejected ballots, and the winning candidate and party; only constituencies with a poll are listed."
+    },
+    "ebc-publications": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Publications and Reports",
+      "url": "https://ebctt.com/publications-and-reports/"
+    },
+    "ebc-parliamentary": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Elections: Parliamentary Elections",
+      "url": "https://ebctt.com/elections/parliamentary-elections/"
+    },
+    "ebc-local": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Elections: Local Government Elections",
+      "url": "https://ebctt.com/elections/local-government-elections/"
+    },
+    "ebc-local-bye": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Elections: Local Government Bye-Elections",
+      "url": "https://ebctt.com/elections/local-government-bye-elections/"
+    },
+    "ebc-tha": {
+      "kind": "official_body",
+      "publisher": "Elections and Boundaries Commission of Trinidad and Tobago",
+      "title": "Elections: Tobago House of Assembly Elections",
+      "url": "https://ebctt.com/elections/tobago-house-of-assembly-elections/"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Trinidad and Tobago",
+      "name_en": "Trinidad and Tobago",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const",
+      "counts": [
+        {
+          "date": "2016-12-31",
+          "value": 1,
+          "source": "const",
+          "locator": "Constitution s.1(1): \"The Republic of Trinidad and Tobago shall be a sovereign democratic State.\""
+        }
+      ]
+    },
+    {
+      "key": "constituency",
+      "name": "Constituencies (electoral districts of the House of Representatives)",
+      "name_en": "Constituencies",
+      "parent": "national",
+      "scheme": "tt.constituency",
+      "source": "const",
+      "counts": [
+        {
+          "date": "1976-08-01",
+          "value": 36,
+          "source": "const",
+          "locator": "Constitution s.70(1): \"Trinidad and Tobago shall be divided into thirty-six constituencies or such other number as may be provided for by an Order made by the President\""
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "value": 41,
+          "source": "ebc-milestones",
+          "locator": "2007: \"The number of seats in the Parliamentary Elections to the House of Representatives increased from 36 to 41\""
+        },
+        {
+          "date": "2024-03-13",
+          "value": 41,
+          "source": "ebc-boundaries-2024",
+          "locator": "\"Tobago remained at two (2); totalling forty-one (41) constituencies throughout the country\""
+        },
+        {
+          "date": "2025-04-28",
+          "value": 41,
+          "source": "ebc-ge2025",
+          "locator": "\"to the forty-one (41) Returning Officers appointed by the Commission to conduct the poll in the forty-one (41) electoral districts\""
+        }
+      ]
+    },
+    {
+      "key": "tobago",
+      "name": "Tobago (the electoral area of the Tobago House of Assembly)",
+      "name_en": "Tobago",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "const",
+      "valid_from": "1980-01-01",
+      "counts": [
+        {
+          "date": "2016-12-31",
+          "value": 1,
+          "source": "const",
+          "locator": "Constitution s.141A(1): \"There shall be an Assembly for Tobago to be called 'the Tobago House of Assembly'\""
+        }
+      ]
+    },
+    {
+      "key": "tha_district",
+      "name": "Electoral districts of the Tobago House of Assembly",
+      "name_en": "THA electoral districts",
+      "parent": "tobago",
+      "source": "tha-act",
+      "valid_from": "1980-01-01",
+      "counts": [
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "value": 12,
+          "source": "ebc-tha2026",
+          "locator": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026, row 1980: 12 electoral districts"
+        },
+        {
+          "date": "2016-12-31",
+          "value": 12,
+          "source": "tha-act",
+          "locator": "s.5(1)(a): \"twelve Assemblymen elected at an election held in accordance with the Representation of the People Act\""
+        },
+        {
+          "date": "2025-08-29",
+          "value": 15,
+          "source": "ebc-tha-boundaries-2025",
+          "locator": "\"2. (2) There shall be fifteen electoral districts in the electoral area of Tobago.\""
+        },
+        {
+          "date": "2026-01-12",
+          "value": 15,
+          "source": "ebc-tha2026",
+          "locator": "\"to conduct the poll in the fifteen (15) electoral districts\""
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Municipal corporations (city, borough, and regional corporations; county and municipal councils before 1992)",
+      "name_en": "Municipal corporations",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "mca",
+      "counts": [
+        {
+          "date": "2023-08-14",
+          "value": 14,
+          "source": "ebc-lge2023",
+          "locator": "\"the Commission allocated Aldermen in the fourteen (14) electoral areas as shown in Table 3 below\""
+        }
+      ]
+    },
+    {
+      "key": "lg_district",
+      "name": "Local government electoral districts",
+      "name_en": "Local government electoral districts",
+      "parent": "municipality",
+      "source": "mca",
+      "counts": [
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "value": 139,
+          "source": "ebc-lge2023",
+          "locator": "Appendix VIII, Comparison of Results of Elections from 1968-2023, row 1992: total number of districts 139"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "value": 126,
+          "source": "ebc-lge2023",
+          "locator": "Appendix VIII, row 2003: total number of districts 126"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "value": 136,
+          "source": "ebc-lge2023",
+          "locator": "Appendix VIII, row 2013: total number of districts 136"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "value": 139,
+          "source": "ebc-lge2023",
+          "locator": "Appendix VIII, row 2019: total number of districts 139"
+        },
+        {
+          "date": "2023-08-14",
+          "value": 141,
+          "source": "ebc-lge2023",
+          "locator": "\"to conduct the poll in one hundred and forty-one (141) electoral districts\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "house",
+      "tier": "national",
+      "name": "General elections of members of the House of Representatives",
+      "name_en": "House of Representatives general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.polling_station"
+        ]
+      },
+      "finest_note": "The Commission's election reports give votes by polling station for each constituency (2025 report Appendix II); its results table gives constituency totals for 1946-2015. Polling-station returns before 2015 are not online.",
+      "valid_from": "1961-12-01",
+      "first_held": "1961-12-04",
+      "earliest_record": "1961-12-04",
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (ss.46, 68-70)",
+      "note": "First past the post in single-member constituencies (36 under Constitution s.70(1), 41 since 2007). Parliament lasts five years from its first sitting unless dissolved sooner (s.68(2)), and a general election follows within three months of every dissolution (s.69(1)). The bicameral Parliament dates from the 1961 constitution; the 1946-1956 elections were to the unicameral Legislative Council.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "TT",
+          "valid_from": "1961-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "Constitution s.68(2): \"Parliament, unless sooner dissolved, shall continue for five years from the date of its first sitting after any dissolution, and shall then stand dissolved\"; s.69(1) general election within three months after every dissolution",
+          "selection": "elected",
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Commission, parliamentary results table",
+          "url": "https://ebctt.com/wp-content/plugins/charts/data/parliamentary-results.tsv",
+          "format": "tsv",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.constituency",
+          "source": "ebc-results-table",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "1946-07-01",
+          "last_date": "2015-09-07",
+          "evidence": "Constituency rows for every general election from 1946 to 2015 (electors, ballots accepted and rejected, winner); candidate votes are not in it."
+        },
+        {
+          "platform": "Elections and Boundaries Commission, publications and reports (election reports as PDF)",
+          "url": "https://ebctt.com/publications-and-reports/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.polling_station",
+          "source": "ebc-publications",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2015-09-07",
+          "last_date": "2025-04-28",
+          "evidence": "The 2025 report gives candidate votes by polling station for all 41 constituencies; 2015 constituency, candidate, and party workbooks and the 2020 preliminary results are linked from the parliamentary elections page. Reports for earlier elections are sold in print, not posted."
+        },
+        {
+          "platform": "Elections and Boundaries Commission of Trinidad and Tobago",
+          "url": "https://ebctt.com/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "role": "administers",
+          "source": "const",
+          "evidence": "The Commission conducts registration and every public election under the Representation of the People Act; the Constitution puts \"the registration of voters and the conduct of elections in every constituency\" under its direction and supervision (s.71(11))."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1961-12-04",
+          "contests": 30,
+          "seats": 30,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 30 constituencies counted from the Commission's results table for 1961. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1966-11-07",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1966. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1971-05-24",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1971. The polling day is not quoted from a fetched file. The Commission's table lists polls in 28 constituencies; the other 8 of the 36 (Arima, Barataria, Laventille, Ortoire-Mayaro, San Fernando East and West, St Ann's, Tobago East) have no poll row and are taken as returned unopposed, which no fetched official source states."
+        },
+        {
+          "date": "1976-09-13",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1976. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1981-11-09",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1981. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1986-12-15",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1986. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1991-12-16",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1991. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1995-11-06",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 1995. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2000-12-11",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-milestones",
+          "quote": "For the first time two Parliamentary Elections are held in 12 month period, December 11 2000 and December 10 2001",
+          "note": "36 constituencies counted from the Commission's results table for 2000."
+        },
+        {
+          "date": "2001-12-10",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-milestones",
+          "quote": "For the first time two Parliamentary Elections are held in 12 month period, December 11 2000 and December 10 2001",
+          "note": "36 constituencies counted from the Commission's results table for 2001."
+        },
+        {
+          "date": "2002-10-07",
+          "contests": 36,
+          "seats": 36,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 36 constituencies counted from the Commission's results table for 2002. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2007-11-05",
+          "contests": 41,
+          "seats": 41,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 41 constituencies counted from the Commission's results table for 2007. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2010-05-24",
+          "contests": 41,
+          "seats": 41,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 41 constituencies counted from the Commission's results table for 2010. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2015-09-07",
+          "contests": 41,
+          "seats": 41,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 41 constituencies counted from the Commission's results table for 2015. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2020-08-10",
+          "contests": 41,
+          "seats": 41,
+          "source": "ebc-results-table",
+          "note": "One member per constituency; 41 constituencies since 2007 (Commission milestones). The 2020 rows are not in the Commission's results table; the polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2025-04-28",
+          "contests": 41,
+          "seats": 41,
+          "source": "ebc-ge2025",
+          "quote": "the forty-one (41) Returning Officers appointed by the Commission to conduct the poll in the forty-one (41) electoral districts. ... On poll day, Monday 28th April, 2025, voting commenced as scheduled"
+        }
+      ],
+      "est_votes": 8400000,
+      "effort": 2
+    },
+    {
+      "key": "house_by",
+      "tier": "national",
+      "name": "Bye-elections of members of the House of Representatives",
+      "name_en": "House of Representatives by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.polling_station"
+        ]
+      },
+      "valid_from": "1961-12-01",
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (s.69(3))",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "TT",
+          "valid_from": "1961-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "const",
+          "locator": "Constitution s.69(3)",
+          "selection": "elected",
+          "called": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district",
+          "vacancy_rule": "A vacancy within the first four years of a Parliament is filled at a bye-election held not later than ninety days after the Speaker announces it (Constitution s.69(3)); a later vacancy stays open until the general election."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of House bye-elections has been reached; the Commission's site lists none."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "General elections of elected members of the Legislative Council (adult suffrage)",
+      "name_en": "Legislative Council elections, 1946-1956",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.constituency"
+        ]
+      },
+      "finest_note": "The Commission's results table gives constituency totals for 1946 and 1956; 1950 is missing from it.",
+      "valid_from": "1946-01-01",
+      "valid_to": "1961-12-01",
+      "first_held": "1946-07-01",
+      "earliest_record": "1946-07-01",
+      "source": "ebc-history",
+      "note": "Elected members of the colonial Legislative Council, chosen by first past the post in single-member districts under universal adult suffrage from 1946 (franchise at 21). Replaced by the House of Representatives under the 1961 constitution.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "TT",
+          "valid_from": "1946-01-01",
+          "valid_to": "1961-12-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Commission, parliamentary results table",
+          "url": "https://ebctt.com/wp-content/plugins/charts/data/parliamentary-results.tsv",
+          "format": "tsv",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.constituency",
+          "source": "ebc-results-table",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "1946-07-01",
+          "last_date": "1956-09-24",
+          "evidence": "Constituency rows for 1946 (9) and 1956 (24); none for 1950."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-07-01",
+          "contests": 9,
+          "seats": 9,
+          "source": "ebc-results-table",
+          "note": "Nine single-member districts counted from the Commission's results table for 1946, the first election under universal adult suffrage (Commission history). The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1950-09-18",
+          "note": "Third general election to the Legislative Council (18 elected members under the 1950 constitution); not in the Commission's results table, and neither the date nor the count is quoted from a fetched official source."
+        },
+        {
+          "date": "1956-09-24",
+          "contests": 24,
+          "seats": 24,
+          "source": "ebc-results-table",
+          "note": "24 single-member districts counted from the Commission's results table for 1956. The polling day is not quoted from a fetched file."
+        }
+      ],
+      "est_votes": 400000,
+      "effort": 4
+    },
+    {
+      "key": "legislative_council_restricted",
+      "tier": "national",
+      "name": "General elections of elected members of the Legislative Council (restricted franchise)",
+      "name_en": "Legislative Council elections, 1925-1938",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1925-01-01",
+      "valid_to": "1946-01-01",
+      "first_held": "1925-02-07",
+      "source": "ebc-milestones",
+      "note": "Seven elected members sat with nominated and official members after the Wood Commission's reforms; men from 21 and women from 30 could vote subject to property and income qualifications (Commission milestones), until universal adult suffrage in 1946.",
+      "disposition": "blocked",
+      "disposition_reason": "The Commission's results start in 1946; returns of the 1925-1938 polls survive only in the colonial Royal Gazette and Council papers, which no official body publishes online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "TT",
+          "valid_from": "1925-01-01",
+          "valid_to": "1946-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1925-02-07",
+          "contests": 7,
+          "seats": 7,
+          "source": "ebc-milestones",
+          "quote": "1921 Wood Commission recommends 7 elected and 19 nominated members in a Legislative Assembly of 26 members ... 1925 First General Elections held on the recommendation of the Wood Commission",
+          "note": "The polling day is not quoted from a fetched official source."
+        },
+        {
+          "date": "1928-01-01",
+          "precision": "year",
+          "note": "General election under the restricted franchise; not in the Commission's results table."
+        },
+        {
+          "date": "1933-01-01",
+          "precision": "year",
+          "note": "General election under the restricted franchise; not in the Commission's results table."
+        },
+        {
+          "date": "1938-01-01",
+          "precision": "year",
+          "note": "General election under the restricted franchise; not in the Commission's results table."
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 5
+    },
+    {
+      "key": "federal_house",
+      "tier": "national",
+      "name": "Elections in Trinidad and Tobago to the House of Representatives of the West Indies Federation",
+      "name_en": "West Indies Federation House of Representatives (Trinidad and Tobago seats)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1958-01-01",
+      "valid_to": "1962-05-31",
+      "first_held": "1958-03-25",
+      "source": "ebc-milestones",
+      "note": "Trinidad and Tobago returned 10 of the 45 members of the federal House at the only federal general election, 25 March 1958; the Federation was dissolved on 31 May 1962. Neither the date nor the seat count is quoted from a fetched official source.",
+      "disposition": "blocked",
+      "disposition_reason": "The Commission's results table and reports do not include the 1958 federal election, and no official publication of its constituency returns is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "name_pattern": "(West Indies|Federal|Federation)",
+          "precedence": 5,
+          "valid_from": "1958-01-01",
+          "valid_to": "1962-05-31"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1958-03-25",
+          "note": "The only federal general election; not quoted from a fetched official source."
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (s.54)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Neither the Constitution nor any electoral law provides for a referendum: the Constitution is altered by Act of Parliament passed by special majorities of both Houses (s.54), and no national or Tobago referendum has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "TT"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "The Senate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (s.40)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 31 Senators are appointed by the President: 16 on the advice of the Prime Minister, 6 on that of the Leader of the Opposition, and 9 in the President's own discretion (Constitution s.40); none is elected.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "TT"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of the President by the Electoral College",
+      "name_en": "President (Electoral College)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1976-08-01",
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (ss.28-29)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The President is elected by secret ballot of the Electoral College, all members of the Senate and the House sitting together (Constitution ss.28-29), not by the public; the Prime Minister is appointed by the President from the House.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state",
+            "head_of_government"
+          ],
+          "iso_pattern": "TT"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "judiciary",
+      "tier": "national",
+      "name": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://laws.gov.tt/pdf/Constitution.pdf (ss.102, 104)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Chief Justice is appointed by the President after consultation with the Prime Minister and the Leader of the Opposition, and other judges on the advice of the Judicial and Legal Service Commission (Constitution ss.102 and 104); none is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Party candidate selections and internal elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "rpa",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties screen and select candidates and elect their officers under their own rules; the Commission neither runs nor publishes these, and candidates enter the official process only on nomination day under the Representation of the People Act.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "TT"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "tha",
+      "tier": "tha_district",
+      "name": "Elections of Assemblymen to the Tobago House of Assembly",
+      "name_en": "Tobago House of Assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.polling_station"
+        ]
+      },
+      "finest_note": "The Commission's THA reports give votes by polling station in each electoral district (2026 report Appendix II; reports for January and December 2021 are also posted). Reports for 1980-2017 are not online; the 2026 report's Appendix IX gives only island totals for them.",
+      "valid_from": "1980-01-01",
+      "first_held": "1980-01-01",
+      "earliest_record": "1980-01-01",
+      "source": "tha-act",
+      "note": "First past the post in single-member electoral districts (12 until 2021, 15 since December 2021) under the Representation of the People Act (THA Act s.5(1)(a)). The Assembly lasts four years from its first sitting unless it dissolves itself sooner (s.22). Four appointed Councillors and the Presiding Officer complete the Assembly.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "Tobago House of Assembly",
+          "precedence": 5,
+          "valid_from": "1980-01-01"
+        },
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "special"
+          ],
+          "iso_pattern": "TT-TOB",
+          "valid_from": "1980-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "tha-act",
+          "locator": "THA Act s.22(1): \"The Assembly shall continue for four years from the date of its first sitting after any primary election, and shall then stand dissolved, unless the Assembly, by resolution, dissolves\"",
+          "selection": "elected",
+          "term_years": 4,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Commission, publications and reports (election reports as PDF)",
+          "url": "https://ebctt.com/publications-and-reports/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.polling_station",
+          "source": "ebc-publications",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2021-01-25",
+          "last_date": "2026-01-12",
+          "evidence": "Reports on the THA elections of 25 January 2021, 6 December 2021, and 12 January 2026, each with results by polling station; Appendix IX of the 2026 report compares island totals for every election since 1980."
+        },
+        {
+          "platform": "Elections and Boundaries Commission of Trinidad and Tobago",
+          "url": "https://ebctt.com/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "role": "administers",
+          "source": "tha-act",
+          "evidence": "The Commission conducts registration and every public election under the Representation of the People Act; the Constitution puts \"the registration of voters and the conduct of elections in every constituency\" under its direction and supervision (s.71(11))."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "1980 12 [electoral districts] ... 15,990 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "1984 12 [electoral districts] ... 19,786 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "1988 12 [electoral districts] ... 16,720 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "1992 12 [electoral districts] ... 17,860 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "1996 12 [electoral districts] ... 15,034 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "2001 12 [electoral districts] ... 22,619 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "2005 12 [electoral districts] ... 21,013 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "2009 12 [electoral districts] ... 24,034 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "2013 12 [electoral districts] ... 32,657 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-tha2026",
+          "quote": "2017 12 [electoral districts] ... 24,343 [votes cast]",
+          "note": "Appendix IX, Comparison of Results of Tobago House of Assembly Elections: 1980 to 2026. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2021-01-25",
+          "contests": 12,
+          "seats": 12,
+          "source": "ebc-publications",
+          "quote": "Report of the Elections and Boundaries Commission on the Tobago House of Assembly Elections held on Monday 25th January, 2021",
+          "note": "12 electoral districts from the 2026 report's Appendix IX (row \"2021 (Jan)\"). The result was a six-six tie; the Assembly was enlarged to 15 districts and a fresh election held in December 2021."
+        },
+        {
+          "date": "2021-12-06",
+          "contests": 15,
+          "seats": 15,
+          "source": "ebc-publications",
+          "quote": "Report of the Elections and Boundaries Commission of the Tobago House of Assembly Elections held on Monday 6th December, 2021",
+          "note": "15 electoral districts from the 2026 report's Appendix IX (row \"2021 (Dec)\")."
+        },
+        {
+          "date": "2026-01-12",
+          "contests": 15,
+          "seats": 15,
+          "source": "ebc-tha2026",
+          "quote": "The Tobago People's Party was the only successful party contesting the 2026 Tobago House of Assembly Elections; their candidates having been elected in all fifteen (15) electoral districts."
+        }
+      ],
+      "est_votes": 293000,
+      "effort": 2
+    },
+    {
+      "key": "tha_by",
+      "tier": "tha_district",
+      "name": "Bye-elections of Assemblymen to the Tobago House of Assembly",
+      "name_en": "Tobago House of Assembly by-elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1980-01-01",
+      "source": "tha-act",
+      "note": "A vacant Assemblyman's seat is filled at a bye-election, except near the end of the Assembly's term (THA Act s.21). No list of THA bye-elections has been reached.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "name_pattern": "Tobago House of Assembly",
+          "precedence": 5,
+          "valid_from": "1980-01-01"
+        },
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "iso_pattern": "TT-TOB",
+          "valid_from": "1980-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "tha-act",
+          "locator": "THA Act s.21",
+          "selection": "elected",
+          "called": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district",
+          "vacancy_rule": "The President, after consultation with the Prime Minister and the Chief Secretary, fixes a bye-election two to three months after the vacancy is declared; none is held within three months of a general THA election, and the President may decline one in the Assembly's last year (THA Act s.21)."
+        }
+      ],
+      "dates": [],
+      "est_votes": 10000,
+      "effort": 3
+    },
+    {
+      "key": "tha_executive",
+      "tier": "tobago",
+      "name": "Chief Secretary, Presiding Officer, and Councillors of the Tobago House of Assembly",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1980-01-01",
+      "source": "tha-act",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Presiding Officer and the Chief Secretary are elected by the Assemblymen, and the four Councillors are appointed on the advice of the Chief Secretary (three) and the Minority Leader (one) (THA Act ss.5 and 7-9); none is chosen by a public vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "local_councils",
+      "tier": "lg_district",
+      "name": "Local government elections of councillors",
+      "name_en": "Municipal corporation councillors (county and municipal councils before 1992)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.polling_station"
+        ]
+      },
+      "finest_note": "The Commission's 2023 report gives votes by polling station in every electoral district; reports for earlier local elections are not posted, and its Appendix VIII gives only national totals back to 1968.",
+      "earliest_record": "1968-01-01",
+      "source": "mca",
+      "note": "One councillor per electoral district by first past the post (Municipal Corporations Act s.11(3)) in the 14 city, borough, and regional corporations of Trinidad; Tobago has had no local councils since the Tobago House of Assembly replaced its county council in 1980. Councillors served three-year terms under the Act as revised to 2016 (s.11(4)), but elections have often been postponed by Act of Parliament.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "TT"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "TT-*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "mca",
+          "locator": "Municipal Corporations Act s.11(4): \"The term of office of Councillors shall be three years\"; s.11(4A) election within three months of the expiry of the term",
+          "selection": "elected",
+          "term_years": 3,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Commission, publications and reports (election reports as PDF)",
+          "url": "https://ebctt.com/publications-and-reports/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.polling_station",
+          "source": "ebc-publications",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2023-08-14",
+          "last_date": "2023-08-14",
+          "evidence": "The report on the 14 August 2023 local government elections gives votes by polling station in all 141 districts and the aldermen allocated to each party; Appendix VIII compares totals for every local election since 1968."
+        },
+        {
+          "platform": "Elections and Boundaries Commission of Trinidad and Tobago",
+          "url": "https://ebctt.com/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "role": "administers",
+          "source": "mca",
+          "evidence": "The Commission conducts registration and every public election under the Representation of the People Act; the Constitution puts \"the registration of voters and the conduct of elections in every constituency\" under its direction and supervision (s.71(11))."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "through": "1967-12-31",
+          "note": "County council and municipal (city and borough) council elections under adult suffrage before 1968; the Commission's comparison table starts in 1968 and no official list of the earlier polls has been reached."
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "contests": 100,
+          "seats": 100,
+          "source": "ebc-lge2023",
+          "quote": "1968 ... total number of districts 100",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "contests": 100,
+          "seats": 100,
+          "source": "ebc-lge2023",
+          "quote": "1971 ... total number of districts 100",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. Only 26 of the 100 districts were contested. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1977-01-01",
+          "precision": "year",
+          "contests": 100,
+          "seats": 100,
+          "source": "ebc-lge2023",
+          "quote": "1977 ... total number of districts 100",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 113,
+          "seats": 113,
+          "source": "ebc-lge2023",
+          "quote": "1980 ... total number of districts 113",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 120,
+          "seats": 120,
+          "source": "ebc-lge2023",
+          "quote": "1983 ... total number of districts 120",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "contests": 125,
+          "seats": 125,
+          "source": "ebc-lge2023",
+          "quote": "1987 ... total number of districts 125",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. Before 1992 most county-council districts were returned unopposed or polled separately; the total counts every district of both kinds. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 139,
+          "seats": 139,
+          "source": "ebc-lge2023",
+          "quote": "1992 ... total number of districts 139",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 124,
+          "seats": 124,
+          "source": "ebc-lge2023",
+          "quote": "1996 ... total number of districts 124",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 124,
+          "seats": 124,
+          "source": "ebc-lge2023",
+          "quote": "1999 ... total number of districts 124",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "contests": 126,
+          "seats": 126,
+          "source": "ebc-lge2023",
+          "quote": "2003 ... total number of districts 126",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 134,
+          "seats": 134,
+          "source": "ebc-lge2023",
+          "quote": "2010 ... total number of districts 134",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 136,
+          "seats": 136,
+          "source": "ebc-lge2023",
+          "quote": "2013 ... total number of districts 136",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 137,
+          "seats": 137,
+          "source": "ebc-lge2023",
+          "quote": "2016 ... total number of districts 137",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. 136 districts contested and 1 returned unopposed. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 139,
+          "seats": 139,
+          "source": "ebc-lge2023",
+          "quote": "2019 ... total number of districts 139",
+          "note": "Appendix VIII, Comparison of Results of Elections from 1968-2023: total number of districts (county council and municipal) and votes cast in the municipal districts. The polling day is not quoted from a fetched file."
+        },
+        {
+          "date": "2023-08-14",
+          "contests": 141,
+          "seats": 141,
+          "source": "ebc-lge2023",
+          "quote": "the Commission submits herewith its report on the Local Government Elections which was held on Monday 14th August, 2023 ... to conduct the poll in one hundred and forty-one (141) electoral districts",
+          "note": "The election in Lengua/Indian Walk was declared void and polled again on 17 June 2024 (listed under local by-elections)."
+        }
+      ],
+      "est_votes": 3360000,
+      "effort": 3
+    },
+    {
+      "key": "local_by",
+      "tier": "lg_district",
+      "name": "Local government bye-elections and fresh elections",
+      "name_en": "Local government by-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "tt.polling_station"
+        ]
+      },
+      "source": "rpa",
+      "note": "A vacant councillor's seat is filled at a bye-election in its electoral district; a district whose election is declared void is polled again.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "TT"
+        },
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "TT-*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "mca",
+          "locator": "Municipal Corporations Act s.11(5)",
+          "selection": "elected",
+          "called": true,
+          "administered_by": "Elections and Boundaries Commission, through returning officers it appoints for each electoral district",
+          "vacancy_rule": "A councillor elected to fill a vacancy holds office until the time the councillor replaced would have gone out of office (Municipal Corporations Act s.11(5))."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Elections and Boundaries Commission, publications and reports (election reports as PDF)",
+          "url": "https://ebctt.com/publications-and-reports/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "finest": "tt.polling_station",
+          "source": "ebc-publications",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2022-02-07",
+          "last_date": "2024-06-17",
+          "evidence": "Reports on the Debe South bye-election of 7 February 2022 and on the Quinam/Morne Diablo bye-election and Lengua/Indian Walk fresh election of 17 June 2024, with results by polling station."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "through": "2021-12-31",
+          "note": "No official list of earlier local bye-elections has been reached; the Commission posts reports from 2022 on."
+        },
+        {
+          "date": "2022-02-07",
+          "contests": 1,
+          "seats": 1,
+          "source": "ebc-local-bye",
+          "quote": "Report of the Elections and Boundaries Commission on the Local Government Bye-Election in the Electoral District of Debe South held on Monday 7th February, 2022"
+        },
+        {
+          "date": "2024-06-17",
+          "contests": 2,
+          "seats": 2,
+          "source": "ebc-publications",
+          "quote": "Report of the Elections and Boundaries Commission on the Local Government Election in the Electoral District of Lengua/Indian Walk held on Monday 17th June, 2024 ... Report of the Elections and Boundaries Commission on the Local Government Election in the Electoral District of Quinam / Morne Diablo held on Monday 17th June, 2024",
+          "note": "Quinam/Morne Diablo was a bye-election; Lengua/Indian Walk was a fresh poll after its 2023 election was declared void."
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 2
+    },
+    {
+      "key": "aldermen",
+      "tier": "municipality",
+      "name": "Aldermen allocated to parties from the councillor vote",
+      "name_en": "Aldermen",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "2013-01-01",
+      "source": "ebc-lge2023",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Since Act No. 13 of 2013 the Commission allocates each corporation's four aldermen to parties in proportion to their votes in that corporation's councillor elections; there is no separate ballot, and the allocation is derived from results the local_councils class already holds (2023 report, Table 3). Before 2013 aldermen were chosen by the councillors.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "mayors",
+      "tier": "municipality",
+      "name": "Mayors, chairmen, and their deputies",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "mca",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Mayor (Chairman of a regional corporation) and deputy are elected from among the aldermen and councillors at a council meeting (Municipal Corporations Act s.14); no public vote is held.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "TT"
+        },
+        {
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "TT-*"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
