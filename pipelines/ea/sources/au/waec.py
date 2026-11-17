@@ -2,8 +2,10 @@
 
 The commission publishes a Results and Statistics report after each state general election. Its district profiles
 print the Legislative Assembly's first preference votes for each candidate at each polling place, the declaration
-votes by type, and the two-candidate preferred count. The reports are PDFs with a text layer, read here with
-`pdftotext -layout`. One package holds each general election, plus a `registry` package.
+votes by type, and the two-candidate preferred count; its region profiles print each Legislative Council region's
+count, whose first line gives every candidate's first preference votes. The referendum reports print yes and no
+votes at each polling place. The reports are PDFs with a text layer, read here with `pdftotext -layout`. One
+package holds each general election and each referendum, plus a `geo` and a `registry` package.
 """
 
 import functools
@@ -114,9 +116,11 @@ class Candidate:
     def display(self) -> str:
         words = []
         for word in self.surname.split():
-            if re.search(r"[A-Z]{2}", word):
-                word = "-".join(part.capitalize() for part in word.split("-"))
-                word = re.sub(r"^(Mc|Mac|O')([a-z])", lambda m: m[1] + m[2].upper(), word)
+            prefix = re.match(r"^([A-Z][a-z]+)([A-Z]{2}.*)$", word)  # McSWEENEY, MacTIERNAN, DeCAMPO
+            if prefix:
+                word = prefix[1] + prefix[2].capitalize()
+            elif re.search(r"[A-Z]{2}", word):
+                word = re.sub(r"[A-Za-z]+", lambda m: m[0].capitalize(), word)  # D'ORAZIO, BENSON-LIDHOLM
             words.append(word)
         given = self.preferred or self.given
         return f"{given} {' '.join(words)}".strip()
@@ -333,6 +337,14 @@ def ballots(link: str, column: str = "District") -> dict[str, list[Candidate]]:
             nick = fields.pop(0) if preferred and fields else ""
             party = " ".join(fields)
             entries.append(Candidate(found["surname"].strip(), given, party, nick))
+    # A long given name sometimes runs into the party with one space between them.
+    known = sorted({c.party for _, entries in found_lists for c in entries if c.party}, key=len, reverse=True)
+    for _, entries in found_lists:
+        for c in entries:
+            if not c.party:
+                party = next((k for k in known if c.given.endswith(f" {k}")), None)
+                if party:
+                    c.given, c.party = c.given.removesuffix(f" {party}"), party
     out: dict[str, list[Candidate]] = {}
     for names, entries in found_lists:
         name = "".join(n if n.endswith("-") else f"{n} " for n in names).strip()
@@ -340,14 +352,6 @@ def ballots(link: str, column: str = "District") -> dict[str, list[Candidate]]:
             raise ValueError(f"{name} is listed twice in {link}")
         out[fold(name)] = entries
     return out
-
-
-def block_name(lines: list[str]) -> str:
-    for line in lines:
-        found = TITLE.search(line)
-        if found:
-            return found[1].strip()
-    raise ValueError("no district title")
 
 
 def nearest_name(lines: list[str], context: list[str]) -> str:
