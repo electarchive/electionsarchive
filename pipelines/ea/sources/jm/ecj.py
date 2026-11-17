@@ -641,7 +641,13 @@ def build_scanned(day: str) -> Package:
     p = Package(
         f"jm.ecj/{day}",
         SOURCE,
-        f"The Jamaican general election of {first} by constituency, from the Director of Elections' report",
+        f"The Jamaican general election of {first} "
+        + (
+            "by polling station where the box-by-box report was read, otherwise by constituency"
+            if scanned.stations(day)
+            else "by constituency"
+        )
+        + ", from the Director of Elections' report",
         depends=depends,
     )
     p.external.add(JAMAICA)
