@@ -1,0 +1,625 @@
+# Folketingsvalgene den 16. Juni 1903 med Suppleringsvalg i Tiden 1901-03 (Statistiske Meddelelser, 4. Række, 13. Bind, 6. Hæfte); constituency tables pages 6-32, by-elections page 33
+# the general-election tables print "Ugyldige Stemmesedler" and "Udlev., men ikke afg. Stemmesedl."; a ditto-like mark (″) in the latter means none and is written 0; the by-election page prints one combined line "Ugyld. ell. ubenytt. Stemmesedl."
+constituency	6	1903-06-16	general	Staden København	1		4225	2560	poll
+candidate	6	Herman Trier	Borgerrepræsent.	V. R.	København	1466	1	1
+candidate	6	Albert Vilhelm Riber Magius	Postekspedient	H.	København	1081	0	0
+line	6	Ugyldige Stemmesedler	13
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	2		3574	2637	poll
+candidate	6	H. L. Møller	Skolebestyrer, Dr. phil.	H.	København	1370	0	1
+candidate	6	Alfred Benzon	Borgerrepræsentant, Fabrikejer	V. R.	Københ.	1232	1	0
+line	6	Ugyldige Stemmesedler	35
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	3		3321	2103	poll
+candidate	6	Alfred Christensen	Overretssagfører	V. R.	København	1153	1	1
+candidate	6	Vilhelm Frederik Ferdinand Juul	Slagtermester	H.	Københ.	930	0	0
+line	6	Ugyldige Stemmesedler	20
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	4		3115	2165	poll
+candidate	6	Laurits V. Birck	Dr. polit.	H.	Gentofte	1139	0	1
+candidate	6	Gustav Philipsen	Borgerrepræsentant, Cand. jur.	V. R.	København	1012	1	0
+line	6	Ugyldige Stemmesedler	14
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	5		4068	2560	poll
+candidate	6	F. H. Jeppesen Borgbjerg	Borgerrepræsentant, Cand. phil.	S.	København	1429	1	1
+candidate	6	Jens Rasmussen	Skoleinspektør	V. R.	København	1088	0	0
+line	6	Ugyldige Stemmesedler	43
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	6		4937	3519	poll
+candidate	6	H. A. Hammerich	Etatsraad, Ingeniør	H.	København	2057	1	1
+candidate	6	R. P. Rasmussen	Kursusbestyrer	V. R.	København	1444	0	0
+line	6	Ugyldige Stemmesedler	18
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	6	1903-06-16	general	Staden København	7		2778	1982	poll
+candidate	6	C. A. Schmidt	Snedker	S.	København	772	0	1
+candidate	6	C. Hage	Finansminister og Minister for offentl. Arbejder	V. R.	København	621	1	0
+candidate	6	Johannes Elith Østrup	Dr. phil.	H.	København	579	0	0
+line	6	Ugyldige Stemmesedler	10
+line	6	Udlev., men ikke afg. Stemmesedl.	0
+constituency	7	1903-06-16	general	Staden København	8		3432	2506	poll
+candidate	7	Martin Olsen	Borgerrepræsentant, Snedker	S.	København	1072	1	1
+candidate	7	Carl August Christensen	Materialist	H.	København	997	0	0
+candidate	7	Frederik Ludvig Vilhelm Drechsel	Sekretær	V. R.	Frederiksberg	406	0	0
+line	7	Ugyldige Stemmesedler	31
+line	7	Udlev., men ikke afg. Stemmesedl.	0
+constituency	7	1903-06-16	general	Staden København	9		5770	3474	poll
+candidate	7	C. Hørdum	Forretningsfører	S.	København	2558	1	1
+candidate	7	Ludvig August Grønvold	Fabrikant	H.	København	745	0	0
+candidate	7	Søren Peter Sørensen	Vinhandler	V. R.	København	150	0	0
+line	7	Ugyldige Stemmesedler	21
+line	7	Udlev., men ikke afg. Stemmesedl.	0
+constituency	7	1903-06-16	general	Staden København	10		6133	3996	poll
+candidate	7	P. Knudsen	Raadmand	S.	København	2494	0	1
+candidate	7	Axel Damkier	Redaktør	H.	København	1473	0	0
+line	7	Ugyldige Stemmesedler	29
+line	7	Udlev., men ikke afg. Stemmesedl.	0
+constituency	7	1903-06-16	general	Staden København	11		6282		unopposed
+candidate	7	Sigvald Olsen	Bryggeribestyrer	S.	Frederiksberg		1	1
+constituency	7	1903-06-16	general	Staden København	12		4222	1882	poll
+candidate	7	E. Wiinblad	Redaktør	S.	København	1471	1	1
+line	7	Nej	369
+line	7	Ugyldige Stemmesedler	42
+line	7	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	7	1903-06-16	general	Staden København	13		4980		unopposed
+candidate	7	A. C. Meyer	Journalist	S.	Frederiksberg		1	1
+constituency	8	1903-06-16	general	Københavns Amt	1	Frederiksberg	7173	5147	poll
+candidate	8	H. O. G. Ellinger	Professor	H.	Frederiksberg	2953	0	1
+candidate	8	Johan Ottosen	Skoleinspektør	V. R.	København	2143	1	0
+line	8	Ugyldige Stemmesedler	51
+line	8	Udlev., men ikke afg. Stemmesedl.	0
+constituency	8	1903-06-16	general	Københavns Amt	2	Frederiksberg	7019		unopposed
+candidate	8	K. M. Klausen	Raadmand	S.	København		1	1
+constituency	8	1903-06-16	general	Københavns Amt	3	Valby	5227	3460	poll
+candidate	8	Niels Emil Hyller	Cigarfabrikant	S.	København	1718	0	1
+candidate	8	Ferdinand Daniel Hansen	Handelsgartner	H.	Hellerup	1026	0	0
+candidate	8	Oscar Hansen	Dr. phil.	V. R.	Vedbæk	692	1	0
+line	8	Ugyldige Stemmesedler	24
+line	8	Udlev., men ikke afg. Stemmesedl.	0
+constituency	8	1903-06-16	general	Københavns Amt	4	Lyngby	5643	3844	poll
+candidate	8	Emil Georg Piper	Proprietær	H.	Lyngby	1721	0	1
+candidate	8	Johan Carl Thorvald Wilmann	Forretningsf.	S.	Vedbæk	1507	1	0
+candidate	8	Jacob Frederik Brandt	Kaptajn	V. R.	Hellerup	490	0	0
+candidate	8	Oscar Koefoed	Postmester	H.	Hellerup	93	0	0
+line	8	Ugyldige Stemmesedler	29
+line	8	Udlev., men ikke afg. Stemmesedl.	4
+constituency	8	1903-06-16	general	Københavns Amt	5	Roskilde Købstad	3978	3168	poll
+candidate	8	H. J. Rosleff	Mejeriejer	V. R.	Lille Karleby	1344	1	1
+candidate	8	Asger Karstensen	Redaktør	H.	København	942	0	0
+candidate	8	H. Nielsen	Tobakshandler	S.	Roskilde	863	0	0
+line	8	Ugyldige Stemmesedler	19
+line	8	Udlev., men ikke afg. Stemmesedl.	0
+constituency	9	1903-06-16	general	Københavns Amt	6	Køge Købstad	3519	1903	poll
+candidate	9	A. Alberti	Justitsminister	V. R.	København	1285	1	1
+candidate	9	J. S. Koch	Overretssagf.	S.	Lyngby	597	0	0
+line	9	Ugyldige Stemmesedler	21
+line	9	Udlev., men ikke afg. Stemmesedl.	0
+constituency	9	1903-06-16	general	Københavns Amt	7	Lejre Kro	2223	1030	poll
+candidate	9	Ole Hansen	Landbrugsminister	V. R.	Bringstrup	930	1	1
+candidate	9	Christian Jagd	Møller	A.	Vintre Mølle	79	0	0
+line	9	Ugyldige Stemmesedler	20
+line	9	Udlev., men ikke afg. Stemmesedl.	1
+constituency	9	1903-06-16	general	Frederiksborg Amt	1	Helsingør Købstad	3519	2864	poll
+candidate	9	Christian Rasmussen	Forretningsfører	S.	Helsingør	1431	1	1
+candidate	9	Christian Frederik Kuhn	Overretssagfører	L.	Espergærde	1401	0	0
+line	9	Ugyldige Stemmesedler	32
+line	9	Udlev., men ikke afg. Stemmesedl.	0
+constituency	9	1903-06-16	general	Frederiksborg Amt	2	Fredensborg	3099	1953	poll
+candidate	9	Lars Pedersen	Møller	V. R.	Annise	1114	0	1
+candidate	9	Carl E. Jensen	Grdej.	H.	Lyngby	802	0	0
+line	9	Ugyldige Stemmesedler	37
+line	9	Udlev., men ikke afg. Stemmesedl.	0
+constituency	9	1903-06-16	general	Frederiksborg Amt	3	Hillerød Købstad	3427	1990	poll
+candidate	9	Lars Dinesen	Fhv. Statsrevisor	Fk.	Charlottenlund	866	1	1
+candidate	9	Jens Madsen Videbæk	Sekretær	V. R.	Hellerup	545	0	0
+candidate	9	P. Petersen	Gaardejer	S.	Viksø	538	0	0
+line	9	Ugyldige Stemmesedler	40
+line	9	Udlev., men ikke afg. Stemmesedl.	1
+constituency	10	1903-06-16	general	Frederiksborg Amt	4	Frederiksværk	3134	2012	poll
+candidate	10	Heinrich August Doose	Gaardejer	V. R.	Hømb	1225	1	1
+candidate	10	Tvermoes	Forpagter	Fk.	Søllerødgaard	700	0	0
+line	10	Ugyldige Stemmesedler	87
+line	10	Udlev., men ikke afg. Stemmesedl.	0
+constituency	10	1903-06-16	general	Frederiksborg Amt	5	Frederikssund Købstad	3075		unopposed
+candidate	10	Sigurd Berg	Redaktør	V. R.	Hillerød		1	1
+# footnote: "Godkendelsen af dette Valg er udsat." (approval of this election was postponed)
+constituency	10	1903-06-16	general	Holbæk Amt	1	Holbæk Købstad	3610	1754	poll
+candidate	10	K. L. Fogtmann	Skolelærer	V. R.	Sandby	1336	1	1
+line	10	Nej	341
+line	10	Ugyldige Stemmesedler	77
+line	10	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	10	1903-06-16	general	Holbæk Amt	2	Svinninge Kro	3600		unopposed
+candidate	10	Kristian Pedersen	Gaardejer	V. R.	Sandby		1	1
+constituency	11	1903-06-16	general	Holbæk Amt	3	Vedby Kro	3638	2061	poll
+candidate	11	Hans Laurits Jørgensen	Gaardejer	M. V.	Ougtved	1141	1	1
+candidate	11	Kristian Sørensen	Lærer	V. R.	Munkebjergby	857	0	0
+line	11	Ugyldige Stemmesedler	63
+line	11	Udlev., men ikke afg. Stemmesedl.	0
+constituency	11	1903-06-16	general	Holbæk Amt	4	Kalundborg Købstad; Onsbjerg	3921	2738	poll
+candidate	11	Christopher Krabbe	Herredsf.	V. R.	Kjellerup	1678	1	1
+candidate	11	M. A. Madsen	Husejer	S.	Alderslyst	1027	0	0
+line	11	Ugyldige Stemmesedler	33
+line	11	Udlev., men ikke afg. Stemmesedl.	0
+# two polling places: Kalundborg Købstad, and Onsbjerg for the Samsø parishes
+constituency	11	1903-06-16	general	Holbæk Amt	5	Nykøbing Købstad	3587		unopposed
+candidate	11	Peter Madsen	Gaardejer	V. R.	Eskildstrup		1	1
+constituency	11	1903-06-16	general	Sorø Amt	1	Ringsted Købstad	3527	2454	poll
+candidate	11	C. Th. Zahle	Overretssagfører	V. R.	København	1464	1	1
+candidate	11	V. T. E. Hjort	Redaktør	H.	Slagelse	550	0	0
+candidate	11	H. C. Jensen	Husmand	S.	Thestrup	399	0	0
+line	11	Ugyldige Stemmesedler	41
+line	11	Udlev., men ikke afg. Stemmesedl.	0
+constituency	12	1903-06-16	general	Sorø Amt	2	Sorø Købstad	2803		unopposed
+candidate	12	Poul Christensen	Husmand	V. R.	Ødemark		1	1
+constituency	12	1903-06-16	general	Sorø Amt	3	Slagelse Købstad	4474	3935	poll
+candidate	12	Vilhelm Lange	Tobaksfabrikant	H.	Slagelse	1428	0	1
+candidate	12	Anton Bing	Redaktør	V. R.	København	1422	1	0
+candidate	12	P. D. Pedersen	Pakmester	S.	København	1061	0	0
+line	12	Ugyldige Stemmesedler	23
+line	12	Udlev., men ikke afg. Stemmesedl.	1
+constituency	12	1903-06-16	general	Sorø Amt	4	Skælskør Købstad	3002	2376	poll
+candidate	12	Rasmus Andersen	Gaardejer	V. R.	Tranderup	1379	1	1
+candidate	12	R. C. Sørensen-Allesø	Gaardejer	H.	Allesø	962	0	0
+line	12	Ugyldige Stemmesedler	31
+line	12	Udlev., men ikke afg. Stemmesedl.	4
+constituency	12	1903-06-16	general	Sorø Amt	5	Fuglebjerg Kro	2910	1505	poll
+candidate	12	Lars Jensen	Gaardejer	V. R.	Arløse, Førslev	1139	1	1
+candidate	12	Vilh. Andersen	Gaardbestyrer	S.	Tybjerglille	328	0	0
+line	12	Ugyldige Stemmesedler	38
+line	12	Udlev., men ikke afg. Stemmesedl.	0
+constituency	13	1903-06-16	general	Præstø Amt	1	Storeheddinge Købstad	3422	2634	poll
+candidate	13	Svend Høgsbro	Højesteretssagfører	V. R.	København	1666	1	1
+candidate	13	J. F. Scavenius	Kammerherre	H.	Gjorslev	914	0	0
+line	13	Ugyldige Stemmesedler	47
+line	13	Udlev., men ikke afg. Stemmesedl.	7
+constituency	13	1903-06-16	general	Præstø Amt	2	Fakse	3427	2138	poll
+candidate	13	Anton Jensen	Lærer	V. R.	Lund	1304	1	1
+candidate	13	Stauning	Redakt.	S.	Københ.	748	0	0
+line	13	Ugyldige Stemmesedler	86
+line	13	Udlev., men ikke afg. Stemmesedl.	0
+constituency	13	1903-06-16	general	Præstø Amt	3	Næstved Købstad	3672	2886	poll
+candidate	13	Julius Frandsen	Gaardejer	V. R.	Nørre Tvede	1662	1	1
+candidate	13	Joseph Hansen	Redaktør	S.	Næstved	1173	0	0
+line	13	Ugyldige Stemmesedler	12
+line	13	Udlev., men ikke afg. Stemmesedl.	39
+constituency	13	1903-06-16	general	Præstø Amt	4	Præstø Købstad	2692	1846	poll
+candidate	13	Rasmus Nielsen	Gaardejer	V. R.	Brøderup	792	0	1
+candidate	13	Niels Hansen	Gaardejer	V. R.	Kausbjerggaard	585	0	0
+candidate	13	Chr. Hansen	Høker og Husejer	V. R.	Bøgesø	427	0	0
+line	13	Ugyldige Stemmesedler	42
+line	13	Udlev., men ikke afg. Stemmesedl.	0
+constituency	14	1903-06-16	general	Præstø Amt	5	Vordingborg Købstad	2957	2340	poll
+candidate	14	Carl Hansen	Brandkassedirektør	V. R.	Holsteinsminde	1162	0	1
+candidate	14	Jens Chr. Larsen	Arbejdsmand	S.	Næstved	585	0	0
+candidate	14	Hemming Poulsen	Gaardejer	Fk.	Sallerup	546	0	0
+line	14	Ugyldige Stemmesedler	43
+line	14	Udlev., men ikke afg. Stemmesedl.	4
+constituency	14	1903-06-16	general	Præstø Amt	6	Stege Købstad	2929	2238	poll
+candidate	14	Jens Jensen-Brændholt	Gaardejer	V. R.	Merløse	1126	1	1
+candidate	14	Peter Bojsen	Forstander	M. V.	Ry	1084	0	0
+line	14	Ugyldige Stemmesedler	27
+line	14	Udlev., men ikke afg. Stemmesedl.	1
+constituency	14	1903-06-16	general	Bornholms Amt	1	Rønne Købstad	3288	2198	poll
+candidate	14	M. P. Blem	Gaardejer	V. R.	Engegaard, Ny-Larsker	1437	1	1
+candidate	14	Christen Nielsen-Hauge	Redakt.	S.	Rønne	717	0	0
+line	14	Ugyldige Stemmesedler	38
+line	14	Udlev., men ikke afg. Stemmesedl.	6
+constituency	14	1903-06-16	general	Bornholms Amt	2	Aakirkeby Købstad	2985	1589	poll
+candidate	14	Niels Ingvard Jensen	Lærer	V. R.	Gudhjem	1147	1	1
+candidate	14	L. B. Brüel	Skovrider	L.	Rømersdal, Almindingen	422	0	0
+line	14	Ugyldige Stemmesedler	20
+line	14	Udlev., men ikke afg. Stemmesedl.	0
+constituency	15	1903-06-16	general	Maribo Amt	1	Nakskov Købstad	4311	3574	poll
+candidate	15	L. Reventlow	Hofjægerm., Greve	Fk.	Rudbjerggaard	1742	1	1
+candidate	15	S. Bresemann	Red.	S.	Nakskov	1163	0	0
+candidate	15	S. Keiser Nielsen	Sognepræst	V. R.	Thorslunde	643	0	0
+line	15	Ugyldige Stemmesedler	26
+line	15	Udlev., men ikke afg. Stemmesedl.	0
+constituency	15	1903-06-16	general	Maribo Amt	2	Maribo Købstad	3856	2693	poll
+candidate	15	O. Olsen	Grdejer	V. R.	Tjæreby	1614	1	1
+candidate	15	Vilh. Hansen	Grdjr.	H.	Ringseby	1007	0	0
+line	15	Ugyldige Stemmesedler	72
+line	15	Udlev., men ikke afg. Stemmesedl.	0
+constituency	15	1903-06-16	general	Maribo Amt	3	Sakskøbing Købstad	3303	2452	poll
+candidate	15	Holger Rørdam	Læge	V. R.	København	1323	1	1
+candidate	15	Karl Munk	Gaardejer	M. V.	Bjernæs	798	0	0
+candidate	15	Joh. P. Larsen	Lærer	S.	Ø. Ulslev	309	0	0
+line	15	Ugyldige Stemmesedler	22
+line	15	Udlev., men ikke afg. Stemmesedl.	0
+constituency	15	1903-06-16	general	Maribo Amt	4	Nykøbing Købstad	4024	2993	poll
+candidate	15	G. Kristian J. K. Bjerre	Sognepræst	V. R.	Pedersborg	1053	0	1
+candidate	15	P. Chr. Reventlow	Redaktør	H.	Nykøbing F.	870	0	0
+candidate	15	J. Valdemar Olsen	Sekretær	S.	København	731	0	0
+candidate	15	Peter Petersen	Gaardejer	V. R.	Killerup	318	0	0
+line	15	Ugyldige Stemmesedler	19
+line	15	Udlev., men ikke afg. Stemmesedl.	2
+constituency	16	1903-06-16	general	Maribo Amt	5	Stubbekøbing Købstad	3374	2068	poll
+candidate	16	Jens Christian Jacobsen Stub	Gaardejer	V. R.	N. Alslev	1078	0	1
+candidate	16	Niels Poulsen Nørbjerg	Gaardejer	A.	Borregaard, Thy	962	0	0
+line	16	Ugyldige Stemmesedler	28
+line	16	Udlev., men ikke afg. Stemmesedl.	0
+constituency	16	1903-06-16	general	Odense Amt	1	Odense Købstad	3234	2728	poll
+candidate	16	C. E. Marott	Redaktør	S.	Odense	1385	0	1
+candidate	16	C. C. F. Nanke	Borgmester	H.	Korsør	1320	1	0
+line	16	Ugyldige Stemmesedler	23
+line	16	Udlev., men ikke afg. Stemmesedl.	0
+constituency	16	1903-06-16	general	Odense Amt	2	Odense Købstad	4640	3802	poll
+candidate	16	Martin Madsen	Kaptajn	H.	København	1998	1	1
+candidate	16	Gustav Bang	Dr. phil.	S.	Frederiksberg	1766	0	0
+line	16	Ugyldige Stemmesedler	38
+line	16	Udlev., men ikke afg. Stemmesedl.	0
+constituency	16	1903-06-16	general	Odense Amt	3	Kerteminde Købstad	3222	2206	poll
+candidate	16	Peder Pedersen Pindstrup	Gaardejer	V. R.	Godensgaard	1302	0	1
+candidate	16	Lars Christiansen	Gaardejer	Fk.	Vindinge Søgaard	864	1	0
+line	16	Ugyldige Stemmesedler	40
+line	16	Udlev., men ikke afg. Stemmesedl.	0
+constituency	17	1903-06-16	general	Odense Amt	4	Assens Købstad	3298	1666	poll
+candidate	17	Klaus Berntsen	Kreditforeningsdirektør	M. V.	Særslev	1215	1	1
+candidate	17	Jørgen Larsen	Gaardbestyrer	S.	St. Hans Landsogn	421	0	0
+line	17	Ugyldige Stemmesedler	30
+line	17	Udlev., men ikke afg. Stemmesedl.	0
+constituency	17	1903-06-16	general	Odense Amt	5	Middelfart Købstad	3680	2702	poll
+candidate	17	Karl Slengerik	Redaktør	V. R.	Odense	1476	1	1
+candidate	17	Niels R. Møller	Handelsgartner, Borgerrepræs.	V. R.	Vanløse	1203	0	0
+line	17	Ugyldige Stemmesedler	23
+line	17	Udlev., men ikke afg. Stemmesedl.	0
+constituency	17	1903-06-16	general	Odense Amt	6	Bogense Købstad	3147	1829	poll
+candidate	17	Jens Jensen	Husejer	M. V.	Aadal, Kværndrup	921	1	1
+candidate	17	Jørgen Hansen	Gaardejer	V. R.	Hudevad	483	0	0
+candidate	17	Laurits Hansen	Gaardejer	Fk.	Killerup	395	0	0
+line	17	Ugyldige Stemmesedler	30
+line	17	Udlev., men ikke afg. Stemmesedl.	0
+constituency	17	1903-06-16	general	Odense Amt	7	Otterup	3212	2429	poll
+candidate	17	Christian Lohmann	Gaardmand	M. V.	Aasum	1080	0	1
+candidate	17	Mads Larsen	Gaardejer	V. R.	Hessum	1069	1	0
+candidate	17	N. E. Hofmann-Bang	Stamhusbesidder	H.	Hofmansgave	257	0	0
+line	17	Ugyldige Stemmesedler	23
+line	17	Udlev., men ikke afg. Stemmesedl.	0
+# footnote: "Godkendelsen af dette Valg er udsat." (approval of this election was postponed)
+constituency	18	1903-06-16	general	Odense Amt	8	Verninge	2959	1765	poll
+candidate	18	N. P. Lindø	Gaardejer	A.	Sønder-Næraa	1020	0	1
+candidate	18	N. Tang	Højskoleforstander	V. R.	Emdrupborg	721	0	0
+line	18	Ugyldige Stemmesedler	24
+line	18	Udlev., men ikke afg. Stemmesedl.	0
+constituency	18	1903-06-16	general	Svendborg Amt	1	Nyborg Købstad	3797	2349	poll
+candidate	18	Niels Jensen	Gaardejer	M. V.	Toustrup	1241	1	1
+candidate	18	Hans Nielsen	Redaktionssekret.	S.	Odense	755	0	0
+candidate	18	Mads Pedersen (Tange)	Husmand	V. R.	Palleshave	308	0	0
+line	18	Ugyldige Stemmesedler	45
+line	18	Udlev., men ikke afg. Stemmesedl.	0
+constituency	18	1903-06-16	general	Svendborg Amt	2	Gudme	3019		unopposed
+candidate	18	Andreas Christensen Rosager	Gaardejer	V. R.	Vejstrup		1	1
+constituency	18	1903-06-16	general	Svendborg Amt	3	Svendborg Købstad	4796	3584	poll
+candidate	18	Kristian Knop	Gaardejer	V. R.	Kathrinebjerg	1679	1	1
+candidate	18	W. Neergaard	Godsejer	H.	Faarevejle	1221	0	0
+candidate	18	H. P. Hansen	Redaktør	S.	Svendborg	668	0	0
+line	18	Ugyldige Stemmesedler	16
+line	18	Udlev., men ikke afg. Stemmesedl.	0
+constituency	19	1903-06-16	general	Svendborg Amt	4	Faaborg Købstad	3423	2424	poll
+candidate	19	Hans Poul Pedersen	Gaardfæster	V. R.	Viby	1351	1	1
+candidate	19	Rasmus Christiansen	Forpagter	Fk.	Brænderupgaard	1045	0	0
+line	19	Ugyldige Stemmesedler	28
+line	19	Udlev., men ikke afg. Stemmesedl.	0
+constituency	19	1903-06-16	general	Svendborg Amt	5	Højrup	3010	1095	poll
+candidate	19	I. H. Deuntzer	Konseilspræsident	V. R.	København	999	1	1
+line	19	Nej	81
+line	19	Ugyldige Stemmesedler	15
+line	19	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	19	1903-06-16	general	Svendborg Amt	6	Rudkøbing Købstad	3590	1529	poll
+candidate	19	Niels Guldbrandsen	Redaktør	V. R.	Frederiksberg	1114	1	1
+line	19	Nej	370
+line	19	Ugyldige Stemmesedler	45
+line	19	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	19	1903-06-16	general	Svendborg Amt	7	Ærøskøbing Købstad	2548	1116	poll
+candidate	19	Jørgen Frederiksen	Gaardejer	V. R.	Strandbygaard	839	1	1
+line	19	Nej	222
+line	19	Ugyldige Stemmesedler	55
+line	19	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	20	1903-06-16	general	Hjørring Amt	1	Frederikshavn Købstad	3927	2370	poll
+candidate	20	Hans Madsen	Gaardejer	V. R.	Skærum	1753	1	1
+candidate	20	Jørgen Hald	Gaardejer	V. R.	Hugdrup	535	0	0
+line	20	Ugyldige Stemmesedler	75
+line	20	Udlev., men ikke afg. Stemmesedl.	7
+constituency	20	1903-06-16	general	Hjørring Amt	2	Sæby Købstad	3621	2502	poll
+candidate	20	Vilhelm Lassen	Redaktør	V. R.	Aalborg	1531	1	1
+candidate	20	Chr. Thomsen	Gaardejer	V. R.	Fæbroen	933	0	0
+line	20	Ugyldige Stemmesedler	38
+line	20	Udlev., men ikke afg. Stemmesedl.	0
+constituency	20	1903-06-16	general	Hjørring Amt	3	Hjørring Købstad	3996	2405	poll
+candidate	20	Mads Christian Jensen Jungersen	Gaardejer	V. R.	Hundelev	1114	1	1
+candidate	20	Johannes Carl Døcker	Proprietær	H.	Rørbæk-Hovgaard	493	0	0
+candidate	20	Christen Hansen	Gaardejer	V. R.	Bindslev	393	0	0
+candidate	20	Hans Lauritz Jensen Østergaard	Gaardejer	V. R.	Skt. Hans	343	0	0
+line	20	Ugyldige Stemmesedler	62
+line	20	Udlev., men ikke afg. Stemmesedl.	0
+constituency	20	1903-06-16	general	Hjørring Amt	4	Vraa Station	3690	922	poll
+candidate	20	Thomas Larsen	Husmand	V. R.	Vraa	765	1	1
+line	20	Nej	136
+line	20	Ugyldige Stemmesedler	18
+line	20	Udlev., men ikke afg. Stemmesedl.	3
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	21	1903-06-16	general	Hjørring Amt	5	Halvrimme Skole i Brovst Sogn	2776	822	poll
+candidate	21	Carl Sørensen	Gaardejer	V. R.	Øland	659	1	1
+line	21	Nej	124
+line	21	Ugyldige Stemmesedler	36
+line	21	Udlev., men ikke afg. Stemmesedl.	3
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	21	1903-06-16	general	Thisted Amt	1	Bjerget Kro i Lild S.	2290	498	poll
+candidate	21	Jens Peter Christensen Nørhave	Gaardejer	V. R.	Vust	456	1	1
+line	21	Nej	23
+line	21	Ugyldige Stemmesedler	19
+line	21	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	21	1903-06-16	general	Thisted Amt	2	Thisted Købstad	3491	2398	poll
+candidate	21	Niels Andersen	Etatsraad	H.	Søholm, Gentofte	1207	0	1
+candidate	21	Jens Jensen Andersen	Gaardejer	V. R.	Nygaard	1157	1	0
+line	21	Ugyldige Stemmesedler	34
+line	21	Udlev., men ikke afg. Stemmesedl.	0
+# footnote on Niels Andersen: "Valgt i Thisted Amts 3die Kreds den 3die April 1901."
+constituency	21	1903-06-16	general	Thisted Amt	3	Hurup Station	2887	2290	poll
+candidate	21	S. Barner	Kammerherre	H.	Eskildstrup	1184	0	1
+candidate	21	A. K. Kierkegaard	Lærer	V. R.	Agger	1063	0	0
+line	21	Ugyldige Stemmesedler	43
+line	21	Udlev., men ikke afg. Stemmesedl.	0
+constituency	22	1903-06-16	general	Thisted Amt	4	Nykøbing Købstad	3859	2652	poll
+candidate	22	Niels Markvorsen	Gaardejer	V. R.	Lødderup	1652	1	1
+candidate	22	P. C. Dyekjær	Redaktør	L.	København	621	0	0
+candidate	22	Niels Chr. Christensen	Husmand	S.	Lødderup	307	0	0
+line	22	Ugyldige Stemmesedler	72
+line	22	Udlev., men ikke afg. Stemmesedl.	0
+constituency	22	1903-06-16	general	Aalborg Amt	1	Nørresundby Købstad	3338	1849	poll
+candidate	22	Jens Jensen	Gaardejer	V. R.	Sønderup	1122	1	1
+candidate	22	J. Bertelsen	Gaardejer	V. R.	Skalborg	675	0	0
+line	22	Ugyldige Stemmesedler	52
+line	22	Udlev., men ikke afg. Stemmesedl.	0
+constituency	22	1903-06-16	general	Aalborg Amt	2	Aalborg Købstad	5713	4205	poll
+candidate	22	N. C. Christensen	Journalist	S.	Aalborg	1740	0	1
+candidate	22	J. F. Jul. Wulff	Sekretær	H.	Frederiksberg	1525	0	0
+candidate	22	Vald. Petersen	Sagfører	V. R.	Aalborg	868	0	0
+candidate	22	D. H. Petersen	Sognepræst	L.	Astrup-Storarden	23	0	0
+line	22	Ugyldige Stemmesedler	43
+line	22	Udlev., men ikke afg. Stemmesedl.	6
+# no asterisk is printed on N. C. Christensen, although he was the sitting member elected here in 1901 (kept as printed)
+constituency	22	1903-06-16	general	Aalborg Amt	3	Bælum	3553	2178	poll
+candidate	22	Jens Henrik Jensen	Snedker	V. R.	Nørre-Kongerslev	1231	1	1
+candidate	22	Niels Kr. Mikkelsen Vittrup	Husmand	V. R.	Hurup	624	0	0
+candidate	22	J. P. Mathiasen	Husmand	S.	Lindved	289	0	0
+line	22	Ugyldige Stemmesedler	34
+line	22	Udlev., men ikke afg. Stemmesedl.	0
+constituency	23	1903-06-16	general	Aalborg Amt	4	Aars	3963		unopposed
+candidate	23	Anders Thomsen	Gaardejer, Skolelærer	V. R.	Havbro		1	1
+constituency	23	1903-06-16	general	Aalborg Amt	5	Nibe Købstad	3176	1055	poll
+candidate	23	Lars Sørensen Kvist	Gaardejer	V. R.	Estrup	702	1	1
+line	23	Nej	318
+line	23	Ugyldige Stemmesedler	32
+line	23	Udlev., men ikke afg. Stemmesedl.	3
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	24	1903-06-16	general	Viborg Amt	1	Skive Købstad	3845	2533	poll
+candidate	24	Carl Hansen	Husmand	V. R.	Vinde	1336	1	1
+candidate	24	Jens Mortensen	Gaardejer	M. V.	Tøndering	1068	0	0
+candidate	24	Peder Hansen	Boelsmand	S.	Hvingel	98	0	0
+line	24	Ugyldige Stemmesedler	31
+line	24	Udlev., men ikke afg. Stemmesedl.	0
+constituency	24	1903-06-16	general	Viborg Amt	2	Viborg Købstad	2976	2142	poll
+candidate	24	Poul Svejstrup	Herredsfoged	V. R.	Viborg	1125	0	1
+candidate	24	Niels Kaas	Forpagter	H.	Staarupgaard	631	0	0
+candidate	24	Fr. Lauritzen	Redaktør	S.	Skive	340	0	0
+line	24	Ugyldige Stemmesedler	38
+line	24	Udlev., men ikke afg. Stemmesedl.	8
+constituency	24	1903-06-16	general	Viborg Amt	3	Kjellerup	4003	2572	poll
+candidate	24	Anders Jensen	Lærer	V. R.	Knudstrup	1416	1	1
+line	24	Nej	1049
+line	24	Ugyldige Stemmesedler	107
+line	24	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	24	1903-06-16	general	Viborg Amt	4	Sønder-Vinge	3200	1016	poll
+candidate	24	Rasmus Hansen	Gaardejer	V. R.	Mammen	736	1	1
+line	24	Nej	232
+line	24	Ugyldige Stemmesedler	48
+line	24	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	25	1903-06-16	general	Viborg Amt	5	Løvel	3422	1191	poll
+candidate	25	Anders Nielsen	Statsrevisor	V. R.	Tapdrup	1009	1	1
+line	25	Nej	124
+line	25	Ugyldige Stemmesedler	58
+line	25	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	25	1903-06-16	general	Randers Amt	1	Mariager Købstad	2926	2085	poll
+candidate	25	N. Kr. Moestrup	Gaardejer	V. R.	Mellerup	1332	1	1
+candidate	25	M. V. Smidt	Bogholder	H.	«Cimbria» pr. Mariager	357	0	0
+candidate	25	J. N. Abrahamsen	Avisbud	S.	Horsens	353	0	0
+line	25	Ugyldige Stemmesedler	41
+line	25	Udlev., men ikke afg. Stemmesedl.	2
+constituency	25	1903-06-16	general	Randers Amt	2	Randers Købstad	3942	3575	poll
+candidate	25	Poul Rasmusen	Overretssagf.	H.	København	1452	1	1
+candidate	25	M. Mortensen	Redaktør	S.	Randers	1259	0	0
+candidate	25	V. H. O. Madsen	Krigsminister	V. R.	København	841	0	0
+line	25	Ugyldige Stemmesedler	20
+line	25	Udlev., men ikke afg. Stemmesedl.	3
+constituency	25	1903-06-16	general	Randers Amt	3	Randers Købstad	3028	1565	poll
+candidate	25	P. Bjerre	Proprietær	V. R.	Højstrup	1001	1	1
+line	25	Nej	453
+line	25	Ugyldige Stemmesedler	111
+line	25	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	26	1903-06-16	general	Randers Amt	4	Hornslet	3396	855	poll
+candidate	26	K. M. Kristiansen	Gaardejer	V. R.	Beder	606	1	1
+line	26	Nej	205
+line	26	Ugyldige Stemmesedler	44
+line	26	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	26	1903-06-16	general	Randers Amt	5	Grenaa Købstad	3502	1310	poll
+candidate	26	Niels Pedersen	Gaardejer	V. R.	Nyskov	950	1	1
+line	26	Nej	297
+line	26	Ugyldige Stemmesedler	63
+line	26	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	26	1903-06-16	general	Randers Amt	6	Æbeltoft Købstad	3107	1592	poll
+candidate	26	N. Neergaard	Direktør	M. V.	København	1135	1	1
+candidate	26	G. Winther	Journalist	S.	Grenaa	412	0	0
+line	26	Ugyldige Stemmesedler	45
+line	26	Udlev., men ikke afg. Stemmesedl.	0
+constituency	26	1903-06-16	general	Aarhus Amt	1	Odder	3215	2367	poll
+candidate	26	Niels Christian Nielsen Grøn	Gaardejer	V. R.	Klakring	1195	1	1
+candidate	26	Carl Jacobsen	Journalist	S.	Odder	679	0	0
+candidate	26	Chr. Leth-Espensen	Gaardejer	A.	Vibygaard	471	0	0
+line	26	Ugyldige Stemmesedler	22
+line	26	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Aarhus Amt	2	Aarhus Købstad	4954	4182	poll
+candidate	27	P. Sabroe	Redaktør	S.	Aarh.	2110	1	1
+candidate	27	Jul. Emil Christoph. Høegh-Guldberg	Overretssagf.	H.	Aarhus	1786	0	0
+candidate	27	T. O. Kornerup	Postmester	V. R.	Hjørring	233	0	0
+line	27	Ugyldige Stemmesedler	53
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Aarhus Amt	3	Aarhus Købstad	4822	3909	poll
+candidate	27	Harald Jensen	Red.	S.	Aarh.	2190	1	1
+candidate	27	P. Jensen	Redaktør	H.	Aarhus	888	0	0
+candidate	27	E. C. L. Drechsel	Borgmester	V. R.	Varde	768	0	0
+line	27	Ugyldige Stemmesedler	63
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Aarhus Amt	4	Skjoldelev i Lading S.	3147	2533	poll
+candidate	27	J. Nielsen	Lærer	V. R.	Jeksen	1325	1	1
+candidate	27	M. Simonsen	Red.	S.	Aarhus	939	0	0
+candidate	27	Niels Kristensen	Gaardejer	V. R.	Spørring	241	0	0
+line	27	Ugyldige Stemmesedler	28
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Skanderborg Amt	1	Horsens Købstad	3410	2940	poll
+candidate	27	Michael Christian Lyngsie	Forretningsfører	S.	København	1270	1	1
+candidate	27	Julius Schovelin	Kontorchef	H.	København	1227	0	0
+candidate	27	S. Paulsen	Direktør	V. R.	Randers	430	0	0
+line	27	Ugyldige Stemmesedler	13
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Skanderborg Amt	2	Skanderborg Købstad	2899	2289	poll
+candidate	27	R. P. Randløv	Gaardejer	M. V.	Taaning	859	0	1
+candidate	27	H. Rasmussen	Redaktør	S.	Skanderborg	749	0	0
+candidate	27	J. Sørensen	Gaardejer	V. R.	Vitved	655	1	0
+line	27	Ugyldige Stemmesedler	26
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	27	1903-06-16	general	Skanderborg Amt	3	Bræstrup By i Ring S.	2721	1980	poll
+candidate	27	Laust Jensen	Landmand	V. R.	Bjørnskov	1084	1	1
+candidate	27	P. Skaarup	Gaardejer	M. V.	Haslund	861	0	0
+line	27	Ugyldige Stemmesedler	35
+line	27	Udlev., men ikke afg. Stemmesedl.	0
+constituency	28	1903-06-16	general	Skanderborg Amt	4	Horsens Købstad	2812	1499	poll
+candidate	28	Peder Thomsen Nielsen	Gaardejer	V. R.	Haarby	1192	1	1
+candidate	28	Niels Kristensen	Ledvogter	S.	Hovedgaard	248	0	0
+line	28	Ugyldige Stemmesedler	59
+line	28	Udlev., men ikke afg. Stemmesedl.	0
+constituency	28	1903-06-16	general	Skanderborg Amt	5	Silkeborg Købstad	3274	2498	poll
+candidate	28	A. Byriel Jensen	Gaardejer	M. V.	Lyngby	933	1	1
+candidate	28	Jacob Christensen	Redaktør	S.	Silkeborg	842	0	0
+candidate	28	N. P. Jensen	Cand. mag., Fuldmægtig	V. R.	Hellerup	692	0	0
+line	28	Ugyldige Stemmesedler	31
+line	28	Udlev., men ikke afg. Stemmesedl.	0
+# footnote on Byriel Jensen's party: "Efter Valget optaget i Venstrereformpartiet."
+constituency	28	1903-06-16	general	Vejle Amt	1	Fredericia Købstad	4251	3408	poll
+candidate	28	Jens Ousen	Gaardejer	M. V.	Egum	1281	1	1
+candidate	28	Lauritz Rasmussen	Redaktør	S.	Horsens	1088	0	0
+candidate	28	S. Chr. Sørensen	Sognepræst	H.	København	991	0	0
+line	28	Ugyldige Stemmesedler	48
+line	28	Udlev., men ikke afg. Stemmesedl.	0
+constituency	28	1903-06-16	general	Vejle Amt	2	Kolding Købstad	4458	2459	poll
+candidate	28	Enevold Sørensen	Indenrigsminister	V. R.	København	1894	1	1
+candidate	28	J. P. Jønsson	Tapetserer	S.	København	524	0	0
+line	28	Ugyldige Stemmesedler	41
+line	28	Udlev., men ikke afg. Stemmesedl.	0
+constituency	29	1903-06-16	general	Vejle Amt	3	Vejle Købstad	5036	3661	poll
+candidate	29	Thomas Nielsen	Træskomand	V. R.	Vejle	1746	1	1
+candidate	29	Peter Hansen	Journalist	S.	Horsens	1294	0	0
+candidate	29	Christen Rosendahl	Gaardejer	H.	Jellinge	579	0	0
+line	29	Ugyldige Stemmesedler	42
+line	29	Udlev., men ikke afg. Stemmesedl.	0
+constituency	29	1903-06-16	general	Vejle Amt	4	Give	3435	2264	poll
+candidate	29	Niels Chr. Jensen	Husmand	M. V.	Flø, Brande	1174	1	1
+candidate	29	Chr. Mortensen	Husmand	V. R.	Bastlund, Ringgive	1068	0	0
+line	29	Ugyldige Stemmesedler	22
+line	29	Udlev., men ikke afg. Stemmesedl.	0
+constituency	29	1903-06-16	general	Vejle Amt	5	Bjerre	2978	1508	poll
+candidate	29	Jens Jørgen Jensen	Gaardejer	V. R.	Ovsted	914	1	1
+candidate	29	Mads Kjær	Forpagter	V. R.	Bottrup	556	0	0
+line	29	Ugyldige Stemmesedler	36
+line	29	Udlev., men ikke afg. Stemmesedl.	2
+constituency	29	1903-06-16	general	Vejle Amt	6	Vonsild	2578	1337	poll
+candidate	29	Anders Jessen	Gaardejer	V. R.	Østergaard, Hjarup	933	1	1
+candidate	29	M. Schytt	Gaardejer	Fk.	Ødis	373	0	0
+line	29	Ugyldige Stemmesedler	31
+line	29	Udlev., men ikke afg. Stemmesedl.	0
+constituency	30	1903-06-16	general	Ringkøbing Amt	1	Ringkøbing Købstad	2884	1486	poll
+candidate	30	J. C. Christensen	Minister for Kirke- og Undervisningsvæsenet	V. R.	København	1400	1	1
+candidate	30	F. K. Madsen	Typograf	S.	København	71	0	0
+line	30	Ugyldige Stemmesedler	15
+line	30	Udlev., men ikke afg. Stemmesedl.	0
+constituency	30	1903-06-16	general	Ringkøbing Amt	2	Lemvig Købstad	3201		unopposed
+candidate	30	Elias Petersen Sandbæk	Gaardejer	V. R.	Nes		1	1
+constituency	30	1903-06-16	general	Ringkøbing Amt	3	Holstebro Købstad	2863	1351	poll
+candidate	30	Mads Mølgaard Nielsen	Gaardejer	V. R.	Hodsager	1140	1	1
+candidate	30	Jens Peter Andersen	Redaktør	S.	Holstebro	163	0	0
+line	30	Ugyldige Stemmesedler	39
+line	30	Udlev., men ikke afg. Stemmesedl.	9
+constituency	30	1903-06-16	general	Ringkøbing Amt	4	Vinderup i Sal Sogn	2870	1814	poll
+candidate	30	Søren Svendsen	Gaardejer	M. V.	Nøddelund	997	1	1
+candidate	30	Jens Jensen Krarup	Lærer	V. R.	Struer	661	0	0
+candidate	30	Chr. Nielsen	Portør	S.	Kbhvn.	135	0	0
+line	30	Ugyldige Stemmesedler	17
+line	30	Udlev., men ikke afg. Stemmesedl.	4
+constituency	31	1903-06-16	general	Ringkøbing Amt	5	Herning	3702	2580	poll
+candidate	31	Rasmus Nielsen	Gaardejer	M. V.	Hammerum, Gjellerup	1379	1	1
+candidate	31	Chr. Christensen Bertelsen	Lærer	V. R.	Gjellerup	1175	0	0
+line	31	Ugyldige Stemmesedler	26
+line	31	Udlev., men ikke afg. Stemmesedl.	0
+constituency	31	1903-06-16	general	Ringkøbing Amt	6	Skjern	3116	1148	poll
+candidate	31	Lucas Peder Ovesen	Husmand	V. R.	Sønder Vium	768	1	1
+line	31	Nej	326
+line	31	Ugyldige Stemmesedler	54
+line	31	Udlev., men ikke afg. Stemmesedl.	0
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	31	1903-06-16	general	Ribe Amt	1	Varde Købstad	3679	1437	poll
+candidate	31	Søren Sørensen	Gaardejer	V. R.	Nørre-Nebel	1234	1	1
+candidate	31	I. P. Justesen	Værtshusholder	S.	Varde	174	0	0
+line	31	Ugyldige Stemmesedler	29
+line	31	Udlev., men ikke afg. Stemmesedl.	0
+constituency	31	1903-06-16	general	Ribe Amt	2	Esbjerg Købstad	5190	3173	poll
+candidate	31	Hans Emil Bluhme	Godsejer, Kommandør	V. R.	Nørlund	2174	1	1
+candidate	31	N. P. Sundbo	Redaktør	S.	Esbjerg	923	0	0
+line	31	Ugyldige Stemmesedler	74
+line	31	Udlev., men ikke afg. Stemmesedl.	2
+constituency	32	1903-06-16	general	Ribe Amt	3	Ribe Købstad	2964	1506	poll
+candidate	32	Jens Busk	Fhv. Gaardejer	V. R.	Horsens	1111	1	1
+candidate	32	Andresen	Redaktør	S.	Kolding	234	0	0
+candidate	32	Johansen	Landbrugslærer	V. R.	Ladelund	138	0	0
+line	32	Ugyldige Stemmesedler	23
+line	32	Udlev., men ikke afg. Stemmesedl.	0
+constituency	32	1903-06-16	general	Ribe Amt	4	Bække By	3241	2354	poll
+candidate	32	Laurids Rasmussen	Husmand	V. R.	Grindsted	1307	1	1
+candidate	32	Hans Skjøde	Gaardmand	V. R.	Verst	576	0	0
+candidate	32	J. Jensen	Lærer	L.	Billund	460	0	0
+line	32	Ugyldige Stemmesedler	11
+line	32	Udlev., men ikke afg. Stemmesedl.	0
+constituency	32	1903-07-23	general	Færø Amt	1		2661	982	poll
+candidate	32	Johannes Patursson	Kongsbonde	V. R.	Kirkebø, Sydstrømø	488	1	1
+candidate	32	I. H. Schrøter	Sysselmand	V. R.	Sand, Sandø	478	0	0
+line	32	Ugyldige Stemmesedler	16
+line	32	Udlev., men ikke afg. Stemmesedl.	0
+# Færø Amt has a single constituency ("Valgkreds", numbered 1 here). The footnote prints "Paa Færøerne afholdtes Valget d. 23. Juli 1901."; the year is a misprint for 1903 (the remarks on page 34 say "paa Færøerne den 23de Juli" of the 1903 election), so the date is written 1903-07-23
+# by-elections (Suppleringsvalg) 1901-1903, page 33
+constituency	33	1901-12-03	by	Hjørring Amt	2	Sæby Købstad	3536	1855	poll
+candidate	33	Vilhelm Lassen	Redaktør	V. R.	Aalborg	931	0	1
+candidate	33	Christian Thomsen	Gaardejer	V. R.	Fæbroen	902	0	0
+line	33	Ugyld. ell. ubenytt. Stemmesedl.	22
+constituency	33	1902-02-18	by	Svendborg Amt	5	Højrup	3032	1444	poll
+candidate	33	I. H. Deuntzer	Konseilspræsident	V. R.	København	1288	0	1
+line	33	Nej	117
+line	33	Ugyld. ell. ubenytt. Stemmesedl.	39
+# a single candidate polled Ja/Nej: the candidate's votes are the printed "Ja", and "Nej" is written as a line
+constituency	33	1902-10-24	by	Viborg Amt	1	Skive Købstad	3751	1773	poll
+candidate	33	Carl Hansen	Husmand	V. R.	Vinde	899	0	1
+candidate	33	Anders Kristensen Sloth	Gaardejer	M. V.	Ravnholt	833	0	0
+line	33	Ugyld. ell. ubenytt. Stemmesedl.	41
+constituency	33	1903-01-14	by	Sorø Amt	4	Skælskør Købstad	2981	2342	poll
+candidate	33	Rasmus Andersen	Gaardejer	V. R.	Tranderup	1277	0	1
+candidate	33	Knud Sehested	Kammerherre	H.	Addithus	1008	0	0
+line	33	Ugyld. ell. ubenytt. Stemmesedl.	57

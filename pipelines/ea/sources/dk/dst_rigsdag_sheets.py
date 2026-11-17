@@ -157,6 +157,7 @@ class Constituency:
     result: str  # poll or unopposed
     candidates: list[Candidate] = field(default_factory=list)
     lines: list[tuple[str, int]] = field(default_factory=list)  # other printed ballot lines, such as invalid
+    misprint: str = ""  # the transcriber's note where the printed figures themselves do not add up
 
 
 def number(text: str) -> int | None:
@@ -168,6 +169,8 @@ def constituencies(path: Path) -> list[Constituency]:
     """Read a single-member transcription (records: constituency, candidate, line)."""
     found: list[Constituency] = []
     for count, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if line.startswith("# misprint") and found:
+            found[-1].misprint = line.removeprefix("# misprint:").strip()
         if not line.strip() or line.startswith("#"):
             continue
         parts = line.split("\t")
@@ -204,7 +207,9 @@ def single_problems(found: list[Constituency]) -> list[str]:
             problems.append(f"{name}: listed twice")
         seen.add(key)
         elected = [x for x in c.candidates if x.elected]
-        if len(elected) != 1:
+        against = sum(v for label, v in c.lines if label.lower().startswith("nej"))
+        rejected = len(c.candidates) == 1 and against > (c.candidates[0].votes or 0)
+        if len(elected) != (0 if rejected else 1):
             problems.append(f"{name}: {len(elected)} candidates marked elected")
         if c.result == "unopposed":
             if len(c.candidates) != 1:
@@ -216,7 +221,7 @@ def single_problems(found: list[Constituency]) -> list[str]:
         votes = sum(x.votes or 0 for x in c.candidates)
         others = sum(v for _, v in c.lines)
         returned = sum(v for label, v in c.lines if not label.lower().startswith("udlev"))
-        if c.voted is not None and c.voted not in (votes + others, votes + returned):
+        if not c.misprint and c.voted is not None and c.voted not in (votes + others, votes + returned):
             problems.append(f"{name}: candidates {votes} + lines {others} (returned {returned}) != voted {c.voted}")
         top = max(c.candidates, key=lambda x: x.votes or 0)
         if elected and (top.votes or 0) > (elected[0].votes or 0):

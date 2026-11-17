@@ -119,7 +119,8 @@ line	11	Nej	1273
 line	11	Ugyld. ell. ubenytt. Stemmesedl.	35
 # a single candidate polled Ja/Nej (candidate's votes = "Ja"; "Nej" as a line); Nej won, so nobody was elected on 3 April and the checker reports 0 elected here
 # two polling places: Kalundborg Købstad, and Onsbjerg for the Samsø parishes
-constituency	11	1901-04-15	general	Holbæk Amt	4				unopposed
+constituency	11	1901-04-15	general	Holbæk Amt	4	Kalundborg Købstad; Onsbjerg	3755		unopposed
+# registered voters and polling places of the rerun are those printed for the poll of 3 April in the same block, the same register
 candidate	11	Christopher Krabbe	Herredsf.	V. R.	Kjellerup		0	1
 # "Paa det ny Valgmøde d. 15. Apr. 1901 blev Herredsf. Christopher Krabbe (V.R.), Kjellerup, valgt uden Afstemning, da ingen ny Kandidat havde meldt sig."
 constituency	11	1901-04-03	general	Holbæk Amt	5	Nykøbing Købstad	3532	2109	poll

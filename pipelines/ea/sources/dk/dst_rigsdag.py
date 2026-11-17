@@ -78,6 +78,7 @@ class Volume:
     cid: int
     name: str
     title: str  # the volume's title as printed
+    offset: int = 0  # the PDF page of a printed page, less the printed page number
 
 
 # Proportional representation, from July 1920: election day -> the volume and its transcribed table.
@@ -100,7 +101,7 @@ SINGLE = {
     1901: Volume(20232, "valg1901", "Folketingsvalgene den 3. April 1901 med Supplerings- og Omvalg 1898-1901"),
     1903: Volume(20231, "valg1903", "Folketingsvalgene 1903"),
     1906: Volume(20230, "valg1906", "Folketingsvalgene 1906"),
-    1909: Volume(20229, "valg1909", "Folketingsvalgene 1909"),
+    1909: Volume(20229, "valg1909", "Folketingsvalgene 1909", -1),
     1910: Volume(20228, "valg1910", "Folketingsvalgene 1910"),
     1913: Volume(20227, "valg1913", "Folketingsvalgene 1913"),
     1915: Volume(20226, "valg1915", "Folketingsvalgene den 7de Maj 1915 med Suppleringsvalg 1913-15"),
@@ -355,11 +356,10 @@ def letter_party(letter: str, year: int) -> tuple[str, str] | None:
         return LETTERS["V. R."] if year < 1910 else LETTERS["V."]
     if text == "V." and year < 1910:
         return LETTERS["V. R."]
-    if text.endswith(" L.") and text != "L.":
-        return None  # an independent (løsgænger) close to a party
-    if text not in LETTERS:
-        raise LookupError(f"{year}: no party for letter {letter!r}")
-    return LETTERS[text]
+    text = re.sub(r"^V\. R\. \(.*\)$", "V. R.", text)  # 1909: the wings of Venstrereformpartiet
+    # anything else (a mixed letter such as "H. A." or "R. L.", or a description such as "Afholdskandidat") is
+    # a candidate outside the parties
+    return LETTERS.get(text)
 
 
 def registry() -> Package:
@@ -437,7 +437,7 @@ def pr_path(day: date) -> Path:
 
 
 # The single-member volumes whose transcription is complete and checked.
-READY: set[int] = {1915}
+READY: set[int] = {1901, 1903, 1906, 1909, 1910, 1913, 1915}
 
 
 def sm_path(year: int) -> Path:
@@ -741,7 +741,8 @@ SM_METHOD = (
     "valid votes are the candidates' votes together. Ballots cast are the printed number who voted (Deraf stemte) "
     "where it equals the valid, invalid, and blank ballots together; where the volume also counts ballots handed out "
     "but not returned, that figure is left out. Where a sole candidate faced a poll, the votes against him "
-    "(Nej-Stemmer) are stored as a vote against and count as valid. Each figure was checked against the printed "
+    "(Nej-Stemmer) are stored as a vote against and count as valid. Where the volume prints invalid and blank "
+    "ballots as one figure, it is stored as invalid. Each figure was checked against the printed "
     "number who voted."
 )
 TACIT = (
@@ -759,11 +760,21 @@ def single() -> dict[date, list[tuple[int, sheets.Constituency]]]:
         problems = sheets.single_problems(rows)
         if problems:
             raise ValueError(f"{sm_path(year).name} does not add up: {problems[:5]}")
+        for c in rows:  # the transcriptions cite printed page numbers; locate the pages of the PDF
+            c.page += SINGLE[year].offset
+            for candidate in c.candidates:
+                candidate.page += SINGLE[year].offset
         days = [c.day for c in rows if c.kind == "general"]
         main = max(set(days), key=days.count)
+        first = {(c.county, c.number) for c in rows if c.kind == "general" and c.day == main}
         for c in rows:
-            # a general-election poll held on another day (the Faroe Islands) belongs to that general election
-            day = main if c.kind == "general" else c.day
+            # a general-election poll held on another day (the Faroe Islands) belongs to that general election;
+            # a second poll in a constituency that already voted that day is a rerun, an election of its own
+            day = c.day
+            if c.kind == "general" and (c.day == main or (c.county, c.number) not in first):
+                day = main
+            elif c.kind == "general":
+                c.kind = "by"
             found.setdefault(date.fromisoformat(day), []).append((year, c))
     return found
 
@@ -851,7 +862,11 @@ def sm_package(day: date) -> Package:
             id=key("citation", result_set),
             entity_id=result_set,
             source_id=DST_SOURCE,
-            locator={"url": url(volume.cid, volume.name), "title": volume.title, "page": c.page},
+            locator={
+                "url": url(volume.cid, volume.name),
+                "title": volume.title,
+                "printed_page": c.page - volume.offset,
+            },
         )
         unit = key("unit", day, tag)
         p.add(
@@ -922,20 +937,32 @@ def sm_package(day: date) -> Package:
             # a sole candidate at a poll: the ballot let voters vote against him
             option = key("option", f"{day}:{tag}:against")
             p.add("contest_option", id=option, contest_id=contest, kind="none_of_the_above", ballot_label="Nej")
-            p.add("outcome", result_set_id=result_set, option_id=option, kind="lost")
+            won = len(c.candidates) == 1 and against[0][1] > (c.candidates[0].votes or 0)
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if won else "lost")
             facts.add(unit, option, VOTES, against[0][1], page, normalized(pdf, c.page, None))
         if not tacit:
             valid = sum(x.votes or 0 for x in c.candidates) + sum(v for _, v in against)
             invalid = sum(v for label, v in c.lines if "ugyld" in label.lower())
-            blank = sum(v for label, v in c.lines if "blank" in label.lower())
+            blank = sum(v for label, v in c.lines if "blank" in label.lower() and "ugyld" not in label.lower())
             last = c.candidates[-1].page
             facts.add(unit, None, VALID, valid, pages[(volume, last)], normalized(pdf, last, None))
             if any("ugyld" in label.lower() for label, _ in c.lines):
                 facts.add(unit, None, INVALID, invalid, pages[(volume, last)], at(last, invalid))
-            if any("blank" in label.lower() for label, _ in c.lines):
+            if any("blank" in label.lower() and "ugyld" not in label.lower() for label, _ in c.lines):
                 facts.add(unit, None, BLANK, blank, pages[(volume, last)], at(last, blank))
             if c.voted is not None and c.voted == valid + invalid + blank:
                 facts.add(unit, None, CAST, c.voted, page, at(c.page, c.voted))
+            if c.misprint:
+                p.add(
+                    "note",
+                    id=key("note", result_set, "misprint"),
+                    entity_id=result_set,
+                    kind="caveat",
+                    lang="en",
+                    body_md="The volume's own figures for this constituency do not add up: the candidates' votes and "
+                    "the printed ballot lines differ from the printed number who voted. Every figure is stored as "
+                    "printed, and the number who voted is not stored as ballots cast.",
+                )
         facts.write(p)
     return p
 
