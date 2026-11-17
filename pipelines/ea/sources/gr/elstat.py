@@ -202,6 +202,7 @@ def read(name: str) -> Election:
     return election
 
 
+TABLE_NAMES = ("turnout", "votes", "seats")
 MISPRINT = re.compile(r"^(\w+) ([A-Z]?\d+|[A-Z]|=)(?: \([^)]*\))?(?: (\w+))?:")
 
 
@@ -678,10 +679,11 @@ def election(e: Election) -> Package:
                     }
                 )
     if e.notes:
-        printed = "; ".join(e.notes)
+        printed = "; ".join(note for note in e.notes if not note.startswith(tuple(f"{t} = " for t in TABLE_NAMES)))
         owned = misprints(e)
-        codes = {"accounting.votes_valid"} if any(table == "votes" for table, _, _ in owned) else set()
-        if any(column in ("valid", "cast", "invalid") for _, _, column in owned):
+        cells = {(table, row, column) for table, row, column in owned if row != "="}
+        codes = {"accounting.votes_valid"} if any(table == "votes" for table, _, _ in cells) else set()
+        if any(column in ("valid", "cast", "invalid") for _, _, column in cells):
             codes.add("accounting.ballots_sum")
         for code in sorted(codes):
             p.accept(code, f"The volume's own figures disagree, kept as printed and noted on the result set: {printed}")
