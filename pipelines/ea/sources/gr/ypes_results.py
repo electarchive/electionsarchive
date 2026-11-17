@@ -5,7 +5,8 @@ for the elections from 2012 to 2015, one per municipality (`dhm_N.js`) and munic
 from a browser concatenate many of them under `<!-- url -->` headers; `split` takes them apart again.
 
 The 1996, 1999, 2000, and 2004 European pages give only the national result. The 2004 to 2009 parliamentary and 2009
-European elections, which the Ministry published only by electoral district, are built by `ypes_national`.
+European elections, which the Ministry published only by electoral district, are built by `ypes_national`. The 2019
+and 2024 European elections, which the Ministry published by polling station, are built by `ypes_ep`.
 """
 
 import html
@@ -35,7 +36,6 @@ B = "browser://20261116-224930-393d08/"
 OLD = "http://ekloges-prev.singularlogic.eu/"
 GEO = f"{SOURCE}/national-geo"  # `ypes` builds the local elections' geo and registry
 REGISTRY = f"{SOURCE}/national-registry"
-LIVE = "https://ekloges.ypes.gr/current/{dyn,dyn1,stat}/e/"
 
 
 @dataclass(frozen=True)
@@ -70,7 +70,6 @@ ELECTIONS = [
         "ref-2015", date(2015, 7, 5), "referendum", (B + "gr-2015-referendum-national-district-municipality.txt",)
     ),
     Election("ps-2015-09", date(2015, 9, 20), "parliament", (B + "gr-2015-sep-national-district-municipality.txt",)),
-    Election("eu-2019", date(2019, 5, 26), "euro", (B + "gr-2019-may-euro-national-districts-stat.txt",)),
     Election(
         "ps-2019",
         date(2019, 7, 7),
@@ -95,7 +94,6 @@ ELECTIONS = [
         ),
         extra=tuple(_june(n) for n in (40, 48, 49, 57)),
     ),
-    Election("eu-2024", date(2024, 6, 9), "euro", (LIVE,), extra=(f"{SITE}current/dyn/e/ep_57.js",)),
 ]
 LEGACY = "https://eklogesapps.ypes.gr/{0}/eklogesapps.ypes.gr/ekloges/content/gr/elec_data/{1}_epi_res.html"
 ELECTIONS += [
@@ -803,8 +801,6 @@ class Build:
                     self.leaves[n].append(leaf)
         else:
             for n, whole in sorted(d.districts.items()):
-                if e.key == "eu-2024" and n == 57:
-                    continue  # the one saved copy of this district was taken during counting
                 if n == 57:
                     leaf = Leaf(self.unit("gr.district", str(n), None, "unlocated", "abroad_mission"), whole)
                 else:
