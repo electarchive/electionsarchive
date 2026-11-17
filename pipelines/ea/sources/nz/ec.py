@@ -70,12 +70,23 @@ SYSTEM_ELECTORATE = key("electoral_system", "electorate")
 SYSTEM_REFERENDUM = key("electoral_system", "referendum")
 
 
+# The 2023 voting-place files that a person saved from the results site in a browser are keyed by the name of the saved
+# file; each is the file the page of the same name links to, under the statistics folder's csv folder.
+SAVED_YEAR = 2023
+
+
 @functools.cache
 def _held() -> dict[str, str]:
-    """The raw cache's entries by the URL the authority serves them from, whether fetched directly or by snapshot."""
+    """The raw cache's entries by the URL the authority serves them from, whether fetched directly, by snapshot, or
+    saved from a browser."""
     found: dict[str, str] = {}
     for stored in raw.keys(SOURCE):
-        original = stored.split("id_/", 1)[1] if "web.archive.org/web/" in stored and "id_/" in stored else stored
+        if stored.startswith("browser://"):
+            original = csv_url(SAVED_YEAR, stored.rsplit("/", 1)[1])
+        elif "web.archive.org/web/" in stored and "id_/" in stored:
+            original = stored.split("id_/", 1)[1]
+        else:
+            original = stored
         found[original.replace("://www.", "://")] = stored
     return found
 
@@ -91,8 +102,20 @@ def has(url: str) -> bool:
     return url.replace("://www.", "://") in _held()
 
 
+def page_source(year: int, vote: str, number: int) -> str | None:
+    """The cached file for one electorate's page: the page itself, or else the csv file it links to."""
+    for url in (page_url(year, vote, number), page_csv_url(year, vote, number)):
+        if has(url):
+            return url
+    return None
+
+
 def page_url(year: int, vote: str, number: int) -> str:
     return f"{SITE}/electionresults_{year}/statistics/{vote}-votes-by-voting-place-{number}.html"
+
+
+def page_csv_url(year: int, vote: str, number: int) -> str:
+    return csv_url(year, f"{vote}-votes-by-voting-place-{number}.csv")
 
 
 def csv_url(year: int, name: str) -> str:
@@ -195,16 +218,46 @@ class Page:
     total: list[int] = field(default_factory=list)
     parties: dict[str, str] = field(default_factory=dict)
     winner: str | None = None
+    cancelled: bool = False
 
 
 def read_page(url: str) -> Page:
+    if url.endswith(".csv"):
+        return _read_rows(url, _csv_rows(url))
     cells = Cells()
     cells.feed(art(url).path.read_text("utf-8"))
-    rows = cells.rows
-    title = re.fullmatch(r"(.+) (\d+) (?:Party|Candidate) Vote Details", rows[0][0])
+    return _read_rows(url, cells.rows)
+
+
+# An area is also printed on a line of its own above the places it holds, which the pages do not show, so only these
+# headings are sections.
+SECTIONS = ("Advance Voting Places", "Voting Places")
+
+
+def _csv_rows(url: str) -> list[list[str]]:
+    """A voting-place csv file laid out as the page's table rows: the title with the column headings, and a place's
+    area and name in one cell."""
+    rows = [[cell.strip() for cell in row] for row in csv.reader(io.StringIO(art(url).path.read_text("utf-8-sig")))]
+    if len(rows) < 3 or len(rows[1]) != 2 or rows[2][:2] != ["", ""]:
+        raise ValueError(f"{url}: unexpected layout")
+    width = len(rows[2])
+    laid = [[clean(f"{rows[1][0]} {rows[1][1]}"), *rows[2][2:]]]
+    for row in rows[3:]:
+        if len(row) == width:
+            laid.append([", ".join(cell for cell in row[:2] if cell), *row[2:]])
+        elif len(row) == 1:
+            if row[0] in SECTIONS:
+                laid.append(row)
+        elif any(row):
+            laid.append(row)
+    return laid
+
+
+def _read_rows(url: str, rows: list[list[str]]) -> Page:
+    title = re.fullmatch(r"(.+) (\d+)( \(Poll Cancelled\))? (?:Party|Candidate) Vote Details", rows[0][0])
     if title is None:
         raise ValueError(f"{url}: unexpected title {rows[0][0]!r}")
-    page = Page(title.group(1), int(title.group(2)), rows[0][1:-2])
+    page = Page(title.group(1), int(title.group(2)), rows[0][1:-2], cancelled=bool(title.group(3)))
     width = len(rows[0])
     section = ""
     after = False
@@ -378,12 +431,29 @@ def party_id(name: str) -> str:
     return key("party", name.casefold())
 
 
+# The 2023 voting-place pages list parties that no summary prints, such as parties that stood only candidates. The
+# registry holds the parties that the summaries list, so the 2023 election makes the others itself, under ids of its own.
+LOCAL_YEARS = (2023,)
+
+
+def listed(year: int) -> set[str]:
+    """The parties the year's summary prints with votes or seats, case-folded."""
+    summ = summary(year)
+    return {name.casefold() for name, votes in summ.votes.items() if votes or name in summ.seats}
+
+
+def party_for(year: int, name: str) -> str:
+    if year in LOCAL_YEARS and name.casefold() not in listed(year):
+        return key("party", year, name.casefold())
+    return party_id(name)
+
+
 @functools.cache
 def pages(year: int, vote: str) -> dict[int, Page]:
     found: dict[int, Page] = {}
     for n in range(1, 80):
-        url = page_url(year, vote, n)
-        if has(url):
+        url = page_source(year, vote, n)
+        if url:
             found[n] = read_page(url)
     return found
 
@@ -526,7 +596,7 @@ def registry() -> Package:
     for day in days():
         year = GENERAL[day]
         names |= {name for name, votes in summary(year).votes.items() if votes or name in summary(year).seats}
-        if level(year) == "voting_place":
+        if level(year) == "voting_place" and year not in LOCAL_YEARS:
             for vote in ("candidate", "party"):
                 for page in pages(year, vote).values():
                     names |= {*page.parties.values(), *(label for label in page.labels if vote == "party")}
@@ -632,9 +702,10 @@ def _channel(row: Row) -> tuple[int, bool]:
     return (EARLY if row.section.startswith("Advance") else ELECTION_DAY), aggregate
 
 
-def _cite(p: Package, urls: list[str]) -> None:
+def _cite(p: Package, urls: list[str | None]) -> None:
     for url in urls:
-        p.uses(art(url))
+        if url:
+            p.uses(art(url))
 
 
 DESCRIPTION = {
@@ -687,7 +758,7 @@ def general(day: str) -> Package:
             id=option,
             contest_id=party_contest,
             kind="list",
-            party_id=party_id(label),
+            party_id=party_for(year, label),
             ballot_position=position,
             ballot_label=label,
         )
@@ -704,6 +775,7 @@ def general(day: str) -> Package:
         p.add("declared", result_set_id=party_set, option_id=None, measure=INVALID, value=summ.informal)
     p.uses(art(summ.url))
     if how == "voting_place":
+        _local_parties(p, year)
         _voting_places(p, day, election, party_set, options)
     elif how == "electorate":
         p.uses(art(e9_url(year, "e9_part4.csv")))
@@ -766,6 +838,23 @@ def general(day: str) -> Package:
     return p
 
 
+def _local_parties(p: Package, year: int) -> None:
+    """The parties of a year's pages that its registry lacks, once each under the spelling that sorts first."""
+    if year not in LOCAL_YEARS:
+        return
+    names: set[str] = set()
+    for vote in ("candidate", "party"):
+        for page in pages(year, vote).values():
+            names |= {*page.parties.values(), *(label for label in page.labels if vote == "party")}
+    made: dict[str, str] = {}
+    for name in sorted(names - {"Independent"}):
+        if name.casefold() not in listed(year):
+            made.setdefault(party_for(year, name), name)
+    for id, name in made.items():
+        p.add("party", id=id, kind="party", polity_id=NEW_ZEALAND)
+        p.name(id, name, "en", "official")
+
+
 def _voting_places(p: Package, day: str, election: str, party_set: str, options: dict[str, str]) -> None:
     year = GENERAL[day]
     candidate_pages = pages(year, "candidate")
@@ -775,8 +864,8 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
     _cite(
         p,
         [
-            *(page_url(year, "candidate", n) for n in candidate_pages),
-            *(page_url(year, "party", n) for n in party_pages),
+            *(page_source(year, "candidate", n) for n in candidate_pages),
+            *(page_source(year, "party", n) for n in party_pages),
             index_url(year),
             *([csv_url(year, "winning-electorate-candidates.csv")] if won else []),
             *(
@@ -821,8 +910,15 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
         )
 
     # The electorate votes.
+    cancelled: list[str] = []
     for number, page in sorted(candidate_pages.items()):
         name = page.electorate
+        if page.cancelled:
+            # The poll was cancelled on the day and held later, so the page prints no votes and no winner.
+            if any(row.values[-2] for row in page.rows) or page.winner:
+                raise ValueError(f"{year} {name}: a cancelled poll prints votes")
+            cancelled.append(name)
+            continue
         if won and won.get(name) != page.winner:
             raise ValueError(f"{year} {name}: the page names {page.winner} the winner, the table {won.get(name)}")
         if page.winner is None or set(page.parties) != set(page.labels):
@@ -852,7 +948,7 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
                 id=option,
                 contest_id=contest,
                 kind="candidate",
-                party_id=None if independent else party_id(party),
+                party_id=None if independent else party_for(year, party),
                 ballot_position=position,
                 ballot_label=label,
             )
@@ -863,7 +959,7 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
                 option_id=option,
                 role="head",
                 ballot_name=label,
-                member_of_party_id=None if independent else party_id(party),
+                member_of_party_id=None if independent else party_for(year, party),
                 is_independent=independent,
             )
             if page.winner == label:
@@ -879,6 +975,17 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
             p.add("declared", result_set_id=result_set, option_id=choice[label], measure=VOTES, value=value)
         p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=page.total[-2])
         p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=page.total[-1])
+    if cancelled:
+        p.add(
+            "note",
+            id=key("note", party_set, "cancelled"),
+            entity_id=party_set,
+            kind="caveat",
+            body_md=f"The electorate poll of {', '.join(cancelled)} was cancelled on election day and held later, so "
+            "the results pages print no electorate votes for it and this election holds no contest for it. Its "
+            "party votes were counted on election day.",
+            lang="en",
+        )
 
 
 def referendum() -> Package:
