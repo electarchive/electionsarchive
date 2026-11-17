@@ -83,6 +83,34 @@
       "url": "https://www.bcn.cl/historiapolitica/elecciones/index.html?periodo=1925-1973",
       "kind": "official_body",
       "note": "Read 2026-11-16. Each period page lists dated events with a detail page per election; the library states its figures are illustrative and points to Servel and Servel's historical archive for official counts."
+    },
+    "ine_provincias": {
+      "title": "Cifras Comunales: regional, provincial, and communal indicators of the 2017 census, one row per comuna with its region and province codes (INE open-data layer Resultados_Censo)",
+      "publisher": "Instituto Nacional de Estadísticas (INE)",
+      "url": "https://services5.arcgis.com/hUyD8u3TeZLKPe4T/arcgis/rest/services/Resultados_Censo/FeatureServer/0",
+      "kind": "official_body",
+      "note": "Read 2026-11-17: 346 rows, one per comuna, with 16 regions and 56 distinct provinces on the current division (Ñuble with Diguillín, Itata, and Punilla; Biobío with Arauco, Biobío, and Concepción). The layer was last modified 2021-04-13."
+    },
+    "servel_gore_2024_segunda": {
+      "title": "Regiones con Segunda Vuelta de Gobernadores Regionales (Elecciones 2024), with a ballot facsimile per region",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/biblioteca-de-documentos/procesos-electorales/elecciones-2024/documentos-elecciones-2024/regiones-con-segunda-vuelta-de-gobernadores-regionales/",
+      "kind": "official_body",
+      "note": "Read 2026-11-17: the page lists a facsimile for each of 11 regions (Arica y Parinacota, Antofagasta, Atacama, Coquimbo, Valparaíso, Metropolitana, O'Higgins, Maule, Biobío, La Araucanía, Los Lagos), each with two candidates. Servel publishes the 2024 results only in dashboards, not as files."
+    },
+    "servel_primarias_2024": {
+      "title": "Documentos Elecciones Primarias 2024: candidate bulletins and one ballot facsimile per primary (A and B ballots where two pacts held a primary in a comuna)",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/biblioteca-de-documentos/procesos-electorales/elecciones-2024/documentos-elecciones-2024/documentos-elecciones-primarias-2024/",
+      "kind": "official_body",
+      "note": "Read 2026-11-17: 2 regional governor facsimiles (Coquimbo, Aysén) and 72 mayoral facsimile entries, of which 6 are single-ballot sheets for the 6 comunas with an A and a B ballot, so 66 mayoral ballots in 60 comunas."
+    },
+    "servel_primarias_2024_resultados": {
+      "title": "Primarias2024_Resultados_Provisorios.zip (provisional results by mesa of the 9 June 2024 primaries for regional governors and mayors)",
+      "publisher": "Servicio Electoral de Chile (Servel)",
+      "url": "https://www.servel.cl/wp-content/uploads/2024/06/Primarias2024_Resultados_Provisorios.zip",
+      "kind": "official_body",
+      "license": "No license stated: official results published by Servel; facts reused with attribution"
     }
   },
   "tiers": [
@@ -118,7 +146,16 @@
       "name_en": "Provinces, run by an appointed presidential delegate; they elect no one",
       "parent": "region",
       "elects": false,
-      "source": "cpr"
+      "source": "cpr",
+      "counts": [
+        {
+          "date": "2021-04-13",
+          "precision": "day",
+          "value": 56,
+          "source": "ine_provincias",
+          "locator": "https://services5.arcgis.com/hUyD8u3TeZLKPe4T/arcgis/rest/services/Resultados_Censo/FeatureServer/0 (56 distinct PROVINCIA codes over the 346 comunas: Arica y Parinacota 2, Tarapacá 2, Antofagasta 3, Atacama 3, Coquimbo 3, Valparaíso 8, Metropolitana 6, O'Higgins 3, Maule 4, Ñuble 3, Biobío 3, La Araucanía 2, Los Ríos 2, Los Lagos 4, Aysén 4, Magallanes 4; the layer's last edit is dated 2021-04-13)"
+        }
+      ]
     },
     {
       "key": "circ_provincial",
@@ -725,7 +762,7 @@
           "cl.mesa"
         ]
       },
-      "note": "Senators serve eight years and half the circunscripciones are renewed every four years with the Chamber (CPR art. 49). 1989-2013: 38 elected senators in 19 two-member circunscripciones (with designated and ex-officio senators until 2006, who were not elected); since 2017: 50 senators, one circunscripción per region with 2 to 5 seats, by D'Hondt (LOC 18.700 art. 180).",
+      "note": "Senators serve eight years and half the circunscripciones are renewed every four years with the Chamber (CPR art. 49). 1989-2013: 38 elected senators in 19 two-member circunscripciones (with designated and ex-officio senators until 2006, who were not elected); since 2017: 50 senators, one circunscripción per region with 2 to 5 seats, by D'Hondt (LOC 18.700 art. 180). Counts are the circunscripciones electing senators on each day, taken from Servel's files: 9 or 10 two-member circunscripciones every four years from 1993 to 2013, then 7 regions with 23 seats (2017 and 2025) and 9 regions with 27 seats (2021).",
       "source": "cpr",
       "locator": "https://www.bcn.cl/leychile/navegar?idNorma=242302 (art. 49); https://www.bcn.cl/leychile/navegar?idNorma=30082 (art. 180: \"El Senado se compone de 50 miembros\")",
       "est_votes": 6500000,
@@ -811,47 +848,65 @@
         {
           "date": "1993-12-11",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1993 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1993 renewal, 9 circunscripciones senatoriales with candidates marked elected, 18 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 9,
+          "seats": 18
         },
         {
           "date": "1997-12-11",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1997 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 1997 renewal, 10 circunscripciones senatoriales with candidates marked elected, 20 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 10,
+          "seats": 20
         },
         {
           "date": "2001-12-16",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2001 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2001 renewal, 9 circunscripciones senatoriales with candidates marked elected, 18 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 9,
+          "seats": 18
         },
         {
           "date": "2005-12-11",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2005 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2005 renewal, 10 circunscripciones senatoriales with candidates marked elected, 20 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 10,
+          "seats": 20
         },
         {
           "date": "2009-12-13",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2009 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2009 renewal, 9 circunscripciones senatoriales with candidates marked elected, 18 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 9,
+          "seats": 18
         },
         {
           "date": "2013-11-17",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2013 partial renewal"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2013 renewal, 10 circunscripciones senatoriales with candidates marked elected, 20 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 10,
+          "seats": 20
         },
         {
           "date": "2017-11-19",
           "source": "servel_resultados",
-          "quote": "Servel's senators workbooks for 2017: partial renewal by region"
+          "quote": "resultados_elecciones_senadores_ce_1989_2017.xlsx: 2017 renewal, 7 circunscripciones senatoriales with candidates marked elected, 23 elected senators (designated and ex-officio senators are not in the file)",
+          "contests": 7,
+          "seats": 23
         },
         {
           "date": "2021-11-21",
           "source": "servel_resultados",
-          "quote": "Servel's senators workbooks for 2021: partial renewal by region"
+          "quote": "Senadores-1.zip: 9 regional workbooks (Antofagasta 3, Coquimbo 3, O'Higgins 3, Biobío 3, Los Lagos 3, Magallanes 2, Metropolitana 5, Los Ríos 3, Ñuble 2 seats per LOC 18.700 art. 180), 27 seats",
+          "contests": 9,
+          "seats": 27
         },
         {
           "date": "2025-11-16",
           "source": "servel_resultados",
-          "quote": "Servel's senators workbooks for 2025: partial renewal by region"
+          "quote": "PRELIMINARES_SENADORES_CIRCUNSCRIPCION.zip: 7 circunscripciones (Arica y Parinacota 2, Tarapacá 2, Atacama 2, Valparaíso 5, Maule 5, La Araucanía 5, Aysén 2), 23 elected candidates flagged",
+          "contests": 7,
+          "seats": 23
         }
       ]
     },
@@ -1729,7 +1784,8 @@
           "date": "2021-06-13",
           "election_kind": "runoff",
           "source": "servel_resultados",
-          "quote": "Segunda_Votacion__de__GORE_2021.zip: second round of 13 June 2021"
+          "quote": "Segunda_Votacion__de__GORE_2021.zip: one table of results for 13 regions (1, 2, 3, 4, 6, 7, 8, 9, 10, 13, 14, 15, 16); Valparaíso, Aysén, and Magallanes had no second round",
+          "contests": 13
         },
         {
           "date": "2024-10-26",
@@ -1743,7 +1799,9 @@
         {
           "date": "2024-11-24",
           "election_kind": "runoff",
-          "note": "Second round in the regions where no candidate reached 40%; count not yet taken from Servel."
+          "contests": 11,
+          "source": "servel_gore_2024_segunda",
+          "quote": "Regiones con Segunda Vuelta de Gobernadores Regionales: a ballot facsimile for each of 11 regions (Arica y Parinacota, Antofagasta, Atacama, Coquimbo, Valparaíso, Metropolitana, O'Higgins, Maule, Biobío, La Araucanía, Los Lagos)"
         }
       ]
     },
@@ -2360,12 +2418,14 @@
         {
           "date": "2013-06-30",
           "source": "servel_resultados",
-          "quote": "resultados_elecciones_primarias_diputados_ce_2013_2017.xlsx: 2013"
+          "quote": "resultados_elecciones_primarias_diputados_ce_2013_2017-1.xlsx: 2013, deputies' primaries in 10 districts, one pact (list B) each",
+          "contests": 10
         },
         {
           "date": "2017-07-02",
           "source": "servel_resultados",
-          "quote": "Resultados_Diputados_Primarias2017_Tricel.xlsx: 2017"
+          "quote": "Resultados_Diputados_Primarias2017_Tricel.xlsx: 2017, deputies' primaries in 7 districts, one pact (list B) each",
+          "contests": 7
         }
       ]
     },
@@ -2390,7 +2450,7 @@
           "cl.mesa"
         ]
       },
-      "note": "Held with the mayoral primaries on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2020 on 29 November ahead of the postponed 2021 elections, 2024 on 9 June.",
+      "note": "Held with the mayoral primaries on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2020 on 29 November ahead of the postponed 2021 elections, 2024 on 9 June. A contest is one pact's primary in one region.",
       "source": "primarias",
       "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3: \"La elección primaria para la nominación de candidatos a los cargos de alcalde y de gobernador regional deberá realizarse el vigésimo domingo anterior a la fecha de las elecciones municipales\")",
       "est_votes": 300000,
@@ -2426,12 +2486,14 @@
         {
           "date": "2020-11-29",
           "source": "servel_resultados",
-          "quote": "Primarias_2020_Alcalde-GORE.zip: GORE"
+          "quote": "Primarias_2020_Alcalde-GORE.zip, GORE: 28 primaries (region and pact) in all 16 regions",
+          "contests": 28
         },
         {
           "date": "2024-06-09",
-          "source": "primarias",
-          "quote": "Art. 3: the twentieth Sunday before the municipal elections of 27 October 2024"
+          "source": "servel_primarias_2024",
+          "quote": "Boletín Único Primarias Gobernadores Regionales 2024 and Primarias2024_Resultados_Provisorios.zip: Chile Vamos's primary in Coquimbo and in Aysén, three candidates each",
+          "contests": 2
         }
       ]
     },
@@ -2455,7 +2517,7 @@
           "cl.mesa"
         ]
       },
-      "note": "In the communes where a pact opts in, on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2016 on 19 June, 2020 on 29 November, 2024 on 9 June.",
+      "note": "In the communes where a pact opts in, on the twentieth Sunday before the municipal elections (Ley 20.640 art. 3); 2016 on 19 June, 2020 on 29 November, 2024 on 9 June. A contest is one pact's primary in one comuna, so a comuna where two pacts opted in counts twice.",
       "source": "primarias",
       "locator": "https://www.bcn.cl/leychile/navegar?idNorma=1107657 (art. 3)",
       "est_votes": 300000,
@@ -2491,17 +2553,20 @@
         {
           "date": "2016-06-19",
           "source": "servel_resultados",
-          "quote": "Resultados_Pimarias_Alcalde_2016.xlsx: 2016"
+          "quote": "Resultados_Pimarias_Alcalde_2016.xlsx: 96 primaries (comuna and pact) in 93 comunas; Chile Vamos 43 and Nueva Mayoría 53, three comunas with both",
+          "contests": 96
         },
         {
           "date": "2020-11-29",
           "source": "servel_resultados",
-          "quote": "Primarias_2020_Alcalde-GORE.zip: Alcaldes"
+          "quote": "Primarias_2020_Alcalde-GORE.zip, Alcaldes: 40 primaries (comuna and pact) in 36 comunas, four comunas with two pacts",
+          "contests": 40
         },
         {
           "date": "2024-06-09",
-          "source": "primarias",
-          "quote": "Art. 3: the twentieth Sunday before the municipal elections of 27 October 2024"
+          "source": "servel_primarias_2024",
+          "quote": "Facsimiles of Elecciones Primarias 2024: 66 mayoral ballots in 60 comunas (La Florida, Lo Barnechea, Peñalolén, Puente Alto, Pucón, and Futrono each had an A and a B ballot); the 60 comunas match Primarias2024_Resultados_Provisorios.zip",
+          "contests": 66
         }
       ]
     },
