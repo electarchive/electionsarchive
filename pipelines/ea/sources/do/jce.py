@@ -240,6 +240,14 @@ DAYS = (
     ),
 )
 
+WINNERS = {
+    "2016-05-15": entry(5404),
+    "2020-07-05": entry(18724),
+    "2024-05-19": entry(30611),
+}
+"""The Board's lists of the elected, by election day: the winners of the presidency, the Senate, and the Chamber."""
+
+
 FIELDS = ("prov", "prov_name", "mun", "mun_name", "dm", "dm_name", "circ", "col", "letter", "level")
 LAYOUTS: dict[str, tuple[dict[str, tuple[str, ...]], frozenset[str]]] = {
     "2000": (
@@ -489,6 +497,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, s.url, suffix=s.suffix)
         for _, url, suffix in d.totals:
             raw.fetch(SOURCE, url, suffix=suffix)
+        if d.key in WINNERS:
+            raw.fetch(SOURCE, WINNERS[d.key], suffix=".xlsx")
 
 
 @functools.cache
@@ -1776,6 +1786,177 @@ def _values(c: Contest, d: Day, result_set: str, options: dict[str, str]) -> tup
     return frame.with_columns(result_set_id=pl.lit(result_set)), Tally(ballots_sum, turnout, votes_valid, dropped)
 
 
+class Winner(NamedTuple):
+    contest: str
+    party: str
+    own_party: str | None
+    name: str
+    role: str
+    sex: str | None
+    born: date | None
+
+
+def _alliance_lead(text: str) -> str:
+    """The party that presented a list, from the Board's "PRM Y ALIADOS" spelling."""
+    return sigla(re.sub(r"\s+Y\s+ALIADOS\s*$", "", text.strip(), flags=re.IGNORECASE))
+
+
+def _circ(text: str | None) -> int:
+    found = re.search(r"\d+", text or "")
+    return max(int(found[0]), 1) if found else 1
+
+
+def _sex(text: str | None) -> str | None:
+    return {"M": "male", "F": "female"}.get((text or "").strip().upper())
+
+
+def _born(text: str | None) -> date | None:
+    found = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", (text or "").strip())
+    return date(int(found[3]), int(found[2]), int(found[1])) if found else None
+
+
+def _post(cargo: str, prov: int | None, circ: str | None) -> tuple[str, str] | None:
+    """The contest key and candidacy role of a winner's post, or None for posts without a contest here."""
+    if prov is None and cargo in ("SENADOR", "DIPUTADO"):
+        raise ValueError(f"a {cargo.lower()} winner names no province")
+    match cargo:
+        case "PRESIDENTE":
+            return "president", "head"
+        case "VICEPRESIDENTE":
+            return "president", "running_mate"
+        case "SENADOR":
+            return f"senate:{prov:02d}", "list_member"
+        case "DIPUTADO":
+            return f"deputies:{prov:02d}:{_circ(circ)}", "list_member"
+        case "DIPUTADO DE ULTRAMAR" | "DIPUTADO EXTERIOR":
+            return f"abroad:{_circ(circ)}", "list_member"
+    return None
+
+
+def winners(d: Day) -> tuple[list[Winner], Counter[str]]:
+    """The Board's declared winners of the presidency, the Senate, and the Chamber, and the posts left out."""
+    book = workbook(WINNERS[d.key])
+    provinces = {fold(name): code for code, name in places().provinces.items()}
+    out: list[Winner] = []
+    left: Counter[str] = Counter()
+
+    def rows(sheet: str) -> list[dict[str, str | None]]:
+        frame = book.load_sheet_by_name(sheet, dtypes="string").to_polars()
+        return [
+            {k: (v.strip() if v is not None and v.strip() not in ("", "NULL") else None) for k, v in row.items()}
+            for row in frame.iter_rows(named=True)
+        ]
+
+    def add(r: dict[str, str | None], cargo: str, columns: dict[str, str]) -> None:
+        name = r[columns["name"]] or ""
+        prov: int | None = None
+        if columns.get("prov") and r[columns["prov"]]:
+            prov = provinces.get(fold(r[columns["prov"]]))
+            if prov is None:
+                raise ValueError(f"{d.key}: winners file names an unknown province {r[columns['prov']]!r}")
+        post = _post(cargo, prov, r[columns["circ"]] if "circ" in columns else None)
+        if post is None:
+            left[cargo.capitalize()] += 1
+            return
+        own = r[columns["own"]] if "own" in columns else None
+        lead = r[columns["party"]] or ""
+        out.append(
+            Winner(
+                post[0],
+                _alliance_lead(lead),
+                sigla(own) if own else None,
+                name,
+                post[1],
+                _sex(r[columns["sex"]]) if "sex" in columns else None,
+                _born(r[columns["born"]]) if "born" in columns else None,
+            )
+        )
+
+    if d.key == "2024-05-19":
+        party_column = "PARTIDO Y/O ALIANZAS DE PARTIDOS"
+        for r in rows("PRESIDENTE"):
+            add(r, r["CARGO"] or "", {"name": "NOMBRE", "party": party_column, "sex": "SEXO"})
+        for r in rows("SENADO"):
+            add(r, "SENADOR", {"name": "NOMBRE", "party": party_column, "sex": "SEXO", "prov": "PROVINCIA"})
+        for r in rows("DIPUTADO"):
+            add(
+                r,
+                "DIPUTADO",
+                {"name": "NOMBRE", "party": party_column, "sex": "SEXO", "prov": "PROVINCIA", "circ": "CIRC"},
+            )
+        for r in rows("DIPUTADO EXTERIOR"):
+            add(r, "DIPUTADO EXTERIOR", {"name": "NOMBRE", "party": party_column, "sex": "SEXO", "circ": "CIRC"})
+        left["Diputado nacional"] += len(rows("DIPUTADO NACIONAL"))
+        left["Parlacen"] += len(rows("PARLACEN"))
+    elif d.key == "2020-07-05":
+        for r in rows("Sheet1"):
+            add(
+                r,
+                r["CARGO"] or "",
+                {
+                    "name": "NOMBRE COMPLETO",
+                    "party": "SIGLAS",
+                    "own": "PARTIDO DEL CANDIDATO",
+                    "sex": "SEXO",
+                    "born": "FECHA NACIMIENTO",
+                    "prov": "PROVINCIA",
+                    "circ": "CIRCUNSCRIPCION",
+                },
+            )
+    elif d.key == "2016-05-15":
+        for r in rows("Sheet2"):
+            if r["NIVEL"] == "MUNICIPAL":
+                left["Municipal posts"] += 1
+                continue
+            add(
+                r,
+                (r["CARGO"] or "").upper(),
+                {
+                    "name": "NOMBRE",
+                    "party": "PARTIDO",
+                    "own": "PARTIDO_CANDIDATO",
+                    "prov": "PROVINCIA",
+                    "circ": "CIRCUNSCRIPCION",
+                },
+            )
+    return out, left
+
+
+def _elected(p: Package, d: Day, c: Contest, result_set: str, options: dict[str, str], found: list[Winner]) -> None:
+    """Stages the Board's winners of one contest as people, candidacies, and declared outcomes."""
+    seats: Counter[str] = Counter()
+    for w in found:
+        if w.party not in options:
+            raise ValueError(f"{d.key} {c.key}: winner {w.name} of {w.party} has no option")
+        option = options[w.party]
+        tag = f"{d.key}:{c.key}:{w.role}:{w.party}:{seats[w.party] + 1}"
+        person = key("person", tag)
+        candidacy = key("candidacy", tag)
+        p.add("person", id=person, gender=w.sex, birth_date=w.born, birth_precision="day" if w.born else None)
+        p.name(person, title(w.name), "es", "official")
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=option,
+            role=w.role,
+            ballot_name=title(w.name),
+            member_of_party_id=party(w.own_party) if w.own_party else None,
+            is_independent=False,
+        )
+        if c.key != "president":
+            seats[w.party] += 1
+            p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+    if c.key == "president":
+        lead = {w.party for w in found}
+        if len(lead) != 1:
+            raise ValueError(f"{d.key}: the winning ticket names several parties")
+        p.add("outcome", result_set_id=result_set, option_id=options[lead.pop()], kind="elected", seats=1)
+        return
+    for code, n in seats.items():
+        p.add("outcome", result_set_id=result_set, option_id=options[code], kind="won", seats=n)
+
+
 def election(d: Day) -> Package:
     p = Package(
         f"{SOURCE}/{d.key}",
@@ -1792,6 +1973,11 @@ def election(d: Day) -> Package:
             cited.add(s.url)
     for _, url, _ in d.totals:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    elected: dict[str, list[Winner]] = {}
+    if d.key in WINNERS:
+        p.artifact(raw.cached(SOURCE, WINNERS[d.key]), SOURCE_ID)
+        for w in winners(d)[0]:
+            elected.setdefault(w.contest, []).append(w)
     election_id = key("election", d.key)
     p.add(
         "election",
@@ -1870,6 +2056,8 @@ def election(d: Day) -> Package:
                 ballot_position=position,
                 ballot_label=label,
             )
+        if c.key in elected:
+            _elected(p, d, c, result_set, options, elected.pop(c.key))
         frame, tally = _values(c, d, result_set, options)
         values.append(frame)
         tallies["ballots_sum"] += tally.ballots_sum
@@ -1905,6 +2093,9 @@ def election(d: Day) -> Package:
                 p.add("declared", result_set_id=result_set, option_id=options[code], measure=VOTES, value=value)
                 if got.get((options[code], VOTES)) != value:
                     declared_diffs.append(f"{code} printed {value:,}, files {got.get((options[code], VOTES)) or 0:,}")
+    if elected:
+        # The 2016 congressional file prints no ballots cast abroad, so those deputies have no contest to join.
+        print(f"{d.key}: left out, winners of contests with no results: {sorted(elected)}", flush=True)
     facts = pl.concat(values)
     p.frame(
         "result_value",
