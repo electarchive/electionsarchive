@@ -291,7 +291,6 @@ def election(spec: Election) -> Package:
         round_number=1,
         electoral_system_id=SYSTEM,
         default_result_kind="tacit",
-        term="remainder" if spec.kind == "by_election" else "full",
     )
     p.name(contest, title, "en", "official")
     p.add("slug", path=f"{path}/reserved-women", entity_id=contest, is_current=True)
