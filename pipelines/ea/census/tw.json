@@ -1,0 +1,3093 @@
+{
+ "polity": "TW",
+ "name": "Taiwan",
+ "sources": {
+  "constitution": {
+   "title": "中華民國憲法 (Constitution of the Republic of China), promulgated 1 January 1947",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001",
+   "kind": "official_body",
+   "note": "Arts. 25-34 (National Assembly, suspended by the Additional Articles), 62-65 (Legislative Yuan, three-year term), 91 (Control Yuan elected by provincial and municipal councils), 112-113 and 124-128 (provincial and county assemblies and executives)."
+  },
+  "additional": {
+   "title": "中華民國憲法增修條文 (Additional Articles of the Constitution of the Republic of China), as amended 10 June 2005",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000002",
+   "kind": "official_body",
+   "note": "Arts. 1 and 12 (constitutional amendments and territorial changes ratified by referendum of the free area, the National Assembly's articles suspended), 2 (direct election of the president and vice president on one ticket from the ninth term in 1996, plurality), 4 (113 legislators from the seventh term, four-year term: 73 single-member district seats, 3 lowland and 3 highland indigenous seats, 34 at-large and overseas seats by party list with a 5 percent threshold), 7 (Control Yuan nominated by the president), and 9 (provincial government appointed)."
+  },
+  "csera": {
+   "title": "公職人員選舉罷免法 (Civil Servants Election and Recall Act), as amended to 1 July 2026",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010",
+   "kind": "official_body",
+   "note": "Arts. 2 (offices elected: legislators, special municipality, county and city councillors and heads, township and mountain indigenous district representatives and heads, village chiefs), 3 (single non-transferable vote, party list for at-large and overseas seats), 35-37 (constituencies), 39 (election at least ten days before the term ends; sixty days after a dissolution), 67 (plurality; party-list allocation), 68 (women's reserved seats), 70 (20 percent of electors for an unopposed head), 73 (legislative by-elections within three months), 76 and 90 (recall: 1 percent to propose, carried with more yes than no votes and yes votes at least a quarter of electors)."
+  },
+  "pvpera": {
+   "title": "總統副總統選舉罷免法 (Presidential and Vice Presidential Election and Recall Act), as amended to 19 August 2026",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020053",
+   "kind": "official_body",
+   "note": "Enacted 9 August 1995; the election is announced 120 days before the term ends and held at least 30 days before it ends."
+  },
+  "referendum_act": {
+   "title": "公民投票法 (Referendum Act), as amended to 3 December 2025",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020050",
+   "kind": "official_body",
+   "note": "National and local referendums; Art. 23 (held three to six months after a proposal is certified, on the day of a national election when one falls in that window), Art. 29 (carried with more yes than no votes and yes votes at least a quarter of electors)."
+  },
+  "lga": {
+   "title": "地方制度法 (Local Government Act), as amended to 3 December 2025",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003",
+   "kind": "official_body",
+   "note": "Arts. 3 and 5 (provinces, special municipalities, counties and cities, townships, districts, villages), 33 (councillors and representatives, four-year term), 55-57 (special municipality mayors, county and city heads, township heads, four-year term, one re-election), 58 (district chiefs appointed), 59 (village chiefs, four-year term), 82 (by-elections for heads within three months unless under two years remain), 83-1 (terms aligned to 25 December 2014), 83-2 (mountain indigenous districts), 87-1 (first elections of a new special municipality)."
+  },
+  "farmers_act": {
+   "title": "農會法 (Farmers' Association Act), as amended to 3 February 2021",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=M0090001",
+   "kind": "official_body",
+   "note": "Members elect member representatives, and representatives elect directors and supervisors (選任人員); the associations run these elections under the agriculture authority's supervision."
+  },
+  "irrigation_act": {
+   "title": "農田水利法 (Irrigation Act), promulgated 22 July 2020",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=M0100016",
+   "kind": "official_body",
+   "note": "Converted the irrigation associations (農田水利會), whose chairs and representatives had been elected by members, into public agencies run by the agriculture authority."
+  },
+  "offshore_act": {
+   "title": "離島建設條例 (Offshore Islands Development Act), as amended to 7 August 2024",
+   "publisher": "Ministry of Justice, Laws and Regulations Database of the Republic of China (Taiwan)",
+   "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030121",
+   "kind": "official_body",
+   "note": "Art. 10-2: a casino on an offshore island requires a local referendum under the Referendum Act, carried by a majority of valid votes with no turnout floor."
+  },
+  "cec_elc": {
+   "title": "選舉資料庫：投開票概況 (Election database: regular elections)",
+   "publisher": "Central Election Commission (中央選舉委員會)",
+   "url": "https://db.cec.gov.tw/ElecTable/Election",
+   "kind": "official_body",
+   "license": "Open Government Data License, version 1.0 (Taiwan)",
+   "note": "Lists every regular election the Commission holds results for, by type (static/elections/list/ELC_<type>.json): president from 1996, legislators from 1995, special municipality mayors and councillors from 1994, county and city heads from 1997 and councillors from 1998, township heads from 1998, township representatives and village chiefs from 2010, mountain indigenous district heads and representatives from 2014, the National Assembly of 1996 and 2005, and the Taiwan Provincial Governor and Assembly of 1994. Seats and votes are the national profile of each election (static/elections/data/profiles/...); constituencies are counted from the constituency-level profiles."
+  },
+  "cec_bel": {
+   "title": "選舉資料庫：補選 (Election database: by-elections)",
+   "publisher": "Central Election Commission (中央選舉委員會)",
+   "url": "https://db.cec.gov.tw/ElecTable/ByElection",
+   "kind": "official_body",
+   "license": "Open Government Data License, version 1.0 (Taiwan)",
+   "note": "static/elections/list/BEL_<type>.json: legislative by-elections from 2009 and local by-elections listed from 1997; the list is not exhaustive for local by-elections before 2020."
+  },
+  "cec_rcl": {
+   "title": "選舉資料庫：罷免 (Election database: recalls)",
+   "publisher": "Central Election Commission (中央選舉委員會)",
+   "url": "https://db.cec.gov.tw/ElecTable/Recall",
+   "kind": "official_body",
+   "license": "Open Government Data License, version 1.0 (Taiwan)",
+   "note": "static/elections/list/RCL_<type>.json: recall votes from 2015, with the outcome of each (vote_result Y carried, N defeated)."
+  },
+  "cec_ref": {
+   "title": "選舉資料庫：公民投票 (Election database: referendums)",
+   "publisher": "Central Election Commission (中央選舉委員會)",
+   "url": "https://db.cec.gov.tw/static/referendums/list/N.json",
+   "kind": "official_body",
+   "license": "Open Government Data License, version 1.0 (Taiwan)",
+   "note": "National referendums (static/referendums/list/N.json, cases 1 to 21 from 2004 and the constitutional amendment of 2022) and local referendums (static/referendums/list/L.json)."
+  },
+  "president_chiang": {
+   "title": "第1~5任 蔣總統中正先生 (Presidents since the Constitution: Chiang Kai-shek, first to fifth terms)",
+   "publisher": "Office of the President, Republic of China (Taiwan)",
+   "url": "https://www.president.gov.tw/Page/83",
+   "kind": "official_body",
+   "note": "Elected by the National Assembly in 1948, 1954, 1960, 1966, and 1972; local self-government elections, from township representatives to the Provincial Assembly and from village chiefs to county heads, all directly elected by 1959; supplementary elections of national representatives from 1969."
+  },
+  "president_yen": {
+   "title": "第5任 嚴總統家淦先生 (Presidents since the Constitution: Yen Chia-kan)",
+   "publisher": "Office of the President, Republic of China (Taiwan)",
+   "url": "https://www.president.gov.tw/Page/84",
+   "kind": "official_body"
+  },
+  "president_lee": {
+   "title": "第7~9任 李總統登輝先生 (Presidents since the Constitution: Lee Teng-hui, seventh to ninth terms)",
+   "publisher": "Office of the President, Republic of China (Taiwan)",
+   "url": "https://www.president.gov.tw/Page/86",
+   "kind": "official_body",
+   "note": "Elected vice president by the National Assembly in 1984 and president in March 1990; the first direct elections of the Taiwan Provincial Governor and special municipality mayors in 1994; the first direct presidential election in March 1996; the 1997 National Development Conference froze provincial elections; the 1999 revision moved the National Assembly to party lists; the 2000 revision made it an ad hoc body elected by party list."
+  },
+  "ris_q": {
+   "title": "中華民國人口統計季刊 民國114年冬季季刊 (Demography Quarterly, October-December 2025), Table 1: Numbers of Civil Divisions and Households for Counties and Cities, end of December 2025",
+   "publisher": "Department of Household Registration, Ministry of the Interior (內政部戶政司)",
+   "url": "https://www.ris.gov.tw/documents/data/5/2/DemographicQuarterly_Winter2025.pdf",
+   "kind": "official_body",
+   "note": "Grand total: 368 township-level divisions (170 districts, 14 county-administered cities, 38 towns, 146 townships) and 7,752 villages (5,860 li, 1,892 tsun); 6 special municipalities, 14 counties and cities in Taiwan Province, and 2 counties in Fuchien Province."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "中華民國（臺灣）",
+   "name_en": "Republic of China (Taiwan)",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "tw.nation",
+   "source": "additional"
+  },
+  {
+   "key": "province",
+   "name": "臺灣省（省議會、省長）",
+   "name_en": "Taiwan Province, while its assembly and governor were elected",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_to": "1998-12-21",
+   "source": "president_lee",
+   "counts": [
+    {
+     "date": "1994-12-03",
+     "value": 1,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_P9.json (83年臺灣省長選舉, the only provincial governor election; Fuchien Province never elected organs)"
+    }
+   ]
+  },
+  {
+   "key": "municipality",
+   "name": "直轄市",
+   "name_en": "Special municipalities",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "tw.county",
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 6,
+     "source": "ris_q",
+     "locator": "Table 1, end of December 2025: 新北市, 臺北市, 桃園市, 臺中市, 臺南市, 高雄市"
+    },
+    {
+     "date": "1994-12-03",
+     "value": 2,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_C1.json (83年直轄市長選舉: 臺北市, 高雄市)"
+    },
+    {
+     "date": "2010-11-27",
+     "value": 5,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_C1.json (99年直轄市長選舉: five mayors elected)"
+    }
+   ]
+  },
+  {
+   "key": "county",
+   "name": "縣（市）",
+   "name_en": "Counties and provincial cities",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "tw.county",
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 16,
+     "source": "ris_q",
+     "locator": "Table 1, end of December 2025: 11 counties and 3 cities in Taiwan Province (14) and Kinmen and Lienchiang counties in Fuchien Province (2)"
+    },
+    {
+     "date": "1997-11-29",
+     "value": 23,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_C2.json (86年縣市長選舉: 23 heads elected)"
+    },
+    {
+     "date": "2009-12-05",
+     "value": 17,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_C2.json (98年縣市長選舉: 17 heads elected; Taipei, Taichung, Tainan, and Kaohsiung counties merged into special municipalities in 2010)"
+    }
+   ]
+  },
+  {
+   "key": "township",
+   "name": "鄉（鎮、市）",
+   "name_en": "Townships, towns, and county-administered cities",
+   "parent": "county",
+   "polity_kind": "municipality",
+   "scheme": "tw.township",
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 198,
+     "source": "ris_q",
+     "locator": "Table 1, end of December 2025: 14 縣轄市, 38 鎮, 146 鄉"
+    },
+    {
+     "date": "1998-01-24",
+     "value": 319,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_D2.json (87年鄉鎮市長選舉: 319 heads elected)"
+    },
+    {
+     "date": "2009-12-05",
+     "value": 211,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_D2.json (98年鄉鎮市長選舉: 211 heads elected)"
+    }
+   ]
+  },
+  {
+   "key": "indigenous_district",
+   "name": "直轄市山地原住民區",
+   "name_en": "Mountain indigenous districts of special municipalities",
+   "parent": "municipality",
+   "polity_kind": "municipality",
+   "scheme": "tw.township",
+   "valid_from": "2014-12-25",
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2022-11-26",
+     "value": 6,
+     "source": "cec_elc",
+     "locator": "https://db.cec.gov.tw/static/elections/list/ELC_D1.json (111年直轄市區長選舉: 6 district heads elected)"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "區",
+   "name_en": "Districts of special municipalities and provincial cities (chiefs appointed)",
+   "parent": "municipality",
+   "polity_kind": "submunicipal",
+   "scheme": "tw.township",
+   "elects": false,
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 170,
+     "source": "ris_q",
+     "locator": "Table 1, end of December 2025: 170 區, of which 158 in special municipalities (including the 6 mountain indigenous districts, recorded as their own tier) and 12 in Keelung, Hsinchu, and Chiayi cities"
+    }
+   ]
+  },
+  {
+   "key": "village",
+   "name": "村（里）",
+   "name_en": "Villages and urban neighborhoods (tsun and li)",
+   "parent": "township",
+   "polity_kind": "submunicipal",
+   "scheme": "tw.village",
+   "source": "lga",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 7752,
+     "source": "ris_q",
+     "locator": "Table 1, end of December 2025: 7,752 村里 (5,860 里, 1,892 村)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "總統副總統選舉",
+   "name_en": "Presidential elections (president and vice president on one ticket)",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station for every election since 1996.",
+   "note": "Elected directly since 1996 by plurality on a joint ticket, four-year term, one re-election; held in March until 2008 and in January with the legislative election since 2012.",
+   "source": "additional",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000002 (Art. 2)",
+   "valid_from": "1996-03-23",
+   "first_held": "1996-03-23",
+   "earliest_record": "1996-03-23",
+   "est_votes": 14000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission",
+     "valid_from": "1996-03-23",
+     "valid_to": "2012-01-14",
+     "source": "pvpera"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 1,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission",
+     "valid_from": "2012-01-14",
+     "vacancy_rule": "The vice president succeeds; a vacant vice presidency is filled by the Legislative Yuan from the president's nominees (Additional Articles Art. 2).",
+     "source": "pvpera"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=President",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1996-03-23",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "TW",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-03-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第09任總統副總統選舉"
+    },
+    {
+     "date": "2000-03-18",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第10任總統副總統選舉"
+    },
+    {
+     "date": "2004-03-20",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第11任總統副總統選舉"
+    },
+    {
+     "date": "2008-03-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第12任總統副總統選舉"
+    },
+    {
+     "date": "2012-01-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第13任總統副總統選舉"
+    },
+    {
+     "date": "2016-01-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第14任總統副總統選舉"
+    },
+    {
+     "date": "2020-01-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第15任總統副總統選舉"
+    },
+    {
+     "date": "2024-01-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "第16任總統副總統選舉"
+    }
+   ]
+  },
+  {
+   "key": "president_indirect",
+   "tier": "national",
+   "name": "國民大會選舉總統副總統",
+   "name_en": "Presidential and vice presidential elections by the National Assembly",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Votes of the National Assembly's delegates, one national count.",
+   "note": "The National Assembly elected the president and vice president for six-year terms from 1948 to 1990 (Constitution Art. 27); the Temporary Provisions lifted the two-term limit in 1960. Each date holds a presidential and a vice presidential contest.",
+   "source": "constitution",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001 (Arts. 27 and 47)",
+   "valid_from": "1948-03-29",
+   "valid_to": "1996-03-23",
+   "est_votes": 1500,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "TW",
+     "valid_to": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_chiang",
+     "quote": "民國37年當選行憲後中華民國第一任總統"
+    },
+    {
+     "date": "1954-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_chiang",
+     "quote": "43年當選第二任總統"
+    },
+    {
+     "date": "1960-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_chiang",
+     "quote": "連任第三任總統"
+    },
+    {
+     "date": "1966-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_chiang",
+     "quote": "連任第四任總統"
+    },
+    {
+     "date": "1972-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_chiang",
+     "quote": "61年與嚴家淦再度當選連任"
+    },
+    {
+     "date": "1978-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_yen",
+     "quote": "蔣經國院長當選第六任總統"
+    },
+    {
+     "date": "1984-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_lee",
+     "quote": "民國73年，當選為中華民國第七任副總統"
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "contests": 2,
+     "source": "president_lee",
+     "quote": "79年3月，經國民大會選舉為第八任總統"
+    }
+   ]
+  },
+  {
+   "key": "ly",
+   "tier": "national",
+   "name": "立法委員選舉（區域）",
+   "name_en": "Legislative Yuan elections: district seats",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "tw.ly_district"
+    ],
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1995.",
+   "note": "73 single-member districts by plurality since 2008 (Additional Articles Art. 4); from 1992 to 2004, multi-member county and city districts (Taipei and Kaohsiung split) by single non-transferable vote with a three-year term. The First Legislative Yuan was elected across China in January 1948; members for Taiwan were added by the 1969 supplementary election and the additional (增額) elections of 1972 to 1989, and the whole body was first re-elected in 1992.",
+   "source": "additional",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000002 (Art. 4)",
+   "valid_from": "1948-01-21",
+   "first_held": "1948-01-21",
+   "earliest_record": "1995-12-02",
+   "est_votes": 13700000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 12,
+     "term_years": 3,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Central Election Commission",
+     "valid_from": "1992-12-19",
+     "valid_to": "2008-01-12",
+     "source": "constitution",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001 (Art. 65: three-year term)"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 1,
+     "term_years": 4,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Central Election Commission",
+     "valid_from": "2008-01-12",
+     "vacancy_rule": "A vacant district or indigenous seat is filled at a by-election within three months unless under a year remains; a party-list vacancy passes down the party's list (CSERA Art. 73).",
+     "source": "csera",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010 (Arts. 39 and 73)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=Legislator",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1995-12-02",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "TW"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-01-21",
+     "through": "1992-12-19",
+     "source": "president_chiang",
+     "quote": "58年起，辦理中央民意代表增補選，民權的行使及於中央政府",
+     "note": "The First Legislative Yuan (January 1948, nationwide), the 1969 supplementary election, the additional elections of 1972, 1975, 1980, 1983, 1986, and 1989, and the Second Legislative Yuan of 1992; the Commission's database starts in 1995."
+    },
+    {
+     "date": "1995-12-02",
+     "election_kind": "general",
+     "contests": 27,
+     "seats": 122,
+     "source": "cec_elc",
+     "quote": "第03屆立法委員選舉",
+     "note": "Multi-member districts by single non-transferable vote."
+    },
+    {
+     "date": "1998-12-05",
+     "election_kind": "general",
+     "contests": 29,
+     "seats": 168,
+     "source": "cec_elc",
+     "quote": "第04屆立法委員選舉",
+     "note": "Multi-member districts by single non-transferable vote."
+    },
+    {
+     "date": "2001-12-01",
+     "election_kind": "general",
+     "contests": 29,
+     "seats": 168,
+     "source": "cec_elc",
+     "quote": "第05屆立法委員選舉",
+     "note": "Multi-member districts by single non-transferable vote."
+    },
+    {
+     "date": "2004-12-11",
+     "election_kind": "general",
+     "contests": 35,
+     "seats": 168,
+     "source": "cec_elc",
+     "quote": "第06屆立法委員選舉",
+     "note": "Multi-member districts by single non-transferable vote."
+    },
+    {
+     "date": "2008-01-12",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "cec_elc",
+     "quote": "第07屆立法委員選舉",
+     "note": "Single-member districts by plurality."
+    },
+    {
+     "date": "2012-01-14",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "cec_elc",
+     "quote": "第08屆立法委員選舉",
+     "note": "Single-member districts by plurality."
+    },
+    {
+     "date": "2016-01-16",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "cec_elc",
+     "quote": "第09屆立法委員選舉",
+     "note": "Single-member districts by plurality."
+    },
+    {
+     "date": "2020-01-11",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "cec_elc",
+     "quote": "第10屆立法委員選舉",
+     "note": "Single-member districts by plurality."
+    },
+    {
+     "date": "2024-01-13",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "cec_elc",
+     "quote": "第11屆立法委員選舉",
+     "note": "Single-member districts by plurality."
+    }
+   ]
+  },
+  {
+   "key": "ly_party_list",
+   "tier": "national",
+   "name": "立法委員選舉（全國不分區及僑居國外國民）",
+   "name_en": "Legislative Yuan elections: at-large and overseas party-list seats",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Party-list votes published by polling station since 2008.",
+   "note": "34 seats by a separate party ballot since 2008, largest-remainder allocation among parties with 5 percent, at least half of each party's winners women (Additional Articles Art. 4; CSERA Art. 67). From 1992 to 2004 the at-large and overseas seats were allocated by the parties' shares of district votes.",
+   "source": "additional",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000002 (Art. 4)",
+   "valid_from": "1992-12-19",
+   "first_held": "1992-12-19",
+   "earliest_record": "2008-01-12",
+   "est_votes": 14000000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=Legislator",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2008-01-12",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "TW"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-12-02",
+     "election_kind": "general",
+     "seats": 36,
+     "note": "At-large and overseas seats allocated by each party's share of the district vote; no separate ballot, and the Commission's database lists no party-list count before 2008."
+    },
+    {
+     "date": "1998-12-05",
+     "election_kind": "general",
+     "seats": 49,
+     "note": "At-large and overseas seats allocated by each party's share of the district vote; no separate ballot, and the Commission's database lists no party-list count before 2008."
+    },
+    {
+     "date": "2001-12-01",
+     "election_kind": "general",
+     "seats": 49,
+     "note": "At-large and overseas seats allocated by each party's share of the district vote; no separate ballot, and the Commission's database lists no party-list count before 2008."
+    },
+    {
+     "date": "2004-12-11",
+     "election_kind": "general",
+     "seats": 49,
+     "note": "At-large and overseas seats allocated by each party's share of the district vote; no separate ballot, and the Commission's database lists no party-list count before 2008."
+    },
+    {
+     "date": "2008-01-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 34,
+     "source": "cec_elc",
+     "quote": "第07屆立法委員選舉 不分區政黨"
+    },
+    {
+     "date": "2012-01-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 34,
+     "source": "cec_elc",
+     "quote": "第08屆立法委員選舉 不分區政黨"
+    },
+    {
+     "date": "2016-01-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 34,
+     "source": "cec_elc",
+     "quote": "第09屆立法委員選舉 不分區政黨"
+    },
+    {
+     "date": "2020-01-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 34,
+     "source": "cec_elc",
+     "quote": "第10屆立法委員選舉 不分區政黨"
+    },
+    {
+     "date": "2024-01-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 34,
+     "source": "cec_elc",
+     "quote": "第11屆立法委員選舉 不分區政黨"
+    }
+   ]
+  },
+  {
+   "key": "ly_indigenous",
+   "tier": "national",
+   "name": "立法委員選舉（平地原住民、山地原住民）",
+   "name_en": "Legislative Yuan elections: lowland and highland indigenous seats",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "tw.indigenous"
+    ],
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1995.",
+   "note": "Two nationwide constituencies of indigenous electors, lowland and highland, each electing three members by single non-transferable vote (four each from 1998 to 2004). Contests are those whose district is in the scheme tw.indigenous.",
+   "source": "csera",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010 (Art. 35(3))",
+   "valid_from": "1992-12-19",
+   "first_held": "1992-12-19",
+   "earliest_record": "1995-12-02",
+   "est_votes": 270000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=Legislator",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1995-12-02",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "schemes": [
+      "tw.indigenous"
+     ],
+     "iso_pattern": "TW",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-12-02",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第03屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "1998-12-05",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 8,
+     "source": "cec_elc",
+     "quote": "第04屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2001-12-01",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 8,
+     "source": "cec_elc",
+     "quote": "第05屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2004-12-11",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 8,
+     "source": "cec_elc",
+     "quote": "第06屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2008-01-12",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第07屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2012-01-14",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第08屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2016-01-16",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第09屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2020-01-11",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第10屆立法委員選舉 平地原住民、山地原住民"
+    },
+    {
+     "date": "2024-01-13",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "第11屆立法委員選舉 平地原住民、山地原住民"
+    }
+   ]
+  },
+  {
+   "key": "ly_by",
+   "tier": "national",
+   "name": "立法委員缺額補選",
+   "name_en": "Legislative Yuan by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station for the by-elections of 2009 to 2015; the later ones are listed with their outcome but no detailed tables.",
+   "note": "Vacant district and indigenous seats are filled within three months unless under a year of the term remains (CSERA Art. 73).",
+   "source": "csera",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010 (Art. 73)",
+   "valid_from": "1992-12-19",
+   "earliest_record": "2009-03-14",
+   "est_votes": 300000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/ByElection?type=Legislator",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2009-03-14",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_bel"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "TW"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-03-14",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員苗栗縣第01選舉區補選"
+    },
+    {
+     "date": "2009-03-28",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員臺北市第06選舉區補選"
+    },
+    {
+     "date": "2009-09-26",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員雲林縣第02選舉區補選"
+    },
+    {
+     "date": "2009-12-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員南投縣第01選舉區補選"
+    },
+    {
+     "date": "2010-01-09",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 3,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員桃園縣第02選舉區補選; 第7屆立法委員臺中縣第03選舉區補選; 第7屆立法委員臺東縣補選"
+    },
+    {
+     "date": "2010-02-27",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 4,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員桃園縣第03選舉區補選; 第7屆立法委員新竹縣補選; 第7屆立法委員嘉義縣第02選舉區補選; 第7屆立法委員花蓮縣補選"
+    },
+    {
+     "date": "2011-03-05",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_bel",
+     "quote": "第7屆立法委員臺南市第04選舉區補選; 第7屆立法委員高雄市第04選舉區補選"
+    },
+    {
+     "date": "2013-01-26",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第8屆立法委員臺中市第02選舉區補選"
+    },
+    {
+     "date": "2015-02-07",
+     "election_kind": "by_election",
+     "contests": 5,
+     "seats": 5,
+     "source": "cec_bel",
+     "quote": "第8屆立法委員臺中市第06選舉區缺額補選; 第8屆立法委員苗栗縣第02選舉區缺額補選; 第8屆立法委員彰化縣第04選舉區缺額補選; 第8屆立法委員南投縣第02選舉區缺額補選; 第8屆立法委員屏東縣第03選舉區缺額補選"
+    },
+    {
+     "date": "2019-01-27",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_bel",
+     "quote": "第9屆立法委員臺北市第02選舉區缺額補選; 第9屆立法委員臺中市第05選舉區缺額補選"
+    },
+    {
+     "date": "2019-03-16",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 4,
+     "source": "cec_bel",
+     "quote": "第9屆立法委員新北市第03選舉區缺額補選; 第9屆立法委員臺南市第02選舉區缺額補選; 第9屆立法委員彰化縣第01選舉區缺額補選; 第9屆立法委員金門縣選舉區缺額補選"
+    },
+    {
+     "date": "2022-01-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第10屆立法委員臺中市第02選舉區缺額補選"
+    },
+    {
+     "date": "2023-01-08",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第10屆立法委員臺北市第3選舉區缺額補選"
+    },
+    {
+     "date": "2023-03-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_bel",
+     "quote": "第10屆立法委員南投縣第2選舉區缺額補選"
+    }
+   ]
+  },
+  {
+   "key": "national_assembly",
+   "tier": "national",
+   "name": "國民大會代表選舉",
+   "name_en": "National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "tw.na_district"
+    ],
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.station"
+    ]
+   },
+   "finest_note": "1996 published by township (district seats) and nationally (indigenous seats); 2005 by polling station.",
+   "note": "The First National Assembly was elected across China in November 1947; Taiwan's members were added by the 1969 supplementary and the additional elections of 1972, 1980, and 1986, and the Second National Assembly was elected in full in December 1991. The Third (1996) had district, indigenous, and party-list at-large and overseas seats. The 2000 revision made the Assembly an ad hoc body; the only one, elected by party list on 14 May 2005, ratified the 2005 revision that abolished it.",
+   "source": "constitution",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001 (Arts. 25-34)",
+   "valid_from": "1947-11-21",
+   "valid_to": "2005-06-10",
+   "first_held": "1947-11-21",
+   "earliest_record": "1996-03-23",
+   "est_votes": 10600000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=NationalAssembly",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1996-03-23",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly",
+      "electoral_college"
+     ],
+     "iso_pattern": "TW"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-11-21",
+     "through": "1991-12-21",
+     "source": "president_chiang",
+     "quote": "58年起，辦理中央民意代表增補選，民權的行使及於中央政府",
+     "note": "The First National Assembly (1947, nationwide), the 1969 supplementary election, the additional elections of 1972, 1980, and 1986, and the Second National Assembly of 21 December 1991; not in the Commission's database."
+    },
+    {
+     "date": "1996-03-23",
+     "election_kind": "general",
+     "contests": 58,
+     "seats": 234,
+     "source": "cec_elc",
+     "quote": "第03屆國大代表選舉",
+     "note": "District and indigenous seats; 100 at-large and overseas seats were allocated by the parties' shares of the district vote."
+    },
+    {
+     "date": "2005-05-14",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_elc",
+     "quote": "94年任務型國大代表選舉",
+     "note": "Ad hoc National Assembly of 300 elected by national party list to ratify the 2005 constitutional amendments."
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "全國性公民投票、憲法修正案及領土變更案複決",
+   "name_en": "National referendums, including ratification of constitutional amendments",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station.",
+   "note": "Referendum Act of 2003: questions proposed by the Legislative Yuan, the president (defensive referendums), or citizens' petitions, carried with more yes than no votes and yes votes from a quarter of electors (from 2018; a turnout floor of half the electorate before). Constitutional amendments and territorial changes proposed by the Legislative Yuan need yes votes from half the electorate (Additional Articles Arts. 1 and 12); the only one held, lowering the voting age, failed on 26 November 2022.",
+   "source": "referendum_act",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020050 (Arts. 23 and 29)",
+   "valid_from": "2003-12-31",
+   "first_held": "2004-03-20",
+   "earliest_record": "2004-03-20",
+   "est_votes": 8000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "called": true,
+     "administered_by": "Central Election Commission",
+     "source": "referendum_act",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020050 (Art. 23: three to six months after certification, with a national election when one falls in the window)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Referendum",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-03-20",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "static/referendums/list/N.json lists cases 1 to 21 and the 2022 constitutional amendment; static/referendums/data/ holds the tables by county, township, village, and polling station.",
+     "source": "cec_ref"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "TW"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-03-20",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cec_ref",
+     "quote": "第1案 台灣人民堅持台海問題應該和平解決。如果中共不撤除瞄準台灣的飛; 第2案 你是不是同意政府與中共展開協商談判，推動建立兩岸和平穩定的互"
+    },
+    {
+     "date": "2008-01-12",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cec_ref",
+     "quote": "第3案 你是否同意依下列原則制定「政黨不當取得財產處理條例」，將中國; 第4案 你是否同意制定法律追究國家領導人及其部屬，因故意或重大過失之"
+    },
+    {
+     "date": "2008-03-22",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cec_ref",
+     "quote": "第5案 1971年中華人民共和國進入聯合國，取代中華民國，台灣成為國; 第6案 您是否同意我國申請重返聯合國及加入其它組織，名稱採務實、有彈"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "referendum",
+     "contests": 10,
+     "source": "cec_ref",
+     "quote": "第7案 你是否同意以「平均每年至少降低1%」之方式逐年降低火力發電廠; 第8案 您是否同意確立「停止新建、擴建任何燃煤發電廠或發電機組(包括; 第9案 你是否同意政府維持禁止開放日本福島311核災相關地區，包括福; 第10案 你是否同意民法婚姻規定應限定在一男一女的結合?; 第11案 你是否同意在國民教育階段內(國中及國小)，教育部及各級學校不; 第12案 你是否同意以民法婚姻規定以外之其他形式來保障同性別二人經營永; 第13案 你是否同意，以「台灣」(Taiwan)為全名申請參加所有國際; 第14案 您是否同意，以民法婚姻章保障同性別二人建立婚姻關係?; 第15案 您是否同意，以「性別平等教育法」明定在國民教育各階段內實施性; 第16案 廢除電業法第95條第1項，即廢除「核能發電設備應於中華民國一"
+    },
+    {
+     "date": "2021-12-18",
+     "election_kind": "referendum",
+     "contests": 4,
+     "source": "cec_ref",
+     "quote": "第17案 您是否同意核四啟封商轉發電？; 第18案 你是否同意政府應全面禁止進口含有萊克多巴胺之乙型受體素豬隻之; 第19案 你是否同意公民投票案公告成立後半年內，若該期間內遇有全國性選; 第20案 您是否同意中油第三天然氣接收站遷離桃園大潭藻礁海岸及海域？（"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_ref",
+     "quote": "憲法修正案 中華民國憲法增修條文增訂第一條之一條文修正案：\n第一條之一 "
+    },
+    {
+     "date": "2025-08-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_ref",
+     "quote": "第21案 您是否同意第三核能發電廠經主管機關同意確認無安全疑慮後，繼續"
+    }
+   ]
+  },
+  {
+   "key": "recall",
+   "tier": "national",
+   "name": "罷免案投票",
+   "name_en": "Recall votes against legislators and local officials",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station for the 2020 Kaohsiung mayoral recall; the others are listed with their outcome, and the Commission's notices carry the counts.",
+   "note": "Any directly elected official except party-list legislators can be recalled after a year in office by the electors of the original constituency; carried with more yes than no votes and yes votes from a quarter of electors (CSERA Arts. 76 and 90; the presidential recall is in the Presidential Act and has never reached a vote). The database lists recalls from 2015; the 26 July and 23 August 2025 rounds held 31 votes against legislators and one against Hsinchu City's mayor, all defeated.",
+   "source": "csera",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010 (Arts. 76 and 90)",
+   "earliest_record": "2015-02-14",
+   "est_votes": 4000000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Recall",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-02-14",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "static/elections/list/RCL_<type>.json lists every recall vote from 2015 with its result; detailed tables only for 2020.",
+     "source": "cec_rcl"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-02-14",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "臺北市第8屆第四選舉區立法委員蔡正元罷免案"
+    },
+    {
+     "date": "2017-12-16",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "新北市第九屆第十二選舉區立法委員黃國昌罷免案"
+    },
+    {
+     "date": "2020-06-06",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "高雄市第3屆市長韓國瑜罷免案"
+    },
+    {
+     "date": "2021-01-16",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "桃園市議會第二屆第七選舉區議員王浩宇罷免案"
+    },
+    {
+     "date": "2021-02-06",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "高雄市議會第三屆第九選舉區議員黃捷罷免案"
+    },
+    {
+     "date": "2021-10-23",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "臺中市第十屆第二選舉區立法委員陳柏惟罷免案"
+    },
+    {
+     "date": "2022-01-09",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "臺北市第十屆第五選舉區立法委員林昶佐罷免案"
+    },
+    {
+     "date": "2024-10-13",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "基隆市第19屆市長謝國樑罷免案"
+    },
+    {
+     "date": "2025-07-13",
+     "election_kind": "recall",
+     "contests": 1,
+     "source": "cec_rcl",
+     "quote": "南投縣議會第20屆第4選舉區議員陳玉鈴罷免案"
+    },
+    {
+     "date": "2025-07-26",
+     "election_kind": "recall",
+     "contests": 25,
+     "source": "cec_rcl",
+     "quote": "新竹市第11屆市長高虹安罷免案; 臺北市第11屆第4選舉區立法委員李彥秀罷免案; 臺北市第11屆第6選舉區立法委員羅智強罷免案; 臺北市第11屆第7選舉區立法委員徐巧芯罷免案; 臺北市第11屆第8選舉區立法委員賴士葆罷免案; 臺北市第11屆第3選舉區立法委員王鴻薇罷免案; 新北市第11屆第12選舉區立法委員廖先翔罷免案; 新北市第11屆第1選舉區立法委員洪孟楷罷免案; 新北市第11屆第7選舉區立法委員葉元之罷免案; 新北市第11屆第8選舉區立法委員張智倫罷免案; 新北市第11屆第9選舉區立法委員林德福罷免案; 桃園市第11屆第1選舉區立法委員牛煦庭罷免案; 桃園市第11屆第5選舉區立法委員呂玉玲罷免案; 桃園市第11屆第2選舉區立法委員涂權吉罷免案; 桃園市第11屆第3選舉區立法委員魯明哲罷免案; 桃園市第11屆第4選舉區立法委員萬美玲罷免案; 桃園市第11屆第6選舉區立法委員邱若華罷免案; 臺中市第11屆第6選舉區立法委員羅廷瑋罷免案; 臺中市第11屆第4選舉區立法委員廖偉翔罷免案; 臺中市第11屆第5選舉區立法委員黃健豪罷免案; 雲林縣第11屆第1選舉區立法委員丁學忠罷免案; 臺東縣第11屆立法委員黃建賓罷免案; 花蓮縣第11屆立法委員傅崐萁罷免案; 基隆市第11屆立法委員林沛祥罷免案; 新竹市第11屆立法委員鄭正鈐罷免案"
+    },
+    {
+     "date": "2025-08-23",
+     "election_kind": "recall",
+     "contests": 7,
+     "source": "cec_rcl",
+     "quote": "新北市第11屆第11選舉區立法委員羅明才罷免案; 臺中市第11屆第2選舉區立法委員顏寬恒罷免案; 臺中市第11屆第8選舉區立法委員江啟臣罷免案; 臺中市第11屆第3選舉區立法委員楊瓊瓔罷免案; 新竹縣第11屆第2選舉區立法委員林思銘罷免案; 南投縣第11屆第2選舉區立法委員游顥罷免案; 南投縣第11屆第1選舉區立法委員馬文君罷免案"
+    }
+   ]
+  },
+  {
+   "key": "primaries",
+   "tier": "national",
+   "name": "政黨提名初選",
+   "name_en": "Party nomination contests",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "csera",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose their nominees by their own member votes and commissioned telephone polls; no election law governs them and the Central Election Commission neither runs nor publishes them.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "control_yuan",
+   "tier": "national",
+   "name": "監察委員選舉",
+   "name_en": "Control Yuan elections by provincial and municipal councils",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Members were elected by the provincial and special municipality councils (Constitution Art. 91): nationwide in 1948, then Taiwan's additional members by the Taiwan Provincial Assembly and the Taipei and Kaohsiung councils from 1973 to 1987, and the Second Control Yuan in 1992. Since 1993 members are nominated by the president with the Legislative Yuan's consent (Additional Articles Art. 7).",
+   "source": "constitution",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001 (Art. 91)",
+   "valid_from": "1948-01-01",
+   "valid_to": "1993-02-01",
+   "disposition": "blocked",
+   "disposition_reason": "The councils' votes are recorded only in their printed proceedings; neither the Central Election Commission nor the Control Yuan publishes them, and no official copy is online.",
+   "est_votes": 100,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "name_pattern": "(監察院|監察委員|Control Yuan)",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "farmers_fishermen",
+   "tier": "national",
+   "name": "農會、漁會選任人員選舉",
+   "name_en": "Farmers' and fishermen's association elections",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "farmers_act",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Farmers' and fishermen's associations are membership bodies: members elect representatives, who elect directors and supervisors; the associations run the votes under the agriculture authority's supervision and publish no official returns."
+  },
+  {
+   "key": "irrigation_associations",
+   "tier": "national",
+   "name": "農田水利會會長、會務委員選舉",
+   "name_en": "Irrigation association elections (abolished)",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "irrigation_act",
+   "valid_to": "2020-10-01",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Members of the 17 irrigation associations elected their chairs and representatives (last in 2018) in votes the associations ran themselves; the Irrigation Act of 2020 turned them into public agencies with appointed heads."
+  },
+  {
+   "key": "provincial_governor",
+   "tier": "province",
+   "name": "臺灣省長選舉",
+   "name_en": "Taiwan Provincial Governor election",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.county",
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station.",
+   "note": "Held once, on 3 December 1994; the 1997 revision froze provincial elections and the governor became an appointee from 21 December 1998 (Additional Articles Art. 9).",
+   "source": "president_lee",
+   "valid_from": "1994-12-03",
+   "valid_to": "1998-12-21",
+   "first_held": "1994-12-03",
+   "earliest_record": "1994-12-03",
+   "est_votes": 8500000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=ProvincialGovernor",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-12-03",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "name_pattern": "(臺灣省|台灣省|Taiwan Provinc)",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "83年臺灣省長選舉"
+    }
+   ]
+  },
+  {
+   "key": "provincial_assembly",
+   "tier": "province",
+   "name": "臺灣省議員選舉",
+   "name_en": "Taiwan Provincial Assembly elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "tw.county"
+    ],
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "1994 published by polling station.",
+   "note": "Directly elected from the second Provisional Provincial Assembly (1954) to the tenth Provincial Assembly (1994), with county and city constituencies and lowland and highland indigenous seats; the first Provisional Assembly (1951) was chosen by the county and city councils. Abolished on 21 December 1998.",
+   "source": "president_chiang",
+   "valid_to": "1998-12-21",
+   "earliest_record": "1994-12-03",
+   "est_votes": 8400000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=ProvincialAssemblyCouncilMembers",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-12-03",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "name_pattern": "(臺灣省議會|台灣省議會|臺灣省臨時省議會|Taiwan Provincial Assembly)",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1951-01-01",
+     "precision": "year",
+     "through": "1989-12-02",
+     "source": "president_chiang",
+     "quote": "至民國48年臺灣民意機關自鄉鎮縣市民代表至省議員...均由各縣市公民直接選舉產生",
+     "note": "Provisional and regular Provincial Assembly elections of 1951 (indirect), 1954, 1957, 1960, 1963, 1968, 1972, 1977, 1981, 1985, and 1989; not in the Commission's database."
+    },
+    {
+     "date": "1994-12-03",
+     "election_kind": "general",
+     "contests": 24,
+     "seats": 79,
+     "source": "cec_elc",
+     "quote": "83年臺灣省議員選舉",
+     "note": "21 county and city constituencies (75 seats) and northern lowland, southern lowland, and highland indigenous constituencies (4 seats)."
+    }
+   ]
+  },
+  {
+   "key": "municipal_mayor",
+   "tier": "municipality",
+   "name": "直轄市長選舉",
+   "name_en": "Special municipality mayoral elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1994.",
+   "note": "Taipei (1967) and Kaohsiung (1979) mayors were appointed until the first direct elections of 1994; New Taipei, Taichung, and Tainan (2010) and Taoyuan (2014) elect from their creation. Plurality, four-year term, one re-election (LGA Art. 55). By-elections are the class local_by.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 55)",
+   "valid_from": "1994-12-03",
+   "first_held": "1994-12-03",
+   "earliest_record": "1994-12-03",
+   "est_votes": 8000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission and the special municipality election commissions",
+     "valid_from": "2010-11-27",
+     "vacancy_rule": "A by-election within three months unless under two years remain; otherwise an acting mayor appointed by the Executive Yuan (LGA Art. 82).",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 55, 82, and 83-1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=Mayor",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-12-03",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-TPE",
+     "valid_from": "1967-07-01",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-KHH",
+     "valid_from": "1979-07-01",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-NWT",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-TXG",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-TNN",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "TW-TAO",
+     "valid_from": "2014-12-25",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-03",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_elc",
+     "quote": "83年直轄市長選舉"
+    },
+    {
+     "date": "1998-12-05",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_elc",
+     "quote": "87年直轄市長選舉"
+    },
+    {
+     "date": "2002-12-07",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_elc",
+     "quote": "91年直轄市長選舉"
+    },
+    {
+     "date": "2006-12-09",
+     "election_kind": "general",
+     "contests": 2,
+     "seats": 2,
+     "source": "cec_elc",
+     "quote": "95年直轄市長選舉"
+    },
+    {
+     "date": "2010-11-27",
+     "election_kind": "general",
+     "contests": 5,
+     "seats": 5,
+     "source": "cec_elc",
+     "quote": "99年直轄市長選舉"
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "103年直轄市長選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "107年直轄市長選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "111年直轄市長選舉"
+    }
+   ]
+  },
+  {
+   "key": "municipal_council",
+   "tier": "municipality",
+   "name": "直轄市議員選舉",
+   "name_en": "Special municipality council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "tw.council_district"
+    ],
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1994.",
+   "note": "Multi-member district constituencies by single non-transferable vote with women's reserved seats, plus lowland and highland indigenous constituencies (LGA Art. 33; CSERA Arts. 36 and 68). Taipei's council has been elected since 1969 and Kaohsiung's since 1981; contests count district and indigenous constituencies.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 33)",
+   "valid_from": "1969-11-15",
+   "first_held": "1969-11-15",
+   "earliest_record": "1994-12-03",
+   "est_votes": 7900000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission and the special municipality election commissions",
+     "valid_from": "2010-11-27",
+     "vacancy_rule": "A vacant seat is filled from the runners-up only after a vote-buying conviction (CSERA Art. 74); otherwise left vacant unless half the district's seats are vacant (CSERA Art. 70).",
+     "source": "csera",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020010 (Arts. 70 and 74)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=CouncilMember",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-12-03",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-TPE",
+     "valid_from": "1967-07-01",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-KHH",
+     "valid_from": "1979-07-01",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-NWT",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-TXG",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-TNN",
+     "valid_from": "2010-12-25",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-TAO",
+     "valid_from": "2014-12-25",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1969-11-15",
+     "through": "1990-12-01",
+     "note": "Taipei City Council elections from 1969 and Kaohsiung City Council elections from 1981; not in the Commission's database."
+    },
+    {
+     "date": "1994-12-03",
+     "election_kind": "general",
+     "seats": 96,
+     "source": "cec_elc",
+     "quote": "83年直轄市議員選舉",
+     "contests": 14
+    },
+    {
+     "date": "1998-12-05",
+     "election_kind": "general",
+     "seats": 96,
+     "source": "cec_elc",
+     "quote": "87年直轄市議員選舉",
+     "contests": 13
+    },
+    {
+     "date": "2002-12-07",
+     "election_kind": "general",
+     "seats": 96,
+     "source": "cec_elc",
+     "quote": "91年直轄市議員選舉",
+     "contests": 13
+    },
+    {
+     "date": "2006-12-09",
+     "election_kind": "general",
+     "seats": 96,
+     "source": "cec_elc",
+     "quote": "95年直轄市議員選舉",
+     "contests": 13
+    },
+    {
+     "date": "2010-11-27",
+     "election_kind": "general",
+     "seats": 314,
+     "source": "cec_elc",
+     "quote": "99年直轄市議員選舉",
+     "contests": 69
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "seats": 375,
+     "source": "cec_elc",
+     "quote": "103年直轄市市議員選舉",
+     "contests": 83
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "seats": 380,
+     "source": "cec_elc",
+     "quote": "107年直轄市市議員選舉",
+     "contests": 79
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "seats": 377,
+     "source": "cec_elc",
+     "quote": "111年直轄市議員選舉",
+     "contests": 80
+    }
+   ]
+  },
+  {
+   "key": "county_head",
+   "tier": "county",
+   "name": "縣（市）長選舉",
+   "name_en": "County magistrate and city mayor elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1997.",
+   "note": "Elected directly since the first local self-government elections of 1950-1951 (LGA Art. 56: plurality, four-year term, one re-election). Taipei City (to 1964) and Kaohsiung City (to 1977) elected their mayors as provincial cities before becoming special municipalities; contests in the six special municipalities after their creation are municipal_mayor.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 56)",
+   "valid_from": "1950-01-01",
+   "earliest_record": "1997-11-29",
+   "est_votes": 3700000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission and the county and city election commissions",
+     "valid_from": "2014-11-29",
+     "vacancy_rule": "A by-election within three months unless under two years remain (LGA Art. 82).",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 56, 82, and 83-1)"
+    },
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 12,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission and the county and city election commissions",
+     "valid_from": "1997-11-29",
+     "valid_to": "2014-11-29",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 83-1: terms ending 20 December 2013 extended to 25 December 2014)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=CountyMayor",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1997-11-29",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "governor"
+     ],
+     "iso_pattern": "TW-*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1950-01-01",
+     "precision": "year",
+     "through": "1993-12-31",
+     "source": "president_chiang",
+     "quote": "行政人員由村里長至縣市長，均由各縣市公民直接選舉產生",
+     "note": "County and city head elections from 1950-1951 to 1993; not in the Commission's database."
+    },
+    {
+     "date": "1997-11-29",
+     "election_kind": "general",
+     "contests": 23,
+     "seats": 23,
+     "source": "cec_elc",
+     "quote": "86年縣市長選舉"
+    },
+    {
+     "date": "2001-12-01",
+     "election_kind": "general",
+     "contests": 23,
+     "seats": 23,
+     "source": "cec_elc",
+     "quote": "90年縣市長選舉"
+    },
+    {
+     "date": "2005-12-03",
+     "election_kind": "general",
+     "contests": 23,
+     "seats": 23,
+     "source": "cec_elc",
+     "quote": "94年縣市長選舉"
+    },
+    {
+     "date": "2009-12-05",
+     "election_kind": "general",
+     "contests": 17,
+     "seats": 17,
+     "source": "cec_elc",
+     "quote": "98年縣市長選舉"
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "contests": 16,
+     "seats": 16,
+     "source": "cec_elc",
+     "quote": "103年縣市長選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "contests": 16,
+     "seats": 16,
+     "source": "cec_elc",
+     "quote": "107年縣市長選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "contests": 15,
+     "seats": 15,
+     "source": "cec_elc",
+     "quote": "111年縣市長選舉"
+    },
+    {
+     "date": "2022-12-18",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_elc",
+     "quote": "111年嘉義市長重行選舉",
+     "note": "Chiayi City's mayoral vote, postponed from 26 November after a candidate died."
+    }
+   ]
+  },
+  {
+   "key": "county_council",
+   "tier": "county",
+   "name": "縣（市）議員選舉",
+   "name_en": "County and city council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "tw.council_district"
+    ],
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 1998.",
+   "note": "Multi-member district constituencies by single non-transferable vote with women's reserved seats, plus lowland and highland indigenous constituencies (LGA Art. 33; CSERA Arts. 36 and 68); contests count district and indigenous constituencies.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 33)",
+   "valid_from": "1950-01-01",
+   "earliest_record": "1998-01-24",
+   "est_votes": 3600000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Central Election Commission and the county and city election commissions",
+     "valid_from": "2014-11-29",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 33 and 83-1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=CountyCouncilMember",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1998-01-24",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "iso_pattern": "TW-*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1950-01-01",
+     "precision": "year",
+     "through": "1994-12-31",
+     "source": "president_chiang",
+     "quote": "至民國48年臺灣民意機關自鄉鎮縣市民代表至省議員...均由各縣市公民直接選舉產生",
+     "note": "County and city council elections from 1950-1951 to 1994; not in the Commission's database."
+    },
+    {
+     "date": "1998-01-24",
+     "election_kind": "general",
+     "seats": 891,
+     "source": "cec_elc",
+     "quote": "87年縣市議員選舉",
+     "contests": 194
+    },
+    {
+     "date": "2002-01-26",
+     "election_kind": "general",
+     "seats": 897,
+     "source": "cec_elc",
+     "quote": "91年縣市議員選舉",
+     "contests": 195
+    },
+    {
+     "date": "2005-12-03",
+     "election_kind": "general",
+     "seats": 901,
+     "source": "cec_elc",
+     "quote": "94年縣市議員選舉",
+     "contests": 211
+    },
+    {
+     "date": "2009-12-05",
+     "election_kind": "general",
+     "seats": 592,
+     "source": "cec_elc",
+     "quote": "98年縣市議員選舉",
+     "contests": 144
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "seats": 532,
+     "source": "cec_elc",
+     "quote": "103年縣市議員選舉",
+     "contests": 134
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "seats": 532,
+     "source": "cec_elc",
+     "quote": "107年縣市議員選舉",
+     "contests": 135
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "seats": 533,
+     "source": "cec_elc",
+     "quote": "111年縣市議員選舉",
+     "contests": 135
+    }
+   ]
+  },
+  {
+   "key": "local_by",
+   "tier": "county",
+   "name": "地方公職人員補選",
+   "name_en": "Local by-elections (mayors, heads, and councillors)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "The 2020 Kaohsiung mayoral by-election is published by polling station; the others are listed with their outcome only.",
+   "note": "Heads are replaced at a by-election within three months unless under two years remain (LGA Art. 82); councils hold one only when half a district's seats fall vacant (CSERA Art. 70). The database's list starts in 1997 and is not exhaustive for township heads and councillors before 2023.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 82)",
+   "earliest_record": "1997-03-15",
+   "est_votes": 400000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/ByElection",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1997-03-15",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_bel"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "iso_pattern": "TW-*"
+    },
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-03-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "桃園縣第12屆縣長缺額補選"
+    },
+    {
+     "date": "2003-08-02",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "花蓮縣第14屆縣長出缺補選"
+    },
+    {
+     "date": "2006-04-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "臺東縣第15屆縣長出缺補選"
+    },
+    {
+     "date": "2007-05-12",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "基隆市第15屆市長出缺補選"
+    },
+    {
+     "date": "2020-08-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "高雄市第3屆市長補選"
+    },
+    {
+     "date": "2023-06-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "花蓮縣富里鄉第19屆鄉長補選"
+    },
+    {
+     "date": "2023-08-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "彰化縣北斗鎮第19屆鎮長缺額補選"
+    },
+    {
+     "date": "2024-04-13",
+     "election_kind": "by_election",
+     "contests": 6,
+     "source": "cec_bel",
+     "quote": "苗栗縣苗栗市第12屆市長補選; 雲林縣虎尾鎮第19屆鎮長補選; 雲林縣麥寮鄉第19屆鄉長補選; 臺東縣大武鄉第19屆鄉長補選; 臺中市議會第4屆議員第15選舉區缺額補選; 宜蘭縣議會第20屆議員第4選舉區缺額補選"
+    },
+    {
+     "date": "2024-06-01",
+     "election_kind": "by_election",
+     "contests": 2,
+     "source": "cec_bel",
+     "quote": "新竹縣議會第20屆議員第7選舉區缺額補選; 臺東縣議會第20屆議員第16選舉區缺額補選"
+    },
+    {
+     "date": "2024-07-27",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "屏東縣長治鄉第19屆鄉長補選"
+    },
+    {
+     "date": "2025-01-11",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "屏東縣新埤鄉第19屆鄉長補選"
+    },
+    {
+     "date": "2025-01-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "南投縣草屯鎮第19屆鎮長補選"
+    },
+    {
+     "date": "2025-02-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cec_bel",
+     "quote": "臺東縣蘭嶼鄉第19屆鄉長補選"
+    }
+   ]
+  },
+  {
+   "key": "local_referendum",
+   "tier": "county",
+   "name": "地方性公民投票",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "tw.township",
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station.",
+   "note": "Held by a special municipality or county on its own self-government matters (Referendum Act), and on an offshore island before a casino can be licensed (Offshore Islands Development Act Art. 10-2). The database lists only Hsinchu City's 2021 wastewater question; the casino referendums held in Penghu, Lienchiang, and Kinmen are not in it.",
+   "source": "referendum_act",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020050",
+   "valid_from": "2003-12-31",
+   "earliest_record": "2021-12-18",
+   "est_votes": 150000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Referendum",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2021-12-18",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "static/referendums/list/L.json lists the local referendums the database holds.",
+     "source": "cec_ref"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "TW-*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2021-12-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_ref",
+     "quote": "新竹市 第1案 您是否同意，新竹市應訂定，廢污水管理自治條例，明定工業廢水、醫療廢水及其他事業廢"
+    }
+   ]
+  },
+  {
+   "key": "township_head",
+   "tier": "township",
+   "name": "鄉（鎮、市）長選舉",
+   "name_en": "Township, town, and county-administered city head elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "1998 and 2002 published by township only; by polling station since 2005.",
+   "note": "Plurality, four-year term, one re-election; heads of the 24 mountain indigenous townships must be highland indigenous (LGA Art. 57). Townships of counties merged into special municipalities in 2010 and 2014 became districts with appointed chiefs.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 57)",
+   "valid_from": "1950-01-01",
+   "earliest_record": "1998-01-24",
+   "est_votes": 3200000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "County election commissions",
+     "valid_from": "2014-11-29",
+     "vacancy_rule": "A by-election within three months unless under two years remain (LGA Art. 82).",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 57, 82, and 83-1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=CityMayor",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1998-01-24",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1950-01-01",
+     "precision": "year",
+     "through": "1994-12-31",
+     "source": "president_chiang",
+     "quote": "行政人員由村里長至縣市長，均由各縣市公民直接選舉產生",
+     "note": "Township head elections from the 1950s to 1994; not in the Commission's database."
+    },
+    {
+     "date": "1998-01-24",
+     "election_kind": "general",
+     "contests": 319,
+     "seats": 319,
+     "source": "cec_elc",
+     "quote": "87年鄉鎮市長選舉"
+    },
+    {
+     "date": "2002-01-26",
+     "election_kind": "general",
+     "contests": 319,
+     "seats": 319,
+     "source": "cec_elc",
+     "quote": "91年鄉鎮市長選舉"
+    },
+    {
+     "date": "2005-12-03",
+     "election_kind": "general",
+     "contests": 319,
+     "seats": 319,
+     "source": "cec_elc",
+     "quote": "94年鄉鎮市長選舉"
+    },
+    {
+     "date": "2009-12-05",
+     "election_kind": "general",
+     "contests": 211,
+     "seats": 211,
+     "source": "cec_elc",
+     "quote": "98年鄉鎮市長選舉"
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "contests": 198,
+     "seats": 198,
+     "source": "cec_elc",
+     "quote": "103年鄉鎮市長選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "contests": 198,
+     "seats": 198,
+     "source": "cec_elc",
+     "quote": "107年鄉鎮市長選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "contests": 198,
+     "seats": 198,
+     "source": "cec_elc",
+     "quote": "111年鄉鎮市長選舉"
+    }
+   ]
+  },
+  {
+   "key": "township_council",
+   "tier": "township",
+   "name": "鄉（鎮、市）民代表選舉",
+   "name_en": "Township, town, and county-administered city representative council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "tw.township_district"
+    ],
+    "fine": [
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 2010.",
+   "note": "Multi-member districts by single non-transferable vote with women's reserved seats, plus lowland indigenous constituencies (LGA Art. 33). The database starts in 2010; the number of constituencies is not in its national profile, so contests are not counted.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 33)",
+   "valid_from": "1946-01-01",
+   "earliest_record": "2010-06-12",
+   "est_votes": 3200000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "County election commissions",
+     "valid_from": "2014-11-29",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 33 and 83-1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=CityRepresentatives",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-06-12",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1946-01-01",
+     "precision": "year",
+     "through": "2006-12-31",
+     "source": "president_chiang",
+     "quote": "至民國48年臺灣民意機關自鄉鎮縣市民代表至省議員...均由各縣市公民直接選舉產生",
+     "note": "Township representative elections from 1946 to 2006; not in the Commission's database."
+    },
+    {
+     "date": "2010-06-12",
+     "election_kind": "general",
+     "seats": 2322,
+     "source": "cec_elc",
+     "quote": "99年鄉鎮市民代表選舉"
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "seats": 2091,
+     "source": "cec_elc",
+     "quote": "103年鄉鎮市民代表選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "seats": 2098,
+     "source": "cec_elc",
+     "quote": "107年鄉鎮市民代表選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "seats": 2088,
+     "source": "cec_elc",
+     "quote": "111年鄉鎮市民代表選舉"
+    }
+   ]
+  },
+  {
+   "key": "indigenous_district_head",
+   "tier": "indigenous_district",
+   "name": "直轄市山地原住民區長選舉",
+   "name_en": "Mountain indigenous district head elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station.",
+   "note": "Six districts (Wulai, Fuxing, Heping, Namasia, Taoyuan, Maolin) that were mountain indigenous townships before their counties became special municipalities; heads elected as township heads since 2014 (LGA Art. 83-2).",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 83-2 and 83-3)",
+   "valid_from": "2014-11-29",
+   "first_held": "2014-11-29",
+   "earliest_record": "2014-11-29",
+   "est_votes": 24000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Special municipality election commissions",
+     "valid_from": "2014-11-29",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 83-2)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=DistrictExecutive",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2014-11-29",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(區長|[Dd]istrict)",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "103年直轄市區長選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "107年直轄市區長選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "contests": 6,
+     "seats": 6,
+     "source": "cec_elc",
+     "quote": "111年直轄市區長選舉"
+    }
+   ]
+  },
+  {
+   "key": "indigenous_district_council",
+   "tier": "indigenous_district",
+   "name": "直轄市山地原住民區民代表選舉",
+   "name_en": "Mountain indigenous district representative council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "tw.township_district"
+    ],
+    "fine": [
+     "tw.village",
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station.",
+   "note": "Representative councils of the six mountain indigenous districts, elected as township councils since 2014 (LGA Art. 83-2); contests are not counted.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 83-2)",
+   "valid_from": "2014-11-29",
+   "first_held": "2014-11-29",
+   "earliest_record": "2014-11-29",
+   "est_votes": 24000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Special municipality election commissions",
+     "valid_from": "2014-11-29",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 83-2)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=DistrictRepresentatives",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2014-11-29",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(區民代表會|[Dd]istrict [Rr]epresentative)",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "seats": 50,
+     "source": "cec_elc",
+     "quote": "103年直轄市區民代表選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "seats": 50,
+     "source": "cec_elc",
+     "quote": "107年直轄市區民代表選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "seats": 50,
+     "source": "cec_elc",
+     "quote": "111年直轄市區民代表選舉"
+    }
+   ]
+  },
+  {
+   "key": "village_chief",
+   "tier": "village",
+   "name": "村（里）長選舉",
+   "name_en": "Village and neighborhood chief elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "tw.station"
+    ]
+   },
+   "finest_note": "Published by polling station since 2010.",
+   "note": "One chief per village or neighborhood, plurality, four-year term with no term limit and no turnout floor when unopposed (LGA Art. 59; CSERA Art. 70); a village with no candidate after two calls gets an appointee. Contests count the chiefs elected, slightly fewer than the villages.",
+   "source": "lga",
+   "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Art. 59)",
+   "valid_from": "1950-01-01",
+   "earliest_record": "2010-06-12",
+   "est_votes": 11600000,
+   "effort": 2,
+   "contests_per_unit": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 11,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Special municipality and county election commissions",
+     "valid_from": "2014-11-29",
+     "vacancy_rule": "A by-election within three months unless under two years remain (LGA Art. 82).",
+     "source": "lga",
+     "locator": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 (Arts. 59, 82, and 83-1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "中央選舉委員會 選舉資料庫 (db.cec.gov.tw)",
+     "url": "https://db.cec.gov.tw/ElecTable/Election?type=VillageChief",
+     "format": "json, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-06-12",
+     "finest": "tw.station",
+     "license": "Open Government Data License, version 1.0 (Taiwan)",
+     "evidence": "Static JSON profiles and candidate tickets by nation, county, constituency, township, village, and polling station, with an Excel bulk archive per election; Open Government Data License.",
+     "source": "cec_elc"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1950-01-01",
+     "precision": "year",
+     "through": "2006-12-31",
+     "source": "president_chiang",
+     "quote": "行政人員由村里長至縣市長，均由各縣市公民直接選舉產生",
+     "note": "Village chief elections from the 1950s to 2006; not in the Commission's database."
+    },
+    {
+     "date": "2010-06-12",
+     "election_kind": "general",
+     "contests": 4074,
+     "seats": 4074,
+     "source": "cec_elc",
+     "quote": "99年縣市村里長選舉"
+    },
+    {
+     "date": "2010-11-27",
+     "election_kind": "general",
+     "contests": 3757,
+     "seats": 3757,
+     "source": "cec_elc",
+     "quote": "99年直轄市里長選舉"
+    },
+    {
+     "date": "2014-11-29",
+     "election_kind": "general",
+     "contests": 7848,
+     "seats": 7848,
+     "source": "cec_elc",
+     "quote": "103年村里長選舉"
+    },
+    {
+     "date": "2018-11-24",
+     "election_kind": "general",
+     "contests": 7744,
+     "seats": 7744,
+     "source": "cec_elc",
+     "quote": "107年村里長選舉"
+    },
+    {
+     "date": "2022-11-26",
+     "election_kind": "general",
+     "contests": 7740,
+     "seats": 7740,
+     "source": "cec_elc",
+     "quote": "111年村里長選舉"
+    }
+   ]
+  }
+ ]
+}
