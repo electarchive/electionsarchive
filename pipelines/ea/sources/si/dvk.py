@@ -1,3 +1,4 @@
+import json
 import re
 import unicodedata
 from collections import Counter
@@ -198,22 +199,27 @@ REPORTS = {
     2014: f"{DOCS}/drzavni_zbor_2014/Porocilo-o-izidu---predcasne-volitve-v-DZ-2014--anonimizirano.pdf",
     2018: f"{DOCS}/drzavni_zbor_2018/011dyenp.pdf",
     2022: f"{DOCS}/DZ/2022/izidi_volitev/VDZ_2022_Zapisnik_o_ugotovitvi_izida_sprejet_7.5.2022.pdf",
+    # The results site's data file, which gives each list's seats nationally and by electoral unit.
+    2026: f"{ARCHIVE}/dz2026/data/data.json",
 }
 MANDATES = {
     2018: f"{DOCS}/DZ/2022/navodila_medijem/mandati.csv",
     2022: "https://www.dvk-rs.si/fileadmin/user_upload/mandati.csv",
+    2026: f"{ARCHIVE}/dz2026/data/mandati.csv",
 }
 # The mandate lists name each list by the number of its list in the file: the ballot position in 2018, and a code
-# the commission assigned to each running list in 2022.
+# the commission assigned to each running list in 2022 and 2026.
 MANDATE_LISTS = {
     2018: {str(position): position for position in range(1, 26)},
     2022: {"241141": 4, "241152": 15, "241149": 12, "241154": 17, "241143": 6},
+    2026: {"107753": 1, "107752": 2, "107757": 5, "107760": 6, "107749": 10, "107754": 11, "107755": 15},
 }
 # Seats the commission declared each list at the national level, by ballot position.
 NATIONAL_SEATS = {
     2014: {13: 36, 10: 21, 1: 10, 9: 6, 4: 6, 6: 5, 16: 4},
     2018: {15: 25, 9: 13, 20: 10, 18: 10, 8: 9, 12: 7, 23: 5, 2: 5, 17: 4},
     2022: {4: 41, 15: 27, 12: 8, 17: 7, 6: 5},
+    2026: {11: 29, 5: 28, 10: 9, 1: 6, 15: 6, 2: 5, 6: 5},
 }
 # 2014: the seats of each list in each electoral unit, the first-stage seats plus the national remainder seats the
 # record names unit by unit, by ballot position.
@@ -260,6 +266,17 @@ def unit_seats(year: int) -> dict[int, dict[int, int]] | None:
         national.update(lists)
     if dict(national) != NATIONAL_SEATS[year]:
         raise ValueError(f"{year}: unit seats {dict(national)} disagree with the declared totals")
+    if REPORTS.get(year, "").endswith(".json"):
+        # The results site's own figures: each list's seats nationally and in each electoral unit, by list code.
+        positions = MANDATE_LISTS[year]
+        data = json.loads(raw.cached(SOURCE, REPORTS[year]).path.read_text(encoding="utf-8-sig"))["slovenija"]
+        declared = {positions[str(line["st"])]: line["man"] for line in data["rez"]["rez"] if line["man"]}
+        if declared != NATIONAL_SEATS[year]:
+            raise ValueError(f"{year}: the results site declares {declared}")
+        for unit in data["enote"]:
+            lines = {positions[str(line["st"])]: line["man"] for line in unit["rez"]["rez"] if line.get("man")}
+            if lines != seats[unit["st"]]:
+                raise ValueError(f"{year}: unit {unit['st']} seats {lines} disagree with the mandate list")
     return seats
 
 
