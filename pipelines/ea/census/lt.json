@@ -1,0 +1,1763 @@
+{
+ "polity": "LT",
+ "name": "Lithuania",
+ "sources": {
+  "konstitucija": {
+   "title": "Lietuvos Respublikos Konstitucija (1992)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm",
+   "kind": "official_body"
+  },
+  "rinkimu_kodeksas": {
+   "title": "Lietuvos Respublikos rinkimų kodeksas (2022)",
+   "publisher": "Lietuvos Respublikos Seimas (e-seimas.lrs.lt)",
+   "url": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/44e06821075711edbfe9c72e552dd5bd",
+   "kind": "official_body",
+   "note": "In force from 1 September 2022; replaced the separate laws on Seimas, presidential, municipal council, and European Parliament elections and on the Central Electoral Commission."
+  },
+  "teritorijos_istatymas": {
+   "title": "Lietuvos Respublikos teritorijos administracinių vienetų ir jų ribų įstatymas (1994, Nr. I-558)",
+   "publisher": "Lietuvos Respublikos Seimas (e-seimas.lrs.lt)",
+   "url": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/TAIS.5911/asr",
+   "kind": "official_body"
+  },
+  "savivaldos_istatymas": {
+   "title": "Lietuvos Respublikos vietos savivaldos įstatymas (1994, Nr. I-533; new wording from 1 April 2023)",
+   "publisher": "Lietuvos Respublikos Seimas (e-seimas.lrs.lt)",
+   "url": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/TAIS.5884/asr",
+   "kind": "official_body"
+  },
+  "referendumo_istatymas": {
+   "title": "Republic of Lithuania Law on Referendums (official translation)",
+   "publisher": "Lietuvos Respublikos Seimas (e-seimas.lrs.lt)",
+   "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/9d793af360d111e99684a7f33a9827ac",
+   "kind": "official_body"
+  },
+  "vrk_rinkimai": {
+   "title": "Rinkimai ir referendumai",
+   "publisher": "Vyriausioji rinkimų komisija (vrk.lt)",
+   "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+   "kind": "official_body"
+  },
+  "vrk_statiniai": {
+   "title": "Rinkimų rezultatai: statiniai rezultatų puslapiai ir failai",
+   "publisher": "Vyriausioji rinkimų komisija (vrk.lt)",
+   "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/",
+   "kind": "official_body",
+   "note": "Static result pages and tab-separated files per election, round, and polling district; reachable while the rest of vrk.lt sits behind a browser challenge."
+  },
+  "vrk_ref2024": {
+   "title": "2024 m. gegužės 12 d. privalomasis referendumas dėl Konstitucijos 12 straipsnio pakeitimo: rezultatai savivaldybėse",
+   "publisher": "Vyriausioji rinkimų komisija (vrk.lt)",
+   "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/1504/1/2104/rezultatai/lt/rezultataiRefSavivaldybese.html",
+   "kind": "official_body"
+  },
+  "vrk_atviri": {
+   "title": "Atviri duomenys",
+   "publisher": "Vyriausioji rinkimų komisija (vrk.lt)",
+   "url": "https://www.vrk.lt/lt/atviri-duomenys",
+   "kind": "official_body"
+  },
+  "vrk_ep": {
+   "title": "Europos Parlamento nariai, išrinkti Lietuvos Respublikoje",
+   "publisher": "Vyriausioji rinkimų komisija (vrk.lt)",
+   "url": "https://www.vrk.lt/lt/europos-parlamento-nariai",
+   "kind": "official_body"
+  },
+  "lrs_nuo1990": {
+   "title": "Lietuvos Respublikos Seimas (nuo 1990 m.)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16308&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_1920_1940": {
+   "title": "Seimas Lietuvos Respublikoje (1920–1940 m.)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16265&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_steigiamasis": {
+   "title": "Steigiamasis Seimas (1920–1922)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16272&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_i_seimas": {
+   "title": "I Seimas (1922–1923)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16273&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_ii_seimas": {
+   "title": "II Seimas (1923–1926)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16274&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_iii_seimas": {
+   "title": "III Seimas (1926–1927)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16275&p_k=1",
+   "kind": "official_body"
+  },
+  "lrs_iv_seimas": {
+   "title": "IV Seimas (1936–1940)",
+   "publisher": "Lietuvos Respublikos Seimas (lrs.lt)",
+   "url": "https://www.lrs.lt/sip/portal.show?p_r=16276&p_k=1",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Lietuvos Respublika",
+   "name_en": "Republic of Lithuania",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "konstitucija"
+  },
+  {
+   "key": "apskritis",
+   "name": "Apskritys",
+   "name_en": "Counties",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1995-01-01",
+   "elects": false,
+   "source": "teritorijos_istatymas",
+   "counts": [
+    {
+     "date": "2022-01-28",
+     "value": 10,
+     "source": "teritorijos_istatymas",
+     "locator": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/TAIS.5911/asr (art. 5: the ten counties, their centres and territories; consolidated version in force from 2022-01-28)"
+    }
+   ]
+  },
+  {
+   "key": "savivaldybe",
+   "name": "Savivaldybės",
+   "name_en": "Municipalities",
+   "parent": "apskritis",
+   "polity_kind": "municipality",
+   "scheme": "lt.sav",
+   "valid_from": "1995-03-25",
+   "source": "teritorijos_istatymas",
+   "counts": [
+    {
+     "date": "2024-05-12",
+     "value": 60,
+     "source": "vrk_ref2024",
+     "locator": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/1504/1/2104/rezultatai/lt/rezultataiRefSavivaldybese.html (Apylinkių skaičius - 1895 Savivaldybių skaičius - 60)"
+    }
+   ]
+  },
+  {
+   "key": "seniunija",
+   "name": "Seniūnijos",
+   "name_en": "Elderships",
+   "parent": "savivaldybe",
+   "polity_kind": "submunicipal",
+   "valid_from": "1995-03-25",
+   "elects": false,
+   "source": "savivaldos_istatymas"
+  },
+  {
+   "key": "seniunaitija",
+   "name": "Seniūnaitijos",
+   "name_en": "Eldership wards (seniūnaitijos)",
+   "parent": "seniunija",
+   "polity_kind": "submunicipal",
+   "source": "savivaldos_istatymas"
+  },
+  {
+   "key": "klaipedos_krastas",
+   "name": "Klaipėdos kraštas",
+   "name_en": "Klaipėda Region (autonomous, 1924-1939)",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1924-05-08",
+   "valid_to": "1939-03-22",
+   "source": "lrs_iii_seimas"
+  },
+  {
+   "key": "valscius",
+   "name": "Apskritys, valsčiai ir miestai (1918-1940)",
+   "name_en": "Interwar counties, rural districts (valsčiai), and towns",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "valid_from": "1918-01-01",
+   "valid_to": "1940-06-15",
+   "source": "lrs_1920_1940"
+  },
+  {
+   "key": "lssr",
+   "name": "Lietuvos SSR",
+   "name_en": "Lithuanian SSR (Soviet occupation, 1940-1990)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1940-06-15",
+   "valid_to": "1990-03-11",
+   "source": "lrs_nuo1990"
+  }
+ ],
+ "classes": [
+  {
+   "key": "seimas",
+   "tier": "national",
+   "name": "Seimo rinkimai",
+   "name_en": "Seimas elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "lt.seimas",
+     "world.country"
+    ],
+    "fine": [
+     "lt.sav",
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė); stations abroad count with their constituency (since 2020 the world-Lithuanians constituency). Polling districts are address lists, not mapped areas.",
+   "note": "141 members (Constitution art. 55): 71 in single-member constituencies, two rounds unless one candidate wins outright (plurality in one round in 2000), and 70 by nationwide list PR with a 5% threshold (7% for joint lists) and preference votes. Vacant constituency seats go to new elections (nauji rinkimai).",
+   "source": "konstitucija",
+   "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (arts. 55, 57, 58)",
+   "valid_from": "1992-10-25",
+   "first_held": "1992-10-25",
+   "earliest_record": "1992-10-25",
+   "contests_per_unit": 72,
+   "est_votes": 28000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 10,
+     "day_rule": "oct_second_sunday",
+     "term_years": 4,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "Single-member constituencies: a second round between the top two within 15 days when no candidate wins a majority (Rinkimų kodeksas).",
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "1992-10-25",
+     "source": "konstitucija",
+     "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (art. 57: regular Seimas elections on the second Sunday of October of the year the mandate ends; art. 58: early elections)",
+     "vacancy_rule": "A vacant single-member seat is filled at a new election; a vacant list seat passes to the next candidate on the list (Rinkimų kodeksas)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-04-23",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for Seimas elections, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "schemes": [
+      "lt.seimas"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1992-10-01"
+    },
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "schemes": [
+      "world.country"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1992-10-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-10-25",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "1992-11-15",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "1996-10-20",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "1996-11-10",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2000-10-08",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest. Single-member seats were won by plurality in one round."
+    },
+    {
+     "date": "2004-10-10",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2004-10-24",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2008-10-12",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2008-10-26",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2012-10-14",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2012-10-28",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2016-10-09",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2016-10-23",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2020-10-11",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2020-10-25",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "2024-10-13",
+     "contests": 72,
+     "seats": 141,
+     "source": "konstitucija",
+     "quote": "Seimą sudaro Tautos atstovai – 141 Seimo narys",
+     "note": "71 single-member constituencies and one nationwide list contest."
+    },
+    {
+     "date": "2024-10-27",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round in the single-member constituencies left open."
+    },
+    {
+     "date": "1993-01-01",
+     "through": "2016-12-31",
+     "election_kind": "by_election",
+     "note": "New and repeat single-member elections (nauji ir pakartotiniai rinkimai) between general elections; not yet counted."
+    },
+    {
+     "date": "2017-04-23",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "New election in the Anykščiai-Panevėžys constituency."
+    },
+    {
+     "date": "2018-09-16",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "New election in the Zanavykai constituency."
+    },
+    {
+     "date": "2019-09-08",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 3,
+     "source": "vrk_statiniai",
+     "note": "New elections in the Žirmūnai, Gargždai, and Žiemgala constituencies."
+    },
+    {
+     "date": "2023-09-03",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "Early election in the Raseiniai-Kėdainiai constituency."
+    },
+    {
+     "date": "2026-11-08",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "Early election in the Nalšia North constituency."
+    }
+   ]
+  },
+  {
+   "key": "prezidentas",
+   "tier": "national",
+   "name": "Respublikos Prezidento rinkimai",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "lt.sav",
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė).",
+   "note": "Direct two-round election for five years (Constitution arts. 78-81); a first-round win needs a majority of those voting with turnout of at least half the electorate, or a third of all voters when turnout is lower.",
+   "source": "konstitucija",
+   "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (arts. 78, 80, 81, 89)",
+   "valid_from": "1993-02-14",
+   "first_held": "1993-02-14",
+   "earliest_record": "1993-02-14",
+   "est_votes": 20000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "A second round between the top two two weeks after the first (Constitution art. 81).",
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "1993-01-01",
+     "valid_to": "2004-04-06",
+     "source": "konstitucija",
+     "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (art. 80: the last Sunday two months before the term ends; the cycle reset after the 2004 removal of President Paksas)"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "A second round between the top two two weeks after the first (Constitution art. 81).",
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "2004-04-06",
+     "source": "konstitucija",
+     "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (art. 80: the last Sunday two months before the term ends; art. 89: an election within two months of a vacancy)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-05-12",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for presidential elections, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-02-14",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "1997-12-21",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "1998-01-04",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    },
+    {
+     "date": "2002-12-22",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "2003-01-05",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    },
+    {
+     "date": "2004-06-13",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams",
+     "note": "Early election after the removal of President Paksas by impeachment."
+    },
+    {
+     "date": "2004-06-27",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    },
+    {
+     "date": "2009-05-17",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "2014-05-11",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    },
+    {
+     "date": "2019-05-12",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    },
+    {
+     "date": "2024-05-12",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "Respublikos Prezidentą renka Lietuvos Respublikos piliečiai penkeriems metams"
+    },
+    {
+     "date": "2024-05-26",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "konstitucija",
+     "quote": "po dviejų savaičių rengiamas pakartotinis balsavimas"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Rinkimai į Europos Parlamentą",
+   "name_en": "European Parliament elections",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "lt.sav",
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė).",
+   "note": "One nationwide constituency, list PR with a 5% threshold and preference votes (Rinkimų kodeksas); 13 seats in 2004, 12 in 2009, and 11 since 2014.",
+   "source": "rinkimu_kodeksas",
+   "valid_from": "2004-06-13",
+   "first_held": "2004-06-13",
+   "earliest_record": "2004-06-13",
+   "est_votes": 5000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 6,
+     "term_years": 5,
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "2004-01-01",
+     "source": "rinkimu_kodeksas",
+     "locator": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/44e06821075711edbfe9c72e552dd5bd (European Parliament elections on the day the Council of the European Union sets)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list."
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-05-26",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for European Parliament elections, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "world.country"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "2004-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null,
+     "valid_from": "2004-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-13",
+     "contests": 1,
+     "seats": 13,
+     "source": "vrk_ep",
+     "note": "One nationwide constituency."
+    },
+    {
+     "date": "2009-06-07",
+     "contests": 1,
+     "seats": 12,
+     "source": "vrk_ep",
+     "note": "One nationwide constituency."
+    },
+    {
+     "date": "2014-05-25",
+     "contests": 1,
+     "seats": 11,
+     "source": "vrk_ep",
+     "note": "One nationwide constituency."
+    },
+    {
+     "date": "2019-05-26",
+     "contests": 1,
+     "seats": 11,
+     "source": "vrk_ep",
+     "note": "One nationwide constituency."
+    },
+    {
+     "date": "2024-06-09",
+     "contests": 1,
+     "seats": 11,
+     "source": "vrk_ep",
+     "note": "One nationwide constituency."
+    }
+   ]
+  },
+  {
+   "key": "referendumas",
+   "tier": "national",
+   "name": "Referendumai",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "lt.sav",
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė); the Commission's pages also total by municipality.",
+   "note": "Called by the Seimas or on the demand of 300,000 voters (Constitution art. 9); mandatory for Chapters 1 and 14 of the Constitution (art. 148). Turnout and approval quorums apply (Law on Referendums).",
+   "source": "konstitucija",
+   "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (arts. 9, 147, 148)",
+   "valid_from": "1991-03-11",
+   "first_held": "1992-05-23",
+   "earliest_record": "1992-05-23",
+   "est_votes": 20000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "called": true,
+     "valid_from": "1991-01-01",
+     "source": "referendumo_istatymas",
+     "locator": "https://e-seimas.lrs.lt/rs/legalact/TAD/9d793af360d111e99684a7f33a9827ac"
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-05-12",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for referendums, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-05-23",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Restoring the office of President."
+    },
+    {
+     "date": "1992-06-14",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Withdrawal of the Soviet army and compensation for damages."
+    },
+    {
+     "date": "1992-10-25",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Adoption of the Constitution, held with the first Seimas election."
+    },
+    {
+     "date": "1994-08-27",
+     "source": "vrk_rinkimai",
+     "note": "One ballot of eight statements on privatization, deposits, and law-breaking; not yet counted as contests."
+    },
+    {
+     "date": "1996-10-20",
+     "source": "vrk_rinkimai",
+     "note": "Two referendums with the Seimas election, one of three statements on Articles 55, 57, and 131 and one on compensating deposits; not yet counted as contests."
+    },
+    {
+     "date": "1996-11-10",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Amending Article 47 of the Constitution, held with the Seimas runoff."
+    },
+    {
+     "date": "2003-05-10",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Membership of the European Union; voting ran over 10 and 11 May."
+    },
+    {
+     "date": "2008-10-12",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Extending the operation of the Ignalina nuclear power plant."
+    },
+    {
+     "date": "2012-10-14",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Building a new nuclear power plant (consultative)."
+    },
+    {
+     "date": "2014-06-29",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Restricting the sale of land to foreigners."
+    },
+    {
+     "date": "2019-05-12",
+     "contests": 2,
+     "source": "vrk_rinkimai",
+     "note": "Amending Article 12 (dual citizenship) and Article 55 (number of Seimas members)."
+    },
+    {
+     "date": "2024-05-12",
+     "contests": 1,
+     "source": "vrk_rinkimai",
+     "note": "Amending Article 12 (dual citizenship)."
+    }
+   ]
+  },
+  {
+   "key": "apklausa_1991",
+   "tier": "national",
+   "name": "1991 m. vasario 9 d. visuotinė Lietuvos gyventojų apklausa",
+   "name_en": "1991 independence poll (plebiscite)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ]
+   },
+   "note": "A nationwide poll called by the Supreme Council on whether Lithuania should be an independent democratic republic; held under a poll law rather than as a referendum.",
+   "source": "lrs_nuo1990",
+   "locator": "https://www.lrs.lt/sip/portal.show?p_r=16308&p_k=1 (1991 m. vasario 9 d. visuotinė Lietuvos gyventojų apklausa (plebiscitas))",
+   "valid_from": "1991-02-09",
+   "valid_to": "1991-02-10",
+   "first_held": "1991-02-09",
+   "earliest_record": "1991-02-09",
+   "est_votes": 2250000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1991-02-01",
+     "valid_to": "1991-03-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-02-09",
+     "contests": 1,
+     "source": "lrs_nuo1990",
+     "quote": "1991 m. vasario 9 d. visuotinė Lietuvos gyventojų apklausa (plebiscitas)"
+    }
+   ]
+  },
+  {
+   "key": "savivaldybes_taryba",
+   "tier": "savivaldybe",
+   "name": "Savivaldybių tarybų rinkimai",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "grain": [
+     "lt.sav"
+    ],
+    "fine": [
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė).",
+   "note": "Each municipality elects its council for four years by list PR with preference votes (Constitution art. 119; Rinkimų kodeksas); independent candidates may run since 2015 through public election committees. Council size scales with population.",
+   "source": "konstitucija",
+   "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (art. 119)",
+   "valid_from": "1995-03-25",
+   "first_held": "1995-03-25",
+   "earliest_record": "1995-03-25",
+   "contests_per_unit": 1,
+   "est_votes": 11000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "2011-01-01",
+     "source": "rinkimu_kodeksas",
+     "locator": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/44e06821075711edbfe9c72e552dd5bd (regular municipal elections; terms ran 2, 3, and 5 years before 2011 as the law changed)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list."
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-03-03",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for municipal council elections, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1995-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-03-25",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "1997-03-23",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2000-03-19",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2002-12-22",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2007-02-25",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2011-02-27",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2015-03-01",
+     "source": "vrk_rinkimai"
+    },
+    {
+     "date": "2019-03-03",
+     "contests": 60,
+     "source": "vrk_ref2024",
+     "quote": "Savivaldybių skaičius - 60",
+     "note": "One council in each of the 60 municipalities, the count the Commission gives for May 2024."
+    },
+    {
+     "date": "2023-03-05",
+     "contests": 60,
+     "source": "vrk_ref2024",
+     "quote": "Savivaldybių skaičius - 60",
+     "note": "One council in each of the 60 municipalities, the count the Commission gives for May 2024."
+    }
+   ]
+  },
+  {
+   "key": "meras",
+   "tier": "savivaldybe",
+   "name": "Savivaldybių merų rinkimai",
+   "name_en": "Direct mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "grain": [
+     "lt.sav"
+    ],
+    "fine": [
+     "lt.apylinke"
+    ]
+   },
+   "finest_note": "Counted by polling district (apylinkė).",
+   "note": "Mayors directly elected for four years since 2015, two rounds (Constitution art. 119 as amended in 2014); councils elected the mayor before 2015.",
+   "source": "konstitucija",
+   "locator": "https://www.lrs.lt/home/Konstitucija/Konstitucija.htm (art. 119)",
+   "valid_from": "2015-03-01",
+   "first_held": "2015-03-01",
+   "earliest_record": "2015-03-01",
+   "est_votes": 5500000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": true,
+     "runoff": "majority",
+     "runoff_rule": "A second round between the top two two weeks later when no candidate wins outright.",
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "2015-01-01",
+     "source": "rinkimu_kodeksas",
+     "locator": "https://e-seimas.lrs.lt/portal/legalAct/lt/TAD/44e06821075711edbfe9c72e552dd5bd",
+     "vacancy_rule": "A vacancy is filled at an early (pirmalaikiai) mayoral election."
+    }
+   ],
+   "access": [
+    {
+     "platform": "VRK rezultatų puslapiai ir failai (vrk.lt/statiniai)",
+     "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/{id}/",
+     "format": "html and tsv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-04-23",
+     "finest": "lt.apylinke",
+     "evidence": "Static result pages and tab-separated files for mayoral elections, by polling district (apylinkė); the lt.vrk pipeline reads them from 2017 on.",
+     "source": "vrk_statiniai"
+    },
+    {
+     "platform": "VRK rinkimų ir referendumų archyvas (vrk.lt)",
+     "url": "https://www.vrk.lt/lt/rinkimai-ir-referendumai",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The Commission's election pages; the site front answers automated clients with a browser challenge, so its reach back before 2017 was not confirmed in this survey.",
+     "source": "vrk_rinkimai"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "2015-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2015-03-01",
+     "contests": 60,
+     "seats": 60,
+     "source": "vrk_ref2024",
+     "quote": "Savivaldybių skaičius - 60",
+     "note": "One mayor in each of the 60 municipalities."
+    },
+    {
+     "date": "2015-03-15",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round where no candidate won outright."
+    },
+    {
+     "date": "2019-03-03",
+     "contests": 60,
+     "seats": 60,
+     "source": "vrk_ref2024",
+     "quote": "Savivaldybių skaičius - 60",
+     "note": "One mayor in each of the 60 municipalities."
+    },
+    {
+     "date": "2019-03-17",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round where no candidate won outright."
+    },
+    {
+     "date": "2023-03-05",
+     "contests": 60,
+     "seats": 60,
+     "source": "vrk_ref2024",
+     "quote": "Savivaldybių skaičius - 60",
+     "note": "One mayor in each of the 60 municipalities."
+    },
+    {
+     "date": "2023-03-19",
+     "election_kind": "runoff",
+     "source": "vrk_rinkimai",
+     "note": "Second round where no candidate won outright."
+    },
+    {
+     "date": "2017-04-23",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "vrk_statiniai",
+     "note": "New elections in Jonava and Šakiai district municipalities."
+    },
+    {
+     "date": "2017-09-10",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "New election in Marijampolė municipality."
+    },
+    {
+     "date": "2021-04-11",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "New election in Radviliškis district municipality."
+    },
+    {
+     "date": "2021-10-10",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "vrk_statiniai",
+     "note": "New elections in Kelmė and Trakai district municipalities."
+    },
+    {
+     "date": "2023-05-07",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "Repeat vote in Visaginas municipality."
+    },
+    {
+     "date": "2023-10-08",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "vrk_statiniai",
+     "note": "Early election in Kupiškis district municipality."
+    },
+    {
+     "date": "2025-03-16",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "vrk_statiniai",
+     "note": "Early elections in Joniškis district and Panevėžys city municipalities."
+    }
+   ]
+  },
+  {
+   "key": "vietos_apklausa",
+   "tier": "savivaldybe",
+   "name": "Vietos gyventojų apklausos",
+   "name_en": "Local residents' polls",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "grain": [
+     "lt.sav"
+    ]
+   },
+   "disposition": "blocked",
+   "disposition_reason": "Consultative polls run by each municipality under the Local Self-Government Law, not by the Commission; no central register of polls or their results was found.",
+   "source": "savivaldos_istatymas",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null,
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "seniunaitis",
+   "tier": "seniunaitija",
+   "name": "Seniūnaičių rinkimai",
+   "name_en": "Election of eldership ward representatives (seniūnaičiai)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Ward representatives are chosen by residents' meetings or polls the municipal administration organizes (Local Self-Government Law); no ballot is run by the Commission and no results are published.",
+   "source": "savivaldos_istatymas"
+  },
+  {
+   "key": "netiesioginiai",
+   "tier": "national",
+   "name": "Netiesioginiai rinkimai",
+   "name_en": "Indirect elections (Seimas Speaker, Prime Minister's approval, council-elected mayors before 2015)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by a vote of an elected body, not by voters.",
+   "source": "konstitucija",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_government",
+      "mayor",
+      "speaker",
+      "other"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1990-01-01"
+    }
+   ]
+  },
+  {
+   "key": "teisejai",
+   "tier": "national",
+   "name": "Teisėjų skyrimas",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed by the President or the Seimas (Constitution arts. 103, 112); no judicial office is filled by popular vote.",
+   "source": "konstitucija"
+  },
+  {
+   "key": "partiju_vidaus",
+   "tier": "national",
+   "name": "Partijų vidaus rinkimai",
+   "name_en": "Party internal and nominating contests",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose candidates under their own statutes; the state runs no primaries.",
+   "source": "rinkimu_kodeksas",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "LT"
+    }
+   ]
+  },
+  {
+   "key": "pilieciu_iniciatyva",
+   "tier": "national",
+   "name": "Piliečių įstatymų leidybos ir referendumo iniciatyvos",
+   "name_en": "Citizens' legislative and referendum initiatives",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Signature collection (50,000 for a bill, 300,000 for a referendum), not a vote; an initiative that reaches a ballot is counted under referendums.",
+   "source": "konstitucija"
+  },
+  {
+   "key": "aukscausioji_taryba_1990",
+   "tier": "lssr",
+   "name": "Aukščiausiosios Tarybos-Atkuriamojo Seimo rinkimai (1990)",
+   "name_en": "Supreme Council (Reconstituent Seimas) election, 1990",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "lt.seimas"
+    ]
+   },
+   "note": "141 single-member constituencies, two rounds, with repeat voting where turnout fell short. The council restored independence on 11 March 1990 and sat until the 1992 Seimas.",
+   "source": "lrs_nuo1990",
+   "valid_from": "1990-02-24",
+   "valid_to": "1992-10-25",
+   "first_held": "1990-02-24",
+   "earliest_record": "1990-02-24",
+   "contests_per_unit": 141,
+   "est_votes": 2800000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1990-01-01",
+     "valid_to": "1992-10-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-02-24",
+     "contests": 141,
+     "seats": 141,
+     "source": "lrs_nuo1990",
+     "quote": "1990 m. vasaris – Aukščiausiosios Tarybos-Atkuriamojo Seimo rinkimai",
+     "note": "Runoffs on 4, 7, 8, and 10 March and repeat voting in April 1990 left open."
+    }
+   ]
+  },
+  {
+   "key": "liaudies_seimas_1940",
+   "tier": "lssr",
+   "name": "Liaudies Seimo rinkimai (1940)",
+   "name_en": "People's Seimas election, 1940",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "note": "A single-list election staged under Soviet occupation on 14-15 July 1940; the assembly requested admission to the USSR.",
+   "source": "lrs_1920_1940",
+   "valid_from": "1940-07-14",
+   "valid_to": "1940-08-03",
+   "first_held": "1940-07-14",
+   "earliest_record": "1940-07-14",
+   "est_votes": 1300000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1940-07-01",
+     "valid_to": "1940-08-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1940-07-14",
+     "source": "lrs_1920_1940",
+     "note": "Voting ran over 14 and 15 July 1940; contests not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "lssr_tarybos",
+   "tier": "lssr",
+   "name": "Lietuvos SSR Aukščiausiosios Tarybos ir vietinių tarybų rinkimai (1941-1990)",
+   "name_en": "Lithuanian SSR Supreme Soviet and local soviet elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "disposition": "blocked",
+   "disposition_reason": "Single-candidate elections under occupation whose district results survive only in Soviet press and archives; no official publisher of the results was found.",
+   "source": "lrs_nuo1990",
+   "valid_from": "1941-01-01",
+   "valid_to": "1990-03-11",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "by_election"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1940-08-03",
+     "valid_to": "1990-01-01"
+    }
+   ]
+  },
+  {
+   "key": "tsrs_rinkimai",
+   "tier": "lssr",
+   "name": "TSRS institucijų rinkimai Lietuvoje",
+   "name_en": "Elections to USSR bodies held in Lithuania (to 1989)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections to the bodies of another state (the USSR Supreme Soviet and the 1989 Congress of People's Deputies); they belong to a USSR census.",
+   "source": "lrs_nuo1990",
+   "valid_from": "1940-08-03",
+   "valid_to": "1990-03-11",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "iso_pattern": "SU",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "steigiamasis_seimas",
+   "tier": "national",
+   "name": "Steigiamojo Seimo rinkimai (1920)",
+   "name_en": "Constituent Seimas election, 1920",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "note": "112 members elected by list PR in constituencies on 14-16 April 1920; the planned seats for Vilnius, Lyda, Balstogė, Gardinas, and the Klaipėda Region went unfilled.",
+   "source": "lrs_steigiamasis",
+   "valid_from": "1920-04-14",
+   "valid_to": "1922-10-10",
+   "first_held": "1920-04-14",
+   "earliest_record": "1920-04-14",
+   "est_votes": 750000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "LT",
+     "valid_to": "1921-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-04-14",
+     "seats": 112,
+     "source": "lrs_steigiamasis",
+     "quote": "Steigiamojo Seimo rinkimai vyko 1920 m. balandžio 14–16 dienomis"
+    }
+   ]
+  },
+  {
+   "key": "seimas_1922",
+   "tier": "national",
+   "name": "Seimo rinkimai (1922-1936)",
+   "name_en": "Interwar Seimas elections (I-IV Seimas)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "note": "List PR in multi-member constituencies for the I-III Seimas; the 1936 IV Seimas was elected from candidates put up by county councils, without parties.",
+   "source": "lrs_1920_1940",
+   "valid_from": "1922-10-10",
+   "valid_to": "1940-06-15",
+   "first_held": "1922-10-10",
+   "earliest_record": "1922-10-10",
+   "est_votes": 3000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 3,
+     "term_years": 3,
+     "called": true,
+     "administered_by": "Vyriausioji rinkimų komisija",
+     "valid_from": "1922-08-01",
+     "valid_to": "1928-05-15",
+     "source": "lrs_i_seimas",
+     "locator": "https://www.lrs.lt/sip/portal.show?p_r=16273&p_k=1"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1922-01-01",
+     "valid_to": "1940-06-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1922-10-10",
+     "seats": 78,
+     "source": "lrs_i_seimas",
+     "quote": "I Seimo rinkimai vyko 1922 m. spalio 10–11 dienomis",
+     "note": "I Seimas."
+    },
+    {
+     "date": "1923-05-12",
+     "seats": 78,
+     "source": "lrs_ii_seimas",
+     "quote": "II Seimo rinkimai vyko 1923 m. gegužės 12–13 dienomis",
+     "note": "II Seimas."
+    },
+    {
+     "date": "1926-05-08",
+     "seats": 85,
+     "source": "lrs_iii_seimas",
+     "quote": "III Seimo rinkimai vyko 1926 m. gegužės 8–10 dienomis",
+     "note": "III Seimas, with the Klaipėda Region as a tenth constituency."
+    },
+    {
+     "date": "1936-06-09",
+     "seats": 49,
+     "source": "lrs_iv_seimas",
+     "quote": "IV Seimo rinkimai vyko 1936 m. birželio 9–10 dienomis",
+     "note": "IV Seimas."
+    }
+   ]
+  },
+  {
+   "key": "prezidentas_1920",
+   "tier": "national",
+   "name": "Respublikos Prezidento rinkimai Seime ir Tautos atstovų (1920-1938)",
+   "name_en": "Interwar presidential elections by the Seimas and by special representatives",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "note": "The Seimas elected the President under the 1922 Constitution; under the 1928 and 1938 constitutions special national representatives (Tautos atstovai) did so in 1931 and 1938.",
+   "source": "lrs_1920_1940",
+   "valid_from": "1920-06-19",
+   "valid_to": "1940-06-15",
+   "est_votes": 600,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "LT",
+     "valid_to": "1940-06-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-06-19",
+     "through": "1938-11-14",
+     "note": "Elections by the Seimas and by Tautos atstovai; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "savivalda_1918",
+   "tier": "valscius",
+   "name": "Savivaldybių tarybų rinkimai (1918-1940)",
+   "name_en": "Interwar local council elections (counties, rural districts, and towns)",
+   "category": "council",
+   "goal": "local",
+   "measure": {},
+   "note": "Councils of rural districts (valsčiai), towns, and counties under the interwar local government laws.",
+   "source": "lrs_1920_1940",
+   "valid_from": "1918-12-01",
+   "valid_to": "1940-06-15",
+   "est_votes": 2000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "LT",
+     "valid_from": "1918-01-01",
+     "valid_to": "1940-06-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1918-12-01",
+     "through": "1938-12-31",
+     "note": "Interwar local elections; dates and counts not yet listed."
+    }
+   ]
+  },
+  {
+   "key": "klaipedos_seimelis",
+   "tier": "klaipedos_krastas",
+   "name": "Klaipėdos krašto Seimelio rinkimai",
+   "name_en": "Klaipėda Region Diet (Seimelis) elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {},
+   "note": "The autonomous region's 29-member diet, elected by list PR under the Klaipėda Convention and Statute (1924) in 1925, 1927, 1930, 1932, 1935, and 1938.",
+   "source": "lrs_iii_seimas",
+   "valid_from": "1925-01-01",
+   "valid_to": "1939-03-22",
+   "first_held": "1925-01-01",
+   "est_votes": 420000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "name_pattern": "(Klaipėd|Memel)",
+     "iso_pattern": "LT",
+     "valid_from": "1925-01-01",
+     "valid_to": "1939-03-22",
+     "precedence": 2
+    }
+   ],
+   "dates": [
+    {
+     "date": "1925-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    },
+    {
+     "date": "1927-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    },
+    {
+     "date": "1930-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    },
+    {
+     "date": "1932-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    },
+    {
+     "date": "1935-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    },
+    {
+     "date": "1938-01-01",
+     "precision": "year",
+     "seats": 29,
+     "note": "Day not yet confirmed from an official source."
+    }
+   ]
+  }
+ ]
+}
