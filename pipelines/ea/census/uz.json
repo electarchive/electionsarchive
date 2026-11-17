@@ -1,0 +1,1513 @@
+{
+  "polity": "UZ",
+  "name": "Uzbekistan",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Uzbekistan",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "Oʻzbekiston",
+        "lang": "uz",
+        "kind": "native"
+      },
+      {
+        "text": "Узбекистан",
+        "lang": "ru",
+        "kind": "native"
+      }
+    ],
+    "slug": "uz",
+    "wikidata": "Q265",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "title": "Конституция Республики Узбекистан (принята референдумом 30 апреля 2023 года, ЗРУ-837 от 01.05.2023), консолидированная редакция",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/6445147",
+      "kind": "official_body",
+      "note": "Art. 9: referendums; arts. 86 and 89: Karakalpakstan's own constitution and its right to secede by a referendum of its people; art. 91: two chambers with five-year terms; art. 92: 150 deputies of the Legislative Chamber and a Senate of four members from each of Karakalpakstan, the regions, and Tashkent city, elected at joint sittings of local council deputies, plus nine appointed by the President; art. 106: President elected directly for seven years, at most two terms in a row; art. 120: Kengashes of people's deputies in regions, districts, and cities (except cities of district subordination), for five years; art. 124: khokims appointed; art. 127: citizens' assemblies elect their chairs and sit outside state power; art. 128: regular elections in the year a term expires, on the first Sunday of the third ten-day period of October; arts. 132 and 134: Constitutional and Supreme Court judges elected by the Senate."
+    },
+    "constitution_1992": {
+      "title": "Конституция Республики Узбекистан от 8 декабря 1992 года (утратила силу), редакции по датам",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/35869",
+      "kind": "official_body",
+      "note": "Original art. 77: a single-chamber Oliy Majlis of 150 deputies from territorial districts for five years (?ONDATE=08.12.1992); art. 90: President for five years, seven from the 2003 amendment; art. 77 from 2005: Legislative Chamber of 120 deputies and a Senate; art. 117 until 2021: elections on the first Sunday of the third ten-day period of December (?ONDATE=05.09.2019), moved to October by ЗРУ-670 of 8 February 2021."
+    },
+    "code": {
+      "title": "Избирательный кодекс Республики Узбекистан (утвержден Законом от 25 июня 2019 года № ЗРУ-544), консолидированная редакция по 30.12.2025",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/4386846",
+      "kind": "official_body",
+      "note": "Art. 9: 75 territorial single-member districts; art. 59: presidential runoff of the top two; art. 60: repeat elections; art. 66: early presidential elections; art. 67: 75 deputies by single-member districts and 75 by party lists in one nationwide district (ЗРУ-883 of 18.12.2023); art. 74: new elections for a vacated district seat, not within six months of the term's end; art. 74-2: list vacancies filled from the list; arts. 75-87: Senate elected at joint sittings; art. 88: local Kengashes by territorial single-member districts for five years, with seat ranges by population; art. 96: plurality in districts, 7 percent threshold, 33 percent turnout."
+    },
+    "law_om": {
+      "title": "Закон Республики Узбекистан «О выборах в Олий Мажлис Республики Узбекистан» от 28 декабря 1993 года № 990-XII (в редакции Закона от 29 августа 2003 года № 518-II; утратил силу 26.06.2019)",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/71045",
+      "kind": "official_body",
+      "note": "Art. 1: 150 deputies, of whom 15 elected by the Ecological Movement of Uzbekistan (ЗРУ-194 of 2008); art. 7: 135 territorial districts; art. 44: more than half of the votes with 33 percent turnout; art. 45: runoff. Repealed by ЗРУ-544."
+    },
+    "law_president": {
+      "title": "Закон Республики Узбекистан «О выборах Президента Республики Узбекистан» от 18 ноября 1991 года № 414-XII (утратил силу 26.06.2019)",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/111840",
+      "kind": "official_body",
+      "note": "Art. 1: President elected for five years; art. 35: more than half of the votes, else a runoff of the top two, with 33 percent turnout."
+    },
+    "law_local": {
+      "title": "Закон Республики Узбекистан «О выборах в областные, районные и городские Кенгаши народных депутатов» от 5 мая 1994 года № 1050-XII (утратил силу 26.06.2019)",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/67440",
+      "kind": "official_body",
+      "note": "Art. 1: deputies elected in single-member districts for five years; art. 41: more than half of the votes with 33 percent turnout; art. 42: runoff."
+    },
+    "law_referendum": {
+      "title": "Закон Республики Узбекистан «О референдуме Республики Узбекистан» (новая редакция, Закон от 30 августа 2001 года № 265-II)",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/82205",
+      "kind": "official_body",
+      "note": "Art. 11: initiative of citizens (5 percent of voters, art. 12), the chambers of the Oliy Majlis, or the President; art. 13: «Референдум назначается Олий Мажлисом Республики Узбекистан»; art. 38: more than half of participants, with at least half of registered voters taking part."
+    },
+    "ref1995": {
+      "title": "Постановление Олий Мажлиса Республики Узбекистан от 24 февраля 1995 года № 25-I «О проведении референдума Республики Узбекистан»",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/242433",
+      "kind": "official_body"
+    },
+    "kk_law": {
+      "title": "Закон Республики Каракалпакстан «О выборах» от 4 сентября 2019 года № 266/XXVII",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/5233925",
+      "kind": "official_body",
+      "note": "Art. 9: 65 single-member districts for the Jokargy Kenes; art. 12: the Central Election Commission of the Republic of Karakalpakstan, elected by the Jokargy Kenes; art. 59: runoff; art. 61: 65 deputies for five years; art. 77: more than half of the votes with 33 percent turnout. The lex.uz page shows no later amendments."
+    },
+    "mahalla_law": {
+      "title": "Закон Республики Узбекистан «О выборах председателя схода граждан» от 15 октября 2018 года № ЗРУ-499 (с изменениями по ЗРУ-1027 от 11.02.2025)",
+      "publisher": "Министерство юстиции Республики Узбекистан (Национальная база данных законодательства, lex.uz)",
+      "url": "https://lex.uz/ru/docs/3988402",
+      "kind": "official_body",
+      "note": "Art. 8: the chair is elected for five years by the citizens' assembly or, where it cannot be convened, by an assembly of citizens' representatives; art. 10: dates set by the Jokargy Kenes and the regional and Tashkent city Kengashes; art. 12: assistance commissions, not the CEC; art. 20: secret ballot."
+    },
+    "cec_pres2000": {
+      "title": "Выборы Президента Республики Узбекистан 9 января 2000 года",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/5",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2007": {
+      "title": "Выборы Президента Республики Узбекистан 23 декабря 2007 года",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/4",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2015": {
+      "title": "Выборы Президента 2015",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/3",
+      "kind": "official_body",
+      "note": "Some candidates' figures on the page repeat those of 2016.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2016": {
+      "title": "Выборы Президента Республики Узбекистан 4 декабря 2016 года",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/1",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2021": {
+      "title": "Qaror № 1154: 2021-yil 24-oktabr kuni o'tkazilgan O'zbekiston Respublikasi Prezidenti saylovi natijalari to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1154-2021-yil-24-oktabr-kuni-o-tkazilgan-o-zbekiston-respublikasi-prezidenti-saylovi-natijalari-to-g-risida",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2023": {
+      "title": "Qaror № 1318: 2023-yil 9-iyul kuni o'tkazilgan muddatidan ilgari O'zbekiston Respublikasi Prezidenti saylovi natijalari to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1318-2023-yil-9-iyul-kuni-o-tkazilgan-muddatidan-ilgari-o-zbekiston-respublikasi-prezidenti-saylovi-natijalari-to-g-risida",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_pres2023_speech": {
+      "title": "Выборы Президента 2023: выступление председателя ЦИК на пресс-конференции 10 июля 2023 года",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/12",
+      "kind": "official_body",
+      "note": "Gives the electorate (19,593,838), turnout (15,651,405), and each candidate's votes; one figure is truncated on the page.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_ref2002": {
+      "title": "Референдумы 2002",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/10",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_ref2023": {
+      "title": "Qaror № 1245: 2023-yil 30-aprelda o'tkazilgan O'zbekiston Respublikasi referendumining yakunlari to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1245-2023-yil-30-aprelda-o-tkazilgan-o-zbekiston-respublikasi-referendumining-yakunlari-to-g-risida",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_om1999": {
+      "title": "Парламентские выборы 1999",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/9",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2004": {
+      "title": "Парламентские выборы 2004",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/8",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2009": {
+      "title": "Парламентские выборы 2009",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/7",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2014": {
+      "title": "Парламентские выборы 2014",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/6",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2019": {
+      "title": "Парламентские выборы 2019",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/2",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2024": {
+      "title": "Парламентские выборы 2024",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/ru/elections-and-referendums/page/14",
+      "kind": "official_body",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2024_list": {
+      "title": "Qaror № 1412: Yagona saylov okrugi bo'yicha O'zbekiston Respublikasi Oliy Majlisi Qonunchilik palatasiga deputatlar saylovining natijalari to'g'risida (with the protocol of the CEC as a .docx)",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1412-yagona-saylov-okrugi-bo-yicha-o-zbekiston-respublikasi-oliy-majlisi-qonunchilik-palatasiga-deputatlar-saylovining-natijalari-to-g-risida",
+      "kind": "official_body",
+      "note": "Protocol: 20,110,490 voters, 15,018,498 took part, 72,327 invalid ballots, votes for each of the five parties, quotient 199,282, seats 26/14/10/13/12.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2024_smd": {
+      "title": "Qaror № 1413: Bir mandatli saylov okruglari bo'yicha O'zbekiston Respublikasi Oliy Majlisi Qonunchilik palatasiga deputatlar saylovining natijalari to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1413-bir-mandatli-saylov-okruglari-bo-yicha-o-zbekiston-respublikasi-oliy-majlisi-qonunchilik-palatasiga-deputatlar-saylovining-natijalari-to-g-risida",
+      "kind": "official_body",
+      "note": "The annex PDF lists the winner and party of each of the 75 districts, with no vote counts.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_lc2024_districts": {
+      "title": "Qaror № 1362: O'zbekiston Respublikasi Oliy Majlisi Qonunchilik palatasi deputatlari saylovini o'tkazish bo'yicha bir mandatli saylov okruglarini tuzish to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1362-o-zbekiston-respublikasi-oliy-majlisi-qonunchilik-palatasi-deputatlari-saylovini-o-tkazish-bo-yicha-bir-mandatli-saylov-okruglarini-tuzish-to-g-risida",
+      "kind": "official_body",
+      "note": "The annex .docx gives each district's territory and number of voters.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_senate2020": {
+      "title": "Qaror № 1023: O'zbekiston Respublikasi Oliy Majlisining Senati a'zolarini ro'yxatga olish to'g'risida (17.01.2020)",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1023-o-zbekiston-respublikasi-oliy-majlisining-senati-a-zolarini-ro-yxatga-olish-to-g-risida",
+      "kind": "official_body",
+      "note": "Title only on the site.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_senate2024": {
+      "title": "Qaror № 1420: O'zbekiston Respublikasi Oliy Majlisining Senati a'zolarini ro'yxatga olish to'g'risida (16.11.2024)",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1420-o-zbekiston-respublikasi-oliy-majlisining-senati-a-zolarini-ro-yxatga-olish-to-g-risida",
+      "kind": "official_body",
+      "note": "The annex .docx lists the senators elected from each region, with no vote counts. Decision № 1417 convened the joint sittings for 7-12 November 2024.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_infographic2024": {
+      "title": "Инфографика ЦИК: важные цифры избирательной кампании 2024 года (ru4.jpg)",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/storage/infographics/04.10.2024/Saylov%20kampaniyasi/ru4.jpg",
+      "kind": "official_body",
+      "note": "States 150 deputies of the Legislative Chamber, 56 members of the Senate, and 65 deputies of the Jokargy Kenes of the Republic of Karakalpakstan.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "cec_local_by": {
+      "title": "Qaror № 1427: Ayrim bo'shab qolgan o'rinlarga mahalliy Kengashlar deputatlarining saylovini tayinlash to'g'risida",
+      "publisher": "Центральная избирательная комиссия Республики Узбекистан (ЦИК)",
+      "url": "https://saylov.uz/oz/cec_decision/1427-ayrim-bo-shab-qolgan-o-rinlarga-mahalliy-kengashlar-deputatlarining-saylovini-tayinlash-to-g-risida",
+      "kind": "official_body",
+      "note": "Calls by-elections in single districts of local Kengashes; decisions № 1428, 1438, 1446, 1453, 1457, 1465, and 1468 (2025-2026) call more. No results are published centrally.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "tashkent_city_2024": {
+      "title": "Qaror № 93: Xalq deputatlari Toshkent shahar Kengashiga deputatlar saylovining natijalari to'g'risida (Toshkent shahar saylov komissiyasi, 2024)",
+      "publisher": "Toshkent shahar saylov komissiyasi (Tashkent city election commission)",
+      "url": "https://toshkentsh.saylov.uz/oz/cec_decision/93-xalq-deputatlari-toshkent-shahar-kengashiga-deputatlar-saylovining-natijalari-to-g-risida",
+      "kind": "official_body",
+      "note": "The annex is a scanned PDF listing the winner of each of 50 districts, with no vote counts.",
+      "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)"
+    },
+    "parliament_history": {
+      "title": "Parlament tarixi (history of the Oliy Majlis), Legislative Chamber of the Oliy Majlis",
+      "publisher": "Олий Мажлис Республики Узбекистан, Законодательная палата",
+      "url": "https://parliament.gov.uz/api/v1/cms/menu/parlament-tarixi/posts/",
+      "kind": "official_body",
+      "note": "JSON behind the chamber's history page: the Oliy Kengash as the first single-chamber parliament of independent Uzbekistan (1991-1994), and the first Oliy Majlis of 250 deputies elected from 25 December 1994."
+    },
+    "senate_history": {
+      "title": "O'zbekistonda parlamentarizmning rivojlantirish tarixi (history of parliamentarism in Uzbekistan)",
+      "publisher": "Сенат Олий Мажлиса Республики Узбекистан",
+      "url": "https://senat.uz/api/v1/site/menu/ozbekistonda-parlamentarizmning-rivojlantirish-tarixi",
+      "kind": "official_body",
+      "note": "JSON behind the Senate's history page: the three rounds of the 1994-1995 election, the 2004-2005 election of 120 deputies, and the first joint sitting of the two-chamber Oliy Majlis on 28 January 2005."
+    },
+    "siat_districts": {
+      "title": "Районы (индикатор 2.01.01.0036), количество на 1 января, 2010-2026",
+      "publisher": "Национальный комитет Республики Узбекистан по статистике (SIAT)",
+      "url": "https://api.siat.stat.uz/media/uploads/sdmx/sdmx_data_307.xlsx",
+      "kind": "official_body",
+      "note": "Sheet Ma'lumot: row 2 is the national total (code 1700), then one row per region (1735 Karakalpakstan, 1703 to 1733, 1726 Tashkent city) and per district (xxxx2nn) and city (xxxx4nn); columns F (2010) to V (2026). The total includes Tashkent's 12 city districts and Namangan's 2. Linked from https://stat.uz/ru/ofitsialnaya-statistika/demography."
+    },
+    "siat_cities": {
+      "title": "Города (индикатор 2.01.01.0035), количество на 1 января, 2010-2026",
+      "publisher": "Национальный комитет Республики Узбекистан по статистике (SIAT)",
+      "url": "https://api.siat.stat.uz/media/uploads/sdmx/sdmx_data_290.xlsx",
+      "kind": "official_body",
+      "note": "Same layout: 120 cities in 2026, of which 31 rows coded xxxx4nn are cities of regional (or, for Nukus, republican) significance; the others are subordinate to districts."
+    },
+    "siat_mahalla": {
+      "title": "Количество органов самоуправления граждан (индикатор 2.01.02.0154), 2020-2026",
+      "publisher": "Национальный комитет Республики Узбекистан по статистике (SIAT)",
+      "url": "https://api.siat.stat.uz/media/uploads/sdmx/sdmx_data_4620.xlsx",
+      "kind": "official_body",
+      "note": "Sheet Ma'lumot, row 2: citizens' self-government bodies (mahallas and the assemblies of towns, kishlaks, and auls) from the unified mahalla classifier; columns F (2020) to L (2026)."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Oʻzbekiston Respublikasi / Республика Узбекистан",
+      "name_en": "Republic of Uzbekistan",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "uz.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "karakalpakstan",
+      "name": "Қарақалпақстан Республикасы / Республика Каракалпакстан",
+      "name_en": "Republic of Karakalpakstan, a sovereign republic within Uzbekistan with its own constitution and Jokargy Kenes",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "scheme": "uz.karakalpakstan",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 1,
+          "source": "siat_districts",
+          "locator": "Sheet Ma'lumot: one first-level row 1735 (Республика Каракалпакстан) among 14"
+        }
+      ]
+    },
+    {
+      "key": "viloyat",
+      "name": "Viloyatlar va Toshkent shahri / Области и город Ташкент",
+      "name_en": "Regions (viloyats) and the city of Tashkent, each with a Kengash of people's deputies",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "uz.viloyat",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 13,
+          "source": "siat_districts",
+          "locator": "Sheet Ma'lumot: first-level rows 1703 to 1733 (12 regions) and 1726 (город Ташкент), besides 1735 Karakalpakstan"
+        }
+      ]
+    },
+    {
+      "key": "tuman",
+      "name": "Tumanlar / Районы",
+      "name_en": "Districts (tumans), including the 12 city districts of Tashkent and 2 of Namangan, each with a Kengash",
+      "parent": "viloyat",
+      "polity_kind": "county",
+      "scheme": "uz.tuman",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2019-01-01",
+          "value": 170,
+          "source": "siat_districts",
+          "locator": "Sheet Ma'lumot, row 2 (code 1700), column O (2019)"
+        },
+        {
+          "date": "2026-01-01",
+          "value": 177,
+          "source": "siat_districts",
+          "locator": "Sheet Ma'lumot, row 2 (code 1700), column V (2026); unchanged since 2022"
+        }
+      ]
+    },
+    {
+      "key": "shahar",
+      "name": "Viloyatga boʻysunuvchi shaharlar / Города областного подчинения",
+      "name_en": "Cities of regional (and, for Nukus, republican) significance, each with a Kengash; cities subordinate to a district have none",
+      "parent": "viloyat",
+      "polity_kind": "municipality",
+      "scheme": "uz.shahar",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 31,
+          "source": "siat_cities",
+          "locator": "Sheet Ma'lumot, column V (2026): 31 seven-digit rows coded xxxx4nn (cities of regional significance, 1735401 Nukus included); row 2 gives 120 cities in all"
+        }
+      ]
+    },
+    {
+      "key": "mahalla",
+      "name": "Fuqarolar yigʻinlari (mahallalar) / Сходы граждан (махалли)",
+      "name_en": "Citizens' assemblies (mahallas, and the assemblies of towns, kishlaks, and auls), each electing a chair",
+      "parent": "tuman",
+      "polity_kind": "submunicipal",
+      "scheme": "uz.mahalla",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 9452,
+          "source": "siat_mahalla",
+          "locator": "Sheet Ma'lumot, row 2, column K (2025)"
+        },
+        {
+          "date": "2026-01-01",
+          "value": 8994,
+          "source": "siat_mahalla",
+          "locator": "Sheet Ma'lumot, row 2, column L (2026), after the 2025 consolidation"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Oʻzbekiston Respublikasi Prezidenti saylovi / Выборы Президента Республики Узбекистан",
+      "name_en": "Presidential elections by direct vote",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1991-12-29",
+      "first_held": "1991-12-29",
+      "earliest_record": "2000-01-09",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "uz.nation"
+        ]
+      },
+      "finest_note": "National totals only: the CEC's election pages give the electorate, turnout, and each candidate's votes (2000, 2007, 2015, 2016, 2023) or only percentages (2021); turnout by region appears only in infographic images.",
+      "note": "Direct election for seven years, at most two terms in a row (Constitution art. 106); a candidate needs more than half of the votes of those taking part, else the top two meet in a runoff within a month (Electoral Code arts. 59 and 96). Five-year terms until the 2002 referendum. Regular elections fall on the first Sunday of the third ten-day period of October of the year the term ends (art. 128), the next in 2030; the President may call an early election, as in 2023. The Supreme Soviet of the Uzbek SSR chose the first President on 24 March 1990; the first popular election was on 29 December 1991, with the independence referendum.",
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (art. 106)",
+      "est_votes": 15600000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "UZ"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "law_president",
+          "locator": "https://lex.uz/ru/docs/111840 (art. 1: «сроком на пять лет»; art. 35: majority and runoff)",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "More than half of the votes of those taking part, else a runoff of the top two (art. 35).",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "valid_from": "1991-11-18",
+          "valid_to": "2002-04-04"
+        },
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 106: «сроком на семь лет»; art. 128: «в первое воскресенье третьей декады октября»)",
+          "period_years": 7,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 7,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "More than half of the votes of those taking part wins; otherwise the two leading candidates meet within a month, no earlier than 15 days, and turnout does not count (Electoral Code arts. 59 and 96).",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "vacancy_rule": "Early election within three months when the President cannot serve, within two months when the President calls it (Electoral Code art. 66).",
+          "valid_from": "2023-05-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC election pages (saylov.uz)",
+          "url": "https://saylov.uz/ru/elections-and-referendums/pages/vybory-prezidenta",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "One prose page per election, 2000 to 2023, with national figures; results decisions № 794 (2016) and № 1154 (2021) give no vote counts.",
+          "finest": "uz.nation",
+          "first_date": "2000-01-09",
+          "last_date": "2023-07-09",
+          "source": "cec_pres2016"
+        },
+        {
+          "platform": "CEC chair's press conference (saylov.uz)",
+          "url": "https://saylov.uz/ru/elections-and-referendums/page/12",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Gives each candidate's votes in the early election of 9 July 2023 (one figure truncated on the page).",
+          "finest": "uz.nation",
+          "first_date": "2023-07-09",
+          "last_date": "2023-07-09",
+          "source": "cec_pres2023_speech"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-12-29",
+          "note": "First popular election, with the independence referendum; not documented on the CEC's site or in the legislation database."
+        },
+        {
+          "date": "2000-01-09",
+          "contests": 1,
+          "source": "cec_pres2000",
+          "quote": "9 января 2000 года состоялись выборы Президента Республики Узбекистан"
+        },
+        {
+          "date": "2007-12-23",
+          "contests": 1,
+          "source": "cec_pres2007",
+          "quote": "23 декабря 2007 года состоялись выборы Президента Республики Узбекистан"
+        },
+        {
+          "date": "2015-03-29",
+          "contests": 1,
+          "source": "cec_pres2015",
+          "quote": "29 марта 2015 года состоялись выборы в Президенты Республики Узбекистан"
+        },
+        {
+          "date": "2016-12-04",
+          "election_kind": "special",
+          "contests": 1,
+          "source": "cec_pres2016",
+          "quote": "В ходе голосования 4 декабря 2016 года из 20 миллионов 461 тысяч 805 избирателей приняло участие 17 миллионов 951 тысяч 667"
+        },
+        {
+          "date": "2021-10-24",
+          "contests": 1,
+          "source": "cec_pres2021",
+          "quote": "2021-yil 24-oktabr kuni o'tkazilgan O'zbekiston Respublikasi Prezidenti saylovi natijalari to'g'risida; 80,12 foiz ovozi bilan"
+        },
+        {
+          "date": "2023-07-09",
+          "election_kind": "special",
+          "contests": 1,
+          "source": "cec_pres2023",
+          "quote": "2023-yil 9-iyul kuni o'tkazilgan muddatidan ilgari O'zbekiston Respublikasi Prezidenti saylovi natijalari to'g'risida; 87,05 foiz ovozi bilan yetti yil muddatga"
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Oʻzbekiston Respublikasi referendumi / Референдум Республики Узбекистан",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1991-11-18",
+      "first_held": "1991-12-29",
+      "earliest_record": "2002-01-27",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "uz.nation"
+        ]
+      },
+      "finest_note": "National totals only: the CEC's 2002 page and its decision № 1245 (2023) give the electorate, turnout, and the votes for and against.",
+      "note": "Called by the Oliy Majlis (Referendum Law art. 13; Constitution art. 93) on the initiative of 5 percent of voters, either chamber, or the President; a proposal passes with more than half of those voting if at least half of registered voters take part (art. 38). Held on 29 December 1991 (independence), 26 March 1995 (extending the President's term to 2000), 27 January 2002 (two questions: a two-chamber parliament and a seven-year presidential term), and 30 April 2023 (the new Constitution). The 17 March 1991 Union referendum was run by the USSR while Uzbekistan was a union republic.",
+      "source": "law_referendum",
+      "locator": "https://lex.uz/ru/docs/82205 (arts. 11-13 and 38)",
+      "est_votes": 16600000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "UZ"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "law_referendum",
+          "locator": "https://lex.uz/ru/docs/82205 (art. 13: «Референдум назначается Олий Мажлисом Республики Узбекистан»)",
+          "called": true,
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "valid_from": "2001-08-30"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC election pages and decisions (saylov.uz)",
+          "url": "https://saylov.uz/ru/elections-and-referendums/pages/referendumy",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Pages for 2002 and 2023 with national figures; nothing for 1991 or 1995.",
+          "finest": "uz.nation",
+          "first_date": "2002-01-27",
+          "last_date": "2023-04-30",
+          "source": "cec_ref2023"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-12-29",
+          "note": "Independence referendum, held with the first presidential election; its result is not on the CEC's site or in the legislation database."
+        },
+        {
+          "date": "1995-03-26",
+          "contests": 1,
+          "source": "ref1995",
+          "quote": "Провести в воскресенье 26 марта 1995 года референдум ... по вопросу о продлении срока полномочий Президента",
+          "note": "The result is not published online by an official body."
+        },
+        {
+          "date": "2002-01-27",
+          "contests": 2,
+          "source": "cec_ref2002",
+          "quote": "27 января 2002 года ... В список избирателей включены 13 миллионов 266 602 человека; results given separately for the bicameral parliament (11 миллионов 344 тысячи 242 or 93,65%) and the seven-year term (11 миллионов 117 тысяч 841 or 91,78%)"
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 1,
+          "source": "cec_ref2023",
+          "quote": "roʻyxatiga kiritilgan ... 19 722 809 nafar; ... ishtirok etgan ... 16 667 097 nafar ... 'Ha' ... 15 034 608 ... 'Yoʻq' ... 1 558 817"
+        }
+      ]
+    },
+    {
+      "key": "legislative_chamber_list",
+      "tier": "national",
+      "name": "Qonunchilik palatasiga yagona saylov okrugi boʻyicha saylov / Выборы в Законодательную палату по единому избирательному округу",
+      "name_en": "Legislative Chamber, party-list seats (75 in one nationwide district)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2023-12-18",
+      "first_held": "2024-10-27",
+      "earliest_record": "2024-10-27",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "uz.nation"
+        ]
+      },
+      "finest_note": "National totals only, in the CEC's protocol (.docx) attached to decision № 1412.",
+      "note": "Since ЗРУ-883 of 18 December 2023, 75 of the 150 deputies are elected by party lists in one nationwide district, with a 7 percent threshold (two parties share the seats if only one passes) and seats by the quotient of votes divided by 75 (Electoral Code arts. 67, 96, and 96-1); a vacated list seat goes to the next unelected candidate on the list (art. 74-2). Held with the single-member districts and the local Kengashes.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (arts. 67, 96, and 96-1)",
+      "est_votes": 15000000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "UZ",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 91: «пять лет»; art. 128: «в первое воскресенье третьей декады октября»)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "vacancy_rule": "The next unelected candidate on the party's list takes the seat (Electoral Code art. 74-2).",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC decision and protocol (saylov.uz)",
+          "url": "https://saylov.uz/oz/cec_decisions",
+          "format": "docx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Decision № 1412 attaches the CEC's protocol with each party's votes and seats.",
+          "finest": "uz.nation",
+          "first_date": "2024-10-27",
+          "last_date": "2024-10-27",
+          "source": "cec_lc2024_list"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-10-27",
+          "contests": 1,
+          "seats": 75,
+          "source": "cec_lc2024",
+          "quote": "регистрация 150 депутатов, из которых 75 избраны от одномандатных округов, а остальные 75 — от единого избирательного округа по партийным спискам"
+        }
+      ]
+    },
+    {
+      "key": "legislative_chamber_districts",
+      "tier": "national",
+      "name": "Qonunchilik palatasiga bir mandatli saylov okruglari boʻyicha saylov / Выборы в Законодательную палату по одномандатным округам",
+      "name_en": "Legislative Chamber, single-member districts (general elections, runoffs, and by-elections), 2004-",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2004-12-26",
+      "first_held": "2004-12-26",
+      "earliest_record": "2004-12-26",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "uz.lc_okrug"
+        ]
+      },
+      "finest_note": "The CEC publishes national prose summaries (2004-2019) and, for 2024, the winner and party of each district (decision № 1413), but no district's votes.",
+      "note": "120 deputies in single-member districts in 2004; 135 districts plus 15 deputies of the Ecological Movement in 2009 and 2014; 150 districts in 2019, all needing more than half of the votes, with runoffs of the top two (Law of 1993 arts. 44-45; Electoral Code of 2019 art. 59). Since 2024, 75 districts by plurality with no runoff (arts. 9, 67, and 96); a vacated district seat gets a new election unless within six months of the term's end (art. 74). No by-election has been held since 2019. The chamber's 2019 regular date was the first Sunday of the third ten-day period of December; October from 2021.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (arts. 9, 67, 74, and 96)",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes votes by district: the CEC's pages give national turnout and seat totals, and its 2024 decision lists only each district's winner; district election commissions' protocols are not published.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "contest_kinds": [
+            "body_seats",
+            "office"
+          ],
+          "iso_pattern": "UZ",
+          "valid_from": "2004-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution_1992",
+          "locator": "https://lex.uz/ru/docs/35869?ONDATE=05.09.2019%2000 (art. 117: «в первое воскресенье третьей декады декабря»); Electoral Code of 2019 arts. 59, 67, and 96",
+          "period_years": 5,
+          "phase": 4,
+          "month": 12,
+          "day_rule": "first Sunday of the third ten-day period of December (Constitution of 1992 art. 117)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "More than half of the votes of those taking part; otherwise the top two meet in a repeat vote within a month.",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "valid_from": "2004-12-26",
+          "valid_to": "2021-02-08"
+        },
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 128); Electoral Code art. 96: «наибольшее число голосов»",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "vacancy_rule": "New election in the district, unless the vacancy falls within six months of the end of the term (Electoral Code art. 74).",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC decisions (saylov.uz)",
+          "url": "https://saylov.uz/oz/cec_decisions",
+          "format": "pdf",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Decision № 1413 lists the 75 winners by district with no votes; earlier elections have prose summaries only.",
+          "first_date": "2024-10-27",
+          "last_date": "2024-10-27",
+          "source": "cec_lc2024_smd"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-12-26",
+          "contests": 120,
+          "seats": 120,
+          "source": "cec_lc2004",
+          "quote": "По результатам выборов 26 декабря 2004 года и повторного голосования 9 января 2005 года были избраны и зарегистрированы все - 120 депутатов",
+          "deferred": [
+            "2005-01-09"
+          ]
+        },
+        {
+          "date": "2009-12-27",
+          "contests": 135,
+          "seats": 135,
+          "source": "cec_lc2009",
+          "quote": "В голосовании приняли участие более 33 процентов избирателей, включенных во все 135 избирательных округов",
+          "note": "Runoffs in 39 districts in January 2010."
+        },
+        {
+          "date": "2014-12-21",
+          "contests": 135,
+          "seats": 135,
+          "source": "cec_lc2014",
+          "quote": "По итогам голосования 21 декабря 2014 года в 113 избирательных округах были избраны ... в 22 избирательных округах ... 4 января 2015 года ... повторное голосование",
+          "deferred": [
+            "2015-01-04"
+          ]
+        },
+        {
+          "date": "2019-12-22",
+          "contests": 150,
+          "seats": 150,
+          "source": "cec_lc2019",
+          "quote": "в 25 избирательных округах ... была назначена дата проведения повторного голосования- 5 января 2020 года; final seats 53, 36, 24, 22, and 15",
+          "deferred": [
+            "2020-01-05"
+          ]
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 75,
+          "seats": 75,
+          "source": "cec_lc2024_districts",
+          "quote": "yetmish beshta bir mandatli saylov okrugi ... tuzilsin"
+        }
+      ]
+    },
+    {
+      "key": "oliy_majlis_1994",
+      "tier": "national",
+      "name": "Oʻzbekiston Respublikasi Oliy Majlisiga saylov (bir palatali) / Выборы в Олий Мажлис (однопалатный)",
+      "name_en": "Oliy Majlis (single chamber, 250 seats), 1994-2004",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1994-12-25",
+      "valid_to": "2004-12-26",
+      "first_held": "1994-12-25",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "250 deputies in single-member districts for five years, needing more than half of the votes with runoffs (Law of 28 December 1993 № 990-XII); elected 25 December 1994 with further rounds on 8 and 22 January 1995, and 5 December 1999 with runoffs on 19 December. Replaced by the two-chamber Oliy Majlis after the 2002 referendum.",
+      "source": "law_om",
+      "locator": "https://lex.uz/ru/docs/71045",
+      "disposition": "blocked",
+      "disposition_reason": "No district results are published by an official body: the CEC's site gives only a national prose summary of 1999 and nothing for 1994-1995, and the parliament's histories give seat totals by party.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "UZ",
+          "valid_from": "1994-12-01",
+          "valid_to": "2004-12-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-25",
+          "seats": 250,
+          "source": "senate_history",
+          "quote": "Uch bosqichda (1994-yil 25-dekabrda, 1995-yil 8- va 22-yanvarda) bo‘lib o‘tgan saylov yakunlariga binoan 245 nafar deputatdan iborat tarkibdagi parlament shakllantirildi",
+          "deferred": [
+            "1995-01-08",
+            "1995-01-22"
+          ]
+        },
+        {
+          "date": "1999-12-05",
+          "contests": 250,
+          "seats": 250,
+          "source": "cec_om1999",
+          "quote": "во всех 250 округах избиратели приняли участие в процессе голосования ... повторное голосование ... состоялось в воскресенье, 19 декабря",
+          "deferred": [
+            "1999-12-19"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "supreme_soviet",
+      "tier": "national",
+      "name": "Oʻzbekiston SSR Oliy Soveti / Oliy Kengash",
+      "name_en": "Supreme Soviet of the Uzbek SSR (from 1991 the Oliy Kengash of the Republic of Uzbekistan), 1938-1994",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1938-06-24",
+      "valid_to": "1994-12-25",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Single-candidate district elections under the 1937 and 1978 constitutions of the Uzbek SSR until the competitive election of 1990, whose Supreme Soviet declared independence on 31 August 1991, adopted the 1992 Constitution as the Oliy Kengash, and called the first Oliy Majlis election for 25 December 1994.",
+      "source": "parliament_history",
+      "disposition": "blocked",
+      "disposition_reason": "Results were printed only in the official press of the time; no current official body publishes them, and the CEC's records begin in 1999.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "UZ",
+          "valid_from": "1938-01-01",
+          "valid_to": "1994-12-01"
+        }
+      ]
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "Oliy Majlis Senati aʼzolari saylovi / Выборы членов Сената Олий Мажлиса",
+      "name_en": "Senate members elected at joint sittings of local council deputies, 2005-",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2005-01-01",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "uz.viloyat"
+        ]
+      },
+      "note": "Each of the 14 units (Karakalpakstan, 12 regions, Tashkent city) elects senators by secret ballot at a joint sitting of the deputies of its Jokargy Kenes or regional, district, and city Kengashes, within a month of the local elections, under the CEC: six each (84) until 2023, four each (56) since (Constitution art. 92; Electoral Code arts. 75-87). Joint sittings were held in January 2005, 2010, 2015, and 2020 and on 7-12 November 2024; vacancies are filled at further joint sittings.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (arts. 75-87)",
+      "disposition": "blocked",
+      "disposition_reason": "The CEC registers the elected senators by region (decisions № 1023 of 2020 and № 1420 of 2024) but publishes no candidates' votes from the joint sittings.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "UZ"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CEC decisions (saylov.uz)",
+          "url": "https://saylov.uz/oz/cec_decisions",
+          "format": "docx",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Decision № 1420 attaches the list of senators elected from each region, with no votes.",
+          "first_date": "2024-11-07",
+          "last_date": "2024-11-12",
+          "source": "cec_senate2024"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "code",
+          "locator": "https://lex.uz/ru/docs/4386846 (art. 75: «по четыре человека»; art. 76: «не позднее одного месяца после избрания депутатов»)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 11,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Repeat voting at the same joint sitting, then repeat elections (Electoral Code arts. 83-84).",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC)",
+          "valid_from": "2023-05-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "through": "2015-12-31",
+          "note": "Joint sittings of January 2005, 2010, and 2015 (84 senators each); not on the CEC's site."
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "month",
+          "source": "cec_senate2020",
+          "quote": "O'zbekiston Respublikasi Oliy Majlisining Senati a'zolarini ro'yxatga olish to'g'risida (17.01.2020)"
+        },
+        {
+          "date": "2024-11-01",
+          "precision": "month",
+          "seats": 56,
+          "source": "cec_infographic2024",
+          "quote": "56 ЧЛЕНОВ Сената"
+        }
+      ]
+    },
+    {
+      "key": "senate_appointed",
+      "tier": "national",
+      "name": "Prezident tomonidan tayinlanadigan Senat aʼzolari / Члены Сената, назначаемые Президентом",
+      "name_en": "Senators appointed by the President (16 until 2023, 9 since)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (art. 92: «Девять членов Сената ... назначаются Президентом»)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the President from distinguished citizens, with no vote."
+    },
+    {
+      "key": "ecological_movement",
+      "tier": "national",
+      "name": "Oʻzbekiston Ekologik harakatidan saylanadigan deputatlar / Депутаты от Экологического движения Узбекистана",
+      "name_en": "Legislative Chamber deputies chosen by the Ecological Movement of Uzbekistan, 2009-2019",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2008-12-01",
+      "valid_to": "2019-06-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "law_om",
+      "locator": "https://lex.uz/ru/docs/71045 (art. 1: «Пятнадцать депутатов ... избираются от Экологического движения Узбекистана»)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 15 deputies were chosen at a conference of the movement on election day, not by voters; the Electoral Code of 2019 ended the reserved seats.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "UZ"
+        }
+      ]
+    },
+    {
+      "key": "officers",
+      "tier": "national",
+      "name": "Oliy Majlis va Kengashlar tomonidan saylanadigan mansabdor shaxslar / Должностные лица, избираемые палатами и Кенгашами",
+      "name_en": "Officers chosen by elected bodies (chamber speakers, Kengash chairs, the CEC, and the Constitutional and Supreme Court judges elected by the Senate)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (arts. 120, 129, 132, and 134)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes inside elected bodies, part of their proceedings rather than elections run by the CEC."
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Sudyalar / Судьи",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (arts. 109, 132, 134, and 135)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are elected by the Senate or appointed by the President on the Supreme Judicial Council's proposal, never by voters."
+    },
+    {
+      "key": "nominations",
+      "tier": "national",
+      "name": "Siyosiy partiyalar tomonidan nomzod koʻrsatish / Выдвижение кандидатов политическими партиями",
+      "name_en": "Party nominations of candidates",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties nominate candidates at their own congresses and plenums; the state runs no nominating contest."
+    },
+    {
+      "key": "jokargy_kenes",
+      "tier": "karakalpakstan",
+      "name": "Qaraqalpaqstan Respublikası Joqarğı Keңesine saylaw / Выборы в Жокаргы Кенес Республики Каракалпакстан",
+      "name_en": "Jokargy Kenes (Supreme Council) of the Republic of Karakalpakstan",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1994-12-25",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "uz.jk_okrug"
+        ]
+      },
+      "finest_note": "No results are published centrally; the infographic of the CEC gives only the number of deputies.",
+      "note": "65 deputies in single-member districts for five years, needing more than half of the votes with 33 percent turnout, else a runoff (Karakalpakstan Law «О выборах» of 2019, arts. 9, 59, 61, and 77), run by the Central Election Commission of Karakalpakstan on the same day as the Legislative Chamber.",
+      "source": "kk_law",
+      "locator": "https://lex.uz/ru/docs/5233925 (arts. 9, 61, and 77)",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes votes by district or the elected list online: the Karakalpak election commission has no results pages on saylov.uz, and the CEC gives only the size of the body.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "iso_pattern": "UZ-QR"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "kk_law",
+          "locator": "https://lex.uz/ru/docs/5233925 (art. 61: «сроком на пять лет»)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "administered_by": "Central Election Commission of the Republic of Karakalpakstan",
+          "valid_from": "2019-09-04"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-25",
+          "precision": "year",
+          "through": "2019-12-31",
+          "note": "Elected with the Oliy Majlis and the Legislative Chamber in 1994, 1999, 2004, 2009, 2014, and 2019; not published online."
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 1,
+          "seats": 65,
+          "source": "cec_infographic2024",
+          "quote": "65 ДЕПУТАТОВ Жокаргы Кенеса Республики Каракалпакстан"
+        }
+      ]
+    },
+    {
+      "key": "karakalpakstan_referendum",
+      "tier": "karakalpakstan",
+      "name": "Qaraqalpaqstan xalqınıń ulıwma referendumı / Всеобщий референдум народа Каракалпакстана",
+      "name_en": "Referendums of the people of Karakalpakstan",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1993-04-09",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The Constitution gives Karakalpakstan the right to secede by a general referendum of its people (art. 89); none has been held.",
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (art. 89)",
+      "est_votes": 0,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "UZ-QR"
+        }
+      ]
+    },
+    {
+      "key": "regional_kengash",
+      "tier": "viloyat",
+      "name": "Viloyat va Toshkent shahar xalq deputatlari Kengashlariga saylov / Выборы в областные и Ташкентский городской Кенгаши народных депутатов",
+      "name_en": "Regional and Tashkent city Kengashes of people's deputies",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "1994-12-25",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "uz.viloyat_okrug"
+        ]
+      },
+      "finest_note": "Election commissions of the regions publish scanned lists of the winners per district (Tashkent city, 2024), with no votes; the CEC publishes nothing by council.",
+      "note": "Elected in territorial single-member districts on a multi-party basis for five years, on the same day as the Legislative Chamber (Electoral Code art. 88; Constitution art. 120); a majority with runoffs until 2023, plurality since. Vacated seats get by-elections called by the CEC, skipped within six months of the term's end (art. 93). Each has 30 to 60 deputies by population. Tashkent city's Kengash had 50 districts in 2024.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (art. 88)",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes votes for local Kengash districts: the CEC gives only national composition figures, and the regional commissions' decisions list winners without votes as scanned PDFs.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "UZ*",
+          "valid_from": "1994-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 120: «Срок полномочий Кенгашей народных депутатов — пять лет»; art. 128)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC) through the regional, district, and city election commissions",
+          "vacancy_rule": "New election in the district, unless within six months of the end of the term (Electoral Code art. 93).",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-25",
+          "precision": "year",
+          "through": "2019-12-31",
+          "note": "Elected with the parliament in 1994, 1999, 2004, 2009, 2014, and 2019 under the 1994 law and the 2019 Code; no official count of councils or results is published."
+        },
+        {
+          "date": "2024-10-27",
+          "source": "cec_lc2024",
+          "quote": "Всего на выборах в Законодательную палату Олий Мажлиса Республики Узбекистан, Жокаргы Кенес Республики Каракалпакстан, областной и Ташкентский городской, районные и городские Кенгаши народных депутатов проголосовало 15 027 529 избирателей"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "election_kind": "by_election",
+          "source": "cec_local_by",
+          "quote": "Ayrim bo'shab qolgan o'rinlarga mahalliy Kengashlar deputatlarining saylovini tayinlash to'g'risida",
+          "note": "By-elections in single districts called by CEC decisions № 1427 to № 1468; not yet counted, and no results are published centrally."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Regional election commission decisions (toshkentsh.saylov.uz and the other regional subdomains)",
+          "url": "https://toshkentsh.saylov.uz/oz/cec_decisions",
+          "format": "pdf (scanned)",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "license": "Attribution to www.saylov.uz required; all rights reserved (site footer)",
+          "evidence": "Decision № 93 of the Tashkent city commission lists the 50 winners by district with no votes.",
+          "first_date": "2024-10-27",
+          "last_date": "2024-10-27",
+          "source": "tashkent_city_2024"
+        }
+      ]
+    },
+    {
+      "key": "district_kengash",
+      "tier": "tuman",
+      "name": "Tuman xalq deputatlari Kengashlariga saylov / Выборы в районные Кенгаши народных депутатов",
+      "name_en": "District (tuman) Kengashes of people's deputies, including the city districts of Tashkent",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1994-12-25",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "uz.tuman_okrug"
+        ]
+      },
+      "finest_note": "Election commissions of the regions publish scanned lists of the winners per district (Tashkent city, 2024), with no votes; the CEC publishes nothing by council.",
+      "note": "Elected in territorial single-member districts on a multi-party basis for five years, on the same day as the Legislative Chamber (Electoral Code art. 88; Constitution art. 120); a majority with runoffs until 2023, plurality since. Vacated seats get by-elections called by the CEC, skipped within six months of the term's end (art. 93). Each has 10 to 30 deputies by population.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (art. 88)",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes votes for local Kengash districts: the CEC gives only national composition figures, and the regional commissions' decisions list winners without votes as scanned PDFs.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "iso_pattern": "UZ*",
+          "valid_from": "1994-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 120: «Срок полномочий Кенгашей народных депутатов — пять лет»; art. 128)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC) through the regional, district, and city election commissions",
+          "vacancy_rule": "New election in the district, unless within six months of the end of the term (Electoral Code art. 93).",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-25",
+          "precision": "year",
+          "through": "2019-12-31",
+          "note": "Elected with the parliament in 1994, 1999, 2004, 2009, 2014, and 2019 under the 1994 law and the 2019 Code; no official count of councils or results is published."
+        },
+        {
+          "date": "2024-10-27",
+          "source": "cec_lc2024",
+          "quote": "Всего на выборах в Законодательную палату Олий Мажлиса Республики Узбекистан, Жокаргы Кенес Республики Каракалпакстан, областной и Ташкентский городской, районные и городские Кенгаши народных депутатов проголосовало 15 027 529 избирателей"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "election_kind": "by_election",
+          "source": "cec_local_by",
+          "quote": "Ayrim bo'shab qolgan o'rinlarga mahalliy Kengashlar deputatlarining saylovini tayinlash to'g'risida",
+          "note": "By-elections in single districts called by CEC decisions № 1427 to № 1468; not yet counted, and no results are published centrally."
+        }
+      ]
+    },
+    {
+      "key": "city_kengash",
+      "tier": "shahar",
+      "name": "Shahar xalq deputatlari Kengashlariga saylov / Выборы в городские Кенгаши народных депутатов",
+      "name_en": "City Kengashes of people's deputies (cities of regional significance)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1994-12-25",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "uz.shahar_okrug"
+        ]
+      },
+      "finest_note": "Election commissions of the regions publish scanned lists of the winners per district (Tashkent city, 2024), with no votes; the CEC publishes nothing by council.",
+      "note": "Elected in territorial single-member districts on a multi-party basis for five years, on the same day as the Legislative Chamber (Electoral Code art. 88; Constitution art. 120); a majority with runoffs until 2023, plurality since. Vacated seats get by-elections called by the CEC, skipped within six months of the term's end (art. 93). Each has 10 to 30 deputies by population.",
+      "source": "code",
+      "locator": "https://lex.uz/ru/docs/4386846 (art. 88)",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes votes for local Kengash districts: the CEC gives only national composition figures, and the regional commissions' decisions list winners without votes as scanned PDFs.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "UZ*",
+          "valid_from": "1994-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://lex.uz/ru/docs/6445147 (art. 120: «Срок полномочий Кенгашей народных депутатов — пять лет»; art. 128)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 10,
+          "day_rule": "first Sunday of the third ten-day period of October (Constitution art. 128)",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Republic of Uzbekistan (CEC) through the regional, district, and city election commissions",
+          "vacancy_rule": "New election in the district, unless within six months of the end of the term (Electoral Code art. 93).",
+          "valid_from": "2023-12-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-25",
+          "precision": "year",
+          "through": "2019-12-31",
+          "note": "Elected with the parliament in 1994, 1999, 2004, 2009, 2014, and 2019 under the 1994 law and the 2019 Code; no official count of councils or results is published."
+        },
+        {
+          "date": "2024-10-27",
+          "source": "cec_lc2024",
+          "quote": "Всего на выборах в Законодательную палату Олий Мажлиса Республики Узбекистан, Жокаргы Кенес Республики Каракалпакстан, областной и Ташкентский городской, районные и городские Кенгаши народных депутатов проголосовало 15 027 529 избирателей"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "election_kind": "by_election",
+          "source": "cec_local_by",
+          "quote": "Ayrim bo'shab qolgan o'rinlarga mahalliy Kengashlar deputatlarining saylovini tayinlash to'g'risida",
+          "note": "By-elections in single districts called by CEC decisions № 1427 to № 1468; not yet counted, and no results are published centrally."
+        }
+      ]
+    },
+    {
+      "key": "local_soviets_ssr",
+      "tier": "tuman",
+      "name": "Oʻzbekiston SSR mahalliy xalq deputatlari Sovetlari / Местные Советы народных депутатов Узбекской ССР",
+      "name_en": "Local soviets of people's deputies of the Uzbek SSR (regional, district, city, settlement, and village), to 1994",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1994-12-25",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elected in single-member districts under the constitutions of the Uzbek SSR, last in 1990, until the 1994 law replaced them with Kengashes of people's deputies in regions, districts, and cities.",
+      "source": "law_local",
+      "locator": "https://lex.uz/ru/docs/67440",
+      "disposition": "blocked",
+      "disposition_reason": "Results were printed only in the official press of the time; no current official body publishes them.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "UZ*",
+          "valid_to": "1994-12-01"
+        }
+      ]
+    },
+    {
+      "key": "khokims",
+      "tier": "viloyat",
+      "name": "Hokimlar / Хокимы",
+      "name_en": "Khokims (heads of regions, Tashkent city, districts, and cities)",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://lex.uz/ru/docs/6445147 (arts. 121 and 124)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed for five years by the President (regions and Tashkent city) or by the regional khokim with the Kengash's approval (districts and cities), never elected by voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor",
+            "mayor"
+          ],
+          "iso_pattern": "UZ*"
+        }
+      ]
+    },
+    {
+      "key": "mahalla_chairs",
+      "tier": "mahalla",
+      "name": "Fuqarolar yigʻini raisi saylovi / Выборы председателя схода граждан",
+      "name_en": "Chairs (aksakals) of citizens' assemblies (mahallas, towns, kishlaks, and auls)",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each assembly elects its chair for five years by secret ballot at a meeting of residents or, where one cannot be convened, of their representatives, on dates set by the Jokargy Kenes and the regional and Tashkent city Kengashes, with commissions of assistance rather than the CEC (Law № ЗРУ-499 arts. 8, 10, 12, and 20).",
+      "source": "mahalla_law",
+      "locator": "https://lex.uz/ru/docs/3988402 (arts. 8, 10, 12, and 20)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen at meetings of residents or their representatives, outside the Electoral Code and the CEC, for bodies the Constitution places outside state power (art. 127); no official body publishes the votes."
+    }
+  ]
+}
