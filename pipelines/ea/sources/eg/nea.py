@@ -59,6 +59,7 @@ def fetch() -> None:
     raw.fetch_many(SOURCE, urls, suffix=".html", workers=4)
     senate_fetch()
     raw.fetch(GEOBOUNDARIES, ADM1, suffix=".geojson")
+    presidential_fetch()
 
 
 import functools
@@ -69,6 +70,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
 
+import polars as pl
 import shapely
 import shapely.geometry
 
@@ -191,6 +193,8 @@ def packages() -> list[str]:
         *(f"{SOURCE}/hor-{year}" for year in YEARS),
         f"{SOURCE}/senate-registry",
         *(f"{SOURCE}/sen-{year}" for year in YEARS),
+        f"{SOURCE}/pres-registry",
+        *(f"{SOURCE}/pres-{year}" for year in PRES_YEARS),
     ]
 
 
@@ -202,6 +206,9 @@ def parse() -> None:
     senate_registry().write()
     for year in YEARS:
         senate(year).write()
+    pres_registry().write()
+    for year in PRES_YEARS:
+        presidential(year).write()
 
 
 def emit() -> None:
@@ -1082,4 +1089,351 @@ def senate(year: int) -> Package:
             "The 2020 pages print each single-seat district's valid ballots but not the winner's votes, "
             "so no candidate votes exist to match them.",
         )
+    return p
+
+
+# The presidential elections, announced as a national page for 2018 and a national page plus a fragment for each
+# governorate for 2024 (the vote held on 10 to 12 December 2023).
+
+PRES_PAGE = {
+    2018: "https://www.elections.eg/archive/pres-2018/pres-results-2018",
+    2024: "https://www.elections.eg/archive/pres-2024/pres-2024-result",
+}
+PRES_BY_GOV = "https://www.elections.eg/archive/pres-2024/pres-2024-result-by-gov"
+PRES_FRAGMENT = "https://www.elections.eg/static/pres_2024_result_by_gov/data/{}.html"
+
+
+def presidential_codes() -> list[str]:
+    text = raw.cached(SOURCE, PRES_BY_GOV).path.read_text("utf-8")
+    return [code for code in re.findall(r"<option value='(\w+)'>", text) if code != "EG"]
+
+
+def presidential_fetch() -> None:
+    for url in (*PRES_PAGE.values(), PRES_BY_GOV):
+        raw.fetch(SOURCE, url, suffix=".html")
+    raw.fetch_many(
+        SOURCE, [PRES_FRAGMENT.format(code) for code in ("EG", *presidential_codes())], suffix=".html", workers=4
+    )
+
+
+PRES_YEARS = (2018, 2024)
+PRES_DAYS = {2018: (date(2018, 3, 16), date(2018, 3, 28)), 2024: (date(2023, 12, 1), date(2023, 12, 12))}
+PRES_VOTE_DAY = {2018: date(2018, 3, 26), 2024: date(2023, 12, 10)}
+PRES_NAMES = {
+    2018: "2018 Egyptian presidential election",
+    2024: "2023 Egyptian presidential election",
+}
+PRES_ARABIC = {2018: "انتخابات رئاسة الجمهورية 2018", 2024: "انتخابات رئاسة الجمهورية 2023"}
+PRES_ENGLISH = {
+    "عبد الفتاح سعيد حسين خليل السيسي": "Abdel Fattah el-Sisi",
+    "موسي مصطفي موسي محمد": "Mostafa Moussa Mostafa",
+    "حازم محمد سليمان محمد عمر": "Hazem Omar",
+    "محمد فريد سعد زهران": "Farid Zahran",
+    "عبد السند حسن محمد يمامه": "Abdel-Sanad Yamama",
+}
+PRES_SYSTEM = key("electoral_system", "president")
+PRESIDENCY = key("office", "president")
+PRES_METHOD = (
+    "Published by the National Elections Authority as a national results page{gov}. Each page prints the valid votes "
+    "of every candidate{figures}. The pages print no polling-station results. The authority names the candidate "
+    "with the most votes as the winner."
+)
+
+
+@dataclass
+class PresPage:
+    figures: dict[str, int]
+    votes: dict[str, int]
+
+
+def pres_clean(text: str) -> str:
+    return " ".join(clean(text).replace("ـ", "").split())
+
+
+def pres_number(text: str) -> int:
+    return number(text.strip())
+
+
+def pres_parse(year: int, code: str | None = None) -> PresPage:
+    """The turnout figures and the candidates' votes of a national page or governorate fragment, in print order."""
+    span = r"<span>(?!\s*نسبة)(.*?)</span>\s*([\d,]+)\s*</p>"
+    if code is None and year == 2018:
+        text = raw.cached(SOURCE, PRES_PAGE[year]).path.read_text("utf-8").split("<body>", 1)[1].split("</body>", 1)[0]
+        rows = [
+            (pres_clean(label), pres_number(value))
+            for label, value in re.findall(r"<p>\s*([^<\d]*?)\s*([\d,]{4,})\s*</p>", text)
+        ]
+        rows += [
+            (pres_clean(label), pres_number(value))
+            for value, label in re.findall(r"<p>\s*([\d,]{4,})\s*([^<\d]+?)\s*</p>", text)
+        ]
+        rows = [(label, value) for label, value in rows if label]
+    else:
+        url = PRES_PAGE[year] if code is None else PRES_FRAGMENT.format(code)
+        text = raw.cached(SOURCE, url).path.read_text("utf-8")
+        if code is None:
+            text = text.split("statsic-2018", 1)[1]
+        text = text.split("<script", 1)[0]
+        rows = [(pres_clean(label), pres_number(value)) for label, value in re.findall(span, text, re.DOTALL)]
+    labels = {
+        "عدد المسجلين": "registered",
+        "عدد الحضور": "cast",
+        "عدد الأصوات الباطلة": "invalid",
+        "عدد الأصوات الصحيحة": "valid",
+    }
+    figures = {labels[label]: value for label, value in rows if label in labels}
+    votes = {label: value for label, value in rows if label not in labels}
+    return PresPage(figures, votes)
+
+
+def pres_chart(year: int) -> dict[str, int]:
+    """The candidates and votes in the chart data of the national page, which gives each name its own pair."""
+    text = raw.cached(SOURCE, PRES_PAGE[year]).path.read_text("utf-8")
+    block = re.search(r"arrayToDataTable\(\[\[.*?\](.*?)\]\);", text, re.DOTALL)
+    if block is None:
+        raise ValueError(f"{year}: no chart data")
+    return {pres_clean(name): int(count) for name, count in re.findall(r'\["([^"]+)",\s*(\d+)\]', block.group(1))}
+
+
+def pres_national(year: int) -> PresPage:
+    found = pres_parse(year)
+    chart = pres_chart(year)
+    if found.votes != chart:
+        raise ValueError(f"{year}: the page text and chart disagree: {found.votes} against {chart}")
+    return found
+
+
+PRES_MEASURES = {"registered": 2, "cast": 3, "valid": 4, "invalid": 5}
+
+
+def presidential_source() -> dict[str, object]:
+    return {
+        "id": key("source", "president"),
+        "kind": "official_body",
+        "publisher": "الهيئة الوطنية للانتخابات (National Elections Authority)",
+        "title": "Presidential election results, elections.eg",
+        "url": "https://www.elections.eg/",
+        "license": "Published by the authority with no license stated",
+        "license_url": "https://www.elections.eg/",
+        "attribution": "National Elections Authority, Egypt",
+    }
+
+
+def pres_registry() -> Package:
+    p = Package(
+        f"{SOURCE}/pres-registry",
+        SOURCE,
+        "Egypt's presidency and the electoral system of its direct election",
+        depends=[f"{SOURCE}/registry"],
+    )
+    p.external.add(EGYPT)
+    p.add("scheme", code="eg.nation", polity_id=EGYPT, kind="administrative", rank=0, noun="nation")
+    p.add("office", id=PRESIDENCY, polity_id=EGYPT, kind="head_of_state")
+    p.name(PRESIDENCY, "President of Egypt", "en", "official")
+    p.name(PRESIDENCY, "رئيس جمهورية مصر العربية", "ar", "official", False)
+    p.add(
+        "electoral_system",
+        id=PRES_SYSTEM,
+        polity_id=EGYPT,
+        rules={"formula": "two_round", "majority": 0.5, "advance": 2},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", PRES_SYSTEM),
+        entity_id=PRES_SYSTEM,
+        kind="methodology",
+        body_md="The President is elected directly. A candidate with more than half the valid votes wins in the "
+        "first round; otherwise the two leading candidates face a runoff.",
+        lang="en",
+    )
+    return p
+
+
+def presidential(year: int) -> Package:
+    p = Package(
+        f"{SOURCE}/pres-{year}",
+        SOURCE,
+        f"The {PRES_NAMES[year]}, nationally" + (" and by governorate" if year == 2024 else ""),
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/pres-registry"],
+    )
+    p.external |= {EGYPT, COUNTRY}
+    source = str(presidential_source()["id"])
+    p.add("source", **{**presidential_source(), "title": f"{PRES_NAMES[year]} results, elections.eg"})
+    page_url = PRES_PAGE[year]
+    p.artifact(raw.cached(SOURCE, page_url), source)
+    national = pres_national(year)
+    by_gov: dict[str, PresPage] = {}
+    if year == 2024:
+        p.artifact(raw.cached(SOURCE, PRES_BY_GOV), source)
+        p.artifact(raw.cached(SOURCE, PRES_FRAGMENT.format("EG")), source)
+        for code in presidential_codes():
+            p.artifact(raw.cached(SOURCE, PRES_FRAGMENT.format(code)), source)
+            by_gov[code] = pres_parse(year, code)
+        everywhere = pres_parse(year, "EG")
+        if everywhere.figures != national.figures or everywhere.votes != national.votes:
+            raise ValueError("2024: the national page and the all-governorates fragment disagree")
+        if set(by_gov) != set(GOVERNORATES):
+            raise ValueError(f"2024: governorate fragments {sorted(by_gov)} differ from the 27 governorates")
+        for name in national.votes:
+            if any(set(g.votes) != set(national.votes) for g in by_gov.values()):
+                raise ValueError("2024: a governorate lists different candidates")
+        for label in (*national.votes, *PRES_MEASURES):
+            total = sum(g.votes.get(label, g.figures.get(label, 0)) for g in by_gov.values())
+            expected = national.votes.get(label, national.figures.get(label))
+            if label != "registered" and total != expected:
+                print(f"{year}: {label}: governorates add to {total}, nationally {expected}", flush=True)
+    stated = national.figures
+    if stated["valid"] + stated["invalid"] != stated["cast"] or sum(national.votes.values()) != stated["valid"]:
+        raise ValueError(f"{year}: the national figures do not add up")
+    election = key("election", "president", year)
+    first, last = PRES_DAYS[year]
+    p.add(
+        "election",
+        id=election,
+        polity_id=EGYPT,
+        kind="general",
+        date_from=first,
+        date_to=last,
+        status="held",
+    )
+    p.name(election, PRES_NAMES[year], "en", "official")
+    p.name(election, PRES_ARABIC[year], "ar", "native", False)
+    path = f"eg/{PRES_VOTE_DAY[year]}-presidential"
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    contest = key("contest", "president", year)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="office",
+        office_id=PRESIDENCY,
+        district_area_id=COUNTRY,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=PRES_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, PRES_NAMES[year], "en", "official")
+    p.name(contest, PRES_ARABIC[year], "ar", "native", False)
+    p.add("slug", path=f"{path}/president", entity_id=contest, is_current=True)
+    rs = key("result_set", "president", year)
+    p.add(
+        "result_set",
+        id=rs,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=source,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    gov = " and a page for each of the 27 governorates" if year == 2024 else ""
+    figures = ", and the registered voters, ballots cast, valid, and invalid ballots of the nation" + (
+        ""
+        if year == 2018
+        else ", and for each governorate the ballots cast, valid, and invalid ballots, but not its registered voters"
+    )
+    p.add(
+        "note",
+        id=key("note", rs),
+        entity_id=rs,
+        kind="methodology",
+        body_md=PRES_METHOD.format(gov=gov, figures=figures),
+        lang="en",
+    )
+    options: dict[str, str] = {}
+    winner = max(national.votes, key=lambda name: national.votes[name])
+    for position, name in enumerate(national.votes, 1):
+        english = PRES_ENGLISH.get(name)
+        if english is None:
+            raise KeyError(f"no English name for candidate {name}")
+        person = key("person", "president", year, name)
+        p.add("person", id=person, gender="male")
+        p.name(person, name, "ar", "official")
+        p.name(person, english, "en", "english", False)
+        option = options[name] = key("option", "president", year, name)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            ballot_position=position,
+            ballot_label=name,
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", "president", year, name),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=name,
+        )
+        p.add("outcome", result_set_id=rs, option_id=option, kind="elected" if name == winner else "lost")
+        p.add("declared", result_set_id=rs, option_id=option, measure=1, value=national.votes[name])
+    for label, measure in PRES_MEASURES.items():
+        p.add("declared", result_set_id=rs, option_id=None, measure=measure, value=stated[label])
+    values: list[dict[str, object]] = []
+
+    def put(unit: str, option: str | None, measure: int, amount: int) -> None:
+        values.append(
+            {
+                "result_set_id": rs,
+                "unit_id": unit,
+                "option_id": option,
+                "channel": 0,
+                "measure": measure,
+                "count_round": 0,
+                "flags": 0,
+                "value": amount,
+            }
+        )
+
+    def unit(tag: str, scheme: str, title: str, area: str, english: str | None = None) -> str:
+        id = key("unit", "president", year, tag)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=EGYPT,
+            scheme_code=scheme,
+            code=f"president-{year}:{tag}",
+            area_relation="equals",
+            area_id=area,
+            kind="standard",
+        )
+        p.name(id, title, "ar", "official")
+        if english:
+            p.name(id, english, "en", "english", False)
+        return id
+
+    if year == 2024:
+        names = dict(
+            re.findall(
+                r"<option value='(\d+)'>([^<]+)</option>", raw.cached(SOURCE, PRES_BY_GOV).path.read_text("utf-8")
+            )
+        )
+        for code, found in sorted(by_gov.items(), key=lambda item: int(item[0])):
+            title = pres_clean(names[code])
+            u = unit(code, "eg.governorate", title, governorate_area(code))
+            for label, measure in PRES_MEASURES.items():
+                if label in found.figures:
+                    put(u, None, measure, found.figures[label])
+            for name, option in options.items():
+                put(u, option, 1, found.votes[name])
+    else:
+        u = unit("EG", "eg.nation", "جمهورية مصر العربية", COUNTRY, "Egypt")
+        for label, measure in PRES_MEASURES.items():
+            put(u, None, measure, stated[label])
+        for name, option in options.items():
+            put(u, option, 1, national.votes[name])
+    p.frame("result_value", pl.DataFrame(values, infer_schema_length=None))
+    if year == 2024:
+        p.accept(
+            "accounting.declared",
+            "The authority prints the 67,032,438 registered voters only for the nation; its governorate fragments "
+            "carry no registered voters, so no governorate figure exists to add up to the national roll.",
+        )
+    print(f"{p.key}: {len(values)} values; winner {PRES_ENGLISH[winner]} {national.votes[winner]}", flush=True)
     return p
