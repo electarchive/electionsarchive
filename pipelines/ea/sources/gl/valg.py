@@ -68,8 +68,8 @@ class Election:
 
 
 ELECTIONS = [
-    Election("Landstingsvalg 2005", "inatsisartut", date(2005, 11, 22)),
-    Election("Kommunevalg 2005", "local", date(2005, 1, 1), "year"),
+    Election("Landstingsvalg 2005", "inatsisartut", date(2005, 11, 15)),
+    Election("Kommunevalg 2005", "local", date(2005, 4, 5)),
     Election("Folketingsvalg 2007", "folketing", date(2007, 11, 13)),
     Election("Kommunevalg 2008", "local", date(2008, 1, 1), "year"),
     Election("Landstingsvalg 2009", "inatsisartut", date(2009, 6, 2)),
