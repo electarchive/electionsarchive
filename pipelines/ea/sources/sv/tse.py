@@ -65,8 +65,9 @@ def _crawl(round_number: int, name: str) -> list[str]:
 
 
 def fetch() -> None:
-    from ea.sources.sv import assembly, concejos, parlacen
+    from ea.sources.sv import assembly, concejos, parlacen, presidents
 
+    presidents.fetch()
     assembly.fetch()
     concejos.fetch()
     parlacen.fetch()
@@ -80,12 +81,13 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    from ea.sources.sv import assembly, concejos, parlacen
+    from ea.sources.sv import assembly, concejos, parlacen, presidents
 
     return [
         "sv.tse/geo",
         "sv.tse/registry",
         *(f"sv.tse/pres-{day}" for _, day in ROUNDS.values()),
+        *presidents.packages(),
         *assembly.packages(),
         *concejos.packages(),
         *parlacen.packages(),
@@ -93,8 +95,10 @@ def packages() -> list[str]:
 
 
 def build(name: str) -> Package:
-    from ea.sources.sv import assembly, concejos, parlacen
+    from ea.sources.sv import assembly, concejos, parlacen, presidents
 
+    if name in presidents.packages():
+        return presidents.build(name)
     if name in parlacen.packages():
         return parlacen.build(name)
     if name in assembly.packages():
