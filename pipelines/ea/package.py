@@ -11,6 +11,7 @@ from collections.abc import Iterable, Iterator
 from contextlib import suppress
 from datetime import UTC, datetime
 from io import BytesIO
+from itertools import batched
 from pathlib import Path
 from typing import LiteralString, NamedTuple, NotRequired, TypedDict, cast
 from uuid import NAMESPACE_URL, uuid5
@@ -32,6 +33,7 @@ CHECK_MEMORY = "1GB"
 CHUNK_BYTES = 2 << 20
 SERVER_LIMIT = 3072
 ROLLUP_VALUES = 500_000
+LOAD_CHUNK = 20
 ROLLED = {"election", "contest", "reporting_unit", "result_set"}
 
 U = pl.String()
@@ -1184,26 +1186,28 @@ def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, di
 
 
 def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
-    items = _ordered(items)
-    with conn.transaction():
-        conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
-        conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
-        loaded = [item for path, accepted in items if (item := _facts(conn, path, accepted)) is not None]
-        steps = [meter.step("facts")]
+    done: list[str] = []
+    for chunk in batched(_ordered(items), LOAD_CHUNK):
+        with conn.transaction():
+            conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
+            conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
+            loaded = [item for path, accepted in chunk if (item := _facts(conn, path, accepted)) is not None]
+            steps = [meter.step("facts")]
+            if loaded:
+                steps += _derive(conn, loaded, meter)
+                _verify(conn, loaded)
+                steps.append(meter.step("verify"))
+        for item in loaded:
+            copy = folder(item.key) / f"v{item.version}"
+            if copy.exists():
+                shutil.rmtree(copy)
+            shutil.copytree(item.path, copy)
+            changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in item.counts.items() if a or d)
+            print(f"{item.key} v{item.version} as {item.changeset_id}: {changed}", flush=True)
         if loaded:
-            steps += _derive(conn, loaded, meter)
-            _verify(conn, loaded)
-            steps.append(meter.step("verify"))
-    for item in loaded:
-        copy = folder(item.key) / f"v{item.version}"
-        if copy.exists():
-            shutil.rmtree(copy)
-        shutil.copytree(item.path, copy)
-        changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in item.counts.items() if a or d)
-        print(f"{item.key} v{item.version} as {item.changeset_id}: {changed}", flush=True)
-    if loaded:
-        print(f"{len(loaded)} packages: {', '.join(steps)}", flush=True)
-    return [item.changeset_id for item in loaded]
+            print(f"{len(loaded)} packages: {', '.join(steps)}", flush=True)
+        done += [item.changeset_id for item in loaded]
+    return done
 
 
 READY_COLUMNS = """select a.attname, a.attnotnull,
