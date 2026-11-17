@@ -1,0 +1,2111 @@
+{
+ "polity": "RS",
+ "name": "Serbia",
+ "sources": {
+  "ustav": {
+   "title": "Устав Републике Србије („Службени гласник РС”, бр. 98/2006)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/extfile/sr/31/Ustav%20RS%20cir.pdf",
+   "kind": "official_body",
+   "note": "The 2006 text as RIK hosts it; the 2022 amendments (115/2021) changed the judiciary articles only."
+  },
+  "zakon_np": {
+   "title": "Закон о избору народних посланика („Службени гласник РС”, бр. 14/2022)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/extfile/sr/41916/Zakon%20o%20izboru%20narodnih%20poslanika.pdf",
+   "kind": "official_body"
+  },
+  "zakon_pr": {
+   "title": "Закон о избору председника Републике („Службени гласник РС”, бр. 14/2022)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/extfile/sr/41934/Zakon%20o%20izboru%20predsednika%20Republike.pdf",
+   "kind": "official_body"
+  },
+  "zakon_li": {
+   "title": "Закон о локалним изборима („Службени гласник РС”, бр. 14/2022, 35/2024 и 47/2026)",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/docs/12026zakonOLokalnimIzborima_8a0a05bc-42ad-46f5-b0ae-491ce61e66a1.pdf",
+   "kind": "official_body"
+  },
+  "zakon_li_2007": {
+   "title": "Закон о локалним изборима („Службени гласник РС”, бр. 129/2007, 34/10 - УС, 54/11, 12/20, 16/20 и 68/20)",
+   "publisher": "Службени гласник (Правно-информациони систем Републике Србије)",
+   "url": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/3/reg",
+   "kind": "official_body"
+  },
+  "zakon_ls": {
+   "title": "Закон о локалној самоуправи („Службени гласник РС”, бр. 129/2007 и измене)",
+   "publisher": "Службени гласник (Правно-информациони систем Републике Србије)",
+   "url": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/2/reg",
+   "kind": "official_body"
+  },
+  "zakon_beograd": {
+   "title": "Закон о главном граду („Службени гласник РС”, бр. 129/2007 и измене)",
+   "publisher": "Службени гласник (Правно-информациони систем Републике Србије)",
+   "url": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/4/reg",
+   "kind": "official_body"
+  },
+  "zakon_ref": {
+   "title": "Закон о референдуму и народној иницијативи („Службени гласник РС”, бр. 111/2021 и 119/2021)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/extfile/sr/11469/Zakon%20referendum-2021.pdf",
+   "kind": "official_body"
+  },
+  "zakon_nsnm": {
+   "title": "Закон о националним саветима националних мањина („Службени гласник РС”, бр. 72/09, 20/14 – УС, 55/14 и 47/18)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/extfile/sr/124/Zakon-Nacionalni-saveti-2018-preciscen-CIR.pdf",
+   "kind": "official_body"
+  },
+  "zakon_vss": {
+   "title": "Закон о Високом савету судства („Службени гласник РС”, бр. 10/2023)",
+   "publisher": "Високи савет судства",
+   "url": "https://vss.sud.rs/api/documents/preview/zakon_o_visokom_savetu_sudstva_08_04_2026_14_47_21.pdf",
+   "kind": "official_body"
+  },
+  "zakon_teritorija": {
+   "title": "Закон о територијалној организацији Републике Србије („Службени гласник РС”, бр. 129/2007 и измене)",
+   "publisher": "Министарство државне управе и локалне самоуправе",
+   "url": "https://mduls.gov.rs/wp-content/uploads/zakon-o-teritorijalnoj-organizaciji-rs.pdf",
+   "kind": "official_body"
+  },
+  "uredba_okruzi": {
+   "title": "Уредба о управним окрузима („Службени гласник РС”, бр. 15/06)",
+   "publisher": "Министарство државне управе и локалне самоуправе",
+   "url": "https://mduls.gov.rs/wp-content/uploads/uredba-o-upravnim-okruzima.pdf",
+   "kind": "official_body"
+  },
+  "mduls_jls": {
+   "title": "Локалне самоуправе у Србији (регистар)",
+   "publisher": "Министарство државне управе и локалне самоуправе",
+   "url": "https://mduls.gov.rs/registri/lokalne-samouprave-u-srbiji/",
+   "kind": "official_body"
+  },
+  "rzs_god_2025": {
+   "title": "Статистички годишњак Републике Србије 2025",
+   "publisher": "Републички завод за статистику",
+   "url": "https://publikacije.stat.gov.rs/G2025/Pdf/G20252058.pdf",
+   "kind": "official_body"
+  },
+  "rzs_opstine_2025": {
+   "title": "Општине и региони у Републици Србији, 2025",
+   "publisher": "Републички завод за статистику",
+   "url": "https://publikacije.stat.gov.rs/G2025/Pdf/G202513052.pdf",
+   "kind": "official_body"
+  },
+  "szs_2001": {
+   "title": "Статистички џепни приручник СРЈ 2001",
+   "publisher": "Савезни завод за статистику (издање на серверу Републичког завода за статистику)",
+   "url": "https://publikacije.stat.gov.rs/G2001/pdf/G20016001.pdf",
+   "kind": "official_body"
+  },
+  "skupstina_1804": {
+   "title": "Историјат 1804–1918",
+   "publisher": "Народна скупштина Републике Србије",
+   "url": "https://www.parlament.gov.rs/народна-скупштина/историјат/историјат-1804---1918.117.html",
+   "kind": "official_body"
+  },
+  "skupstina_posle": {
+   "title": "Историјат: после Другог светског рата",
+   "publisher": "Народна скупштина Републике Србије",
+   "url": "https://www.parlament.gov.rs/народна-скупштина/историјат/после-другог-светског-рата.126.html",
+   "kind": "official_body"
+  },
+  "rik_arhiva": {
+   "title": "Архива сајта до 1. марта 2020. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/",
+   "kind": "official_body"
+  },
+  "rik_rezultati": {
+   "title": "Резултати избора (апликација)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/542645/rezultati/",
+   "kind": "official_body"
+  },
+  "rik_dokumenta": {
+   "title": "Документи изборних комисија",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/dokumenta/41985",
+   "kind": "official_body"
+  },
+  "rik_zapisnici_2026": {
+   "title": "Записници - Локални избори 2026",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/zapisnici/677084",
+   "kind": "official_body"
+  },
+  "rik_zapisnici_go_2026": {
+   "title": "Записници - Локални избори градске општине 2026",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/zapisnici/677087",
+   "kind": "official_body"
+  },
+  "rik_zapisnici_ref_2026": {
+   "title": "Записници локални референдуми 2026.",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/zapisnici/678611",
+   "kind": "official_body"
+  },
+  "rik_2020": {
+   "title": "Укупни резултати избора за народне посланике Народне скупштине 2020. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/tekst/9386/ukupni-rezultati-izbora-za-narodne-poslanike-narodne-skupstine-2020-godine.php",
+   "kind": "official_body"
+  },
+  "rik_2022": {
+   "title": "Обрасци за подношење изборних листа кандидата за изборе расписане за 3. април 2022.",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/tekst/43242/obrasci-za-podnosenje-izbornih-lista-kandidata-za-izbore-raspisane-za-3-april-2022.php",
+   "kind": "official_body"
+  },
+  "rik_ref_2022": {
+   "title": "Републички референдум ради потврђивања Акта о промени Устава Републике Србије, 16. јануар 2022. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/tekst/11511/republicki-referendum-radi-potvrdjivanja-akta-o-promeni-ustava-republike-srbije-16-januar-2022-godine.php",
+   "kind": "official_body"
+  },
+  "rik_s51_2024": {
+   "title": "51. седница Републичке изборне комисије (12. јануар 2024)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/vest/564488/51-sednica-republicke-izborne-komisije.php",
+   "kind": "official_body"
+  },
+  "rik_s75_2026": {
+   "title": "75. седница Републичке изборне комисије (5. новембар 2026)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/vest/822434/75-sednica-republicke-izborne-komisije.php",
+   "kind": "official_body"
+  },
+  "rik_nsnm_2014": {
+   "title": "Избори за чланове националних савета националних мањина 2014",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-nacionalne-savete.php",
+   "kind": "official_body"
+  },
+  "rik_nsnm_2018": {
+   "title": "Избори за чланове националних савета националних мањина 2018. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/izbori-za-nsnm-2018.php",
+   "kind": "official_body"
+  },
+  "rik_nsnm_docs": {
+   "title": "Документи НСНМ",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://www.rik.parlament.gov.rs/snm/329620",
+   "kind": "official_body"
+  },
+  "min_nsnm_2026": {
+   "title": "Избори за чланове националних савета националних мањина",
+   "publisher": "Министарство за људска и мањинска права и друштвени дијалог",
+   "url": "https://minljmpdd.gov.rs/izbori-za-clanove-nacionalnih-saveta-nacionalnih-manjina/",
+   "kind": "official_body"
+  },
+  "pik": {
+   "title": "Покрајинска изборна комисија",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/pik",
+   "kind": "official_body"
+  },
+  "pik_odluka_2023": {
+   "title": "Покрајинска скупштинска одлука о избору посланика у Скупштину Аутономне покрајине Војводине („Службени лист АПВ”, бр. 40/2023)",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/docs/1PSOoIzboruPoslanikaAPV.pdf",
+   "kind": "official_body"
+  },
+  "pik_arhiva": {
+   "title": "Резултати избора: архива",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultatiarhiva",
+   "kind": "official_body"
+  },
+  "pik_2004": {
+   "title": "Избори 2004",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/izbori2004?izbori=2004",
+   "kind": "official_body"
+  },
+  "pik_2008": {
+   "title": "Избори 2008",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/izbori2008?izbori=2008",
+   "kind": "official_body"
+  },
+  "pik_2010": {
+   "title": "Допунски избори 2010",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati/?izbori=2010",
+   "kind": "official_body"
+  },
+  "pik_2012": {
+   "title": "Избори 2012",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati2012/?izbori=2012",
+   "kind": "official_body"
+  },
+  "pik_2013": {
+   "title": "Допунски избори 2013",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati2013?izbori=2013",
+   "kind": "official_body"
+  },
+  "pik_2016": {
+   "title": "Избори 2016",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati?izbori=2016",
+   "kind": "official_body"
+  },
+  "pik_2020": {
+   "title": "Избори 2020",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati?izbori=2020",
+   "kind": "official_body"
+  },
+  "pik_2023": {
+   "title": "Избори 2023",
+   "publisher": "Покрајинска изборна комисија",
+   "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultati?izbori=2023",
+   "kind": "official_body"
+  },
+  "beograd_gik": {
+   "title": "Градска изборна комисија",
+   "publisher": "Град Београд",
+   "url": "https://www.beograd.rs/cir/gradska-vlast/a87998/Gradska-izborna-komisija.html",
+   "kind": "official_body"
+  },
+  "rik_np_1990": {
+   "title": "Архива: Избори за народне посланике - 1990",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-1990.php",
+   "kind": "official_body"
+  },
+  "rik_np_1993": {
+   "title": "Архива: Избори за народне посланике - 1993",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-1993.php",
+   "kind": "official_body"
+  },
+  "rik_np_1997": {
+   "title": "Архива: Избори за народне посланике - 1997",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-1997.php",
+   "kind": "official_body"
+  },
+  "rik_np_2000": {
+   "title": "Архива: Избори за народне посланике - 2000",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2000.php",
+   "kind": "official_body"
+  },
+  "rik_np_2003": {
+   "title": "Архива: Избори за народне посланике - 2003",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2003.php",
+   "kind": "official_body"
+  },
+  "rik_np_2007": {
+   "title": "Архива: Избори за народне посланике - 2007",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2007.php",
+   "kind": "official_body"
+  },
+  "rik_np_2008": {
+   "title": "Архива: Избори за народне посланике - 2008",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2008.php",
+   "kind": "official_body"
+  },
+  "rik_np_2012": {
+   "title": "Архива: Избори за народне посланике - 2012",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2012.php",
+   "kind": "official_body"
+  },
+  "rik_np_2014": {
+   "title": "Архива: Избори за народне посланике - 2014",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-narodne-poslanike-2014.php",
+   "kind": "official_body"
+  },
+  "rik_np_2016": {
+   "title": "Архива: Избори за народне посланике 2016. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/izbori-za-narodne-poslanike-2016.php",
+   "kind": "official_body"
+  },
+  "rik_pr_1990": {
+   "title": "Архива: Избори за председника Републике - 1990",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-1990.php",
+   "kind": "official_body"
+  },
+  "rik_pr_1992": {
+   "title": "Архива: Избори за председника Републике - 1992",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-1992.php",
+   "kind": "official_body"
+  },
+  "rik_pr_1997a": {
+   "title": "Архива: Избори за председника Републике - 1997 (I)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-19971.php",
+   "kind": "official_body"
+  },
+  "rik_pr_1997b": {
+   "title": "Архива: Избори за председника Републике - 1997 (II)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-19972.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2002a": {
+   "title": "Архива: Избори за председника Републике - 2002 (I)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-20021.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2002b": {
+   "title": "Архива: Избори за председника Републике - 2002 (II)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-20022.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2003": {
+   "title": "Архива: Избори за председника Републике - 2003",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-2003.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2004": {
+   "title": "Архива: Избори за председника Републике - 2004",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-2004.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2008": {
+   "title": "Архива: Избори за председника Републике - 2008",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-2008.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2012": {
+   "title": "Архива: Избори за председника Републике - 2012",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-izbori-za-predsednika-2012.php",
+   "kind": "official_body"
+  },
+  "rik_pr_2017": {
+   "title": "Архива: Избори за председника Републике 2017. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/izbori-za-predsednika-republike-2017.php",
+   "kind": "official_body"
+  },
+  "rik_ref_1992a": {
+   "title": "Архива: Референдум 1992 (I)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-referendumi-19921.php",
+   "kind": "official_body"
+  },
+  "rik_ref_1992c": {
+   "title": "Архива: Референдум 1992 (III)",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-referendumi-19923.php",
+   "kind": "official_body"
+  },
+  "rik_ref_2006": {
+   "title": "Архива: Референдум 2006",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/arhiva-referendumi-2006.php",
+   "kind": "official_body"
+  },
+  "rik_ref_1998_report": {
+   "title": "Извештај о спроведеном републичком референдуму ради изјашњавања грађана Србије да ли прихватају учешће страних представника у решавању проблема на Косову и Метохији",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/doc/arhiva/referendumi/1.%20izvestaj%201998%20referendum.pdf",
+   "kind": "official_body"
+  },
+  "rik_np_1990_report": {
+   "title": "Извештај о укупним резултатима избора за народне посланике у Народну скупштину Републике Србије 9. и 23. децембра 1990. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/doc/arhiva/poslanici/1990/1990%20izvestaj%20o%20ukupnim%20rezultatima%20np.pdf",
+   "kind": "official_body"
+  },
+  "rik_np_1991_report": {
+   "title": "Извештај о укупним резултатима допунских избора за народног посланика у Изборној јединици 10. Раковица I – 16. и 30. јуна 1991. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/doc/arhiva/poslanici/1990/1991%20izvestaj%20o%20ukupnim%20rezultatima%20dopunskih%20izbora%20np.pdf",
+   "kind": "official_body"
+  },
+  "rik_np_1992_report": {
+   "title": "Извештај о укупним резултатима избора за народне посланике у Народну скупштину Републике Србије, одржаних 20. и 27. децембра 1992. године и 3. јануара 1993. године",
+   "publisher": "Републичка изборна комисија",
+   "url": "https://arhiva.rik.parlament.gov.rs/doc/arhiva/poslanici/1992/1992%20izvestaj%20o%20ukupnim%20rezultatima%20np.pdf",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Република Србија",
+   "name_en": "Republic of Serbia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "ustav"
+  },
+  {
+   "key": "pokrajina",
+   "name": "Аутономне покрајине",
+   "name_en": "Autonomous provinces",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "ustav",
+   "counts": [
+    {
+     "date": "2006-11-08",
+     "value": 2,
+     "source": "ustav",
+     "locator": "https://www.rik.parlament.gov.rs/extfile/sr/31/Ustav%20RS%20cir.pdf (чл. 182: Република Србија има Аутономну покрајину Војводину и Аутономну покрајину Косово и Метохија; only Vojvodina elects an assembly under Serbian administration since 1999)"
+    }
+   ]
+  },
+  {
+   "key": "okrug",
+   "name": "Управни окрузи",
+   "name_en": "Administrative districts",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "rs.okrug",
+   "elects": false,
+   "source": "uredba_okruzi",
+   "counts": [
+    {
+     "date": "2006-03-07",
+     "value": 29,
+     "source": "uredba_okruzi",
+     "locator": "https://mduls.gov.rs/wp-content/uploads/uredba-o-upravnim-okruzima.pdf (чл. 12: Образују се управни окрузи ... 1) Севернобачки управни округ ... 29) Косовско-поморавски управни округ; the City of Belgrade belongs to none)"
+    }
+   ]
+  },
+  {
+   "key": "jls",
+   "name": "Јединице локалне самоуправе (општине, градови и град Београд)",
+   "name_en": "Local self-government units (municipalities, cities, and the City of Belgrade)",
+   "parent": "okrug",
+   "polity_kind": "municipality",
+   "scheme": "rs.opstina",
+   "source": "ustav",
+   "counts": [
+    {
+     "date": "1998-04-23",
+     "value": 189,
+     "source": "rik_ref_1998_report",
+     "locator": "https://arhiva.rik.parlament.gov.rs/doc/arhiva/referendumi/1.%20izvestaj%201998%20referendum.pdf (Гласање на републичком референдуму обављено је 23. априла 1998. године на 9.836 гласачких места, у свих 189 општина у Републици Србији)"
+    },
+    {
+     "date": "2007-12-29",
+     "value": 174,
+     "source": "zakon_teritorija",
+     "locator": "https://mduls.gov.rs/wp-content/uploads/zakon-o-teritorijalnoj-organizaciji-rs.pdf (чл. 16 lists 150 municipalities, чл. 20 lists 23 cities, plus the City of Belgrade, чл. 2; 29 of the 174 lie in Kosovo and Metohija)"
+    },
+    {
+     "date": "2026-11-17",
+     "value": 174,
+     "source": "mduls_jls",
+     "locator": "https://mduls.gov.rs/registri/lokalne-samouprave-u-srbiji/ (непосредно и преко слободно изабраних представника у 174 јединица локалне самоуправе; RZS's Statistical Yearbook 2025, table 1.4, puts 29 of them in Kosovo and Metohija, where no Serbian local election has been held since 2012)"
+    }
+   ]
+  },
+  {
+   "key": "gradska_opstina",
+   "name": "Градске општине",
+   "name_en": "City municipalities",
+   "parent": "jls",
+   "polity_kind": "submunicipal",
+   "source": "zakon_ls",
+   "counts": [
+    {
+     "date": "2025-01-01",
+     "value": 28,
+     "source": "rzs_god_2025",
+     "locator": "https://publikacije.stat.gov.rs/G2025/Pdf/G20252058.pdf (табела 1.4, Територијалне јединице, 1. јануара 2025: Градске општине 28 | 17 | 0 | 2 | 9 | 0; Belgrade 17, Niš 5, Užice, Požarevac, and Vranje 2 each; 25 elect an assembly, since the assemblies of the cities of Vranje, Požarevac, and Užice also act for their namesake city municipalities)"
+    }
+   ]
+  },
+  {
+   "key": "mesna_zajednica",
+   "name": "Месне заједнице",
+   "name_en": "Local communities",
+   "parent": "jls",
+   "polity_kind": "submunicipal",
+   "source": "zakon_ls",
+   "counts": [
+    {
+     "date": "2024-12-31",
+     "value": 4009,
+     "source": "rzs_opstine_2025",
+     "locator": "https://publikacije.stat.gov.rs/G2025/Pdf/G202513052.pdf (табела 1.1, Општи подаци 2024: РЕПУБЛИКА СРБИЈА ... 4009 месних заједница, from the Регистар јединица разврставања at 31.12.2024)"
+    }
+   ]
+  },
+  {
+   "key": "nacionalne_manjine",
+   "name": "Националне мањине (национални савети)",
+   "name_en": "National minorities (national councils)",
+   "parent": "national",
+   "source": "zakon_nsnm",
+   "counts": [
+    {
+     "date": "2026-11-08",
+     "value": 23,
+     "source": "min_nsnm_2026",
+     "locator": "https://minljmpdd.gov.rs/izbori-za-clanove-nacionalnih-saveta-nacionalnih-manjina/ (на њима ће се бирати чланови националних савета 23 националне мањине ... 21 ... на непосредним изборима, ... горанске и руске националне мањине ... путем електорске скупштине)"
+    }
+   ]
+  },
+  {
+   "key": "srj_scg",
+   "name": "Савезна Република Југославија / Државна заједница Србија и Црна Гора",
+   "name_en": "Federal Republic of Yugoslavia / Serbia and Montenegro (federal tier, 1992–2006)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1992-04-27",
+   "valid_to": "2006-06-05",
+   "source": "szs_2001"
+  },
+  {
+   "key": "nr_sr_srbija",
+   "name": "Народна / Социјалистичка Република Србија",
+   "name_en": "People's (Socialist) Republic of Serbia within Yugoslavia (1945–1990)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1945-04-09",
+   "valid_to": "1990-09-28",
+   "source": "skupstina_posle"
+  },
+  {
+   "key": "knezevina_kraljevina",
+   "name": "Кнежевина и Краљевина Србија",
+   "name_en": "Principality and Kingdom of Serbia (to 1918)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_to": "1918-12-01",
+   "source": "skupstina_1804"
+  },
+  {
+   "key": "jugoslavija",
+   "name": "Краљевина СХС / Југославија и ФНРЈ / СФРЈ (савезни ниво)",
+   "name_en": "Kingdom of Serbs, Croats and Slovenes / Yugoslavia and federal Yugoslavia (federal tier, 1918–1992)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1918-12-01",
+   "valid_to": "1992-04-27",
+   "source": "skupstina_posle"
+  }
+ ],
+ "classes": [
+  {
+   "key": "narodna_skupstina",
+   "tier": "national",
+   "name": "Избори за народне посланике Народне скупштине",
+   "name_en": "National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.opstina",
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "Polling-station results from 2003 (RIK spreadsheets and, from 2023, its results application); 1990–2000 only as total reports and statistical publications, mostly scanned, by constituency and municipality.",
+   "note": "250 deputies for four years. 1990: 250 single-member constituencies with a runoff; 1992 and 1993: list PR in nine constituencies; 1997: 29 constituencies; since 2000 the whole country is one constituency with D'Hondt, a 5% threshold until the 2020 change to 3%, and minority lists exempt from it (their quotients raised by 35% since 2022).",
+   "source": "zakon_np",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/41916/Zakon%20o%20izboru%20narodnih%20poslanika.pdf (чл. 1: Народна скупштина има 250 народних посланика, који се бирају на четири године; Народни посланици бирају се у Републици Србији као једној изборној јединици)",
+   "valid_from": "1990-12-09",
+   "first_held": "1990-12-09",
+   "earliest_record": "1990-12-09",
+   "est_votes": 62000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Републичка изборна комисија and the polling boards",
+     "source": "ustav",
+     "locator": "https://www.rik.parlament.gov.rs/extfile/sr/31/Ustav%20RS%20cir.pdf (чл. 102: Мандат народног посланика ... траје четири године; early dissolution under чл. 109)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list (Zakon o izboru narodnih poslanika)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "RIK archive (arhiva.rik.parlament.gov.rs)",
+     "url": "https://arhiva.rik.parlament.gov.rs/arhiva.php",
+     "format": "pdf, doc, xls",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1990-12-09",
+     "last_date": "2016-04-24",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Total-results reports and RZS publications for every election 1990–2016, with RZS spreadsheets by district, municipality, and polling station from 2003.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_arhiva"
+    },
+    {
+     "platform": "RIK results application",
+     "url": "https://www.rik.parlament.gov.rs/542645/rezultati/",
+     "format": "html, xlsx, csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2020-06-21",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Results by region, municipality, and polling station with XLSX and CSV export for the 2023 and 2026 elections; 2020 as spreadsheets on the site.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_rezultati"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "RS",
+     "valid_from": "1990-12-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-12-09",
+     "election_kind": "general",
+     "contests": 250,
+     "seats": 250,
+     "deferred": [
+      "1990-12-16"
+     ],
+     "source": "rik_np_1990_report",
+     "quote": "у првом кругу изабрано 96 народних посланика ... На овим бирачким местима гласање је поновљено 16. децембра 1990. године",
+     "note": "250 single-member constituencies; 96 filled in the first round. Voting was repeated on 16 December 1990 at eight polling stations in Arilje, Bujanovac, and Kula."
+    },
+    {
+     "date": "1990-12-23",
+     "election_kind": "runoff",
+     "contests": 154,
+     "seats": 154,
+     "source": "rik_np_1990_report",
+     "quote": "у другом кругу изабрано је 154 народна посланика"
+    },
+    {
+     "date": "1991-06-16",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_np_1991_report",
+     "quote": "Допунски избори за народног посланика у Изборној јединици 10. Раковица I ... одржани су 16. и 30. јуна 1991. године",
+     "note": "The first round failed the 50% turnout rule."
+    },
+    {
+     "date": "1991-06-30",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_np_1991_report",
+     "quote": "Допунски избори за народног посланика у Изборној јединици 10. Раковица I ... одржани су 16. и 30. јуна 1991. године"
+    },
+    {
+     "date": "1992-05-31",
+     "election_kind": "by_election",
+     "source": "rik_np_1990",
+     "quote": "Извештај о резултатима допунских избора за народне посланике у Народну скупштину Републике Србије 31. маја и 14. јуна 1992. године",
+     "note": "By-elections with a second round on 14 June 1992; the report is an image scan and its constituencies are not yet counted."
+    },
+    {
+     "date": "1992-12-20",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 250,
+     "deferred": [
+      "1992-12-27",
+      "1993-01-03"
+     ],
+     "source": "rik_np_1992_report",
+     "quote": "Избори су одржани у девет изборних јединица одређених Законом о изборним јединицама за избор народних посланика",
+     "note": "List PR in nine constituencies; voting repeated on 27 December 1992 and 3 January 1993."
+    },
+    {
+     "date": "1993-12-19",
+     "election_kind": "general",
+     "contests": 9,
+     "seats": 250,
+     "deferred": [
+      "1993-12-26",
+      "1994-01-05"
+     ],
+     "source": "rik_np_1993",
+     "quote": "Избори за народне посланике Народне скупштине одржани 19. и 26. децембра 1993. године и 5. јануара 1994. године",
+     "note": "Same nine constituencies as 1992."
+    },
+    {
+     "date": "1997-09-21",
+     "election_kind": "general",
+     "contests": 29,
+     "seats": 250,
+     "deferred": [
+      "1997-09-28",
+      "1997-10-05"
+     ],
+     "source": "rik_np_1997",
+     "quote": "Избори за народне посланике Народне скупштине одржани 21. и 28. септембра и 5. октобра 1997. године",
+     "note": "List PR in 29 constituencies (1 Palilula to 29 Peć)."
+    },
+    {
+     "date": "2000-12-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2001-01-10"
+     ],
+     "source": "rik_np_2000",
+     "quote": "Избори за народне посланике Народне скупштине одржани 23. децембра 2000. године и 10. јануара 2001. године",
+     "note": "First election with Serbia as one constituency; voting repeated at 19 polling stations on 10 January 2001."
+    },
+    {
+     "date": "2003-12-28",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "source": "rik_np_2003",
+     "quote": "Избори за народне посланике Народне скупштине одржани 28. децембра 2003. године"
+    },
+    {
+     "date": "2007-01-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2007-02-08"
+     ],
+     "source": "rik_np_2007",
+     "quote": "Избори за народне посланике Народне скупштине одржани 21. јануара и 8. фебрауара 2007. године"
+    },
+    {
+     "date": "2008-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "source": "rik_np_2008",
+     "quote": "Избори за народне посланике Народне скупштине одржани 11. маја 2008. године"
+    },
+    {
+     "date": "2012-05-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "source": "rik_np_2012",
+     "quote": "Избори за народне посланике Народне скупштине, 6. маj 2012. године"
+    },
+    {
+     "date": "2014-03-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2014-03-23"
+     ],
+     "source": "rik_np_2014",
+     "quote": "Избори за народне посланике Народне скупштине одржани 16. и 23. марта 2014. године"
+    },
+    {
+     "date": "2016-04-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "source": "rik_np_2016",
+     "quote": "Избори за народне посланике 2016. године"
+    },
+    {
+     "date": "2020-06-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2020-07-01"
+     ],
+     "source": "rik_2020",
+     "quote": "одржаних 21. јуна 2020. године и поновљених на 234 бирачка места 1. јула 2020. године"
+    },
+    {
+     "date": "2022-04-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "source": "rik_2022",
+     "quote": "Обрасци за подношење изборних листа кандидата за изборе расписане за 3. aприл 2022. ... ИЗБОРИ ЗА НАРОДНЕ ПОСЛАНИКЕ НАРОДНЕ СКУПШТИНЕ"
+    },
+    {
+     "date": "2023-12-17",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2023-12-30",
+      "2024-01-02"
+     ],
+     "source": "rik_s51_2024",
+     "quote": "одржаним 17. децембра 2023. године и поновљеним на 35 бирачких места 30. децембра 2023. године и на осам бирачких места 2. јануара 2024. године"
+    },
+    {
+     "date": "2026-10-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 250,
+     "deferred": [
+      "2026-11-01"
+     ],
+     "source": "rik_s75_2026",
+     "quote": "одржаним 25. октобра 2026. године и поновљеним на 53 бирачка места 1. новембра 2026. године"
+    }
+   ]
+  },
+  {
+   "key": "predsednik",
+   "tier": "national",
+   "name": "Избори за председника Републике",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.opstina",
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "Polling-station spreadsheets from the December 2002 vote onward on the RIK archive; 1990–1997 as total reports and scanned statistical publications.",
+   "note": "Direct two-round majority election for five years, at most two terms (Ustav чл. 114, 116). Until 2004 a round was void unless more than half the electorate voted, which voided the votes of 1997 (I), September–October 2002, December 2002, and 2003.",
+   "source": "zakon_pr",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/41934/Zakon%20o%20izboru%20predsednika%20Republike.pdf (чл. 1: Председник Републике бира се на пет година; чл. 21–23)",
+   "valid_from": "1990-12-09",
+   "first_held": "1990-12-09",
+   "earliest_record": "1990-12-09",
+   "est_votes": 60000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "term_years": 5,
+     "called": true,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "A candidate needs a majority of those who voted; otherwise the top two meet again within 15 days (Zakon o izboru predsednika Republike чл. 21–23).",
+     "administered_by": "Републичка изборна комисија",
+     "source": "ustav",
+     "locator": "https://www.rik.parlament.gov.rs/extfile/sr/31/Ustav%20RS%20cir.pdf (чл. 116: Мандат председника Републике траје пет година ... Нико не може више од два пута да буде биран)",
+     "vacancy_rule": "The Speaker acts as president and an election is held within three months (Ustav чл. 120)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "RIK archive (arhiva.rik.parlament.gov.rs)",
+     "url": "https://arhiva.rik.parlament.gov.rs/arhiva.php",
+     "format": "pdf, doc, xls",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1990-12-09",
+     "last_date": "2017-04-02",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Reports and RZS publications for every vote 1990–2017; RZS spreadsheets by district, municipality, and polling station from the December 2002 vote.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_arhiva"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "RS",
+     "valid_from": "1990-12-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-12-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1990",
+     "quote": "Избори за председника Републике, одржани 9. децембра 1990. године"
+    },
+    {
+     "date": "1992-12-20",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1992",
+     "quote": "Избори за председника Републике, одржани 20. децембра 1992. године"
+    },
+    {
+     "date": "1997-09-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1997a",
+     "quote": "Избори за председника Републике, одржани 21. септембра и 5. октобра 1997. године"
+    },
+    {
+     "date": "1997-10-05",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1997a",
+     "quote": "Избори за председника Републике, одржани 21. септембра и 5. октобра 1997. године",
+     "note": "Void: turnout below half of the electorate."
+    },
+    {
+     "date": "1997-12-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1997b",
+     "quote": "Избори за председника Републике, одржани 7. и 21. децембра 1997. године"
+    },
+    {
+     "date": "1997-12-21",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_1997b",
+     "quote": "Избори за председника Републике, одржани 7. и 21. децембра 1997. године"
+    },
+    {
+     "date": "2002-09-29",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2002a",
+     "quote": "Избори за председника Републике, одржани 29. септембра и 13. октобра 2002. године"
+    },
+    {
+     "date": "2002-10-13",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2002a",
+     "quote": "Избори за председника Републике, одржани 29. септембра и 13. октобра 2002. године",
+     "note": "Void: turnout below half of the electorate."
+    },
+    {
+     "date": "2002-12-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2002b",
+     "quote": "Избори за председника Републике, одржани 8. децембра 2002. године",
+     "note": "Void: turnout below half of the electorate."
+    },
+    {
+     "date": "2003-11-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2003",
+     "quote": "Избори за председника Републике, одржани 16. новембра 2003. године",
+     "note": "Void: turnout below half of the electorate; the turnout rule was dropped in 2004."
+    },
+    {
+     "date": "2004-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2004",
+     "quote": "Избори за председника Републике, одржани 13. и 27. јуна 2004. године"
+    },
+    {
+     "date": "2004-06-27",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2004",
+     "quote": "Избори за председника Републике, одржани 13. и 27. јуна 2004. године"
+    },
+    {
+     "date": "2008-01-20",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2008",
+     "quote": "Избори за председника Републике, одржани 20. јануара и 3. фебруара 2008. године"
+    },
+    {
+     "date": "2008-02-03",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "deferred": [
+      "2008-02-12"
+     ],
+     "source": "rik_pr_2008",
+     "quote": "Избори за председника Републике, одржани 20. јануара и 3. фебруара 2008. године",
+     "note": "RIK's report on the election also names 12 February 2008 (repeat voting)."
+    },
+    {
+     "date": "2012-05-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2012",
+     "quote": "Избори за председника Републике, одржани 6. и 20. маја 2012. године"
+    },
+    {
+     "date": "2012-05-20",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2012",
+     "quote": "Избори за председника Републике, одржани 6. и 20. маја 2012. године"
+    },
+    {
+     "date": "2017-04-02",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_pr_2017",
+     "quote": "Избори за председника Републике 2017. године",
+     "note": "Won in the first round."
+    },
+    {
+     "date": "2022-04-03",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "rik_2022",
+     "quote": "Обрасци за подношење изборних листа кандидата за изборе расписане за 3. aприл 2022. ... ИЗБОРИ ЗА ПРЕДСЕДНИКА РЕПУБЛИКЕ",
+     "note": "Won in the first round."
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Републички референдуми",
+   "name_en": "Republic referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.opstina",
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "2022 by polling station on the RIK site; 1992–2006 as reports and statistical publications by municipality.",
+   "note": "Called by the National Assembly; mandatory to confirm a change to the core of the Constitution (Ustav чл. 203). The 1 and 2 July 1990 referendum on the new Constitution of SR Serbia appears on no official site reached.",
+   "source": "zakon_ref",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/11469/Zakon%20referendum-2021.pdf (чл. 10 and чл. 19: Надлежна изборна комисија за спровођење републичког референдума је Републичка изборна комисија)",
+   "first_held": "1992-05-31",
+   "earliest_record": "1992-05-31",
+   "est_votes": 20000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "RIK archive (arhiva.rik.parlament.gov.rs)",
+     "url": "https://arhiva.rik.parlament.gov.rs/arhiva.php",
+     "format": "pdf, docx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1992-05-31",
+     "last_date": "2006-10-28",
+     "finest": "rs.opstina",
+     "evidence": "Reports and RZS publications for the referendums of 1992 (three), 1998, and 2006.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_arhiva"
+    },
+    {
+     "platform": "RIK site: referendum 2022",
+     "url": "https://www.rik.parlament.gov.rs/tekst/11511/",
+     "format": "xls, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-01-16",
+     "last_date": "2022-01-16",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Totals by NUTS region and results by polling station for the 16 January 2022 referendum.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_ref_2022"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "RS"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-05-31",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "rik_ref_1992a",
+     "quote": "Републички референдум ради потврђивања Амандмана I на Устав Републике Србије, одржан 31. маја 1992. године",
+     "note": "Two referendums that day: Amendment I to the Constitution and, the same day, a consultative vote on the state symbols (RIK archive 1992 (II))."
+    },
+    {
+     "date": "1992-10-11",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "rik_ref_1992c",
+     "quote": "Републички референдум ради потврђивања Амандмана I на Устав Републике Србије, одржан 11. октобра 1992. године",
+     "note": "Not confirmed: the yes vote fell short of half the electorate."
+    },
+    {
+     "date": "1998-04-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "rik_ref_1998_report",
+     "quote": "Гласање на републичком референдуму обављено је 23. априла 1998. године на 9.836 гласачких места, у свих 189 општина"
+    },
+    {
+     "date": "2006-10-28",
+     "election_kind": "referendum",
+     "contests": 1,
+     "deferred": [
+      "2006-10-29"
+     ],
+     "source": "rik_ref_2006",
+     "quote": "Републички референдум ради потврђивања новог Устава Републике Србије, одржан 28. и 29. октобра 2006. године"
+    },
+    {
+     "date": "2022-01-16",
+     "election_kind": "referendum",
+     "contests": 1,
+     "deferred": [
+      "2022-01-23",
+      "2022-02-02"
+     ],
+     "source": "rik_ref_2022",
+     "quote": "Републички референдум ради потврђивања Акта о промени Устава Републике Србије, 16. јануар 2022. године",
+     "note": "Voting repeated on 23 January and 2 February 2022 at some stations."
+    }
+   ]
+  },
+  {
+   "key": "skupstina_apv",
+   "tier": "pokrajina",
+   "name": "Избори за посланике у Скупштину Аутономне покрајине Војводине",
+   "name_en": "Assembly of Vojvodina elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.opstina",
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "2023 by polling station (PIK and RIK applications); 2016 and 2020 by municipality (PDF); 2004–2012 by constituency (HTML and PDF); 1992–2000 as scanned reports.",
+   "note": "120 members for four years. 1992–2000: 120 single-member constituencies with a runoff; 2004–2012: 60 by list PR in one provincial constituency and 60 in single-member constituencies; since 2016 all 120 by list PR with D'Hondt, now a 3% threshold with minority lists' quotients raised by 35%.",
+   "source": "pik_odluka_2023",
+   "locator": "https://pik.skupstinavojvodine.gov.rs/docs/1PSOoIzboruPoslanikaAPV.pdf (чл. 1: Скупштина Аутономне покрајине Војводине ... има 120 посланика, који се бирају на четири године; чл. 5)",
+   "first_held": "1992-05-31",
+   "earliest_record": "1992-05-31",
+   "est_votes": 9000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Покрајинска изборна комисија",
+     "source": "pik",
+     "locator": "https://pik.skupstinavojvodine.gov.rs/Strana/pik (Покрајинска изборна комисија је орган за спровођење избора за посланике у Скупштину Аутономне покрајине Војводине)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Покрајинска изборна комисија: архива",
+     "url": "https://pik.skupstinavojvodine.gov.rs/Strana/rezultatiarhiva",
+     "format": "pdf (scanned), html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1992-05-31",
+     "last_date": "2020-06-21",
+     "finest": "rs.opstina",
+     "evidence": "Scanned reports for 1992 (two elections), 1996, and 2000; HTML pages by constituency for 2004 and 2008; PDFs by municipality for 2012–2020.",
+     "source": "pik_arhiva"
+    },
+    {
+     "platform": "Покрајинска изборна комисија: резултати 2023",
+     "url": "https://pik.skupstinavojvodine.gov.rs/Rezultati?izbori=2023",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-12-17",
+     "last_date": "2023-12-17",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Results by district, municipality, and polling station, with polling-board minutes.",
+     "source": "pik_2023"
+    },
+    {
+     "platform": "RIK results application (Покрајински 2023)",
+     "url": "https://www.rik.parlament.gov.rs/542645/rezultati/",
+     "format": "html, xlsx, csv",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-12-17",
+     "last_date": "2023-12-17",
+     "finest": "rs.biracko_mesto",
+     "evidence": "The 2023 provincial election by polling station with XLSX and CSV export.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_rezultati"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "RS",
+     "name_pattern": "Vojvodin|Војводин"
+    },
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "within": null,
+     "iso_pattern": "RS-VO"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-05-31",
+     "election_kind": "general",
+     "contests": 120,
+     "seats": 120,
+     "source": "pik_arhiva",
+     "quote": "31. маја и 14. јуна 1992. године",
+     "note": "120 single-member constituencies; second round 14 June 1992."
+    },
+    {
+     "date": "1992-06-14",
+     "election_kind": "runoff",
+     "source": "pik_arhiva",
+     "quote": "31. маја и 14. јуна 1992. године"
+    },
+    {
+     "date": "1992-12-20",
+     "election_kind": "general",
+     "contests": 120,
+     "seats": 120,
+     "source": "pik_arhiva",
+     "quote": "на превременим изборима одржаним 20. децембра 1992. године",
+     "note": "Early election."
+    },
+    {
+     "date": "1996-11-03",
+     "election_kind": "general",
+     "contests": 120,
+     "seats": 120,
+     "source": "pik_arhiva",
+     "quote": "одржаних 3. и 17. новембра 1996. године"
+    },
+    {
+     "date": "1996-11-17",
+     "election_kind": "runoff",
+     "source": "pik_arhiva",
+     "quote": "одржаних 3. и 17. новембра 1996. године"
+    },
+    {
+     "date": "2000-09-24",
+     "election_kind": "general",
+     "contests": 120,
+     "seats": 120,
+     "source": "pik_arhiva",
+     "quote": "Избори су одржани на основу утврђених и оглашених листа кандидата у 120 изборних јединица ... одржани су 24. септембра и 8. октобра 2000. године"
+    },
+    {
+     "date": "2000-10-08",
+     "election_kind": "runoff",
+     "source": "pik_arhiva",
+     "quote": "одржани су 24. септембра и 8. октобра 2000. године"
+    },
+    {
+     "date": "2004-09-19",
+     "election_kind": "general",
+     "contests": 61,
+     "seats": 120,
+     "source": "pik_2004",
+     "quote": "бира се 120 посланика, и то 60 посланика по пропорционалном и 60 посланика по већинском изборном систему ... одржани су 19. септембра 2004. године",
+     "note": "One provincial list contest and 60 single-member constituencies, with runoffs within 15 days."
+    },
+    {
+     "date": "2008-05-11",
+     "election_kind": "general",
+     "contests": 61,
+     "seats": 120,
+     "source": "pik_2008",
+     "quote": "одржани су 11. маја 2008. године",
+     "note": "One provincial list contest and 60 single-member constituencies."
+    },
+    {
+     "date": "2010-05-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "pik_2010",
+     "quote": "Допунски избори 2010 (изборна јединица 13 Жабаљ)"
+    },
+    {
+     "date": "2012-05-06",
+     "election_kind": "general",
+     "contests": 61,
+     "seats": 120,
+     "source": "pik_2012",
+     "quote": "одржаних 6. мај 2012. године",
+     "note": "One provincial list contest and 60 single-member constituencies."
+    },
+    {
+     "date": "2013-02-17",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 3,
+     "source": "pik_2013",
+     "quote": "Допунски избори 2013 (Апатин, Зрењанин 3, Србобран)"
+    },
+    {
+     "date": "2016-04-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 120,
+     "source": "pik_2016",
+     "quote": "одржани 24. априла 2016. године"
+    },
+    {
+     "date": "2020-06-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 120,
+     "source": "pik_2020",
+     "quote": "одржаних 21. јуна 2020. године"
+    },
+    {
+     "date": "2023-12-17",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 120,
+     "deferred": [
+      "2023-12-30"
+     ],
+     "source": "pik_2023",
+     "quote": "одржаним 17. и 30. децембра 2023. године"
+    }
+   ]
+  },
+  {
+   "key": "skupstina_jls",
+   "tier": "jls",
+   "name": "Избори за одборнике скупштина општина, градова и града Београда",
+   "name_en": "Municipal, city, and Belgrade City Assembly elections",
+   "category": "council",
+   "goal": "local",
+   "contests_per_unit": 1,
+   "measure": {
+    "schemes": [
+     "rs.opstina"
+    ],
+    "fine": [
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "Since the 2022 law each local electoral commission must post its total report and per-polling-station results on the RIK site (Zakon o lokalnim izborima чл. 60); the RIK document register holds them unevenly from 2022, and the results application only Belgrade 2024. Earlier results sit with each local commission.",
+   "note": "List PR in one constituency per unit, four-year term, D'Hondt, 3% threshold (5% before 2020). Elections were held nationwide on one day until 2020; since 2022 units vote on several dates (3 April 2022, 17 December 2023, 2 June 2024, and later rounds). The 29 units in Kosovo and Metohija count in the official register but hold no Serbian local elections.",
+   "source": "zakon_li",
+   "locator": "https://pik.skupstinavojvodine.gov.rs/docs/12026zakonOLokalnimIzborima_8a0a05bc-42ad-46f5-b0ae-491ce61e66a1.pdf (чл. 1: Одборници се бирају на четири године; чл. 5)",
+   "earliest_record": "2022-04-03",
+   "est_votes": 30000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1992-01-01",
+     "administered_by": "the municipal or city electoral commission (општинска односно градска изборна комисија)",
+     "source": "zakon_li_2007",
+     "locator": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/3/reg (чл. 1: Одборници се бирају на четири године; чл. 7)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "RIK: документи изборних комисија",
+     "url": "https://www.rik.parlament.gov.rs/dokumenta/41985",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-04-03",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Local commissions' decisions, lists, and result reports for the local rounds of 2022, 2023, 2024, 2025, and 2026, posted unevenly (83 result reports for 62 units in 2024).",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_dokumenta"
+    },
+    {
+     "platform": "RIK: записници (локални избори 2025 и 2026)",
+     "url": "https://www.rik.parlament.gov.rs/zapisnici/677084",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-06-08",
+     "finest": "rs.biracko_mesto",
+     "evidence": "One scanned polling-board minute per station: 410 stations in nine units in March 2026, 225 in five units in 2025.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_zapisnici_2026"
+    },
+    {
+     "platform": "Град Београд: Градска изборна комисија",
+     "url": "https://www.beograd.rs/cir/gradska-vlast/a87998/Gradska-izborna-komisija.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-04-03",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Belgrade City Assembly totals, by city municipality, and by polling station for 2022, 2023, and 2024.",
+     "source": "beograd_gik"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "runoff",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "RS"
+    },
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "runoff",
+      "special"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "skupstina_gradske_opstine",
+   "tier": "gradska_opstina",
+   "name": "Избори за одборнике скупштина градских општина",
+   "name_en": "City municipality assembly elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "Belgrade's city municipalities by polling station in the City Electoral Commission's PDFs from 2022; RIK's document register has separate city-municipality rounds for 2023, 2024, and 2026.",
+   "note": "25 of the 28 city municipalities (Belgrade's 17, Niš's 5, Sevojno, Kostolac, and Vranjska Banja) elect an assembly of 19 to 75 members by list PR for four years, usually with their city's assembly and on the same polling stations (Zakon o lokalnim izborima чл. 95а).",
+   "source": "zakon_beograd",
+   "locator": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/4/reg (чл. 6: Статутом града се образују градске општине)",
+   "earliest_record": "2022-04-03",
+   "est_votes": 6000000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Град Београд: Градска изборна комисија",
+     "url": "https://www.beograd.rs/cir/gradska-vlast/a87998/Gradska-izborna-komisija.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-04-03",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Results by city municipality and polling station for 2022–2024.",
+     "source": "beograd_gik"
+    },
+    {
+     "platform": "RIK: записници (градске општине 2026)",
+     "url": "https://www.rik.parlament.gov.rs/zapisnici/677087",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2026-03-29",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Polling-board minutes for Sevojno's five stations, 2026.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_zapisnici_go_2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election",
+      "runoff",
+      "special"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "градск[аеи] општин|gradsk[aei] opštin|city municipal"
+    }
+   ]
+  },
+  {
+   "key": "predsednik_opstine_neposredni",
+   "tier": "jls",
+   "name": "Непосредни избори председника општине и градоначелника",
+   "name_en": "Direct mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2002-02-26",
+   "valid_to": "2008-05-11",
+   "first_held": "2004-09-19",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "The 2002 Law on Local Self-Government had the president of each municipality and the mayor of each city elected directly, in two rounds; first held at the local elections of September 2004. The 2007 law returned the choice to the assembly (чл. 43) from the next local elections.",
+   "source": "zakon_ls",
+   "locator": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/2/reg (чл. 43: Председника општине бира скупштина општине; чл. 99 repeals the Закон о локалној самоуправи, бр. 9/02, 33/04, 135/04 и 62/06; чл. 101)",
+   "disposition": "blocked",
+   "disposition_reason": "Results were published only by each local electoral commission in 2004–2007; no official online record was found, and the 2002 law's gazette text sits behind the legal portal's subscription.",
+   "est_votes": 5000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election",
+      "general"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "valid_from": "2002-01-01",
+     "valid_to": "2008-05-11"
+    }
+   ]
+  },
+  {
+   "key": "referendum_lokalni",
+   "tier": "jls",
+   "name": "Покрајински и локални референдуми",
+   "name_en": "Provincial and local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "Polling-board minutes on the RIK site for 2026 (Ada); otherwise results appear only in each unit's official gazette.",
+   "note": "Called by the provincial assembly or the unit's assembly and run by the provincial or local electoral commission (Zakon o referendumu i narodnoj inicijativi чл. 10, 19); results are published the way the calling decision was (чл. 41). No official list of held local referendums exists.",
+   "source": "zakon_ref",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/11469/Zakon%20referendum-2021.pdf (чл. 10: локални референдум расписује скупштина јединице локалне самоуправе; чл. 19; чл. 41)",
+   "est_votes": 300000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "RIK: записници локални референдуми 2026.",
+     "url": "https://www.rik.parlament.gov.rs/zapisnici/678611",
+     "format": "pdf (scanned)",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2026-01-01",
+     "finest": "rs.biracko_mesto",
+     "evidence": "21 polling-board minutes of Ada's 2026 local referendum.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_zapisnici_ref_2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "savet_mesne_zajednice",
+   "tier": "mesna_zajednica",
+   "name": "Избори за савете месних заједница",
+   "name_en": "Local community council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Outside Belgrade the councils are elected by direct secret ballot under each municipality's founding acts, called by the assembly's president; in Belgrade the city municipality's assembly chooses them on the proposal of a citizens' meeting (Zakon o glavnom gradu чл. 50а).",
+   "source": "zakon_ls",
+   "locator": "https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2007/129/2/reg (чл. 74: Избори за савет месне заједнице спроводе се по правилима непосредног и тајног гласања ... у складу са актом о оснивању)",
+   "disposition": "blocked",
+   "disposition_reason": "Each of about 4,000 local communities votes on its own date under municipal rules, and no authority publishes the results centrally.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "месн[аеи] заједниц|mesn[aei] zajednic|local communit"
+    }
+   ]
+  },
+  {
+   "key": "lokalni_izbori_kim",
+   "tier": "jls",
+   "name": "Локални избори у општинама на Косову и Метохији",
+   "name_en": "Serbian-run local elections in Kosovo municipalities",
+   "category": "council",
+   "goal": "local",
+   "valid_to": "2013-01-01",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Serbia held local elections in Kosovo Serb areas with its own local elections in 2008 and 2012, outside the administration set up under UN Security Council Resolution 1244.",
+   "source": "rzs_god_2025",
+   "locator": "https://publikacije.stat.gov.rs/G2025/Pdf/G20252058.pdf (табела 1.4: 29 units of Kosovo and Metohija, for which RZS publishes no data)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Kosovo's municipalities sit in the archive's Kosovo census, which leaves these Serbian-run votes out of scope; no Serbian authority publishes their results.",
+   "match": []
+  },
+  {
+   "key": "nacionalni_saveti",
+   "tier": "nacionalne_manjine",
+   "name": "Избори за чланове националних савета националних мањина",
+   "name_en": "National minority council elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "rs.opstina",
+     "rs.biracko_mesto"
+    ]
+   },
+   "finest_note": "2014 and 2018 by polling station and municipality (RIK archive spreadsheets); 2022 council totals only; 2026 council totals plus scanned polling-board minutes.",
+   "note": "Each council has 15 to 35 members for four years. It is elected directly by the voters on the minority's special roll, in Serbia as one constituency by list PR with D'Hondt and no threshold, when more than 40% of the minority's census population is on that roll; otherwise an electoral assembly chooses it. Direct elections are run by RIK; the Ministry calls them and runs electoral assemblies. Dates counted here are the direct elections; electoral assemblies (3 in 2014, 4 in 2018 and 2022, 2 in 2026) are indirect.",
+   "source": "zakon_nsnm",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/124/Zakon-Nacionalni-saveti-2018-preciscen-CIR.pdf (чл. 9, 10, 29, 60, 97а, 98)",
+   "first_held": "2010-06-06",
+   "earliest_record": "2014-10-26",
+   "est_votes": 1700000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Републичка изборна комисија (direct elections); the Ministry for human and minority rights calls them",
+     "source": "zakon_nsnm",
+     "locator": "https://www.rik.parlament.gov.rs/extfile/sr/124/Zakon-Nacionalni-saveti-2018-preciscen-CIR.pdf (чл. 10: траје до истека четири године од конституисања; чл. 35: Изборе ... расписује министар)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "RIK archive: НСНМ 2014 and 2018",
+     "url": "https://arhiva.rik.parlament.gov.rs/izbori-za-nsnm-2018.php",
+     "format": "doc, xls",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2014-10-26",
+     "last_date": "2018-11-04",
+     "finest": "rs.biracko_mesto",
+     "evidence": "Per council: report, results by polling station and by municipality (XLS), and seat decisions for 2014 and 2018.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_nsnm_2018"
+    },
+    {
+     "platform": "RIK: документи НСНМ",
+     "url": "https://www.rik.parlament.gov.rs/snm/329620",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-11-13",
+     "evidence": "Total-results report per council for 2022 and 2026; scanned polling-board minutes for 2026.",
+     "license": "CC BY-NC-ND 3.0 RS (stated on the Commission's website)",
+     "source": "rik_nsnm_docs"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "runoff",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "RS",
+     "name_pattern": "национални савет|nacionalni savet|national council"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-06-06",
+     "election_kind": "general",
+     "note": "First elections under the 2009 law, run by the Ministry; no official record of the date or results was reached."
+    },
+    {
+     "date": "2014-10-26",
+     "election_kind": "general",
+     "contests": 17,
+     "source": "rik_nsnm_2014",
+     "quote": "Избори за чланове националних савета националних мањина, одржани 2014. године НА НЕПОСРЕДНИМ ИЗБОРИМА",
+     "note": "17 councils elected directly; 3 (Macedonian, Montenegrin, Croatian) by electoral assembly."
+    },
+    {
+     "date": "2018-11-04",
+     "election_kind": "general",
+     "contests": 18,
+     "deferred": [
+      "2018-11-14"
+     ],
+     "source": "rik_nsnm_2018",
+     "quote": "Избори за чланове националних савета националних мањина 2018. године, 4. новембар 2018. године",
+     "note": "18 councils elected directly; 4 by electoral assembly."
+    },
+    {
+     "date": "2022-11-13",
+     "election_kind": "general",
+     "contests": 19,
+     "source": "rik_nsnm_docs",
+     "quote": "ИЗВЕШТАЈ О УКУПНИМ РЕЗУЛТАТИМА ИЗБОРА ЗА ЧЛАНОВЕ НАЦИОНАЛНОГ САВЕТА ... 13. новембра 2022",
+     "note": "19 councils elected directly (one report each); 4 by electoral assembly."
+    },
+    {
+     "date": "2026-11-08",
+     "election_kind": "general",
+     "contests": 21,
+     "deferred": [
+      "2026-11-22"
+     ],
+     "source": "min_nsnm_2026",
+     "quote": "Чланови националних савета 21 националне мањине бирају се на непосредним изборима",
+     "note": "Repeat voting ordered for 22 November 2026 at some stations."
+    }
+   ]
+  },
+  {
+   "key": "savezna_skupstina",
+   "tier": "srj_scg",
+   "name": "Избори за савезне посланике у Веће грађана и Веће република Савезне скупштине (у Србији)",
+   "name_en": "Federal Assembly of Yugoslavia elections (in Serbia)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1992-05-31",
+   "valid_to": "2003-02-04",
+   "first_held": "1992-05-31",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Direct elections to the Chamber of Citizens on 31 May 1992, 20 December 1992, 3 November 1996, and 24 September 2000 (138 seats across the federation), and to the Chamber of Republics on 24 September 2000 (40 seats). Serbia is the legal successor of the federation.",
+   "source": "szs_2001",
+   "locator": "https://publikacije.stat.gov.rs/G2001/pdf/G20016001.pdf (IZBORNE LISTE PREMA DOBIJENIM MANDATIMA U SAVEZNOJ SKUPŠTINI SRJ ... 24. septembar 2000. godine)",
+   "disposition": "blocked",
+   "disposition_reason": "Run by the defunct Federal Electoral Commission; no official online source gives results below the federation's totals, which survive only in the Federal Statistical Office's printed statistics.",
+   "est_votes": 16000000,
+   "effort": 5,
+   "match": []
+  },
+  {
+   "key": "predsednik_srj",
+   "tier": "srj_scg",
+   "name": "Избори за председника Савезне Републике Југославије",
+   "name_en": "Presidential election of FR Yugoslavia (2000)",
+   "category": "executive",
+   "goal": "national",
+   "valid_from": "2000-07-06",
+   "valid_to": "2003-02-04",
+   "first_held": "2000-09-24",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The only direct election of the federal president, 24 September 2000; earlier federal presidents were chosen by the Federal Assembly.",
+   "source": "szs_2001",
+   "locator": "https://publikacije.stat.gov.rs/G2001/pdf/G20016001.pdf (presidential candidates' votes, 24 September 2000)",
+   "disposition": "blocked",
+   "disposition_reason": "Only federation-wide candidate totals survive online, in the Federal Statistical Office's 2001 pocket book; no official results by republic or municipality were found.",
+   "est_votes": 4800000,
+   "effort": 4,
+   "match": []
+  },
+  {
+   "key": "skupstina_scg",
+   "tier": "srj_scg",
+   "name": "Скупштина Србије и Црне Горе",
+   "name_en": "Assembly of Serbia and Montenegro (2003–2006)",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2003-02-04",
+   "valid_to": "2006-06-05",
+   "measure": {},
+   "note": "Its 126 members were delegated by the republics' assemblies in 2003; no direct election was ever held.",
+   "source": "skupstina_posle",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: delegated by the republican assemblies, with no popular vote.",
+   "match": []
+  },
+  {
+   "key": "skupstina_nrs_srs",
+   "tier": "nr_sr_srbija",
+   "name": "Избори за народне посланике Народне скупштине НР / СР Србије",
+   "name_en": "Assembly of the People's (Socialist) Republic of Serbia elections (1946–1969)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1946-11-10",
+   "valid_to": "1974-05-06",
+   "first_held": "1946-11-10",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-list elections: the Constituent Assembly on 10 November 1946 (287 deputies), then March 1951, November 1953, 1958, 1963, 1967, and 1969; voting by rubber ball until 1953.",
+   "source": "skupstina_posle",
+   "locator": "https://www.parlament.gov.rs/народна-скупштина/историјат/после-другог-светског-рата.126.html (Први скупштински избори у Србији после Другог светског рата одржани су 10. новембра 1946. године)",
+   "disposition": "blocked",
+   "disposition_reason": "No official source online gives the votes; they survive only in printed statistics of the period.",
+   "est_votes": 30000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "constituent_assembly",
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "RS",
+     "valid_from": "1946-01-01",
+     "valid_to": "1974-01-01"
+    }
+   ]
+  },
+  {
+   "key": "delegatski_sistem",
+   "tier": "nr_sr_srbija",
+   "name": "Делегатски избори Скупштине СР Србије и скупштина општина",
+   "name_en": "Delegate-system elections (1974–1986)",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1974-05-06",
+   "valid_to": "1990-09-28",
+   "measure": {},
+   "note": "From 1974 voters chose delegations at their work and local communities, which in turn sent delegates to the municipal and republic assemblies (terms from 1974, 1978, 1982, and 1986).",
+   "source": "skupstina_posle",
+   "locator": "https://www.parlament.gov.rs/народна-скупштина/историјат/после-другог-светског-рата.126.html (Уместо посланичког, уведен је делегатски систем)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: no popular vote chose the assembly's members.",
+   "match": []
+  },
+  {
+   "key": "skupstine_opstina_socijalizam",
+   "tier": "nr_sr_srbija",
+   "name": "Избори за народне одборе и скупштине општина (1945–1974)",
+   "name_en": "People's committee and municipal assembly elections (1945–1974)",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "1945-04-09",
+   "valid_to": "1974-05-06",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Local people's committees, then municipal assemblies, were chosen by direct single-list elections until the delegate system.",
+   "source": "skupstina_posle",
+   "disposition": "blocked",
+   "disposition_reason": "No official online record of the votes; only printed statistics of the period.",
+   "est_votes": 20000000,
+   "effort": 5,
+   "match": []
+  },
+  {
+   "key": "narodna_skupstina_kraljevina",
+   "tier": "knezevina_kraljevina",
+   "name": "Избори за народне посланике Народне скупштине Кнежевине и Краљевине Србије",
+   "name_en": "National Assembly elections of the Principality and Kingdom of Serbia (1858–1912)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1858-10-28",
+   "valid_to": "1918-12-01",
+   "first_held": "1858-11-30",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The first law on the assembly (28 October 1858) convened the St. Andrew's Assembly, elected one deputy per set number of tax heads; the first election law followed in 1870. Under the 1869 constitution the prince appointed one deputy for every three elected; from 1888 all deputies were elected, by list PR from 1903. Voting was public until 1888.",
+   "source": "skupstina_1804",
+   "locator": "https://www.parlament.gov.rs/народна-скупштина/историјат/историјат-1804---1918.117.html (Први закон о народној скупштини Србије донет је 28. октобра 1858. године ... Исте године донет је и први закон о избору народних посланика)",
+   "disposition": "blocked",
+   "disposition_reason": "The National Assembly's history gives no election dates or votes, and no official digital record of the results was found.",
+   "est_votes": 4000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house",
+      "upper_house",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "RS",
+     "valid_to": "1918-12-01"
+    }
+   ]
+  },
+  {
+   "key": "jugoslovenski_savezni_izbori",
+   "tier": "jugoslavija",
+   "name": "Избори за савезну скупштину Краљевине СХС / Југославије и ФНРЈ / СФРЈ",
+   "name_en": "Yugoslav federal elections (1920–1990)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1918-12-01",
+   "valid_to": "1992-04-27",
+   "measure": {},
+   "note": "Elections to the parliaments of the Kingdom of Serbs, Croats and Slovenes (Yugoslavia) and of federal socialist Yugoslavia, held across all of today's successor states.",
+   "source": "skupstina_posle",
+   "disposition": "out_of_scope",
+   "disposition_reason": "These belong to a Yugoslav polity shared by all the successor states, not to Serbia's census.",
+   "match": []
+  },
+  {
+   "key": "skupstina_apkm",
+   "tier": "pokrajina",
+   "name": "Скупштина Аутономне покрајине Косово и Метохија",
+   "name_en": "Assembly of the Autonomous Province of Kosovo and Metohija",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {},
+   "note": "The provincial assembly was chosen through the delegate system until 1990; Serbia has held no election to it since, and after 1999 Kosovo was placed under UN administration.",
+   "source": "ustav",
+   "locator": "https://www.rik.parlament.gov.rs/extfile/sr/31/Ustav%20RS%20cir.pdf (чл. 182)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No direct election to it has ever been held; Kosovo's own assemblies are in the archive's Kosovo census.",
+   "match": []
+  },
+  {
+   "key": "posredni_izbori",
+   "tier": "national",
+   "name": "Посредни избори (Влада, председник Скупштине, покрајинска влада, председници општина и градоначелници)",
+   "name_en": "Indirect elections (government, speakers, provincial government, mayors)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "note": "The National Assembly elects the government and its speaker; the provincial assembly the provincial government; since 2008 each local assembly elects the president of the municipality or the mayor (Zakon o lokalnoj samoupravi чл. 43).",
+   "source": "zakon_ls",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: chosen by assemblies, not by voters.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "RS"
+    }
+   ]
+  },
+  {
+   "key": "pravosudni_saveti",
+   "tier": "national",
+   "name": "Избори изборних чланова Високог савета судства и Високог савета тужилаштва",
+   "name_en": "Judicial and prosecutorial council elections",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "note": "Judges elect six members of the High Judicial Council (and prosecutors their members of the High Prosecutorial Council) in ballots run by the councils' own commissions.",
+   "source": "zakon_vss",
+   "locator": "https://vss.sud.rs/api/documents/preview/zakon_o_visokom_savetu_sudstva_08_04_2026_14_47_21.pdf (чл. 7: Чланови Савета су шест судија које бирају судије; чл. 28, 29)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Only judges or prosecutors vote; the public elects no judicial office in Serbia.",
+   "match": []
+  },
+  {
+   "key": "stranacki_izbori",
+   "tier": "national",
+   "name": "Унутарстраначки избори кандидата",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "note": "Parties and citizens' groups compile their lists and nominate candidates under their own rules; the electoral laws require only voters' signatures.",
+   "source": "zakon_np",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No state-run nominating contest exists in Serbia.",
+   "match": []
+  }
+ ]
+}
