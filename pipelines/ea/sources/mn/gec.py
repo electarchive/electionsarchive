@@ -4,9 +4,9 @@ import functools
 from datetime import date
 from uuid import uuid5
 
-from ea import package, raw
+from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.mn import parliament, places, polls
+from ea.sources.mn import local, parliament, places, polls, sheets, translit
 
 SOURCE = "mn.gec"
 MONGOLIA = str(uuid5(package.NAMESPACE, "polity\x1fMN"))
@@ -26,6 +26,12 @@ GEC_SOURCE = key("source", "gec")
 PRESIDENCY = key("office", "president")
 PRESIDENT_SYSTEM = key("electoral_system", "president", 1993)
 KHURAL = key("body", "state-great-khural")
+
+
+def council_body(council: local.Council) -> str:
+    return key("body", "council", council.key)
+
+
 BLOCK_2024 = key("electoral_system", "block", 2024)
 BLOCK_METHOD = (
     "In each multi-member constituency a voter marks up to as many candidates as the constituency has seats, and "
@@ -105,12 +111,62 @@ def parliament_keys() -> list[str]:
     return [str(parliament.DAY_2024)]
 
 
+LOCAL_2020 = date(2020, 10, 15)
+PLACE_LIST_2020 = "1fa2007c"
+RESULTS_LOCAL_2020 = "cacc51cc"
+
+
+@functools.cache
+def local_2020() -> list[local.Block]:
+    return local.blocks(RESULTS_LOCAL_2020, local.section_places(PLACE_LIST_2020))
+
+
+def local_files() -> list[str]:
+    return [sheets.url(RESULTS_LOCAL_2020), sheets.url(PLACE_LIST_2020)]
+
+
+def council_name(council: local.Council) -> tuple[str, str | None]:
+    """The Mongolian and, where it is known, the English name of a council."""
+    if council.kind == "capital":
+        return "Нийслэлийн Иргэдийн Төлөөлөгчдийн Хурал", "Ulaanbaatar Citizens' Representatives Khural"
+    if council.kind == "aimag":
+        english = places.AIMAGS[places.aimag_code(council.aimag or "") or ""][1]
+        return (
+            f"{council.aimag} аймгийн Иргэдийн Төлөөлөгчдийн Хурал",
+            f"{english} Aimag Citizens' Representatives Khural",
+        )
+    noun = "сумын" if council.kind == "soum" else "дүүргийн"
+    place = f"{council.aimag} аймгийн " if council.aimag else ""
+    return f"{place}{council.soum} {noun} Иргэдийн Төлөөлөгчдийн Хурал", None
+
+
+def council_slug(council: local.Council) -> str:
+    if council.kind == "capital":
+        return "capital"
+    if council.kind == "aimag":
+        return changeset.slug(places.AIMAGS[places.aimag_code(council.aimag or "") or ""][1]) + "-aimag"
+    place = council.place
+    english = places.AIMAGS[place.aimag][1] if place else ""
+    return changeset.slug(f"{english} {translit.latin(council.soum or '')} {council.kind}")
+
+
+def council_area(council: local.Council) -> str:
+    if council.kind == "capital":
+        return area("mn.aimag", places.CAPITAL)
+    if council.kind == "aimag":
+        return area("mn.aimag", places.aimag_code(council.aimag or "") or "")
+    place = council.place
+    assert place is not None
+    return area("mn.soum", place.code)
+
+
 def packages() -> list[str]:
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         *(f"{SOURCE}/{poll.key}" for poll in all_polls()),
         *(f"{SOURCE}/{day}" for day in parliament_keys()),
+        f"{SOURCE}/{LOCAL_2020}",
     ]
 
 
@@ -128,6 +184,7 @@ def parse() -> None:
     for poll in all_polls():
         election(poll).write()
     legislature_2024().write()
+    councils_2020().write()
 
 
 def emit() -> None:
@@ -138,9 +195,13 @@ def _places() -> dict[str, places.Place]:
     found: dict[str, places.Place] = {}
     rows = [row for poll in all_polls() for row in poll.rows]
     rows += [row for contest in parliament_2024() for row in contest.rows]
+    rows += [row for block in local_2020() for row in block.rows]
     for row in rows:
         if row.place is not None:
             found.setdefault(row.place.code, row.place)
+    for block in local_2020():
+        if block.council.place is not None:
+            found.setdefault(block.council.place.code, block.council.place)
     return found
 
 
@@ -156,6 +217,7 @@ def geo() -> Package:
         ("mn.soum", 2, "administrative", "soum or district"),
         ("mn.hesg", 3, "precinct", "polling section"),
         ("mn.constituency", 2, "electoral_district", "parliamentary constituency"),
+        ("mn.council_constituency", 2, "electoral_district", "council constituency"),
     ):
         p.add("scheme", code=code, polity_id=MONGOLIA, kind=kind, rank=rank, noun=noun, code_system=None)
     for code, (name, english) in places.AIMAGS.items():
@@ -174,6 +236,13 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         p.name(id, f"{parliament.DAY_2024.year} constituency {contest.number}", "en", "official")
         p.name(id, f"{contest.number}-р тойрог", "mn", "native", False)
+    for block in local_2020():
+        code = f"{LOCAL_2020}:{block.council.key}:{block.number}"
+        id = area("mn.council_constituency", code)
+        p.add("area", id=id, scheme_code="mn.council_constituency")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=council_area(block.council))
+        p.name(id, f"{council_name(block.council)[0]}, {block.number}-р тойрог", "mn", "native")
     for code, place in sorted(_places().items()):
         id = area("mn.soum", code)
         p.add("area", id=id, scheme_code="mn.soum")
@@ -202,6 +271,7 @@ def registry() -> Package:
     )
     files = {url for poll in all_polls() for url in poll.files}
     files |= {url for contest in parliament_2024() for url in contest.files}
+    files |= set(local_files())
     for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
     p.add("office", id=PRESIDENCY, polity_id=MONGOLIA, kind="head_of_state")
@@ -237,6 +307,17 @@ def registry() -> Package:
         rules_version=1,
     )
     p.add("note", id=key("note", BLOCK_2024), entity_id=BLOCK_2024, kind="methodology", body_md=BLOCK_METHOD, lang="en")
+    seen: set[str] = set()
+    for block in local_2020():
+        if block.council.key in seen:
+            continue
+        seen.add(block.council.key)
+        id = council_body(block.council)
+        p.add("body", id=id, polity_id=MONGOLIA, kind="council")
+        native, english = council_name(block.council)
+        p.name(id, native, "mn", "native", english is None)
+        if english:
+            p.name(id, english, "en", "official")
     for abbreviation, (name, english) in PARTIES.items():
         id = party(abbreviation)
         assert id is not None
@@ -520,6 +601,122 @@ def legislature_2024() -> Package:
             if contest.declared is not None:
                 p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=contest.declared[index])
         for row in contest.rows:
+            for option, value in zip(options, row.votes, strict=True):
+                if value is not None:
+                    _value(p, result_set, units[row.code], option, 1, value)
+    return p
+
+
+def councils_2020() -> Package:
+    day = LOCAL_2020
+    blocks = local_2020()
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "The 2020 Mongolian local council elections (capital, aimag, district, and soum councils) by polling "
+        "section and constituency from the General Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {MONGOLIA, TERRITORY}
+    for url in local_files():
+        p.uses(raw.cached(SOURCE, url))
+    election_id = key("election", str(day))
+    p.add("election", id=election_id, polity_id=MONGOLIA, kind="local", date_from=day, date_to=day, status="held")
+    p.name(election_id, "2020 Mongolian local council elections", "en", "official")
+    p.name(
+        election_id,
+        "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын 2020 оны ээлжит сонгууль",
+        "mn",
+        "native",
+        False,
+    )
+    path = f"mn/{day}-local"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units: dict[str, str] = {}
+    for block in blocks:
+        for row in block.rows:
+            if row.code in units:
+                continue
+            unit = units[row.code] = key("unit", str(day), row.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=MONGOLIA,
+                scheme_code="mn.hesg",
+                code=f"{day}:{row.code}",
+                area_relation="within" if row.place else "unlocated",
+                area_id=area("mn.soum", row.place.code) if row.place else None,
+                kind="standard",
+            )
+            p.name(unit, f"{row.code}", "mn", "official")
+    for block in blocks:
+        tag = f"{block.council.key}:{block.number}"
+        contest = key("contest", str(day), tag)
+        native, _ = council_name(block.council)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=council_body(block.council),
+            district_area_id=area("mn.council_constituency", f"{day}:{tag}"),
+            magnitude=block.seats,
+            round_number=1,
+            electoral_system_id=BLOCK_2024,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{native}, {block.number}-р тойрог", "mn", "native")
+        p.add("slug", path=f"{path}/{council_slug(block.council)}-{block.number}", entity_id=contest, is_current=True)
+        result_set = key("result_set", str(day), tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=GEC_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=BLOCK_METHOD,
+            lang="en",
+        )
+        options: list[str] = []
+        for index, entry in enumerate(block.candidates):
+            option = key("option", str(day), tag, index)
+            options.append(option)
+            person = key("person", str(day), tag, index)
+            p.add("person", id=person)
+            p.name(person, entry.label, "mn", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party(entry.party),
+                ballot_position=index + 1,
+                ballot_label=entry.label + (f" ({entry.party})" if entry.party else ""),
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", str(day), tag, index),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=entry.label,
+                member_of_party_id=party(entry.party),
+                is_independent=entry.party is None,
+            )
+            if block.declared is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=block.declared[index])
+        for row in block.rows:
             for option, value in zip(options, row.votes, strict=True):
                 if value is not None:
                     _value(p, result_set, units[row.code], option, 1, value)
