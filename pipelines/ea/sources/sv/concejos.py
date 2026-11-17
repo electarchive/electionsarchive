@@ -609,7 +609,7 @@ def build_election(day: date) -> Package:
                 id=unit,
                 polity_id=tse.EL_SALVADOR,
                 scheme_code="sv.municipio",
-                code=f"{day}:{code.removeprefix('mun')}",
+                code=f"{day}:council:{code.removeprefix('mun')}",
                 area_relation="equals",
                 area_id=tse.area("sv.municipio", code),
                 kind="aggregate",
