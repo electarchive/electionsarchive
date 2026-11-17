@@ -183,6 +183,12 @@
    "publisher": "Amt der Vorarlberger Landesregierung",
    "url": "https://apps.vorarlberg.at/wahlen/",
    "kind": "official_body"
+  },
+  "sbg-landtag": {
+   "title": "Landtagswahl",
+   "publisher": "Amt der Salzburger Landesregierung",
+   "url": "https://www.salzburg.gv.at/pol/wahl/wahl-landtag",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -1493,7 +1499,7 @@
     ]
    },
    "finest_note": "The Länder publish results by municipality; Vienna and some Länder also by polling district.",
-   "note": "Each of the nine Länder elects its Landtag by list PR (Art. 95 B-VG), for five years (six in Upper Austria). Vienna's Landtag is its Gemeinderat, elected once for both roles. Elections began in 1919 (Burgenland from 1922, Vienna as a Land from 1922) and resumed in 1945. Counted per election; the days are not yet listed from each Land's records.",
+   "note": "Each of the nine Länder elects its Landtag by list PR (Art. 95 B-VG), for five years (six in Upper Austria). Vienna's Landtag is its Gemeinderat, elected once for both roles. Elections began in 1919 (Burgenland from 1922, Vienna as a Land from 1922) and resumed in 1945. Counted per election; the days are listed for Tyrol since 1989 (its election page) and Salzburg for 2023 (its Landtag page); the other Länder's days remain uncounted spans.",
    "source": "bvg",
    "valid_from": "1919-01-01",
    "est_votes": 4400000,
@@ -1573,6 +1579,87 @@
      "date": "1919-02-16",
      "through": "2026-11-16",
      "source": "bvg"
+    },
+    {
+     "date": "1989-03-12",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "12.03.1989 | Landtagswahl 1989"
+    },
+    {
+     "date": "1994-03-13",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "13.03.1994 | Landtagswahl 1994"
+    },
+    {
+     "date": "1999-03-07",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "07.03.1999 | Landtagswahl 1999"
+    },
+    {
+     "date": "2003-09-28",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "28.09.2003 | Landtagswahl 2003"
+    },
+    {
+     "date": "2008-06-08",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "08.06.2008 | Landtagswahl 2008"
+    },
+    {
+     "date": "2013-04-28",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "28.04.2013 | Landtagswahl 2013"
+    },
+    {
+     "date": "2018-02-25",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "25.02.2018 | Landtagswahl 2018"
+    },
+    {
+     "date": "2022-09-25",
+     "contests": 1,
+     "regions": {
+      "7": 1
+     },
+     "source": "tirol",
+     "quote": "25.09.2022 | Landtagswahl 2022"
+    },
+    {
+     "date": "2023-04-23",
+     "contests": 1,
+     "regions": {
+      "5": 1
+     },
+     "source": "sbg-landtag",
+     "quote": "Am 23. April 2023 fand die Landtagswahl statt."
     }
    ]
   },
@@ -1698,6 +1785,41 @@
      "through": "2026-11-16",
      "precision": "year",
      "source": "bvg"
+    },
+    {
+     "date": "1998-03-15",
+     "election_kind": "general",
+     "source": "tirol",
+     "quote": "15.03.1998 | Gemeinderatswahl 1998",
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2004-03-07",
+     "election_kind": "general",
+     "source": "tirol",
+     "quote": "07.03.2004 | Gemeinderatswahl 2004",
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2010-03-14",
+     "election_kind": "general",
+     "source": "tirol",
+     "quote": "14.03.2010 | Gemeinderatswahl 2010",
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2016-02-28",
+     "election_kind": "general",
+     "source": "tirol",
+     "quote": "28.02.2016 | Gemeinderats- und Bürgermeisterwahlen 2016",
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2022-02-27",
+     "election_kind": "general",
+     "source": "tirol",
+     "quote": "27.02.2022 | Gemeinderats- und Bürgermeisterwahlen 2022",
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
     }
    ]
   },
@@ -1768,6 +1890,41 @@
      "through": "2026-11-16",
      "precision": "year",
      "source": "bvg"
+    },
+    {
+     "date": "1998-03-29",
+     "election_kind": "runoff",
+     "source": "tirol",
+     "quote": "29.03.1998 | Bürgermeisterstichwahl 1998",
+     "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2004-03-21",
+     "election_kind": "runoff",
+     "source": "tirol",
+     "quote": "21.03.2004 | Bürgermeisterstichwahl 2004",
+     "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2010-03-28",
+     "election_kind": "runoff",
+     "source": "tirol",
+     "quote": "28.03.2010 | Bürgermeisterstichwahl 2010",
+     "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2016-03-13",
+     "election_kind": "runoff",
+     "source": "tirol",
+     "quote": "13.03.2016 | Engere Wahl des Bürgermeisters 2016",
+     "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2022-03-13",
+     "election_kind": "runoff",
+     "source": "tirol",
+     "quote": "13.03.2022 | Engere Wahl des Bürgermeisters 2022",
+     "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
     }
    ]
   },
