@@ -571,7 +571,7 @@ class Memoria(NamedTuple):
     """Deputies elected by national list."""
     layout: str = "tables"
     """"tables" prints each contest by municipality; "cards" prints one contest per page, by its own area; "files2003"
-    is a two-page file for each municipality."""
+    is a two-page file for each municipality; "scan" is a scan read by OCR in `gt.memoria_scan`."""
     districts: tuple[int, int] = (0, 0)
     """The pages of the district tables of a memoria that sets each one sideways."""
     parlacen: tuple[int, int] = (0, 0)
@@ -595,10 +595,19 @@ MEMORIA_LIST = (
     Memoria(2015, "2015_Memoria_Elecciones", date(2015, 9, 6), date(2015, 10, 25), (248, 326), (328, 456), 31),
     Memoria(2019, "2019_Memoria_Elecciones", date(2019, 6, 16), date(2019, 8, 11), (375, 804), (0, 0), 32, "cards"),
     Memoria(2003, "", date(2003, 11, 9), date(2003, 12, 28), (0, 0), (0, 0), 31, "files2003"),
+    Memoria(1999, "1999_Memoria_Elecciones", date(1999, 11, 7), date(1999, 12, 26), (0, 0), (0, 0), 22, "scan"),
+    Memoria(1995, "1995-1996_Memoria_Elecciones", date(1995, 11, 12), date(1996, 1, 7), (0, 0), (0, 0), 16, "scan"),
 )
 NATION = "GT"
 """The unit code of a contest the memoria prints only as a national total."""
 BY_YEAR = {m.year: m for m in MEMORIA_LIST}
+
+
+def _scans() -> ModuleType:
+    """The reader of the scanned memorias, which imports this module."""
+    from ea.sources.gt import memoria_scan
+
+    return memoria_scan
 
 
 def _files2003() -> ModuleType:
@@ -728,6 +737,8 @@ def read(year: int) -> tuple[dict[str, Contest], list[Block]]:
     m = BY_YEAR[year]
     if m.layout == "files2003":
         return _files2003().read(), []
+    if m.layout == "scan":
+        return _scans().read(year), []
     path = raw.cached(SOURCE, url(m)).path
     if m.layout == "cards":
         return _read_cards(path, m), []
@@ -1207,7 +1218,9 @@ def election(year: int, day: date) -> Package:
             status="active",
             is_default=True,
         )
-        note = SOURCE_NOTE + (ZERO_NOTE if year in (2015, 2019) else LEFT_OUT)
+        note = (_scans().note(year, contest) if m.layout == "scan" else SOURCE_NOTE) + (
+            ZERO_NOTE if year in (2015, 2019) else LEFT_OUT
+        )
         if contest.zero:
             zeros.extend(contest.zero)
             note += f" Left out as printed with every cell zero: {', '.join(sorted(contest.zero))}."
