@@ -1,0 +1,866 @@
+{
+  "polity": "PS",
+  "name": "Palestinian Territories",
+  "sources": {
+    "bl2003": {
+      "title": "The Amended Basic Law of 2003",
+      "publisher": "الوقائع الفلسطينية",
+      "url": "https://www.elections.ps/Portals/0/pdf/The_Amended_Basic_Law_2003_EN.pdf",
+      "kind": "official_body",
+      "note": "English text published by the Central Elections Commission. Art. 34 (the President is elected in a general and direct election), art. 36 (term), art. 47 (the Legislative Council is the elected legislative authority), art. 85(1) (each local administrative unit has a council elected directly)."
+    },
+    "bl2005": {
+      "title": "The Basic Law of 2005 amending some provisions of the Amended Basic Law of 2003",
+      "publisher": "الوقائع الفلسطينية",
+      "url": "https://www.elections.ps/Portals/0/pdf/The_amended_Basic_Law_of_2005_EN.pdf",
+      "kind": "official_body",
+      "note": "Promulgated in Gaza on 13 August 2005. Art. 36 (a four-year presidential term, at most two consecutive terms), art. 47(3) (a four-year Council term, elections every four years), art. 48 (the Elections Law fixes the number of members, the constituencies, and the electoral system), art. 47 bis."
+    },
+    "ge-law": {
+      "title": "القرار بقانون رقم (1) لسنة 2007 بشأن الانتخابات العامة وتعديلاته (نص مدمج، 2026)",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Portals/0/ge-law2026Final.pdf",
+      "kind": "official_body",
+      "note": "The Commission's consolidated text of Decree-Law No. 1 of 2007 on General Elections as amended by Decree-Laws No. 1 of 2021 and No. 17 of 2026. Art. 2 (the President calls elections by decree at least three months before a term ends), art. 3 (President: absolute majority of valid votes, otherwise a runoff of the top two 15 days after the final first-round results; four-year term, two consecutive terms at most; runoff added by Decree-Law 1 of 2021), art. 4 (132 members by full proportional representation in a single national district, four-year term), art. 6 (closed lists, 1% threshold), art. 101 (Sainte-Laguë)."
+    },
+    "ge-laws": {
+      "title": "قانون الانتخابات العامة",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/820/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "The Commission's page on the general elections laws: Law No. 13 of 1995 (majority districts; the 1996 elections), Law No. 9 of 2005 of 18 June 2005 (132 seats, half by lists and half by districts; the 2006 election), Decree-Law No. 1 of 2007 of 2 September 2007 (full proportional representation), Decree-Law No. 1 of 2021, Decree-Law No. 10 of 18 June 2026 (200 seats, repealed before any vote), and Decree-Law No. 17 of 2026 (August 2026: 132 seats, candidacy at 23, lists of at least 16)."
+    },
+    "ge-system": {
+      "title": "The Electoral System for General Elections",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/478/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "The Commission's description of the systems of Law No. 13 of 1995 (16 districts, 88 members by simple majority, seats reserved for Christians and one for Samaritans) and Law No. 9 of 2005 (66 members from national lists and 66 in 16 districts, six district seats reserved for Christians, per the presidential decree of 15 September 2005)."
+    },
+    "events": {
+      "title": "أحداث انتخابية سابقة",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/603/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "The Commission's overview of every electoral event since 1996: four general elections (1996, 2005, 2006), the local elections of 2004-2005, 2012-2013, 2017, 2021-2022, and 2026, the postponed general elections of 2021, the legislative election of 28 November 2026 cancelled during nomination, and the concurrent legislative and presidential elections called for 11 September 2027."
+    },
+    "pe1996": {
+      "title": "الانتخابات العامة 1996",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/642/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Results of the first general elections of 20 January 1996 (the President and 88 Council members), by district, as PDF."
+    },
+    "pe2005": {
+      "title": "الانتخابات الرئاسية 2005",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/640/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Results of the presidential election of 9 January 2005, national and by district, as PDF."
+    },
+    "plc2006": {
+      "title": "الانتخابات التشريعية 2006",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/639/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Results of the legislative election of 25 January 2006 (66 list seats and 66 district seats), national and by district, as PDF."
+    },
+    "decree-2021": {
+      "title": "Presidential Decree No. (1) of 2021 On the Call for Legislative, Presidential and National Council Elections",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1127/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Issued 15 January 2021: Legislative Council on 22 May 2021, President on 31 July 2021, and the Legislative Council election as the first stage of the National Council, to be completed on 31 August 2021. All three were postponed on 30 April 2021."
+    },
+    "ge2026": {
+      "title": "الانتخابات التشريعية 2026",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1312/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "The decree of 9 July 2026 called a Legislative Council election for 28 November 2026; a presidential decree of 10 October 2026 cancelled it during nomination and called concurrent legislative and presidential elections for 11 September 2027. 2.97 million eligible voters (1.59 million in the West Bank, 1.24 million in Gaza)."
+    },
+    "ge2027": {
+      "title": "Presidential Decree concerning Cancelling the Scheduled Date for conducting Legislative Elections and Calling for Conducting General Elections on September 11, 2027",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Default.aspx?TabId=1069&ArtMID=8994&ArticleID=5441",
+      "kind": "official_body",
+      "note": "Published by the Commission on 11 October 2026."
+    },
+    "pnc-2026": {
+      "title": "مرسوم رقم (2) لسنة 2026م بشأن انتخابات المجلس الوطني الفلسطيني",
+      "publisher": "الوقائع الفلسطينية",
+      "url": "https://www.elections.ps/Portals/0/Presidential%20Decree%20on%20the%20Elections%20of%20the%20Palestinian%20National%20Council_1.pdf",
+      "kind": "official_body",
+      "note": "Official Gazette special issue 33, 3 February 2026: Palestinians at home and in the diaspora are called to elect the National Council on Sunday 1 November 2026, wherever possible inside and outside the State of Palestine (art. 2), by full proportional representation (art. 3), under the Commission's supervision (art. 4)."
+    },
+    "le-laws": {
+      "title": "قانون الانتخابات المحلية",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/821/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "The Commission's page on the local elections laws: Law No. 5 of 1996 (16 December 1996) and Law No. 5 of 2004 (majority districts), Law No. 10 of 2005 (15 August 2005, proportional lists with a women's quota) amended by Law No. 12 of 2005 and Decree-Laws of 2012 and 2017, and Decree-Law No. 23 of 2025 (19 November 2025), which repeals Law No. 10 of 2005."
+    },
+    "dl23-2025": {
+      "title": "القرار بقانون رقم (23) لسنة 2025 بشأن انتخاب مجالس الهيئات المحلية",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Portals/0/23-2025.pdf",
+      "kind": "official_body",
+      "note": "Issued in Ramallah on 19 November 2025. Art. 3 (all local councils elected every four years on a date the Council of Ministers sets, possibly in phases), art. 14 (municipal councils by open-list proportional representation, village councils by individual plurality), arts. 15-16 (women's quotas), the 5% threshold and Sainte-Laguë allocation, and art. 56(4) (the council elects its chairperson and deputy at its first meeting). An English translation is at https://www.elections.ps/Portals/0/23-2025%20EN.pdf."
+    },
+    "le-system": {
+      "title": "The Electoral System for Local Elections",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/318/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Open lists in municipal councils (one list and up to five of its candidates, 5% threshold, Sainte-Laguë) and individual candidacy in village councils (up to five candidates), under Decree-Law No. 23 of 2025."
+    },
+    "le2004": {
+      "title": "Local election, 2004-2005",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/168/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Four rounds run by the Higher Committee for Local Elections: 23 December 2004 (22 West Bank localities) and 27 January 2005 (14 Gaza localities), 5 May 2005 (82), 29 September 2005 (104, West Bank only), and 15 December 2005 (40). The first two rounds used majority districts under Law No. 5 of 1996, the last two lists under Law No. 10 of 2005; the fifth round was not held. Results and registration statistics as PDF."
+    },
+    "le2012": {
+      "title": "Local Elections 2012",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/426/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Cabinet decision of 10 July 2012: West Bank elections on 20 October 2012 (272 of 353 localities), complementary elections on 22 December 2012 (81 localities), and a second complementary round on 1 June 2013. Final results, locality and polling-center details as PDF."
+    },
+    "le2017": {
+      "title": "Local Elections 2017",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/556/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Called for 13 May 2017 in all localities; held in 326 of 391 West Bank localities (145 by vote, 181 by acclamation); complementary elections on 29 July 2017 in 32 localities (14 by vote, 18 by acclamation); re-run elections in 2018. Results as xlsx."
+    },
+    "le2018": {
+      "title": "2018 Re-run Local Elections Timeline",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Portals/30/pdf/LE2018/2018Re-runLocalElectionsTimelineEN.pdf",
+      "kind": "official_body",
+      "note": "Polling day 22 September 2018."
+    },
+    "le2019": {
+      "title": "Re- Run Local Elections 2019",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1092/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Cabinet decisions of 6 and 20 May 2019: re-run elections in 17 West Bank localities on 13 July 2019."
+    },
+    "le2021-1": {
+      "title": "2021 Local Elections (First Phase)",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1167/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Cabinet decision 18/123 of 6 September 2021: phase one in 387 localities of the West Bank and Gaza (C-class municipalities and village councils); held on 11 December 2021 in the West Bank only: polling in 154 localities, acclamation in 162, no complete list in 60."
+    },
+    "le2021-2": {
+      "title": "Local Elections (Second Phase)",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1203/language/en-US/Default.aspx",
+      "kind": "official_body",
+      "note": "Cabinet decision 18/126 of 27 September 2021: phase two on 26 March 2022 in 55 A- and B-class localities of the West Bank and Gaza plus the 11 Gaza C-class localities moved from phase one; postponed in the Gaza Strip; polling in 50 localities and acclamation in 23."
+    },
+    "le2021-results": {
+      "title": "نتائج الانتخابات المحلية 2021 - المرحلة الأولى",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1204/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Seats by winning list, winners' names, and acclamation lists for phase one, as PDF."
+    },
+    "le2026": {
+      "title": "الانتخابات المحلية 2026",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1300/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Held on 25 April 2026 under Decree-Law No. 23 of 2025 in every West Bank local authority and the municipality of Deir al-Balah: 420 local authorities (136 municipal councils, 284 village councils); polling in 183 (90 municipal, 93 village), acclamation in 197, no candidates in 40; 3,697 members elected; turnout 56% in the West Bank and 23% in Deir al-Balah."
+    },
+    "le2026-results": {
+      "title": "نتائج الانتخابات المحلية 2026",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/tabid/1310/language/ar-PS/Default.aspx",
+      "kind": "official_body",
+      "note": "Final results: detailed results by candidate for the 90 municipal councils, results by local authority, results of the 93 village councils, acclamation lists and candidates, and final turnout by local authority, as PDF."
+    },
+    "le2026-final": {
+      "title": "Approval of Final Results of the 2026 Local Elections",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Default.aspx?TabId=1069&ArtMID=8994&ArticleID=5315",
+      "kind": "official_body",
+      "note": "7 May 2026: results final after the Election Cases Court ruled on 60 appeals; certificates handed to the Ministry of Local Government for the 183 local authorities that voted and the 197 formed by acclamation."
+    },
+    "le2026-gaza": {
+      "title": "The CEC issues a Statement concerning Local Elections in the Gaza Strip",
+      "publisher": "لجنة الانتخابات المركزية - فلسطين",
+      "url": "https://www.elections.ps/Default.aspx?TabId=1069&ArtMID=8994&ArticleID=5176",
+      "kind": "official_body",
+      "note": "19 January 2026: the Cabinet decision of 2 December 2025 set 25 April 2026 for all local councils of the West Bank and Gaza; the Commission found the whole Gaza Strip unfeasible and decided to hold elections in Deir al-Balah."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "فلسطين",
+      "name_en": "Palestine (the West Bank, including East Jerusalem, and the Gaza Strip)",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "bl2003"
+    },
+    {
+      "key": "governorate",
+      "name": "المحافظات",
+      "name_en": "Governorates (the electoral districts)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "ps.district",
+      "elects": false,
+      "source": "ge-system",
+      "counts": [
+        {
+          "date": "2005-09-15",
+          "value": 16,
+          "source": "ge-system",
+          "locator": "https://www.elections.ps/tabid/478/language/en-US/Default.aspx (the sixteen electoral districts of the decree of 15 September 2005, eleven in the West Bank and five in the Gaza Strip)"
+        }
+      ]
+    },
+    {
+      "key": "local",
+      "name": "الهيئات المحلية (البلديات والمجالس القروية)",
+      "name_en": "Local authorities (municipalities and village councils)",
+      "parent": "governorate",
+      "polity_kind": "municipality",
+      "scheme": "ps.local_authority",
+      "source": "dl23-2025",
+      "counts": [
+        {
+          "date": "2021-09-27",
+          "value": 442,
+          "source": "le2021-2",
+          "locator": "https://www.elections.ps/tabid/1167/language/en-US/Default.aspx (phase one: 387 localities in the West Bank and Gaza Strip, all C-class municipalities and village councils) and https://www.elections.ps/tabid/1203/language/en-US/Default.aspx (phase two: 55 A- and B-class localities in the West Bank and Gaza)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "انتخاب رئيس دولة فلسطين (رئيس السلطة الوطنية الفلسطينية)",
+      "name_en": "President of the Palestinian Authority (State of Palestine)",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1996-01-20",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "ps.district"
+        ]
+      },
+      "source": "bl2003",
+      "locator": "https://www.elections.ps/Portals/0/pdf/The_Amended_Basic_Law_2003_EN.pdf (arts. 34 and 36)",
+      "note": "Elected by direct universal suffrage (Basic Law art. 34). Under Law No. 13 of 1995, Law No. 9 of 2005, and Decree-Law No. 1 of 2007 the candidate with the most votes won in one national round; Decree-Law No. 1 of 2021 requires an absolute majority of valid votes, otherwise a runoff of the top two 15 days after the final results (Decree-Law 1 of 2007 arts. 3 and 100). The term has been four years, renewable once, since the Basic Law amendment of 2005; no election has been held since 2005. The 2021 presidential election was postponed; the next is called for 11 September 2027.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "PS"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "none",
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "ge-laws",
+          "locator": "https://www.elections.ps/tabid/820/language/ar-PS/Default.aspx (Law No. 13 of 1995 and Law No. 9 of 2005: the candidate with the most votes)",
+          "valid_to": "2021-01-11"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Top two 15 days after the final first-round results",
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "ge-law",
+          "locator": "https://www.elections.ps/Portals/0/ge-law2026Final.pdf (arts. 2, 3, and 100)",
+          "valid_from": "2021-01-11"
+        }
+      ],
+      "access": [
+        {
+          "platform": "لجنة الانتخابات المركزية، أحداث انتخابية سابقة",
+          "url": "https://www.elections.ps/tabid/642/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "1996-01-20",
+          "last_date": "1996-01-20",
+          "finest": "ps.district",
+          "source": "pe1996",
+          "evidence": "1996_GeneralElectionsResults_AR.pdf: the presidential result by district"
+        },
+        {
+          "platform": "لجنة الانتخابات المركزية، أحداث انتخابية سابقة",
+          "url": "https://www.elections.ps/tabid/640/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2005-01-09",
+          "last_date": "2005-01-09",
+          "finest": "ps.district",
+          "source": "pe2005",
+          "evidence": "PE2005-ResultsSummaryOnDistrictLevel: votes by candidate in each of the 16 districts"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-01-20",
+          "contests": 1,
+          "seats": 1,
+          "source": "pe1996",
+          "quote": "الانتخابات العامة 1996: انتخاب رئيس السلطة الوطنية وأعضاء المجلس التشريعي",
+          "note": "Held with the first Legislative Council election under Law No. 13 of 1995."
+        },
+        {
+          "date": "2005-01-09",
+          "contests": 1,
+          "seats": 1,
+          "source": "pe2005",
+          "quote": "الانتخابات الرئاسية الثانية عقدت في 9 كانون ثاني 2005 استناداً إلى قانون رقم (13) لعام 1995",
+          "note": "Early election after the death of President Arafat on 11 November 2004."
+        },
+        {
+          "date": "2027-09-11",
+          "election_kind": "general",
+          "source": "ge2027",
+          "quote": "Calling for Conducting General Elections on September 11, 2027",
+          "note": "Called by the presidential decree of 10 October 2026 with the Legislative Council election. The presidential election called for 31 July 2021 was postponed on 30 April 2021."
+        }
+      ],
+      "est_votes": 1600000,
+      "effort": 2
+    },
+    {
+      "key": "plc",
+      "tier": "national",
+      "name": "انتخابات المجلس التشريعي الفلسطيني",
+      "name_en": "Palestinian Legislative Council",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1996-01-20",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "ps.district"
+        ]
+      },
+      "source": "bl2005",
+      "locator": "https://www.elections.ps/Portals/0/pdf/The_amended_Basic_Law_of_2005_EN.pdf (arts. 47(3) and 48)",
+      "note": "1996: 88 members by plurality block vote in 16 districts, with seats reserved for Christians and one Samaritan seat (Law No. 13 of 1995). 2006: 132 members, 66 from national closed lists by Sainte-Laguë (2% threshold) and 66 by block vote in 16 districts, six of them reserved for Christians (Law No. 9 of 2005). Since Decree-Law No. 1 of 2007: 132 members by closed-list proportional representation in one national district, Sainte-Laguë, with a 1% threshold since 2021. The term is four years (Basic Law art. 47(3) as amended in 2005), but no election has been held since 2006: the 2021 election was postponed, Decree-Law No. 10 of 2026 (200 seats) was repealed by Decree-Law No. 17 of 2026 before any vote, and the election called for 28 November 2026 was cancelled during nomination in favor of 11 September 2027.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "PS"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "ge-system",
+          "locator": "https://www.elections.ps/tabid/478/language/en-US/Default.aspx (Law No. 13 of 1995: 88 members in 16 districts)",
+          "valid_to": "2005-06-18"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "ge-system",
+          "locator": "https://www.elections.ps/tabid/478/language/en-US/Default.aspx (Law No. 9 of 2005: 66 list and 66 district members)",
+          "valid_from": "2005-06-18",
+          "valid_to": "2007-09-02"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "ge-law",
+          "locator": "https://www.elections.ps/Portals/0/ge-law2026Final.pdf (arts. 4, 6, and 101: 132 members, one national district)",
+          "valid_from": "2007-09-02"
+        }
+      ],
+      "access": [
+        {
+          "platform": "لجنة الانتخابات المركزية، أحداث انتخابية سابقة",
+          "url": "https://www.elections.ps/tabid/642/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "1996-01-20",
+          "last_date": "1996-01-20",
+          "finest": "ps.district",
+          "source": "pe1996",
+          "evidence": "1996_GeneralElectionsResults_AR.pdf: the winners of each district's seats with their votes"
+        },
+        {
+          "platform": "لجنة الانتخابات المركزية، أحداث انتخابية سابقة",
+          "url": "https://www.elections.ps/tabid/639/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2006-01-25",
+          "last_date": "2006-01-25",
+          "finest": "ps.district",
+          "source": "plc2006",
+          "evidence": "PLC2006 national list results and list votes by district; the district candidate tables are printed per district"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-01-20",
+          "contests": 16,
+          "seats": 88,
+          "source": "ge-system",
+          "quote": "the West Bank and the Gaza Strip were divided into 16 electoral districts from which 88 PLC members were elected"
+        },
+        {
+          "date": "2006-01-25",
+          "contests": 17,
+          "seats": 132,
+          "source": "ge-system",
+          "quote": "66 of the 132 total PLC members are elected based on the proportional representation system (lists), and the remaining 66 are elected by simple majority (districts)",
+          "note": "Sixteen district contests and one national list contest."
+        },
+        {
+          "date": "2027-09-11",
+          "election_kind": "general",
+          "source": "ge2027",
+          "quote": "Calling for Conducting General Elections on September 11, 2027",
+          "note": "Called by the presidential decree of 10 October 2026, which cancelled the election called for 28 November 2026 during its nomination period. The election called for 22 May 2021 was postponed on 30 April 2021."
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 3
+    },
+    {
+      "key": "pnc",
+      "tier": "national",
+      "name": "انتخابات المجلس الوطني الفلسطيني",
+      "name_en": "Palestinian National Council (PLO), at home and in the diaspora",
+      "category": "non_territorial",
+      "goal": "national",
+      "valid_from": "2021-01-15",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "pnc-2026",
+      "note": "The National Council is the parliament of the Palestine Liberation Organization; its members have been chosen by the PLO's own bodies, never by popular vote. Decree No. 1 of 2021 made the Legislative Council election the first stage of its election, to be completed on 31 August 2021; that was postponed with the general elections. Decree No. 2 of 2026 called Palestinians at home and in the diaspora to elect it on 1 November 2026 by full proportional representation, wherever possible, under the Commission's supervision; by 17 November 2026 the Commission had published no preparation for that vote and no result.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral",
+            "appointed_assembly"
+          ],
+          "name_pattern": "National Council|المجلس الوطني",
+          "iso_pattern": "PS"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "pnc-2026",
+          "locator": "https://www.elections.ps/Portals/0/Presidential%20Decree%20on%20the%20Elections%20of%20the%20Palestinian%20National%20Council_1.pdf (arts. 1-4)",
+          "valid_from": "2026-02-03"
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "president_plo",
+      "tier": "national",
+      "name": "انتخاب رئيس دولة فلسطين من المجلس المركزي لمنظمة التحرير",
+      "name_en": "President of the State of Palestine, chosen by the PLO Central Council",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "decree-2021",
+      "locator": "https://www.elections.ps/tabid/1127/language/en-US/Default.aspx",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The PLO Central Council names the President of the State of Palestine under the PLO's own statutes; no state election authority runs or publishes the vote, and the office is held by the directly elected President of the Palestinian Authority, whose elections are class president.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "الاستفتاء العام",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "bl2003",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Neither the Amended Basic Law nor any election law provides for a national referendum, the Commission's elections laws page lists none, and none has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "PS"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "local_councils",
+      "tier": "local",
+      "name": "انتخاب مجالس الهيئات المحلية (المجالس البلدية والقروية)",
+      "name_en": "Local authority councils (municipal and village councils)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1996-12-16",
+      "first_held": "2004-12-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ps.local_authority"
+        ],
+        "fine": [
+          "ps.polling_station"
+        ]
+      },
+      "finest_note": "Results by local authority; turnout by polling center; 2026 municipal results by candidate",
+      "source": "bl2003",
+      "locator": "https://www.elections.ps/Portals/0/pdf/The_Amended_Basic_Law_2003_EN.pdf (art. 85(1))",
+      "note": "Each local authority's council is elected directly (Basic Law art. 85). Law No. 5 of 1996 used majority districts (the 2004 and early 2005 rounds); Law No. 10 of 2005 used closed lists with a women's quota (September 2005 to 2022); Decree-Law No. 23 of 2025 uses open lists with a 5% threshold and Sainte-Laguë in municipal councils (11, 13, or 15 seats) and individual plurality with up to five votes in village councils (9 seats). Councils sit for four years. A council with a single complete list or no more candidates than seats is filled by acclamation, which the counts here include. The Gaza Strip has voted only in 2004-2005 and in Deir al-Balah in 2026; its other councils are appointed. The 2010 elections were cancelled, the 2011 and 2016 elections postponed, and Gaza's share of the 2017 and 2021-2022 elections postponed. 2026: 420 local authorities were covered (136 municipal councils with Deir al-Balah, 284 village councils).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "اللجنة العليا للانتخابات المحلية",
+          "source": "le2004",
+          "locator": "https://www.elections.ps/tabid/168/language/en-US/Default.aspx (Law No. 5 of 1996: majority districts, run by the Higher Committee for Local Elections)",
+          "valid_from": "1996-12-16",
+          "valid_to": "2005-08-15"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "اللجنة العليا للانتخابات المحلية (2005)، ثم لجنة الانتخابات المركزية",
+          "source": "le-laws",
+          "locator": "https://www.elections.ps/tabid/821/language/ar-PS/Default.aspx (Law No. 10 of 2005 and its amendments; art. 72 moved local elections to the Commission, which ran them from 2012)",
+          "valid_from": "2005-08-15",
+          "valid_to": "2025-11-19"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "لجنة الانتخابات المركزية",
+          "source": "dl23-2025",
+          "locator": "https://www.elections.ps/Portals/0/23-2025.pdf (arts. 3 and 14)",
+          "valid_from": "2025-11-19"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Central Elections Commission, Local election 2004-2005",
+          "url": "https://www.elections.ps/tabid/168/language/en-US/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2004-12-23",
+          "last_date": "2005-12-15",
+          "finest": "ps.local_authority",
+          "source": "le2004",
+          "evidence": "results_election2004-2005.pdf, resultsSecond.pdf, resultsThird.pdf, resultsFourth.pdf: results by locality, from the Higher Committee for Local Elections"
+        },
+        {
+          "platform": "Central Elections Commission, Local Elections 2012",
+          "url": "https://www.elections.ps/tabid/426/language/en-US/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2012-10-20",
+          "last_date": "2013-06-01",
+          "finest": "ps.local_authority",
+          "source": "le2012",
+          "evidence": "LE2012_FinalResults_EN.pdf, LE2012-LocalitiesDetails.pdf, LE2012-PollingCentersDetails.pdf"
+        },
+        {
+          "platform": "Central Elections Commission, Local Elections 2017",
+          "url": "https://www.elections.ps/tabid/178/language/en-US/Default.aspx",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2017-05-13",
+          "last_date": "2018-09-22",
+          "finest": "ps.local_authority",
+          "source": "le2017",
+          "evidence": "WinnersAccordingToPoliticalAffiliation-en.xlsx (145 localities by vote), WinnersByAcclamationAccordingToPoliticalAffiliation-en.xlsx (181), and the complementary and re-run files"
+        },
+        {
+          "platform": "لجنة الانتخابات المركزية، نتائج الانتخابات المحلية 2021",
+          "url": "https://www.elections.ps/tabid/1204/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2021-12-11",
+          "last_date": "2022-03-26",
+          "finest": "ps.local_authority",
+          "source": "le2021-results",
+          "evidence": "26_12-ResultFinalSeatsDistribution.pdf and 26_12-ResultFinalWinnersNames.pdf: seats by list and winners in each locality"
+        },
+        {
+          "platform": "لجنة الانتخابات المركزية، نتائج الانتخابات المحلية 2026",
+          "url": "https://www.elections.ps/tabid/1310/language/ar-PS/Default.aspx",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2026-04-25",
+          "last_date": "2026-04-25",
+          "finest": "ps.local_authority",
+          "source": "le2026-results",
+          "evidence": "Elections_2026_Full_7_5_20266.pdf (votes by list and candidate in the 90 municipal councils), RES_ELECTED_WINNERS_NOMINAL_2026_7_5_2026.pdf (93 village councils), acclamation files, turnout by local authority"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-12-23",
+          "election_kind": "local",
+          "contests": 22,
+          "source": "le2004",
+          "quote": "In the West Bank, this round was carried out on 23 December 2004 in 22 localities",
+          "note": "First round, majority districts under Law No. 5 of 1996, run by the Higher Committee for Local Elections."
+        },
+        {
+          "date": "2005-01-27",
+          "election_kind": "local",
+          "contests": 14,
+          "source": "le2004",
+          "quote": "in the Gaza Strip the first round was held on 27 January 2005 in 14 localities",
+          "note": "First round in the Gaza Strip."
+        },
+        {
+          "date": "2005-05-05",
+          "election_kind": "local",
+          "contests": 82,
+          "source": "le2004",
+          "quote": "The second round of local elections was held on 5 May 2005 in 82 localities across Palestine (76 in the West Bank and 6 in the Gaza Strip)"
+        },
+        {
+          "date": "2005-09-29",
+          "election_kind": "local",
+          "contests": 104,
+          "source": "le2004",
+          "quote": "The third round of local elections was held on 29 September 2005 in 104 localities in the West Bank only",
+          "note": "The first round with lists under Law No. 10 of 2005."
+        },
+        {
+          "date": "2005-12-15",
+          "election_kind": "local",
+          "contests": 40,
+          "source": "le2004",
+          "quote": "The fourth round of local elections was held on 15 December2005 in 40 population centers in the West Bank and the Gaza Strip",
+          "note": "The fifth round was never held."
+        },
+        {
+          "date": "2012-10-20",
+          "election_kind": "local",
+          "contests": 272,
+          "source": "le2012",
+          "quote": "272 out of a total of 353 localities participated in said elections",
+          "note": "West Bank only, the first local elections run by the Commission; the 2010 elections were cancelled and the 2011 elections postponed."
+        },
+        {
+          "date": "2012-12-22",
+          "election_kind": "special",
+          "contests": 81,
+          "source": "le2012",
+          "quote": "complementary elections on 22 December 2012 where 81 localities took part"
+        },
+        {
+          "date": "2013-06-01",
+          "election_kind": "special",
+          "source": "le2012",
+          "quote": "a second complementary elections to take place on Saturday, 1 June 2013 in 36 localities in the West Bank",
+          "note": "The Commission's Arabic overview counts 22 local authorities that took part."
+        },
+        {
+          "date": "2017-05-13",
+          "election_kind": "local",
+          "contests": 326,
+          "source": "le2017",
+          "quote": "local elections were held only in 326 localities of the West Bank out of 391 localities",
+          "note": "Polling in 145 localities and acclamation in 181; the elections of 8 October 2016 had been postponed, and the Gaza Strip was excluded."
+        },
+        {
+          "date": "2017-07-29",
+          "election_kind": "special",
+          "contests": 32,
+          "source": "le2017",
+          "quote": "complementary elections were held on 29 July 2017 in 32 West Bank localities"
+        },
+        {
+          "date": "2018-09-22",
+          "election_kind": "special",
+          "source": "le2018",
+          "quote": "Polling day 1 22/9/2018",
+          "note": "Re-run elections in West Bank localities whose councils had dissolved."
+        },
+        {
+          "date": "2019-07-13",
+          "election_kind": "special",
+          "contests": 17,
+          "source": "le2019",
+          "quote": "hold local elections in 14 localities in addition to the three localities included in a Cabinet decision issued on May 20th in the West Bank to hold re-run local elections for on 13 July 2019"
+        },
+        {
+          "date": "2021-12-11",
+          "election_kind": "local",
+          "contests": 316,
+          "source": "le2021-1",
+          "quote": "154 Localities, in which more than one electoral list was nominated ... 162 Localities, with one complete nominated electoral list, which will win by acclamation",
+          "note": "Phase one, West Bank only: 154 by vote and 162 by acclamation; 60 localities had no complete list."
+        },
+        {
+          "date": "2022-03-26",
+          "election_kind": "local",
+          "contests": 73,
+          "source": "le2021-2",
+          "quote": "50 Localities where more than one electoral list was nominated ... 23 Localities with one complete nominated electoral list which will win by acclamation",
+          "note": "Phase two, West Bank only; postponed in the Gaza Strip."
+        },
+        {
+          "date": "2026-04-25",
+          "election_kind": "local",
+          "contests": 380,
+          "source": "le2026-final",
+          "quote": "the 183 local authorities involved in polling ... the 197 local authorities whose councils are formed by acclamation",
+          "note": "The first under Decree-Law No. 23 of 2025: every West Bank local authority and the municipality of Deir al-Balah, the first local vote in the Gaza Strip since 2005."
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 4
+    },
+    {
+      "key": "local_chair",
+      "tier": "local",
+      "name": "انتخاب رئيس مجلس الهيئة المحلية",
+      "name_en": "Chairs (mayors) of local authority councils, chosen by the council",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dl23-2025",
+      "locator": "https://www.elections.ps/Portals/0/23-2025.pdf (art. 56(4))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council elects its chairperson and deputy from among its members at its first meeting (Decree-Law No. 23 of 2025 art. 56(4)); the Commission does not run or publish these votes.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "nominating",
+      "tier": "national",
+      "name": "الانتخابات الداخلية للأحزاب والفصائل",
+      "name_en": "Party and faction candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ge-law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Lists and parties choose their candidates under their own rules; the General Elections Law provides for no state-run primaries and the Commission runs none.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "تعيين القضاة",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "bl2003",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed under the Judicial Authority Law on the High Judicial Council's nomination; no judicial office is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "chambers_unions",
+      "tier": "national",
+      "name": "انتخابات الغرف التجارية والنقابات المهنية والمجالس الطلابية",
+      "name_en": "Chambers of commerce, professional unions, and student councils",
+      "category": "special_purpose",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "events",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Membership bodies elect their boards under their own laws and statutes with members as the electorate; the Commission's record of electoral events lists none of them and no state authority publishes their results.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}
