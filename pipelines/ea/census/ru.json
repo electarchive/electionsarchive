@@ -1,0 +1,1885 @@
+{
+  "polity": "RU",
+  "name": "Russia",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Russia",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "Российская Федерация",
+        "lang": "ru",
+        "kind": "native"
+      }
+    ],
+    "slug": "ru",
+    "wikidata": "Q159",
+    "source": "constitution"
+  },
+  "region_schemes": [
+    "ru.subject"
+  ],
+  "sources": {
+    "constitution": {
+      "title": "Конституция Российской Федерации (принята всенародным голосованием 12 декабря 1993 года, с изменениями, одобренными в ходе общероссийского голосования 1 июля 2020 года)",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/constitution/item",
+      "kind": "official_body",
+      "note": "Current text as the President's site hosts it. Art. 3(3): referendum and free elections; art. 65(1): the 89 subjects listed (24 republics, 9 krais, 48 oblasts, 3 cities of federal significance, 1 autonomous oblast, 4 autonomous okrugs); art. 81(1): the President is elected for six years by direct vote; art. 95: the Federation Council of senators (two representatives per subject, one from its legislature and one from its executive, plus up to 30 presidential appointees) and the 450-member State Duma; art. 96(1): the Duma is elected for five years; arts. 130-131: local self-government by referendum, elections, and other forms of direct expression of will, in municipal formations whose kinds federal law sets."
+    },
+    "fz67": {
+      "title": "Федеральный закон от 12 июня 2002 г. № 67-ФЗ «Об основных гарантиях избирательных прав и права на участие в референдуме граждан Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/18173",
+      "kind": "official_body",
+      "note": "Consolidated text as the President's site hosts it. Art. 10: elections of subject and municipal bodies fall on the single voting day, the second Sunday of September of the year their term ends (the third Sunday when the second is next to a public holiday), and in a State Duma year on the Duma's voting day."
+    },
+    "fz20": {
+      "title": "Федеральный закон от 22 февраля 2014 г. № 20-ФЗ «О выборах депутатов Государственной Думы Федерального Собрания Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/38146",
+      "kind": "official_body",
+      "note": "Art. 3: 225 deputies in single-member districts and 225 by federal party lists in one federal district in proportion to the votes; art. 5(2): the President calls the election 90-110 days ahead, and polling falls on the third Sunday of the month in which the Duma's constitutional term ends."
+    },
+    "fz19": {
+      "title": "Федеральный закон от 10 января 2003 г. № 19-ФЗ «О выборах Президента Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/19006",
+      "kind": "official_body",
+      "note": "Consolidated text. Art. 5(2): the Federation Council calls the election 90-100 days ahead; polling falls on the second Sunday of the month of the previous general election; art. 5(7) (as amended by Law No. 103-ФЗ of 1 June 2017): a Sunday in a week with a public holiday moves to the next Sunday, so the March Sunday next to 8 March always moves to the third Sunday of March; arts. 76-77: over half of those who voted wins, else a runoff of the top two 21 days later."
+    },
+    "fkz_referendum": {
+      "title": "Федеральный конституционный закон от 28 июня 2004 г. № 5-ФКЗ «О референдуме Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/21089",
+      "kind": "official_body",
+      "note": "The federal referendum: called by the President on the initiative of at least 2 million voters, or of a constitutional assembly; none has been held under it."
+    },
+    "fz414": {
+      "title": "Федеральный закон от 21 декабря 2021 г. № 414-ФЗ «Об общих принципах организации публичной власти в субъектах Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/47393",
+      "kind": "official_body",
+      "note": "Art. 9(11): the deputies of a subject's legislature serve five years; art. 15(5): a subject law may set how many deputies are elected by party lists in a single district in proportion to the votes; art. 20(2): the head of a subject is elected by the citizens or by the deputies of the subject's legislature, for five years; art. 22: direct election; art. 23: election by the legislature from candidates the President presents on the proposals of parliamentary parties."
+    },
+    "fz33": {
+      "title": "Федеральный закон от 20 марта 2025 г. № 33-ФЗ «Об общих принципах организации местного самоуправления в единой системе публичной власти»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/51732",
+      "kind": "official_body",
+      "note": "In force 90 days after publication (art. 94). Art. 9(2): urban okrugs, municipal okrugs, and intra-city municipal formations of the cities of federal significance; art. 89: where a subject keeps the two-level system, municipal districts with urban and rural settlements; art. 15(1): the representative body consists of deputies elected at municipal elections; art. 19(2): the head is elected at municipal elections, or by the representative body from its own members, from candidates of the subject's head, or from candidates of a competition commission; art. 43: local referendum; art. 44: municipal elections; art. 45: the assembly of citizens (сход); art. 91(4): on a subject's move to one level no new settlement or district elections are called except by-elections; art. 93(1)(1): chapters 1, 2, and 4-12 of Law No. 131-ФЗ of 6 October 2003, with its recall and boundary votes, lapse."
+    },
+    "duma1993_reg": {
+      "title": "Указ Президента Российской Федерации от 1 октября 1993 г. № 1557 «Об утверждении уточненной редакции Положения о выборах депутатов Государственной Думы в 1993 году ...»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/4486",
+      "kind": "official_body",
+      "note": "Положение art. 3: 450 deputies, 225 in single-member districts and 225 by an all-federal list district; art. 4: elections on 12 December 1993."
+    },
+    "fc1993": {
+      "title": "Указ Президента Российской Федерации от 11 октября 1993 г. № 1626 «О выборах в Совет Федерации Федерального Собрания Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/4574",
+      "kind": "official_body",
+      "note": "Calls the Federation Council election for 12 December 1993 and approves its regulation."
+    },
+    "const1993": {
+      "title": "Указ Президента Российской Федерации от 15 октября 1993 г. № 1633 «О проведении всенародного голосования по проекту Конституции Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/4597",
+      "kind": "official_body",
+      "note": "Calls the nationwide vote on the draft Constitution for 12 December 1993."
+    },
+    "vote2020": {
+      "title": "Указ Президента Российской Федерации от 1 июня 2020 г. № 354 «Об определении даты проведения общероссийского голосования по вопросу одобрения изменений в Конституцию Российской Федерации»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/45561",
+      "kind": "official_body",
+      "note": "Sets 1 July 2020 for the all-Russian vote on the amendments of Law No. 1-ФКЗ of 14 March 2020, after Decree No. 188 of 17 March 2020 called it for 22 April and Decree No. 205 of 25 March 2020 postponed it."
+    },
+    "duma2003": {
+      "title": "Указ Президента Российской Федерации от 2 сентября 2003 г. № 1030 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/19919",
+      "kind": "official_body",
+      "note": "Calls the election for 7 December 2003."
+    },
+    "duma2007": {
+      "title": "Указ Президента Российской Федерации от 2 сентября 2007 г. № 1144 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/26122",
+      "kind": "official_body",
+      "note": "Calls the election for 2 December 2007."
+    },
+    "duma2011": {
+      "title": "Указ Президента Российской Федерации от 29 августа 2011 г. № 1124 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/33834",
+      "kind": "official_body",
+      "note": "Calls the election for 4 December 2011."
+    },
+    "duma2016": {
+      "title": "Указ Президента Российской Федерации от 17 июня 2016 г. № 291 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/40880",
+      "kind": "official_body",
+      "note": "Calls the election for 18 September 2016."
+    },
+    "duma2021": {
+      "title": "Указ Президента Российской Федерации от 17 июня 2021 г. № 367 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/46879",
+      "kind": "official_body",
+      "note": "Calls the election for 19 September 2021."
+    },
+    "duma2026": {
+      "title": "Указ Президента Российской Федерации от 16 июня 2026 г. № 428 «О назначении выборов депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва»",
+      "publisher": "Президент Российской Федерации (официальный сайт kremlin.ru)",
+      "url": "http://www.kremlin.ru/acts/bank/53341",
+      "kind": "official_body",
+      "note": "Calls the election for 20 September 2026 under art. 5(2) of Law No. 20-ФЗ."
+    },
+    "pres2012": {
+      "title": "Постановление Совета Федерации Федерального Собрания Российской Федерации от 25 ноября 2011 г. № 442-СФ «О назначении выборов Президента Российской Федерации»",
+      "publisher": "Официальный интернет-портал правовой информации (publication.pravo.gov.ru)",
+      "url": "http://publication.pravo.gov.ru/document/0001201111250007",
+      "kind": "official_body",
+      "note": "Scanned resolution: \"Назначить выборы Президента Российской Федерации на 4 марта 2012 года\"."
+    },
+    "pres2018": {
+      "title": "Постановление Совета Федерации Федерального Собрания Российской Федерации от 15 декабря 2017 г. № 528-СФ «О назначении выборов Президента Российской Федерации»",
+      "publisher": "Официальный интернет-портал правовой информации (publication.pravo.gov.ru)",
+      "url": "http://publication.pravo.gov.ru/document/0001201712180034",
+      "kind": "official_body",
+      "note": "\"Назначить выборы Президента Российской Федерации на 18 марта 2018 года\"."
+    },
+    "pres2024": {
+      "title": "Постановление Совета Федерации Федерального Собрания Российской Федерации от 7 декабря 2023 г. № 678-СФ «О назначении выборов Президента Российской Федерации»",
+      "publisher": "Официальный интернет-портал правовой информации (publication.pravo.gov.ru)",
+      "url": "http://publication.pravo.gov.ru/document/0001202312070002",
+      "kind": "official_body",
+      "note": "Scanned resolution: \"Назначить выборы Президента Российской Федерации на 17 марта 2024 года\"; the CEC spread polling over 15-17 March."
+    },
+    "cec": {
+      "title": "Сведения о проводимых выборах и референдумах (ГАС «Выборы»)",
+      "publisher": "Центральная избирательная комиссия Российской Федерации (ЦИК России)",
+      "url": "http://www.izbirkom.ru/region/izbirkom",
+      "kind": "official_body",
+      "note": "The CEC's results portal for federal, subject, and municipal elections, with result tables from the federal level down to each precinct commission (УИК). The host reset or timed out every connection from a cloud session on 2026-11-17, so nothing in this census is quoted from it."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Российская Федерация",
+      "name_en": "Russian Federation (the RSFSR until 25 December 1991)",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "ru.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "subject",
+      "name": "Субъекты Российской Федерации",
+      "name_en": "Subjects of the Russian Federation: republics, krais, oblasts, cities of federal significance, the autonomous oblast, and autonomous okrugs",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "scheme": "ru.subject",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2022-10-05",
+          "value": 83,
+          "source": "constitution",
+          "locator": "Art. 65(1) lists 89 subjects (24 republics, 9 krais, 48 oblasts, Moscow, Saint Petersburg, and Sevastopol, the Jewish Autonomous Oblast, and 4 autonomous okrugs); 83 lie within Russia's internationally recognized borders. The Republic of Crimea and Sevastopol (Federal Constitutional Law No. 6-ФКЗ of 21 March 2014) and the Donetsk and Luhansk People's Republics and Zaporozhye and Kherson oblasts (Laws No. 5-ФКЗ to 8-ФКЗ of 4 October 2022) are Ukrainian territory and are counted under Ukraine."
+        }
+      ]
+    },
+    {
+      "key": "municipal_district",
+      "name": "Муниципальные районы",
+      "name_en": "Municipal districts, the upper level of the two-level system, each containing urban and rural settlements",
+      "parent": "subject",
+      "polity_kind": "county",
+      "scheme": "ru.municipal_district",
+      "source": "fz33"
+    },
+    {
+      "key": "okrug",
+      "name": "Городские округа и муниципальные округа",
+      "name_en": "Urban okrugs and municipal okrugs, the single-level municipalities that replace districts and settlements as subjects move to one level",
+      "parent": "subject",
+      "polity_kind": "municipality",
+      "scheme": "ru.okrug",
+      "source": "fz33"
+    },
+    {
+      "key": "settlement",
+      "name": "Городские и сельские поселения",
+      "name_en": "Urban and rural settlements within municipal districts",
+      "parent": "municipal_district",
+      "polity_kind": "municipality",
+      "scheme": "ru.settlement",
+      "source": "fz33"
+    },
+    {
+      "key": "intracity",
+      "name": "Внутригородские муниципальные образования городов федерального значения",
+      "name_en": "Intra-city municipal formations of Moscow and Saint Petersburg (municipal okrugs, towns, and settlements)",
+      "parent": "subject",
+      "polity_kind": "municipality",
+      "scheme": "ru.intracity",
+      "source": "fz33"
+    },
+    {
+      "key": "intracity_district",
+      "name": "Внутригородские районы",
+      "name_en": "Intra-city districts of urban okrugs with intra-city division (Law No. 131-ФЗ, 2014-2025)",
+      "parent": "okrug",
+      "polity_kind": "submunicipal",
+      "valid_from": "2014-05-27",
+      "valid_to": "2025-06-19",
+      "source": "fz33"
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Выборы Президента Российской Федерации",
+      "name_en": "Presidential elections by direct vote",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1991-06-12",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.subject"
+        ],
+        "fine": [
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "finest_note": "The CEC publishes results by subject, territorial commission (ТИК), and precinct commission (УИК) on izbirkom.ru",
+      "note": "Direct election (Constitution art. 81(1)): six-year terms since the 2012 election (Law No. 6-ФКЗ of 30 December 2008), four years before. Over half of those who voted wins, else a runoff of the top two (Law No. 19-ФЗ arts. 76-77); the only runoff was on 3 July 1996. The 12 June 1991 election chose the President of the RSFSR with a Vice-President on the same ticket. Elections: 12 June 1991, 16 June and 3 July 1996, 26 March 2000 (early), 14 March 2004, 2 March 2008, 4 March 2012, 18 March 2018, and 17 March 2024 (polling 15-17 March).",
+      "source": "constitution",
+      "locator": "http://www.kremlin.ru/acts/constitution/item (art. 81(1))",
+      "est_votes": 87000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "RU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz19",
+          "locator": "http://www.kremlin.ru/acts/bank/19006 (art. 5(2) and (7): the second Sunday of the month of the previous general election, moved to the next Sunday in a week with a public holiday; Constitution art. 81(1): six years)",
+          "period_years": 6,
+          "phase": 2,
+          "month": 3,
+          "day_rule": "mar_third_sunday",
+          "term_years": 6,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Over half of those who voted wins in the first round; otherwise the top two meet 21 days later and the plurality wins (Law No. 19-ФЗ arts. 76-77).",
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "vacancy_rule": "The Federation Council calls an early election within 14 days of the vacancy, held on the last Sunday before three months have passed (art. 5(4)).",
+          "valid_from": "2012-03-04"
+        },
+        {
+          "source": "fz19",
+          "locator": "http://www.kremlin.ru/acts/bank/19006 (art. 5(2)); four-year term of the 1993 Constitution",
+          "period_years": 4,
+          "phase": 0,
+          "month": 3,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "valid_from": "1996-06-16",
+          "valid_to": "2012-03-04"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2000-03-26",
+          "last_date": "2024-03-17",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "One results page per election with tables by subject, territorial commission, and precinct; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-06-12",
+          "note": "RSFSR presidential election with a Vice-President on the same ticket (not quoted from a fetched source)"
+        },
+        {
+          "date": "1996-06-16",
+          "note": "First round; runoff 3 July 1996 (not quoted from a fetched source)"
+        },
+        {
+          "date": "1996-07-03",
+          "election_kind": "runoff",
+          "note": "Runoff of the top two (not quoted from a fetched source)"
+        },
+        {
+          "date": "2000-03-26",
+          "note": "Early election after the resignation of 31 December 1999 (not quoted from a fetched source)"
+        },
+        {
+          "date": "2004-03-14",
+          "note": "Not quoted from a fetched source"
+        },
+        {
+          "date": "2008-03-02",
+          "note": "Not quoted from a fetched source"
+        },
+        {
+          "date": "2012-03-04",
+          "contests": 1,
+          "source": "pres2012",
+          "quote": "Назначить выборы Президента Российской Федерации на 4 марта 2012 года."
+        },
+        {
+          "date": "2018-03-18",
+          "contests": 1,
+          "source": "pres2018",
+          "quote": "Назначить выборы Президента Российской Федерации на 18 марта 2018 года."
+        },
+        {
+          "date": "2024-03-17",
+          "contests": 1,
+          "source": "pres2024",
+          "quote": "Назначить выборы Президента Российской Федерации на 17 марта 2024 года.",
+          "note": "Polling ran over 15-17 March."
+        }
+      ]
+    },
+    {
+      "key": "state_duma",
+      "tier": "national",
+      "name": "Выборы депутатов Государственной Думы Федерального Собрания Российской Федерации",
+      "name_en": "State Duma general elections",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1993-12-12",
+      "contests_per_unit": 226,
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.duma_okrug"
+        ],
+        "fine": [
+          "ru.subject",
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "finest_note": "The CEC publishes the federal list vote and each single-member district by subject, territorial commission, and precinct commission",
+      "note": "450 deputies: 225 in single-member districts by plurality and 225 by federal party lists with a 5 percent threshold (1993-2003 and since 2016; Law No. 20-ФЗ art. 3); all 450 by lists with a 7 percent threshold in 2007 and 2011. Four-year terms to 2011, five years since (Constitution art. 96(1)). Polling on the third Sunday of the month in which the term ends (art. 5(2)), September since 2016.",
+      "source": "fz20",
+      "locator": "http://www.kremlin.ru/acts/bank/38146 (arts. 3 and 5)",
+      "est_votes": 56000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "valid_from": "1993-01-01",
+          "iso_pattern": "RU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz20",
+          "locator": "http://www.kremlin.ru/acts/bank/38146 (art. 5(2): \"Днем голосования является третье воскресенье месяца, в котором истекает конституционный срок\"; Constitution art. 96(1): five years)",
+          "period_years": 5,
+          "phase": 1,
+          "month": 9,
+          "day_rule": "sep_third_sunday",
+          "term_years": 5,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "vacancy_rule": "A list seat passes to the next candidate on the list; a vacated single-member seat is filled at a by-election unless less than a year of the term remains.",
+          "valid_from": "2016-09-18"
+        },
+        {
+          "source": "constitution",
+          "locator": "http://www.kremlin.ru/acts/constitution/item (art. 96(1), four years before the 2008 amendment)",
+          "period_years": 4,
+          "phase": 3,
+          "month": 12,
+          "term_years": 4,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "valid_from": "1995-12-17",
+          "valid_to": "2016-09-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2003-12-07",
+          "last_date": "2026-09-20",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "One results page per election with the federal list and each single-member district by territorial and precinct commission; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-12-12",
+          "contests": 226,
+          "seats": 450,
+          "source": "duma1993_reg",
+          "quote": "Государственная Дума состоит из 450 депутатов. 225 депутатов Государственной Думы избираются на основе мажоритарной системы по одномандатным ... избирательным округам ... Остальные 225 депутатов ... по общефедеральному избирательному округу. ... Выборы депутатов Государственной Думы проводятся 12 декабря 1993 года.",
+          "note": "One federal list contest and 225 single-member districts as the regulation drew them; districts in the Chechen Republic did not vote."
+        },
+        {
+          "date": "1995-12-17",
+          "seats": 450,
+          "note": "225 single-member districts and 225 list seats under Law No. 90-ФЗ of 21 June 1995 (not quoted from a fetched source)"
+        },
+        {
+          "date": "1999-12-19",
+          "seats": 450,
+          "note": "225 single-member districts and 225 list seats under Law No. 121-ФЗ of 24 June 1999 (not quoted from a fetched source)"
+        },
+        {
+          "date": "2003-12-07",
+          "contests": 226,
+          "seats": 450,
+          "source": "duma2003",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 7 декабря 2003 г.",
+          "note": "One federal list contest and 225 single-member districts under Law No. 175-ФЗ of 20 December 2002."
+        },
+        {
+          "date": "2007-12-02",
+          "contests": 1,
+          "seats": 450,
+          "source": "duma2007",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 2 декабря 2007 г.",
+          "note": "All 450 seats by federal party lists under Law No. 51-ФЗ of 18 May 2005."
+        },
+        {
+          "date": "2011-12-04",
+          "contests": 1,
+          "seats": 450,
+          "source": "duma2011",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 4 декабря 2011 г.",
+          "note": "All 450 seats by federal party lists."
+        },
+        {
+          "date": "2016-09-18",
+          "contests": 226,
+          "seats": 450,
+          "source": "duma2016",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 18 сентября 2016 г.",
+          "note": "One federal list contest and 225 single-member districts (Law No. 20-ФЗ art. 3)."
+        },
+        {
+          "date": "2021-09-19",
+          "contests": 226,
+          "seats": 450,
+          "source": "duma2021",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 19 сентября 2021 г.",
+          "note": "One federal list contest and 225 single-member districts (Law No. 20-ФЗ art. 3); polling ran over 17-19 September."
+        },
+        {
+          "date": "2026-09-20",
+          "contests": 226,
+          "seats": 450,
+          "source": "duma2026",
+          "quote": "Назначить выборы депутатов Государственной Думы Федерального Собрания Российской Федерации нового созыва на 20 сентября 2026 г.",
+          "note": "One federal list contest and 225 single-member districts (Law No. 20-ФЗ art. 3)."
+        }
+      ]
+    },
+    {
+      "key": "state_duma_by",
+      "tier": "national",
+      "name": "Дополнительные выборы депутатов Государственной Думы",
+      "name_en": "State Duma by-elections in single-member districts",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.duma_okrug"
+        ],
+        "fine": [
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "note": "Fill a single-member seat that falls vacant, and repeat elections where a district's election failed; none in 2007-2016, when every seat was a list seat. Usually held on the single voting day in September.",
+      "source": "fz20",
+      "locator": "http://www.kremlin.ru/acts/bank/38146",
+      "est_votes": 1500000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "valid_from": "1993-01-01",
+          "iso_pattern": "RU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10: the single voting day)",
+          "called": true,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "valid_from": "2016-09-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "By-elections are listed with each region's elections; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2007-12-01",
+          "note": "By-elections and repeat elections in single-member districts of the 1993, 1995, 1999, and 2003 Dumas; not counted from the CEC because its site refused this session."
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "through": "2026-09-19",
+          "note": "By-elections in single-member districts of the 2016 and 2021 Dumas; not counted from the CEC because its site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "federation_council_1993",
+      "tier": "national",
+      "name": "Выборы депутатов Совета Федерации Федерального Собрания Российской Федерации 1993 года",
+      "name_en": "Federation Council direct election of 1993 (abolished)",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1993-12-12",
+      "valid_from": "1993-12-12",
+      "valid_to": "1996-01-01",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.subject"
+        ]
+      },
+      "note": "The one direct election of the upper house: two deputies from each subject, in a two-member district per subject, for a two-year transitional term. From 1996 the heads of each subject's legislature and executive sat ex officio, and since 2000 the members are appointed (see federation_council_formed).",
+      "source": "fc1993",
+      "locator": "http://www.kremlin.ru/acts/bank/4574",
+      "est_votes": 50000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "RU"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "The CEC's printed and digital electoral statistics hold the 1993 results; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-12-12",
+          "source": "fc1993",
+          "quote": "Назначить выборы в Совет Федерации Федерального Собрания Российской Федерации на 12 декабря 1993 года.",
+          "note": "Two-member districts, one per subject; the Chechen Republic did not vote."
+        }
+      ]
+    },
+    {
+      "key": "federation_council_formed",
+      "tier": "national",
+      "name": "Формирование Совета Федерации",
+      "name_en": "Federation Council members chosen ex officio or by appointment (1996-)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1996-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Two senators per subject, one chosen by its legislature and one appointed by its head, plus up to 30 representatives of the Federation appointed by the President and former Presidents for life (Constitution art. 95(2)).",
+      "source": "constitution",
+      "locator": "http://www.kremlin.ru/acts/constitution/item (art. 95(2))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Senators are chosen by regional bodies or appointed, never by voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "RU"
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Референдум Российской Федерации и всенародное голосование",
+      "name_en": "National referendums and the 1993 nationwide vote on the Constitution",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1991-03-17",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "ru.subject"
+        ],
+        "fine": [
+          "ru.tik"
+        ]
+      },
+      "note": "17 March 1991: the RSFSR's question on creating the post of President, held with the USSR referendum; 25 April 1993: four questions on confidence in the President, his policy, and early presidential and parliamentary elections; 12 December 1993: the nationwide vote adopting the Constitution. No federal referendum has been held under Law No. 5-ФКЗ of 2004.",
+      "source": "fkz_referendum",
+      "locator": "http://www.kremlin.ru/acts/bank/21089",
+      "est_votes": 58000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "RU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fkz_referendum",
+          "locator": "http://www.kremlin.ru/acts/bank/21089",
+          "called": true,
+          "administered_by": "Central Election Commission of the Russian Federation (CEC)",
+          "valid_from": "2004-06-28"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-03-17",
+          "note": "RSFSR question on introducing the post of President, voted with the USSR referendum (not quoted from a fetched source)"
+        },
+        {
+          "date": "1993-04-25",
+          "note": "Four questions (not quoted from a fetched source)"
+        },
+        {
+          "date": "1993-12-12",
+          "contests": 1,
+          "source": "const1993",
+          "quote": "Провести всенародное голосование по проекту Конституции Российской Федерации 12 декабря 1993 года."
+        }
+      ]
+    },
+    {
+      "key": "constitutional_vote_2020",
+      "tier": "national",
+      "name": "Общероссийское голосование по вопросу одобрения изменений в Конституцию Российской Федерации",
+      "name_en": "All-Russian vote on the constitutional amendments of 2020",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "2020-07-01",
+      "valid_from": "2020-07-01",
+      "valid_to": "2020-07-02",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "ru.subject"
+        ],
+        "fine": [
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "note": "A vote created by art. 2 of Law No. 1-ФКЗ of 14 March 2020 rather than a referendum under Law No. 5-ФКЗ; the CEC ran it, with polling over 25 June-1 July 2020.",
+      "source": "vote2020",
+      "locator": "http://www.kremlin.ru/acts/bank/45561",
+      "est_votes": 74000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "valid_from": "2020-06-25",
+          "valid_to": "2020-07-02",
+          "precedence": 1,
+          "iso_pattern": "RU"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-07-01",
+          "last_date": "2020-07-01",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "One results page with tables by subject, territorial commission, and precinct; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-07-01",
+          "contests": 1,
+          "source": "vote2020",
+          "quote": "Определить 1 июля 2020 г. в качестве даты проведения общероссийского голосования по вопросу одобрения изменений в Конституцию Российской Федерации"
+        }
+      ]
+    },
+    {
+      "key": "congress_rsfsr",
+      "tier": "national",
+      "name": "Выборы народных депутатов РСФСР",
+      "name_en": "Congress of People's Deputies of the RSFSR (1990, abolished 1993)",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1990-03-04",
+      "valid_from": "1990-03-04",
+      "valid_to": "1993-10-07",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "1,068 deputies in territorial and national-territorial single-member districts, with runoffs on 18 March 1990 and repeat elections; the Congress elected the Supreme Soviet from its members, and was dissolved by Decree No. 1400 of 21 September 1993.",
+      "source": "constitution",
+      "disposition": "blocked",
+      "disposition_reason": "District results were published by the RSFSR Central Electoral Commission only in the press of 1990; no official digital publication is known and the CEC's own site refused this session.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "valid_from": "1989-01-01",
+          "valid_to": "1993-10-07",
+          "iso_pattern": "RU"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-03-04",
+          "note": "First round; runoffs 18 March 1990 (not quoted from a fetched source)"
+        }
+      ]
+    },
+    {
+      "key": "soviet_rsfsr",
+      "tier": "national",
+      "name": "Выборы в Верховный Совет РСФСР (1938-1985)",
+      "name_en": "Supreme Soviet of the RSFSR elections, 1938-1985",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1938-06-26",
+      "valid_to": "1990-03-04",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Single-candidate elections in single-member districts every four (from 1979 five) years.",
+      "source": "constitution",
+      "disposition": "blocked",
+      "disposition_reason": "Only national turnout and approval totals were printed in the press of the day; no official district results are published.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "valid_to": "1989-01-01",
+          "iso_pattern": "RU"
+        }
+      ]
+    },
+    {
+      "key": "constituent_assembly_1917",
+      "tier": "national",
+      "name": "Выборы во Всероссийское Учредительное собрание",
+      "name_en": "All-Russian Constituent Assembly election of 1917",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1917-11-25",
+      "valid_from": "1917-11-25",
+      "valid_to": "1918-01-19",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "List proportional representation by electoral district from 25 November 1917; the Assembly met once, on 18 January 1918, and was dissolved.",
+      "source": "constitution",
+      "disposition": "blocked",
+      "disposition_reason": "No body today publishes the results; the district returns survive only in the 1917-1918 press and in later scholarly compilations, which are not official sources.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "valid_to": "1918-02-01",
+          "iso_pattern": "RU"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1917-11-25",
+          "note": "Polling over several days from 25 November 1917 (not quoted from a fetched source)"
+        }
+      ]
+    },
+    {
+      "key": "imperial_duma",
+      "tier": "national",
+      "name": "Выборы в Государственную думу Российской империи",
+      "name_en": "State Duma of the Russian Empire, 1906-1912 (multi-stage curial elections)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1906-03-01",
+      "valid_to": "1917-03-15",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Four Dumas (1906, 1907, 1907, 1912) chosen by electoral assemblies of the guberniyas, whose electors the landowner, town, peasant, and worker curiae chose in one to three stages.",
+      "source": "constitution",
+      "disposition": "blocked",
+      "disposition_reason": "No popular vote counts by candidate exist at the guberniya level, and no body today publishes the curial returns; they survive only in printed imperial statistics.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "electoral_college"
+          ],
+          "valid_to": "1918-01-01",
+          "iso_pattern": "RU"
+        }
+      ]
+    },
+    {
+      "key": "regional_head",
+      "tier": "subject",
+      "name": "Выборы высших должностных лиц субъектов Российской Федерации",
+      "name_en": "Direct elections of the heads of subjects (governors and republic heads)",
+      "category": "executive",
+      "goal": "subnational",
+      "first_held": "1991-06-12",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.subject"
+        ],
+        "fine": [
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "note": "Direct elections from 1991-1996 until Law No. 159-ФЗ of 11 December 2004 replaced them with confirmation by the legislature on the President's nomination; restored by Law No. 40-ФЗ of 2 May 2012 with first elections on 14 October 2012. Five-year terms (Law No. 414-ФЗ art. 20(2)), a majority with a runoff of the top two, and polling on the single voting day; early elections follow a resignation, usually after an acting head is appointed. Some republics elect the head through the legislature instead (regional_head_indirect).",
+      "source": "fz414",
+      "locator": "http://www.kremlin.ru/acts/bank/47393 (arts. 20 and 22)",
+      "est_votes": 12000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "governor",
+            "head_of_state",
+            "head_of_government"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz414",
+          "locator": "http://www.kremlin.ru/acts/bank/47393 (art. 20(2): \"на пять лет\"); Law No. 67-ФЗ art. 10: the single voting day",
+          "period_years": 5,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Over half of those who voted wins; otherwise the top two meet in a second round two weeks later.",
+          "administered_by": "Election commission of the subject of the Russian Federation",
+          "vacancy_rule": "The President appoints an acting head until an early election on the next single voting day.",
+          "valid_from": "2012-10-14"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2012-10-14",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Each subject's election commission publishes through the CEC's regional sections, with tables by territorial and precinct commission; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-06-12",
+          "precision": "year",
+          "through": "2004-12-31",
+          "note": "Direct elections of governors and republic presidents from 1991 (Moscow, Saint Petersburg, and Tatarstan in June 1991) and across all subjects by 1996-1997, until Law No. 159-ФЗ of 11 December 2004; not counted from the CEC because its site refused this session."
+        },
+        {
+          "date": "2012-10-14",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Direct elections since their restoration, mostly on the September single voting day; not counted from the CEC because its site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "regional_head_indirect",
+      "tier": "subject",
+      "name": "Избрание высшего должностного лица субъекта депутатами законодательного органа",
+      "name_en": "Heads of subjects elected by the legislature (2005-2012 confirmations and the 2013- legislative option)",
+      "category": "indirect",
+      "goal": "subnational",
+      "valid_from": "2005-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "From 2005 to 2012 legislatures confirmed the President's nominee; since 2013 a subject may choose election by its legislature from three candidates the President presents on the proposals of parliamentary parties (Law No. 414-ФЗ art. 23), as several North Caucasus republics and autonomous okrugs do.",
+      "source": "fz414",
+      "locator": "http://www.kremlin.ru/acts/bank/47393 (art. 23)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A vote of the regional legislature on presidential nominees, not a popular election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor",
+            "head_of_state",
+            "head_of_government"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "regional_legislature",
+      "tier": "subject",
+      "name": "Выборы депутатов законодательных органов субъектов Российской Федерации",
+      "name_en": "Legislatures of the subjects (regional dumas, assemblies, and state councils), general elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "first_held": "1993-12-12",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.subject",
+          "ru.regional_okrug"
+        ],
+        "fine": [
+          "ru.tik",
+          "ru.uik"
+        ]
+      },
+      "note": "Each subject's legislature, including the Moscow City Duma and the Legislative Assembly of Saint Petersburg, is elected for five years (Law No. 414-ФЗ art. 9(11)), mostly in a mixed system of single- or multi-member districts and a regional party list in one district (art. 15(5)). First elected from December 1993 to 1995 after the Supreme Soviets of the republics and the regional soviets were dissolved; polling on the single voting day since 2013.",
+      "source": "fz414",
+      "locator": "http://www.kremlin.ru/acts/bank/47393 (arts. 9 and 15)",
+      "est_votes": 20000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz414",
+          "locator": "http://www.kremlin.ru/acts/bank/47393 (art. 9(11): \"составляет пять лет\"); Law No. 67-ФЗ art. 10: the single voting day",
+          "period_years": 5,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "term_years": 5,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "Election commission of the subject of the Russian Federation",
+          "vacancy_rule": "A list seat passes to the next candidate on the list; a district seat is filled at a by-election.",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Each subject's election commission publishes through the CEC's regional sections, with list and district results by territorial and precinct commission; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-12-12",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "General elections of the 83 legislatures, each on its own five-year (earlier four-year) cycle; not counted from the CEC because its site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "regional_legislature_by",
+      "tier": "subject",
+      "name": "Дополнительные и повторные выборы депутатов законодательных органов субъектов",
+      "name_en": "Regional legislature by-elections and repeat elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ru.regional_okrug"
+        ]
+      },
+      "note": "Fill vacated district seats, usually on the single voting day.",
+      "source": "fz67",
+      "locator": "http://www.kremlin.ru/acts/bank/18173",
+      "est_votes": 800000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10)",
+          "called": true,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "administered_by": "Election commission of the subject of the Russian Federation",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed with each region's elections; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted from the CEC because its site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "regional_referendum",
+      "tier": "subject",
+      "name": "Референдумы субъектов Российской Федерации",
+      "name_en": "Referendums of the subjects",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1992-03-21",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "ru.subject"
+        ]
+      },
+      "note": "Held under each subject's constitution or charter and Law No. 67-ФЗ: the 1992 Tatarstan sovereignty referendum, the 1993 Sverdlovsk referendum, and regional mergers of 2003-2007 among them; rare since 2008.",
+      "source": "fz67",
+      "locator": "http://www.kremlin.ru/acts/bank/18173",
+      "est_votes": 1000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173",
+          "called": true,
+          "administered_by": "Election commission of the subject of the Russian Federation"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Merger referendums of 2003-2007 are on the regional sections; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "through": "2026-11-17",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "occupied_ukraine",
+      "tier": "subject",
+      "name": "Выборы на оккупированных территориях Украины",
+      "name_en": "Elections Russia holds in occupied Ukrainian territory (Crimea and Sevastopol since 2014; Donetsk, Luhansk, Zaporizhzhia, and Kherson oblasts since 2022)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Russia runs federal, regional, and municipal elections and the 2014 and 2022 annexation votes in these territories and counts them in its national totals, including Duma single-member districts and the presidential vote.",
+      "source": "constitution",
+      "locator": "http://www.kremlin.ru/acts/constitution/item (art. 65(1))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held on Ukrainian territory outside Ukrainian law; the archive places these territories under Ukraine and does not record Russia's votes there as Russian subnational elections.",
+      "match": [
+        {
+          "iso_pattern": "UA-*",
+          "precedence": 1
+        }
+      ]
+    },
+    {
+      "key": "municipal_council",
+      "tier": "okrug",
+      "name": "Выборы депутатов представительных органов городских и муниципальных округов и внутригородских муниципальных образований",
+      "name_en": "Councils of urban okrugs, municipal okrugs, and the intra-city municipalities of Moscow and Saint Petersburg (and the intra-city districts of 2014-2025)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "ru.municipal_okrug_district"
+        ],
+        "fine": [
+          "ru.uik"
+        ]
+      },
+      "note": "Representative bodies of deputies elected at municipal elections (Law No. 33-ФЗ arts. 15(1) and 44) for a term the charter sets, by single- or multi-member districts, or mixed with party lists in larger bodies (art. 44(7)-(8)); polling on the single voting day. Single-level okrugs are absorbing districts and settlements as subjects move to one level (art. 91).",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (arts. 15 and 44)",
+      "est_votes": 15000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ],
+          "valid_from": "1993-10-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10: the second Sunday of September of the year the term ends)",
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "called": false,
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Municipal elections are listed under each subject's regional section, by municipality, with results by precinct; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted; the CEC's site refused this session, and municipal unit counts await Rosstat's register."
+        }
+      ]
+    },
+    {
+      "key": "district_council",
+      "tier": "municipal_district",
+      "name": "Выборы депутатов представительных органов муниципальных районов",
+      "name_en": "Councils of municipal districts",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "ru.municipal_district"
+        ],
+        "fine": [
+          "ru.uik"
+        ]
+      },
+      "note": "Elected directly, or under Law No. 131-ФЗ formed by delegation of settlement heads and councillors; no new district elections are called once a subject moves to one level (Law No. 33-ФЗ art. 91(4)).",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (arts. 15, 89, and 91)",
+      "est_votes": 4000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_from": "1993-10-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10)",
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "called": false,
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "settlement_council",
+      "tier": "settlement",
+      "name": "Выборы депутатов представительных органов городских и сельских поселений",
+      "name_en": "Councils of urban and rural settlements",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "2005-01-01",
+      "measure": {
+        "unit": "polity",
+        "grain": [
+          "ru.settlement"
+        ]
+      },
+      "note": "The most numerous elected bodies, created by Law No. 131-ФЗ from 2005-2006, mostly by plurality in multi-member districts; disappearing as subjects merge districts and settlements into okrugs (Law No. 33-ФЗ art. 91).",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (arts. 89 and 91)",
+      "est_votes": 6000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "name_pattern": "поселени|settlement",
+          "valid_from": "2005-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10)",
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "called": false,
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "municipal_head",
+      "tier": "okrug",
+      "name": "Выборы глав муниципальных образований",
+      "name_en": "Direct elections of municipal heads (mayors and settlement heads)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "A head elected at municipal elections is one of four options (Law No. 33-ФЗ art. 19(2)); most large cities now choose the head through the council, and direct elections survive mainly in settlements and some okrugs. Mayors of Moscow and Saint Petersburg are regional heads.",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 19(2))",
+      "est_votes": 3000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10)",
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "called": false,
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission",
+          "valid_from": "2013-09-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "municipal_head_indirect",
+      "tier": "okrug",
+      "name": "Избрание глав муниципальных образований представительным органом",
+      "name_en": "Municipal heads chosen by the council or after a competition",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The council elects the head from its members, from candidates of the subject's head, or from a competition commission's shortlist (Law No. 33-ФЗ art. 19(2)(2)-(4)).",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 19(2))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the council, not by voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "municipal_by",
+      "tier": "okrug",
+      "name": "Дополнительные и повторные муниципальные выборы",
+      "name_en": "Municipal by-elections and repeat elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Fill vacated council seats; allowed even after a subject moves to one level (Law No. 33-ФЗ art. 91(4)(1)).",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 91(4))",
+      "est_votes": 1000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz67",
+          "locator": "http://www.kremlin.ru/acts/bank/18173 (art. 10)",
+          "called": true,
+          "month": 9,
+          "day_rule": "sep_second_sunday",
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "through": "2026-09-13",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "local_referendum",
+      "tier": "okrug",
+      "name": "Местные референдумы",
+      "name_en": "Local referendums (including self-taxation votes)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Called by the council on the initiative of citizens, associations, or the council and administration together, over the whole municipality (Law No. 33-ФЗ art. 43); most are votes on self-taxation in rural settlements.",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 43)",
+      "est_votes": 300000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "fz33",
+          "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 43)",
+          "called": true,
+          "administered_by": "Territorial (municipal) election commission, under the subject's election commission"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "through": "2026-11-17",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "municipal_recall_boundary",
+      "tier": "okrug",
+      "name": "Голосование по отзыву депутата, главы муниципального образования и по вопросам изменения границ и преобразования",
+      "name_en": "Municipal recall votes and votes on boundary changes and transformations (Law No. 131-ФЗ, abolished 2025)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "2006-01-01",
+      "valid_to": "2025-06-19",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Law No. 131-ФЗ art. 24 provided votes on recalling a deputy or elected head and on changing a municipality's boundaries or merging it; its chapter 5 lapsed under Law No. 33-ФЗ art. 93(1)(1), which keeps no such vote.",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 93(1)(1))",
+      "est_votes": 100000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ],
+      "access": [
+        {
+          "platform": "ЦИК России, izbirkom.ru (ГАС «Выборы»)",
+          "url": "http://www.izbirkom.ru/region/izbirkom",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "finest": "ru.uik",
+          "source": "cec",
+          "evidence": "Listed under each subject's regional section; www.izbirkom.ru and www.cikrf.ru reset or timed out every connection from a cloud session on 2026-11-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "through": "2025-06-18",
+          "note": "Not counted; the CEC's site refused this session."
+        }
+      ]
+    },
+    {
+      "key": "skhod",
+      "tier": "settlement",
+      "name": "Сход граждан",
+      "name_en": "Assemblies of citizens (сход) in small settlements",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Decides self-taxation and supports initiative projects by a show of hands of the residents present (Law No. 33-ФЗ art. 45); under Law No. 131-ФЗ it also replaced the council in the smallest settlements.",
+      "source": "fz33",
+      "locator": "http://www.kremlin.ru/acts/bank/51732 (art. 45)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An open meeting deciding by those present, with no ballot or published count by an election commission.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ],
+          "name_pattern": "сход",
+          "precedence": 1
+        }
+      ]
+    },
+    {
+      "key": "soviets_local",
+      "tier": "okrug",
+      "name": "Выборы в местные Советы народных депутатов РСФСР",
+      "name_en": "Local soviets of the RSFSR (to 1993)",
+      "category": "council",
+      "goal": "local",
+      "valid_to": "1993-10-26",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Krai, oblast, city, district, and village soviets, last elected in March 1990 and dissolved by decrees of October 1993.",
+      "source": "constitution",
+      "disposition": "blocked",
+      "disposition_reason": "Results were published only locally in the press of the day; no official digital publication exists.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_to": "1993-10-01"
+        }
+      ]
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Судьи, мировые судьи и присяжные заседатели",
+      "name_en": "Judges, justices of the peace, and jurors",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Federal judges are appointed by the President, judges of the high courts by the Federation Council on the President's nomination (Constitution arts. 83 and 102), justices of the peace by the subject's legislature, and jurors are drawn by lot.",
+      "source": "constitution",
+      "locator": "http://www.kremlin.ru/acts/constitution/item (arts. 83, 102, 128)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed or chosen by legislatures and jurors by lot; none faces voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "(суд|judge)",
+          "iso_pattern": "RU"
+        }
+      ]
+    },
+    {
+      "key": "party_primaries",
+      "tier": "national",
+      "name": "Предварительное голосование политических партий",
+      "name_en": "Party preliminary votes (primaries)",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Parties, chiefly United Russia since 2016, hold preliminary votes to rank candidates; no law requires them.",
+      "source": "fz67",
+      "locator": "http://www.kremlin.ru/acts/bank/18173",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties themselves under their own rules, not by an election commission.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "RU"
+        }
+      ]
+    }
+  ]
+}
