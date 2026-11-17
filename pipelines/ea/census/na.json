@@ -1,0 +1,1466 @@
+{
+  "polity": "NA",
+  "name": "Namibia",
+  "sources": {
+    "constitution": {
+      "title": "Namibian Constitution, as amended to the Third Amendment Act 8 of 2014",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Namibian%20Constitution.pdf",
+      "kind": "official_body",
+      "note": "Arts. 28-29 (President: direct, more than half of the valid votes or a second ballot between the top two; five-year term; by-election on a vacancy more than a year before the term ends), 46 (96 elected members of the National Assembly and up to 8 appointed without a vote), 48 (vacancies filled from the party list), 49 and Schedule 4 (party lists by proportional representation), 50 (five-year Assembly), 51 (Speaker elected by the Assembly), 57 (dissolution), 69-70 (National Council of three members per region elected by each regional council), 94B (Electoral Commission), 102 and 105-109 (regions, constituencies, regional councils, management committees), 111 (local authorities), 132(3) (constitutional referendum), 133-134 (the 1989 Constituent Assembly as the first National Assembly; the first President elected by it), and Schedule 8 (laws repealed at independence, including the South-West Africa Constitution Act 39 of 1968, the Rehoboth Self-Government Act 56 of 1976, and the Representative Authorities Proclamation AG 8 of 1980). Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "third-amendment": {
+      "title": "Namibian Constitution Third Amendment Act 8 of 2014",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Namibian%20Constitution%20Third%20Amendment%20Act%208%20of%202014.pdf",
+      "kind": "official_body",
+      "note": "Raised the elected National Assembly from 72 to 96 members and the appointed members from 6 to 8, the National Council from two to three members per region, and created the office of Vice-President. Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "electoral-act": {
+      "title": "Electoral Act 5 of 2014",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Electoral%20Act%205%20of%202014.pdf",
+      "kind": "official_body",
+      "note": "Ss. 63-64 (general elections and by-elections; by-elections only for the President and regional councils), 72-88 (nominations; party lists for the National Assembly and local authorities; an unopposed candidate is declared elected), 109-113 (determination of results and their publication in the Gazette), 117-134 (referendums by presidential proclamation), and 154 (party funding). Replaced the Electoral Act 24 of 1992. Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "regional-councils-act": {
+      "title": "Regional Councils Act 22 of 1992, as amended",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Regional%20Councils%20Act%2022%20of%201992.pdf",
+      "kind": "official_body",
+      "note": "S. 7 (general elections at intervals not exceeding five years since Act 12 of 2010), s. 8 (five-year term), s. 10(3) (a by-election within 90 days of a vacancy), ss. 26-27 (each regional council elects its National Council members). The annotation records the first regional council elections as 30 November to 3 December 1992 (Proclamation 39 of 1992) and Proclamation 25 of 2013, which split Kavango into Kavango East and Kavango West. Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "local-authorities-act": {
+      "title": "Local Authorities Act 23 of 1992, as amended",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Local%20Authorities%20Act%2023%20of%201992.pdf",
+      "kind": "official_body",
+      "note": "S. 6 (municipal councils of 7-15, town councils of 7-12, and village councils of 5 members, elected on party lists), s. 8 (general elections at intervals not exceeding five years), ss. 11-12 (each council elects its mayor or chairperson), s. 13 (vacancies filled from the party list). Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "traditional-authorities-act": {
+      "title": "Traditional Authorities Act 25 of 2000",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Traditional%20Authorities%20Act%2025%20of%202000.pdf",
+      "kind": "official_body",
+      "note": "Chiefs and heads of traditional communities are designated under the customary law of each community and recognized by the Minister; senior traditional councillors are appointed or elected under customary law. Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "governors-act": {
+      "title": "Special Advisers and Regional Governors Appointment Act 6 of 1990, as amended",
+      "publisher": "Republic of Namibia",
+      "url": "https://www.lac.org.na/laws/annoSTAT/Special%20Advisers%20and%20Regional%20Governors%20Appointment%20Act%206%20of%201990.pdf",
+      "kind": "official_body",
+      "note": "Section 2 (regional representatives) was deleted from 30 November 1992 by the Regional Councils Act; the Amendment Act 15 of 2010 (24 November 2010) provides for regional governors appointed by the President. Read in the annotated statute text that the Legal Assistance Centre hosts from the Government Gazette."
+    },
+    "ecn-results": {
+      "title": "Previous election results",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/previous-election-results/",
+      "kind": "official_body",
+      "note": "Results files for the regional council and local authority elections of 1998, 2004, 2010 (regional only), 2015, 2020, and 2025, and for the presidential and National Assembly elections of 2014, 2019, and 2024. Answered 200 on 2026-11-17.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-by-elections": {
+      "title": "By-elections",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/by-elections/",
+      "kind": "official_body",
+      "note": "Results releases for regional council by-elections from 2020 to 2023, with each by-election's name and date as a heading. Most of the linked releases are scanned images or no longer resolve.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-ar-2025-26": {
+      "title": "Annual Report 2025/26",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2026/10/ECN-2026-Annual-Report_Final.pdf",
+      "kind": "official_body",
+      "note": "Electoral areas (121 constituencies, 59 local authorities), the 2025 regional council and local authority elections and six constituency by-elections, and a historical turnout table of every regional council, local authority, presidential, and National Assembly election from 1989 to 2025."
+    },
+    "ecn-ar-2024-25": {
+      "title": "Annual Report 2024/25",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2026/05/ECN-2024-25-Annual-Report.pdf",
+      "kind": "official_body",
+      "note": "The 2024 presidential and National Assembly elections (4,699 polling stations) and the Guinas constituency by-election of 17 January 2025."
+    },
+    "ecn-ar-2023-24": {
+      "title": "Annual Report 2023/24",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2026/02/10032025-ECN-Annual-Report-23-24_print-read.pdf",
+      "kind": "official_body",
+      "note": "The Keetmanshoop Rural constituency by-election of 15 May 2023."
+    },
+    "ecn-ar-2017-18": {
+      "title": "Annual Report 2017/18",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/ECN_Annual-Report_20172018.pdf",
+      "kind": "official_body",
+      "note": "The Eengodi and Ncuncuni constituency by-elections of 2017 and 2018."
+    },
+    "ecn-compendium-2011-2015": {
+      "title": "Compendium of reports on the activities of the Electoral Commission of Namibia, 2011-2015",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/3983-ECoN-Annual-Report-for-web.pdf",
+      "kind": "official_body",
+      "note": "Annual reports for 2011-2015: 13 regions and 107 constituencies before the 2013 delimitation, 3,972 polling stations in 2014, and the synchronization of regional council and local authority elections first held on 26 and 27 November 2010."
+    },
+    "ecn-2015-report": {
+      "title": "2015 Regional Council and Local Authority Elections post-election report",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2022/02/2015-Post-Elections-Report.pdf",
+      "kind": "official_body",
+      "note": "121 constituencies (from 107) and 57 local authorities; 26 constituencies and 5 local authorities uncontested; 3,480 polling stations."
+    },
+    "ecn-2014-report": {
+      "title": "2014 Presidential and National Assembly Elections post-election report",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2022/02/Post-Election-Report-2014.pdf",
+      "kind": "official_body",
+      "note": "Turnout history since the Constituent Assembly election of 7-11 November 1989; first use of electronic voting machines."
+    },
+    "ecn-pna-2024-report": {
+      "title": "2024 Presidential and National Assembly Elections performance assessment and post-election report",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2025/07/ECN_2024-NPA_Report_Latest_Lower-Version.pdf",
+      "kind": "official_body",
+      "note": "Registered voters, ballots, and turnout by constituency for the 2024 presidential and National Assembly elections; 35 polling stations at foreign missions."
+    },
+    "ecn-polling-2025": {
+      "title": "2025 Regional Council and Local Authority Elections polling stations",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2025/10/ECN_2025-Polling-Stations_A4-Booklet_web.pdf",
+      "kind": "official_body",
+      "note": "Every polling station for the 2025 regional council and local authority elections, by region and constituency, with a description of both electoral systems."
+    },
+    "gazette-pna-2024": {
+      "title": "Publication of results and particulars in respect of general election of President and of members of National Assembly (Government Gazette 8555, Government Notices 1 and 2 of 2025)",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2025/03/Results-publication-2024PNA.pdf",
+      "kind": "official_body",
+      "note": "National totals by candidate and by party list, with the quota and seats, for the election held from 27 to 30 November 2024.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-na-2014": {
+      "title": "Final results, 2014 National Assembly elections",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/FINAL-RESULTS-Elections-2014.pdf",
+      "kind": "official_body",
+      "note": "National Assembly votes for each party by constituency and region.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-rc-1998": {
+      "title": "Regional Councils Elections 1998",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/REgional-Councils-Elections-1998.xls",
+      "kind": "official_body",
+      "note": "Votes for each candidate in each of 102 constituencies.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-la-1998": {
+      "title": "Local Authorities Elections 1998",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/Local-Authourities-Elections-1998.xls",
+      "kind": "official_body",
+      "note": "Votes and seats for each list in each local authority.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-rc-2004": {
+      "title": "Regional Councils Election 2004",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/Regional-Councils-Election-2004.xls",
+      "kind": "official_body",
+      "note": "Votes for each candidate in each of 107 constituencies.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-la-2004": {
+      "title": "Local Authority Election 2004",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/local-Authourity-Election-2004.xls",
+      "kind": "official_body",
+      "note": "Votes and seats for each list in each local authority; the table prints no polling date.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-rc-2010": {
+      "title": "Regional Councils Elections 2010",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/Regional-Councils-2010.pdf",
+      "kind": "official_body",
+      "note": "Votes for each candidate in each of 107 constituencies.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-rc-2015": {
+      "title": "Regional Council Election Results 2015",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/Regional-Counils-Election-Results_Duly-elected-candidates-2015.pdf",
+      "kind": "official_body",
+      "note": "Votes for each candidate in the 95 contested constituencies and the duly elected candidate in each.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-la-2015": {
+      "title": "Local Authority Election Results 2015",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/Local-Authority-2015.pdf",
+      "kind": "official_body",
+      "note": "Votes and seats for each list by local authority.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "gazette-rc-2020": {
+      "title": "Publication of results and particulars in respect of general election for members of regional councils (Government Gazette 7654, Government Notice 219 of 2021)",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2023/02/7654-Gov-N219-Results-Regional-Council-2020.pdf",
+      "kind": "official_body",
+      "note": "Votes for each candidate in each of 121 constituencies, held on 25 November 2020 and 26 February 2021.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "gazette-la-2020": {
+      "title": "Publication of results and particulars in respect of general election for members of local authority councils (Government Gazette 7497, Government Notice 65 of 2021)",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2021/06/7497-Gov-N65-Results-LA-2020.pdf",
+      "kind": "official_body",
+      "note": "Votes, quota, and seats for each list in each of 57 local authorities, held on 25 November 2020 and 26 February 2021.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "gazette-rcla-2025": {
+      "title": "Publication of results and particulars in respect of general elections for members of local authority councils and regional councils (Government Gazette 8818)",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.lac.org.na/laws/2025/8818.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated",
+      "note": "Results of the 26 November 2025 regional council and local authority elections, published 29 December 2025. The Commission's own copy is not linked from its site; the Legal Assistance Centre hosts the Gazette."
+    },
+    "gazette-by-2025": {
+      "title": "Publication of results in respect of by-elections for members of regional councils (Government Gazette 8682, Government Notice 150 of 2025)",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2025/10/Govt-Gazette-five-by-elections-result.pdf",
+      "kind": "official_body",
+      "note": "Results of the five regional council by-elections held on 17 June 2025.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ecn-by-2025-report": {
+      "title": "Performance assessment and post-election report, five constituency by-elections of 17 June 2025",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2026/05/ECN-5-by-election-report.pdf",
+      "kind": "official_body",
+      "note": "Grootfontein, Kabbe South, Kamanjab, Otjiwarongo, and Sesfontein constituencies."
+    },
+    "ecn-outapi-report": {
+      "title": "Performance assessment and post-election report, Outapi constituency by-election",
+      "publisher": "Electoral Commission of Namibia",
+      "url": "https://www.ecn.na/wp-content/uploads/2026/05/270326-Outapi-Constituency-By-election-Report_Final.pdf",
+      "kind": "official_body",
+      "note": "The Outapi constituency by-election of 29 September 2025."
+    },
+    "parliament-nc": {
+      "title": "National Council",
+      "publisher": "Parliament of the Republic of Namibia",
+      "url": "https://www.parliament.na/national-council/",
+      "kind": "official_body",
+      "note": "The National Council's members, elected by the regional councils. Answered 200 on 2026-11-17."
+    },
+    "un-sc-1978": {
+      "title": "Resolutions adopted by the Security Council in 1978",
+      "publisher": "United Nations Security Council",
+      "url": "https://www.un.org/securitycouncil/content/resolutions-adopted-security-council-1978",
+      "kind": "official_body",
+      "note": "Resolution 435 (1978) set the plan for free and fair elections to a Constituent Assembly under United Nations supervision, held in November 1989; resolution 439 (1978) declared the elections the South African administration held in the territory in December 1978 null and void."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Namibia",
+      "name_en": "Namibia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "na.national",
+      "source": "constitution"
+    },
+    {
+      "key": "region",
+      "name": "Region",
+      "name_en": "Regions",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "na.region",
+      "elects": false,
+      "source": "regional-councils-act",
+      "counts": [
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "value": 13,
+          "source": "ecn-compendium-2011-2015",
+          "locator": "Annual reports 2011-2015: the ECN has regional offices in all 13 regions"
+        },
+        {
+          "date": "2025-10-01",
+          "precision": "month",
+          "value": 14,
+          "source": "ecn-polling-2025",
+          "locator": "Namibia has fourteen (14) regions and 121 constituencies."
+        }
+      ]
+    },
+    {
+      "key": "constituency",
+      "name": "Constituency",
+      "name_en": "Constituencies",
+      "parent": "region",
+      "scheme": "na.constituency",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "1998-11-30",
+          "value": 102,
+          "source": "ecn-rc-1998",
+          "locator": "Regional Councils Elections 1998: one row of results for each of 102 constituencies"
+        },
+        {
+          "date": "2004-11-15",
+          "value": 107,
+          "source": "ecn-rc-2004",
+          "locator": "Regional Councils Election 2004: one row of results for each of 107 constituencies"
+        },
+        {
+          "date": "2015-11-27",
+          "value": 121,
+          "source": "ecn-2015-report",
+          "locator": "Creation of fourteen additional constituencies (from 107 to 121 constituencies)"
+        },
+        {
+          "date": "2025-10-01",
+          "precision": "month",
+          "value": 121,
+          "source": "ecn-polling-2025",
+          "locator": "Namibia has fourteen (14) regions and 121 constituencies."
+        }
+      ]
+    },
+    {
+      "key": "local_authority",
+      "name": "Local authority (municipality, town, or village)",
+      "name_en": "Local authorities",
+      "parent": "region",
+      "polity_kind": "municipality",
+      "scheme": "na.local_authority",
+      "source": "local-authorities-act",
+      "counts": [
+        {
+          "date": "2015-11-27",
+          "value": 57,
+          "source": "ecn-2015-report",
+          "locator": "26 of the 121 constituencies and 5 of the 57 local authorities were uncontested"
+        },
+        {
+          "date": "2025-11-26",
+          "value": 59,
+          "source": "ecn-ar-2025-26",
+          "locator": "Electoral areas: 121 constituencies, 59 local authorities"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "national_assembly",
+      "tier": "national",
+      "name": "General election of members of the National Assembly",
+      "name_en": "National Assembly, elected members",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.national"
+        ],
+        "grain": [
+          "na.constituency"
+        ],
+        "fine": [
+          "na.polling_station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Arts. 46(1)(a), 49, and Schedule 4 (members elected on party lists by proportional representation), 50 (five-year term), and 133 (the Constituent Assembly elected in 1989 is the first National Assembly)",
+      "valid_from": "1989-11-07",
+      "first_held": "1989-11-07",
+      "earliest_record": "2014-11-28",
+      "finest_note": "One national list contest; the Commission's 2014 table gives each party's votes by constituency, and the 2024 Gazette notice gives national totals only (its post-election report gives ballots by constituency)",
+      "note": "Closed party lists in a single national constituency, seats by largest remainder against a quota of valid votes divided by elected seats (Schedule 4). 72 elected members from 1989 to 2009 and 96 since 2014 (Third Amendment Act 8 of 2014), plus up to 6 (now 8) members appointed by the President without a vote. The 1989 election, 7-11 November 1989, was to the Constituent Assembly under Security Council resolution 435 (1978), run by the Administrator-General under United Nations supervision; Art. 133 made it the first National Assembly. A vacancy is filled from the party's list, so there are no by-elections. Namibians abroad vote at foreign missions.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 11,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1992-01-01",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "source": "electoral-act",
+          "locator": "Electoral Act 5 of 2014, s. 63(1)(b): a general election not earlier than five months and not later than three months before the Assembly's term expires, or within the period Art. 57(2) sets after a dissolution"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/FINAL-RESULTS-Elections-2014.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2014-11-28",
+          "last_date": "2014-11-28",
+          "finest": "na.constituency",
+          "source": "ecn-na-2014",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Votes for each party by constituency. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2025/03/Results-publication-2024PNA.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-11-27",
+          "last_date": "2024-11-27",
+          "finest": "na.national",
+          "source": "gazette-pna-2024",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 8555: votes, quota, and seats for each party list nationally. Text layer; answered 200 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-11-07",
+          "contests": 1,
+          "seats": 72,
+          "source": "ecn-2014-report",
+          "quote": "the voting that took place over five (5) days from 7-11 November 1989",
+          "note": "Constituent Assembly election, 7-11 November 1989; it became the first National Assembly at independence on 21 March 1990."
+        },
+        {
+          "date": "1994-12-07",
+          "contests": 1,
+          "seats": 72,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583",
+          "note": "Polling on 7 and 8 December 1994."
+        },
+        {
+          "date": "1999-11-30",
+          "contests": 1,
+          "seats": 72,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583",
+          "note": "Polling on 30 November and 1 December 1999."
+        },
+        {
+          "date": "2004-11-15",
+          "contests": 1,
+          "seats": 72,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583",
+          "note": "Polling on 15 and 16 November 2004."
+        },
+        {
+          "date": "2009-11-27",
+          "contests": 1,
+          "seats": 72,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583",
+          "note": "Polling on 27 and 28 November 2009."
+        },
+        {
+          "date": "2014-11-28",
+          "contests": 1,
+          "seats": 96,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583"
+        },
+        {
+          "date": "2019-11-27",
+          "contests": 1,
+          "seats": 96,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, National Assembly Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,499 541,114 829,269 811,143 893,643 820,227 1,108,583"
+        },
+        {
+          "date": "2024-11-27",
+          "contests": 1,
+          "seats": 96,
+          "source": "gazette-pna-2024",
+          "quote": "the general election of members of the National Assembly held from 07h00 on Wednesday, 27 November 2024 until Saturday, 30 November 2024 at 21h00"
+        }
+      ],
+      "est_votes": 6200000,
+      "effort": 2
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of the President",
+      "name_en": "President, direct, two-round majority",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.national"
+        ],
+        "grain": [
+          "na.constituency"
+        ],
+        "fine": [
+          "na.polling_station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 28(2) (direct, universal and equal suffrage; more than 50 per cent of the valid votes, else a second ballot between the two leading candidates) and Art. 29 (five-year term, two terms, by-election on a vacancy more than a year before the term ends)",
+      "valid_from": "1990-03-21",
+      "first_held": "1994-12-07",
+      "earliest_record": "2024-11-27",
+      "finest_note": "The 2024 Gazette notice gives national totals by candidate; constituency counts are announced but not yet found in a published file",
+      "note": "Held with the National Assembly election. The first President was elected by the Constituent Assembly on 16 February 1990 (Art. 134; see president_constituent_assembly), so the first popular vote was in 1994. No second ballot has been needed. The Commission's turnout table lists 1989 under presidential elections, but the 1989 ballot was for the Constituent Assembly only. A presidential by-election under Art. 29(4)(b) has never been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 11,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "majority",
+          "runoff_rule": "Art. 28(2)(b): more than 50 per cent of the valid votes, else a second ballot between the two candidates with the most votes",
+          "selection": "elected",
+          "valid_from": "1992-01-01",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "vacancy_rule": "Art. 29(4): a by-election if the vacancy occurs more than one year before the next presidential election, else succession under Art. 34",
+          "source": "constitution",
+          "locator": "Namibian Constitution, Arts. 28-29"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2025/03/Results-publication-2024PNA.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2024-11-27",
+          "last_date": "2024-11-27",
+          "finest": "na.national",
+          "source": "gazette-pna-2024",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 8555: votes for each candidate nationally. Text layer; answered 200 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-12-07",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138",
+          "note": "Polling on 7 and 8 December 1994."
+        },
+        {
+          "date": "1999-11-30",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138",
+          "note": "Polling on 30 November and 1 December 1999."
+        },
+        {
+          "date": "2004-11-15",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138",
+          "note": "Polling on 15 and 16 November 2004."
+        },
+        {
+          "date": "2009-11-27",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138",
+          "note": "Polling on 27 and 28 November 2009."
+        },
+        {
+          "date": "2014-11-28",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138"
+        },
+        {
+          "date": "2019-11-27",
+          "contests": 1,
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Presidential Elections: Category/Election Year 1989 1994 1999 2004 2009 2014 2019 2024; Number of votes cast 682,787 497,508 545,465 833,165 812,233 875,232 826,181 1,114,138"
+        },
+        {
+          "date": "2024-11-27",
+          "contests": 1,
+          "source": "gazette-pna-2024",
+          "quote": "the general election of the President held from 07h00 on Wednesday, 27 November 2024 until Saturday, 30 November 2024 at 21h00"
+        }
+      ],
+      "est_votes": 5600000,
+      "effort": 2
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.national"
+        ],
+        "grain": [
+          "na.constituency"
+        ]
+      },
+      "source": "electoral-act",
+      "locator": "Electoral Act 5 of 2014, s. 119 (the President may proclaim a referendum on a constitutional bill under Art. 132(3), on any bill or other matter, and must proclaim one the National Assembly resolves on under Art. 63(2)(g)) and ss. 117-134",
+      "valid_from": "1990-03-21",
+      "note": "Provided for since independence but never held: no referendum proclamation has been issued and the Commission's results pages list none.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Electoral Commission of Namibia",
+          "source": "electoral-act"
+        }
+      ],
+      "dates": [],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "national_council",
+      "tier": "region",
+      "name": "Election of members of the National Council",
+      "name_en": "National Council, elected by the regional councils",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 69(1) (three members from each region elected by its regional council from amongst their members) and Art. 70 (five-year term); Regional Councils Act 22 of 1992, ss. 26-27",
+      "valid_from": "1992-12-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each regional council elects its members at a council sitting from amongst its own councillors; there is no public ballot, and the Commission publishes no count.",
+      "note": "Two members per region (26) until 2015 and three (42) since, under the Third Amendment Act 8 of 2014.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker",
+      "name_en": "Speaker of the National Assembly and Chairperson of the National Council",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 51(1) (the National Assembly elects a member as Speaker at its first sitting) and Art. 73 (the National Council elects its Chairperson)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An internal vote of each house at its first sitting, recorded in its debates rather than run or published as an election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "president_constituent_assembly",
+      "tier": "national",
+      "name": "Election of the first President by the Constituent Assembly",
+      "name_en": "First President, elected by the Constituent Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 134(1): the first President of Namibia shall be the person elected to that office by the Constituent Assembly by a simple majority of all its members",
+      "valid_from": "1990-02-16",
+      "valid_to": "1990-03-22",
+      "first_held": "1990-02-16",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A vote of the 72 members of the Constituent Assembly, recorded in its debates; there was no public ballot.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "NA",
+          "valid_to": "1990-03-22"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-02-16"
+        }
+      ]
+    },
+    {
+      "key": "regional_council",
+      "tier": "constituency",
+      "name": "General election of members of regional councils",
+      "name_en": "Regional councils, one councillor per constituency",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.constituency"
+        ],
+        "fine": [
+          "na.polling_station"
+        ]
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 106 (each constituency elects one member of the regional council; the candidate with the most votes is elected; all on the same day, fixed by presidential proclamation)",
+      "valid_from": "1992-11-30",
+      "first_held": "1992-11-30",
+      "earliest_record": "1998-11-30",
+      "finest_note": "Constituency; the Commission's tables and Gazette notices give each candidate's votes by constituency",
+      "boundary_source": "regional-councils-act",
+      "note": "Single-member constituencies by plurality. 95 constituencies in 1992, 102 in 1998, 107 in 2004 and 2010, and 121 since the 2013 delimitation, which also split Kavango into two regions (14 regions). A candidate nominated unopposed is declared elected without a poll (26 of 121 in 2015). Terms ran six years until the Regional Councils Amendment Act 12 of 2010 and five since; from 2010 the elections fall on the same days as the local authority elections. Polls in a few places in 2020 were rerun on 26 February 2021.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "2010-08-13",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "source": "regional-councils-act",
+          "locator": "Regional Councils Act 22 of 1992, s. 7(1) as amended by Act 12 of 2010 (intervals not exceeding five years) and s. 8 (five-year term)"
+        },
+        {
+          "period_years": 6,
+          "phase": 0,
+          "month": 11,
+          "term_years": 6,
+          "called": false,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1992-08-31",
+          "valid_to": "2010-08-13",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "source": "regional-councils-act",
+          "locator": "Regional Councils Act 22 of 1992, ss. 7-8 before Act 12 of 2010"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/REgional-Councils-Elections-1998.xls",
+          "format": "xls",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "1998-11-30",
+          "last_date": "2004-11-15",
+          "finest": "na.constituency",
+          "source": "ecn-results",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Spreadsheets for 1998 and 2004 with each candidate's votes by constituency; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/Regional-Councils-2010.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2010-11-26",
+          "last_date": "2015-11-27",
+          "finest": "na.constituency",
+          "source": "ecn-results",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "PDF tables for 2010 and 2015 with each candidate's votes by constituency. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2023/02/7654-Gov-N219-Results-Regional-Council-2020.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2020-11-25",
+          "last_date": "2020-11-25",
+          "finest": "na.constituency",
+          "source": "gazette-rc-2020",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 7654 with each candidate's votes by constituency. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Government Gazette (copy hosted by the Legal Assistance Centre)",
+          "url": "https://www.lac.org.na/laws/2025/8818.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-11-26",
+          "last_date": "2025-11-26",
+          "finest": "na.constituency",
+          "source": "gazette-rcla-2025",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 8818 with each candidate's votes by constituency. Text layer; answered 200 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-11-30",
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Regional Council Elections: Category/Election Year 1992 1998 2004 2010 2015 2020 2025; Number of votes cast 381,041 213,433 547,756 449,548 384,258 526,373 588,295",
+          "note": "Polling from 30 November to 3 December 1992 (Proclamation 39 of 1992); the constituency results are not on the Commission's site."
+        },
+        {
+          "date": "1998-11-30",
+          "contests": 102,
+          "seats": 102,
+          "source": "ecn-rc-1998",
+          "quote": "Regional Councils Elections 1998: results for 102 constituencies"
+        },
+        {
+          "date": "2004-11-15",
+          "contests": 107,
+          "seats": 107,
+          "source": "ecn-rc-2004",
+          "quote": "Regional Councils Election 2004: results for 107 constituencies",
+          "note": "Held with the presidential and National Assembly elections of 15 and 16 November 2004."
+        },
+        {
+          "date": "2010-11-26",
+          "contests": 107,
+          "seats": 107,
+          "source": "ecn-rc-2010",
+          "quote": "REGIONAL COUNCILS ELECTIONS 2010: results for 107 constituencies",
+          "note": "Polling on 26 and 27 November 2010, with the local authority elections for the first time."
+        },
+        {
+          "date": "2015-11-27",
+          "contests": 121,
+          "seats": 121,
+          "source": "ecn-2015-report",
+          "quote": "26 of the 121 constituencies and 5 of the 57 local authorities were uncontested. Accordingly, no nomination process took place in these constituencies and local authorities. This means that only 95 constituencies and 52 local authority areas were contested",
+          "note": "26 seats were filled unopposed; the Commission's 2015 table lists the 95 contested."
+        },
+        {
+          "date": "2020-11-25",
+          "contests": 121,
+          "seats": 121,
+          "source": "gazette-rc-2020",
+          "quote": "the general election for members of regional councils held on 25 November 2020 and 26 February 2021"
+        },
+        {
+          "date": "2025-11-26",
+          "contests": 121,
+          "seats": 121,
+          "source": "gazette-rcla-2025",
+          "quote": "the general election for members of regional councils held on 26 November 2025"
+        }
+      ],
+      "est_votes": 3100000,
+      "effort": 2
+    },
+    {
+      "key": "regional_council_by",
+      "tier": "constituency",
+      "name": "By-election for a member of a regional council",
+      "name_en": "Regional council by-elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.constituency"
+        ],
+        "fine": [
+          "na.polling_station"
+        ]
+      },
+      "source": "regional-councils-act",
+      "locator": "Regional Councils Act 22 of 1992, s. 10(3) (a by-election within 90 days of a vacancy) and Electoral Act 5 of 2014, s. 63(2)(b)",
+      "valid_from": "1992-12-04",
+      "earliest_record": "2025-06-17",
+      "note": "A vacancy on a regional council is filled by a by-election in the constituency, the only by-elections Namibian law provides besides a presidential one (National Assembly and local authority seats pass down the party list). Dated rows are those the Commission's by-elections page and annual reports name; the page's headings may give the day the result was released rather than polling day, and the 2019/20 annual report counts eight by-elections in that year alone, not yet dated.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "government_kind": "constituency",
+          "vacancy_rule": "by-election in the constituency within 90 days of the vacancy",
+          "administered_by": "Electoral Commission of Namibia",
+          "source": "regional-councils-act"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2025/10/Govt-Gazette-five-by-elections-result.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-06-17",
+          "last_date": "2025-06-17",
+          "finest": "na.constituency",
+          "source": "gazette-by-2025",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 8682 with each candidate's votes in five constituencies. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/by-elections/",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-17",
+          "first_date": "2021-07-02",
+          "last_date": "2023-05-15",
+          "finest": "na.constituency",
+          "source": "ecn-by-elections",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "One results release per by-election; most are scanned images without a text layer, and several links answer with the site's not-found page."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-12-04",
+          "through": "2021-06-30",
+          "note": "Regional council by-elections before mid-2021 are not yet counted from official records (the 2017/18 annual report names Eengodi in 2017 and Ncuncuni on 28 March 2018; the 2019/20 report counts eight in that year)."
+        },
+        {
+          "date": "2021-07-02",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Opuwo Rural By-Election - 02 July 2021"
+        },
+        {
+          "date": "2021-08-25",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Katima Mulilo By-Election - 25 Aug 2021"
+        },
+        {
+          "date": "2021-12-17",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Ncamangoro Constituency By-election - 17 Dec 2021"
+        },
+        {
+          "date": "2022-08-12",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Swakopmund Constituency Regional Council By-Election - 12 August 2022"
+        },
+        {
+          "date": "2023-01-07",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Moses //Garoeb Constituency Regional Council By-Election - 07 Janaury 2023"
+        },
+        {
+          "date": "2023-03-18",
+          "contests": 1,
+          "source": "ecn-by-elections",
+          "quote": "Okaku Constituency Regional Council  By-election -18 March 2023"
+        },
+        {
+          "date": "2023-05-15",
+          "contests": 1,
+          "source": "ecn-ar-2023-24",
+          "quote": "15 May 2023, the ECN conducted the by-election in Keetmanshoop Rural Constituency, //Kharas Region"
+        },
+        {
+          "date": "2025-01-17",
+          "contests": 1,
+          "source": "ecn-ar-2024-25",
+          "quote": "GUINAS CONSTITUENCY BY-ELECTION 17 JANUARY 2025"
+        },
+        {
+          "date": "2025-06-17",
+          "contests": 5,
+          "seats": 5,
+          "source": "gazette-by-2025",
+          "quote": "by-elections for members of regional councils held on 17 June 2025",
+          "note": "Grootfontein, Kabbe South, Kamanjab, Otjiwarongo, and Sesfontein constituencies."
+        },
+        {
+          "date": "2025-09-29",
+          "contests": 1,
+          "source": "ecn-outapi-report",
+          "quote": "OUTAPI CONSTITUENCY BY-ELECTION, OMUSATI REGION ... By-Election Date: 29 September"
+        },
+        {
+          "date": "2025-09-30",
+          "through": "2026-11-17",
+          "note": "No later regional council by-election is yet listed by the Commission."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "local_authority",
+      "tier": "local_authority",
+      "name": "General election of members of local authority councils",
+      "name_en": "Local authority councils (municipal, town, and village), party lists",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "na.local_authority"
+        ],
+        "fine": [
+          "na.polling_station"
+        ]
+      },
+      "source": "local-authorities-act",
+      "locator": "Local Authorities Act 23 of 1992, s. 6 (councils of 7-15, 7-12, or 5 members elected on party lists) and s. 8 (general elections at intervals not exceeding five years)",
+      "valid_from": "1992-11-30",
+      "first_held": "1992-11-30",
+      "earliest_record": "1998-02-16",
+      "finest_note": "Local authority; the Commission's tables and Gazette notices give each list's votes, the quota, and seats by local authority",
+      "note": "Proportional representation of party and association lists in each local authority, seats by largest remainder against the quota the Commission prints. A ward system enacted in 2000 was repealed by Act 17 of 2002 before it was used. A list nominated unopposed is declared elected (5 of 57 in 2015). Elections are also held for a local authority newly declared between general elections (s. 6(2)); these, and the 2021 reruns, are in this class. Vacancies pass down the party list. Since 2010 the elections fall on the regional council days.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "NA"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "2010-08-13",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "source": "local-authorities-act",
+          "locator": "Local Authorities Act 23 of 1992, s. 8, synchronized with the regional councils from 2010 (Commission compendium 2011-2015)"
+        },
+        {
+          "called": false,
+          "partisan": true,
+          "runoff": "none",
+          "valid_from": "1992-08-31",
+          "valid_to": "2010-08-13",
+          "administered_by": "Electoral Commission of Namibia (under the Electoral Act 24 of 1992; a constitutional body under Art. 94B since the Second Amendment Act 7 of 2010)",
+          "source": "local-authorities-act",
+          "locator": "Local Authorities Act 23 of 1992, s. 8 as substituted by Act 17 of 2002; earlier elections fell in 1992, February 1998, and 2004"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/Local-Authourities-Elections-1998.xls",
+          "format": "xls",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "1998-02-16",
+          "last_date": "2004-01-01",
+          "finest": "na.local_authority",
+          "source": "ecn-results",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Spreadsheets for 1998 and 2004 with each list's votes and seats by local authority; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/Local-Authority-2015.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2015-11-27",
+          "last_date": "2015-11-27",
+          "finest": "na.local_authority",
+          "source": "ecn-la-2015",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Each list's votes and seats by local authority. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Electoral Commission of Namibia",
+          "url": "https://www.ecn.na/wp-content/uploads/2021/06/7497-Gov-N65-Results-LA-2020.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2020-11-25",
+          "last_date": "2020-11-25",
+          "finest": "na.local_authority",
+          "source": "gazette-la-2020",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 7497 with each list's votes, the quota, and seats by local authority. Text layer; answered 200 on 2026-11-17."
+        },
+        {
+          "platform": "Government Gazette (copy hosted by the Legal Assistance Centre)",
+          "url": "https://www.lac.org.na/laws/2025/8818.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2025-11-26",
+          "last_date": "2025-11-26",
+          "finest": "na.local_authority",
+          "source": "gazette-rcla-2025",
+          "license": "Official publication; reuse terms are not stated",
+          "evidence": "Government Gazette 8818 with each list's votes and seats by local authority. Text layer; answered 200 on 2026-11-17."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Local Authority Elections: Category/Election Year 1992 1998 2004 2010 2015 2020 2025; Number of votes cast 128,973 63,543 163,398 140,313 162,491 195,072 270,516",
+          "note": "The first local authority elections, held with the regional council elections at the end of 1992; the results are not on the Commission's site."
+        },
+        {
+          "date": "1998-02-16",
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Local Authority Elections: Category/Election Year 1992 1998 2004 2010 2015 2020 2025; Number of votes cast 128,973 63,543 163,398 140,313 162,491 195,072 270,516",
+          "note": "The Commission's 1998 table lists 43 local authorities; whether any were filled unopposed is not yet checked."
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "source": "ecn-ar-2025-26",
+          "quote": "Historical voter turnout, Local Authority Elections: Category/Election Year 1992 1998 2004 2010 2015 2020 2025; Number of votes cast 128,973 63,543 163,398 140,313 162,491 195,072 270,516",
+          "note": "The Commission's 2004 table prints no polling date and lists 44 local authorities."
+        },
+        {
+          "date": "2010-11-26",
+          "source": "ecn-compendium-2011-2015",
+          "quote": "following the passing of the Amendment Act (No.12 of 2010) the two elections were synchronized to take place simultaneously every five (5) years. Since then both elections are held together. This happened for the first time on 26 and 27 November 2010.",
+          "note": "The 2010 local authority results are not on the Commission's results page."
+        },
+        {
+          "date": "2015-11-27",
+          "contests": 57,
+          "source": "ecn-2015-report",
+          "quote": "26 of the 121 constituencies and 5 of the 57 local authorities were uncontested",
+          "note": "5 local authorities were filled unopposed."
+        },
+        {
+          "date": "2020-11-25",
+          "contests": 57,
+          "source": "gazette-la-2020",
+          "quote": "the general election for members of local authority councils held on 25 November 2020 and 26 February 2021"
+        },
+        {
+          "date": "2025-11-26",
+          "contests": 59,
+          "source": "gazette-rcla-2025",
+          "quote": "the general election for members of local authority councils held on 26 November 2025"
+        }
+      ],
+      "est_votes": 1150000,
+      "effort": 2
+    },
+    {
+      "key": "mayors",
+      "tier": "local_authority",
+      "name": "Election of mayors, deputy mayors, and chairpersons of local authority councils",
+      "name_en": "Mayors and council chairpersons, elected by the councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "local-authorities-act",
+      "locator": "Local Authorities Act 23 of 1992, ss. 11-12 (each council elects its mayor and deputy mayor, or chairperson and vice-chairperson, from its members)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council elects its office-bearers from among its members at its first meeting; the state does not run or publish these votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "NA*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "regional_executive",
+      "tier": "region",
+      "name": "Management committees, chairpersons, and governors of regions",
+      "name_en": "Regional council chairpersons and governors",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 109 (each regional council elects its management committee and chairperson); Special Advisers and Regional Governors Appointment Act 6 of 1990 as amended by Act 15 of 2010 (governors appointed by the President)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chairpersons and management committees are elected by each regional council from among its members, and since 2010 regional governors are appointed by the President; neither is a public ballot.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "NA*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "traditional_authorities",
+      "tier": "national",
+      "name": "Designation of chiefs and traditional councillors",
+      "name_en": "Traditional authorities",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "traditional-authorities-act",
+      "locator": "Traditional Authorities Act 25 of 2000, ss. 4-6 (designation of chiefs or heads under the customary law of each community, recognized by the Minister)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chiefs and traditional councillors are designated under each community's customary law, not at a poll the Electoral Commission runs, and no results are published.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_primaries",
+      "tier": "national",
+      "name": "Selection of party candidates and lists",
+      "name_en": "Party primaries and list conventions",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "electoral-act",
+      "locator": "Electoral Act 5 of 2014, ss. 77 and 86 (parties submit their lists) and s. 80 (regional council candidates are nominated by parties or registered voters)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their candidates and rank their lists under their own constitutions; the state neither runs nor publishes these contests.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "NA*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "judges",
+      "tier": "national",
+      "name": "Appointment of judges",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Art. 82 (judges appointed by the President on the recommendation of the Judicial Service Commission)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed, not elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "swa_legislative_assembly",
+      "tier": "national",
+      "name": "Legislative Assembly for the Territory of South-West Africa",
+      "name_en": "South West Africa Legislative Assembly (white electorate)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Schedule 8 (laws repealed at independence: the South-West Africa Constitution Act 39 of 1968, the Rehoboth Self-Government Act 56 of 1976, and the Representative Authorities Proclamation AG 8 of 1980 with the proclamations for each authority)",
+      "valid_from": "1926-01-01",
+      "valid_to": "1980-12-31",
+      "disposition": "blocked",
+      "disposition_reason": "Elected by white voters only under South African administration; the results were printed in the Official Gazette of South West Africa, of which no official copy is online, and the Commission's records begin in 1989.",
+      "note": "Constituted under the South-West Africa Constitution Act 42 of 1925 and later Act 39 of 1968, both under South Africa; replaced by the Legislative Assembly of the Representative Authority of the Whites in 1980. The bounds are year boundaries. A referendum of white voters in May 1977 on the Turnhalle proposals also falls under this administration and is not yet cited from an official record.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "constituent_assembly_1978",
+      "tier": "national",
+      "name": "Election of the Constituent Assembly of South West Africa, 1978",
+      "name_en": "1978 Constituent Assembly (National Assembly 1979-1983)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "un-sc-1978",
+      "locator": "Security Council resolution 439 (1978), declaring the elections held in the territory in December 1978 null and void",
+      "valid_from": "1978-12-04",
+      "valid_to": "1983-01-19",
+      "first_held": "1978-12-04",
+      "disposition": "blocked",
+      "disposition_reason": "Held by the South African administration without United Nations supervision and declared null and void by the Security Council; the results were printed in the Official Gazette of South West Africa, of which no official copy is online.",
+      "note": "Polling 4-8 December 1978. The assembly became a National Assembly with legislative powers in 1979 and was dissolved in January 1983.",
+      "match": [],
+      "dates": [
+        {
+          "date": "1978-12-04"
+        }
+      ]
+    },
+    {
+      "key": "representative_authorities",
+      "tier": "national",
+      "name": "Legislative assemblies of the representative authorities",
+      "name_en": "Ethnic representative authorities (second-tier assemblies)",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Schedule 8 (laws repealed at independence: the South-West Africa Constitution Act 39 of 1968, the Rehoboth Self-Government Act 56 of 1976, and the Representative Authorities Proclamation AG 8 of 1980 with the proclamations for each authority)",
+      "valid_from": "1980-01-01",
+      "valid_to": "1990-03-21",
+      "disposition": "blocked",
+      "disposition_reason": "Second-tier legislative assemblies elected on separate ethnic rolls under South African administration and abolished at independence; their results were printed in the Official Gazette of South West Africa, of which no official copy is online.",
+      "note": "Representative authorities of the Whites, Coloureds, Ovambos, Kavangos, Caprivians, Damaras, Namas, Tswanas, and Hereros under Proclamation AG 8 of 1980 and the proclamations for each. The bounds are year boundaries.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "rehoboth",
+      "tier": "national",
+      "name": "Kaptein and Council of Rehoboth",
+      "name_en": "Rehoboth Kaptein and Legislative Council",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "Namibian Constitution, Schedule 8 (laws repealed at independence: the South-West Africa Constitution Act 39 of 1968, the Rehoboth Self-Government Act 56 of 1976, and the Representative Authorities Proclamation AG 8 of 1980 with the proclamations for each authority)",
+      "valid_from": "1976-01-01",
+      "valid_to": "1990-03-21",
+      "disposition": "blocked",
+      "disposition_reason": "Elected by the Rehoboth Baster community under the Rehoboth Self-Government Act 56 of 1976, repealed at independence; no official record of the results is online.",
+      "note": "The bounds are year boundaries.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}
