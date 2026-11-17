@@ -148,8 +148,8 @@ def key(kind: str, *parts: object) -> str:
 PORTUGAL = mai.PORTUGAL
 COUNTRY = mai.COUNTRY
 CNE_SOURCE = key("source", "cne")
-UNIT_SCHEME = "pt.cne.circulo"
-REGION_SCHEME = "pt.cne.regiao"
+UNIT_SCHEME = "pt.cne_circulo"
+REGION_SCHEME = "pt.cne_regiao"
 VOTES, REGISTERED, CAST, INVALID, BLANK = mai.VOTES, mai.REGISTERED, mai.CAST, mai.INVALID, mai.BLANK
 
 
@@ -554,7 +554,8 @@ REGION_AREAS = {
 
 
 def region_area(code: str) -> str:
-    return key("area", REGION_SCHEME, code)
+    # Keyed by the region scheme's first code so the area ids stay the same across the rename.
+    return key("area", "pt.cne.regiao", code)
 
 
 def registry() -> Package:
