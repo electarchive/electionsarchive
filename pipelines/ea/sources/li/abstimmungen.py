@@ -243,6 +243,7 @@ ENGLISH: dict[int, tuple[str, ...]] = {
 
 
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
+ALL, ELECTION_DAY, POSTAL = 0, 1, 3  # result_value.channel
 DERIVED = 1  # result_value.flags: a figure the archive computed from the source's, not one the source prints
 GEO = f"{SOURCE}/geo"
 LI_GEO = f"{regierung.SOURCE}/geo"
@@ -320,6 +321,17 @@ def figures(vote: int, unit: int, prefer: int | None = None) -> dict[int, tuple[
         found[INVALID] = (invalid, summed)
         found[BLANK] = (blank, summed)
     return found
+
+
+def cards(vote: int, unit: int, cast: int) -> list[tuple[int, int]]:
+    """The cards cast as (channel, value): by post and in person at the ballot box when the protocol prints both and
+    they add up to the total, else the total alone."""
+    rows = protocol(vote, unit)
+    postal = rows.get("Brieflich abgegebene Stimmkarten")
+    urn = rows.get("Persönlich an der Urne abgegebene Stimmkarten")
+    if postal and urn and len(set(postal)) == 1 and len(set(urn)) == 1 and postal[0] + urn[0] == cast:
+        return [(POSTAL, postal[0]), (ELECTION_DAY, urn[0])]
+    return [(ALL, cast)]
 
 
 @dataclass(frozen=True)
@@ -525,7 +537,7 @@ def election(day: Day) -> Package:
             kind="standard",
         )
     p.uses(raw.cached(SOURCE, LANDING))
-    rows: list[tuple[str, str, str | None, int, int, int]] = []
+    rows: list[tuple[str, str, str | None, int, int, int, int]] = []
     for vote in day.votes:
         p.uses(raw.cached(SOURCE, vote.listing))
         for unit in (*MUNICIPALITIES, COUNTRY_UNIT):
@@ -594,9 +606,13 @@ def election(day: Day) -> Package:
                 else:
                     accounted.setdefault(VALID, (counts.yes + counts.no, DERIVED))
                 for measure, (value, flags) in accounted.items():
-                    rows.append((result_set, unit, None, measure, value, flags))
-                rows.append((result_set, unit, options["yes"], VOTES, counts.yes, 0))
-                rows.append((result_set, unit, options["no"], VOTES, counts.no, 0))
+                    if measure == CAST:
+                        for channel, part in cards(vote.id, number_, value):
+                            rows.append((result_set, unit, None, measure, part, flags, channel))
+                    else:
+                        rows.append((result_set, unit, None, measure, value, flags, ALL))
+                rows.append((result_set, unit, options["yes"], VOTES, counts.yes, 0, ALL))
+                rows.append((result_set, unit, options["no"], VOTES, counts.no, 0, ALL))
             national = unit_page(vote.id, COUNTRY_UNIT)
             top = national.drafts[index]
             totals = figures(vote.id, COUNTRY_UNIT, top.yes + top.no)
@@ -618,11 +634,11 @@ def election(day: Day) -> Package:
         "result_value",
         pl.DataFrame(
             rows,
-            schema=["result_set_id", "unit_id", "option_id", "measure", "value", "flags"],
+            schema=["result_set_id", "unit_id", "option_id", "measure", "value", "flags", "channel"],
             orient="row",
             infer_schema_length=None,
         ).with_columns(
-            channel=pl.lit(0, pl.Int16),
+            channel=pl.col("channel").cast(pl.Int16),
             count_round=pl.lit(0, pl.Int16),
             measure=pl.col("measure").cast(pl.Int16),
             flags=pl.col("flags").cast(pl.Int16),
