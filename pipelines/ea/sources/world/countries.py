@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "world.countries"
-VERSION = "2"
+VERSION = "3"
 COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "AL": ("Q222", [("sq", "Shqipëria")]),
     "AM": ("Q399", [("hy", "Հայաստան")]),
@@ -80,6 +80,15 @@ COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "ZM": ("Q953", []),
 }
 
+# Regions of a country in the table above that hold elections of their own, by ISO 3166-2 code: the country, the
+# English name, the native names, and the path of the slug.
+REGIONS: dict[str, tuple[str, str, list[tuple[str, str]], str]] = {
+    "PK-BA": ("PK", "Balochistan", [("ur", "بلوچستان")], "pk/balochistan"),
+    "PK-KP": ("PK", "Khyber Pakhtunkhwa", [("ur", "خیبر پختونخوا")], "pk/khyber-pakhtunkhwa"),
+    "PK-PB": ("PK", "Punjab", [("ur", "پنجاب")], "pk/punjab"),
+    "PK-SD": ("PK", "Sindh", [("ur", "سندھ")], "pk/sindh"),
+}
+
 
 def emit() -> Path:
     with connect() as conn:
@@ -111,4 +120,12 @@ def emit() -> Path:
             cs.add("slug", path=iso.lower(), entity_id=polity)
             cs.add("external_id", entity_id=polity, scheme="wikidata", value=wikidata)
             cs.add("polity_territory", polity_id=polity, area_id=area)
+        for iso, (country, label, natives, path) in REGIONS.items():
+            polity = cs.polity(iso)
+            cs.add("polity", id=polity, kind="region", iso_code=iso)
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(country))
+            cs.add("name", entity_id=polity, text=label, lang="en", kind="official", is_preferred=True)
+            for lang, text in natives:
+                cs.add("name", entity_id=polity, text=text, lang=lang, kind="native", is_preferred=False)
+            cs.add("slug", path=path, entity_id=polity)
         return cs.write()
