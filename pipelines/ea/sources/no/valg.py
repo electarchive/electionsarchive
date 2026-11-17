@@ -1,5 +1,6 @@
 """Norway's elections from Valgdirektoratet's results service, valgresultat.no, down to the polling circuit."""
 
+import difflib
 import functools
 import json
 import re
@@ -17,7 +18,7 @@ import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.no import kartverket
+from ea.sources.no import candidates, kartverket
 
 Doc = dict[str, Any]
 SOURCE = "no.valg"
@@ -55,6 +56,7 @@ def elections() -> list[tuple[str, str]]:
 
 
 def fetch() -> None:
+    candidates.fetch()
     raw.fetch(SOURCE, api_url(), suffix=".json")
     for year, kind in elections():
         source = shard(year, kind)
@@ -637,6 +639,147 @@ def _is_aggregate(unit: Unit) -> bool:
     )
 
 
+# Candidates: the lists the authority publishes as spreadsheets, and the personal votes of the 2023 council elections.
+CANDIDATE_ELECTIONS = {("2013", "ST"), ("2017", "ST"), ("2021", "ST"), ("2025", "ST"), ("2023", "FY"), ("2023", "KO")}
+PERSONAL_VOTES = 10
+CANDIDATE_METHOD = (
+    "Candidates are the persons on the lists as the authority publishes them, in list order. A person's birth date, "
+    "gender, and residence are stored only where the authority's file gives them; a file that gives only a birth "
+    "year stores the year. Members elected are the representatives that the authority's results service lists for "
+    "each party of the district. For the 2023 county and municipal elections the authority's file of elected "
+    "candidates lists every candidate with the personal votes (personstemmer) received, which are stored as "
+    "personal votes on a candidate option under the list, in one aggregate unit for the whole contest. The file also "
+    "flags candidates who received added votes from the list (stemmetillegg) and counts votes received from other "
+    "lists (slengere); neither is stored. The authority notes that the file does not reflect every manual "
+    "recount."
+)
+
+
+# Party names the candidate files print in Nynorsk, which the results service prints in Bokm\u00e5l.
+NYNORSK = {
+    "arbeidarpartiet": "arbeiderpartiet",
+    "framstegspartiet": "fremskrittspartiet",
+    "h\u00f8gre": "h\u00f8yre",
+    "kristeleg folkeparti": "kristelig folkeparti",
+    "milj\u00f8partiet dei gr\u00f8ne": "milj\u00f8partiet de gr\u00f8nne",
+    "raudt": "r\u00f8dt",
+}
+
+
+def _position(person: candidates.Candidate) -> int:
+    return person.position
+
+
+def _plain(text: str) -> str:
+    """A name without accents, for matching spellings that differ only by them."""
+    return "".join(c for c in unicodedata.normalize("NFKD", fold(text)) if not unicodedata.combining(c))
+
+
+def _district(text: str) -> str:
+    return fold(text.split(" - ")[0])
+
+
+def _born_key(person: candidates.Candidate) -> int | None:
+    return person.born.year if person.born else person.born_year
+
+
+def _add_candidates(
+    p: Package,
+    day: date,
+    kind: str,
+    year: str,
+    contest: Contest,
+    option_ids: dict[str, str],
+    rows: list[Row],
+    found: list[candidates.Candidate],
+    set_id: str,
+) -> list[tuple[str, int, int]]:
+    """Add the persons, candidacies, and elected members of one contest; return (option, measure, value) rows."""
+    by_code = {row.code: row for row in rows}
+    by_name = {fold(row.name): row for row in rows}
+    lists: dict[str, list[candidates.Candidate]] = {}
+    for person in found:
+        row = by_code.get(person.party_code or "") or by_name.get(NYNORSK.get(fold(person.party), fold(person.party)))
+        if row is None:
+            # A list the file spells another way, such as in Nynorsk: take the one option whose name is close.
+            close = difflib.get_close_matches(fold(person.party), list(by_name), n=2, cutoff=0.85)
+            row = by_name[close[0]] if len(close) == 1 else None
+        if row is None:
+            raise ValueError(f"{year} {kind} {contest.name}: list {person.party!r} ({person.party_code}) has no option")
+        lists.setdefault(row.code, []).append(person)
+    members: dict[str, list[tuple[str, int | None, bool]]] = {}
+    for entry in contest.doc.get("partier", []):
+        reps = entry["mandater"]["resultat"].get("representanter", [])
+        if reps:
+            members[str(entry["id"]["partikode"])] = [
+                (clean(str(rep["navn"])), rep.get("alder"), bool(rep.get("utjevningsmandat"))) for rep in reps
+            ]
+    elected_total = 0
+    votes: list[tuple[str, int, int]] = []
+    for code, people in sorted(lists.items()):
+        row = by_code[code]
+        pool: dict[int, candidates.Candidate] = {id(person): person for person in people}
+        won: set[int] = set()
+        for name, age, _ in members.get(code, []):
+            same: list[candidates.Candidate] = [
+                x for x in pool.values() if _plain(x.name) == _plain(name) and id(x) not in won
+            ]
+            if len(same) > 1 and age is not None:
+                near = [
+                    x for x in same if _born_key(x) is not None and abs(day.year - (_born_key(x) or 0) - int(age)) <= 1
+                ]
+                same = near or same
+            if not same:
+                raise ValueError(f"{year} {kind} {contest.name}: elected {name} is not on list {code}")
+            won.add(id(min(same, key=_position)))
+        for person in people:
+            tag = f"{year}:{kind}:{contest.code}:{code}:{person.position}"
+            person_id = key("person", tag)
+            candidacy_id = key("candidacy", tag)
+            p.add(
+                "person",
+                id=person_id,
+                birth_date=person.born or (date(person.born_year, 1, 1) if person.born_year else None),
+                birth_precision="day" if person.born else "year" if person.born_year else None,
+                gender=person.gender,
+            )
+            p.name(person_id, person.name, "nb", "official")
+            p.add(
+                "candidacy",
+                id=candidacy_id,
+                person_id=person_id,
+                option_id=option_ids[code],
+                role="list_member",
+                list_position=person.position,
+                ballot_name=person.name,
+                member_of_party_id=party(party_key(kind, contest.code, row)),
+                is_independent=False,
+            )
+            if person.votes is not None:
+                candidate = key("option", tag)
+                p.add(
+                    "contest_option",
+                    id=candidate,
+                    contest_id=key("contest", day, kind, contest.code),
+                    kind="candidate",
+                    parent_option_id=option_ids[code],
+                    party_id=None,
+                    ballot_position=person.position,
+                    ballot_label=person.name,
+                )
+                votes.append((candidate, PERSONAL_VOTES, person.votes))
+            if id(person) in won or person.elected:
+                elected_total += 1
+                p.add(
+                    "outcome",
+                    result_set_id=set_id,
+                    option_id=option_ids[code],
+                    candidacy_id=candidacy_id,
+                    kind="elected",
+                )
+    return votes
+
+
 def election(day: date) -> Package:
     members = [item for item in all_elections() if DAYS[item] == day]
     p = Package(
@@ -676,6 +819,12 @@ def election(day: date) -> Package:
         has_voters = voters(data.root).get("totalGodkjente", 0) > 0
         names = [changeset.slug(c.name) for c in data.contests]
         totals: dict[str, int] = {}
+        listed: dict[str, list[candidates.Candidate]] = {}
+        if (year, kind) in CANDIDATE_ELECTIONS:
+            p.artifact(candidates.artifact(year, kind), VAL_SOURCE)
+            for person in candidates.storting(year) if kind == "ST" else candidates.council(year, kind):
+                listed.setdefault(_district(person.contest) if kind == "ST" else person.contest, []).append(person)
+        used: set[str] = set()
         for contest in data.contests:
             slug_word = changeset.slug(contest.name)
             if names.count(slug_word) > 1:
@@ -732,6 +881,41 @@ def election(day: date) -> Package:
                 )
                 if row.code in won:
                     p.add("outcome", result_set_id=set_id, option_id=option_id, kind="won", seats=won[row.code])
+            found = listed.get(_district(contest.name) if kind == "ST" else contest.code)
+            if found:
+                used.add(_district(contest.name) if kind == "ST" else contest.code)
+                if kind != "ST":
+                    p.accept(
+                        "outcomes.list_members",
+                        "The authority's file of elected candidates flags members after manual recounts in some "
+                        "municipalities (candidates who moved or died, and votes from other lists), so a list can "
+                        "have a different number of flagged members than the seats the results service declares.",
+                    )
+                votes = _add_candidates(p, day, kind, year, contest, option_ids, options(contest.doc), found, set_id)
+                p.add(
+                    "note",
+                    id=key("note", set_id, "candidates"),
+                    entity_id=set_id,
+                    kind="methodology",
+                    body_md=CANDIDATE_METHOD,
+                    lang="en",
+                )
+                if votes:
+                    total = key("unit", day, f"{kind}:{contest.code}:personal")
+                    scheme = COUNTY if kind == "FY" else MUNICIPALITY
+                    p.add(
+                        "reporting_unit",
+                        id=total,
+                        polity_id=NORWAY,
+                        scheme_code=scheme,
+                        code=f"{day}:{kind}:{contest.code}:personal",
+                        area_relation="equals",
+                        area_id=area(scheme, contest.code),
+                        kind="aggregate",
+                    )
+                    p.name(total, contest.name, "nb", "official")
+                    for option_id, measure, value in votes:
+                        facts.append((set_id, total, option_id, 0, measure, value))
             for unit in contest.units:
                 channel = _channel(unit, stems(data.root)["fhs"] > 0)
                 unit_rows.setdefault(unit.code, unit)
@@ -764,6 +948,8 @@ def election(day: date) -> Package:
             if has_voters:
                 declared.append((set_id, None, 14, voters(doc)["totalGodkjente"]))
             totals["valid"] = totals.get("valid", 0) + stems(doc)["total"]
+        if (year, kind) in CANDIDATE_ELECTIONS and set(listed) - used:
+            raise ValueError(f"{year} {kind}: candidate lists of {sorted(set(listed) - used)} match no contest")
         root = data.root
         NATIONAL[f"{year}-{kind}"] = {
             "valid": totals["valid"],
