@@ -34,7 +34,13 @@ NAMES = {
 }
 # Names that the tables print for one municipality and that share no word to join them by: the Atlas lists the
 # municipality of Totora, in the province of San Pedro de Totora, under the province's name for indigenous autonomy.
-JOINED = [("4", "san pedro de totora", "totora")]
+JOINED = [
+    ("4", "san pedro de totora", "totora"),
+    ("4", "totora marka", "totora"),
+    ("1", "huacaya", "villa de huacaya"),
+    ("4", "yunguyo de litoral", "yunguyo del litoral"),
+    ("7", "postrervalle", "postrer valle"),
+]
 CAPITALS = {"cruz de la sierra": "santa cruz de la sierra", "nuestra senora de la paz": "la paz"}
 PREFIX = re.compile(r"^(ciudad capital|capital ciudad|ciudad de|ciudad|capital)\s+", re.IGNORECASE)
 
