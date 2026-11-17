@@ -628,6 +628,25 @@
       "kind": "community",
       "note": "Revision read 2026-11-17: the 7 May 2000 election of the Jefe de Gobierno and the 60 seats of the Legislatura, which the year's provincial table does not list.",
       "license": "CC BY-SA 4.0"
+    },
+    "ley19895": {
+      "title": "Ley 19.895: convocatoria a elecciones nacionales (11 de marzo de 1973)",
+      "publisher": "InfoLEG, Ministerio de Justicia de la Nación",
+      "url": "https://www.argentina.gob.ar/normativa/nacional/norma-309949/texto",
+      "kind": "official_body"
+    },
+    "argentina_1951": {
+      "title": "11 de noviembre de 1951-2021, hace 70 años las argentinas votaban por primera vez",
+      "publisher": "Presidencia de la Nación",
+      "url": "https://www.argentina.gob.ar/noticias/11-de-noviembre-de-1951-2021-hace-70-anos-las-argentinas-votaban-por-primera-vez",
+      "kind": "official_body"
+    },
+    "bcn_consulta": {
+      "title": "Dossier 289: Consulta popular, legislación nacional (mayo de 2024)",
+      "publisher": "Biblioteca del Congreso de la Nación",
+      "url": "https://bcn.gob.ar/uploads/adjuntos/Dossier-N-289-legis-nacional-consulta-popular-may-2024.pdf",
+      "kind": "official_body",
+      "note": "Lists Decreto 2.272 of 25 July 1984 (B.O. 30 July 1984, p. 1), the call for the Beagle Channel consulta."
     }
   },
   "tiers": [
@@ -727,7 +746,7 @@
       "source": "cn",
       "valid_from": "1972-10-05",
       "first_held": "1973-03-11",
-      "note": "President and vice president run on one ticket in a single national district. Under the 1994 Constitution (arts. 94-98) a ticket wins in the first round with more than 45% of the valid affirmative votes, or 40% and a lead of more than 10 points; otherwise the top two meet in a runoff 30 days later (2015 and 2023; in 2003 the runoff was called but not held because one ticket withdrew). Four-year term, one consecutive re-election. The two elections of 1973 (11 March and 23 September) were direct under Ley 19.862, with a majority runoff; the 1951 election under the 1949 Constitution was also direct but is not yet cited from an official text. Every other president from 1854 to 1989 was chosen by an electoral college (class electores_presidente). Since 1995 every presidential election is direct.",
+      "note": "President and vice president run on one ticket in a single national district. Under the 1994 Constitution (arts. 94-98) a ticket wins in the first round with more than 45% of the valid affirmative votes, or 40% and a lead of more than 10 points; otherwise the top two meet in a runoff 30 days later (2015 and 2023; in 2003 the runoff was called but not held because one ticket withdrew). Four-year term, one consecutive re-election. The two elections of 1973 (11 March and 23 September) were direct under Ley 19.862, with a majority runoff; the 1951 election under the 1949 Constitution was also direct (dated from a Presidencia de la Nación page; its decree is not yet found). Every other president from 1854 to 1989 was chosen by an electoral college (class electores_presidente). Since 1995 every presidential election is direct.",
       "match": [
         {
           "election_kinds": [
@@ -755,8 +774,16 @@
       ],
       "dates": [
         {
+          "date": "1951-11-11",
+          "source": "argentina_1951",
+          "quote": "el 11 de noviembre de 1951, más de 3.500.000 mujeres concurrieron a las urnas para participar de las elecciones presidenciales que consagraron como presidente a Juan Domingo Perón",
+          "note": "Direct election under the 1949 Constitution; not yet counted from an official results source."
+        },
+        {
           "date": "1973-03-11",
-          "note": "First round under Ley 19.862; not yet counted from an official results source."
+          "note": "First round under Ley 19.862; not yet counted from an official results source.",
+          "source": "ley19895",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios generales en todo el territorio del país para la elección de las autoridades de la Nación. Art. 2º - A tal efecto se elegirán: a) Presidente y vicepresidente de la Nación; b) Senadores nacionales; c) Diputados nacionales."
         },
         {
           "date": "1973-09-23",
@@ -987,8 +1014,14 @@
       "dates": [
         {
           "date": "1854-01-01",
-          "through": "1976-03-23",
-          "note": "Deputies elections from 1854 to 1975 are not yet enumerated from an official source."
+          "through": "1972-12-31",
+          "note": "Deputies elections from 1854 to 1965 are not yet enumerated from an official source."
+        },
+        {
+          "date": "1973-03-11",
+          "source": "ley19895",
+          "quote": "Convócase para el domingo 11 de marzo de 1973 a comicios generales en todo el territorio del país para la elección de las autoridades de la Nación. Art. 2º - A tal efecto se elegirán: a) Presidente y vicepresidente de la Nación; b) Senadores nacionales; c) Diputados nacionales.",
+          "note": "Counts not yet loaded."
         },
         {
           "date": "1983-10-30",
@@ -1787,7 +1820,7 @@
       "source": "ley25432",
       "valid_from": "1983-12-10",
       "first_held": "1984-11-25",
-      "note": "Constitution art. 40 (1994) and Ley 25.432 let Congress call a binding consulta and Congress or the president a non-binding one. The only national vote held is the non-binding consulta on the Beagle Channel treaty with Chile, called by decree for 25 November 1984; its decree and an official results source are not yet found (DINE's results series skips 1984). A non-binding consultation on constitutional reform was called by Decree 2181/1993 and dropped after the reform pact.",
+      "note": "Constitution art. 40 (1994) and Ley 25.432 let Congress call a binding consulta and Congress or the president a non-binding one. The only national vote held is the non-binding consulta on the Beagle Channel treaty with Chile, called by decree for 25 November 1984; Decreto 2.272 of 25 July 1984 is cited from the Biblioteca del Congreso; its text and an official results source are not yet found (DINE's results series skips 1984). A non-binding consultation on constitutional reform was called by Decree 2181/1993 and dropped after the reform pact.",
       "match": [
         {
           "election_kinds": [
@@ -1799,7 +1832,9 @@
       "dates": [
         {
           "date": "1984-11-25",
-          "note": "Beagle Channel consulta; not yet cited from an official source."
+          "note": "Beagle Channel consulta called by Decreto 2.272/1984; the decree text and an official results source are not yet found.",
+          "source": "bcn_consulta",
+          "quote": "Decreto n° 2.272, 25 de julio de 1984. Convocatoria del Poder Ejecutivo Nacional a una consulta popular sobre los términos del arreglo de los límites con Chile en la zona del Canal de Beagle."
         }
       ],
       "est_votes": 12000000,
