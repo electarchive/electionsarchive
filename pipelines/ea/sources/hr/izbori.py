@@ -352,6 +352,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
             except httpx.HTTPStatusError as failure:
                 print(f"{url}: {failure.response.status_code}", flush=True)
+        if d.family == "euparlament":
+            raw.fetch(SOURCE, elected_url(d), suffix=".pdf")
 
 
 @dataclass
@@ -484,6 +486,11 @@ def _external(scheme: str, value: str) -> str:
     return str(uuid5(package.NAMESPACE, f"external_id:{scheme}\x1f{value}"))
 
 
+def _minted_source(publisher: str, title: str) -> str:
+    """The id `Changeset.source` mints for a source from its publisher and title."""
+    return str(uuid5(package.NAMESPACE, f"source\x1f{publisher}\x1f{title}"))
+
+
 @dataclass(frozen=True)
 class National:
     election: str
@@ -500,13 +507,13 @@ def national(year: int) -> National:
             _external("eu.election", f"HR:{year}:european-parliament"),
             _external("eu.contest", contest),
             _external("eu.ep2024.result_set", f"HR:{year}"),
-            _external("source", f"Državno izborno povjerenstvo Republike Hrvatske\x1f{title}"),
+            _minted_source("Državno izborno povjerenstvo Republike Hrvatske", title),
         )
     return National(
         _external("eu.election", f"HR:{year}:european-parliament"),
         _external("eu.contest", contest),
         _external("eu.ep_cadmus.result_set", contest),
-        _external("source", "European University Institute\x1fEP election results at constituency level, 1979–2019"),
+        _minted_source("European University Institute", "EP election results at constituency level, 1979–2019"),
     )
 
 
