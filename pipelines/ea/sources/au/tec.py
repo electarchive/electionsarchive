@@ -12,6 +12,7 @@ from html.parser import HTMLParser
 from typing import NamedTuple
 from uuid import uuid5
 
+import httpx
 import polars as pl
 
 from ea import changeset, package, raw
@@ -124,7 +125,7 @@ def surname_like(name: str) -> bool:
     head = name.partition(",")[0]
     if "," not in name or not head:
         return False
-    head = re.sub(r"^(Mc|Mac|De|Di|Van|La|Le|Von|Del|Da) ?(?=[A-Z])", "", head)
+    head = re.sub(r"^(?i:mc|mac|de|di|van|la|le|von|del|da) ?(?=[A-Z])", "", head)
     return all(not ch.islower() for ch in head)
 
 
@@ -311,7 +312,7 @@ class Page(NamedTuple):
 
 
 ELECTED = re.compile(
-    r"(?<![A-Za-z])((?:Mc|Mac|De|Di|Van|La|Le|Von|Del|Da)? ?[A-Z][A-Z'\-]+(?: [A-Z][A-Z'\-]+)*, "
+    r"(?<![A-Za-z])((?:(?i:mc|mac|de|di|van|la|le|von|del|da) ?)?[A-Z][A-Z'\-]+(?: [A-Z][A-Z'\-]+)*, "
     r"[A-Z][A-Za-z'\-.()]*(?: [A-Za-z'\-.()]+)*?) [\d ,]+ Elected (\d+)"
 )
 
@@ -570,11 +571,20 @@ def slug(name: str) -> str:
 
 
 def lc_files() -> list[str]:
-    return []
+    files = [lc_summary_url(span) for span in LC_SUMMARIES]
+    for day, (_, divisions) in LC_VOTES.items():
+        for division in divisions:
+            if found := lc_found(day, division):
+                files += [url for url in found if url]
+    return files
 
 
 def lg_files() -> list[str]:
-    return []
+    files: list[str] = []
+    for year in LG_YEARS:
+        for council in COUNCILS:
+            files += [lg_page(year, council), *lg_found(year, council).values()]
+    return files
 
 
 def all_files() -> list[str]:
@@ -693,7 +703,12 @@ def registry_parties() -> dict[str, str]:
 
 
 def lc_parties() -> set[str]:
-    return set()
+    names: set[str] = set()
+    for day, (_, divisions) in LC_VOTES.items():
+        for division in divisions:
+            if found := lc_found(day, division):
+                names |= {o.party for o in lc_count(*found).options if o.party}
+    return names
 
 
 def registry() -> Package:
@@ -748,6 +763,10 @@ def builders() -> dict[str, callable]:  # type: ignore[valid-type]
     out: dict[str, callable] = {}  # type: ignore[valid-type]
     for election in HA_ELECTIONS:
         out[f"{SOURCE}/ha-{election.day}"] = functools.partial(ha_election, election)
+    for held in lc_held():
+        out[f"{SOURCE}/lc-{held.day}"] = functools.partial(lc_election, held.day)
+    for year, day in LG_YEARS.items():
+        out[f"{SOURCE}/lg-{day}"] = functools.partial(lg_election, year)
     return out
 
 
@@ -765,3 +784,641 @@ def parse() -> None:
 
 def emit() -> None:
     package.run("load", packages())
+
+
+# Local government --------------------------------------------------------------------------------------------------------
+
+LG = f"{ROOT}/local-government"
+LG_YEARS = {2022: date(2022, 10, 25), 2026: date(2026, 10, 27)}
+LG_ROLES = {"c": "councillor", "m": "mayor", "dm": "deputy"}
+
+
+def lg_page(year: int, council: str) -> str:
+    return f"{LG}/elections-{year}/results/{council}/index.html"
+
+
+def lg_fragment(year: int, council: str, role: str) -> str:
+    return f"{LG}/elections-{year}/results/{council}/{COUNCILS[council][1]}-{role}.html"
+
+
+@functools.cache
+def lg_found(year: int, council: str) -> dict[str, str]:
+    """The result fragments a council's page holds, by role, among the ones the cache has."""
+    have = raw.keys(SOURCE)
+    return {role: url for role in LG_ROLES if (url := lg_fragment(year, council, role)) in have}
+
+
+def lg_fetch() -> None:
+    for year in LG_YEARS:
+        for council in COUNCILS:
+            raw.fetch(SOURCE, lg_page(year, council), suffix=".html")
+            for role in LG_ROLES:
+                url = lg_fragment(year, council, role)
+                try:
+                    raw.fetch(SOURCE, url, suffix=".html")
+                except httpx.HTTPStatusError as failure:
+                    print(f"{url}: {failure.response.status_code}", flush=True)
+
+
+def fetch_files(urls: list[str]) -> None:
+    for url in dict.fromkeys(urls):
+        raw.fetch(SOURCE, url, suffix=".xlsx" if url.endswith(".xlsx") else ".html")
+
+
+def fetch() -> None:
+    for election in HA_ELECTIONS:
+        fetch_files(ha_files(election))
+    lc_fetch()
+    lg_fetch()
+
+
+NAME = r"(?:(?i:mc|mac|de|di|van|la|le|von|del|da) ?)?[A-Z][A-Z'\-]+(?: [A-Z][A-Z'\-]+)*, [A-Z][A-Za-z'\-.()]*(?: [A-Za-z'\-.()]+)*?"
+
+
+class Contested(NamedTuple):
+    ballots: list[str]
+    votes: list[int]
+    elected: list[str]
+    formal: int | None
+    informal: int | None
+
+
+def _figure(body: str, label: str) -> int | None:
+    found = re.search(rf"{label}[:\s]*([\d,]+)", body)
+    return number(found.group(1)) if found else None
+
+
+def lg_councillors(html: str) -> Contested:
+    rows = table_rows(html)
+    body = plain(html)
+    status = next((i for i, row in enumerate(rows) if row[0].startswith("Elected candidates")), None)
+    elected: list[str] = []
+    if status is not None:
+        for row in rows[status + 1 :]:
+            if not surname_like(row[0]):
+                break
+            elected.append(re.sub(r"\s*\[.*", "", row[0]))
+    ballots: list[str] = []
+    votes: list[int] = []
+    for row in rows:
+        if len(row) >= 3 and surname_like(row[0]) and (n := number(row[1])) is not None and row[2].endswith("%"):
+            ballots.append(row[0])
+            votes.append(n)
+    if not elected:
+        elected = [n.strip() for n in re.findall(NAME, body)] if "unopposed" in body else []
+    return Contested(
+        ballots, votes, elected, _figure(body, "Total formal votes"), _figure(body, "Informal ballot papers")
+    )
+
+
+def lg_single(html: str) -> Contested:
+    rows = table_rows(html)
+    body = plain(html)
+    head = next((i for i, row in enumerate(rows) if row[0] == "" and sum(surname_like(c) for c in row) >= 2), None)
+    if head is None:
+        names = re.findall(rf"({NAME}) elected unopposed", body)
+        return Contested(names, [], names, None, None)
+    ballots = [c for c in rows[head] if surname_like(c)]
+    first = rows[head + 1]
+    votes = [number(c) or 0 for c in first[1 : 1 + len(ballots)]]
+    formal = number(first[rows[head].index("Formal votes")]) if "Formal votes" in rows[head] else None
+    surnames = {b.partition(",")[0]: b for b in ballots}
+    elected: list[str] = []
+    for row in rows[head + 1 :]:
+        if (m := re.fullmatch(r"(.+?) elected", row[-1])) and m.group(1) in surnames:
+            elected.append(surnames[m.group(1)])
+    return Contested(ballots, votes, elected, formal, _figure(body, "Informal ballot papers"))
+
+
+def lg_unopposed(html: str) -> dict[str, list[str]]:
+    """Contests the council's page settles without a ballot, by role."""
+    body = plain(html)
+    out: dict[str, list[str]] = {}
+    for label, name in re.findall(
+        rf"((?:Deputy )?(?:[Ll]ord )?[Mm]ayor) \d+ candidates? - no ballot required ({NAME}) elected unopposed", body
+    ):
+        out["deputy" if label.lower().startswith("deputy") else "mayor"] = [name.strip()]
+    if found := re.search(
+        r"Elected unopposed, no ballot required\.\s*Elected candidates \(in alphabetical order\)(.*?)(?:\d{4} State|Back to top|$)",
+        body,
+    ):
+        out["councillor"] = [name.strip() for name in re.findall(NAME, found.group(1))]
+    return out
+
+
+class Council(NamedTuple):
+    roll: int | None
+    seats: int | None
+
+
+def lg_header(url: str) -> Council:
+    body = plain(text(url))
+    seats = re.search(r"Number to be elected:\s*(\d+) councillors", body)
+    return Council(_figure(body, "Electors enrolled"), int(seats.group(1)) if seats else None)
+
+
+LG_METHOD = (
+    "Councillors, mayors, and deputy mayors are elected at one postal election, so the Tasmanian Electoral "
+    "Commission reports each contest once per council and the count is stored as one unit per contest. First "
+    "preferences are as the commission's results page shows them; the later counts of the distribution of "
+    "preferences are not stored. Declared outcomes are the candidates the commission marks as elected. "
+    "Enrolment is the commission's electors enrolled for the council."
+)
+
+
+def lg_election(year: int) -> Package:
+    day = LG_YEARS[year]
+    p = Package(
+        f"{SOURCE}/lg-{day}",
+        SOURCE,
+        f"The {year} Tasmanian local government elections for 29 councils, from the Tasmanian Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRALIA}
+    election_id = key("election", "lg", day)
+    path = f"au/tas/{day}-local-government"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=AUSTRALIA,
+        kind="local",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, f"{year} Tasmanian local government elections", "en", "official")
+    p.add(
+        "note",
+        id=key("note", election_id),
+        entity_id=election_id,
+        kind="context",
+        body_md=(
+            f"A postal election. Votes had to reach the Tasmanian Electoral Commission by 2 pm on {day:%-d %B %Y}."
+        ),
+        lang="en",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units = Units(p, "au.tas_polling_place", day)
+    values = Values()
+    for council, (label, _) in COUNCILS.items():
+        page = lg_page(year, council)
+        p.uses(raw.cached(SOURCE, page))
+        header = lg_header(page)
+        district = area("au.tas_council", council)
+        found = lg_found(year, council)
+        entries: list[tuple[str, str, Contested]] = []
+        for role, url in found.items():
+            p.uses(raw.cached(SOURCE, url))
+            html = text(url)
+            result = lg_councillors(html) if role == "c" else lg_single(html)
+            kind = LG_ROLES[role]
+            if role == "c" and not result.ballots:
+                result = lg_single(html)
+                kind = "councillor-vacancy"
+            if result.ballots:
+                entries.append((role, kind, result))
+        for kind, names in lg_unopposed(text(page)).items():
+            role = {"councillor": "c", "mayor": "m", "deputy": "dm"}[kind]
+            if role == "c" and any(r == "c" and res.votes for r, _, res in entries):
+                entries.append(("c", "councillor-unopposed", Contested(names, [], names, None, None)))
+            elif not any(r == role for r, _, _ in entries):
+                entries.append((role, kind, Contested(names, [], names, None, None)))
+        elected_seats = sum(len(res.elected) for r, _, res in entries if r == "c")
+        if header.seats is not None and header.seats != elected_seats:
+            raise ValueError(f"{year} {council}: {elected_seats} councillors elected for {header.seats} seats")
+        for role, kind, result in entries:
+            contested = bool(result.votes)
+            contest = key("contest", "lg", day, council, kind)
+            title = {
+                "councillor": "Councillors",
+                "councillor-unopposed": "Councillors elected unopposed",
+                "councillor-vacancy": "Councillor vacancy",
+                "mayor": "Mayor",
+                "deputy": "Deputy Mayor",
+            }[kind]
+            if role == "c":
+                p.add(
+                    "contest",
+                    id=contest,
+                    election_id=election_id,
+                    kind="body_seats",
+                    body_id=key("body", "council", council),
+                    district_area_id=district,
+                    magnitude=len(result.elected),
+                    round_number=1,
+                    electoral_system_id=LG_MAYOR if kind == "councillor-vacancy" else LG_COUNCILLOR,
+                    default_result_kind="counted" if contested else "tacit",
+                )
+            else:
+                p.add(
+                    "contest",
+                    id=contest,
+                    election_id=election_id,
+                    kind="office",
+                    office_id=key("office", council, kind if kind == "deputy" else "mayor"),
+                    district_area_id=district,
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=LG_MAYOR,
+                    default_result_kind="counted" if contested else "tacit",
+                )
+            p.name(contest, f"{label} Council: {title}", "en", "official")
+            p.add("slug", path=f"{path}/{council}/{kind}", entity_id=contest, is_current=True)
+            rs = key("result_set", contest)
+            p.add(
+                "result_set",
+                id=rs,
+                election_id=election_id,
+                contest_id=contest,
+                stage="official",
+                kind="counted" if contested else "tacit",
+                source_id=TEC,
+                status="active",
+                is_default=True,
+                completeness=1.0 if contested else 0.0,
+            )
+            p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=LG_METHOD, lang="en")
+            options: dict[str, str] = {}
+            for position, ballot in enumerate(result.ballots, 1):
+                option = options[ballot] = key("option", "lg", day, council, kind, ballot)
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=position,
+                    ballot_label=ballot,
+                )
+                person = key("person", "lg", day, council, kind, ballot)
+                p.add("person", id=person)
+                p.name(person, person_name(ballot), "en", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", "lg", day, council, kind, ballot),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=ballot,
+                    is_independent=True,
+                )
+                p.add(
+                    "outcome",
+                    result_set_id=rs,
+                    option_id=option,
+                    kind="elected" if ballot in result.elected else "lost",
+                )
+            unknown = set(result.elected) - set(options)
+            if unknown:
+                raise ValueError(f"{year} {council} {kind}: elected {sorted(unknown)} are not on the ballot")
+            if not contested:
+                continue
+            unit = units.add(unit_key(day, council, kind), f"{label} Council: {title}", district, "aggregate")
+            for ballot, votes in zip(result.ballots, result.votes, strict=True):
+                values.add(rs, unit, options[ballot], VOTES, votes)
+            if result.formal is not None:
+                values.add(rs, unit, None, VALID, result.formal)
+                if result.informal is not None:
+                    values.add(rs, unit, None, INFORMAL, result.informal)
+                    values.add(rs, unit, None, CAST, result.formal + result.informal)
+                p.add("declared", result_set_id=rs, option_id=None, measure=VALID, value=result.formal)
+            if header.roll is not None:
+                roll = units.add(
+                    unit_key(day, council, kind, "roll"), f"{label} Council: electoral roll", district, "aggregate"
+                )
+                values.add(rs, roll, None, ROLL, header.roll)
+    p.frame("result_value", values.frame())
+    return p
+
+
+# Legislative Council ----------------------------------------------------------------------------------------------------
+
+LC = f"{ROOT}/legislative-council"
+LC_SUMMARIES = ["1981-1996", "1997-1998", "1999-2008", "2009-2017", "2018-present"]
+MONTHS = {
+    m: i
+    for i, m in enumerate(
+        "January February March April May June July August September October November December".split(), 1
+    )
+}
+
+
+def lc_summary_url(span: str) -> str:
+    return f"{LC}/LCHistory/Summary/{span}.html"
+
+
+class Seat(NamedTuple):
+    division: str
+    retiring: str
+    elected: str
+    unopposed: bool
+    by_election: bool
+
+
+class Held(NamedTuple):
+    day: date
+    seats: list[Seat]
+
+
+def _day(text_: str, year: int) -> date | None:
+    found = re.search(r"(\d{1,2}) ([A-Z][a-z]+)", text_)
+    return date(year, MONTHS[found.group(2)], int(found.group(1))) if found and found.group(2) in MONTHS else None
+
+
+@functools.cache
+def lc_held() -> list[Held]:
+    held: list[Held] = []
+    for span in LC_SUMMARIES:
+        html = text(lc_summary_url(span))
+        year = 0
+        for block in re.split(r'<div class="panel creamfeature"', html)[1:]:
+            if found := re.search(r"<h2>(\d{4})</h2>", block):
+                year = int(found.group(1))
+            rows = table_rows(block)
+            day = next(
+                (
+                    _day(row[i + 1], year)
+                    for row in rows
+                    for i, cell in enumerate(row[:-1])
+                    if cell.lower().startswith("polling day")
+                ),
+                None,
+            )
+            seats: list[Seat] = []
+            heading = next((i for i, row in enumerate(rows) if row[:1] == ["Division"]), None)
+            if day is None or heading is None:
+                continue
+            for row in rows[heading + 1 :]:
+                if len(row) != 3 or not row[0] or row[0] == "Division":
+                    continue
+                by = "(by-election)" in row[0]
+                elected = row[2]
+                unopposed = "(unopposed)" in elected
+                seats.append(
+                    Seat(
+                        re.sub(r"\s*\(.*", "", row[0]),
+                        row[1],
+                        re.sub(r"\s*\(unopposed\)", "", elected).strip(),
+                        unopposed,
+                        by,
+                    )
+                )
+            held.append(Held(day, seats))
+    return held
+
+
+LC_VOTES: dict[date, tuple[str, list[str]]] = {
+    date(2021, 5, 1): (f"{LC}/LegislativeCouncilElections_2021/results", ["derwent", "mersey", "windermere"]),
+    date(2022, 5, 7): (f"{LC}/legislative-council-elections-2022/results", ["elwick", "huon", "mcintyre"]),
+    date(2022, 9, 10): (f"{LC}/legislative-council-byelection-2022/results", ["pembroke"]),
+    date(2023, 5, 6): (f"{LC}/elections-2023/results", ["launceston", "murchison", "rumney"]),
+    date(2024, 5, 4): (f"{LC}/elections-2024/results", ["elwick", "hobart", "prosser"]),
+    date(2025, 5, 24): (f"{LC}/elections-2025/results", ["montgomery", "nelson", "pembroke"]),
+    date(2026, 5, 2): (f"{LC}/elections-2026/results", ["huon", "rosevears"]),
+}
+
+
+def lc_urls(day: date, division: str) -> list[str]:
+    base = LC_VOTES[day][0]
+    return [f"{base}/{division}/fp-{division}-{s}.html" for s in ("m", "e")] + [
+        f"{base}/{division}/dist-{division}-m.html"
+    ]
+
+
+def lc_found(day: date, division: str) -> tuple[str, str | None] | None:
+    have = raw.keys(SOURCE)
+    first, second, dist = lc_urls(day, division)
+    fp = first if first in have else second if second in have else None
+    return (fp, dist if dist in have else None) if fp else None
+
+
+def lc_fetch() -> None:
+    for span in LC_SUMMARIES:
+        raw.fetch(SOURCE, lc_summary_url(span), suffix=".html")
+    for day, (_, divisions) in LC_VOTES.items():
+        for division in divisions:
+            for url in lc_urls(day, division):
+                try:
+                    raw.fetch(SOURCE, url, suffix=".html")
+                except httpx.HTTPStatusError:
+                    continue
+
+
+class LcOption(NamedTuple):
+    ballot: str
+    party: str | None
+
+
+class LcCount(NamedTuple):
+    options: list[LcOption]
+    places: list[tuple[str, list[int], int | None, int | None]]  # name, votes, formal, informal
+    roll: int | None
+    declared: list[int]
+    elected: str | None
+
+
+HEAD = re.compile(
+    r'<span class="candidate-name">(.*?)</span>\s*(?:<br\s*/?>)?\s*<span class="candidate-party">(.*?)</span>',
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def lc_count(fp: str, dist: str | None) -> LcCount:
+    html = text(fp)
+    options: list[LcOption] = []
+    for name, party_name in HEAD.findall(html):
+        parts = [clean(re.sub(r"<[^>]+>", " ", part)) for part in re.split(r"<br\s*/?>", name)]
+        ballot = f"{parts[0]}, {' '.join(parts[1:])}".strip(", ")
+        label = clean(party_name)
+        options.append(LcOption(ballot, None if label.casefold() in NO_PARTY else label))
+    rows = table_rows(html)
+    width = len(options)
+    places: list[tuple[str, list[int], int | None, int | None]] = []
+    declared: list[int] = []
+    for row in rows[1:]:
+        if len(row) < width + 2:
+            continue
+        values = [number(c) for c in row[1 : 1 + width]]
+        if row[0].upper() == "TOTALS":
+            declared = [v or 0 for v in values]
+        elif row[0] and not row[0].lower().startswith("total") and None not in values:
+            places.append((row[0], [v or 0 for v in values], number(row[1 + width]), number(row[2 + width])))
+    body = plain(html)
+    final = table_rows(text(dist)) if dist else []
+    remark = next((m.group(1) for row in reversed(final) if (m := re.fullmatch(r"(.+?) elected", row[-1]))), None)
+    surnames = {o.ballot.partition(",")[0]: o.ballot for o in options}
+    return LcCount(options, places, _figure(body, "Enrolled"), declared, surnames.get(remark or ""))
+
+
+def _same(ballot: str, name: str) -> bool:
+    """Whether a declared name such as `Cassy O'Connor` is the ballot name `O'CONNOR, Cassy`."""
+    surname = re.sub(r"[^a-z]", "", ballot.partition(",")[0].casefold())
+    return re.sub(r"[^a-z]", "", name.casefold()).endswith(surname)
+
+
+LC_METHOD = (
+    "First preferences per polling place from the Tasmanian Electoral Commission's results page for the "
+    "division. Postal, provisional, and out-of-division votes are reported once per division and stored as one "
+    "unit each. Informal ballot papers are stored on the same units. Later counts of the distribution of "
+    "preferences are not stored; the declared outcome is the candidate the commission's distribution marks as "
+    "elected."
+)
+LC_SUMMARY_METHOD = (
+    "The commission's summary of Legislative Council elections lists each division's retiring member and the "
+    "candidate elected. It gives no vote counts, so this contest records the declared winner only."
+)
+
+
+def lc_election(day: date) -> Package:
+    held = next(h for h in lc_held() if h.day == day)
+    by = all(seat.by_election for seat in held.seats)
+    title = (
+        f"{day.year} Tasmanian Legislative Council {held.seats[0].division} by-election"
+        if by and len(held.seats) == 1
+        else f"{day.year} Tasmanian Legislative Council {'by-elections' if by else 'elections'}"
+    )
+    p = Package(
+        f"{SOURCE}/lc-{day}",
+        SOURCE,
+        f"The {title[:1].lower() + title[1:]}, from the Tasmanian Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRALIA}
+    p.uses(raw.cached(SOURCE, lc_summary_url(next(s for s in LC_SUMMARIES if _span_has(s, day)))))
+    election_id = key("election", "lc", day)
+    path = f"au/tas/{day}-legislative-council"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=AUSTRALIA,
+        kind="by_election" if by else "general",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, title, "en", "official")
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units = Units(p, "au.tas_polling_place", day)
+    values = Values()
+    for seat in held.seats:
+        code = slug(seat.division)
+        if seat.division not in LC_DIVISIONS:
+            raise ValueError(f"{day}: unknown division {seat.division}")
+        district = area("au.tas_lc_division", code)
+        contest = key("contest", "lc", day, code)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=key("body", "lc"),
+            district_area_id=district,
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=LC_SYSTEM,
+            default_result_kind="tacit" if seat.unopposed else "counted",
+        )
+        p.name(contest, f"Division of {seat.division}", "en", "official")
+        p.add("slug", path=f"{path}/{code}", entity_id=contest, is_current=True)
+        found = lc_found(day, code) if day in LC_VOTES else None
+        rs = key("result_set", contest)
+        p.add(
+            "result_set",
+            id=rs,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="tacit" if seat.unopposed else "counted",
+            source_id=TEC,
+            status="active",
+            is_default=True,
+            completeness=1.0 if found else 0.0,
+        )
+        p.add(
+            "note",
+            id=key("note", rs),
+            entity_id=rs,
+            kind="methodology",
+            body_md=LC_METHOD if found else LC_SUMMARY_METHOD,
+            lang="en",
+        )
+        options: dict[str, str] = {}
+        if found:
+            for url in found:
+                if url:
+                    p.uses(raw.cached(SOURCE, url))
+            count = lc_count(*found)
+            candidates = count.options
+            winner = count.elected
+            if winner is None:
+                winner = next((o.ballot for o in candidates if _same(o.ballot, seat.elected)), None)
+            if winner is None or not _same(winner, seat.elected):
+                raise ValueError(f"{day} {code}: the count elects {winner}, the summary {seat.elected}")
+        else:
+            candidates = [LcOption(seat.elected, None)]
+            winner = seat.elected
+        for position, candidate in enumerate(candidates, 1):
+            option = options[candidate.ballot] = key("option", "lc", day, code, candidate.ballot)
+            party_id = party(candidate.party) if candidate.party else None
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party_id,
+                ballot_position=position,
+                ballot_label=candidate.ballot,
+            )
+            person = key("person", "lc", day, code, candidate.ballot)
+            p.add("person", id=person)
+            p.name(
+                person, person_name(candidate.ballot) if "," in candidate.ballot else candidate.ballot, "en", "official"
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", "lc", day, code, candidate.ballot),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=candidate.ballot,
+                member_of_party_id=party_id,
+                is_independent=candidate.party is None and bool(found),
+            )
+            p.add(
+                "outcome",
+                result_set_id=rs,
+                option_id=option,
+                kind="elected" if candidate.ballot == winner else "lost",
+            )
+        if not found:
+            continue
+        label = seat.division
+        for name, votes, formal, informal in count.places:
+            unit = units.add(unit_key(day, code, name), name, district, place_kind(name))
+            for candidate, n in zip(candidates, votes, strict=True):
+                values.add(rs, unit, options[candidate.ballot], VOTES, n)
+            if formal is not None:
+                values.add(rs, unit, None, VALID, formal)
+                if informal is not None:
+                    values.add(rs, unit, None, INFORMAL, informal)
+                    values.add(rs, unit, None, CAST, formal + informal)
+        if count.roll is not None:
+            roll = units.add(unit_key(day, code, "roll"), f"Division of {label}: electoral roll", district, "aggregate")
+            values.add(rs, roll, None, ROLL, count.roll)
+        for candidate, total in zip(candidates, count.declared, strict=False):
+            p.add("declared", result_set_id=rs, option_id=options[candidate.ballot], measure=VOTES, value=total)
+    p.frame("result_value", values.frame())
+    return p
+
+
+def _span_has(span: str, day: date) -> bool:
+    return any(h.day == day for h in lc_held_for(span))
+
+
+@functools.cache
+def lc_held_for(span: str) -> list[Held]:
+    first, _, last = span.partition("-")
+    low = int(first)
+    high = 2100 if last == "present" else int(last)
+    return [h for h in lc_held() if low <= h.day.year <= high]
