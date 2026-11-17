@@ -840,6 +840,17 @@
      ],
      "iso_pattern": "EU",
      "within": null
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "HR",
+     "name_pattern": "European Parliament",
+     "valid_from": "2013-01-01"
     }
    ],
    "dates": [
