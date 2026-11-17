@@ -817,3 +817,30 @@ def _tight_total(lines: list[str], keys: list[str], units: list[Unit]) -> Unit |
         return None
     best = min(options, key=lambda o: sum(abs(a - b) for a, b in zip(o, expected, strict=True)))
     return Unit("", "TOTAL", figures, best)
+
+
+REGIONAL = ["registered", "cast", "invalid", "blank", "exprimes"]
+
+
+def regional(text: str, fallback: str) -> tuple[list[Unit], Unit | None]:
+    """Read one region's department table of the 2015 presidential election.
+
+    The region's own row is labeled TOTAL or left unlabeled; the percentage row below it has no counts.
+    Valid votes (exprimes) are the candidates' votes alone, blank ballots are counted apart.
+    """
+    found = re.search(r"REGION\s*:\s*(.+)", text)
+    region = " ".join(found.group(1).split()) if found else fallback
+    units: list[Unit] = []
+    total: Unit | None = None
+    for raw in text.splitlines():
+        labels, values = _numbers(raw)
+        if len(values) != len(REGIONAL) + 10:
+            continue
+        figures = dict(zip(REGIONAL, values[: len(REGIONAL)], strict=True))
+        votes = values[len(REGIONAL) :]
+        name = " ".join(labels).strip()
+        if not name or name.upper() == "TOTAL":
+            total = Unit(region, "TOTAL", figures, votes)
+        else:
+            units.append(Unit(region, name, figures, votes))
+    return units, total

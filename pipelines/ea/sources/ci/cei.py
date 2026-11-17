@@ -39,6 +39,41 @@ FILES = {
     "edan2025": f"{UPLOADS}/2025/12/EDAN_2025_RESULTAT_NATIONAL_DETAILS.pdf",
     "edan2026": f"{UPLOADS}/2026/02/REPRISE_EDAN_2025.pdf",
 }
+PROCLAMATION_2015 = f"{SITE}/wp-content/uploads/2020/05/" + (
+    "50-Proclammation-des-resultats-provisoires-de-lelection-du-president-de-la-republique-du-25-10-2015.pdf"
+)
+# The commission's department tables of 2015, one file per region (the communes of Abidjan have one each); the
+# region of a file without a REGION line is Abidjan.
+REGIONS_2015 = [
+    "26-Resultats-worodougou",
+    "27-Resultats-tonpki",
+    "28-Resultats-tchologo",
+    "29-Resultats-poro",
+    "30-Resultats-loh-djiboua",
+    "31-Resultats-la-me",
+    "32-Resultats-haut-sassandra",
+    "33-Resultats-hambol",
+    "34-Resultats-grand-ponts",
+    "35-Resultats-gontougo",
+    "36-Resultats-gbeke",
+    "37-Resultats-cavally",
+    "38-Resultats-bounkani",
+    "39-Resultats-bere",
+    "40-Resultats-bagoue",
+    "41-Resultats-bafing",
+    "42-Resultats-agneby-tiassa",
+    "43-Resultats-abidjan-yopougon",
+    "44-Resultats-abidjan-plateau",
+    "45-Resultats-abidjan-koumassi",
+    "46-Resultats-abidjan-cocody",
+    "47-Resultats-abidjan-adjame",
+    "48-Resultats-abidjan-adjame",
+    "49-Resultats-abidjan-abobo",
+]
+for _name in REGIONS_2015:
+    FILES[f"epr2015-{_name[:2]}"] = f"{SITE}/wp-content/uploads/2020/05/{_name}.pdf"
+FILES["epr2015"] = PROCLAMATION_2015
+FILES2015 = [name for name in FILES if name.startswith("epr2015-")]
 FILES["edan2016"] = (
     "https://www.cei.ci/wp-content/uploads/2024/03/EDAN-2016-RESULTAT-NATIONAL-18122016-et-29122016-et-28012017.pdf"
 )
@@ -71,6 +106,7 @@ PLANS = [
     Plan(date(2011, 12, 11), "legislative", "edan2011", "2011", date(2011, 12, 11)),
     Plan(date(2012, 2, 26), "legislative", "edan2011", "2011", date(2011, 12, 11)),
     Plan(date(2013, 2, 3), "legislative", "edan2013", "2011", date(2013, 2, 3)),
+    Plan(date(2015, 10, 25), "presidential", "epr2015", "2015", date(2015, 10, 25), stage="preliminary"),
     Plan(date(2016, 12, 18), "legislative", "edan2016", "2016", date(2016, 12, 18)),
     Plan(date(2016, 12, 29), "legislative", "edan2016", "2016", date(2016, 12, 18)),
     Plan(date(2017, 1, 28), "legislative", "edan2016", "2016", date(2016, 12, 18)),
@@ -103,6 +139,18 @@ PRESIDENTS: dict[str, list[tuple[str, str]]] = {
         ("WODIE ROMAIN FRANCIS", ""),
     ],
     "2010-2": [("GBAGBO LAURENT", ""), ("OUATTARA ALASSANE", "")],
+    "2015": [
+        ("ALASSANE OUATTARA", "RHDP"),
+        ("KONAN KOUADIO SIMEON", "INDEPENDANT"),
+        ("LAGOU ADJOUA HENRIETTE", "RPC"),
+        ("AFFI N'GUESSAN PASCAL", "FPI"),
+        ("AMARA ESSY", "INDEPENDANT"),
+        ("BANNY KONAN CHARLES", "INDEPENDANT"),
+        ("MAMADOU KOULIBALY", "LIDER"),
+        ("KOUADIO KONAN BERTIN", "INDEPENDANT"),
+        ("KOUANGOUA JACQUELINE-CLAIRE", "INDEPENDANT"),
+        ("GNANGBO KACOU", "INDEPENDANT"),
+    ],
     "2020": [
         ("ALASSANE OUATTARA", "RHDP"),
         ("AFFI N'GUESSAN PASCAL", "FPI"),
@@ -180,8 +228,41 @@ def legislature(name: str, layout: str) -> tuple[list[tables.Circumscription], l
     return tables.legislative(text(name), layout)
 
 
+def file_text(name: str) -> str:
+    path = raw.cached(SOURCE, FILES[name]).path
+    return subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
+
+
+def proclamation_2015() -> tables.Unit:
+    """The national provisional figures proclaimed on 28 October 2015."""
+    body = " ".join(file_text("epr2015").split())
+
+    def number(label: str) -> int:
+        found = re.search(rf"{label}\s*:\s*(\d{{1,3}}(?:\.\d{{3}})*)", body)
+        if found is None:
+            raise ValueError(f"proclamation: no {label}")
+        return int(found.group(1).replace(".", ""))
+
+    surnames = ["OUATTARA", "KONAN Kouadio", "LAGOU", "AFFI", "ESSY", "BANNY", "KOULIBALY", "KOUADIO Konan"]
+    surnames += ["KOUANGOUA", "GNANGBO"]
+    votes = []
+    for surname in surnames:
+        found = re.search(rf"{surname}[^:]*:\s*(\d{{1,3}}(?:\.\d{{3}})*)\s+soit", body)
+        if found is None:
+            raise ValueError(f"proclamation: no votes for {surname}")
+        votes.append(int(found.group(1).replace(".", "")))
+    figures = {"registered": number("Inscrits"), "cast": number("Votants"), "exprimes": number("Suffrages exprimés")}
+    return tables.Unit("", "TOTAL", figures, votes)
+
+
 @functools.cache
 def president(name: str, layout: str) -> tables.Presidential:
+    if layout == "2015":
+        units: list[tables.Unit] = []
+        for part in FILES2015:
+            found, _ = tables.regional(file_text(part), "ABIDJAN")
+            units.extend(found)
+        return tables.Presidential(units, proclamation_2015())
     return tables.presidential(text(name), layout)
 
 
@@ -395,6 +476,9 @@ def _presidential(p: Package, plan: Plan) -> None:
     p.name(contest, f"{year} Ivorian presidential election{', second round' if runoff else ''}", "en", "official")
     p.add("slug", path=f"{path}/president", entity_id=contest, is_current=True)
     result_set = _result_set(p, election, contest, f"pres{plan.day}", plan)
+    if plan.layout == "2015" and table.total:
+        covered = sum(unit.figures["registered"] for unit in table.units) / table.total.figures["registered"]
+        p.rows["result_set"][-1]["completeness"] = round(covered, 4)
     options: list[str] = []
     for position, (name, party) in enumerate(candidates, 1):
         person = key("person", "pres", year, name)
@@ -422,7 +506,10 @@ def _presidential(p: Package, plan: Plan) -> None:
             member_of_party_id=party_id(party),
             is_independent=independent,
         )
-    totals = [sum(unit.votes[i] for unit in table.units) for i in range(len(options))]
+    # the declared national row, where the table prints one, decides who advanced; a table that covers only part
+    # of the country would otherwise be ranked on its own places
+    base = table.total.votes if plan.layout == "2015" and table.total else None
+    totals = base or [sum(unit.votes[i] for unit in table.units) for i in range(len(options))]
     order = sorted(range(len(options)), key=lambda i: -totals[i])
     majority = totals[order[0]] * 2 > sum(totals)
     for index, option in enumerate(options):
@@ -453,7 +540,7 @@ def _presidential(p: Package, plan: Plan) -> None:
         )
         p.name(id, label, "fr", "official")
         figures = unit.figures
-        valid = figures["exprimes"] - figures.get("blank", 0)
+        valid = figures["exprimes"] - (0 if plan.layout == "2015" else figures.get("blank", 0))
         accounting(p, result_set, id, figures, valid)
         for option, value in zip(options, unit.votes, strict=True):
             put(p, result_set, id, option, VOTES, value)
@@ -462,10 +549,11 @@ def _presidential(p: Package, plan: Plan) -> None:
         declared = {
             REGISTERED: figures["registered"],
             CAST: figures["cast"],
-            INVALID: figures["invalid"],
-            VALID: figures["exprimes"] - figures.get("blank", 0),
+            VALID: figures["exprimes"] - (0 if plan.layout == "2015" else figures.get("blank", 0)),
         }
-        if "blank" in figures:
+        if "invalid" in figures:
+            declared[INVALID] = figures["invalid"]
+        if "blank" in figures and plan.layout != "2015":
             declared[BLANK] = figures["blank"]
         for measure, value in declared.items():
             p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
@@ -476,6 +564,8 @@ def _presidential(p: Package, plan: Plan) -> None:
 
 def _presidential_notes(p: Package, plan: Plan, result_set: str, table: tables.Presidential) -> None:
     figures = table.units
+    if plan.layout == "2015":
+        _notes_2015(p, result_set, table)
     if plan.layout == "2010-1":
         p.accept(
             "accounting.declared",
@@ -513,6 +603,32 @@ def _presidential_notes(p: Package, plan: Plan, result_set: str, table: tables.P
         ]
         if mismatch:
             p.accept("accounting.ballots_sum", f"{len(mismatch)} places print ballot figures that do not add up")
+
+
+def _notes_2015(p: Package, result_set: str, table: tables.Presidential) -> None:
+    assert table.total is not None
+    places = {unit.region for unit in table.units}
+    regions = len(places - {"ABIDJAN"})
+    registered = sum(unit.figures["registered"] for unit in table.units)
+    p.accept(
+        "accounting.declared",
+        f"the department tables the commission published cover {regions} regions and 7 communes of Abidjan, "
+        f"{registered:,} of the {table.total.figures['registered']:,} registered voters; the other regions, "
+        "the other communes of Abidjan, and the voters abroad are in no table the commission published, so "
+        "the proclaimed national figures exceed the sum of the places",
+    )
+    p.add(
+        "note",
+        id=key("note", result_set, "coverage"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md=f"Only {regions} of the country's regions and 7 communes of the Abidjan district have a published "
+        "department table, so the places stored here do not add up to the national figures. The declared national "
+        "figures are the provisional results proclaimed by the commission's president on 28 October 2015, "
+        "which print no null or blank ballots. The commission's table for Anyama lists a special local "
+        "commission (CESP) apart from the Anyama commission, stored as printed.",
+        lang="en",
+    )
 
 
 def _legislative(p: Package, plan: Plan) -> None:
