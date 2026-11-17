@@ -33,7 +33,7 @@ ELECTED_SUMMARY = f"{FILES}/resumen-electos-por-organizacion-y-genero-2026.xlsx"
 # The results page of the 2026 portal reads its district totals from these two modules.
 SUMMARY = f"{SITE}/assets/resumen-DviwI-nn.js"
 COUNCIL_SUMMARY = f"{SITE}/assets/juntas-o1DzBmUK.js"
-# Paraguay's district boundaries (admin level 2: 263 distritos) from the DGEEC/INE cartography, as redistributed in the
+# Paraguay's district boundaries (admin levels 1 and 2: 18 departments, 263 distritos) from the DGEEC/INE cartography, as redistributed in the
 # humanitarian community's common operational dataset of July 2026.
 BOUNDARIES = (
     "https://data.humdata.org/dataset/212cd82f-bcb8-445f-8b32-aa194387f6c3/resource/"
@@ -41,6 +41,7 @@ BOUNDARIES = (
 )
 BOUNDARIES_PAGE = "https://data.humdata.org/dataset/cod-ab-pry"
 BOUNDARY_FILE = "pry_admin2.geojson"
+DEPARTMENT_FILE = "pry_admin1.geojson"
 BOUNDARY_DAY = date(2026, 7, 29)
 WORKBOOKS = (MAYORS, COUNCILS, MAYORS_ELECTED, COUNCILS_ELECTED, ELECTED_SUMMARY)
 MODULES = (SUMMARY, COUNCIL_SUMMARY)
@@ -330,6 +331,9 @@ def compare() -> dict[str, dict[str, int]]:
 
 # The cartography numbers the departments of Boquerón and Alto Paraguay the other way round from the Tribunal.
 CARTOGRAPHY_DEPARTMENT = {16: 17, 17: 16}
+# Department names the Tribunal abbreviates or gives another way than the cartography: the capital district is
+# department 0, "Capital", and President Hayes is abbreviated.
+DEPARTMENT_NAMES = {"CAPITAL": "Asunción", "PDTE. HAYES": "Presidente Hayes"}
 # Districts whose Tribunal name is abbreviated or differs from the cartography's, by (department, district).
 RENAMED = {
     (1, 4): "Sargento José Félix López",
@@ -402,6 +406,30 @@ def boundaries() -> dict[tuple[int, int], shapely.Geometry]:
     return found
 
 
+def department_boundaries() -> dict[int, shapely.Geometry]:
+    """The cartography's department shapes keyed by the Tribunal's department code, matched by name.
+
+    The cartography numbers Boquerón and Alto Paraguay the other way round, so the codes are never compared.
+    """
+    with zipfile.ZipFile(raw.cached(SOURCE, BOUNDARIES).path) as archive:
+        collection = json.loads(archive.read(DEPARTMENT_FILE))
+    shapes: dict[str, shapely.Geometry] = {}
+    for feature in collection["features"]:
+        name = _fold(feature["properties"]["adm1_name"])
+        if name in shapes:
+            raise ValueError(f"the cartography has two departments called {feature['properties']['adm1_name']}")
+        shapes[name] = shapely.from_geojson(json.dumps(feature["geometry"]))
+    found: dict[int, shapely.Geometry] = {}
+    for dep, name in districts().select("dep", "dep_name").unique().sort("dep").iter_rows():
+        label = _fold(DEPARTMENT_NAMES.get(name, name))
+        if label not in shapes:
+            raise ValueError(f"no cartography shape for department {dep} {name}")
+        found[dep] = shapes.pop(label)
+    if shapes:
+        raise ValueError(f"cartography departments without a Tribunal department: {sorted(shapes)}")
+    return found
+
+
 def _wkb(geometry: shapely.Geometry) -> str:
     valid = shapely.make_valid(geometry)
     parts = [g for g in getattr(valid, "geoms", [valid]) if g.geom_type in {"Polygon", "MultiPolygon"}]
@@ -461,6 +489,26 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=f"{dep}:{dis}")
         p.add("area_parent", area_id=id, parent_id=area("py.departamento", str(dep)))
         p.name(id, title(name), "es", "official")
+    for dep, shape in sorted(department_boundaries().items()):
+        p.add(
+            "area_geometry",
+            area_id=area("py.departamento", str(dep)),
+            valid_from=None,
+            valid_to=None,
+            geom=_wkb(shape),
+            label_point=_point(shape),
+            quality="official",
+            source_id=BOUNDARY_ID,
+        )
+    p.add(
+        "boundary_set",
+        id=p.id("boundary_set", "py.departamento", "2026"),
+        scheme_code="py.departamento",
+        vintage="2026",
+        valid_from=None,
+        valid_to=None,
+        as_of=DAY,
+    )
     shapes = boundaries()
     for (dep, dis), shape in sorted(shapes.items()):
         p.add(
