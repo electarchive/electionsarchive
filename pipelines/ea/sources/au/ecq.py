@@ -427,7 +427,6 @@ DIVISION_VINTAGES = [
     (date(2024, 3, 16), "2024"),
     (date(2020, 3, 28), "2020"),
     (date(2016, 3, 19), "2016"),
-    (date(2013, 4, 28), "2013"),
     (date(2012, 3, 31), "2012"),
     (date(1900, 1, 1), "2008"),
 ]
@@ -949,6 +948,10 @@ ARCHIVE_METHOD = (
     "one's votes for the whole district are stored as the last count round; the earlier steps of the distribution "
     "are not stored here. Enrolment at the close of the roll is stored on a separate unit per district."
 )
+ARCHIVE_MULTI_METHOD = (
+    " Each voter could mark as many candidates as there were places to fill, and the archive counts votes: its "
+    "formal and informal totals are numbers of votes, not of ballots."
+)
 QUESTION_METHOD = (
     "The Electoral Commission of Queensland's results archive publishes only the total for the whole of "
     "Queensland, with no figures for districts or voting centres. The total is stored on one unit, and the "
@@ -1074,7 +1077,7 @@ def election(event: Event) -> Package:
         archive = any(u.startswith(ARCHIVE) for u in event.urls)
         method = (
             (QUESTION_METHOD if question and not c.scopes[0].booths else ARCHIVE_METHOD if archive else MAIN_METHOD)
-            + (MULTI_METHOD if multi else "")
+            + ((ARCHIVE_MULTI_METHOD if archive else MULTI_METHOD) if multi else "")
             if counted
             else INFERRED_METHOD
             if c.inferred
@@ -1193,17 +1196,19 @@ def election(event: Event) -> Package:
             if c.distributions and scope.final and not any(b.final for b in scope.booths):
                 # The archive prints the last count only for the whole district.
                 total_unit = key("unit", event.stub, scope.name, "total")
-                p.add(
-                    "reporting_unit",
-                    id=total_unit,
-                    polity_id=AUSTRALIA,
-                    scheme_code="au-qld.booth",
-                    code=f"{day}:{event.stub}:{scope.name}:TOTAL",
-                    area_relation="within",
-                    area_id=area_id,
-                    kind="aggregate",
-                )
-                p.name(total_unit, f"{scope.name}: district total", "en", "official")
+                if total_unit not in units:
+                    units[total_unit] = total_unit
+                    p.add(
+                        "reporting_unit",
+                        id=total_unit,
+                        polity_id=AUSTRALIA,
+                        scheme_code="au-qld.booth",
+                        code=f"{day}:{event.stub}:{scope.name}:TOTAL",
+                        area_relation="within",
+                        area_id=area_id,
+                        kind="aggregate",
+                    )
+                    p.name(total_unit, f"{scope.name}: district total", "en", "official")
                 for order, votes in scope.final.items():
                     values.add(result_set, total_unit, options[order], VOTES, votes, c.distributions)
     frame = values.frame()
