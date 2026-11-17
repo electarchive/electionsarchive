@@ -12,6 +12,7 @@ from statistics import median
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 NUMBER = re.compile(r"^\d[\d,]*$")
 PERCENT = re.compile(r"^-?\d[\d,]*(\.\d+)?%?$")
+LABELS = frozenset(("POLLING", "STATION", "LOCATION", "DIVISION", "PD", "PS"))
 STATION = re.compile(r"^\d+[A-Z]?$")
 MONTHS = {
     name: number
@@ -33,7 +34,9 @@ MONTHS = {
         1,
     )
 }
-CANDIDATE_LEFT = 280.0
+DIVISION = re.compile(
+    r"^ELECTORAL DIVISION(?::\s*|\s+)(?!TOTALS)(.+?)\s*\((\d+)\)(?:\s+\d+\s+#DIV/0!)?\s*$", re.IGNORECASE
+)
 
 
 @dataclass
@@ -69,6 +72,23 @@ class Station:
 
 
 @dataclass
+class Row:
+    """One printed line of a page: a station row or a totals line."""
+
+    line: list[Word]
+    totals: bool
+    division: str = ""
+    head: list[Word] = field(default_factory=list)
+    emergency: bool = False
+
+    @property
+    def first(self) -> int:
+        """Where the cells may start: a number right after the station is the start of its location, unless it has none."""
+        bare = all(NUMBER.match(w.text) or PERCENT.match(w.text) for w in self.head[2:])
+        return 2 if bare else 3
+
+
+@dataclass
 class Totals:
     stations: int
     votes: list[int]
@@ -85,6 +105,8 @@ class Constituency:
     stations: list[Station] = field(default_factory=list)
     declared: Totals | None = None
     divisions: list[Totals] = field(default_factory=list)
+    parent: tuple[int, str] | None = None
+    blank: bool = False
 
 
 @dataclass
@@ -131,25 +153,25 @@ def parse_day(text: str) -> date:
     return date(int(found.group(3)), MONTHS[found.group(1).lower()], int(found.group(2)))
 
 
-def _tail(tokens: list[Word]) -> tuple[int, float, int, int, int] | None:
-    """The last four cells of a row: rejected ballots, total votes, percent, and electors."""
-    if len(tokens) < 4:
-        return None
-    electors, percent, total, rejected = tokens[-1], tokens[-2], tokens[-3], tokens[-4]
-    if not (
-        NUMBER.match(electors.text)
-        and PERCENT.match(percent.text)
-        and NUMBER.match(total.text)
-        and NUMBER.match(rejected.text)
-    ):
-        return None
-    return (
-        number(rejected.text),
-        float(percent.text.rstrip("%").replace(",", "")),
-        number(total.text),
-        number(electors.text),
-        0,
-    )
+def _edges(tokens: list[tuple[Word, Word]], rows: int) -> list[float]:
+    """The right edges of the candidate columns: right-aligned numbers share one, and location text does not.
+
+    A cluster of numbers that mostly follow a word of the location closely is the end of a location, such as
+    "Phase 2", and not a column.
+    """
+    clusters: list[list[tuple[Word, Word]]] = []
+    for pair in sorted(tokens, key=lambda t: t[0].x1):
+        if clusters and pair[0].x1 - clusters[-1][-1][0].x1 <= 1.6:
+            clusters[-1].append(pair)
+        else:
+            clusters.append([pair])
+    need = 2 if rows >= 10 else 1
+    return [
+        statistics.median(w.x1 for w, _ in c)
+        for c in clusters
+        if len(c) >= need
+        and sum(1 for w, before in c if not NUMBER.match(before.text) and w.x0 - before.x1 < 6) * 2 < len(c)
+    ]
 
 
 def _party_line(line: list[Word]) -> bool:
@@ -166,7 +188,16 @@ def _header(
     matched to the printed parties by position.
     """
     cut = min((w.x0 for w in page if w.text in ("BALLOTS", "REJECTED") and w.x0 > 400 and w.y1 < end), default=10_000)
-    head = [w for w in page if w.y0 >= top and w.y1 <= end + 1 and w.x1 <= cut + 2 and w.xc >= CANDIDATE_LEFT - 10]
+    head = [
+        w
+        for w in page
+        if w.y0 >= top
+        and w.y1 <= end + 1
+        and w.x1 <= cut + 2
+        and w.xc >= columns[0][1] - 60
+        and w.text not in LABELS
+        and not re.fullmatch(r"\(\d+\)", w.text)
+    ]
     rotated = sum(1 for w in head if w.y1 - w.y0 > 1.5 * (w.x1 - w.x0)) > len(head) / 2
     if rotated:
         groups: list[list[Word]] = [[] for _ in columns]
@@ -174,10 +205,20 @@ def _header(
         for w in head:
             groups[next((i for i, e in enumerate(edges) if w.xc <= e + 4), len(edges) - 1)].append(w)
         out: list[tuple[str, str]] = []
+        # Rotated words are one font height wide, which the longer ones show. A horizontal party tag sits above the rotated names in a newer report,
+        # and an older report rotates the tag too, as the first line of each column.
+        font = statistics.median([w.x1 - w.x0 for w in head if w.y1 - w.y0 > 18] or [7.5])
+
+        def vertical(w: Word) -> bool:
+            return abs(w.x1 - w.x0 - font) <= 1.2
+
+        flat_tags = any(not vertical(w) for w in head)
         for group in groups:
-            ordered = lines_vertical(group)
-            party = ""
-            if ordered and _party_line(ordered[0]):
+            tags = sorted((w for w in group if not vertical(w)), key=lambda w: w.x0) if flat_tags else []
+            rest = [w for w in group if not any(w is t for t in tags)]
+            ordered = lines_vertical(rest)
+            party = " ".join(w.text for w in tags)
+            if not flat_tags and ordered:
                 party = " ".join(w.text for w in ordered[0])
                 ordered = ordered[1:]
             out.append((party, " ".join(w.text for line in ordered for w in line)))
@@ -224,9 +265,15 @@ def lines_vertical(words: list[Word]) -> list[list[Word]]:
     return [sorted(line, key=lambda w: -w.y1) for line in out]
 
 
-def read(path: Path) -> Document:
+def read(path: Path, by: str = "constituency", name: str = "") -> Document:
+    """The stations of a report, grouped by constituency, by electoral division, or as one municipality named `name`.
+
+    A local government report prints a separate set of candidates for each electoral division, so `by="division"`
+    keys the contests by division and keeps the constituency each one lies in. A mayoral report counts one contest for
+    the whole municipality and breaks it down by division, so `by="municipality"` holds all its stations in one.
+    """
     pages = words_by_page(path)
-    constituencies: dict[int, Constituency] = {}
+    constituencies: dict[tuple[int, int], Constituency] = {}
     current: Constituency | None = None
     title = ""
     day: date | None = None
@@ -243,89 +290,153 @@ def read(path: Path) -> Document:
             key=lambda w: w.y0,
             default=None,
         )
-        if label is None:
+        anchor = min((w for w in page if w.text == "LOCATION"), key=lambda w: w.y1, default=None)
+        if label is None and by != "municipality":
             continue
-        row = [w for w in page if abs(w.yc - label.yc) < 4 and w.x0 > label.x1]
-        row.sort(key=lambda w: w.x0)
-        found = re.fullmatch(r"(.+?)\s*\((\d+)\)", " ".join(w.text for w in row))
-        if not found:
-            raise ValueError(f"page {page_number}: constituency line {row!r} in {text!r}")
-        no = int(found.group(2))
-        current = constituencies.setdefault(no, Constituency(no, found.group(1)))
-        anchor = next((w for w in page if w.text == "LOCATION"), None)
         if anchor is None:
+            if by == "municipality":
+                continue
             raise ValueError(f"page {page_number}: no LOCATION header")
         end = anchor.y1
         body = lines([w for w in page if w.y0 > end - 1 and not (w.y1 - w.y0 > 20)])
+        parent: tuple[int, str] | None = None
+        if label is not None:
+            row = [w for w in page if abs(w.yc - label.yc) < 4 and w.x0 > label.x1]
+            row.sort(key=lambda w: w.x0)
+            found = re.fullmatch(r"(.+?)\s*\((\d+)\)", " ".join(w.text for w in row))
+            if not found and by != "municipality":
+                raise ValueError(f"page {page_number}: constituency line {row!r} in {text!r}")
+            if found:
+                parent = (int(found.group(2)), found.group(1))
+        if label is not None:
+            top = label.y1 - 1
+        else:
+            top = max(
+                (w.y1 for w in page if w.y0 < 110 and ("MUNICIPALITY" in w.text or w.text in ("ELECTION", "DAY:"))),
+                default=0.0,
+            )
+        if by == "municipality":
+            current = constituencies.setdefault((0, 1), Constituency(1, name))
+        elif by == "division":
+            printed = {
+                (m.group(1), int(m.group(2)))
+                for m in (DIVISION.match(" ".join(w.text for w in line)) for line in body)
+                if m
+            }
+            if len(printed) != 1:
+                raise ValueError(f"page {page_number}: divisions {sorted(printed)}")
+            division_name, division_no = next(iter(printed))
+            current = constituencies.setdefault(
+                (parent[0] if parent else 0, division_no), Constituency(division_no, division_name)
+            )
+            current.parent = parent
+        else:
+            assert parent is not None
+            current = constituencies.setdefault((parent[0], 0), Constituency(parent[0], parent[1]))
         division = ""
-        pending: list[Station] = []
-        shapes: list[list[Word]] = []
+        items: list[Row] = []
         for line in body:
             joined = " ".join(w.text for w in line)
             if "Report Printed" in joined or re.search(r"\bPage \d+ of \d+", joined):
                 continue
-            if joined.startswith("ELECTORAL DIVISION:"):
-                division = joined.split(":", 1)[1].strip()
+            if shown := DIVISION.match(joined):
+                division = f"{shown.group(1)} ({shown.group(2)})"
                 continue
-            if "TOTALS" in joined:
-                tail = _tail(line)
-                if tail is None:
+            if re.search(r"\bTOTALS?\b", joined) and not re.match(r"^\d", joined):
+                items.append(Row(line, True))
+                continue
+            head = [w for w in line if w.text != "EPM"]
+            if head and re.fullmatch(r"\d+\.", head[0].text):
+                head = head[1:]  # an older report numbers every row before its polling division
+            if len(head) < 3 or not NUMBER.match(head[0].text) or not STATION.match(head[1].text):
+                if re.match(r"^\d", joined) and len(line) > 5:
+                    raise ValueError(f"page {page_number}: unreadable row {joined!r}")
+                continue
+            items.append(Row(line, False, division, head, any(w.text == "EPM" for w in line)))
+        stations = [item for item in items if not item.totals]
+        numbers = [
+            (w, item.head[i - 1])
+            for item in stations
+            for i, w in enumerate(item.head[2:], 2)
+            if i >= item.first and NUMBER.match(w.text)
+        ]
+        rows = len(stations)
+        if rows and not numbers:
+            current.blank = True  # the report lists the stations and prints no figure for any of them
+            continue
+        edges = _edges(numbers, rows)
+        if rows and len(edges) < 4:
+            raise ValueError(f"page {page_number}: only {len(edges)} columns")
+        count = len(edges) - 3
+
+        def aligned(words: list[Word], tolerance: float = 1.6) -> list[Word | None]:
+            """The word under each column edge, matching each word to the edge nearest to it."""
+            best: dict[int, tuple[float, Word]] = {}
+            for w in words:
+                index = min(range(len(edges)), key=lambda i: abs(w.x1 - edges[i]), default=None)
+                if index is None:
+                    continue
+                gap = abs(w.x1 - edges[index])
+                if gap <= tolerance and (index not in best or gap < best[index][0]):
+                    best[index] = (gap, w)
+            return [best[i][1] if i in best else None for i in range(len(edges))]
+
+        def value(word: Word | None) -> int | None:
+            return None if word is None else number(word.text)
+
+        pending: list[Station] = []
+        page_totals: list[Totals] = []
+        shapes: list[list[Word | None]] = []
+        for item in items:
+            line = item.line
+            if item.totals:
+                joined = " ".join(w.text for w in line)
+                cells = aligned([w for w in line if NUMBER.match(w.text)], 6.0)
+                found_ps = re.search(r"(\d+) P[SD]s", joined)
+                rejected_cell, total_cell, electors_cell = cells[-3:]
+                if total_cell is None or electors_cell is None:
                     raise ValueError(f"page {page_number}: totals {joined!r}")
-                rejected, _, total, electors, _ = tail
-                cells = [w for w in line[:-4] if NUMBER.match(w.text) and w.x0 >= CANDIDATE_LEFT - 10]
-                found_ps = re.search(r"(\d+) PSs", joined)
                 totals = Totals(
                     int(found_ps.group(1)) if found_ps else 0,
-                    [number(w.text) for w in cells],
-                    rejected,
-                    total,
-                    electors,
+                    [number(w.text) if w else 0 for w in cells[:-3]],
+                    value(rejected_cell) or 0,
+                    number(total_cell.text),
+                    number(electors_cell.text),
                 )
-                if "CONSTITUENCY" in joined:
+                page_totals.append(totals)
+                if by == "municipality":
+                    if "DIVISION" in joined:
+                        current.divisions.append(totals)
+                elif by == "division":
+                    if "DIVISION" in joined:
+                        current.declared = totals
+                elif "CONSTITUENCY" in joined:
                     current.declared = totals
                 else:
                     current.divisions.append(totals)
                 continue
-            tail = _tail(line)
-            rejected: int | None
-            total: int | None
-            if tail is None:
-                only = line[-1]
-                if (
-                    re.match(r"^\d", joined)
-                    and len(line) > 3
-                    and NUMBER.match(only.text)
-                    and only.x0 > 560
-                    and STATION.match(line[1].text)
-                ):
-                    rejected = total = None
-                    electors = number(only.text)
-                    head = line[:-1]
-                else:
-                    if re.match(r"^\d", joined) and len(line) > 5:
-                        raise ValueError(f"page {page_number}: unreadable row {joined!r}")
-                    continue
-            else:
-                rejected, _, total, electors, _ = tail
-                head = line[:-4]
-            emergency = any(w.text == "EPM" for w in head)
-            head = [w for w in head if w.text != "EPM"]
-            if head and re.fullmatch(r"\d+\.", head[0].text):
-                head = head[1:]  # an older report numbers every row before its polling division
-            if len(head) < 2 or not NUMBER.match(head[0].text) or not STATION.match(head[1].text):
-                raise ValueError(f"page {page_number}: row {joined!r}")
-            cells = [w for w in head[2:] if NUMBER.match(w.text) and w.x0 >= CANDIDATE_LEFT]
-            location = [w for w in head[2:] if w not in cells]
+            station_division, head, emergency = item.division, item.head, item.emergency
+            cells = aligned([w for w in head[item.first :] if NUMBER.match(w.text)])
+            electors = value(cells[-1])
+            if electors is None and re.search(r"\bNO ELECTORS?\b", " ".join(w.text for w in line)):
+                electors = 0
+            if electors is None:
+                raise ValueError(f"page {page_number}: no electors in {' '.join(w.text for w in line)!r}")
+            location = [
+                w
+                for w in head[2:]
+                if not any(w is c for c in cells) and not (PERCENT.match(w.text) and re.search(r"[.%]", w.text))
+            ]
             pending.append(
                 Station(
-                    division,
+                    station_division,
                     head[0].text,
                     head[1].text,
                     emergency,
                     " ".join(w.text for w in location),
-                    [number(w.text) for w in cells],
-                    rejected,
-                    total,
+                    [value(w) for w in cells[:-3]] if any(cells[:-1]) else [],
+                    value(cells[-3]),
+                    value(cells[-2]),
                     electors,
                     page_number,
                     (
@@ -336,34 +447,36 @@ def read(path: Path) -> Document:
                     ),
                 )
             )
-            shapes.append(cells)
+            shapes.append(cells[:-3])
         if pending:
-            count = int(median(len(s.votes) for s in pending if s.total is not None))
-            if any(len(s.votes) != count for s in pending if s.total is not None):
-                bad = next(s for s in pending if s.total is not None and len(s.votes) != count)
-                raise ValueError(
-                    f"page {page_number}: row {bad.pd}/{bad.ps} has {len(bad.votes)} candidate cells against {count}"
-                )
-            shapes = [shape for shape, s in zip(shapes, pending, strict=True) if s.total is not None]
             columns = [
                 (
-                    median(shape[i].xc for shape in shapes),
-                    median(shape[i].x1 for shape in shapes),
+                    median(w.xc for shape in shapes if (w := shape[i]) is not None),
+                    median(w.x1 for shape in shapes if (w := shape[i]) is not None),
                 )
                 for i in range(count)
             ]
             below = min(
                 [s.box[1] for s in pending]
-                + [line[0].y0 for line in body if " ".join(w.text for w in line).startswith("ELECTORAL DIVISION")]
+                + [
+                    line[0].y0
+                    for line in body
+                    if " ".join(w.text for w in line).upper().startswith("ELECTORAL DIVISION")
+                ]
             )
-            header, mapping = _header(page, columns, label.y1 - 1, below - 1)
+            header, mapping = _header(page, columns, top, below - 1)
             if mapping != list(range(len(header))):
                 for station in pending:
                     if station.votes:
-                        cells: list[int | None] = [None] * len(header)
-                        for i, value in zip(mapping, station.votes, strict=True):
-                            cells[i] = value
-                        station.votes = cells
+                        expanded: list[int | None] = [None] * len(header)
+                        for i, cell in zip(mapping, station.votes, strict=True):
+                            expanded[i] = cell
+                        station.votes = expanded
+                for totals in page_totals:
+                    wide = [0] * len(header)
+                    for i, total in zip(mapping, totals.votes, strict=True):
+                        wide[i] = total
+                    totals.votes = wide
             while header and header[-1] == ("", ""):
                 if any(s.votes[len(header) - 1] for s in pending if s.votes):
                     raise ValueError(f"page {page_number}: votes in an unnamed column")
@@ -371,6 +484,8 @@ def read(path: Path) -> Document:
                 for station in pending:
                     if station.votes:
                         station.votes.pop()
+                for totals in page_totals:
+                    totals.votes = totals.votes[: len(header)]
             if not current.candidates:
                 current.candidates = header
             elif current.candidates != header:

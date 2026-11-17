@@ -109,20 +109,28 @@ SYSTEM = key("electoral_system", "house", "fptp")
 
 
 def packages() -> list[str]:
-    return ["jm.ecj/registry", *(f"jm.ecj/{day}" for day in FILES)]
+    from ea.sources.jm import local
+
+    return ["jm.ecj/registry", *(f"jm.ecj/{day}" for day in FILES), *local.packages()]
 
 
 def fetch() -> None:
+    from ea.sources.jm import local
+
     for urls in FILES.values():
         for url in urls:
             if url:
                 raw.fetch(SOURCE, url, suffix=".pdf")
+    local.fetch()
 
 
 def parse() -> None:
+    from ea.sources.jm import local
+
     registry().write()
     for day in FILES:
         build(day).write()
+    local.parse()
 
 
 def emit() -> None:
