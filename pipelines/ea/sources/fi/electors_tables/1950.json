@@ -1,0 +1,546 @@
+{
+  "year": 1950,
+  "date_from": "1950-01-16",
+  "date_to": "1950-01-17",
+  "electors": 300,
+  "parties": [
+    {
+      "key": "kok",
+      "fi": "Kansallinen kokoomuspuolue",
+      "sv": "Nationella samlingspartiet",
+      "fr": "Parti national de coalition",
+      "supports": "J. K. Paasikivi"
+    },
+    {
+      "key": "rkp",
+      "fi": "Ruotsalainen kansanpuolue",
+      "sv": "Svenska folkpartiet",
+      "fr": "Parti suédois",
+      "supports": "J. K. Paasikivi"
+    },
+    {
+      "key": "edistys",
+      "fi": "Kansallinen edistyspuolue",
+      "sv": "Nationella framstegspartiet",
+      "fr": "Parti national progressiste",
+      "supports": "J. K. Paasikivi"
+    },
+    {
+      "key": "sdp",
+      "fi": "Sosialidemokraattinen puolue",
+      "sv": "Socialdemokratiska partiet",
+      "fr": "Parti socialdémocrate",
+      "supports": null
+    },
+    {
+      "key": "pekkala_group",
+      "fi": "Mauno Pekkalan kannattajat",
+      "sv": "Mauno Pekkalas anhängare",
+      "fr": "Candidature de M. Pekkala",
+      "supports": "Mauno Pekkala"
+    },
+    {
+      "key": "kekkonen_group",
+      "fi": "Urho Kekkosen kannattajat",
+      "sv": "Urho Kekkonens anhängare",
+      "fr": "Candidature de M. Kekkonen",
+      "supports": "Urho Kekkonen"
+    },
+    {
+      "key": "other",
+      "fi": "Muut puolueet",
+      "sv": "Övriga partier",
+      "fr": "Autres partis",
+      "supports": null
+    }
+  ],
+  "districts": [
+    {
+      "fi": "Uudenmaan läänin vaalipiiri",
+      "sv": "Nylands läns valkrets",
+      "registered": 442288,
+      "voters": 314654,
+      "cast": 314654,
+      "valid": 313520,
+      "invalid": 1134,
+      "votes": {
+        "kok": 63005,
+        "rkp": 76266,
+        "edistys": 31836,
+        "sdp": 72711,
+        "pekkala_group": 58802,
+        "kekkonen_group": 10852,
+        "other": 48
+      },
+      "electors": {
+        "kok": 10,
+        "rkp": 12,
+        "edistys": 5,
+        "sdp": 12,
+        "pekkala_group": 9,
+        "kekkonen_group": 1
+      },
+      "seats": 49,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Turun läänin eteläinen vaalipiiri",
+      "sv": "Åbo läns södra valkrets",
+      "registered": 222344,
+      "voters": 138138,
+      "cast": 138138,
+      "valid": 137439,
+      "invalid": 699,
+      "votes": {
+        "kok": 30430,
+        "rkp": 12384,
+        "edistys": 15681,
+        "sdp": 27140,
+        "pekkala_group": 32683,
+        "kekkonen_group": 19040,
+        "other": 81
+      },
+      "electors": {
+        "kok": 6,
+        "rkp": 2,
+        "edistys": 3,
+        "sdp": 5,
+        "pekkala_group": 6,
+        "kekkonen_group": 3
+      },
+      "seats": 25,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Turun läänin pohjoinen vaalipiiri",
+      "sv": "Åbo läns norra valkrets",
+      "registered": 182107,
+      "voters": 115419,
+      "cast": 115419,
+      "valid": 114735,
+      "invalid": 684,
+      "votes": {
+        "kok": 34137,
+        "edistys": 1713,
+        "sdp": 28198,
+        "pekkala_group": 26706,
+        "kekkonen_group": 23844,
+        "other": 137
+      },
+      "electors": {
+        "kok": 7,
+        "sdp": 6,
+        "pekkala_group": 5,
+        "kekkonen_group": 5
+      },
+      "seats": 23,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Ahvenanmaan maakunnan vaalipiiri",
+      "sv": "Landskapet Ålands valkrets",
+      "registered": 14978,
+      "voters": 5647,
+      "cast": 5647,
+      "valid": 5619,
+      "invalid": 28,
+      "votes": {
+        "rkp": 5373,
+        "sdp": 122,
+        "pekkala_group": 122,
+        "other": 2
+      },
+      "electors": {
+        "rkp": 1
+      },
+      "seats": 1,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Hämeen läänin eteläinen vaalipiiri",
+      "sv": "Tavastehus läns södra valkrets",
+      "registered": 174619,
+      "voters": 109535,
+      "cast": 109535,
+      "valid": 108904,
+      "invalid": 631,
+      "votes": {
+        "kok": 36051,
+        "edistys": 6432,
+        "sdp": 31576,
+        "pekkala_group": 20957,
+        "kekkonen_group": 13745,
+        "other": 143
+      },
+      "electors": {
+        "kok": 8,
+        "edistys": 1,
+        "sdp": 6,
+        "pekkala_group": 4,
+        "kekkonen_group": 2
+      },
+      "seats": 21,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Hämeen läänin pohjoinen vaalipiiri",
+      "sv": "Tavastehus läns norra valkrets",
+      "registered": 170119,
+      "voters": 112074,
+      "cast": 112074,
+      "valid": 111522,
+      "invalid": 552,
+      "votes": {
+        "kok": 35238,
+        "edistys": 3003,
+        "sdp": 35060,
+        "pekkala_group": 30123,
+        "kekkonen_group": 8009,
+        "other": 89
+      },
+      "electors": {
+        "kok": 5,
+        "edistys": 2,
+        "sdp": 6,
+        "pekkala_group": 6,
+        "kekkonen_group": 1
+      },
+      "seats": 20,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Kymen läänin vaalipiiri",
+      "sv": "Kymmene läns valkrets",
+      "registered": 196318,
+      "voters": 130053,
+      "cast": 130053,
+      "valid": 129315,
+      "invalid": 738,
+      "votes": {
+        "kok": 34836,
+        "edistys": 5519,
+        "sdp": 39040,
+        "pekkala_group": 16829,
+        "kekkonen_group": 33042,
+        "other": 49
+      },
+      "electors": {
+        "kok": 6,
+        "edistys": 1,
+        "sdp": 7,
+        "pekkala_group": 3,
+        "kekkonen_group": 6
+      },
+      "seats": 23,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Mikkelin läänin vaalipiiri",
+      "sv": "S:t Michels läns valkrets",
+      "registered": 148356,
+      "voters": 81113,
+      "cast": 81113,
+      "valid": 80508,
+      "invalid": 605,
+      "votes": {
+        "kok": 18259,
+        "edistys": 5954,
+        "sdp": 21041,
+        "pekkala_group": 11230,
+        "kekkonen_group": 23922,
+        "other": 102
+      },
+      "electors": {
+        "kok": 4,
+        "edistys": 1,
+        "sdp": 5,
+        "pekkala_group": 2,
+        "kekkonen_group": 6
+      },
+      "seats": 18,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Kuopion läänin läntinen vaalipiiri",
+      "sv": "Kuopio läns västra valkrets",
+      "registered": 149097,
+      "voters": 95468,
+      "cast": 95468,
+      "valid": 94862,
+      "invalid": 606,
+      "votes": {
+        "kok": 16526,
+        "edistys": 2571,
+        "sdp": 14875,
+        "pekkala_group": 30502,
+        "kekkonen_group": 30329,
+        "other": 59
+      },
+      "electors": {
+        "kok": 3,
+        "sdp": 3,
+        "pekkala_group": 7,
+        "kekkonen_group": 6
+      },
+      "seats": 19,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Kuopion läänin itäinen vaalipiiri",
+      "sv": "Kuopio läns östra valkrets",
+      "registered": 122817,
+      "voters": 66711,
+      "cast": 66711,
+      "valid": 66122,
+      "invalid": 589,
+      "votes": {
+        "kok": 17259,
+        "edistys": 482,
+        "sdp": 16882,
+        "pekkala_group": 12835,
+        "kekkonen_group": 18590,
+        "other": 74
+      },
+      "electors": {
+        "kok": 4,
+        "sdp": 4,
+        "pekkala_group": 3,
+        "kekkonen_group": 5
+      },
+      "seats": 16,
+      "pages": {
+        "turnout": 10,
+        "votes": 11,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Vaasan läänin itäinen vaalipiiri",
+      "sv": "Vasa läns östra valkrets",
+      "registered": 148436,
+      "voters": 87185,
+      "cast": 87185,
+      "valid": 86579,
+      "invalid": 606,
+      "votes": {
+        "kok": 17882,
+        "edistys": 1268,
+        "sdp": 23179,
+        "pekkala_group": 17867,
+        "kekkonen_group": 26329,
+        "other": 54
+      },
+      "electors": {
+        "kok": 4,
+        "sdp": 5,
+        "pekkala_group": 4,
+        "kekkonen_group": 6
+      },
+      "seats": 19,
+      "pages": {
+        "turnout": 10,
+        "votes": 12,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Vaasan läänin eteläinen vaalipiiri",
+      "sv": "Vasa läns södra valkrets",
+      "registered": 127197,
+      "voters": 81499,
+      "cast": 81499,
+      "valid": 81154,
+      "invalid": 345,
+      "votes": {
+        "kok": 20349,
+        "rkp": 24285,
+        "sdp": 7627,
+        "pekkala_group": 11755,
+        "kekkonen_group": 17120,
+        "other": 18
+      },
+      "electors": {
+        "kok": 4,
+        "rkp": 5,
+        "sdp": 1,
+        "pekkala_group": 2,
+        "kekkonen_group": 3
+      },
+      "seats": 15,
+      "pages": {
+        "turnout": 10,
+        "votes": 12,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Vaasan läänin pohjoinen vaalipiiri",
+      "sv": "Vasa läns norra valkrets",
+      "registered": 101716,
+      "voters": 70219,
+      "cast": 70219,
+      "valid": 69909,
+      "invalid": 310,
+      "votes": {
+        "kok": 11625,
+        "rkp": 21010,
+        "sdp": 7709,
+        "pekkala_group": 8981,
+        "kekkonen_group": 20503,
+        "other": 81
+      },
+      "electors": {
+        "kok": 2,
+        "rkp": 4,
+        "sdp": 1,
+        "pekkala_group": 2,
+        "kekkonen_group": 4
+      },
+      "seats": 13,
+      "pages": {
+        "turnout": 10,
+        "votes": 12,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Oulun läänin vaalipiiri",
+      "sv": "Uleåborgs läns valkrets",
+      "registered": 197944,
+      "voters": 123307,
+      "cast": 123307,
+      "valid": 122310,
+      "invalid": 997,
+      "votes": {
+        "kok": 16058,
+        "edistys": 9127,
+        "sdp": 12892,
+        "pekkala_group": 39321,
+        "kekkonen_group": 44833,
+        "other": 79
+      },
+      "electors": {
+        "kok": 3,
+        "edistys": 2,
+        "sdp": 2,
+        "pekkala_group": 9,
+        "kekkonen_group": 10
+      },
+      "seats": 26,
+      "pages": {
+        "turnout": 10,
+        "votes": 12,
+        "electors": 28
+      }
+    },
+    {
+      "fi": "Lapin läänin vaalipiiri",
+      "sv": "Lapplands läns valkrets",
+      "registered": 88894,
+      "voters": 54813,
+      "cast": 54813,
+      "valid": 54545,
+      "invalid": 268,
+      "votes": {
+        "kok": 9134,
+        "edistys": 1370,
+        "sdp": 5776,
+        "pekkala_group": 19322,
+        "kekkonen_group": 18902,
+        "other": 41
+      },
+      "electors": {
+        "kok": 2,
+        "sdp": 1,
+        "pekkala_group": 5,
+        "kekkonen_group": 4
+      },
+      "seats": 12,
+      "pages": {
+        "turnout": 10,
+        "votes": 12,
+        "electors": 28
+      }
+    }
+  ],
+  "national": {
+    "registered": 2487230,
+    "voters": 1585835,
+    "cast": 1585835,
+    "valid": 1577043,
+    "invalid": 8792,
+    "votes": {
+      "kok": 360789,
+      "rkp": 139318,
+      "edistys": 84956,
+      "sdp": 343828,
+      "pekkala_group": 338035,
+      "kekkonen_group": 309060,
+      "other": 1057
+    },
+    "electors": {
+      "kok": 68,
+      "rkp": 24,
+      "edistys": 15,
+      "sdp": 64,
+      "pekkala_group": 67,
+      "kekkonen_group": 62
+    },
+    "seats": 300,
+    "pages": {
+      "turnout": 10,
+      "votes": 12,
+      "electors": 28
+    }
+  },
+  "notes": [
+    "The volume does not print the polling days; the poll was held on 16 and 17 January 1950.",
+    "The kok, rkp and edistys columns are printed under the joint heading 'J. K. Paasikiven kannattajat — J. K. Paasikivis anhängare — Candidature de M. Paasikivi'; the Finnish header of the kok column is abbreviated as printed: 'Kansallinen kokoomuspuol.'.",
+    "pekkala_group = 'Mauno Pekkalan kannattajat' (lists supporting Mauno Pekkala; per the introduction, put forward by Suomen kansan demokraattinen liitto, SKDL). kekkonen_group = 'Urho Kekkosen kannattajat' (lists supporting Urho Kekkonen; put forward by Maalaisliitto). other = 'Muut puolueet'.",
+    "Table 2 footnote 1: the rkp figure for Uudenmaan läänin vaalipiiri (76 266) includes 2 109 votes for Ruotsalainen vapaamielinen puolue (Svenska frisinnade partiet).",
+    "Table 2 footnote 2: the edistys figure for Uudenmaan läänin vaalipiiri (31 836) includes 9 152 votes for Itsenäinen keskiluokka (Självständiga medelklassen).",
+    "Table 2 (page 12) footnote 2: the edistys figure for Oulun läänin vaalipiiri (9 127) includes 689 votes for Pienviljelijäin puolue (Småbrukarpartiet); the national edistys total 84 956 includes these and the 9 152 Itsenäinen keskiluokka votes.",
+    "Table 8 footnote 1: of the 12 rkp electors in Uudenmaan läänin vaalipiiri, 1 belongs to Ruotsalainen vapaamielinen puolue. Footnote 2: of the 5 edistys electors there, 1 belongs to Itsenäinen keskiluokka.",
+    "District votes are the constituency total rows, which include ballots arriving from other constituencies ('Vaaliliput muista vaalipiireistä'). Voters (table 1 'Yhteensä') equal cast ballots (table 2 'Yhteensä') in every constituency.",
+    "Constituency change since the 1948 parliamentary election: the municipalities of Iitti, Kuusankoski, Jaala, Elimäki and Anjala were transferred from Uudenmaan lääni to Kymen lääni on 1 January 1949 and so moved to the Kymen läänin vaalipiiri.",
+    "Table 1 is a two-page spread (printed pages 10-11) on PDF page 10; table 2 rows for Uusimaa-Kuopio east are on PDF page 11, Vaasa east-Lappi and the national total on PDF page 12; table 8 is printed page 42 on PDF page 28.",
+    "Not a data issue but noted: table 1 prints the turnout percentage of Turun läänin eteläinen vaalipiiri as 82.1 %; 138 138 / 222 344 = 62.1 %."
+  ],
+  "misprints": []
+}

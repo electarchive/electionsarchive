@@ -1,0 +1,675 @@
+{
+ "year": 1968,
+ "date_from": "1968-01-15",
+ "date_to": "1968-01-16",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "skdl",
+   "fi": "Suomen Kansan Demokraattinen Liitto",
+   "sv": "Demokratiska Förbundet för Finlands Folk",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "tpsl",
+   "fi": "Työväen ja Pienviljelijäin Sosialidemokraattinen Liitto",
+   "sv": "Arbetarnas och Småbrukarnas Socialdemokratiska Förbund",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "sdp",
+   "fi": "Suomen Sosialidemokraattinen Puolue",
+   "sv": "Finlands Socialdemokratiska Parti",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "ml",
+   "fi": "Keskustapuolue",
+   "sv": "Centerpartiet",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "kekkonen_union_rkp",
+   "fi": "Ruotsalainen Kansanpuolue",
+   "sv": "Svenska Folkpartiet",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "kekkonen_union_ind",
+   "fi": "Puolueettomat",
+   "sv": "Partilösa",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "lkp",
+   "fi": "Liberaalisen Kansanpuolueen vaaliliitto",
+   "sv": "Liberala Folkpartiets valförbund",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "rkp_kekkonen",
+   "fi": "Kekkosen kannattajat",
+   "sv": "Kekkonens anhängare",
+   "fr": null,
+   "supports": "Kekkonen"
+  },
+  {
+   "key": "rkp_vennamo",
+   "fi": "Vennamon kannattaja",
+   "sv": "Vennamos anhängare",
+   "fr": null,
+   "supports": "Vennamo"
+  },
+  {
+   "key": "rkp_virkkunen",
+   "fi": "Virkkusen kannattajat",
+   "sv": "Virkkunens anhängare",
+   "fr": null,
+   "supports": "Virkkunen"
+  },
+  {
+   "key": "smp",
+   "fi": "Vennamon vaaliliitto",
+   "sv": "Vennamos valförbund",
+   "fr": null,
+   "supports": "Vennamo"
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen Kokoomus",
+   "sv": "Nationella Samlingspartiet",
+   "fr": null,
+   "supports": "Virkkunen"
+  },
+  {
+   "key": "kok_ind",
+   "fi": "Puolueettomat",
+   "sv": "Partilösa",
+   "fr": null,
+   "supports": "Virkkunen"
+  },
+  {
+   "key": "written",
+   "fi": "Kirjoitetut listat",
+   "sv": "Skrivna listor",
+   "fr": null,
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Helsingin kaupungin vaalipiiri",
+   "sv": "Helsingfors stads valkrets",
+   "registered": 354354,
+   "voters": 243945,
+   "votes": {
+    "skdl": 35315,
+    "tpsl": 9276,
+    "sdp": 33517,
+    "ml": 4246,
+    "kekkonen_union_rkp": 2568,
+    "kekkonen_union_ind": 2777,
+    "lkp": 18865,
+    "rkp_kekkonen": 7007,
+    "rkp_virkkunen": 24988,
+    "smp": 21936,
+    "kok": 79780,
+    "kok_ind": 2470,
+    "written": 17
+   },
+   "valid": 242762,
+   "invalid": 1184,
+   "cast": 243946,
+   "electors": {
+    "skdl": 5,
+    "tpsl": 1,
+    "sdp": 6,
+    "lkp": 2,
+    "rkp_kekkonen": 2,
+    "rkp_virkkunen": 2,
+    "smp": 3,
+    "kok": 10,
+    "kok_ind": 1
+   },
+   "seats": 32,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 272911,
+   "voters": 185332,
+   "votes": {
+    "skdl": 24568,
+    "tpsl": 5000,
+    "sdp": 36360,
+    "ml": 20365,
+    "kekkonen_union_ind": 2829,
+    "lkp": 8297,
+    "rkp_kekkonen": 20349,
+    "rkp_virkkunen": 9561,
+    "smp": 18156,
+    "kok": 38772,
+    "kok_ind": 135,
+    "written": 4
+   },
+   "valid": 184396,
+   "invalid": 1089,
+   "cast": 185485,
+   "electors": {
+    "skdl": 5,
+    "tpsl": 1,
+    "sdp": 6,
+    "ml": 2,
+    "lkp": 1,
+    "rkp_kekkonen": 2,
+    "rkp_virkkunen": 2,
+    "smp": 3,
+    "kok": 6
+   },
+   "seats": 28,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 245350,
+   "voters": 171841,
+   "votes": {
+    "skdl": 37084,
+    "tpsl": 2386,
+    "sdp": 28943,
+    "ml": 25632,
+    "kekkonen_union_ind": 2648,
+    "lkp": 13489,
+    "rkp_kekkonen": 5154,
+    "rkp_vennamo": 677,
+    "rkp_virkkunen": 2627,
+    "smp": 15274,
+    "kok": 37160
+   },
+   "valid": 171074,
+   "invalid": 799,
+   "cast": 171873,
+   "electors": {
+    "skdl": 5,
+    "sdp": 5,
+    "ml": 4,
+    "lkp": 2,
+    "rkp_virkkunen": 1,
+    "smp": 2,
+    "kok": 5
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 195969,
+   "voters": 143679,
+   "votes": {
+    "skdl": 29740,
+    "tpsl": 1509,
+    "sdp": 26425,
+    "ml": 30468,
+    "kekkonen_union_ind": 1357,
+    "lkp": 5944,
+    "smp": 15954,
+    "kok": 28967,
+    "kok_ind": 2487,
+    "written": 2
+   },
+   "valid": 142853,
+   "invalid": 816,
+   "cast": 143669,
+   "electors": {
+    "skdl": 5,
+    "sdp": 4,
+    "ml": 5,
+    "smp": 2,
+    "kok": 3,
+    "kok_ind": 1
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Ahvenanmaan maakunnan vaalipiiri",
+   "sv": "Ålands landskaps valkrets",
+   "registered": 14735,
+   "voters": 3994,
+   "votes": {
+    "rkp_kekkonen": 3910,
+    "written": 4
+   },
+   "valid": 3914,
+   "invalid": 82,
+   "cast": 3996,
+   "electors": {
+    "rkp_kekkonen": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 212577,
+   "voters": 147431,
+   "votes": {
+    "skdl": 24195,
+    "tpsl": 3561,
+    "sdp": 29547,
+    "ml": 22674,
+    "kekkonen_union_ind": 839,
+    "lkp": 6713,
+    "smp": 16157,
+    "kok": 42198,
+    "kok_ind": 645,
+    "written": 1
+   },
+   "valid": 146530,
+   "invalid": 856,
+   "cast": 147386,
+   "electors": {
+    "skdl": 3,
+    "tpsl": 1,
+    "sdp": 5,
+    "ml": 4,
+    "lkp": 1,
+    "smp": 2,
+    "kok": 6
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 182874,
+   "voters": 132296,
+   "votes": {
+    "skdl": 31708,
+    "tpsl": 3024,
+    "sdp": 25241,
+    "ml": 8764,
+    "kekkonen_union_ind": 3059,
+    "lkp": 4218,
+    "smp": 10809,
+    "kok": 44670,
+    "written": 1
+   },
+   "valid": 131494,
+   "invalid": 747,
+   "cast": 132241,
+   "electors": {
+    "skdl": 5,
+    "sdp": 4,
+    "ml": 2,
+    "smp": 1,
+    "kok": 6
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Kymen läänin vaalipiiri",
+   "sv": "Kymmene läns valkrets",
+   "registered": 224801,
+   "voters": 154405,
+   "votes": {
+    "skdl": 12213,
+    "tpsl": 5270,
+    "sdp": 37169,
+    "ml": 38145,
+    "kekkonen_union_ind": 502,
+    "lkp": 9306,
+    "smp": 16295,
+    "kok": 34728,
+    "written": 1
+   },
+   "valid": 153629,
+   "invalid": 874,
+   "cast": 154503,
+   "electors": {
+    "skdl": 2,
+    "tpsl": 1,
+    "sdp": 6,
+    "ml": 6,
+    "lkp": 1,
+    "smp": 2,
+    "kok": 5
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 143325,
+   "voters": 93855,
+   "votes": {
+    "skdl": 7079,
+    "tpsl": 4132,
+    "sdp": 15073,
+    "ml": 35791,
+    "lkp": 3534,
+    "smp": 11399,
+    "kok": 16368
+   },
+   "valid": 93376,
+   "invalid": 505,
+   "cast": 93881,
+   "electors": {
+    "skdl": 1,
+    "tpsl": 1,
+    "sdp": 3,
+    "ml": 6,
+    "smp": 2,
+    "kok": 2
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Pohjois-Karjalan läänin vaalipiiri",
+   "sv": "Norra Karelens läns valkrets",
+   "registered": 117124,
+   "voters": 79236,
+   "votes": {
+    "skdl": 6874,
+    "tpsl": 2063,
+    "sdp": 12941,
+    "ml": 20438,
+    "kekkonen_union_ind": 3893,
+    "lkp": 3989,
+    "smp": 16790,
+    "kok": 11753
+   },
+   "valid": 78741,
+   "invalid": 464,
+   "cast": 79205,
+   "electors": {
+    "skdl": 1,
+    "sdp": 2,
+    "ml": 4,
+    "kekkonen_union_ind": 1,
+    "smp": 3,
+    "kok": 2
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Kuopion läänin vaalipiiri",
+   "sv": "Kuopio läns valkrets",
+   "registered": 162353,
+   "voters": 113430,
+   "votes": {
+    "skdl": 23449,
+    "tpsl": 2120,
+    "sdp": 12184,
+    "ml": 33195,
+    "kekkonen_union_ind": 1438,
+    "lkp": 5116,
+    "smp": 19699,
+    "kok": 15633,
+    "kok_ind": 117
+   },
+   "valid": 112951,
+   "invalid": 370,
+   "cast": 113321,
+   "electors": {
+    "skdl": 5,
+    "sdp": 3,
+    "ml": 5,
+    "smp": 3,
+    "kok": 2
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Keski-Suomen läänin vaalipiiri",
+   "sv": "Mellersta Finlands läns valkrets",
+   "registered": 151323,
+   "voters": 104983,
+   "votes": {
+    "skdl": 17977,
+    "tpsl": 6060,
+    "sdp": 19849,
+    "ml": 27797,
+    "kekkonen_union_ind": 229,
+    "lkp": 4238,
+    "smp": 11389,
+    "kok": 16746
+   },
+   "valid": 104285,
+   "invalid": 682,
+   "cast": 104967,
+   "electors": {
+    "skdl": 2,
+    "tpsl": 1,
+    "sdp": 5,
+    "ml": 4,
+    "smp": 2,
+    "kok": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 12,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Vaasan läänin vaalipiiri",
+   "sv": "Vasa läns valkrets",
+   "registered": 282774,
+   "voters": 206864,
+   "votes": {
+    "skdl": 24964,
+    "tpsl": 1325,
+    "sdp": 18655,
+    "ml": 58028,
+    "kekkonen_union_ind": 1617,
+    "lkp": 3304,
+    "rkp_kekkonen": 31958,
+    "rkp_virkkunen": 6716,
+    "smp": 21778,
+    "kok": 36809,
+    "kok_ind": 933,
+    "written": 1
+   },
+   "valid": 206088,
+   "invalid": 646,
+   "cast": 206734,
+   "electors": {
+    "skdl": 4,
+    "sdp": 3,
+    "ml": 9,
+    "rkp_kekkonen": 4,
+    "rkp_virkkunen": 1,
+    "smp": 3,
+    "kok": 5
+   },
+   "seats": 29,
+   "pages": {
+    "turnout": 13,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Oulun läänin vaalipiiri",
+   "sv": "Uleåborgs läns valkrets",
+   "registered": 238885,
+   "voters": 176361,
+   "votes": {
+    "skdl": 44896,
+    "tpsl": 636,
+    "sdp": 12313,
+    "ml": 66968,
+    "kekkonen_union_ind": 237,
+    "lkp": 8905,
+    "smp": 22772,
+    "kok": 18893
+   },
+   "valid": 175620,
+   "invalid": 657,
+   "cast": 176277,
+   "electors": {
+    "skdl": 8,
+    "sdp": 2,
+    "ml": 10,
+    "lkp": 1,
+    "smp": 3,
+    "kok": 3
+   },
+   "seats": 27,
+   "pages": {
+    "turnout": 13,
+    "votes": 13,
+    "electors": 33
+   }
+  },
+  {
+   "fi": "Lapin läänin vaalipiiri",
+   "sv": "Lapplands läns valkrets",
+   "registered": 121280,
+   "voters": 91350,
+   "votes": {
+    "skdl": 25547,
+    "tpsl": 471,
+    "sdp": 6851,
+    "ml": 28686,
+    "lkp": 6913,
+    "smp": 12874,
+    "kok": 9537
+   },
+   "valid": 90879,
+   "invalid": 421,
+   "cast": 91300,
+   "electors": {
+    "skdl": 5,
+    "sdp": 1,
+    "ml": 4,
+    "lkp": 1,
+    "smp": 2,
+    "kok": 1
+   },
+   "seats": 14,
+   "pages": {
+    "turnout": 13,
+    "votes": 13,
+    "electors": 33
+   }
+  }
+ ],
+ "national": {
+  "registered": 2920635,
+  "voters": 2049002,
+  "votes": {
+   "skdl": 345609,
+   "tpsl": 46833,
+   "sdp": 315068,
+   "ml": 421197,
+   "kekkonen_union_rkp": 2568,
+   "kekkonen_union_ind": 21425,
+   "lkp": 102831,
+   "rkp_kekkonen": 68378,
+   "rkp_vennamo": 677,
+   "rkp_virkkunen": 43892,
+   "smp": 231282,
+   "kok": 432014,
+   "kok_ind": 6787,
+   "written": 31
+  },
+  "valid": 2038592,
+  "invalid": 10192,
+  "cast": 2048784,
+  "electors": {
+   "skdl": 56,
+   "tpsl": 6,
+   "sdp": 55,
+   "ml": 65,
+   "kekkonen_union_ind": 1,
+   "lkp": 9,
+   "rkp_kekkonen": 9,
+   "rkp_virkkunen": 6,
+   "smp": 33,
+   "kok": 58,
+   "kok_ind": 2
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 12,
+   "votes": 13,
+   "electors": 33
+  }
+ },
+ "notes": [
+  "Table 2 groups the lists into electoral unions; the party keys are the leaf ('of which') columns, so they sum to the valid total. Union totals printed: Kekkonen union (skdl+tpsl+sdp+ml+kekkonen_union_rkp+kekkonen_union_ind) 1 152 700; Swedish People's Party union (rkp_kekkonen+rkp_vennamo+rkp_virkkunen) 112 947; National Coalition union (kok+kok_ind) 438 801.",
+  "ml = Keskustapuolue (Center Party). kekkonen_union_rkp = Swedish People's Party candidates inside the Kekkonen electoral union (Helsinki only); kekkonen_union_ind = independents (Puolueettomat) in the Kekkonen union. rkp_kekkonen / rkp_vennamo / rkp_virkkunen = adherents of Kekkonen / Vennamo / Virkkunen within the Swedish People's Party electoral union. smp = Vennamo's electoral union, footnoted as the Finnish Rural Party (Suomen Maaseudun Puolue) and independents. kok_ind = independents in the National Coalition union. lkp = the Liberal People's Party electoral union, which nominated Kekkonen. written = written lists (Kirjoitetut listat).",
+  "Footnote 1: the Liberal People's Party union figure for Helsinki (18 865) includes 94 votes for an independent candidate.",
+  "Footnote 2: the Virkkunen adherents figure for Helsinki (24 988) includes 105 votes for a candidate of the Independence Party (Itsenäisyyspuolue).",
+  "Footnote 4: Åland's 3 910 votes (shown in the Swedish People's Party union total and its Kekkonen adherents column) are for Ahvenanmaan Kokoomus (Åländsk Samling), the only list in Åland, which supported Kekkonen; its 1 elector is printed in the same column of table 8 (footnoted likewise).",
+  "Table 1 footnote: the national voters total (2 049 002) and Uusimaa's (185 332) include 111 persons whose sex and commune are unknown. Table 1 voters are counted by place of registration, so they differ from the ballots in table 2.",
+  "Table 8 has no column for kekkonen_union_rkp or rkp_vennamo (no electors). Of the 300 electors, 201 were Kekkonen adherents, 33 Vennamo adherents and 66 Virkkunen adherents; 52 were women.",
+  "Constituencies unchanged from 1962; seats were increased by two in Helsinki and Uusimaa and by one in Häme South, and reduced by one in Mikkeli, North Karelia, Central Finland, Vaasa and Oulu.",
+  "Polling days 15 and 16 January 1968. The volume has English, not French, headings, so fr is null."
+ ],
+ "misprints": []
+}

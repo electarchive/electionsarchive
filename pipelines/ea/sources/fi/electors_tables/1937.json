@@ -1,0 +1,585 @@
+{
+ "year": 1937,
+ "date_from": "1937-01-15",
+ "date_to": "1937-01-16",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "sdp",
+   "fi": "Sosialidemokraattinen puolue",
+   "sv": "Socialdemokratiska partiet",
+   "fr": "Parti socialdémocrate",
+   "supports": null
+  },
+  {
+   "key": "svinhufvud_general",
+   "fi": "P. E. Svinhufvudin kannattajat: Yleinen vaaliliitto",
+   "sv": "P. E. Svinhufvuds anhängare: Allmänna valförbundet",
+   "fr": "Candidature de M. Svinhufvud: Alliance électorale générale",
+   "supports": "P. E. Svinhufvud"
+  },
+  {
+   "key": "ikl",
+   "fi": "Isänmaallinen kansanliike",
+   "sv": "Fosterländska folkrörelsen",
+   "fr": "Parti populaire patriotique",
+   "supports": "P. E. Svinhufvud"
+  },
+  {
+   "key": "kallio_group",
+   "fi": "Kyösti Kallion kannattajat",
+   "sv": "Kyösti Kallios anhängare",
+   "fr": "Candidature de M. Kallio",
+   "supports": "Kyösti Kallio"
+  },
+  {
+   "key": "stahlberg_general",
+   "fi": "K. J. Ståhlbergin kannattajat: Yleinen vaaliliitto",
+   "sv": "K. J. Ståhlbergs anhängare: Allmänna valförbundet",
+   "fr": "Candidature de M. Ståhlberg: Alliance électorale générale",
+   "supports": "K. J. Ståhlberg"
+  },
+  {
+   "key": "ruots_vasemmisto",
+   "fi": "Ruotsalainen vasemmisto",
+   "sv": "Svenska vänstern",
+   "fr": "Gauche suédoise",
+   "supports": "K. J. Ståhlberg"
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": "Parti suédois",
+   "supports": null
+  },
+  {
+   "key": "other",
+   "fi": "Muut",
+   "sv": "Övriga",
+   "fr": "Autres",
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 320305,
+   "voters": 210608,
+   "cast": 210608,
+   "valid": 210180,
+   "invalid": 428,
+   "votes": {
+    "sdp": 60303,
+    "svinhufvud_general": 35901,
+    "ikl": 12093,
+    "kallio_group": 3976,
+    "stahlberg_general": 37045,
+    "ruots_vasemmisto": 10743,
+    "rkp": 50026,
+    "other": 93
+   },
+   "electors": {
+    "sdp": 13,
+    "svinhufvud_general": 7,
+    "ikl": 2,
+    "stahlberg_general": 8,
+    "ruots_vasemmisto": 2,
+    "rkp": 11
+   },
+   "seats": 43,
+   "pages": {
+    "turnout": 28,
+    "votes": 44,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 158124,
+   "voters": 91134,
+   "cast": 91134,
+   "valid": 90890,
+   "invalid": 244,
+   "votes": {
+    "sdp": 27686,
+    "svinhufvud_general": 18672,
+    "ikl": 4911,
+    "kallio_group": 6425,
+    "stahlberg_general": 16573,
+    "rkp": 16606,
+    "other": 17
+   },
+   "electors": {
+    "sdp": 8,
+    "svinhufvud_general": 4,
+    "ikl": 2,
+    "kallio_group": 1,
+    "stahlberg_general": 4,
+    "rkp": 4
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 29,
+    "votes": 45,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 136790,
+   "voters": 80678,
+   "cast": 80678,
+   "valid": 80447,
+   "invalid": 231,
+   "votes": {
+    "sdp": 31061,
+    "svinhufvud_general": 19097,
+    "ikl": 14679,
+    "kallio_group": 7829,
+    "stahlberg_general": 7746,
+    "other": 35
+   },
+   "electors": {
+    "sdp": 9,
+    "svinhufvud_general": 5,
+    "ikl": 4,
+    "kallio_group": 2,
+    "stahlberg_general": 2
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 30,
+    "votes": 47,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 107683,
+   "voters": 66794,
+   "cast": 66794,
+   "valid": 66569,
+   "invalid": 225,
+   "votes": {
+    "sdp": 24531,
+    "svinhufvud_general": 12915,
+    "ikl": 12934,
+    "kallio_group": 3321,
+    "stahlberg_general": 12818,
+    "other": 50
+   },
+   "electors": {
+    "sdp": 7,
+    "svinhufvud_general": 3,
+    "ikl": 3,
+    "stahlberg_general": 3
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 32,
+    "votes": 48,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 111023,
+   "voters": 71472,
+   "cast": 71472,
+   "valid": 71251,
+   "invalid": 221,
+   "votes": {
+    "sdp": 34667,
+    "svinhufvud_general": 19564,
+    "ikl": 5292,
+    "kallio_group": 2767,
+    "stahlberg_general": 8910,
+    "other": 51
+   },
+   "electors": {
+    "sdp": 8,
+    "svinhufvud_general": 5,
+    "ikl": 1,
+    "stahlberg_general": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 32,
+    "votes": 49,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Viipurin läänin läntinen vaalipiiri",
+   "sv": "Viborgs läns västra valkrets",
+   "registered": 166388,
+   "voters": 102257,
+   "cast": 102257,
+   "valid": 101981,
+   "invalid": 276,
+   "votes": {
+    "sdp": 32043,
+    "svinhufvud_general": 34080,
+    "ikl": 8433,
+    "kallio_group": 14725,
+    "stahlberg_general": 12656,
+    "other": 44
+   },
+   "electors": {
+    "sdp": 8,
+    "svinhufvud_general": 9,
+    "ikl": 2,
+    "kallio_group": 3,
+    "stahlberg_general": 3
+   },
+   "seats": 25,
+   "pages": {
+    "turnout": 33,
+    "votes": 50,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Viipurin läänin itäinen vaalipiiri",
+   "sv": "Viborgs läns östra valkrets",
+   "registered": 163338,
+   "voters": 93096,
+   "cast": 93096,
+   "valid": 92814,
+   "invalid": 282,
+   "votes": {
+    "sdp": 20720,
+    "svinhufvud_general": 23412,
+    "ikl": 4705,
+    "kallio_group": 38061,
+    "stahlberg_general": 5845,
+    "other": 71
+   },
+   "electors": {
+    "sdp": 6,
+    "svinhufvud_general": 7,
+    "ikl": 1,
+    "kallio_group": 11,
+    "stahlberg_general": 1
+   },
+   "seats": 26,
+   "pages": {
+    "turnout": 34,
+    "votes": 50,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 107771,
+   "voters": 56673,
+   "cast": 56673,
+   "valid": 56472,
+   "invalid": 201,
+   "votes": {
+    "sdp": 19189,
+    "svinhufvud_general": 16856,
+    "ikl": 1872,
+    "kallio_group": 9378,
+    "stahlberg_general": 9165,
+    "other": 12
+   },
+   "electors": {
+    "sdp": 6,
+    "svinhufvud_general": 5,
+    "kallio_group": 3,
+    "stahlberg_general": 3
+   },
+   "seats": 17,
+   "pages": {
+    "turnout": 35,
+    "votes": 51,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Kuopion läänin läntinen vaalipiiri",
+   "sv": "Kuopio läns västra valkrets",
+   "registered": 103743,
+   "voters": 55054,
+   "cast": 55054,
+   "valid": 54881,
+   "invalid": 173,
+   "votes": {
+    "sdp": 18142,
+    "svinhufvud_general": 10485,
+    "ikl": 3014,
+    "kallio_group": 16722,
+    "stahlberg_general": 6492,
+    "other": 26
+   },
+   "electors": {
+    "sdp": 6,
+    "svinhufvud_general": 3,
+    "ikl": 1,
+    "kallio_group": 6,
+    "stahlberg_general": 2
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 35,
+    "votes": 52,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Kuopion läänin itäinen vaalipiiri",
+   "sv": "Kuopio läns östra valkrets",
+   "registered": 86726,
+   "voters": 41581,
+   "cast": 41581,
+   "valid": 41475,
+   "invalid": 106,
+   "votes": {
+    "sdp": 15960,
+    "svinhufvud_general": 9606,
+    "kallio_group": 12054,
+    "stahlberg_general": 3835,
+    "other": 20
+   },
+   "electors": {
+    "sdp": 6,
+    "svinhufvud_general": 3,
+    "kallio_group": 5,
+    "stahlberg_general": 1
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 36,
+    "votes": 53,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Vaasan läänin itäinen vaalipiiri",
+   "sv": "Vasa läns östra valkrets",
+   "registered": 94210,
+   "voters": 55330,
+   "cast": 55330,
+   "valid": 55158,
+   "invalid": 172,
+   "votes": {
+    "sdp": 21650,
+    "svinhufvud_general": 10445,
+    "ikl": 4218,
+    "kallio_group": 14320,
+    "stahlberg_general": 4351,
+    "other": 174
+   },
+   "electors": {
+    "sdp": 7,
+    "svinhufvud_general": 3,
+    "ikl": 1,
+    "kallio_group": 4,
+    "stahlberg_general": 1
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 37,
+    "votes": 54,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Vaasan läänin eteläinen vaalipiiri",
+   "sv": "Vasa läns södra valkrets",
+   "registered": 104793,
+   "voters": 56203,
+   "cast": 56203,
+   "valid": 56141,
+   "invalid": 62,
+   "votes": {
+    "sdp": 9462,
+    "svinhufvud_general": 11164,
+    "ikl": 4413,
+    "kallio_group": 11480,
+    "rkp": 19607,
+    "other": 15
+   },
+   "electors": {
+    "sdp": 3,
+    "svinhufvud_general": 3,
+    "ikl": 1,
+    "kallio_group": 3,
+    "rkp": 6
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 37,
+    "votes": 55,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Vaasan läänin pohjoinen vaalipiiri",
+   "sv": "Vasa läns norra valkrets",
+   "registered": 78904,
+   "voters": 47323,
+   "cast": 47323,
+   "valid": 47249,
+   "invalid": 74,
+   "votes": {
+    "sdp": 8578,
+    "svinhufvud_general": 4561,
+    "ikl": 5150,
+    "kallio_group": 12925,
+    "rkp": 16011,
+    "other": 24
+   },
+   "electors": {
+    "sdp": 2,
+    "svinhufvud_general": 1,
+    "ikl": 2,
+    "kallio_group": 4,
+    "rkp": 4
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 38,
+    "votes": 55,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Oulun läänin eteläinen vaalipiiri",
+   "sv": "Uleåborgs läns södra valkrets",
+   "registered": 109304,
+   "voters": 52201,
+   "cast": 52201,
+   "valid": 52016,
+   "invalid": 185,
+   "votes": {
+    "sdp": 11050,
+    "svinhufvud_general": 8832,
+    "ikl": 5108,
+    "kallio_group": 16311,
+    "stahlberg_general": 10685,
+    "other": 30
+   },
+   "electors": {
+    "sdp": 4,
+    "svinhufvud_general": 3,
+    "ikl": 2,
+    "kallio_group": 7,
+    "stahlberg_general": 4
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 39,
+    "votes": 56,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Oulun läänin pohjoinen vaalipiiri",
+   "sv": "Uleåborgs läns norra valkrets",
+   "registered": 69539,
+   "voters": 32109,
+   "cast": 32109,
+   "valid": 31989,
+   "invalid": 120,
+   "votes": {
+    "sdp": 6097,
+    "svinhufvud_general": 3944,
+    "ikl": 3556,
+    "kallio_group": 12607,
+    "stahlberg_general": 5776,
+    "other": 9
+   },
+   "electors": {
+    "sdp": 2,
+    "svinhufvud_general": 2,
+    "ikl": 1,
+    "kallio_group": 6,
+    "stahlberg_general": 2
+   },
+   "seats": 13,
+   "pages": {
+    "turnout": 40,
+    "votes": 57,
+    "electors": 24
+   }
+  },
+  {
+   "fi": "Lapin vaalipiiri",
+   "sv": "Lappmarkens valkrets",
+   "registered": 11227,
+   "voters": 3191,
+   "cast": 3191,
+   "valid": 3133,
+   "invalid": 58,
+   "votes": {
+    "sdp": 269,
+    "svinhufvud_general": 1068,
+    "kallio_group": 1767,
+    "other": 29
+   },
+   "electors": {
+    "kallio_group": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 41,
+    "votes": 58,
+    "electors": 24
+   }
+  }
+ ],
+ "national": {
+  "registered": 1929868,
+  "voters": 1115704,
+  "cast": 1115704,
+  "valid": 1112646,
+  "invalid": 3058,
+  "votes": {
+   "sdp": 341408,
+   "svinhufvud_general": 240602,
+   "ikl": 90378,
+   "kallio_group": 184668,
+   "stahlberg_general": 141897,
+   "ruots_vasemmisto": 10743,
+   "rkp": 102250,
+   "other": 700
+  },
+  "electors": {
+   "sdp": 95,
+   "svinhufvud_general": 63,
+   "ikl": 23,
+   "kallio_group": 56,
+   "stahlberg_general": 36,
+   "ruots_vasemmisto": 2,
+   "rkp": 25
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 27,
+   "votes": 43,
+   "electors": 24
+  }
+ },
+ "notes": [
+  "Polling days 15 and 16 January 1937 (introduction, PDF page 6). 300 electors in 16 constituencies.",
+  "Sources: registered voters (column 5) and total voters (column 17) from Table II (by commune, constituency total rows), national from Table I (PDF page 27); votes, rejected and total ballots from Table IV (by commune, constituency total rows, which include ballots sent from other constituencies), national from Table III Koko maa row (PDF page 43); electors from the text table in section 11 (PDF page 24). The constituency voters also agree with the text table on PDF page 11.",
+  "There is no separate Åland constituency for these elections: the communes of Åland (Ahvenanmaa) belong to Turun läänin eteläinen vaalipiiri, which therefore includes Åland's voters. Table III footnote: the ballots sent from other constituencies in Turun ja Porin lääni include 24 ballots belonging to communes of Åland.",
+  "Party keys: svinhufvud_general = 'Yleinen vaaliliitto' (general electoral alliance) of P. E. Svinhufvud's supporters (chiefly the National Coalition, kokoomus); ikl = Isänmaallinen kansanliike, also listed under Svinhufvud's supporters; kallio_group = Kyösti Kallio's supporters (the Agrarian League); stahlberg_general = 'Yleinen vaaliliitto' of K. J. Ståhlberg's supporters; ruots_vasemmisto = Ruotsalainen vasemmisto (Swedish Left), also listed under Ståhlberg's supporters.",
+  "Text section 10: of the Ståhlberg general alliance's 141 897 votes, 123 355 went to lists of Kansallinen edistyspuolue (National Progressive Party), 13 883 to Suomen pienviljelijäin puolue (Small Farmers' Party) and 4 659 to Kansanpuolue.",
+  "Table IV footnote (Turun läänin eteläinen, Vaasan läänin eteläinen, Vaasan läänin pohjoinen, Oulun läänin pohjoinen vaalipiiri): P. E. Svinhufvud's supporters had a joint electoral alliance (svinhufvud_general and ikl columns).",
+  "Table IV footnote (Hämeen läänin pohjoinen vaalipiiri, sdp column): includes 54 votes of one list left outside the electoral alliance.",
+  "Table IV footnote (Mikkelin läänin vaalipiiri, stahlberg_general column): the National Progressive Party formed its own alliance, which received 8 618 votes, including 48 votes of one list outside the alliance; the Finnish Small Farmers' Party formed another alliance, which received 547 votes (8 618 + 547 = 9 165).",
+  "Table IV footnote (Vaasan läänin itäinen vaalipiiri, ikl column): includes 32 votes of two lists left outside the electoral alliance.",
+  "The electors table has no column for 'Muut' (other); of the 300 electors 17 were women."
+ ],
+ "misprints": []
+}

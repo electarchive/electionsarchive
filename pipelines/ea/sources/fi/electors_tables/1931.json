@@ -1,0 +1,557 @@
+{
+ "year": 1931,
+ "date_from": "1931-01-15",
+ "date_to": "1931-01-16",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "sdp",
+   "fi": "Sosialidemokraattinen työväenpuolue",
+   "sv": "Socialdemokratiska arbetarpartiet",
+   "fr": "Parti socialdémocrate",
+   "supports": null
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen kokoomuspuolue y. m. eli P. E. Svinhufvudin kannattajat",
+   "sv": "Nationella samlingspartiet o. a. eller P. E. Svinhufvuds anhängare",
+   "fr": "Parti national de coalition etc., candidat P. E. Svinhufvud",
+   "supports": "P. E. Svinhufvud"
+  },
+  {
+   "key": "ml",
+   "fi": "Maalaisliitto tai Kyösti Kallion kannattajat",
+   "sv": "Agrarförbundet eller Kyösti Kallios anhängare",
+   "fr": "Union agraire, candidat Kyösti Kallio",
+   "supports": "Kyösti Kallio"
+  },
+  {
+   "key": "edistys",
+   "fi": "Kansallinen edistyspuolue eli K. J. Ståhlbergin kannattajat",
+   "sv": "Nationella framstegspartiet ell. K. J. Ståhlbergs anhängare",
+   "fr": "Parti national progressiste, candidat K. J. Ståhlberg",
+   "supports": "K. J. Ståhlberg"
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": "Parti suédois",
+   "supports": null
+  },
+  {
+   "key": "pienviljelijat",
+   "fi": "Suomen pienviljelijäin puolue",
+   "sv": "Finska småbrukarpartiet",
+   "fr": "Parti des petits propriétaires",
+   "supports": null
+  },
+  {
+   "key": "other",
+   "fi": "Muut puolueet",
+   "sv": "Övriga partier",
+   "fr": "Autres partis",
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 280669,
+   "voters": 156936,
+   "cast": 156936,
+   "valid": 156347,
+   "invalid": 589,
+   "votes": {
+    "sdp": 43361,
+    "kok": 26066,
+    "ml": 3909,
+    "edistys": 40151,
+    "rkp": 42781,
+    "other": 79
+   },
+   "electors": {
+    "sdp": 12,
+    "kok": 7,
+    "ml": 1,
+    "edistys": 11,
+    "rkp": 11
+   },
+   "seats": 42,
+   "pages": {
+    "turnout": 30,
+    "votes": 45,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 148398,
+   "voters": 67682,
+   "cast": 67682,
+   "valid": 67449,
+   "invalid": 233,
+   "votes": {
+    "sdp": 14139,
+    "kok": 15264,
+    "ml": 5486,
+    "edistys": 19920,
+    "rkp": 10950,
+    "pienviljelijat": 1669,
+    "other": 21
+   },
+   "electors": {
+    "sdp": 5,
+    "kok": 5,
+    "ml": 2,
+    "edistys": 8,
+    "rkp": 4
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 31,
+    "votes": 46,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 127961,
+   "voters": 59386,
+   "cast": 59386,
+   "valid": 59093,
+   "invalid": 293,
+   "votes": {
+    "sdp": 21519,
+    "kok": 18163,
+    "ml": 8781,
+    "edistys": 8461,
+    "pienviljelijat": 2143,
+    "other": 26
+   },
+   "electors": {
+    "sdp": 8,
+    "kok": 7,
+    "ml": 3,
+    "edistys": 4
+   },
+   "seats": 22,
+   "pages": {
+    "turnout": 32,
+    "votes": 48,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 98594,
+   "voters": 53794,
+   "cast": 53794,
+   "valid": 53553,
+   "invalid": 241,
+   "votes": {
+    "sdp": 21781,
+    "kok": 14733,
+    "ml": 5023,
+    "edistys": 11243,
+    "pienviljelijat": 717,
+    "other": 56
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 4,
+    "ml": 1,
+    "edistys": 4
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 34,
+    "votes": 49,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 101885,
+   "voters": 55776,
+   "cast": 55776,
+   "valid": 55542,
+   "invalid": 234,
+   "votes": {
+    "sdp": 28892,
+    "kok": 14242,
+    "ml": 2714,
+    "edistys": 8250,
+    "pienviljelijat": 1368,
+    "other": 76
+   },
+   "electors": {
+    "sdp": 10,
+    "kok": 4,
+    "edistys": 3
+   },
+   "seats": 17,
+   "pages": {
+    "turnout": 34,
+    "votes": 50,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Viipurin läänin läntinen vaalipiiri",
+   "sv": "Viborgs läns västra valkrets",
+   "registered": 151271,
+   "voters": 82758,
+   "cast": 82758,
+   "valid": 82512,
+   "invalid": 246,
+   "votes": {
+    "sdp": 26291,
+    "kok": 23547,
+    "ml": 16463,
+    "edistys": 16140,
+    "other": 71
+   },
+   "electors": {
+    "sdp": 8,
+    "kok": 7,
+    "ml": 5,
+    "edistys": 4
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 35,
+    "votes": 50,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Viipurin läänin itäinen vaalipiiri",
+   "sv": "Viborgs läns östra valkrets",
+   "registered": 146801,
+   "voters": 66106,
+   "cast": 66106,
+   "valid": 65925,
+   "invalid": 181,
+   "votes": {
+    "sdp": 16343,
+    "kok": 12847,
+    "ml": 30575,
+    "edistys": 6104,
+    "other": 56
+   },
+   "electors": {
+    "sdp": 6,
+    "kok": 5,
+    "ml": 12,
+    "edistys": 2
+   },
+   "seats": 25,
+   "pages": {
+    "turnout": 36,
+    "votes": 51,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 104026,
+   "voters": 43899,
+   "cast": 43899,
+   "valid": 43773,
+   "invalid": 126,
+   "votes": {
+    "sdp": 16443,
+    "kok": 7205,
+    "ml": 10338,
+    "edistys": 7509,
+    "pienviljelijat": 2240,
+    "other": 38
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 3,
+    "ml": 4,
+    "edistys": 2,
+    "pienviljelijat": 2
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 37,
+    "votes": 52,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Kuopion läänin läntinen vaalipiiri",
+   "sv": "Kuopio läns västra valkrets",
+   "registered": 97593,
+   "voters": 46467,
+   "cast": 46467,
+   "valid": 46326,
+   "invalid": 141,
+   "votes": {
+    "sdp": 13734,
+    "kok": 7262,
+    "ml": 15422,
+    "edistys": 9600,
+    "pienviljelijat": 271,
+    "other": 37
+   },
+   "electors": {
+    "sdp": 5,
+    "kok": 3,
+    "ml": 6,
+    "edistys": 4
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 37,
+    "votes": 53,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Kuopion läänin itäinen vaalipiiri",
+   "sv": "Kuopio läns östra valkrets",
+   "registered": 81749,
+   "voters": 32007,
+   "cast": 32007,
+   "valid": 31908,
+   "invalid": 99,
+   "votes": {
+    "sdp": 13752,
+    "kok": 4874,
+    "ml": 9726,
+    "edistys": 3494,
+    "other": 62
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 2,
+    "ml": 5,
+    "edistys": 1
+   },
+   "seats": 15,
+   "pages": {
+    "turnout": 38,
+    "votes": 54,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Vaasan läänin itäinen vaalipiiri",
+   "sv": "Vasa läns östra valkrets",
+   "registered": 87253,
+   "voters": 40435,
+   "cast": 40435,
+   "valid": 40326,
+   "invalid": 109,
+   "votes": {
+    "sdp": 17116,
+    "kok": 7367,
+    "ml": 10355,
+    "edistys": 4518,
+    "pienviljelijat": 916,
+    "other": 54
+   },
+   "electors": {
+    "sdp": 7,
+    "kok": 3,
+    "ml": 5,
+    "edistys": 1
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 39,
+    "votes": 54,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Vaasan läänin eteläinen vaalipiiri",
+   "sv": "Vasa läns södra valkrets",
+   "registered": 104688,
+   "voters": 38672,
+   "cast": 38672,
+   "valid": 38625,
+   "invalid": 47,
+   "votes": {
+    "sdp": 5878,
+    "kok": 10486,
+    "ml": 9913,
+    "rkp": 12332,
+    "other": 16
+   },
+   "electors": {
+    "sdp": 2,
+    "kok": 5,
+    "ml": 5,
+    "rkp": 6
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 39,
+    "votes": 55,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Vaasan läänin pohjoinen vaalipiiri",
+   "sv": "Vasa läns norra valkrets",
+   "registered": 76024,
+   "voters": 32069,
+   "cast": 32069,
+   "valid": 32036,
+   "invalid": 33,
+   "votes": {
+    "sdp": 4569,
+    "kok": 6973,
+    "ml": 11138,
+    "rkp": 9319,
+    "other": 37
+   },
+   "electors": {
+    "sdp": 2,
+    "kok": 3,
+    "ml": 5,
+    "rkp": 4
+   },
+   "seats": 14,
+   "pages": {
+    "turnout": 40,
+    "votes": 56,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Oulun läänin eteläinen vaalipiiri",
+   "sv": "Uleåborgs läns södra valkrets",
+   "registered": 99769,
+   "voters": 39916,
+   "cast": 39916,
+   "valid": 39814,
+   "invalid": 102,
+   "votes": {
+    "sdp": 6266,
+    "kok": 7408,
+    "ml": 16180,
+    "edistys": 8169,
+    "pienviljelijat": 1769,
+    "other": 22
+   },
+   "electors": {
+    "sdp": 3,
+    "kok": 4,
+    "ml": 8,
+    "edistys": 4
+   },
+   "seats": 19,
+   "pages": {
+    "turnout": 41,
+    "votes": 57,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Oulun läänin pohjoinen vaalipiiri",
+   "sv": "Uleåborgs läns norra valkrets",
+   "registered": 59568,
+   "voters": 21430,
+   "cast": 21430,
+   "valid": 21358,
+   "invalid": 72,
+   "votes": {
+    "sdp": 2466,
+    "kok": 3501,
+    "ml": 10119,
+    "edistys": 4578,
+    "pienviljelijat": 679,
+    "other": 15
+   },
+   "electors": {
+    "sdp": 1,
+    "kok": 2,
+    "ml": 6,
+    "edistys": 2
+   },
+   "seats": 11,
+   "pages": {
+    "turnout": 42,
+    "votes": 58,
+    "electors": 25
+   }
+  },
+  {
+   "fi": "Lapin vaalipiiri",
+   "sv": "Lappmarkens valkrets",
+   "registered": 9733,
+   "voters": 2188,
+   "cast": 2188,
+   "valid": 2171,
+   "invalid": 17,
+   "votes": {
+    "kok": 440,
+    "ml": 1432,
+    "edistys": 293,
+    "other": 6
+   },
+   "electors": {
+    "ml": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 42,
+    "votes": 58,
+    "electors": 25
+   }
+  }
+ ],
+ "national": {
+  "registered": 1775982,
+  "voters": 839521,
+  "cast": 839521,
+  "valid": 836758,
+  "invalid": 2763,
+  "votes": {
+   "sdp": 252550,
+   "kok": 180378,
+   "ml": 167574,
+   "edistys": 148430,
+   "rkp": 75382,
+   "pienviljelijat": 11772,
+   "other": 672
+  },
+  "electors": {
+   "sdp": 90,
+   "kok": 64,
+   "ml": 69,
+   "edistys": 50,
+   "rkp": 25,
+   "pienviljelijat": 2
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 29,
+   "votes": 44,
+   "electors": 25
+  }
+ },
+ "notes": [
+  "Sources: registered and voters per constituency from Table II (by commune; constituency total rows), pages 30-42; national from Table I (by province), page 29. Votes per constituency from Table IV (by commune; constituency total rows, which include ballots sent from other constituencies), pages 45-58; national from Table III, page 44. Electors from the text table in section 11 (page 25, printed page 22).",
+  "Voters (Table II, 'Hela antalet röstande') equal the total ballots (valid + rejected) of Table IV in every constituency.",
+  "Åland (Ahvenanmaan maakunta) has no constituency of its own; its communes belong to Turun läänin eteläinen vaalipiiri. Table III footnote: the ballots sent to Turku-Pori province from other constituencies include 4 ballots belonging to communes of Åland.",
+  "Party key 'pienviljelijat' = Suomen pienviljelijäin puolue (Finnish Smallholders' Party); 'other' = Muut puolueet (other parties).",
+  "Electoral alliances (Table IV footnotes): the National Progressive Party (edistys) and the Finnish Smallholders' Party had a joint electoral alliance in Turun läänin eteläinen, Turun läänin pohjoinen, Hämeen läänin eteläinen, Hämeen läänin pohjoinen and Mikkelin läänin vaalipiiri; the Agrarian Union (ml) and the National Progressive Party had a joint alliance in Vaasan läänin itäinen vaalipiiri.",
+  "Mikkelin läänin vaalipiiri (Table IV footnotes): the ml figure 10 338 includes 38 votes of 2 lists left outside the electoral alliance; the pienviljelijat figure 2 240 includes 139 votes of 1 list left outside the alliance.",
+  "Kuopion läänin läntinen vaalipiiri (Table IV footnote): the sdp figure 13 734 includes 66 votes of 1 list left outside the electoral alliance.",
+  "Of the 300 electors, 19 were women (sdp 9, kok 2, ml 1, edistys 7)."
+ ],
+ "misprints": []
+}

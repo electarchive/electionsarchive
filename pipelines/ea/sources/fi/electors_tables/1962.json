@@ -1,0 +1,643 @@
+{
+ "year": 1962,
+ "date_from": "1962-01-15",
+ "date_to": "1962-01-16",
+ "electors": 300,
+ "parties": [
+  {
+   "key": "ml",
+   "fi": "Maalaisliitto",
+   "sv": "Agrarpartiet",
+   "fr": null,
+   "supports": "Urho Kekkonen"
+  },
+  {
+   "key": "kansanpuolue_kekkonen",
+   "fi": "Suomen kansanpuolue",
+   "sv": "Finska folkpartiet",
+   "fr": null,
+   "supports": "Urho Kekkonen"
+  },
+  {
+   "key": "rkp_kekkonen",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": null,
+   "supports": "Urho Kekkonen"
+  },
+  {
+   "key": "kekkonen_other",
+   "fi": "Muita",
+   "sv": "Övriga",
+   "fr": null,
+   "supports": "Urho Kekkonen"
+  },
+  {
+   "key": "skdl",
+   "fi": "Suomen kansan demokraattinen liitto",
+   "sv": "Demokratiska förbundet för Finlands folk",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "kok",
+   "fi": "Kansallinen kokoomus",
+   "sv": "Nationella samlingspartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "vapaamieliset",
+   "fi": "Vapaamielisten liitto",
+   "sv": "De frisinnades förbund",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "kansanpuolue",
+   "fi": "Suomen kansanpuolue",
+   "sv": "Finska folkpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "sdp",
+   "fi": "Sosialidemokraattinen puolue",
+   "sv": "Socialdemokratiska partiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "rkp",
+   "fi": "Ruotsalainen kansanpuolue",
+   "sv": "Svenska folkpartiet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "tpsl",
+   "fi": "Sosialidemokraattinen liitto",
+   "sv": "Socialdemokratiska förbundet",
+   "fr": null,
+   "supports": null
+  },
+  {
+   "key": "written",
+   "fi": "Muut",
+   "sv": "Övriga",
+   "fr": null,
+   "supports": null
+  }
+ ],
+ "districts": [
+  {
+   "fi": "Helsingin kaupungin vaalipiiri",
+   "sv": "Helsingfors stads valkrets",
+   "registered": 315539,
+   "voters": 257815,
+   "cast": 257815,
+   "valid": 257196,
+   "invalid": 619,
+   "votes": {
+    "ml": 23812,
+    "kansanpuolue_kekkonen": 36556,
+    "rkp_kekkonen": 21266,
+    "kekkonen_other": 14729,
+    "skdl": 44174,
+    "kok": 43766,
+    "vapaamieliset": 4018,
+    "kansanpuolue": 8873,
+    "sdp": 39046,
+    "rkp": 14560,
+    "tpsl": 6392,
+    "written": 4
+   },
+   "electors": {
+    "ml": 2,
+    "kansanpuolue_kekkonen": 5,
+    "rkp_kekkonen": 4,
+    "kekkonen_other": 1,
+    "skdl": 5,
+    "kok": 5,
+    "vapaamieliset": 1,
+    "kansanpuolue": 1,
+    "sdp": 5,
+    "rkp": 1
+   },
+   "seats": 30,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Uudenmaan läänin vaalipiiri",
+   "sv": "Nylands läns valkrets",
+   "registered": 239289,
+   "voters": 191688,
+   "cast": 191688,
+   "valid": 190790,
+   "invalid": 898,
+   "votes": {
+    "ml": 30748,
+    "kansanpuolue_kekkonen": 18276,
+    "kekkonen_other": 10413,
+    "skdl": 34864,
+    "kok": 16798,
+    "vapaamieliset": 1066,
+    "sdp": 30261,
+    "rkp": 43176,
+    "tpsl": 5166,
+    "written": 22
+   },
+   "electors": {
+    "ml": 5,
+    "kansanpuolue_kekkonen": 3,
+    "kekkonen_other": 1,
+    "skdl": 5,
+    "kok": 2,
+    "sdp": 4,
+    "rkp": 6
+   },
+   "seats": 26,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Turun läänin eteläinen vaalipiiri",
+   "sv": "Åbo läns södra valkrets",
+   "registered": 231468,
+   "voters": 189800,
+   "cast": 189800,
+   "valid": 189112,
+   "invalid": 688,
+   "votes": {
+    "ml": 52756,
+    "kansanpuolue_kekkonen": 28129,
+    "rkp_kekkonen": 14333,
+    "kekkonen_other": 4926,
+    "skdl": 44152,
+    "kok": 20722,
+    "sdp": 18482,
+    "tpsl": 5611,
+    "written": 1
+   },
+   "electors": {
+    "ml": 10,
+    "kansanpuolue_kekkonen": 2,
+    "rkp_kekkonen": 2,
+    "skdl": 6,
+    "kok": 2,
+    "sdp": 2
+   },
+   "seats": 24,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Turun läänin pohjoinen vaalipiiri",
+   "sv": "Åbo läns norra valkrets",
+   "registered": 186595,
+   "voters": 154975,
+   "cast": 154975,
+   "valid": 154256,
+   "invalid": 719,
+   "votes": {
+    "ml": 54365,
+    "kansanpuolue_kekkonen": 12567,
+    "skdl": 36733,
+    "kok": 23849,
+    "sdp": 22848,
+    "tpsl": 3894
+   },
+   "electors": {
+    "ml": 8,
+    "kansanpuolue_kekkonen": 1,
+    "skdl": 5,
+    "kok": 3,
+    "sdp": 3
+   },
+   "seats": 20,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28
+   }
+  },
+  {
+   "fi": "Ahvenanmaan vaalipiiri",
+   "sv": "Ålands valkrets",
+   "registered": 14131,
+   "voters": 6367,
+   "cast": 6367,
+   "valid": 6163,
+   "invalid": 204,
+   "votes": {
+    "skdl": 222,
+    "rkp": 5939,
+    "written": 2
+   },
+   "electors": {
+    "rkp": 1
+   },
+   "seats": 1,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Hämeen läänin eteläinen vaalipiiri",
+   "sv": "Tavastehus läns södra valkrets",
+   "registered": 197632,
+   "voters": 160396,
+   "cast": 160396,
+   "valid": 159728,
+   "invalid": 668,
+   "votes": {
+    "ml": 38177,
+    "kansanpuolue_kekkonen": 10139,
+    "kekkonen_other": 13742,
+    "skdl": 30611,
+    "kok": 31516,
+    "sdp": 27425,
+    "tpsl": 8116,
+    "written": 2
+   },
+   "electors": {
+    "ml": 6,
+    "kansanpuolue_kekkonen": 1,
+    "kekkonen_other": 2,
+    "skdl": 4,
+    "kok": 4,
+    "sdp": 3,
+    "tpsl": 1
+   },
+   "seats": 21,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Hämeen läänin pohjoinen vaalipiiri",
+   "sv": "Tavastehus läns norra valkrets",
+   "registered": 168559,
+   "voters": 143053,
+   "cast": 143053,
+   "valid": 142542,
+   "invalid": 511,
+   "votes": {
+    "ml": 29207,
+    "kansanpuolue_kekkonen": 14883,
+    "kekkonen_other": 1853,
+    "skdl": 38903,
+    "kok": 28404,
+    "sdp": 24883,
+    "tpsl": 4409
+   },
+   "electors": {
+    "ml": 4,
+    "kansanpuolue_kekkonen": 1,
+    "kekkonen_other": 1,
+    "skdl": 5,
+    "kok": 4,
+    "sdp": 3
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 12,
+    "votes": 14,
+    "electors": 28
+   }
+  },
+  {
+   "fi": "Kymen läänin vaalipiiri",
+   "sv": "Kymmene läns valkrets",
+   "registered": 212187,
+   "voters": 170964,
+   "cast": 170964,
+   "valid": 170342,
+   "invalid": 622,
+   "votes": {
+    "ml": 67134,
+    "kansanpuolue_kekkonen": 11160,
+    "kekkonen_other": 183,
+    "skdl": 19934,
+    "kok": 26284,
+    "vapaamieliset": 2814,
+    "kansanpuolue": 1383,
+    "sdp": 35452,
+    "tpsl": 5998
+   },
+   "electors": {
+    "ml": 10,
+    "kansanpuolue_kekkonen": 1,
+    "skdl": 3,
+    "kok": 4,
+    "sdp": 5
+   },
+   "seats": 23,
+   "pages": {
+    "turnout": 12,
+    "votes": 15,
+    "electors": 28
+   }
+  },
+  {
+   "fi": "Mikkelin läänin vaalipiiri",
+   "sv": "S:t Michels läns valkrets",
+   "registered": 139200,
+   "voters": 108378,
+   "cast": 108378,
+   "valid": 107776,
+   "invalid": 602,
+   "votes": {
+    "ml": 54694,
+    "kansanpuolue_kekkonen": 2619,
+    "kekkonen_other": 1825,
+    "skdl": 13156,
+    "kok": 12084,
+    "kansanpuolue": 691,
+    "sdp": 17421,
+    "tpsl": 5285,
+    "written": 1
+   },
+   "electors": {
+    "ml": 9,
+    "kansanpuolue_kekkonen": 1,
+    "skdl": 2,
+    "kok": 2,
+    "sdp": 2
+   },
+   "seats": 16,
+   "pages": {
+    "turnout": 12,
+    "votes": 15,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Pohjois-Karjalan läänin vaalipiiri",
+   "sv": "Norra Karelens läns valkrets",
+   "registered": 115482,
+   "voters": 88854,
+   "cast": 88854,
+   "valid": 88348,
+   "invalid": 506,
+   "votes": {
+    "ml": 31771,
+    "kansanpuolue_kekkonen": 5237,
+    "kekkonen_other": 6746,
+    "skdl": 14783,
+    "kok": 10007,
+    "sdp": 15548,
+    "tpsl": 4255,
+    "written": 1
+   },
+   "electors": {
+    "ml": 6,
+    "kansanpuolue_kekkonen": 1,
+    "kekkonen_other": 1,
+    "skdl": 2,
+    "kok": 1,
+    "sdp": 3
+   },
+   "seats": 14,
+   "pages": {
+    "turnout": 12,
+    "votes": 15,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Kuopion läänin vaalipiiri",
+   "sv": "Kuopio läns valkrets",
+   "registered": 155980,
+   "voters": 124840,
+   "cast": 124840,
+   "valid": 124320,
+   "invalid": 520,
+   "votes": {
+    "ml": 50593,
+    "kansanpuolue_kekkonen": 2997,
+    "kekkonen_other": 7026,
+    "skdl": 34741,
+    "kok": 14958,
+    "kansanpuolue": 140,
+    "sdp": 10173,
+    "tpsl": 3691,
+    "written": 1
+   },
+   "electors": {
+    "ml": 7,
+    "kansanpuolue_kekkonen": 1,
+    "kekkonen_other": 2,
+    "skdl": 5,
+    "kok": 2,
+    "sdp": 1
+   },
+   "seats": 18,
+   "pages": {
+    "turnout": 12,
+    "votes": 15,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Keski-Suomen läänin vaalipiiri",
+   "sv": "Mellersta Finlands läns valkrets",
+   "registered": 142737,
+   "voters": 116220,
+   "cast": 116220,
+   "valid": 115563,
+   "invalid": 657,
+   "votes": {
+    "ml": 51177,
+    "kansanpuolue_kekkonen": 3046,
+    "kekkonen_other": 3532,
+    "skdl": 24613,
+    "kok": 10477,
+    "sdp": 16821,
+    "tpsl": 5897
+   },
+   "electors": {
+    "ml": 9,
+    "skdl": 4,
+    "kok": 1,
+    "sdp": 2,
+    "tpsl": 1
+   },
+   "seats": 17,
+   "pages": {
+    "turnout": 13,
+    "votes": 15,
+    "electors": 28
+   }
+  },
+  {
+   "fi": "Vaasan läänin vaalipiiri",
+   "sv": "Vasa läns valkrets",
+   "registered": 266864,
+   "voters": 217452,
+   "cast": 217452,
+   "valid": 216599,
+   "invalid": 853,
+   "votes": {
+    "ml": 81510,
+    "kansanpuolue_kekkonen": 2729,
+    "kekkonen_other": 3980,
+    "skdl": 31294,
+    "kok": 29299,
+    "sdp": 16002,
+    "rkp": 48066,
+    "tpsl": 3719
+   },
+   "electors": {
+    "ml": 13,
+    "skdl": 4,
+    "kok": 4,
+    "sdp": 2,
+    "rkp": 7
+   },
+   "seats": 30,
+   "pages": {
+    "turnout": 13,
+    "votes": 15,
+    "electors": 28
+   }
+  },
+  {
+   "fi": "Oulun läänin vaalipiiri",
+   "sv": "Uleåborgs läns valkrets",
+   "registered": 219149,
+   "voters": 187065,
+   "cast": 187065,
+   "valid": 186265,
+   "invalid": 800,
+   "votes": {
+    "ml": 86508,
+    "kansanpuolue_kekkonen": 12007,
+    "kekkonen_other": 7006,
+    "skdl": 54143,
+    "kok": 14245,
+    "sdp": 9902,
+    "tpsl": 2453,
+    "written": 1
+   },
+   "electors": {
+    "ml": 14,
+    "kansanpuolue_kekkonen": 1,
+    "kekkonen_other": 2,
+    "skdl": 8,
+    "kok": 2,
+    "sdp": 1
+   },
+   "seats": 28,
+   "pages": {
+    "turnout": 13,
+    "votes": 15,
+    "electors": 28,
+    "written": 9
+   }
+  },
+  {
+   "fi": "Lapin läänin vaalipiiri",
+   "sv": "Lapplands läns valkrets",
+   "registered": 110071,
+   "voters": 93574,
+   "cast": 93574,
+   "valid": 93204,
+   "invalid": 370,
+   "votes": {
+    "ml": 45747,
+    "kansanpuolue_kekkonen": 5144,
+    "skdl": 29427,
+    "kok": 6503,
+    "sdp": 5102,
+    "tpsl": 1280,
+    "written": 1
+   },
+   "electors": {
+    "ml": 7,
+    "kansanpuolue_kekkonen": 1,
+    "skdl": 5,
+    "kok": 1
+   },
+   "seats": 14,
+   "pages": {
+    "turnout": 13,
+    "votes": 15,
+    "electors": 28,
+    "written": 9
+   }
+  }
+ ],
+ "national": {
+  "registered": 2714883,
+  "voters": 2211441,
+  "cast": 2211441,
+  "valid": 2202204,
+  "invalid": 9237,
+  "votes": {
+   "ml": 698199,
+   "kansanpuolue_kekkonen": 165489,
+   "rkp_kekkonen": 35599,
+   "kekkonen_other": 75961,
+   "skdl": 451750,
+   "kok": 288912,
+   "vapaamieliset": 7898,
+   "kansanpuolue": 11087,
+   "sdp": 289366,
+   "rkp": 111741,
+   "tpsl": 66166,
+   "written": 36
+  },
+  "electors": {
+   "ml": 110,
+   "kansanpuolue_kekkonen": 19,
+   "rkp_kekkonen": 6,
+   "kekkonen_other": 10,
+   "skdl": 63,
+   "kok": 37,
+   "vapaamieliset": 1,
+   "kansanpuolue": 1,
+   "sdp": 36,
+   "rkp": 15,
+   "tpsl": 2
+  },
+  "seats": 300,
+  "pages": {
+   "turnout": 12,
+   "votes": 14,
+   "electors": 28,
+   "written": 9
+  }
+ },
+ "notes": [
+  "Columns 1-4 belong to Kekkosen vaaliliitto (Kekkonens valförbund, electoral union of Mr Kekkonen): Maalaisliitto (ml), Suomen kansanpuolue lists within the Kekkonen union (kansanpuolue_kekkonen), Ruotsalainen kansanpuolue lists within the Kekkonen union (rkp_kekkonen), and 'Muita' / other Kekkonen-union lists (kekkonen_other).",
+  "Columns kok, vapaamieliset (Vapaamielisten liitto / De frisinnades förbund, Liberal Union, the predecessor of LKP) and kansanpuolue form 'Kokoomuksen ja kansanpuolueen vaaliliitto' (Samlingspartiets och folkpartiets valförbund); the header names no presidential candidate. sdp = Sosialidemokraattinen puolue; rkp = Ruotsalainen kansanpuolue outside the Kekkonen union; tpsl = Sosialidemokraattinen liitto (Socialdemokratiska förbundet, Social Democratic League, i.e. TPSL).",
+  "Table 2 headnote: accepted hand-written candidate lists are counted only in the total of valid ballots, not in any party column. Their counts are taken from the column 'Muut / Övriga / Others' of text table D (PDF page 9) and stored under the key 'written' (Helsinki 4, Uusimaa 22, Turku south 1, Åland 2, Häme south 2, Mikkeli 1, North Karelia 1, Kuopio 1, Oulu 1, Lapland 1, whole country 36).",
+  "Constituency totals in table 2 include the row 'Muut' (footnote 1: ballots cast in other constituencies and abroad).",
+  "1962 was the first election under the constituency division of the law of 9 December 1960: 15 constituencies (one fewer than before). The former eastern and western Kuopio constituencies became Pohjois-Karjalan and Kuopion läänin vaalipiiri; Keski-Suomen läänin vaalipiiri roughly replaces the former eastern Vaasa constituency (plus some communes formerly in Häme and Mikkeli provinces); Vaasan läänin vaalipiiri combines nearly all communes of the former southern and northern Vaasa constituencies.",
+  "Registered voters and voters are from table 1 (pages 12-13 of the PDF, printed pages 12-15); the voters total equals the grand total of ballots in table 2."
+ ],
+ "misprints": []
+}
