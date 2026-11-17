@@ -7,6 +7,7 @@ from 2021, the paper votes cast outside the voter's home district. The archive p
 for every municipality. Those are the finest figures the authorities publish.
 """
 
+import html
 import io
 import json
 import re
@@ -17,6 +18,7 @@ from functools import cache
 from uuid import uuid5
 from xml.etree import ElementTree
 
+import httpx
 import numpy
 import pyproj
 import shapefile
@@ -53,6 +55,12 @@ class Spec:
 ELECTIONS = {
     spec.key: spec
     for spec in (
+        Spec("kov-1993", date(1993, 10, 17), html="k93"),
+        Spec("kov-1996", date(1996, 10, 20), html="k96"),
+        Spec("kov-1999", date(1999, 10, 17), html="k99"),
+        Spec("kov-2002", date(2002, 10, 20), html="k02"),
+        Spec("kov-2005", date(2005, 10, 16), html="k05"),
+        Spec("kov-2009", date(2009, 10, 18), html="kov09"),
         Spec("kov-2013", date(2013, 10, 20), zip="KOV2013_election_result_data.zip"),
         Spec("kov-2017", date(2017, 10, 15), zip="KOV2017_election_result_data.zip"),
         Spec("kov-2021", date(2021, 10, 17), api="KOV_2021"),
@@ -101,6 +109,8 @@ def source_urls(spec: Spec) -> list[str]:
             or name in {"RESULTS.xml", "metadata.json", "POSTELECTION_PARTICIPATION_INFO.xml"}
         ]
         return [listing_url(spec), *(api_url(spec, name) for name in wanted)]
+    if spec.html:
+        return html_files(spec)
     return []
 
 
@@ -116,6 +126,11 @@ def fetch() -> None:
                 found = raw.fetch_many(SOURCE, [u for u, s in suffixed.items() if s == suffix], suffix=suffix)
                 if len(found) != sum(1 for s in suffixed.values() if s == suffix):
                     raise RuntimeError(f"{spec.key}: some {suffix} files could not be fetched")
+    for spec in ELECTIONS.values():
+        if spec.html:
+            found = raw.fetch_many(SOURCE, html_files(spec), suffix=".html")
+            if len(found) != len(html_files(spec)):
+                raise RuntimeError(f"{spec.key}: some pages could not be fetched")
     for url in (OLD_SHAPES, NEW_SHAPES):
         raw.fetch(SOURCE, url, suffix=".zip")
 
@@ -191,6 +206,8 @@ class District:
     declared_seats: dict[str, int] = field(default_factory=dict)
     registered: int | None = None
     cast: int | None = None
+    divisions: list[str] = field(default_factory=list)
+    title: str = ""
 
 
 @dataclass
@@ -204,7 +221,8 @@ class Muni:
     valid: int | None = None
     party_votes: dict[str, int] = field(default_factory=dict)
     party_seats: dict[str, int] = field(default_factory=dict)
-    stations: dict[str, str] = field(default_factory=dict)
+    coded: bool = True
+    parts: dict[tuple[str, str], tuple[int | None, int | None]] = field(default_factory=dict)
 
 
 def unit_votes(cells: list[tuple[str, int]]) -> dict[str, int]:
@@ -317,7 +335,8 @@ def admin_units(spec: Spec) -> dict[str, tuple[str, str]]:
         meta = json.loads(raw.cached(SOURCE, api_url(spec, "metadata.json")).path.read_text())
         counties = {c["ehak"]: clean(c["name"]) for c in meta["greaterMunicipalities"]}
         for item in meta["municipalities"]:
-            out[item["ehak"]] = (clean(item["name"]), counties.get(item["parentEhak"], ""))
+            county = counties.get(item["parentEhak"], "")
+            out[item["ehak"]] = (clean(item["name"]), "" if county == clean(item["name"]) else county)
         return out
     ((_, data),) = members(spec, r"POSTELECTION_PARTICIPATION_INFO")
 
@@ -336,6 +355,8 @@ def admin_units(spec: Spec) -> dict[str, tuple[str, str]]:
 
 @cache
 def read(spec: Spec) -> dict[str, Muni]:
+    if spec.html:
+        return read_html(spec)
     names = admin_units(spec)
     pattern = r"ELECTION_RESULT_\d{4}" if spec.key == "kov-2013" else r"DETAILED_RESULT_PARISH_\d{4}"
     out: dict[str, Muni] = {}
@@ -398,12 +419,29 @@ COALITION_CODE = "VAL_LIIDUD"
 
 
 def party_names(spec: Spec) -> dict[str, tuple[str, str]]:
-    """Casefolded list name to (party code, name) for the parties the office registers nationally."""
+    """Casefolded list name to (party code, name) for the parties the office registers nationally.
+
+    The archive pages carry no party codes, so a list there is a party only when its name is that of a party the
+    open data registers or the 2009 page of party totals names."""
+    if spec.html:
+        return known_parties()
     out: dict[str, tuple[str, str]] = {}
     for name, (code, _) in national(spec).lists.items():
         if code in {COALITION_CODE, "ÜKSIK", "Üksik."} or name.startswith("Üksik") or name == "Valimisliidud":
             continue
         out[name.casefold()] = (code, name)
+    return out
+
+
+@cache
+def known_parties() -> dict[str, tuple[str, str]]:
+    out: dict[str, tuple[str, str]] = {}
+    for spec in ELECTIONS.values():
+        if not spec.html:
+            for folded, found in party_names(spec).items():
+                out.setdefault(folded, found)
+    for name in parties_2009()[1]:
+        out.setdefault(name.casefold(), (f"2009:{changeset.slug(name)}", name))
     return out
 
 
@@ -419,6 +457,7 @@ class Place:
     names: dict[str, int] = field(default_factory=dict)
     codes: dict[str, list[int]] = field(default_factory=dict)
     first: Spec | None = None
+    first_code: str = ""
     elections: list[str] = field(default_factory=list)
 
 
@@ -439,20 +478,22 @@ def places() -> tuple[dict[str, Place], dict[tuple[str, str], str]]:
             place_id = by_name.get(name_key)
             if (
                 place_id is None
+                and muni.coded
                 and code in by_code
                 and muni.name.casefold() in {n.casefold() for n in found[by_code[code]].names}
             ):
                 place_id = by_code[code]
             if place_id is None:
                 place_id = key("area", "ee.vald", f"{spec.year}:{code}")
-                found[place_id] = Place(place_id, muni.county, first=spec)
+                found[place_id] = Place(place_id, muni.county, first=spec, first_code=code)
             place = found[place_id]
             place.names[muni.name] = spec.year
-            place.codes.setdefault(code, []).append(spec.year)
+            if muni.coded:
+                place.codes.setdefault(code, []).append(spec.year)
+                by_code[code] = place_id
             place.elections.append(spec.key)
             index[(spec.key, code)] = place_id
             by_name[name_key] = place_id
-            by_code[code] = place_id
     return found, index
 
 
@@ -501,6 +542,8 @@ def outline_rows(
     The board publishes the municipalities as they stood on 15 October 2017 and as they stand now. The later file
     describes a place back to the reform only when the place kept its name and so its identity into the current
     plan; the reform took effect on 21 October 2017."""
+    if not place.codes:
+        return []
     old, new = outlines(OLD_SHAPES), outlines(NEW_SHAPES)
     rows: list[tuple[shapely.Geometry, date | None, date | None, str]] = []
     for code in place.codes:
@@ -586,6 +629,11 @@ def district_area(spec: Spec, place: Place, code: str, number: str, single: bool
     return area("ee.kov_ringkond", f"{spec.day}:{code}:{number}")
 
 
+def district_title(muni: Muni, district: District) -> str:
+    suffix = f" ({district.title})" if district.title else ""
+    return f"{muni.name}, valimisringkond nr {district.number}{suffix}"
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
@@ -639,7 +687,9 @@ def geo() -> Package:
                     singles.add(place.id)
                     id = whole(place)
                     p.add("area", id=id, scheme_code="ee.kov_ringkond")
-                    p.add("area_code", area_id=id, code=f"{place.first.year if place.first else ''}:{code}:1")
+                    p.add(
+                        "area_code", area_id=id, code=f"{place.first.year if place.first else ''}:{place.first_code}:1"
+                    )
                     p.name(id, place_name(place), "et", "official")
                     p.add("area_parent", area_id=id, parent_id=place.id)
                     for shape, start, end, _ in outline_rows(place):
@@ -648,7 +698,7 @@ def geo() -> Package:
                     id = district_area(spec, place, code, district.number, False)
                     p.add("area", id=id, scheme_code="ee.kov_ringkond")
                     p.add("area_code", area_id=id, code=f"{spec.day}:{code}:{district.number}")
-                    p.name(id, f"{muni.name}, valimisringkond nr {district.number}", "et", "official")
+                    p.name(id, district_title(muni, district), "et", "official")
                     p.add("area_parent", area_id=id, parent_id=place.id)
     return p
 
@@ -722,11 +772,27 @@ def party(code: str) -> str:
 def unit_label(code: str, unit: str, number: str, name: str) -> str:
     if unit == "E":
         return f"{name}, e-hääled (valimisringkond {number})"
+    if unit in {"R", "TOTAL"}:
+        return f"{name}, valimisringkond {number}, kokku"
     if unit.startswith("EJ"):
         return f"{name}, e-hääled (jaoskonna {unit[2:]} valijad)"
     if unit == "VPR":
         return f"{name}, väljaspool elukohajärgset ringkonda hääletanud (valimisringkond {number})"
     return f"{name}, jaoskond {unit[1:]}"
+
+
+def part_of(muni: Muni, number: str, unit: str, many: bool) -> tuple[int | None, int | None]:
+    """A unit's voters on the roll and voters, where the source prints them.
+
+    The electronic votes are one row for the whole municipality, so they are given to a district only when it is the
+    municipality's only one."""
+    if (number, unit) in muni.parts:
+        return muni.parts[(number, unit)]
+    if unit == "E" and many:
+        return None, None
+    if re.fullmatch(r"J\d+", unit) or unit == "E":
+        return muni.registered.get(unit), muni.cast.get(unit)
+    return None, None
 
 
 def put(p: Package, result_set: str, unit_id: str, option: str | None, measure: int, value: int, derived: bool) -> None:
@@ -808,6 +874,9 @@ def election(name: str) -> Package:
             number = district.number
             contest = key("contest", name, code, number)
             elected = sum(1 for e in district.entries.values() for c in e.candidates if c.elected)
+            coarse = not any(e.candidates for e in district.entries.values())
+            if coarse or (spec.html and not elected):
+                elected = district.seats
             district_id = district_area(spec, place, code, number, not many)
             p.add(
                 "contest",
@@ -821,11 +890,19 @@ def election(name: str) -> Package:
                 electoral_system_id=SYSTEM,
                 default_result_kind="counted",
             )
-            title = f"{muni.name}, valimisringkond nr {number}" if many else muni.name
+            title = district_title(muni, district) if many else muni.name
             p.name(contest, title, "et", "official")
-            label = f"{muni.name} council, electoral district {number}" if many else f"{muni.name} council"
+            label = (
+                f"{muni.name} council, electoral district {number}{f' ({district.title})' if district.title else ''}"
+                if many
+                else f"{muni.name} council"
+            )
             p.name(contest, label, "en", "english", False)
             slug = f"{path}/{changeset.slug(label)}"
+            if slug in slugs:
+                slug = f"{path}/{changeset.slug(f'{label} {muni.county}')}"
+            if slug in slugs:
+                slug = f"{path}/{changeset.slug(f'{label} {code}')}"
             if slug in slugs:
                 raise ValueError(f"{name}: duplicate slug {slug}")
             slugs.add(slug)
@@ -858,9 +935,25 @@ def election(name: str) -> Package:
                     entity_id=result_set,
                     kind="methodology",
                     body_md=(
-                        f"The district's basic mandates were {district.seats}; {elected} candidates were declared "
-                        "elected from its lists once the compensation mandates were allocated across the city. The "
-                        "seats stored are those declared."
+                        f"The page prints {district.seats} mandates for the district and marks {elected} candidates "
+                        "as elected; the seats stored are those marked."
+                        if spec.html
+                        else f"The district's basic mandates were {district.seats}; {elected} candidates were "
+                        "declared elected from its lists once the compensation mandates were allocated across the "
+                        "city. The seats stored are those declared."
+                    ),
+                    lang="en",
+                )
+            if coarse:
+                p.add(
+                    "note",
+                    id=key("note", result_set, "coarse"),
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=(
+                        "The source prints this district's votes for each list and its seats for each list, but not "
+                        "its candidates or the votes by polling division. The votes are stored for the district as "
+                        "a whole."
                     ),
                     lang="en",
                 )
@@ -873,10 +966,19 @@ def election(name: str) -> Package:
                 valid_units[unit] = sum(e.total.get(unit, 0) for e in district.entries.values())
                 uid = unit_of(number, unit, district_id)
                 put(p, result_set, uid, None, VALID, valid_units[unit], True)
-                if unit in muni.registered and not many and muni.registered[unit]:
-                    put(p, result_set, uid, None, REGISTERED, muni.registered[unit], False)
-                if unit in muni.cast and (re.fullmatch(r"J\d+", unit) or not many):
-                    put(p, result_set, uid, None, CAST, muni.cast[unit], False)
+                registered, cast = part_of(muni, number, unit, many)
+                if registered:
+                    put(p, result_set, uid, None, REGISTERED, registered, False)
+                if cast is not None:
+                    put(p, result_set, uid, None, CAST, cast, False)
+            for unit in district.divisions:
+                if unit not in every:
+                    uid = unit_of(number, unit, district_id)
+                    registered, cast = part_of(muni, number, unit, many)
+                    if registered:
+                        put(p, result_set, uid, None, REGISTERED, registered, False)
+                    if cast is not None:
+                        put(p, result_set, uid, None, CAST, cast, False)
             if spec.year >= 2021 and district.registered is not None and district.cast is not None:
                 total = unit_of(number, "TOTAL", district_id)
                 put(p, result_set, total, None, REGISTERED, district.registered, False)
@@ -934,7 +1036,7 @@ def election(name: str) -> Package:
                         measure=VOTES,
                         value=district.declared_votes[entry.name],
                     )
-                wins = 0
+                wins = district.declared_seats.get(entry.name, 0) if not entry.candidates else 0
                 for person in entry.candidates:
                     tag = f"{name}:{code}:{number}:{person.regno}"
                     full = person.name.title()
@@ -946,7 +1048,7 @@ def election(name: str) -> Package:
                         kind="candidate",
                         parent_option_id=parent,
                         party_id=party_id,
-                        ballot_position=person.regno or None,
+                        ballot_position=None if spec.html else person.regno or None,
                         ballot_label=full,
                     )
                     who = key("person", tag)
@@ -959,7 +1061,7 @@ def election(name: str) -> Package:
                         person_id=who,
                         option_id=parent,
                         role="list_member",
-                        list_position=person.regno or None,
+                        list_position=None if spec.html else person.regno or None,
                         ballot_name=full,
                         member_of_party_id=party_id,
                         is_independent=entry.independents,
@@ -979,7 +1081,10 @@ def election(name: str) -> Package:
                         p.add("outcome", result_set_id=result_set, option_id=parent, candidacy_id=cand, kind="elected")
                 if wins:
                     p.add("outcome", result_set_id=result_set, option_id=parent, kind="won", seats=wins)
-    totals(spec, munis)
+    if spec.html:
+        html_totals(spec, munis)
+    else:
+        totals(spec, munis)
     return p
 
 
@@ -1009,3 +1114,411 @@ def totals(spec: Spec, munis: dict[str, Muni]) -> None:
             code = "ÜKSIK"
         if code in mine and mine[code] != votes:
             raise ValueError(f"{spec.key} {label}: {mine[code]} votes, the office prints {votes}")
+
+
+# ---------------------------------------------------------------- the archive pages of 1993 to 2009
+
+VVK = "https://www.vvk.ee/varasemad"
+COUNTIES = (
+    "Harju", "Hiiu", "Ida-Viru", "Jõgeva", "Järva", "Lääne", "Lääne-Viru", "Põlva", "Pärnu", "Rapla", "Saare",
+    "Tartu", "Valga", "Viljandi", "Võru",
+)  # fmt: skip
+COUNTY_CODES_2009 = {
+    "0037": "Harju", "0039": "Hiiu", "0044": "Ida-Viru", "0049": "Jõgeva", "0051": "Järva", "0057": "Lääne",
+    "0059": "Lääne-Viru", "0065": "Põlva", "0067": "Pärnu", "0070": "Rapla", "0074": "Saare", "0078": "Tartu",
+    "0082": "Valga", "0084": "Viljandi", "0086": "Võru",
+}  # fmt: skip
+CITIES_2009 = {"0784": "Tallinn", "0795": "Tartu linn"}
+
+
+def page(url: str) -> str:
+    """A page of the archive as text; the older ones are Latin-1 and the newer ones UTF-8."""
+    data = raw.cached(SOURCE, url).path.read_bytes()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("latin-1")
+
+
+def ensure(url: str) -> str:
+    """Fetch a page into the raw cache when it is not there yet, then read it."""
+    raw.fetch(SOURCE, url, suffix=".html")
+    return page(url)
+
+
+def index_url(spec: Spec) -> str:
+    folder = spec.html
+    if spec.key == "kov-2009":
+        return f"{VVK}/{folder}/detailed.html"
+    return f"{VVK}/{folder}/tulemus/tulemus.html" if spec.key == "kov-2005" else f"{VVK}/{folder}/tulemus.stm"
+
+
+PARTIES_2009 = f"{VVK}/kov09/erakonniti.html"
+REPEATS: dict[str, list[str]] = {}
+
+
+@cache
+def html_files(spec: Spec) -> list[str]:
+    """The pages an old election's package cites: the index, each county's page, and each municipality's table."""
+    index = index_url(spec)
+    top = ensure(index)
+    urls = [index]
+    folder = f"{VVK}/{spec.html}"
+    if spec.key == "kov-2009":
+        counties = sorted(set(re.findall(r"detailed_(\d{4})\.html", top)))
+        found = set(counties)
+        for code in counties:
+            if code in COUNTY_CODES_2009:
+                url = f"{folder}/detailed_{code}.html"
+                urls.append(url)
+                found |= set(re.findall(r"detailed_(\d{4})\.html", ensure(url)))
+        urls += [f"{folder}/detailed_{code}.html" for code in sorted(found) if code not in COUNTY_CODES_2009]
+        ensure(PARTIES_2009)
+        return [*urls, PARTIES_2009]
+    ids = set(re.findall(r"(?:tulemus/|\./)(\d{9,10})\.html", top, re.IGNORECASE))
+    munis: set[str] = set()
+    for ident in sorted(ids):
+        if ident.endswith("00000000"):
+            url = f"{folder}/tulemus/{ident}.html"
+            urls.append(url)
+            munis |= set(re.findall(r'href="(\d{9,10})\.html"', ensure(url), re.IGNORECASE)) - {ident}
+        else:
+            munis.add(ident)
+    for ident in sorted(munis):
+        url = f"{folder}/tulemus/vtl_{ident}.html"
+        try:
+            ensure(url)
+        except httpx.HTTPStatusError as failure:
+            if failure.response.status_code != 404:
+                raise
+            continue
+        subpages = re.findall(rf"vtl_{ident}-(\d+)\.html", ensure(url))
+        if subpages:
+            first = f"{folder}/tulemus/vtl_{ident}-1.html"
+            ensure(first)
+            urls.append(first)
+            REPEATS.setdefault(spec.key, []).append(ident)
+            continue
+        urls.append(url)
+    return urls
+
+
+DISTRICT = re.compile(
+    r"Valimisringkond nr (\d+)(?:\s*-\s*([^<]*))?(?=(?:\s|<[^>]*>)*H(?:&auml;|ä)(?:&auml;|ä)lte jaotus kandidaatide vahel)",
+    re.IGNORECASE,
+)
+CELL = re.compile(r"<t([dh])\b([^>]*)>(.*?)</t[dh]>", re.DOTALL | re.IGNORECASE)
+ROW = re.compile(r"<tr\b[^>]*>(.*?)</tr>", re.DOTALL | re.IGNORECASE)
+TAGS = re.compile(r"<[^>]+>")
+
+
+@dataclass
+class Cell:
+    text: str
+    raw: str
+    attrs: str
+
+    @property
+    def marked(self) -> bool:
+        """Whether the page marks the candidate as elected: bold type, or in 2009 a style class."""
+        return bool(re.search(r"<b>", self.raw, re.IGNORECASE) or re.search(r"\belected\b", self.attrs))
+
+
+def plain_text(fragment: str) -> str:
+    return clean(html.unescape(TAGS.sub(" ", fragment)).replace("\xa0", " "))
+
+
+def table_rows(fragment: str) -> list[list[Cell]]:
+    return [
+        [Cell(plain_text(c.group(3)), c.group(3), c.group(2)) for c in CELL.finditer(row.group(1))]
+        for row in ROW.finditer(fragment)
+    ]
+
+
+def count(value: str) -> int | None:
+    value = value.strip()
+    return int(value) if re.fullmatch(r"\d+", value) else None
+
+
+def decimal(value: str) -> float | None:
+    value = value.replace(" ", "").replace(",", ".")
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+def figures(cells_: list[Cell]) -> tuple[int | None, int | None]:
+    """Voters on the roll and voters from a participation row, whichever layout the year's page uses.
+
+    The pages of 1993 to 1999 print citizens and others separately and the ballots taken before the voters; 2002 prints
+    the ballots taken and then the voters; 2005 and 2009 print only the roll and the voters."""
+    if len(cells_) >= 12:
+        return count(cells_[3].text), count(cells_[10].text)
+    if len(cells_) >= 6:
+        return count(cells_[1].text), count(cells_[4].text)
+    return count(cells_[1].text), count(cells_[2].text)
+
+
+def read_page(spec: Spec, code: str, name: str, county: str, text_: str) -> Muni:
+    """One municipality's page of the archive: its divisions, its lists, and each district's candidates."""
+    found = list(DISTRICT.finditer(text_))
+    head = text_[: found[0].start()] if found else text_
+    chunks: list[str] = []
+    titles: list[str] = []
+    for index, hit in enumerate(found):
+        chunks += [hit.group(1), text_[hit.end() : found[index + 1].start() if index + 1 < len(found) else None]]
+        titles.append(clean(hit.group(2) or ""))
+    muni = Muni(code, name, county, [], coded=spec.key == "kov-2009")
+    rows = table_rows(head)
+    in_party = False
+    declared: dict[str, dict[str, list[int]]] = {}
+    homes: dict[str, str] = {}
+    waiting: list[str] = []
+    pending: dict[str, tuple[int | None, int | None]] = {}
+    for cells_ in rows:
+        label = cells_[0].text if cells_ else ""
+        if not cells_ or len(cells_) < 2:
+            continue
+        if label == "Nimekiri":
+            in_party = True
+            continue
+        if not in_party:
+            if re.fullmatch(r"R\d+", label):
+                for unit in waiting:
+                    homes[unit] = label[1:]
+                for unit, pair in pending.items():
+                    muni.parts[(label[1:], unit)] = pair
+                waiting, pending = [], {}
+            elif re.fullmatch(r"J\d+", label):
+                waiting.append(label)
+            if re.fullmatch(r"J\d+|E", label):
+                registered, voted = figures(cells_)
+                pending[label] = (registered or None, voted)
+            continue
+        if len(cells_) < 5:
+            continue
+        # A list's row has a rank and the name in two cells, or the name alone over both; the rest is the votes, their
+        # share, and the votes in each district, then the mandates, their share, and the mandates in each district.
+        offset = 2 if len(cells_) % 2 == 0 else 1
+        name_ = cells_[offset - 1].text
+        numbers = [count(c.text) for c in cells_[offset:]]
+        k = (len(numbers) - 4) // 2
+        if k < 1:
+            continue
+        if name_ == "KOKKU":
+            muni.valid = numbers[0]
+            name_ = "Kokku"
+        declared[name_] = {"votes": [v or 0 for v in numbers[2 : 2 + k]], "seats": [v or 0 for v in numbers[4 + k :]]}
+    for unit in waiting:
+        homes[unit] = "1"
+    for unit, pair in pending.items():
+        muni.parts[("1", unit)] = pair
+    if not chunks:
+        # The page prints the lists' votes by district but no candidates.
+        count_ = max((len(line["votes"]) for line in declared.values()), default=0)
+        for index in range(count_):
+            number = str(index + 1)
+            entries = {
+                label: Entry(label, {"R": line["votes"][index]})
+                for label, line in declared.items()
+                if label != "Kokku" and index < len(line["votes"]) and line["votes"][index]
+            }
+            seats = sum(
+                line["seats"][index]
+                for label, line in declared.items()
+                if label != "Kokku" and index < len(line["seats"])
+            )
+            district = District(number, seats, entries, divisions=[u for u, d in homes.items() if d == number])
+            for label, line in declared.items():
+                if index < len(line["votes"]):
+                    district.declared_votes[label] = line["votes"][index]
+                if index < len(line["seats"]):
+                    district.declared_seats[label] = line["seats"][index]
+            muni.districts.append(district)
+    for position in range(0, len(chunks), 2):
+        number, body = chunks[position], chunks[position + 1]
+        entries: dict[str, Entry] = {}
+        seats = re.search(r"Mandaate\s*=\s*(\d+)", plain_text(body))
+        district = District(number, int(seats.group(1)) if seats else 0, entries, title=titles[position // 2])
+        columns: list[str] = []
+        current: Entry | None = None
+        for cells_ in table_rows(body):
+            if not cells_:
+                continue
+            first = cells_[0].text
+            if first == "Nimekiri/Kandidaat":
+                columns = [c.text for c in cells_[3:]]
+                continue
+            if not columns:
+                continue
+            if len(cells_) == 1:
+                current = entries.setdefault(first, Entry(first, {}))
+                continue
+            if current is None:
+                continue
+            width = len(columns)
+            if first in {"KOKKU", "Ringkond KOKKU"} or first.startswith("Ringkond"):
+                votes = {
+                    c: count(v.text) or 0
+                    for c, v in zip(columns, cells_[2:], strict=False)
+                    if re.fullmatch(r"J\d+|E", c)
+                }
+                if first == "KOKKU" and len(cells_) == width + 3 - 1:
+                    current.total = votes
+                continue
+            if len(cells_) == width + 3:
+                votes = {
+                    c: count(v.text) or 0
+                    for c, v in zip(columns, cells_[3:], strict=True)
+                    if re.fullmatch(r"J\d+|E", c)
+                }
+                current.candidates.append(
+                    Candidate(sum(len(e.candidates) for e in entries.values()) + 1, first, cells_[0].marked, votes)
+                )
+        full = {re.sub(r"\s*\([^()]*\)\s*$", "", label): label for label in declared}
+        for found_name in [n for n in entries if n not in declared and n in full]:
+            entry = entries.pop(found_name)
+            entry.name = full[found_name]
+            entries[entry.name] = entry
+        for label, line in declared.items():
+            index = int(number) - 1
+            if index < len(line["votes"]):
+                district.declared_votes[label] = line["votes"][index]
+            if index < len(line["seats"]):
+                district.declared_seats[label] = line["seats"][index]
+        muni.districts.append(district)
+    return muni
+
+
+ANCHOR = re.compile(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>', re.DOTALL | re.IGNORECASE)
+RENAMED = {"Tartu": "Tartu linn", "TALLINNA LINN": "Tallinn", "TARTU LINN": "Tartu linn", "Tallinna linn": "Tallinn"}
+
+
+def html_county(ident: str) -> str:
+    """The county of a municipality from the number of its page, which starts with the county's."""
+    number = int(ident[:2] if len(ident) == 10 else ident[:1])
+    return f"{COUNTIES[number - 1]} maakond"
+
+
+def html_names(spec: Spec) -> dict[str, tuple[str, str]]:
+    """Each municipality's page key (its number, or from 2009 its EHAK code) to its name and county."""
+    folder = f"{VVK}/{spec.html}"
+    out: dict[str, tuple[str, str]] = {}
+    if spec.key == "kov-2009":
+        for code, city in CITIES_2009.items():
+            out[code] = (city, "")
+        for county, county_name in COUNTY_CODES_2009.items():
+            for link, label in ANCHOR.findall(page(f"{folder}/detailed_{county}.html")):
+                found = re.fullmatch(r"detailed_(\d{4})\.html", link)
+                if found and found.group(1) not in COUNTY_CODES_2009 and found.group(1) not in CITIES_2009:
+                    out[found.group(1)] = (plain_text(label), f"{county_name} maakond")
+        return out
+    for url in html_files(spec):
+        if url.endswith("00000000.html"):
+            for link, label in ANCHOR.findall(page(url)):
+                found = re.fullmatch(r"(\d{9,10})\.html", link)
+                if found and not found.group(1).endswith("00000000") and found.group(1) not in out:
+                    name = plain_text(label)
+                    out[found.group(1)] = (RENAMED.get(name, name), html_county(found.group(1)))
+    top = page(index_url(spec))
+    for link, label in ANCHOR.findall(top):
+        found = re.search(r"(\d{9,10})\.html", link)
+        if found and not found.group(1).endswith("00000000") and found.group(1) not in out:
+            name = plain_text(label)
+            out[found.group(1)] = (RENAMED.get(name, name), "")
+    return out
+
+
+def read_html(spec: Spec) -> dict[str, Muni]:
+    out: dict[str, Muni] = {}
+    folder = f"{VVK}/{spec.html}"
+    for code, (name, county) in html_names(spec).items():
+        url = f"{folder}/detailed_{code}.html" if spec.key == "kov-2009" else f"{folder}/tulemus/vtl_{code}.html"
+        if url not in html_files(spec):
+            url = f"{folder}/tulemus/vtl_{code}-1.html"
+        if url not in html_files(spec):
+            continue
+        out[code] = read_page(spec, code, name, county, page(url))
+    return out
+
+
+def is_county_page(spec: Spec, url: str) -> bool:
+    if spec.key == "kov-2009":
+        found = re.search(r"detailed_(\d{4})\.html$", url)
+        return found is not None and found.group(1) in COUNTY_CODES_2009
+    return url.endswith("00000000.html")
+
+
+def html_participation(spec: Spec) -> dict[str, tuple[int, int]]:
+    """Each municipality's voters on the roll and voters, as the county pages total them."""
+    out: dict[str, tuple[int, int]] = {}
+    for url in html_files(spec):
+        if not is_county_page(spec, url):
+            continue
+        for cells_ in table_rows(page(url)):
+            if len(cells_) < 4 or not re.fullmatch(r"[\d ]+", cells_[1].text):
+                continue
+            registered, voted = figures(cells_)
+            if registered is not None and voted is not None:
+                out[cells_[0].text] = (registered, voted)
+    return out
+
+
+# Where an archive page's divisions add up to a different figure than the county page's row for the municipality, the
+# two pages disagree with each other; the municipality's own page is followed.
+KNOWN_DIFFERENCES: dict[tuple[str, str], str] = {
+    (
+        "kov-1999",
+        "Hummuli vald",
+    ): "the municipality's divisions add up to 798 voters on the roll and 510 voters; the county page prints 800 and 521",
+}
+
+
+def html_totals(spec: Spec, munis: dict[str, Muni]) -> None:
+    """Fail unless the municipalities' voters on the roll and voters add up to the county pages' rows, and, for 2009,
+    the valid votes and the parties' votes to the committee's page of party totals."""
+    expected = html_participation(spec)
+    wrong: list[str] = []
+    for muni in munis.values():
+        want = expected.get(muni.name)
+        if want is None or not muni.parts or (spec.key, muni.name) in KNOWN_DIFFERENCES:
+            continue
+        have = (
+            sum(r or 0 for r, _ in muni.parts.values()),
+            sum(c or 0 for _, c in muni.parts.values()),
+        )
+        if have != want:
+            wrong.append(f"{muni.name}: {have} against {want}")
+    if wrong:
+        raise ValueError(f"{spec.key}: participation differs from the county pages: {wrong[:8]}")
+    if spec.key != "kov-2009":
+        return
+    valid, parties = parties_2009()
+    names = party_names(spec)
+    mine: dict[str, int] = {}
+    total = 0
+    for muni in munis.values():
+        for district in muni.districts:
+            for entry in district.entries.values():
+                votes = sum(entry.total.values())
+                total += votes
+                if entry.name.casefold() in names:
+                    mine[entry.name] = mine.get(entry.name, 0) + votes
+    if total != valid:
+        raise ValueError(f"{spec.key}: {total} valid votes, the committee prints {valid}")
+    for name, votes in parties.items():
+        if mine.get(name, 0) != votes:
+            raise ValueError(f"{spec.key} {name}: {mine.get(name, 0)} votes, the committee prints {votes}")
+
+
+def parties_2009() -> tuple[int, dict[str, int]]:
+    """The valid votes and each party's votes the committee prints for the whole country in 2009."""
+    words = plain_text(page(PARTIES_2009))
+    total = re.search(r"Hääli kokku:\s*(\d+)", words)
+    if total is None:
+        raise LookupError("the 2009 party page has no total")
+    body = words[words.index("ERAKOND HÄÄLI") + len("ERAKOND HÄÄLI") :]
+    body = body.replace("% häältest", "")
+    pairs = re.findall(r"([^\d%]+?)\s+(\d+)\s+[\d,]+%", body)
+    return int(total.group(1)), {clean(name): int(votes) for name, votes in pairs}
