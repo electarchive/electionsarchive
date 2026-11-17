@@ -37,12 +37,21 @@ class Poll:
     declared_extra: dict[int, int]
 
 
+CANONICAL = {"ҮНДЭСНИЙ ЭВСЭЛ": "ҮЭ"}
+
+
 def candidate(header: str) -> Candidate:
-    """A candidate column heading: the name, then the party in parentheses or after a dash."""
-    found = re.match(r"^(.*?)\s*(?:\(([^)]*)\)|\s-\s(\S+))\s*$", header)
-    if found:
-        return Candidate(re.sub(r"\s+", " ", found[1]).strip(), (found[2] or found[3]).strip())
-    return Candidate(header.strip(), None)
+    """A candidate column heading: the name, then the party after a dash or in parentheses."""
+    header = re.sub(r"\s+", " ", header).strip()
+    named = re.match(r"^(.*?) - (.+)$", header)
+    if named:
+        name, party = named[1], named[2].strip()
+        inner = re.search(r"\(([^)]*)\)\s*$", party)
+        party = inner[1].strip() if inner else party
+    else:
+        bracket = re.match(r"^(.*?)\s*\(([^)]*)\)\s*$", header)
+        name, party = (bracket[1], bracket[2].strip()) if bracket else (header, None)
+    return Candidate(name.strip(), CANONICAL.get(party, party) if party else None)
 
 
 SECTION = re.compile(r"^(?:(.*?) аймаг )?(?:Улаанбаатар хот )?(.+?) (?:сум|дүүрэг) (\d+)-р хэс")
