@@ -368,7 +368,10 @@ def packages() -> list[str]:
     return [
         "lv.cvk/geo",
         "lv.cvk/registry",
-        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05", *LEGACY])),
+        *(
+            f"lv.cvk/{day}"
+            for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05", *LEGACY, *EARLY_DAYS])
+        ),
         *(f"lv.cvk/tn-{day}" for day in TN),
     ]
 
@@ -390,6 +393,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, PV2021_ELECTED, suffix=".html")
     for url in pv2021_pages():
         raw.fetch(SOURCE, url, suffix=".html")
+    fetch_early()
 
 
 def parse() -> None:
@@ -404,6 +408,9 @@ def parse() -> None:
     for day in DATI:
         build_dati(day).write()
     build_pv2021().write()
+    for day in EARLY_DAYS[:4]:
+        early_package(day).write()
+    build_vrd2021().write()
     for day in LEGACY:
         build_legacy(day).write()
     for day in TN:
@@ -463,7 +470,7 @@ def registry() -> Package:
         p.artifact(path(name), CVK_SOURCE)
     for day in LEGACY:
         p.artifact(raw.cached(SOURCE, legacy_url(day)), CVK_SOURCE)
-    for url in (PV2021, PV2021_ELECTED, *pv2021_pages()):
+    for url in (PV2021, PV2021_ELECTED, *pv2021_pages(), *early_urls(), *vrd2021_pages()):
         p.artifact(raw.cached(SOURCE, url), CVK_SOURCE)
     for code in DATI.values():
         for url in (
@@ -494,6 +501,13 @@ def registry() -> Package:
     for page in read_pv2021()[0]:
         for stand in page.stands.values():
             labels.setdefault(party(stand.name), stand.name)
+    for page in read_vrd2021()[0]:
+        for stand in page.stands.values():
+            labels.setdefault(party(stand.name), stand.name)
+    for day in EARLY_DAYS[:4]:
+        for race in read_early(day).races:
+            for slate in race.slates:
+                labels.setdefault(party(slate.name), slate.name)
     for prefix in MUNICIPAL.values():
         for council in _municipal(prefix)[0].values():
             for label, _, _ in council.lists.values():
@@ -1806,21 +1820,24 @@ def _station(text: str) -> tuple[int, str]:
     return int(number), clean(name)
 
 
-def read_pv2021() -> tuple[list[Page], list[tuple[str, str, str]]]:
+def read_stations(
+    summary_url: str,
+    elected_url: str,
+    pages_urls: list[str],
+    prefix: str,
+    pair: tuple[int, int, int, int] = (1, 2, 4, 6),
+) -> tuple[list[Page], list[tuple[str, str, str]]]:
     summary = {
-        row[0].text: (_n(row[1]), _n(row[2]), _n(row[4]), _n(row[6]))
-        for row in tables(PV2021).tables["t0"][1:]
+        row[0].text: tuple(_n(row[i]) for i in pair)
+        for row in tables(summary_url).tables["t0"][1:]
         if row[0].text != "Kopā"
     }
+    names = tables(summary_url).anchors
     pages: list[Page] = []
-    for url in pv2021_pages():
-        slug = url.rstrip("/").rsplit("/", 1)[-1].removeprefix("pv-2021-velesanu-iecirkni-")
+    for url in pages_urls:
+        slug = url.rstrip("/").rsplit("/", 1)[-1].removeprefix(prefix)
         page = tables(url)
-        name = next(
-            text
-            for link, text in tables(PV2021).anchors
-            if link.rstrip("/").endswith(url.rstrip("/").rsplit("/", 1)[-1])
-        )
+        name = next(text for link, text in names if link.rstrip("/").endswith(url.rstrip("/").rsplit("/", 1)[-1]))
         addresses = {_station(r[0].text)[0]: clean(r[1].text) for r in page.tables["t0"][1:] if r[0].text != "Kopā"}
         stands = {
             int(r[0].text): Stand(clean(r[1].text), _n(r[2]), 0) for r in page.tables["t2"][1:] if r[0].text.isdigit()
@@ -1834,19 +1851,42 @@ def read_pv2021() -> tuple[list[Page], list[tuple[str, str, str]]]:
                 continue
             number, label = _station(r[0].text)
             stations.append((number, label, addresses.get(number, ""), _n(r[1]), _n(r[3]), matrix.get(number, {})))
-        pages.append(Page(slug, name, stands, stations, summary[name]))
+        row = summary[name]
+        pages.append(Page(slug, name, stands, stations, (row[0], row[1], row[2], row[3])))
     elected = [
         (clean(r[0].text), clean(r[1].text), clean(r[2].text))
-        for r in tables(PV2021_ELECTED).tables["t0"][1:]
+        for r in tables(elected_url).tables["t0"][1:]
         if len(r) >= 3
     ]
     return pages, elected
 
 
+def read_pv2021() -> tuple[list[Page], list[tuple[str, str, str]]]:
+    return read_stations(PV2021, PV2021_ELECTED, pv2021_pages(), "pv-2021-velesanu-iecirkni-")
+
+
 def build_pv2021() -> Package:
-    day = "2021-06-05"
+    pages, elected = read_pv2021()
+    return stations_package(
+        "2021-06-05",
+        ("2021 Latvian municipal elections", "2021. gada pašvaldību vēlēšanas"),
+        "Riga, Rēzekne, and Varakļāni held their own elections in 2020; they are not part of this vote.",
+        (PV2021, PV2021_ELECTED, *pv2021_pages()),
+        pages,
+        elected,
+    )
+
+
+def stations_package(
+    day: str,
+    titles: tuple[str, str],
+    scope: str,
+    urls: tuple[str, ...],
+    pages: list[Page],
+    elected: list[tuple[str, str, str]],
+) -> Package:
     first = date.fromisoformat(day)
-    english, native = "2021 Latvian municipal elections", "2021. gada pašvaldību vēlēšanas"
+    english, native = titles
     p = Package(
         f"lv.cvk/{day}",
         SOURCE,
@@ -1854,9 +1894,8 @@ def build_pv2021() -> Package:
         depends=["lv.cvk/geo", "lv.cvk/registry"],
     )
     p.external |= {LATVIA, COUNTRY}
-    for url in (PV2021, PV2021_ELECTED, *pv2021_pages()):
+    for url in urls:
         p.uses(raw.cached(SOURCE, url))
-    pages, elected = read_pv2021()
     election = key("election", day)
     where = f"lv/{day}-local"
     p.add("election", id=election, polity_id=LATVIA, kind="local", date_from=first, date_to=first, status="held")
@@ -1868,7 +1907,7 @@ def build_pv2021() -> Package:
         id=key("note", election, "scope"),
         entity_id=election,
         kind="context",
-        body_md="Riga, Rēzekne, and Varakļāni held their own elections in 2020; they are not part of this vote.",
+        body_md=scope,
         lang="en",
     )
     seats = Counter((c, lst) for c, lst, _ in elected)
@@ -2259,3 +2298,439 @@ def build_legacy(day: str) -> Package:
             if all(v is not None for v in values) and values:
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=sum(values))
     return p
+
+
+# Municipal elections the commission's archive holds as printed tables or in its archived results application.
+VRD2021 = f"{ARCHIVE}/vrd-2021-velesanu-rezultati/"
+VRD2021_ELECTED = f"{ARCHIVE}/vrd-2021-ieveletie-deputati/"
+PV2009 = f"{ARCHIVE}/pv-2009-rezultati/"
+PV2010 = (f"{ARCHIVE}/roja-2010-velesanas/", f"{ARCHIVE}/mersrags-2010-velesanas/")
+PV2013 = f"{ARCHIVE}/pv-2013-rezultati/"
+PV2013_RIGA = f"{ARCHIVE}/pv-2013-velesanu-iecirkni-riga/"
+RD2020 = "https://archive.cvk.lv/rd2020"
+RD2020_VERSION = "a4360265-c143-47ec-b78f-0fe75a54fb4b"
+RD2020_RESULTS = f"{RD2020}/ElectionResults/ElectionResultsData?versionId={RD2020_VERSION}&locationId=riga"
+RD2020_ELECTED = f"{RD2020}/ElectedDeputies/ElectedDeputiesData?versionId={RD2020_VERSION}&districtId=riga"
+EARLY_DAYS = ("2009-06-06-local", "2010-12-18", "2013-06-01", "2020-08-29", "2021-09-11")
+
+
+def vrd2021_pages() -> list[str]:
+    seen = dict.fromkeys(
+        f"{ARCHIVE}/{link.rsplit('/lv/', 1)[-1]}"
+        for link in tables(VRD2021).links
+        if re.search(r"/lv/vrd-2021-velesanu-iecirkni-[^/]+/?$", link)
+    )
+    return list(seen)
+
+
+def read_vrd2021() -> tuple[list[Page], list[tuple[str, str, str]]]:
+    return read_stations(VRD2021, VRD2021_ELECTED, vrd2021_pages(), "vrd-2021-velesanu-iecirkni-")
+
+
+class Sections(HTMLParser):
+    """The tables of an archive page, each with the heading above it, as rows of text."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.sections: list[tuple[str, list[list[str]]]] = []
+        self._heading = ""
+        self._in_heading = False
+        self._rows: list[list[str]] | None = None
+        self._row: list[str] | None = None
+        self._cell: list[str] | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "h2":
+            self._in_heading, self._heading = True, ""
+        elif tag == "table":
+            self._rows = []
+        elif tag == "tr" and self._rows is not None:
+            self._row = []
+        elif tag in ("td", "th") and self._row is not None:
+            self._cell = []
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "h2":
+            self._in_heading = False
+            self._heading = clean(self._heading)
+        elif tag in ("td", "th") and self._row is not None and self._cell is not None:
+            self._row.append(clean("".join(self._cell)))
+            self._cell = None
+        elif tag == "tr" and self._rows is not None and self._row is not None:
+            self._rows.append(self._row)
+            self._row = None
+        elif tag == "table" and self._rows is not None:
+            self.sections.append((self._heading, self._rows))
+            self._rows = None
+
+    def handle_data(self, data: str) -> None:
+        if self._in_heading:
+            self._heading += data
+        if self._cell is not None:
+            self._cell.append(data)
+
+
+def sections(url: str) -> list[tuple[str, list[list[str]]]]:
+    parser = Sections()
+    parser.feed(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))
+    return parser.sections
+
+
+def _num(text: str) -> int:
+    return int(re.sub(r"\D", "", text) or 0)
+
+
+@dataclass
+class Slate:
+    number: int
+    name: str
+    marks: int
+    seats: int
+    unmodified: int | None = None
+    modified: int | None = None
+
+
+@dataclass
+class Count:
+    code: str
+    name: str
+    address: str
+    registered: int | None
+    cast: int | None
+    valid: int | None
+    marks: dict[int, tuple[int, int | None, int | None]]
+
+
+@dataclass
+class Member:
+    id: str
+    name: str
+    slate: int
+    position: int | None
+
+
+@dataclass
+class Race:
+    slug: str
+    name: str
+    seats: int | None
+    slates: list[Slate]
+    counts: list[Count]
+    level: str  # "council" when the commission prints only council totals, else "station"
+    members: list[Member] = field(default_factory=list)
+
+
+@dataclass
+class Early:
+    titles: tuple[str, str]
+    scope: str
+    method: str
+    urls: list[str]
+    races: list[Race]
+
+
+def _table_race(day: str, heading: str, rows: list[list[str]], seats: int | None, summed: bool) -> Race:
+    slug = changeset.slug(heading)
+    slates: list[Slate] = []
+    total: int | None = None
+    for row in rows[1:]:
+        if any(cell.startswith("Summa") for cell in row[:2]):
+            total = _num(row[2])
+        elif row[0].rstrip(".").isdigit():
+            slates.append(
+                Slate(int(row[0].rstrip(".")), row[1], _num(row[2]), _num(row[6]), _num(row[3]), _num(row[4]))
+            )
+    marks = {s.number: (s.marks, s.unmodified, s.modified) for s in slates}
+    if total is not None and total != sum(s.marks for s in slates):
+        raise ValueError(f"{day} {heading}: list marks do not add up to the printed total")
+    if any(s.unmodified + s.modified != s.marks for s in slates if s.unmodified is not None and s.modified is not None):
+        raise ValueError(f"{day} {heading}: unmodified and modified marks do not add up to a list's marks")
+    count = Count(f"{day}:{slug}", heading, "", None, None, total if summed else None, marks)
+    return Race(slug, heading, seats, slates, [count], "council")
+
+
+def read_2009() -> Early:
+    races = []
+    for heading, rows in sections(PV2009):
+        found = re.search(r"\(\s*(\d+)\s*\)", rows[0][-1])
+        races.append(_table_race("2009-06-06-local", heading, rows, int(found.group(1)) if found else None, False))
+    return Early(
+        ("2009 Latvian municipal elections", "2009. gada pašvaldību vēlēšanas"),
+        "",
+        EARLY_METHOD.format(
+            unit="council",
+            extra="The commission prints no polling-station figures for this election, so each council is one reporting unit.",
+        ),
+        [PV2009],
+        races,
+    )
+
+
+def read_2010() -> Early:
+    races = []
+    for url, name in zip(PV2010, ("Rojas novads", "Mērsraga novads"), strict=True):
+        text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8")
+        footer = re.search(r"(\d+) mandāti", text)
+        races.append(
+            _table_race("2010-12-18", name, sections(url)[0][1], int(footer.group(1)) if footer else None, True)
+        )
+    return Early(
+        (
+            "2010 Latvian municipal elections in Roja and Mērsrags",
+            "2010. gada Rojas novada domes un Mērsraga novada domes vēlēšanas",
+        ),
+        "",
+        EARLY_METHOD.format(
+            unit="council",
+            extra="The commission prints no polling-station figures for these elections, so each council is one "
+            "reporting unit.",
+        ),
+        list(PV2010),
+        races,
+    )
+
+
+def read_2013() -> Early:
+    heading, rows = sections(PV2013)[0]
+    found = re.search(r"\((\d+)\)", rows[0][-1])
+    race = _table_race("2013-06-01", heading, rows, int(found.group(1)) if found else None, False)
+    total = next(_num(row[2]) for row in rows if row[0].startswith("Summa"))
+    counts: list[Count] = []
+    current: dict[int, tuple[int, int | None, int | None]] = {}
+    name, last = "", 0
+    for row in sections(PV2013_RIGA)[0][1][1:]:
+        number = int(row[1].rstrip("."))
+        if row[0] != name or number <= last:
+            if current:
+                counts.append(Count(f"2013-06-01:riga:{len(counts) + 1}", name, "", None, None, None, current))
+            current, name = {}, row[0]
+        last = number
+        current[number] = (_num(row[3]), _num(row[4]), _num(row[5]))
+    counts.append(Count(f"2013-06-01:riga:{len(counts) + 1}", name, "", None, None, None, current))
+    for slate in race.slates:
+        if sum(c.marks.get(slate.number, (0, 0, 0))[0] for c in counts) != slate.marks:
+            raise ValueError(f"2013 Riga list {slate.number}: station marks do not add up to the council's")
+    if sum(s.marks for s in race.slates) != total:
+        raise ValueError("2013 Riga: list marks do not add up to the printed total")
+    race.counts, race.level = counts, "station"
+    return Early(
+        ("2013 Latvian municipal elections", "2013. gada pašvaldību vēlēšanas"),
+        "The commission's archive holds results by list and polling station only for Riga; the other councils elected "
+        "that day are not part of this package.",
+        EARLY_METHOD.format(
+            unit="polling station",
+            extra="Polling stations are named by the venue, because the archive prints no station numbers. The archive "
+            "prints no ballots cast, valid marks, or registered voters per polling station.",
+        ),
+        [PV2013, PV2013_RIGA],
+        [race],
+    )
+
+
+def _json(url: str) -> Any:
+    return json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig"))
+
+
+def read_2020() -> Early:
+    day = "2020-08-29"
+    data = _json(RD2020_RESULTS)
+    top = data["result"]
+    slates = [
+        Slate(s["number"], clean(s["name"]), s["validMarkCount"]["count"], s["electedCandidateCount"]["count"])
+        for s in top["candidateLists"]
+    ]
+    counts = []
+    for child in data["childResults"]:
+        where = child["location"]
+        counts.append(
+            Count(
+                f"{day}:{where['code']}",
+                clean(where["name"]),
+                clean(where.get("address") or ""),
+                where["voterCount"],
+                child["votedVoterCount"]["count"],
+                child["validMarkCount"]["count"],
+                {s["number"]: (s["validMarkCount"]["count"], None, None) for s in child["candidateLists"]},
+            )
+        )
+    members = [
+        Member(c["id"], clean(f"{c['name']} {c['surname']}"), c["candidateList"]["number"], c["number"])
+        for c in _json(RD2020_ELECTED)["candidates"]
+        if c["isElected"]
+    ]
+    race = Race("riga", "Rīga", 60, slates, counts, "station", members)
+    printed = {
+        REGISTERED: top["location"]["voterCount"],
+        CAST: top["votedVoterCount"]["count"],
+        VALID: top["validMarkCount"]["count"],
+    }
+    for measure, value in printed.items():
+        got = sum(getattr(c, {REGISTERED: "registered", CAST: "cast", VALID: "valid"}[measure]) or 0 for c in counts)
+        if got != value:
+            raise ValueError(f"2020 Riga: polling stations add up to {got}, the commission prints {value} ({measure})")
+    return Early(
+        ("2020 Riga City Council snap election", "2020. gada Rīgas domes ārkārtas vēlēšanas"),
+        "Riga's council was dissolved by law in 2020, and this snap election replaced it.",
+        EARLY_METHOD.format(
+            unit="polling station",
+            extra="Registered voters are the voters attached to the polling station, ballots cast are the voters who "
+            "took part, and valid votes are the valid marks for lists. The commission's results application also "
+            "holds each candidate's plus marks, minus marks, and points; they are not stored here yet.",
+        ),
+        [RD2020_RESULTS, RD2020_ELECTED],
+        [race],
+    )
+
+
+EARLY_METHOD = (
+    "Published by the Central Election Commission of Latvia on its archive site. Each list's votes are its valid "
+    "marks; where the archive splits them, unmodified marks are list ballots cast as printed and modified marks are "
+    "list ballots changed by hand. The finest unit the commission prints is the {unit}. {extra}"
+)
+
+
+def read_early(day: str) -> Early:
+    return {"2009-06-06-local": read_2009, "2010-12-18": read_2010, "2013-06-01": read_2013, "2020-08-29": read_2020}[
+        day
+    ]()
+
+
+def early_package(day: str) -> Package:
+    data = read_early(day)
+    first = date.fromisoformat(day[:10])
+    english, native = data.titles
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by the finest unit the Central Election Commission publishes",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    for url in data.urls:
+        p.uses(raw.cached(SOURCE, url))
+    election = key("election", day)
+    where = "lv/" + (day if day.endswith("-local") else f"{day}-local")
+    p.add("election", id=election, polity_id=LATVIA, kind="local", date_from=first, date_to=first, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    if data.scope:
+        p.add(
+            "note",
+            id=key("note", election, "scope"),
+            entity_id=election,
+            kind="context",
+            body_md=data.scope,
+            lang="en",
+        )
+    for race in data.races:
+        contest = key("contest", day, race.slug)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            magnitude=race.seats,
+            round_number=1,
+            electoral_system_id=SYSTEM_MUNICIPAL,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{first.year} {race.name} council election", "en", "official")
+        p.name(contest, f"{race.name} domes vēlēšanas {first.year}", "lv", "native", False)
+        p.add("slug", path=f"{where}/{race.slug}", entity_id=contest, is_current=True)
+        result_set = key("result_set", day, race.slug)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=data.method, lang="en"
+        )
+        options: dict[int, str] = {}
+        for slate in race.slates:
+            option = options[slate.number] = key("option", day, race.slug, slate.number)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(slate.name),
+                ballot_position=slate.number,
+                ballot_label=slate.name,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=slate.marks)
+            if slate.seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=slate.seats)
+        for measure, getter in ((REGISTERED, "registered"), (CAST, "cast"), (VALID, "valid")):
+            values = [getattr(c, getter) for c in race.counts]
+            if values and all(v is not None for v in values):
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=sum(values))
+        for count in race.counts:
+            unit = key("unit", count.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LATVIA,
+                scheme_code="lv.pasvaldiba" if race.level == "council" else "lv.iecirknis",
+                code=count.code,
+                area_relation="unlocated",
+                area_id=None,
+                kind="aggregate" if race.level == "council" else "standard",
+            )
+            p.name(unit, ", ".join(part for part in (count.name, count.address) if part), "lv", "official")
+            _put(p, result_set, unit, None, REGISTERED, count.registered)
+            _put(p, result_set, unit, None, CAST, count.cast)
+            _put(p, result_set, unit, None, VALID, count.valid)
+            for number, option in options.items():
+                marks, unmodified, modified = count.marks.get(number, (0, None, None))
+                _put(p, result_set, unit, option, VOTES, marks)
+                _put(p, result_set, unit, option, 22, unmodified)
+                _put(p, result_set, unit, option, 23, modified)
+        for member in race.members:
+            option = options[member.slate]
+            person = key("person", day, race.slug, member.id)
+            p.add("person", id=person)
+            p.name(person, member.name, "lv", "official")
+            candidacy = key("candidacy", day, race.slug, member.id)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role="list_member",
+                list_position=member.position,
+                ballot_name=member.name,
+            )
+            p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+    return p
+
+
+def build_vrd2021() -> Package:
+    pages, elected = read_vrd2021()
+    return stations_package(
+        "2021-09-11",
+        ("2021 Varakļāni and Rēzekne municipal elections", "2021. gada Varakļānu un Rēzeknes novadu domju vēlēšanas"),
+        "The two councils voted again on their own after the 2021 municipal elections that took place on 5 June.",
+        (VRD2021, VRD2021_ELECTED, *vrd2021_pages()),
+        pages,
+        elected,
+    )
+
+
+def early_urls() -> list[str]:
+    return [PV2009, *PV2010, PV2013, PV2013_RIGA, RD2020_RESULTS, RD2020_ELECTED, VRD2021, VRD2021_ELECTED]
+
+
+def fetch_early() -> None:
+    for url in early_urls():
+        raw.fetch(SOURCE, url, suffix=".json" if url.startswith(RD2020) else ".html")
+    for url in vrd2021_pages():
+        raw.fetch(SOURCE, url, suffix=".html")
