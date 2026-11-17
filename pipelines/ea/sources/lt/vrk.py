@@ -22,6 +22,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.lt import summary
 
 SOURCE = "lt.vrk"
 SITE = "https://www.vrk.lt"
@@ -378,6 +379,66 @@ def fetch() -> None:
             if item.kind in PAGES:
                 for url in summaries(config, item).values():
                     get(url, ".html")
+        fetch_summaries(config)
+
+
+# The summary pages a home page links, by what each one declares.
+SUMMARY_PAGES = {
+    "constituencies": r"rezultataiVienm\.html",
+    "members": r"rezultataiIsrinktiNariai\.html",
+    "ep_members": r"rezultataiEpIsrinktiNariai\.html",
+    "municipalities": r"rezultatai(?:Sav)?TarNariaiMeraiSavivaldybese\.html",
+}
+
+
+def linked(config: Config, kind: str) -> list[str]:
+    """The paths of the home page's summary pages of one kind, in the order the page links them."""
+    html = raw.cached(SOURCE, home(config)).path.read_text(encoding="utf-8")
+    return [
+        path
+        for path in summary.links(html)
+        if path.startswith(f"/rinkimai/{config.id}/") and re.search(SUMMARY_PAGES[kind] + "$", path)
+    ]
+
+
+def places(path: str) -> list[tuple[str, str]]:
+    """The municipality pages a listing links, as (municipality number, path)."""
+    html = summary.cached(path)
+    if html is None:
+        return []
+    found = []
+    for found_table in summary.tables(html):
+        for row in found_table:
+            code = summary.code_of(row[0].text)
+            if code and row[0].href and "Savivaldybeje_rpgId" in row[0].href:
+                found.append((code, row[0].href))
+    return list(dict.fromkeys(found))
+
+
+def fetch_summaries(config: Config) -> None:
+    """Download the summary pages the home page links, and the pages those link to for each contest."""
+    kinds = {item.kind for item in config.parts}
+    for kind in ("constituencies", "members", "ep_members", "municipalities"):
+        for path in linked(config, kind):
+            if kind == "constituencies" and "smd" not in kinds:
+                continue
+            if kind == "members" and "list" not in kinds:
+                continue
+            if kind == "ep_members" and "ep" not in kinds:
+                continue
+            if kind == "municipalities" and not kinds & {"mayor", "council"}:
+                continue
+            get(summary.url(path), ".html")
+            html = summary.cached(path)
+            if html is None:
+                continue
+            if kind == "constituencies":
+                for found in summary.links(html):
+                    if found.endswith("rezultataiVienmIsrinkti.html"):
+                        get(summary.url(found), ".html")
+            if kind == "municipalities":
+                for _, found in places(path):
+                    get(summary.url(found), ".html")
 
 
 # The summary page whose national figures each national contest is compared with.
@@ -720,7 +781,9 @@ class State:
         self.over = 0
         self.over_abroad = 0
         self.gap_net = 0
-        self.held: list[tuple[int, int]] = []
+        self.held: list[tuple[int, int, str]] = []
+        self.cited: set[str] = set()
+        self.differ: list[tuple[str, str | None, int, int, int]] = []
 
 
 def build(config: Config) -> Package:
@@ -749,17 +812,32 @@ def build(config: Config) -> Package:
             for number_round, _, url in selected(config, item):
                 if number_round == round_ and url in raw.keys(SOURCE):
                     p.artifact(raw.cached(SOURCE, url), VRK_SOURCE)
-            summary = summaries(config, item).get(round_) if item.kind in PAGES else None
+            page_url = summaries(config, item).get(round_) if item.kind in PAGES else None
             page = None
-            if summary is not None and summary in raw.keys(SOURCE):
-                page = raw.cached(SOURCE, summary)
+            if page_url is not None and page_url in raw.keys(SOURCE):
+                page = raw.cached(SOURCE, page_url)
                 p.artifact(page, VRK_SOURCE)
+            facts = collect(config, item, round_)
+            for address in dict.fromkeys(facts.urls):
+                if address not in state.cited:
+                    state.cited.add(address)
+                    p.artifact(raw.cached(SOURCE, address), VRK_SOURCE)
             number = 1 if day == config.first else 2
             election = state.elections.get((item.family, number))
             if election is None:
                 election = state.elections[(item.family, number)] = elect(p, state, config, item, number, day)
             contests(
-                p, state, config, item, number, day, election, rows, as_of, page.path.read_text() if page else None
+                p,
+                state,
+                config,
+                item,
+                number,
+                day,
+                election,
+                rows,
+                as_of,
+                page.path.read_text() if page else None,
+                facts,
             )
     if state.gaps:
         p.accept(
@@ -775,14 +853,28 @@ def build(config: Config) -> Package:
             "more ballots cast than registered voters. They are the Commission's own protocol figures, kept as "
             "published.",
         )
+    reasons = []
     if state.held:
-        p.accept(
-            "accounting.declared",
-            "The Commission's summary pages for the presidential election and the referendum leave out the "
-            f"supplementary protocols that its result files carry ({sum(n for n, _ in state.held):,} protocols with "
-            f"{sum(v for _, v in state.held):,} valid ballots). Every figure the pages print agrees with the files "
-            "to the vote when those protocols are left out.",
+        names = {
+            "president": "presidential election",
+            "referendum": "referendum",
+            "list": "Seimas list vote",
+            "ep": "European Parliament election",
+            "smd": "single-member constituencies",
+            "mayor": "mayoral elections",
+            "council": "council elections",
+        }
+        kinds = " and ".join(names[kind] for kind in dict.fromkeys(kind for _, _, kind in state.held))
+        reasons.append(
+            f"The Commission's summary pages for the {kinds} leave out the "
+            f"supplementary protocols that its result files carry ({sum(n for n, _, _ in state.held):,} protocols "
+            f"with {sum(v for _, v, _ in state.held):,} valid ballots). Every figure the pages print agrees with the "
+            "files to the vote when those protocols are left out."
         )
+    if state.differ:
+        raise ValueError(f"declared figures differ from the files in {sorted({w for w, *_ in state.differ})}")
+    if reasons:
+        p.accept("accounting.declared", " ".join(reasons))
     return p
 
 
@@ -816,6 +908,7 @@ def contests(
     rows: pl.DataFrame,
     as_of: datetime | None,
     page: str | None,
+    facts: Facts,
 ) -> None:
     path = state.paths[election]
     district = item.kind in ("smd", "mayor", "council")
@@ -891,7 +984,143 @@ def contests(
         value_rows(p, result_set, here, options, ids)
         if page is not None:
             declared, seats = declare(item, here, page)
-            reconcile(p, state, result_set, here, options, declared, seats)
+            reconcile(p, state, result_set, here, options, declared, seats, item.kind)
+        if code in facts.contests:
+            attach(p, state, item, result_set, here, options, code, facts.contests[code])
+        if facts.members:
+            seat_members(p, state, config, item, result_set, here, options, facts.members)
+
+
+class Facts(NamedTuple):
+    contests: dict[str, summary.Contest]  # by the contest's constituency or municipality number
+    members: list[summary.Member]  # the members elected from the lists of a list contest
+    urls: list[str]  # the summary pages that were read
+
+
+def collect(config: Config, item: Part, round_: int) -> Facts:
+    """What the summary pages declare for the contests of one part and round."""
+    found: dict[str, summary.Contest] = {}
+    members: list[summary.Member] = []
+    urls: list[str] = []
+
+    def page(path: str) -> str | None:
+        html = summary.cached(path)
+        if html is not None:
+            urls.append(summary.url(path))
+        return html
+
+    if item.kind == "smd":
+        for number_round, _, csv in selected(config, item):
+            if number_round != round_:
+                continue
+            path = csv.removeprefix(BASE).rsplit("/rezultatai/", 1)[0] + "/rezultatai/lt/rezultataiVienm.html"
+            html = page(path)
+            if html is None:
+                continue
+            found = summary.constituencies(html)
+            for linked_path in summary.links(html):
+                if linked_path.endswith("rezultataiVienmIsrinkti.html") and (elected := page(linked_path)):
+                    for member in summary.members(elected):
+                        code = summary.code_of(member.area)
+                        if code is not None:
+                            found.setdefault(code, summary.Contest()).elected.append(member.name)
+    elif item.kind in ("mayor", "council"):
+        for listing_path in linked(config, "municipalities"):
+            if summary.round_of(listing_path) != round_ or page(listing_path) is None:
+                continue
+            for code, path in places(listing_path):
+                html = page(path)
+                if html is None:
+                    continue
+                mayor, council = summary.municipality(html)
+                contest = mayor if item.kind == "mayor" else council
+                if contest is not None:
+                    found[code] = contest
+    elif item.kind in ("list", "ep"):
+        for path in linked(config, "members" if item.kind == "list" else "ep_members"):
+            html = page(path)
+            if html is None:
+                continue
+            if item.kind == "list":
+                members = [m for m in summary.members(html) if m.area == "Daugiamandatė"]
+            else:
+                members = summary.members(html, (0, 1, None))
+    return Facts(found, members, urls)
+
+
+def attach(
+    p: Package,
+    state: State,
+    item: Part,
+    result_set: str,
+    here: pl.DataFrame,
+    options: dict[str, str],
+    code: str,
+    found: summary.Contest,
+) -> None:
+    """Store the figures a summary page declares for one contest, and its elected candidates and council seats."""
+    distinct = here.select("option", "first", "last", "number_on_list").unique(subset="option")
+    names = {summary.named(f"{r['first']} {r['last']}"): r["option"] for r in distinct.iter_rows(named=True)}
+    numbers = {str(r["number_on_list"]): r["option"] for r in distinct.iter_rows(named=True)}
+
+    def option_of(label: str) -> str:
+        option = (numbers if item.kind == "council" else names).get(
+            label if item.kind == "council" else summary.named(label)
+        )
+        if option is None:
+            raise ValueError(f"lt.vrk {item.kind} {code}: {label!r} is not an option of the contest")
+        return option
+
+    declared: list[tuple[str | None, int, int]] = [(None, m, v) for m, v in sorted(found.totals.items())]
+    declared += [(option_of(label), 1, votes) for label, votes in found.votes.items()]
+    reconcile(
+        p,
+        state,
+        result_set,
+        here,
+        options,
+        declared,
+        [(option_of(n), seats) for n, seats in found.seats.items()],
+        f"{item.kind} {code}",
+    )
+    for name in found.elected:
+        p.add("outcome", result_set_id=result_set, option_id=options[option_of(name)], kind="elected")
+
+
+def seat_members(
+    p: Package,
+    state: State,
+    config: Config,
+    item: Part,
+    result_set: str,
+    here: pl.DataFrame,
+    options: dict[str, str],
+    members: list[summary.Member],
+) -> None:
+    """The people elected from a list contest's lists: each becomes a candidacy with an elected outcome."""
+    labels = {
+        normal(r["label"]): r["option"] for r in here.select("option", "label").unique("option").iter_rows(named=True)
+    }
+    for member in members:
+        option = labels.get(normal(member.party if item.kind == "list" else member.area))
+        if option is None:
+            raise ValueError(f"lt.vrk {item.kind}: {member.name!r} is elected from an unknown list {member.party!r}")
+        person = key("person", config.first, item.kind, "member", summary.named(member.name))
+        if person not in state.people:
+            state.people.add(person)
+            p.add("person", id=person)
+            p.name(person, title(member.name), "lt", "official")
+        candidacy = key("candidacy", result_set, summary.named(member.name))
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[option],
+            role="list_member",
+            ballot_name=title(member.name),
+            is_independent=False,
+        )
+        p.add("outcome", result_set_id=result_set, option_id=options[option], candidacy_id=candidacy, kind="elected")
 
 
 def options_for(
@@ -1147,8 +1376,9 @@ def reconcile(
     options: dict[str, str],
     declared: list[tuple[str | None, int, int]],
     seats: list[tuple[str, int]],
+    where: str = "",
 ) -> None:
-    """Store the Commission's figures, and note when they leave out the supplementary protocols the files carry."""
+    """Store the Commission's figures, and note when they differ from what the polling-district files add up to."""
     for option, measure, value in declared:
         p.add(
             "declared",
@@ -1165,4 +1395,8 @@ def reconcile(
     main = figures(here.filter(~pl.col("supplementary")))
     if all(main.get((option, measure)) == value for option, measure, value in declared):
         extra = here.filter(pl.col("supplementary"))
-        state.held.append((extra.select("unit").n_unique(), figures(extra)[(None, 4)]))
+        state.held.append((extra.select("unit").n_unique(), figures(extra)[(None, 4)], where.split()[0]))
+        return
+    for option, measure, value in declared:
+        if ours.get((option, measure)) != value:
+            state.differ.append((where, option, measure, value, ours.get((option, measure), 0)))
