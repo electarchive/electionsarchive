@@ -1,8 +1,8 @@
 """Bulgaria's Central Election Commission (CIK): every election it publishes, by polling section.
 
 The CIK publishes, for each election since 2013, a bundle of semicolon-separated text files (`sections`, `protocols`,
-`votes`, `preferences`, party and candidate lists) that it calls open data. Older elections come as differently
-shaped text files. This module reads each bundle from the raw cache and builds one package per election.
+`votes`, `preferences`, party and candidate lists) that it calls open data. Older elections (the 2005 National
+Assembly and the 2011 presidential rounds) come as differently shaped text files. This module reads each bundle from the raw cache and builds one package per election.
 """
 
 import functools
@@ -89,7 +89,11 @@ class Election(NamedTuple):
 
 
 Z = BASE + "/"
+FIRST_ROUND = {"pr-2016-11-13": "pr-2016-11-06", "pr-2011-10-30": "pr-2011-10-23"}
 ELECTIONS = [
+    Election("ns-2005-06-25", "ns", date(2005, 6, 25), "http://pi2005.cik.bg/results/export.zip", "ns2005"),
+    Election("pr-2011-10-23", "pres", date(2011, 10, 23), Z + "mipvr2011/el2011_t1.zip", "pres2011", None, 1),
+    Election("pr-2011-10-30", "pres", date(2011, 10, 30), Z + "mipvr2011/el2011_t2.zip", "pres2011", None, 2),
     Election("ns-2013-05-12", "ns", date(2013, 5, 12), Z + "pi2013/export.zip", "ns2013"),
     Election("ref-2013-01-27", "ref", date(2013, 1, 27), Z + "referendum/export.zip", "ref2013"),
     Election("ep-2014-05-25", "ep", date(2014, 5, 25), Z + "ep2014/export.zip", "ep2014"),
@@ -111,6 +115,8 @@ ELECTIONS = [
 ]
 # Files the CIK publishes that this module does not read yet, or that production could not reach in the last round.
 BLOCKED = [
+    "https://pi2009.cik.bg/results/proportional/index.html",
+    "https://pi2009.cik.bg/?page=6",
     "https://ep2009.cik.bg/results/exports.zip",
     "https://results.cik.bg/pvr202610/tur2/opendata/export.zip",
     "https://results.cik.bg/pvrns2021/tur1/export.zip",
@@ -175,6 +181,16 @@ LAYOUTS: dict[str, Layout] = {
         3,
         True,
         3,
+    ),
+    "ns2005": Layout(None, 0, {"*": {"box": (10,), "inv": (14,), "valid": (15,)}}, "ns2005", 0),
+    "pres2011": Layout(
+        0,
+        1,
+        {"*": {"reg": (3,), "voters": (7,), "box": (20,), "inv": (26,), "valid": (27,)}},
+        "blank_pairs",
+        2,
+        False,
+        0,
     ),
     "pres2016": Layout(
         0,
@@ -306,6 +322,7 @@ PRESIDENCY = key("office", "president")
 ASSEMBLY = key("body", "national-assembly")
 SYSTEM_HARE = key("electoral_system", "ns", 2013)
 SYSTEM_EP = key("electoral_system", "ep", 2014)
+SYSTEM_2005 = key("electoral_system", "ns", 2005)
 SYSTEM_PRES = key("electoral_system", "president", 1992)
 SYSTEM_REF = key("electoral_system", "referendum", 2013)
 
@@ -341,6 +358,15 @@ ROLES = {
 def _members(e: Election) -> dict[str, str]:
     archive = _archive(e.url)
     names = [i.filename for i in archive.infolist() if not i.is_dir() and not i.filename.startswith("suemg/")]
+    if e.layout == "ns2005":
+        return {
+            "sections": "sikproto.txt",
+            "protocols": "sikproto.txt",
+            "votes": "sikproto.txt",
+            "header": "pe2005_export.csv",
+        }
+    if e.layout == "pres2011":
+        names = [n for n in names if "_president_" in n.rpartition("/")[2]]
     folders = list(dict.fromkeys(n.rpartition("/")[0] for n in names))
     if e.folder is not None:
         names = [n for n in names if n.rpartition("/")[0] == folders[e.folder]]
@@ -390,8 +416,10 @@ def sections(e: Election) -> dict[str, Section]:
     layout = LAYOUTS[e.layout]
     out: dict[str, Section] = {}
     for r in rows(e, "sections"):
-        if e.layout in ("ns2013", "ref2013"):
+        if e.layout in ("ns2013", "ref2013", "pres2011"):
             code, place, ekatte, mobile, ship = r[1], r[4], r[5], r[0] == "П", r[0] == "К"
+        elif e.layout == "ns2005":
+            code, place, ekatte, mobile, ship = r[0], r[1], "", False, False
         elif layout.votes in ("order_pairs",):
             code, place, ekatte = r[0], r[1], r[2]
             mobile, ship = r[3] == "1", r[4] == "1"
@@ -429,6 +457,10 @@ def party_votes(e: Election) -> dict[str, dict[str, int]]:
     layout = LAYOUTS[e.layout]
     out: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     for r in rows(e, "votes"):
+        if layout.votes == "ns2005":
+            for index, text in enumerate(r[15:], start=1):
+                out[r[0]][str(index)] += int(text) if text.strip().isdigit() else 0
+            continue
         if layout.votes == "blank_pairs":
             section, body, step, at = r[1], r[2:], 2, 1
         elif layout.votes == "order_pairs":
@@ -458,7 +490,7 @@ LAYOUTS["ref2016"] = Layout(0, 1, {}, "none", flags=3)
 SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
     (
         SYSTEM_HARE,
-        date(2005, 1, 1),
+        date(2009, 1, 1),
         None,
         {
             "formula": "hare",
@@ -468,6 +500,20 @@ SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
         (
             "Seats are allocated among the lists that pass a 4% national threshold, in each of the multi-member "
             "constituencies, by the Hare quota and largest remainders. Preference votes can move a candidate up a list."
+        ),
+    ),
+    (
+        SYSTEM_2005,
+        date(2005, 1, 1),
+        date(2009, 1, 1),
+        {
+            "formula": "hare",
+            "threshold": {"level": "list", "scope": "national", "percent": 4},
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "Seats were allocated among the lists that passed a 4% national threshold, in each of the 31 multi-member "
+            "constituencies, by the Hare quota and largest remainders. Voters chose a list and could not reorder it."
         ),
     ),
     (
@@ -573,7 +619,7 @@ def mir_of(e: Election, code: str) -> int:
 
 
 def abroad(e: Election, code: str) -> bool:
-    return code.startswith("29" if e.layout == "ref2015" else "32")
+    return code.startswith("29" if e.layout in ("ref2015", "pres2011") else "32")
 
 
 def party_kind(name: str) -> str:
@@ -586,6 +632,9 @@ def party_kind(name: str) -> str:
 
 
 def parties(e: Election) -> dict[str, str]:
+    if e.layout == "ns2005":
+        found = (re.match(r"(\d+)\.\s*(.+)$", c.strip()) for c in (rows(e, "header") or [[]])[0])
+        return {m[1]: m[2].strip() for m in found if m}
     return {r[-2].strip(): r[-1].strip() for r in rows(e, "parties") if len(r) >= 2 and r[-2].strip().isdigit()}
 
 
@@ -602,7 +651,9 @@ def candidates(e: Election) -> list[Candidate]:
     out: list[Candidate] = []
     for r in rows(e, "candidates"):
         r = [c.strip() for c in r]
-        if e.layout == "ns2013":
+        if e.layout == "pres2011":
+            out.append(Candidate(0, r[0], int(r[0]), f"{r[1]} и {r[2]}", False, r[3]))
+        elif e.layout == "ns2013":
             out.append(Candidate(int(r[0]), r[1], int(r[2]), r[3], False, r[4]))
         elif e.layout == "ns2014":
             out.append(Candidate(int(r[0]), r[1], int(r[3]), r[4], False, r[2]))
@@ -657,7 +708,7 @@ def build(e: Election) -> Package:
         depends=[
             f"{SOURCE}/geo",
             f"{SOURCE}/registry",
-            *([f"{SOURCE}/pr-2016-11-06"] if e.id == "pr-2016-11-13" else []),
+            *([f"{SOURCE}/{FIRST_ROUND[e.id]}"] if e.id in FIRST_ROUND else []),
         ],
     )
     p.external.add(BULGARIA)
@@ -707,14 +758,18 @@ def build(e: Election) -> Package:
     seen: dict[int, set[str]] = defaultdict(set)
     for section, per in votes.items():
         m = mir_of(e, section)
-        for number, n in per.items():
-            seen[m].add(number)
+        for number, count in per.items():
+            if count or e.layout != "ns2005":  # a 2005 list with no votes in a constituency did not stand there
+                seen[m].add(number)
     for m, listed in running.items():
         running[m] = [*listed, *sorted(seen[m] - set(listed), key=int)]
     nominators = {c.party: c.party_name for c in cands}
     all_numbers = sorted({n for numbers in running.values() for n in numbers}, key=lambda x: int(x))
-    party_id = {n: p.id("party", e.id, n) for n in all_numbers}
+    independent = {n for n in all_numbers if e.layout == "ns2005" and int(n) > len(names)}
+    party_id = {n: p.id("party", e.id, n) for n in all_numbers if n not in independent}
     for n in all_numbers:
+        if n in independent:
+            continue
         name = names.get(n) or nominators.get(n) or f"List {n}"
         p.add("party", id=party_id[n], kind=party_kind(name), polity_id=BULGARIA)
         p.add("external_id", entity_id=party_id[n], scheme="bg.cik.party", value=f"{e.id}:{n}")
@@ -725,8 +780,8 @@ def build(e: Election) -> Package:
     options: dict[tuple[int, str], str] = {}
     none_option: dict[int, str] = {}
     ids = {"contest": [], "option": []}
-    system = {"ns": SYSTEM_HARE, "ep": SYSTEM_EP, "pres": SYSTEM_PRES}[e.kind]
-    previous = key("contest", "pr-2016-11-06", "president") if e.id == "pr-2016-11-13" else None
+    system = {"ns": SYSTEM_2005 if e.layout == "ns2005" else SYSTEM_HARE, "ep": SYSTEM_EP, "pres": SYSTEM_PRES}[e.kind]
+    previous = key("contest", FIRST_ROUND[e.id], "president") if e.id in FIRST_ROUND else None
     for m, ckey, en, bg in contests:
         contest = key("contest", e.id, ckey)
         p.add(
@@ -773,10 +828,12 @@ def build(e: Election) -> Package:
                 "contest_option",
                 id=option,
                 contest_id=contest,
-                kind="ticket" if e.kind == "pres" else "list",
-                party_id=party_id[n],
-                ballot_position=int(n),
-                ballot_label=names.get(n) or nominators.get(n) or f"List {n}",
+                kind="ticket" if e.kind == "pres" else "candidate" if n in independent else "list",
+                party_id=party_id.get(n),
+                ballot_position=None if n in independent else int(n),
+                ballot_label=f"Независим кандидат {int(n) - len(names)}"
+                if n in independent
+                else names.get(n) or nominators.get(n) or f"List {n}",
             )
         if has_none:
             option = none_option[m] = key("option", e.id, ckey, "none")
@@ -888,7 +945,23 @@ def build(e: Election) -> Package:
                 p.rows["contest"][[c["id"] for c in p.rows["contest"]].index(key("contest", e.id, f"{m:02d}"))][
                     "magnitude"
                 ] = total
-    if e.kind == "pres" and e.round == 2 and any(c.elected for c in cands):
+    if e.layout == "pres2011":
+        declared = {r[1].strip(): (r[0].strip(), int(r[4])) for r in rows(e, "result") if len(r) >= 5}
+        for c in cands:
+            status = declared.get(c.party, ("", 0))[0]
+            kind = (
+                "elected"
+                if status == "И"
+                else "advanced"
+                if status == "Б"
+                else "lost"
+                if e.round == 2
+                else "eliminated"
+            )
+            p.add("outcome", result_set_id=sets[0], option_id=options[(0, c.party)], kind=kind)
+        for number, (_, count) in declared.items():
+            p.add("declared", result_set_id=sets[0], option_id=options[(0, number)], measure=VOTES, value=count)
+    elif e.kind == "pres" and e.round == 2 and any(c.elected for c in cands):
         for c in cands:
             kind = "elected" if c.elected else "lost"
             p.add("outcome", result_set_id=sets[0], option_id=options[(0, c.party)], kind=kind)
