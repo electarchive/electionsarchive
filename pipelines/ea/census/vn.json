@@ -1,0 +1,801 @@
+{
+  "polity": "VN",
+  "name": "Vietnam",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      { "text": "Vietnam", "lang": "en", "kind": "official" },
+      { "text": "Việt Nam", "lang": "vi", "kind": "native" }
+    ],
+    "slug": "vn",
+    "wikidata": "Q881",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "title": "Hiến pháp nước Cộng hòa xã hội chủ nghĩa Việt Nam (Constitution of the Socialist Republic of Vietnam, 2013, consolidated text 52/VBHN-VPQH with the amendments of Resolution 203/2025/QH15 of 16 June 2025)",
+      "publisher": "Văn phòng Quốc hội, published on the Cổng Thông tin điện tử Chính phủ (Office of the National Assembly, on the Government Portal)",
+      "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf",
+      "kind": "official_body"
+    },
+    "electoral-law": {
+      "title": "Luật Bầu cử đại biểu Quốc hội và đại biểu Hội đồng nhân dân, số 85/2015/QH13 (Law on the Election of National Assembly and People's Council Deputies, 25 June 2015, amended by Law 83/2025/QH15 of 24 June 2025)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ, Hệ thống văn bản (Government Portal, legal documents)",
+      "url": "https://vanban.chinhphu.vn/default.aspx?pageid=27160&docid=180582",
+      "kind": "official_body"
+    },
+    "electoral-law-commentary": {
+      "title": "Bầu cử thêm, bầu cử lại theo quy định của Luật Bầu cử đại biểu Quốc hội và đại biểu Hội đồng nhân dân (articles 79 and 80 of the electoral law as amended in 2025)",
+      "publisher": "Sở Tư pháp thành phố Cần Thơ, Trang phổ biến giáo dục pháp luật (Can Tho Department of Justice)",
+      "url": "https://pbgdpl.cantho.gov.vn/bau-cu-them-bau-cu-lai-theo-quy-dinh-cua-luat-bau-cu-dai-bieu-quoc-hoi-va-dai-bieu-hoi-dong-nhan-dan",
+      "kind": "official_body"
+    },
+    "electoral-law-seats": {
+      "title": "Quy định số lượng đại biểu Quốc hội và đại biểu Hội đồng nhân dân (articles 7 to 9 of the electoral law as amended in 2025)",
+      "publisher": "Sở Tư pháp thành phố Cần Thơ, Trang phổ biến giáo dục pháp luật (Can Tho Department of Justice)",
+      "url": "https://pbgdpl.cantho.gov.vn/quy-dinh-so-luong-dai-bieu-quoc-hoi-va-dai-bieu-hoi-dong-nhan-dan",
+      "kind": "official_body"
+    },
+    "local-government-law": {
+      "title": "Luật Tổ chức chính quyền địa phương, số 72/2025/QH15 (Law on the Organization of Local Government, 16 June 2025), Công báo 807-808 of 24 June 2025",
+      "publisher": "Cổng Thông tin điện tử Chính phủ, Công báo (Government Portal, Official Gazette)",
+      "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/2025_807-808_72-2025-qh15..pdf",
+      "kind": "official_body"
+    },
+    "referendum-law": {
+      "title": "Luật Trưng cầu ý dân, số 96/2015/QH13 (Law on Referendums, 25 November 2015, in force 1 July 2016)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ, Hệ thống văn bản (Government Portal, legal documents)",
+      "url": "https://vanban.chinhphu.vn/default.aspx?pageid=27160&docid=183213",
+      "kind": "official_body"
+    },
+    "grassroots-law": {
+      "title": "Luật Thực hiện dân chủ ở cơ sở, số 10/2022/QH15 (Law on Grassroots Democracy, 10 November 2022, in force 1 July 2023), Công báo 905-906 of 14 December 2022",
+      "publisher": "Cổng Thông tin điện tử Chính phủ, Công báo (Government Portal, Official Gazette)",
+      "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2023/4/luat10.pdf",
+      "kind": "official_body"
+    },
+    "admin-register": {
+      "title": "Danh mục đơn vị hành chính Việt Nam, Thống kê số lượng tỉnh thành, quận huyện, phường xã (register of Vietnam's administrative units, counts by year 2022-2026)",
+      "publisher": "Cục Thống kê, Bộ Tài chính (National Statistics Office, Ministry of Finance)",
+      "url": "https://danhmuchanhchinh.nso.gov.vn/Tinh_tk_new.aspx",
+      "kind": "official_body"
+    },
+    "hamlets-2026": {
+      "title": "Cả nước hoàn thành sắp xếp thôn, tổ dân phố, giảm hơn 41.500 đơn vị (all provinces complete the merger of hamlets and residential groups, 3 August 2026)",
+      "publisher": "Báo Điện tử Chính phủ (Government of Vietnam)",
+      "url": "https://baochinhphu.vn/ca-nuoc-hoan-thanh-sap-xep-thon-to-dan-pho-giam-hon-41500-don-vi-102260803183313362.htm",
+      "kind": "official_body"
+    },
+    "na-history": {
+      "title": "Vài nét về Quốc hội nước CHXHCN Việt Nam (the National Assembly's terms I to XII, with the date and deputies of each election)",
+      "publisher": "Báo Điện tử Chính phủ (Government of Vietnam)",
+      "url": "https://baochinhphu.vn/vai-net-ve-quoc-hoi-nuoc-chxhcn-viet-nam-10271664.htm",
+      "kind": "official_body"
+    },
+    "na-2011": {
+      "title": "Công bố kết quả bầu cử đại biểu QH khóa XIII và đại biểu HĐND các cấp nhiệm kỳ 2011-2016 (results of the 22 May 2011 election, announced 3 June 2011)",
+      "publisher": "Báo Nhân Dân",
+      "url": "https://nhandan.vn/cong-bo-ket-qua-bau-cu-dai-bieu-qh-khoa-xiii-va-dai-bieu-hdnd-cac-cap-nhiem-ky-2011-2016-post541902.html",
+      "kind": "news_agency"
+    },
+    "na-2016": {
+      "title": "Công bố danh sách 496 đại biểu Quốc hội khóa XIV (Resolution 617/NQ-HĐBCQG announcing the 496 elected, June 2016)",
+      "publisher": "Báo Điện tử Chính phủ (Government of Vietnam)",
+      "url": "https://baochinhphu.vn/cong-bo-danh-sach-496-dai-bieu-quoc-hoi-khoa-xiv-102203984.htm",
+      "kind": "official_body"
+    },
+    "na-2021": {
+      "title": "Xác nhận 499 người trúng cử đủ tư cách đại biểu Quốc hội khóa XV (National Election Council, 12 July 2021)",
+      "publisher": "Báo Điện tử Chính phủ (Government of Vietnam)",
+      "url": "https://baochinhphu.vn/xac-nhan-499-nguoi-trung-cu-du-tu-cach-dai-bieu-quoc-hoi-khoa-xv-102296451.htm",
+      "kind": "official_body"
+    },
+    "na-2026-constituencies": {
+      "title": "Nghị quyết 85/NQ-HĐBCQG về số đơn vị bầu cử, danh sách các đơn vị bầu cử, số lượng đại biểu Quốc hội được bầu ở mỗi đơn vị bầu cử (National Election Council, 15 December 2025)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ, Xây dựng chính sách, pháp luật (Government Portal)",
+      "url": "https://xaydungchinhsach.chinhphu.vn/nghi-quyet-85-nq-hdbcqg-ve-so-don-vi-bau-cu-danh-sach-cac-don-vi-bau-cu-so-luong-dai-bieu-quoc-hoi-duoc-bau-o-moi-don-vi-bau-cu-119260104122958567.htm",
+      "kind": "official_body"
+    },
+    "na-2026-result": {
+      "title": "Tỷ lệ cử tri tham gia bỏ phiếu cao nhất từ trước đến nay (press conference on National Election Council Resolution 232 announcing the results of the 15 March 2026 election, 21 March 2026)",
+      "publisher": "Báo Đại biểu Nhân dân, cơ quan của Quốc hội (newspaper of the National Assembly)",
+      "url": "https://daibieunhandan.vn/ty-le-cu-tri-tham-gia-bo-phieu-cao-nhat-tu-truoc-den-nay-10410736.html",
+      "kind": "official_body"
+    },
+    "na-2026-report": {
+      "title": "Báo cáo Quốc hội về kết quả bầu cử đại biểu Quốc hội khóa XVI và đại biểu HĐND các cấp nhiệm kỳ 2026 - 2031 (National Election Council's report to the first session, April 2026)",
+      "publisher": "Báo Đại biểu Nhân dân, cơ quan của Quốc hội (newspaper of the National Assembly)",
+      "url": "https://daibieunhandan.vn/print/10412372.html",
+      "kind": "official_body"
+    },
+    "na-2026-officers": {
+      "title": "Chiều 7/4/2026: Quốc hội bầu Thủ tướng Chính phủ, Chánh án TANDTC (the first session elects the Prime Minister and the Chief Justice)",
+      "publisher": "Báo Đại biểu Nhân dân, cơ quan của Quốc hội (newspaper of the National Assembly)",
+      "url": "https://daibieunhandan.vn/chieu-7-4-2026-quoc-hoi-bau-thu-tuong-chinh-phu-chanh-an-tandtc-10412600.html",
+      "kind": "official_body"
+    },
+    "president-2026": {
+      "title": "Đồng chí Tổng Bí thư Tô Lâm được bầu làm Chủ tịch nước (the National Assembly elects the President on the morning of 7 April 2026)",
+      "publisher": "Báo Nhân Dân",
+      "url": "https://nhandan.vn/dong-chi-tong-bi-thu-to-lam-duoc-bau-lam-chu-tich-nuoc-post953764.html",
+      "kind": "news_agency"
+    },
+    "session-2026": {
+      "title": "Quốc hội bầu Chủ tịch nước, Chủ tịch Quốc hội, Thủ tướng Chính phủ tại Kỳ họp thứ nhất, Quốc hội khóa XVI (the first session, opening 6 April 2026, fills the leading state offices)",
+      "publisher": "Báo Nhân Dân",
+      "url": "https://nhandan.vn/quoc-hoi-bau-chu-tich-nuoc-chu-tich-quoc-hoi-thu-tuong-chinh-phu-tai-ky-hop-thu-nhat-quoc-hoi-khoa-xvi-post950965.html",
+      "kind": "news_agency"
+    },
+    "election-portal-2026": {
+      "title": "Trang tin Bầu cử Quốc hội khóa XVI (election site of the Vietnam News Agency, with each deputy's constituency and share of the vote)",
+      "publisher": "Thông tấn xã Việt Nam (Vietnam News Agency)",
+      "url": "https://baucuquochoi.vn/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Nước Cộng hòa xã hội chủ nghĩa Việt Nam",
+      "name_en": "Socialist Republic of Vietnam",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "constitution"
+    },
+    {
+      "key": "province",
+      "name": "Tỉnh, thành phố trực thuộc trung ương (cấp tỉnh)",
+      "name_en": "Provinces and centrally governed cities",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "local-government-law",
+      "counts": [
+        {
+          "date": "2022-12-31",
+          "value": 63,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2022 PX: 63 provinces and cities with communes"
+        },
+        {
+          "date": "2024-12-31",
+          "value": 63,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2024 PX: 63 provinces and cities with communes"
+        },
+        {
+          "date": "2025-07-01",
+          "value": 34,
+          "source": "admin-register",
+          "locator": "Đơn vị hành chính, level Tỉnh: Số lượng 34, the 63 merged into 34 by Resolution 202/2025/QH15 of 12 June 2025 with effect from 1 July 2025"
+        },
+        {
+          "date": "2026-11-17",
+          "value": 34,
+          "source": "admin-register",
+          "locator": "Đơn vị hành chính, level Tỉnh, as of November 2026: Số lượng 34 (25 provinces and 9 centrally governed cities after Đồng Nai, Quảng Ninh, and Bắc Ninh became cities in 2026)"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Huyện, quận, thị xã, thành phố thuộc tỉnh (cấp huyện)",
+      "name_en": "Districts, urban districts, towns, and provincial cities",
+      "parent": "province",
+      "polity_kind": "county",
+      "valid_to": "2025-07-01",
+      "source": "local-government-law"
+    },
+    {
+      "key": "commune",
+      "name": "Xã, phường, đặc khu (cấp xã)",
+      "name_en": "Communes, wards, and special zones",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "source": "local-government-law",
+      "counts": [
+        {
+          "date": "2022-12-31",
+          "value": 10408,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2022 PX summed over the 63 provinces: 10,408 communes, wards, and townships (then under the district tier)"
+        },
+        {
+          "date": "2024-12-31",
+          "value": 10118,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2024 PX summed over the 63 provinces: 10,118"
+        },
+        {
+          "date": "2025-12-31",
+          "value": 3321,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2025 PX summed over the 34 provinces: 3,321 communes, wards, and special zones, directly under the province since 1 July 2025"
+        },
+        {
+          "date": "2026-11-17",
+          "value": 3321,
+          "source": "admin-register",
+          "locator": "Thống kê số lượng, column 2026 PX summed over the 34 provinces: 3,321"
+        }
+      ]
+    },
+    {
+      "key": "hamlet",
+      "name": "Thôn, tổ dân phố",
+      "name_en": "Hamlets and residential groups",
+      "parent": "commune",
+      "polity_kind": "submunicipal",
+      "source": "grassroots-law",
+      "counts": [
+        {
+          "date": "2026-08-03",
+          "value": 48078,
+          "source": "hamlets-2026",
+          "locator": "Deputy Minister of Home Affairs at the Government meeting of 3 August 2026: hamlets and residential groups reduced from 89,589 to 48,078 in all 34 provinces"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "national_assembly",
+      "tier": "national",
+      "name": "Bầu cử đại biểu Quốc hội",
+      "name_en": "National Assembly, directly elected",
+      "category": "legislature",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 7: universal, equal, direct, and secret election of deputies; Article 27: voting at 18, standing at 21; Article 71: five-year term, the new Assembly elected 60 days before the old one's term ends)",
+      "valid_from": "1946-01-06",
+      "first_held": "1946-01-06",
+      "earliest_record": "1946-01-06",
+      "finest_note": "electoral unit (đơn vị bầu cử) of up to three seats within a province; each is divided into polling areas (khu vực bỏ phiếu), about 72,000 in 2026",
+      "note": "Sixteen elections from the general election of 6 January 1946 (held across the whole country for the Democratic Republic of Vietnam) through the northern elections of 1960-1975, in which the southern deputies of 1946 kept their seats, to the elections of the reunified country from 25 April 1976. Each province's constituencies elect one to three deputies by block vote: a voter strikes out the candidates they reject, and a candidate needs more than half of the valid ballots. Seats left empty go to a further ballot (bầu cử thêm) among the unsuccessful candidates within seven days, and a constituency where no more than half the voters voted votes again (bầu cử lại); electoral law arts. 79-80. Candidates are nominated through the Fatherland Front's consultative conferences, which settle the list before polling. The National Election Council (Hội đồng bầu cử quốc gia, constitution art. 117) announces the elected with each winner's votes by constituency; the votes of unsuccessful candidates and polling-area counts are kept by the provincial election committees and are not published nationally. The 2011 election was moved a year earlier to coincide with the councils, and the 2026 election was held on 15 March instead of in May.",
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "contest_kinds": ["body_seats"],
+          "body_kinds": ["unicameral"],
+          "iso_pattern": "VN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "valid_from": "2011-01-01",
+          "administered_by": "Hội đồng bầu cử quốc gia (National Election Council), with an election committee in each province",
+          "source": "electoral-law-commentary",
+          "runoff": "majority",
+          "runoff_rule": "A winner needs more than half of the valid ballots; seats left unfilled go to one further ballot among the unsuccessful candidates within seven days (art. 79), and a constituency where no more than half the registered voters voted votes again within seven days (art. 80)",
+          "vacancy_rule": "By-election (bầu cử bổ sung) unless less than a year of the term remains"
+        }
+      ],
+      "access": [
+        {
+          "role": "publishes",
+          "platform": "Báo Đại biểu Nhân dân (daibieunhandan.vn), National Assembly newspaper",
+          "url": "https://daibieunhandan.vn/ty-le-cu-tri-tham-gia-bo-phieu-cao-nhat-tu-truoc-den-nay-10410736.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2026-03-15",
+          "last_date": "2026-03-15",
+          "source": "na-2026-result",
+          "evidence": "National totals of the 2026 election (76,423,940 voters, 76,198,214 voting, 500 elected of 863 candidates) from the press conference on Resolution 232/NQ-HĐBCQG"
+        },
+        {
+          "role": "publishes",
+          "platform": "Trang tin Bầu cử Quốc hội khóa XVI (baucuquochoi.vn), Vietnam News Agency",
+          "url": "https://baucuquochoi.vn/dai-bieu/quoc-hoi-khoa-XVI-{id}.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "first_date": "2026-03-15",
+          "last_date": "2026-03-15",
+          "source": "election-portal-2026",
+          "evidence": "A page for each of the 500 deputies elected in 2026 with constituency and share of the vote (tỷ lệ trúng cử); no figures for unsuccessful candidates"
+        },
+        {
+          "role": "administers",
+          "platform": "Hội đồng bầu cử quốc gia (hoidongbaucu.quochoi.vn)",
+          "url": "https://hoidongbaucu.quochoi.vn/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "evidence": "On 2026-11-17 the National Election Council's site and quochoi.vn returned a JavaScript cookie challenge to a scripted request; not bypassed. The Council's result resolutions (232/NQ-HĐBCQG for 2026) list each winner's votes by constituency."
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-06", "election_kind": "general", "seats": 333, "source": "na-history", "quote": "Quốc hội khóa đầu tiên được bầu ngày 06/01/1946, gồm 403 đại biểu: 333 đại biểu được bầu, 70 ghế theo đề nghị của Chủ tịch Hồ Chí Minh" },
+        { "date": "1960-05-08", "election_kind": "general", "seats": 362, "source": "na-history", "quote": "Bầu ngày 8/5/1960, gồm 453 đại biểu (362 đại biểu được bầu, 91 đại biểu Khóa I của Miền Nam được lưu nhiệm)" },
+        { "date": "1964-04-26", "election_kind": "general", "seats": 366, "source": "na-history", "quote": "Bầu ngày 26/4/1964, gồm 453 đại biểu: 366 đại biểu được bầu, 87 đại biểu Khóa I của Miền Nam được lưu nhiệm" },
+        { "date": "1971-04-11", "election_kind": "general", "seats": 420, "source": "na-history", "quote": "Bầu ngày 11 tháng 4 năm 1971, gồm 420 đại biểu" },
+        { "date": "1975-04-06", "election_kind": "general", "seats": 424, "source": "na-history", "quote": "Bầu ngày 06/4/1975, gồm 424 đại biểu" },
+        { "date": "1976-04-25", "election_kind": "general", "seats": 492, "source": "na-history", "quote": "Quốc hội đầu tiên của nước Việt Nam thống nhất. Bầu ngày 25/4/1976, gồm 492 đại biểu" },
+        { "date": "1981-04-26", "election_kind": "general", "seats": 496, "source": "na-history", "quote": "Bầu ngày 26/4/1981, gồm 496 đại biểu" },
+        { "date": "1987-04-19", "election_kind": "general", "seats": 496, "source": "na-history", "quote": "Khóa VIII (1987 – 1992) Bầu ngày 19 tháng 4 năm 1984, gồm 496 đại biểu", "note": "The source prints the year as 1984 under the heading of the 1987-1992 term; the election was held on 19 April 1987." },
+        { "date": "1992-07-19", "election_kind": "general", "seats": 395, "source": "na-history", "quote": "Bầu ngày 19/7/1992, gồm 395 đại biểu" },
+        { "date": "1997-07-20", "election_kind": "general", "seats": 450, "source": "na-history", "quote": "Bầu ngày 20/7/1997, gồm 450 đại biểu" },
+        { "date": "2002-05-19", "election_kind": "general", "seats": 498, "source": "na-history", "quote": "Bầu ngày 19/5/2002, gồm 498 đại biểu" },
+        { "date": "2007-05-20", "election_kind": "general", "seats": 493, "source": "na-history", "quote": "Bầu ngày 20/5/2007, có 493 đại biểu" },
+        { "date": "2011-05-22", "election_kind": "general", "seats": 500, "source": "na-2011", "quote": "Trong tổng số 827 người ứng cử đại biểu QH khóa XIII có 500 người trúng cử" },
+        { "date": "2016-05-22", "election_kind": "general", "seats": 496, "source": "na-2016", "quote": "Công bố danh sách 496 đại biểu Quốc hội khóa XIV", "deferred": ["2016-05-29"], "note": "Four of the 500 seats stayed empty after the further ballot of 29 May 2016 in Cần Thơ; two of the 496 elected were later refused confirmation." },
+        { "date": "2021-05-23", "election_kind": "general", "seats": 499, "source": "na-2021", "quote": "Xác nhận 499 người trúng cử đủ tư cách đại biểu Quốc hội khóa XV", "note": "500 were elected; the National Election Council refused to confirm the winner in Bình Dương constituency 1." },
+        { "date": "2026-03-15", "election_kind": "general", "contests": 182, "seats": 500, "source": "na-2026-constituencies", "quote": "Tổng số đơn vị bầu cử đại biểu Quốc hội khóa XVI trong cả nước là 182.", "note": "500 elected of 863 candidates; 76,198,214 of 76,423,940 voters voted (99.70%), per Resolution 232/NQ-HĐBCQG of 21 March 2026." },
+        { "date": "2031-01-01", "precision": "year", "election_kind": "general", "note": "Next regular election: the Assembly elected in 2026 serves five years (constitution art. 71)." }
+      ],
+      "est_votes": 1500000000,
+      "effort": 3
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Bầu Chủ tịch nước, Phó Chủ tịch nước",
+      "name_en": "President and Vice President, elected by the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 87: the President is elected by the National Assembly from among its deputies, for the Assembly's term; Article 70(7): the Assembly elects the President and Vice President)",
+      "valid_from": "1946-03-02",
+      "first_held": "1946-03-02",
+      "note": "The Assembly elects the President on a single nomination by secret ballot at its first session, and fills vacancies in mid-term (2024 twice). From 1981 to 1992 the head of state was the collective Council of State (Hội đồng Nhà nước), whose chair and members the Assembly elected; the 1992 constitution restored the President. The Assembly's resolution and the session's press releases give the votes in favor and the deputies present.",
+      "match": [
+        { "election_kinds": ["indirect"], "office_kinds": ["head_of_state"], "iso_pattern": "VN" }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Quốc hội (National Assembly, at its first session)",
+          "source": "constitution",
+          "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 87)",
+          "runoff": "majority",
+          "runoff_rule": "Elected by more than half of all deputies"
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-01", "precision": "year", "through": "2021-12-31", "note": "Elections by the Assembly from 1946, and of the Council of State from 1981 to 1992, not yet counted here." },
+        { "date": "2026-04-07", "election_kind": "indirect", "contests": 1, "source": "president-2026", "quote": "Sáng 7/4, Quốc hội tiến hành các thủ tục bầu Chủ tịch nước ... 495/495 đại biểu tham gia biểu quyết tán thành" }
+      ],
+      "est_votes": 15000,
+      "effort": 2
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Bầu Thủ tướng Chính phủ",
+      "name_en": "Prime Minister, elected by the National Assembly on the President's nomination",
+      "category": "indirect",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 70(7): the Assembly elects the Prime Minister and approves the deputy prime ministers and ministers)",
+      "valid_from": "1946-03-02",
+      "first_held": "1946-03-02",
+      "note": "A secret ballot of the Assembly on one nominee. The same session approves (phê chuẩn) the deputy prime ministers and ministers on the Prime Minister's proposal; the census counts those approvals with the Assembly's officers.",
+      "match": [
+        { "election_kinds": ["indirect"], "office_kinds": ["head_of_government"], "iso_pattern": "VN" }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Quốc hội (National Assembly, at its first session)",
+          "source": "constitution",
+          "runoff": "majority",
+          "runoff_rule": "Elected by more than half of all deputies"
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-01", "precision": "year", "through": "2021-12-31", "note": "Elections by the Assembly not yet counted here." },
+        { "date": "2026-04-07", "election_kind": "indirect", "contests": 1, "source": "na-2026-officers", "quote": "Chiều 7/4/2026, tiếp tục chương trình Kỳ họp thứ Nhất, Quốc hội tiến hành bầu Thủ tướng Chính phủ nước Cộng hòa xã hội chủ nghĩa Việt Nam và Chánh án Tòa án NDTC nhiệm kỳ 2026 - 2031" }
+      ],
+      "est_votes": 12000,
+      "effort": 2
+    },
+    {
+      "key": "assembly_officers",
+      "tier": "national",
+      "name": "Bầu Chủ tịch Quốc hội, các Phó Chủ tịch Quốc hội, Ủy viên Ủy ban thường vụ Quốc hội và các chức danh khác do Quốc hội bầu, phê chuẩn",
+      "name_en": "Chair, vice chairs, and Standing Committee of the National Assembly and the other officers it elects or approves",
+      "category": "indirect",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 70(7): the Assembly elects its Chair, Vice Chairs, Standing Committee members, the chairs of the Ethnic Council and its committees, the Secretary General, the State Auditor General, and the Chair of the National Election Council, and approves the deputy prime ministers, ministers, and the Defense and Security Council)",
+      "valid_from": "1946-03-02",
+      "first_held": "1946-03-02",
+      "note": "Dozens of single-nominee secret ballots and approval votes at each first session (2026 from 6 April) and in mid-term. The Assembly publishes each resolution with the votes in favor.",
+      "match": [
+        { "election_kinds": ["indirect"], "office_kinds": ["speaker", "other"], "iso_pattern": "VN" }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Quốc hội (National Assembly)",
+          "source": "constitution",
+          "runoff": "majority",
+          "runoff_rule": "Elected or approved by more than half of all deputies"
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-01", "precision": "year", "through": "2021-12-31", "note": "Elections by the Assembly not yet counted here." },
+        { "date": "2026-04-01", "precision": "month", "election_kind": "indirect", "source": "session-2026", "quote": "Tại Kỳ họp thứ nhất, Quốc hội sẽ xem xét, kiện toàn nhân sự các chức danh lãnh đạo chủ chốt của Nhà nước, gồm: Chức danh Chủ tịch nước, Chủ tịch Quốc hội, Thủ tướng Chính phủ và các Phó Chủ tịch Quốc hội, các Phó Thủ tướng Chính phủ, các Ủy viên Ủy ban Thường vụ Quốc hội" }
+      ],
+      "est_votes": 300000,
+      "effort": 3
+    },
+    {
+      "key": "supreme_judicial",
+      "tier": "national",
+      "name": "Bầu Chánh án Tòa án nhân dân tối cao, Viện trưởng Viện kiểm sát nhân dân tối cao",
+      "name_en": "Chief Justice of the Supreme People's Court and Procurator General, elected by the National Assembly",
+      "category": "judicial",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 70(7): the Assembly elects the Chief Justice of the Supreme People's Court and the Procurator General of the Supreme People's Procuracy, and approves the Supreme Court's judges)",
+      "valid_from": "1960-07-15",
+      "note": "Elected by the Assembly at each first session on one nomination by the President; the 1959 constitution created both offices as elected by the Assembly.",
+      "match": [
+        { "election_kinds": ["indirect"], "office_kinds": ["other"], "name_pattern": "Chánh án|Viện trưởng|Chief Justice|Procurator", "iso_pattern": "VN" }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Quốc hội (National Assembly)",
+          "source": "constitution",
+          "runoff": "majority",
+          "runoff_rule": "Elected by more than half of all deputies"
+        }
+      ],
+      "dates": [
+        { "date": "1960-01-01", "precision": "year", "through": "2021-12-31", "note": "Elections by the Assembly not yet counted here." },
+        { "date": "2026-04-07", "election_kind": "indirect", "source": "na-2026-officers", "quote": "Quốc hội tiến hành bầu Thủ tướng Chính phủ nước Cộng hòa xã hội chủ nghĩa Việt Nam và Chánh án Tòa án NDTC nhiệm kỳ 2026 - 2031" }
+      ],
+      "est_votes": 15000,
+      "effort": 2
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Trưng cầu ý dân",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": { "unit": "contest" },
+      "source": "referendum-law",
+      "locator": "https://vanban.chinhphu.vn/default.aspx?pageid=27160&docid=183213 (the Assembly decides to hold a referendum on the constitution or an important national matter; constitution art. 29: citizens aged 18 vote in referendums the state holds)",
+      "valid_from": "2016-07-01",
+      "note": "Only the National Assembly can call a referendum, and none has been held under the 2015 law or the earlier constitutions' provisions; the 2013 constitution and its 2025 amendments were adopted by the Assembly after public consultation, without a vote. The class has no expected contests until one is called.",
+      "match": [
+        { "election_kinds": ["referendum"], "iso_pattern": "VN" }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "front_consultation",
+      "tier": "national",
+      "name": "Hiệp thương, hội nghị cử tri giới thiệu người ứng cử",
+      "name_en": "Fatherland Front consultative conferences and voters' meetings that settle the candidate lists",
+      "category": "nominating",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "electoral-law-seats",
+      "locator": "https://pbgdpl.cantho.gov.vn/quy-dinh-so-luong-dai-bieu-quoc-hoi-va-dai-bieu-hoi-dong-nhan-dan (articles 8 and 9: the Standing Committee and the councils set the planned composition of deputies with the Fatherland Front; the Front's consultative conferences then settle the lists)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The candidate lists are settled by three rounds of consultative conferences of the Fatherland Front and by show-of-hands meetings of voters at candidates' homes and workplaces; these are not ballots of the electorate and no counts are published, so the archive records only the general elections they feed.",
+      "match": [
+        { "election_kinds": ["caucus"], "iso_pattern": "VN" }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "party_internal",
+      "tier": "national",
+      "name": "Bầu cử trong Đảng Cộng sản Việt Nam",
+      "name_en": "Communist Party congresses and internal party elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 4: the Communist Party of Vietnam leads the state and society)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Delegate, Central Committee, and General Secretary elections are run under the Party's own charter; no state authority runs or certifies them.",
+      "match": [
+        { "election_kinds": ["primary"], "iso_pattern": "VN" }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "rvn_legislature",
+      "tier": "national",
+      "name": "Bầu cử Quốc hội Lập hiến, Quốc hội, Thượng viện và Hạ viện Việt Nam Cộng hòa",
+      "name_en": "Republic of Vietnam Constituent Assemblies, National Assembly, Senate, and House of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Preamble: the struggle for independence and the reunification of the country in 1975-1976)",
+      "valid_from": "1956-03-04",
+      "valid_to": "1975-04-30",
+      "first_held": "1956-03-04",
+      "disposition": "blocked",
+      "disposition_reason": "Held in the south by the State and then Republic of Vietnam (Constituent Assembly 1956 and 1966, National Assembly 1959 and 1963, Senate 1967, 1970, and 1973, House 1967 and 1971). No authority of the present state publishes their results; the Republic's gazette and election records are held by the National Archives Centre II in Ho Chi Minh City, which has no online catalog of them.",
+      "match": [
+        { "election_kinds": ["general"], "body_kinds": ["lower_house", "upper_house", "constituent_assembly", "unicameral"], "polity_kinds": ["historical_state"], "precedence": 1, "valid_to": "1975-04-30" }
+      ],
+      "est_votes": 40000000,
+      "effort": 5
+    },
+    {
+      "key": "rvn_president",
+      "tier": "national",
+      "name": "Bầu cử Tổng thống, Phó Tổng thống Việt Nam Cộng hòa",
+      "name_en": "Republic of Vietnam President and Vice President, directly elected",
+      "category": "executive",
+      "goal": "national",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Preamble)",
+      "valid_from": "1961-04-09",
+      "valid_to": "1975-04-30",
+      "first_held": "1961-04-09",
+      "disposition": "blocked",
+      "disposition_reason": "Direct presidential elections of the Republic of Vietnam in 1961, 1967, and 1971; no authority of the present state publishes their results, and the records are held by the National Archives Centre II without an online catalog.",
+      "match": [
+        { "election_kinds": ["general"], "office_kinds": ["head_of_state"], "polity_kinds": ["historical_state"], "valid_to": "1975-04-30" }
+      ],
+      "est_votes": 15000000,
+      "effort": 5
+    },
+    {
+      "key": "rvn_referendum",
+      "tier": "national",
+      "name": "Trưng cầu dân ý 1955 (Quốc gia Việt Nam)",
+      "name_en": "State of Vietnam referendum of 23 October 1955 on the head of state",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": { "unit": "contest" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Preamble)",
+      "valid_from": "1955-10-23",
+      "valid_to": "1955-10-24",
+      "first_held": "1955-10-23",
+      "disposition": "blocked",
+      "disposition_reason": "The single referendum of the State of Vietnam, which deposed the former emperor in favor of the prime minister and preceded the Republic; no authority of the present state publishes its result, and the records are held by the National Archives Centre II without an online catalog.",
+      "match": [
+        { "election_kinds": ["referendum"], "polity_kinds": ["historical_state"], "valid_to": "1975-04-30" }
+      ],
+      "est_votes": 5700000,
+      "effort": 4
+    },
+    {
+      "key": "provincial_council",
+      "tier": "province",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân cấp tỉnh",
+      "name_en": "Provincial and city People's Councils, directly elected",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": { "unit": "polity" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 113: the People's Council is elected by the local people; Article 7: universal, equal, direct, and secret ballot)",
+      "valid_from": "1946-01-01",
+      "first_held": "1946-01-01",
+      "finest_note": "council constituency (đơn vị bầu cử) of up to five seats",
+      "note": "Councils of 50 to 85 deputies by population, 125 in Hanoi and Ho Chi Minh City (local government law art. 30), elected by block vote with the same majority rule as the Assembly, except that a further ballot is held only when fewer than two thirds of a constituency's seats are filled (electoral law art. 79). Council elections were held on their own day until 2004 and have coincided with the Assembly's since 22 May 2011. Each provincial election committee announces its winners with their votes by resolution on the province's portal; there is no national publication of candidate votes. The 34 provincial councils elected in 2026 replaced the 63 elected in 2021.",
+      "match": [
+        { "election_kinds": ["general", "local", "by_election"], "body_kinds": ["council", "unicameral"], "polity_kinds": ["region"] }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "valid_from": "2011-01-01",
+          "administered_by": "Ủy ban bầu cử ở tỉnh (provincial election committee), guided by the National Election Council",
+          "source": "electoral-law-commentary",
+          "runoff": "majority",
+          "runoff_rule": "A winner needs more than half of the valid ballots; a further ballot within seven days only if fewer than two thirds of the constituency's seats are filled (art. 79)"
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-01", "precision": "year", "through": "2004-12-31", "note": "Council elections under the Democratic Republic and the reunified state before they joined the Assembly's polling day, not yet counted here." },
+        { "date": "2011-05-22", "election_kind": "general" },
+        { "date": "2016-05-22", "election_kind": "general" },
+        { "date": "2021-05-23", "election_kind": "general" },
+        { "date": "2026-03-15", "election_kind": "general", "seats": 2552, "source": "na-2026-report", "quote": "cử tri cả nước đã bầu đủ 500 đại biểu Quốc hội, 2.552 đại biểu HĐND cấp tỉnh và 72.440 đại biểu HĐND cấp xã" }
+      ],
+      "est_votes": 1200000000,
+      "effort": 4
+    },
+    {
+      "key": "provincial_executive",
+      "tier": "province",
+      "name": "Hội đồng nhân dân cấp tỉnh bầu Chủ tịch Hội đồng nhân dân, Chủ tịch Ủy ban nhân dân",
+      "name_en": "Provincial council chairs and People's Committee chairs, elected by the provincial council",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": { "unit": "polity" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 114: the People's Committee is elected by the People's Council of the same level)",
+      "valid_from": "1946-01-01",
+      "contests_per_unit": 2,
+      "disposition": "blocked",
+      "disposition_reason": "Each council elects its chair, vice chairs, and the People's Committee chair and members at its first session and in mid-term; the provincial portals report who was elected and sometimes the share of votes, but there is no list of these ballots across the 34 provinces and no publication of the counts.",
+      "match": [
+        { "election_kinds": ["indirect"], "polity_kinds": ["region"] }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "valid_from": "2011-01-01",
+          "administered_by": "Hội đồng nhân dân cấp tỉnh (the provincial People's Council)",
+          "source": "local-government-law",
+          "runoff": "majority"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "lay_assessors",
+      "tier": "province",
+      "name": "Hội đồng nhân dân bầu Hội thẩm nhân dân",
+      "name_en": "People's lay assessors of the courts, elected by the People's Councils",
+      "category": "judicial",
+      "goal": "subnational",
+      "measure": { "unit": "polity" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 103: trials at first instance have lay assessors)",
+      "disposition": "blocked",
+      "disposition_reason": "The councils elect the lay assessors of the local courts at their sessions on the Fatherland Front's nomination; only the lists of those elected appear in council resolutions, without counts.",
+      "match": [
+        { "election_kinds": ["indirect"], "polity_kinds": ["region", "county"], "name_pattern": "Hội thẩm|assessor" }
+      ],
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "key": "district_council",
+      "tier": "district",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân cấp huyện",
+      "name_en": "District People's Councils, directly elected (abolished 2025)",
+      "category": "legislature",
+      "goal": "local",
+      "measure": { "unit": "polity" },
+      "source": "local-government-law",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/2025_807-808_72-2025-qh15..pdf (Article 51(3): the People's Councils and Committees of districts, urban districts, towns, and provincial cities end their activity from 1 July 2025)",
+      "valid_to": "2025-07-01",
+      "disposition": "blocked",
+      "disposition_reason": "Results were announced by each of some 700 district election committees on paper and on district portals, many of which closed with the district tier in 2025; no national or provincial publication of candidate votes exists.",
+      "note": "Elected with the provincial and commune councils, last on 23 May 2021. Councils of urban districts and wards were suspended in ten provinces and cities from 2009 to 2016 (Resolution 26/2008/QH12) and abolished in Hanoi, Ho Chi Minh City, and Đà Nẵng from 2021 under their urban government laws.",
+      "match": [
+        { "election_kinds": ["general", "local", "by_election"], "body_kinds": ["council", "unicameral"], "polity_kinds": ["county"] }
+      ],
+      "est_votes": 1000000000,
+      "effort": 5
+    },
+    {
+      "key": "district_executive",
+      "tier": "district",
+      "name": "Hội đồng nhân dân cấp huyện bầu Chủ tịch Hội đồng nhân dân, Chủ tịch Ủy ban nhân dân",
+      "name_en": "District council chairs and People's Committee chairs, elected by the district council (abolished 2025)",
+      "category": "indirect",
+      "goal": "local",
+      "measure": { "unit": "polity" },
+      "source": "local-government-law",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/2025_807-808_72-2025-qh15..pdf (Article 51(3))",
+      "valid_to": "2025-07-01",
+      "contests_per_unit": 2,
+      "disposition": "blocked",
+      "disposition_reason": "Ballots of the district councils were minuted locally and never published with counts.",
+      "match": [
+        { "election_kinds": ["indirect"], "polity_kinds": ["county"] }
+      ],
+      "est_votes": 500000,
+      "effort": 5
+    },
+    {
+      "key": "commune_council",
+      "tier": "commune",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân cấp xã",
+      "name_en": "Commune, ward, and special zone People's Councils, directly elected",
+      "category": "legislature",
+      "goal": "local",
+      "measure": { "unit": "polity" },
+      "source": "local-government-law",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/2025_807-808_72-2025-qh15..pdf (Article 1: communes, wards, and special zones form the second tier; Article 28: special zones under 1,000 residents have no council; Article 30(2): councils of 15 to 30 deputies by population)",
+      "valid_from": "1946-01-01",
+      "first_held": "1946-01-01",
+      "finest_note": "council constituency of up to five seats within the commune",
+      "disposition": "blocked",
+      "disposition_reason": "Each of the 3,321 commune election committees announces its winners with their votes on the commune's notice board and, for some, its portal; provinces publish only totals of deputies elected, and no source gathers the candidate votes.",
+      "note": "Before July 2025 the tier held some 10,000 communes, wards, and townships under the districts. Ward councils were suspended in ten provinces from 2009 to 2016 and abolished in Hanoi, Ho Chi Minh City, and Đà Nẵng in 2021, and were restored in every ward by the 2025 law.",
+      "match": [
+        { "election_kinds": ["general", "local", "by_election"], "body_kinds": ["council", "unicameral"], "polity_kinds": ["municipality"] }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "valid_from": "2011-01-01",
+          "administered_by": "Ủy ban bầu cử ở xã (commune election committee)",
+          "source": "electoral-law-commentary",
+          "runoff": "majority",
+          "runoff_rule": "As for the provincial councils (art. 79)"
+        }
+      ],
+      "dates": [
+        { "date": "1946-01-01", "precision": "year", "through": "2004-12-31", "note": "Commune council elections before 2011 not yet counted here." },
+        { "date": "2011-05-22", "election_kind": "general" },
+        { "date": "2016-05-22", "election_kind": "general" },
+        { "date": "2021-05-23", "election_kind": "general" },
+        { "date": "2026-03-15", "election_kind": "general", "seats": 72440, "source": "na-2026-report", "quote": "cử tri cả nước đã bầu đủ 500 đại biểu Quốc hội, 2.552 đại biểu HĐND cấp tỉnh và 72.440 đại biểu HĐND cấp xã" }
+      ],
+      "est_votes": 1200000000,
+      "effort": 5
+    },
+    {
+      "key": "commune_executive",
+      "tier": "commune",
+      "name": "Hội đồng nhân dân cấp xã bầu Chủ tịch Hội đồng nhân dân, Chủ tịch Ủy ban nhân dân",
+      "name_en": "Commune council chairs and People's Committee chairs, elected by the commune council",
+      "category": "indirect",
+      "goal": "local",
+      "measure": { "unit": "polity" },
+      "source": "constitution",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/52-vbhn-vpqh.pdf (Article 114)",
+      "contests_per_unit": 2,
+      "disposition": "blocked",
+      "disposition_reason": "Minuted by each council and announced by name only; no publication of the counts.",
+      "match": [
+        { "election_kinds": ["indirect"], "polity_kinds": ["municipality"] }
+      ],
+      "est_votes": 2000000,
+      "effort": 5
+    },
+    {
+      "key": "hamlet_head",
+      "tier": "hamlet",
+      "name": "Bầu Trưởng thôn, Tổ trưởng tổ dân phố",
+      "name_en": "Hamlet heads and residential group heads, elected by the households",
+      "category": "executive",
+      "goal": "local",
+      "measure": { "unit": "polity" },
+      "source": "grassroots-law",
+      "locator": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2023/4/luat10.pdf (Article 15(4): the residential community decides the election and dismissal of the hamlet head and residential group head)",
+      "disposition": "blocked",
+      "disposition_reason": "Held at a meeting or by ballot of the household representatives of each of the 48,078 hamlets and residential groups and reported to the commune People's Committee, which confirms the result; nothing is published.",
+      "match": [
+        { "election_kinds": ["local"], "office_kinds": ["other"], "polity_kinds": ["submunicipal"] }
+      ],
+      "est_votes": 250000000,
+      "effort": 5
+    }
+  ]
+}
