@@ -261,7 +261,8 @@
      "source": "kv_od",
      "locator": "https://www.volby.cz/appdata/kv2026/20261009/vysled/0_2.json (140 zastupitelstev městských částí a obvodů zvolených 9.–10. 10. 2026: Praha 57, other statutory cities 83)"
     }
-   ]
+   ],
+   "scheme": "cz.mestska_cast"
   },
   {
    "key": "ceskoslovensko",
@@ -1709,7 +1710,7 @@
    },
    "finest_note": "Polling-district counts with each candidate's votes in the open data from 2002; 1990, 1994, and 1998 are HTML tables by obec. A council may be split into several electoral districts.",
    "boundary_source": "ruian",
-   "note": "Councils of every obec, town, městys, statutory city, and the capital (Zastupitelstvo hlavního města Prahy), and of the city districts of Prague and the statutory cities (140 since 2006). The district councils are counted here because the held contests carry the parent city's area and cannot be told apart by selector. Open lists with up to as many votes as seats; 5% threshold, D'Hondt. New, supplementary, and repeat elections between the regular ones are called by Ministry of Interior notices.",
+   "note": "Councils of every obec, town, městys, statutory city, and the capital (Zastupitelstvo hlavního města Prahy). The councils of the city districts of Prague and the statutory cities are the separate class zmc. Open lists with up to as many votes as seats; 5% threshold, D'Hondt. New, supplementary, and repeat elections between the regular ones are called by Ministry of Interior notices. The 1990 count is the source's single figure and may include city-district councils, which cannot be told apart in the 1990 HTML.",
    "source": "zzo",
    "locator": "https://e-sbirka.gov.cz/sb/2001/491 (§ 45–46)",
    "valid_from": "1990-11-24",
@@ -1763,7 +1764,10 @@
       "council"
      ],
      "iso_pattern": "CZ",
-     "valid_from": "1990-11-01"
+     "valid_from": "1990-11-01",
+     "schemes": [
+      "cz.obec"
+     ]
     }
    ],
    "dates": [
@@ -1778,16 +1782,18 @@
     {
      "date": "1994-11-18",
      "election_kind": "local",
-     "contests": 6262,
+     "contests": 6130,
      "source": "volby",
-     "quote": "kv1994: 6 262 zastupitelstev (6 130 obcí, měst a Prahy, 132 městských částí a obvodů)"
+     "quote": "kv1994: 6 262 zastupitelstev (6 130 obcí, měst a Prahy, 132 městských částí a obvodů)",
+     "note": "Counts the 6130 councils of obce, towns, and Prague; the 132 councils of city districts are in zmc."
     },
     {
      "date": "1998-11-13",
      "election_kind": "local",
-     "contests": 6347,
+     "contests": 6213,
      "source": "volby",
-     "quote": "kv1998: 6 347 zastupitelstev (6 213 obcí, měst a Prahy, 134 městských částí a obvodů)"
+     "quote": "kv1998: 6 347 zastupitelstev (6 213 obcí, měst a Prahy, 134 městských částí a obvodů)",
+     "note": "Counts the 6213 councils of obce, towns, and Prague; the 134 councils of city districts are in zmc."
     },
     {
      "date": "1991-01-01",
@@ -1798,11 +1804,11 @@
     {
      "date": "2002-11-01",
      "election_kind": "local",
-     "contests": 6371,
-     "seats": 62827,
+     "contests": 6222,
+     "seats": 60206,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20021101: 6344 zastupitelstev (6205 obcí, 139 městských částí a obvodů), 6371 volebních obvodů, 62827 mandátů",
-     "note": "6344 councils; councils with several electoral districts count once per district."
+     "note": "6344 councils; councils with several electoral districts count once per district. Counts the 6222 contests of the obec councils; the 149 contests of city-district councils are in zmc."
     },
     {
      "date": "2003-01-25",
@@ -1815,10 +1821,11 @@
     {
      "date": "2003-03-29",
      "election_kind": "by_election",
-     "contests": 68,
-     "seats": 482,
+     "contests": 64,
+     "seats": 452,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20030329 (Sdělení MV č. 496/2002 Sb. - dodatečné volby ve 41 obcích): 68 zastupitelstev (64 obcí, 4 městských částí a obvodů), 68 volebních obvodů, 482 mandátů"
+     "quote": "DATUMVOLEB 20030329 (Sdělení MV č. 496/2002 Sb. - dodatečné volby ve 41 obcích): 68 zastupitelstev (64 obcí, 4 městských částí a obvodů), 68 volebních obvodů, 482 mandátů",
+     "note": "Counts the 64 contests of the obec councils; the 4 contests of city-district councils are in zmc."
     },
     {
      "date": "2003-07-12",
@@ -1847,10 +1854,11 @@
     {
      "date": "2004-01-17",
      "election_kind": "by_election",
-     "contests": 4,
-     "seats": 24,
+     "contests": 3,
+     "seats": 17,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20040117 (Sdělení MV č. 335/2003 Sb. - nové volby v 1 městské části): 4 zastupitelstev (3 obcí, 1 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+     "quote": "DATUMVOLEB 20040117 (Sdělení MV č. 335/2003 Sb. - nové volby v 1 městské části): 4 zastupitelstev (3 obcí, 1 městských částí a obvodů), 4 volebních obvodů, 24 mandátů",
+     "note": "Counts the 3 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2004-04-24",
@@ -1911,19 +1919,20 @@
     {
      "date": "2006-10-20",
      "election_kind": "local",
-     "contests": 6385,
-     "seats": 62652,
+     "contests": 6230,
+     "seats": 59984,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20061020: 6365 zastupitelstev (6225 obcí, 140 městských částí a obvodů), 6385 volebních obvodů, 62652 mandátů",
-     "note": "6365 councils; councils with several electoral districts count once per district."
+     "note": "6365 councils; councils with several electoral districts count once per district. Counts the 6230 contests of the obec councils; the 155 contests of city-district councils are in zmc."
     },
     {
      "date": "2006-12-16",
      "election_kind": "by_election",
-     "contests": 6,
-     "seats": 139,
+     "contests": 5,
+     "seats": 109,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20061216 (Sdělení MV č. 521/2006 Sb. Opakované hlasování v 6 obcích a 1 městské části.): 6 zastupitelstev (5 obcí, 1 městských částí a obvodů), 6 volebních obvodů, 139 mandátů"
+     "quote": "DATUMVOLEB 20061216 (Sdělení MV č. 521/2006 Sb. Opakované hlasování v 6 obcích a 1 městské části.): 6 zastupitelstev (5 obcí, 1 městských částí a obvodů), 6 volebních obvodů, 139 mandátů",
+     "note": "Counts the 5 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2007-02-17",
@@ -1936,10 +1945,11 @@
     {
      "date": "2007-03-31",
      "election_kind": "by_election",
-     "contests": 28,
-     "seats": 192,
+     "contests": 27,
+     "seats": 185,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20070331 (Sdělení MV č. 586/2006 Sb. Opakované volby v 1 obci a 3 městských částech.): 28 zastupitelstev (27 obcí, 1 městských částí a obvodů), 28 volebních obvodů, 192 mandátů"
+     "quote": "DATUMVOLEB 20070331 (Sdělení MV č. 586/2006 Sb. Opakované volby v 1 obci a 3 městských částech.): 28 zastupitelstev (27 obcí, 1 městských částí a obvodů), 28 volebních obvodů, 192 mandátů",
+     "note": "Counts the 27 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2007-06-23",
@@ -2056,11 +2066,11 @@
     {
      "date": "2010-10-15",
      "election_kind": "local",
-     "contests": 6395,
-     "seats": 62459,
+     "contests": 6238,
+     "seats": 59752,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20101015: 6367 zastupitelstev (6227 obcí, 140 městských částí a obvodů), 6395 volebních obvodů, 62459 mandátů",
-     "note": "6367 councils; councils with several electoral districts count once per district."
+     "note": "6367 councils; councils with several electoral districts count once per district. Counts the 6238 contests of the obec councils; the 157 contests of city-district councils are in zmc."
     },
     {
      "date": "2011-01-08",
@@ -2201,11 +2211,11 @@
     {
      "date": "2014-10-10",
      "election_kind": "local",
-     "contests": 6382,
-     "seats": 62213,
+     "contests": 6236,
+     "seats": 59609,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20141010: 6375 zastupitelstev (6235 obcí, 140 městských částí a obvodů), 6382 volebních obvodů, 62213 mandátů",
-     "note": "6375 councils; councils with several electoral districts count once per district."
+     "note": "6375 councils; councils with several electoral districts count once per district. Counts the 6236 contests of the obec councils; the 146 contests of city-district councils are in zmc."
     },
     {
      "date": "2015-01-31",
@@ -2226,10 +2236,11 @@
     {
      "date": "2015-06-13",
      "election_kind": "by_election",
-     "contests": 22,
-     "seats": 138,
+     "contests": 21,
+     "seats": 131,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20150613 (Sdělení MV č. 349/2014 Sb. Nové volby ve 4 obcích.): 22 zastupitelstev (21 obcí, 1 městských částí a obvodů), 22 volebních obvodů, 138 mandátů"
+     "quote": "DATUMVOLEB 20150613 (Sdělení MV č. 349/2014 Sb. Nové volby ve 4 obcích.): 22 zastupitelstev (21 obcí, 1 městských částí a obvodů), 22 volebních obvodů, 138 mandátů",
+     "note": "Counts the 21 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2015-09-26",
@@ -2266,10 +2277,11 @@
     {
      "date": "2016-11-05",
      "election_kind": "by_election",
-     "contests": 7,
-     "seats": 39,
+     "contests": 6,
+     "seats": 34,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20161105 (Sdělení MV č. 146/2016 Sb. Nové volby v 1 městské části.): 7 zastupitelstev (6 obcí, 1 městských částí a obvodů), 7 volebních obvodů, 39 mandátů"
+     "quote": "DATUMVOLEB 20161105 (Sdělení MV č. 146/2016 Sb. Nové volby v 1 městské části.): 7 zastupitelstev (6 obcí, 1 městských částí a obvodů), 7 volebních obvodů, 39 mandátů",
+     "note": "Counts the 6 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2017-02-04",
@@ -2322,11 +2334,11 @@
     {
      "date": "2018-10-05",
      "election_kind": "local",
-     "contests": 6380,
-     "seats": 61939,
+     "contests": 6238,
+     "seats": 59358,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20181005: 6377 zastupitelstev (6237 obcí, 140 městských částí a obvodů), 6380 volebních obvodů, 61939 mandátů",
-     "note": "6377 councils; councils with several electoral districts count once per district."
+     "note": "6377 councils; councils with several electoral districts count once per district. Counts the 6238 contests of the obec councils; the 142 contests of city-district councils are in zmc."
     },
     {
      "date": "2019-01-26",
@@ -2363,10 +2375,11 @@
     {
      "date": "2019-09-14",
      "election_kind": "by_election",
-     "contests": 11,
-     "seats": 71,
+     "contests": 10,
+     "seats": 66,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20190914 (Sdělení MV č. 105/2019 Sb. - Nové volby v 1 obci.): 11 zastupitelstev (10 obcí, 1 městských částí a obvodů), 11 volebních obvodů, 71 mandátů"
+     "quote": "DATUMVOLEB 20190914 (Sdělení MV č. 105/2019 Sb. - Nové volby v 1 obci.): 11 zastupitelstev (10 obcí, 1 městských částí a obvodů), 11 volebních obvodů, 71 mandátů",
+     "note": "Counts the 10 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2019-12-14",
@@ -2459,11 +2472,11 @@
     {
      "date": "2022-09-23",
      "election_kind": "local",
-     "contests": 6384,
-     "seats": 61811,
+     "contests": 6244,
+     "seats": 59259,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20220923: 6383 zastupitelstev (6243 obcí, 140 městských částí a obvodů), 6384 volebních obvodů, 61811 mandátů",
-     "note": "6383 councils; councils with several electoral districts count once per district."
+     "note": "6383 councils; councils with several electoral districts count once per district. Counts the 6244 contests of the obec councils; the 140 contests of city-district councils are in zmc."
     },
     {
      "date": "2023-01-07",
@@ -2508,10 +2521,11 @@
     {
      "date": "2023-12-09",
      "election_kind": "by_election",
-     "contests": 8,
-     "seats": 54,
+     "contests": 7,
+     "seats": 47,
      "source": "kv_od",
-     "quote": "DATUMVOLEB 20231209 (Sdělení MV č. 219/2023 Sb. - Nové volby ve 2 obcích.): 8 zastupitelstev (7 obcí, 1 městských částí a obvodů), 8 volebních obvodů, 54 mandátů"
+     "quote": "DATUMVOLEB 20231209 (Sdělení MV č. 219/2023 Sb. - Nové volby ve 2 obcích.): 8 zastupitelstev (7 obcí, 1 městských částí a obvodů), 8 volebních obvodů, 54 mandátů",
+     "note": "Counts the 7 contests of the obec councils; the 1 contests of city-district councils are in zmc."
     },
     {
      "date": "2024-03-23",
@@ -2588,11 +2602,231 @@
     {
      "date": "2026-10-09",
      "election_kind": "local",
-     "contests": 6390,
-     "seats": 61710,
+     "contests": 6250,
+     "seats": 59132,
      "source": "kv_od",
      "quote": "DATUMVOLEB 20261009: 6389 zastupitelstev (6249 obcí, 140 městských částí a obvodů), 6390 volebních obvodů, 61710 mandátů",
-     "note": "6389 councils; councils with several electoral districts count once per district."
+     "note": "6389 councils; councils with several electoral districts count once per district. Counts the 6250 contests of the obec councils; the 140 contests of city-district councils are in zmc."
+    }
+   ]
+  },
+  {
+   "key": "zmc",
+   "tier": "mestska_cast",
+   "name": "Volby do zastupitelstev městských částí a městských obvodů",
+   "name_en": "City-district council elections (Prague and the statutory cities)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "cz.mestska_cast"
+    ],
+    "fine": [
+     "cz.okrsek"
+    ]
+   },
+   "finest_note": "Polling-district counts with each candidate's votes in the open data from 2002; 1994 and 1998 are HTML tables by city district. A council may be split into several electoral districts. Districts are drawn as the union of the RÚIAN polling districts that carry the district's code; a district without a council has no area.",
+   "boundary_source": "ruian",
+   "note": "Councils of the city districts (městské části) of Prague and the city districts (městské obvody) of statutory cities: 132 in 1994, 134 in 1998, 140 since 2006, as the Ministry of Interior's notices and the open data's council list count them. The open data's 2002 council list also marks 9 ordinary villages as district councils; they are counted under zo. Open lists with up to as many votes as seats; 5% threshold, D'Hondt.",
+   "source": "zzo",
+   "locator": "https://e-sbirka.gov.cz/sb/2001/491 (§ 45–46; § 2 odst. 3 for city districts)",
+   "valid_from": "1994-11-01",
+   "first_held": "1994-11-18",
+   "earliest_record": "1994-11-18",
+   "est_votes": 4000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministerstvo vnitra and the municipal offices; results by Český statistický úřad",
+     "source": "ustava",
+     "locator": "https://e-sbirka.gov.cz/sb/1993/1 (čl. 102)",
+     "vacancy_rule": "Substitutes from the list; when a council falls below its members or is dissolved, new elections (nové volby) are held (§ 58 of Act 491/2001)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Volby.cz otevřená data (ČSÚ)",
+     "url": "https://www.volby.cz/opendata/kv2026/kv2026_opendata.htm",
+     "format": "csv, xml, xlsx, and json in zip",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2002-11-01",
+     "finest": "cz.okrsek",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "Open data by polling district for the regular elections and the new, supplementary, and repeat elections, 2002–2026."
+    },
+    {
+     "platform": "Volby.cz výsledky (ČSÚ)",
+     "url": "https://www.volby.cz/pls/kv1994/kv?xjazyk=CZ&xid=1",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1990-11-24",
+     "finest": "cz.obec",
+     "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+     "evidence": "HTML results for 1990, 1994, and 1998 by obec; parts of 1990 did not survive."
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "CZ",
+     "valid_from": "1994-11-01",
+     "schemes": [
+      "cz.mestska_cast"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-11-18",
+     "election_kind": "local",
+     "contests": 132,
+     "source": "volby",
+     "quote": "kv1994: 6 262 zastupitelstev (6 130 obcí, měst a Prahy, 132 městských částí a obvodů)"
+    },
+    {
+     "date": "1998-11-13",
+     "election_kind": "local",
+     "contests": 134,
+     "source": "volby",
+     "quote": "kv1998: 6 347 zastupitelstev (6 213 obcí, měst a Prahy, 134 městských částí a obvodů)"
+    },
+    {
+     "date": "1991-01-01",
+     "through": "2002-10-31",
+     "election_kind": "by_election",
+     "note": "New, supplementary, and repeat elections of city-district councils called by Ministry of Interior notices between the regular elections of 1990, 1994, and 1998; volby.cz holds no open data for them."
+    },
+    {
+     "date": "2002-11-01",
+     "election_kind": "local",
+     "contests": 149,
+     "seats": 2621,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20021101: 6344 zastupitelstev (6205 obcí, 139 městských částí a obvodů), 6371 volebních obvodů, 62827 mandátů"
+    },
+    {
+     "date": "2003-03-29",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 30,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20030329 (Sdělení MV č. 496/2002 Sb. - dodatečné volby ve 41 obcích): 68 zastupitelstev (64 obcí, 4 městských částí a obvodů), 68 volebních obvodů, 482 mandátů"
+    },
+    {
+     "date": "2004-01-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20040117 (Sdělení MV č. 335/2003 Sb. - nové volby v 1 městské části): 4 zastupitelstev (3 obcí, 1 městských částí a obvodů), 4 volebních obvodů, 24 mandátů"
+    },
+    {
+     "date": "2006-10-20",
+     "election_kind": "local",
+     "contests": 155,
+     "seats": 2668,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20061020: 6365 zastupitelstev (6225 obcí, 140 městských částí a obvodů), 6385 volebních obvodů, 62652 mandátů"
+    },
+    {
+     "date": "2006-12-16",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 30,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20061216 (Sdělení MV č. 521/2006 Sb. Opakované hlasování v 6 obcích a 1 městské části.): 6 zastupitelstev (5 obcí, 1 městských částí a obvodů), 6 volebních obvodů, 139 mandátů"
+    },
+    {
+     "date": "2007-03-31",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20070331 (Sdělení MV č. 586/2006 Sb. Opakované volby v 1 obci a 3 městských částech.): 28 zastupitelstev (27 obcí, 1 městských částí a obvodů), 28 volebních obvodů, 192 mandátů"
+    },
+    {
+     "date": "2010-10-15",
+     "election_kind": "local",
+     "contests": 157,
+     "seats": 2707,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20101015: 6367 zastupitelstev (6227 obcí, 140 městských částí a obvodů), 6395 volebních obvodů, 62459 mandátů"
+    },
+    {
+     "date": "2014-10-10",
+     "election_kind": "local",
+     "contests": 146,
+     "seats": 2604,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20141010: 6375 zastupitelstev (6235 obcí, 140 městských částí a obvodů), 6382 volebních obvodů, 62213 mandátů"
+    },
+    {
+     "date": "2015-06-13",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20150613 (Sdělení MV č. 349/2014 Sb. Nové volby ve 4 obcích.): 22 zastupitelstev (21 obcí, 1 městských částí a obvodů), 22 volebních obvodů, 138 mandátů"
+    },
+    {
+     "date": "2016-11-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 5,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20161105 (Sdělení MV č. 146/2016 Sb. Nové volby v 1 městské části.): 7 zastupitelstev (6 obcí, 1 městských částí a obvodů), 7 volebních obvodů, 39 mandátů"
+    },
+    {
+     "date": "2018-10-05",
+     "election_kind": "local",
+     "contests": 142,
+     "seats": 2581,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20181005: 6377 zastupitelstev (6237 obcí, 140 městských částí a obvodů), 6380 volebních obvodů, 61939 mandátů"
+    },
+    {
+     "date": "2019-09-14",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 5,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20190914 (Sdělení MV č. 105/2019 Sb. - Nové volby v 1 obci.): 11 zastupitelstev (10 obcí, 1 městských částí a obvodů), 11 volebních obvodů, 71 mandátů"
+    },
+    {
+     "date": "2022-09-23",
+     "election_kind": "local",
+     "contests": 140,
+     "seats": 2552,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20220923: 6383 zastupitelstev (6243 obcí, 140 městských částí a obvodů), 6384 volebních obvodů, 61811 mandátů"
+    },
+    {
+     "date": "2023-12-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 7,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20231209 (Sdělení MV č. 219/2023 Sb. - Nové volby ve 2 obcích.): 8 zastupitelstev (7 obcí, 1 městských částí a obvodů), 8 volebních obvodů, 54 mandátů"
+    },
+    {
+     "date": "2026-10-09",
+     "election_kind": "local",
+     "contests": 140,
+     "seats": 2578,
+     "source": "kv_od",
+     "quote": "DATUMVOLEB 20261009: 6389 zastupitelstev (6249 obcí, 140 městských částí a obvodů), 6390 volebních obvodů, 61710 mandátů"
     }
    ]
   },
