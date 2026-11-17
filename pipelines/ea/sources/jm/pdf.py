@@ -198,7 +198,9 @@ def _header(
         and w.text not in LABELS
         and not re.fullmatch(r"\(\d+\)", w.text)
     ]
-    rotated = sum(1 for w in head if w.y1 - w.y0 > 1.5 * (w.x1 - w.x0)) > len(head) / 2
+    tall = sum(1 for w in head if w.y1 - w.y0 > 1.5 * (w.x1 - w.x0))
+    # Initials of a rotated name are as wide as they are tall, so a header can have as few as a third of its words rotated.
+    rotated = tall > len(head) / 2 or (tall >= 2 and tall * 3 >= len(head))
     if rotated:
         groups: list[list[Word]] = [[] for _ in columns]
         edges = [e for _, e in columns]

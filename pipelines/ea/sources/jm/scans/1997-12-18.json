@@ -1,0 +1,2100 @@
+{
+ "day": "1997-12-18",
+ "file": "1997GeneralElectionBoxbyBox.pdf",
+ "title": "General Elections 1997, Part II: Summary of the Poll by Constituency (Table II, printed pp. 22-25, PDF pp. 30-32, 34)",
+ "constituencies": [
+  {
+   "number": 1,
+   "name": "Kingston Western",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 14997,
+   "cast": 13586,
+   "rejected": 39,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2072,
+     "pct": 15.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 11442,
+     "pct": 84.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 33,
+     "pct": 0.2
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "name": "Kingston Central",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 15349,
+   "cast": 11711,
+   "rejected": 81,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6907,
+     "pct": 59.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4643,
+     "pct": 39.6
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 70,
+     "pct": 0.6
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 10,
+     "pct": 0.1
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "name": "Kingston Eastern & Port Royal",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 16585,
+   "cast": 9897,
+   "rejected": 514,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8098,
+     "pct": 81.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1136,
+     "pct": 11.5
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 149,
+     "pct": 1.5
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "name": "St. Andrew West Rural",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 24923,
+   "cast": 14067,
+   "rejected": 115,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6802,
+     "pct": 48.4
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6354,
+     "pct": 45.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 739,
+     "pct": 5.3
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 57,
+     "pct": 0.4
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "name": "St. Andrew Western",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 22200,
+   "cast": 13988,
+   "rejected": 696,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 9822,
+     "pct": 70.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3174,
+     "pct": 22.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 265,
+     "pct": 1.9
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 31,
+     "pct": 0.2
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "name": "St. Andrew West Central",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 19445,
+   "cast": 10688,
+   "rejected": 70,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5263,
+     "pct": 49.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5328,
+     "pct": 49.9
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 27,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 7,
+   "name": "St. Andrew East Central",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 19884,
+   "cast": 10905,
+   "rejected": 218,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7811,
+     "pct": 71.6
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2455,
+     "pct": 22.5
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 421,
+     "pct": 3.9
+    }
+   ]
+  },
+  {
+   "number": 8,
+   "name": "St. Andrew South Western",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 19070,
+   "cast": 15570,
+   "rejected": 67,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 15191,
+     "pct": 97.6
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 312,
+     "pct": 2.0
+    }
+   ]
+  },
+  {
+   "number": 9,
+   "name": "St. Andrew Southern",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 16729,
+   "cast": 15486,
+   "rejected": 141,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 14084,
+     "pct": 90.9
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1206,
+     "pct": 7.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 55,
+     "pct": 0.4
+    }
+   ]
+  },
+  {
+   "number": 10,
+   "name": "St. Andrew South Eastern",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 16485,
+   "cast": 9752,
+   "rejected": 136,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5697,
+     "pct": 58.4
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3236,
+     "pct": 33.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 683,
+     "pct": 7.0
+    }
+   ]
+  },
+  {
+   "number": 11,
+   "name": "St. Andrew Eastern",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 17894,
+   "cast": 11228,
+   "rejected": 197,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5112,
+     "pct": 45.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4626,
+     "pct": 41.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1293,
+     "pct": 11.5
+    }
+   ]
+  },
+  {
+   "number": 12,
+   "name": "St. Andrew North Eastern",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 15021,
+   "cast": 9641,
+   "rejected": 35,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3330,
+     "pct": 34.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4779,
+     "pct": 49.6
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1459,
+     "pct": 15.1
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 38,
+     "pct": 0.4
+    }
+   ]
+  },
+  {
+   "number": 13,
+   "name": "St. Andrew North Central",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 15722,
+   "cast": 9651,
+   "rejected": 73,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3609,
+     "pct": 37.4
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4558,
+     "pct": 47.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1411,
+     "pct": 14.6
+    }
+   ]
+  },
+  {
+   "number": 14,
+   "name": "St. Andrew North Western",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 16496,
+   "cast": 9532,
+   "rejected": 77,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3810,
+     "pct": 23.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4686,
+     "pct": 49.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 921,
+     "pct": 9.7
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 38,
+     "pct": 0.4
+    }
+   ]
+  },
+  {
+   "number": 15,
+   "name": "St. Andrew East Rural",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 22085,
+   "cast": 12732,
+   "rejected": 118,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6769,
+     "pct": 53.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4819,
+     "pct": 37.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1026,
+     "pct": 8.1
+    }
+   ]
+  },
+  {
+   "number": 16,
+   "name": "St. Thomas Western",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 24253,
+   "cast": 15410,
+   "rejected": 78,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7728,
+     "pct": 50.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7260,
+     "pct": 47.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 274,
+     "pct": 1.8
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 70,
+     "pct": 0.5
+    }
+   ]
+  },
+  {
+   "number": 17,
+   "name": "St. Thomas Eastern",
+   "page": 30,
+   "stats_page": 30,
+   "electors": 19956,
+   "cast": 13757,
+   "rejected": 53,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7525,
+     "pct": 54.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6016,
+     "pct": 43.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 163,
+     "pct": 1.2
+    }
+   ]
+  },
+  {
+   "number": 18,
+   "name": "Portland Eastern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 21811,
+   "cast": 12588,
+   "rejected": 27,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7737,
+     "pct": 61.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4438,
+     "pct": 35.3
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 213,
+     "pct": 1.7
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 173,
+     "pct": 1.4
+    }
+   ]
+  },
+  {
+   "number": 19,
+   "name": "Portland Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 15796,
+   "cast": 10439,
+   "rejected": 28,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6282,
+     "pct": 60.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4129,
+     "pct": 39.6
+    }
+   ]
+  },
+  {
+   "number": 20,
+   "name": "St. Mary South Eastern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 16952,
+   "cast": 12041,
+   "rejected": 39,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6470,
+     "pct": 53.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4976,
+     "pct": 41.3
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 556,
+     "pct": 4.6
+    }
+   ]
+  },
+  {
+   "number": 21,
+   "name": "St. Mary Central",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 17668,
+   "cast": 12390,
+   "rejected": 26,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7648,
+     "pct": 61.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4548,
+     "pct": 36.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 168,
+     "pct": 1.4
+    }
+   ]
+  },
+  {
+   "number": 22,
+   "name": "St. Mary Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 22689,
+   "cast": 15051,
+   "rejected": 72,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8245,
+     "pct": 54.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6441,
+     "pct": 42.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 293,
+     "pct": 1.9
+    }
+   ]
+  },
+  {
+   "number": 23,
+   "name": "St. Ann South Eastern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 17314,
+   "cast": 11613,
+   "rejected": 93,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8472,
+     "pct": 73.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2759,
+     "pct": 23.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 258,
+     "pct": 2.2
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 31,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 24,
+   "name": "St. Ann North Eastern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 26265,
+   "cast": 17166,
+   "rejected": 436,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 9150,
+     "pct": 53.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7062,
+     "pct": 41.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 518,
+     "pct": 3.0
+    }
+   ]
+  },
+  {
+   "number": 25,
+   "name": "St. Ann North Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 22210,
+   "cast": 15173,
+   "rejected": 64,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8232,
+     "pct": 54.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6632,
+     "pct": 43.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 245,
+     "pct": 1.6
+    }
+   ]
+  },
+  {
+   "number": 26,
+   "name": "St. Ann South Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 16121,
+   "cast": 12716,
+   "rejected": 64,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6363,
+     "pct": 50.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5749,
+     "pct": 45.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 500,
+     "pct": 3.9
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 40,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 27,
+   "name": "Trelawny Northern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 22951,
+   "cast": 16664,
+   "rejected": 78,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 9397,
+     "pct": 56.4
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6826,
+     "pct": 41.0
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 363,
+     "pct": 2.2
+    }
+   ]
+  },
+  {
+   "number": 28,
+   "name": "Trelawny Southern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 13427,
+   "cast": 10609,
+   "rejected": 68,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4775,
+     "pct": 45.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4606,
+     "pct": 43.4
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1160,
+     "pct": 10.9
+    }
+   ]
+  },
+  {
+   "number": 29,
+   "name": "St. James East Central",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 16443,
+   "cast": 11512,
+   "rejected": 74,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5851,
+     "pct": 50.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5152,
+     "pct": 44.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 435,
+     "pct": 3.8
+    }
+   ]
+  },
+  {
+   "number": 30,
+   "name": "St. James North Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 27719,
+   "cast": 15381,
+   "rejected": 127,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7943,
+     "pct": 51.6
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6691,
+     "pct": 43.5
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 551,
+     "pct": 3.6
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 41,
+     "pct": 0.3
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 2",
+     "party": "IND",
+     "votes": 28,
+     "pct": 0.2
+    }
+   ]
+  },
+  {
+   "number": 31,
+   "name": "St. James West Central",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 21229,
+   "cast": 11804,
+   "rejected": 67,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5873,
+     "pct": 49.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5246,
+     "pct": 44.4
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 618,
+     "pct": 5.2
+    }
+   ]
+  },
+  {
+   "number": 32,
+   "name": "St. James Southern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 16919,
+   "cast": 11135,
+   "rejected": 84,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7106,
+     "pct": 63.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3449,
+     "pct": 31.0
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 496,
+     "pct": 4.5
+    }
+   ]
+  },
+  {
+   "number": 33,
+   "name": "Hanover Eastern",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 15624,
+   "cast": 10276,
+   "rejected": 83,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5622,
+     "pct": 54.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4230,
+     "pct": 41.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 341,
+     "pct": 3.3
+    }
+   ]
+  },
+  {
+   "number": 34,
+   "name": "Hanover Western",
+   "page": 31,
+   "stats_page": 31,
+   "electors": 19293,
+   "cast": 12751,
+   "rejected": 64,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6978,
+     "pct": 54.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4811,
+     "pct": 37.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 898,
+     "pct": 7.0
+    }
+   ]
+  },
+  {
+   "number": 35,
+   "name": "Westmoreland Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 22319,
+   "cast": 15199,
+   "rejected": 86,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8519,
+     "pct": 56.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3329,
+     "pct": 21.9
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 3265,
+     "pct": 21.5
+    }
+   ]
+  },
+  {
+   "number": 36,
+   "name": "Westmoreland Central",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 26789,
+   "cast": 18245,
+   "rejected": 145,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 10863,
+     "pct": 59.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6446,
+     "pct": 35.3
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 791,
+     "pct": 4.3
+    }
+   ]
+  },
+  {
+   "number": 37,
+   "name": "Westmoreland Eastern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 20149,
+   "cast": 13919,
+   "rejected": 138,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 9874,
+     "pct": 70.9
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3733,
+     "pct": 26.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 174,
+     "pct": 1.3
+    }
+   ]
+  },
+  {
+   "number": 38,
+   "name": "St. Elizabeth North Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 15994,
+   "cast": 11799,
+   "rejected": 58,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5439,
+     "pct": 46.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5943,
+     "pct": 50.4
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 305,
+     "pct": 2.6
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 54,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 39,
+   "name": "St. Elizabeth North Eastern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 20981,
+   "cast": 14668,
+   "rejected": 73,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 10058,
+     "pct": 68.6
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4239,
+     "pct": 28.9
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 298,
+     "pct": 2.0
+    }
+   ]
+  },
+  {
+   "number": 40,
+   "name": "St. Elizabeth South Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 19023,
+   "cast": 15406,
+   "rejected": 69,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7956,
+     "pct": 51.6
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7246,
+     "pct": 47.0
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 135,
+     "pct": 0.9
+    }
+   ]
+  },
+  {
+   "number": 41,
+   "name": "St. Elizabeth South Eastern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 19981,
+   "cast": 15049,
+   "rejected": 233,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8164,
+     "pct": 54.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6160,
+     "pct": 40.9
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 492,
+     "pct": 3.3
+    }
+   ]
+  },
+  {
+   "number": 42,
+   "name": "Manchester Southern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 19893,
+   "cast": 13349,
+   "rejected": 54,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8030,
+     "pct": 60.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4966,
+     "pct": 37.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 299,
+     "pct": 2.2
+    }
+   ]
+  },
+  {
+   "number": 43,
+   "name": "Manchester Central",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 22793,
+   "cast": 14278,
+   "rejected": 69,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7987,
+     "pct": 55.9
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5305,
+     "pct": 37.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 846,
+     "pct": 5.9
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 71,
+     "pct": 0.5
+    }
+   ]
+  },
+  {
+   "number": 44,
+   "name": "Manchester North Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 18107,
+   "cast": 11490,
+   "rejected": 66,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7631,
+     "pct": 66.4
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3305,
+     "pct": 28.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 488,
+     "pct": 4.2
+    }
+   ]
+  },
+  {
+   "number": 45,
+   "name": "Manchester North Eastern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 18603,
+   "cast": 14446,
+   "rejected": 62,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5568,
+     "pct": 38.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 6965,
+     "pct": 48.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1851,
+     "pct": 12.8
+    }
+   ]
+  },
+  {
+   "number": 46,
+   "name": "Clarendon North Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 18640,
+   "cast": 13407,
+   "rejected": 32,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5739,
+     "pct": 42.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5943,
+     "pct": 44.3
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 1693,
+     "pct": 12.6
+    }
+   ]
+  },
+  {
+   "number": 47,
+   "name": "Clarendon Northern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 15994,
+   "cast": 11746,
+   "rejected": 57,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6847,
+     "pct": 58.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4619,
+     "pct": 39.3
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 223,
+     "pct": 1.9
+    }
+   ]
+  },
+  {
+   "number": 48,
+   "name": "Clarendon North Central",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 15547,
+   "cast": 11320,
+   "rejected": 45,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5674,
+     "pct": 50.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5194,
+     "pct": 46.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 374,
+     "pct": 3.3
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 33,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 49,
+   "name": "Clarendon Central",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 19384,
+   "cast": 12892,
+   "rejected": 62,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4800,
+     "pct": 37.2
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7546,
+     "pct": 58.5
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 484,
+     "pct": 3.8
+    }
+   ]
+  },
+  {
+   "number": 50,
+   "name": "Clarendon South Western",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 17341,
+   "cast": 12664,
+   "rejected": 77,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7737,
+     "pct": 61.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4535,
+     "pct": 35.8
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 315,
+     "pct": 2.5
+    }
+   ]
+  },
+  {
+   "number": 51,
+   "name": "Clarendon South Eastern",
+   "page": 32,
+   "stats_page": 32,
+   "electors": 23153,
+   "cast": 15100,
+   "rejected": 132,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7296,
+     "pct": 48.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7242,
+     "pct": 48.0
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 430,
+     "pct": 2.8
+    }
+   ]
+  },
+  {
+   "number": 52,
+   "name": "St. Catherine North Western",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 21509,
+   "cast": 11990,
+   "rejected": 68,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7773,
+     "pct": 64.8
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3733,
+     "pct": 31.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 416,
+     "pct": 3.5
+    }
+   ]
+  },
+  {
+   "number": 53,
+   "name": "St. Catherine South Western",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 27354,
+   "cast": 16112,
+   "rejected": 36,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 8267,
+     "pct": 51.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 7122,
+     "pct": 44.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 632,
+     "pct": 3.9
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 55,
+     "pct": 0.3
+    }
+   ]
+  },
+  {
+   "number": 54,
+   "name": "St. Catherine Southern",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 29000,
+   "cast": 13375,
+   "rejected": 87,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7532,
+     "pct": 56.3
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4971,
+     "pct": 37.2
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 720,
+     "pct": 5.4
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 37,
+     "pct": 0.3
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 2",
+     "party": "IND",
+     "votes": 28,
+     "pct": 0.2
+    }
+   ]
+  },
+  {
+   "number": 55,
+   "name": "St. Catherine Central",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 24347,
+   "cast": 11513,
+   "rejected": 0,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2250,
+     "pct": 19.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5746,
+     "pct": 49.9
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 3517,
+     "pct": 30.5
+    }
+   ]
+  },
+  {
+   "number": 56,
+   "name": "St. Catherine South Eastern",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 23391,
+   "cast": 11157,
+   "rejected": 72,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6819,
+     "pct": 61.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3282,
+     "pct": 29.4
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 934,
+     "pct": 8.4
+    },
+    {
+     "name": "",
+     "party_printed": "IND. 1",
+     "party": "IND",
+     "votes": 50,
+     "pct": 0.4
+    }
+   ]
+  },
+  {
+   "number": 57,
+   "name": "St. Catherine East Central",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 19210,
+   "cast": 10733,
+   "rejected": 58,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 7088,
+     "pct": 66.0
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2967,
+     "pct": 27.6
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 620,
+     "pct": 5.8
+    }
+   ]
+  },
+  {
+   "number": 58,
+   "name": "St. Catherine West Central",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 19519,
+   "cast": 11514,
+   "rejected": 93,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 5724,
+     "pct": 49.7
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5198,
+     "pct": 45.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 499,
+     "pct": 4.3
+    }
+   ]
+  },
+  {
+   "number": 59,
+   "name": "St. Catherine North Eastern",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 14134,
+   "cast": 9672,
+   "rejected": 92,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4750,
+     "pct": 49.1
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 4713,
+     "pct": 48.7
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 117,
+     "pct": 1.2
+    }
+   ]
+  },
+  {
+   "number": 60,
+   "name": "St. Catherine South Central",
+   "page": 34,
+   "stats_page": 34,
+   "electors": 21614,
+   "cast": 13115,
+   "rejected": 118,
+   "accepted": null,
+   "candidates": [
+    {
+     "name": "",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 9646,
+     "pct": 73.5
+    },
+    {
+     "name": "",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3164,
+     "pct": 24.1
+    },
+    {
+     "name": "",
+     "party_printed": "N.D.M.",
+     "party": "NDM",
+     "votes": 187,
+     "pct": 1.4
+    }
+   ]
+  }
+ ],
+ "notes": []
+}
