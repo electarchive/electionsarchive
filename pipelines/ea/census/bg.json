@@ -790,7 +790,7 @@
       "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part five)",
       "valid_from": "1991-09-17",
       "first_held": "1991-10-13",
-      "earliest_record": "2015-10-25",
+      "earliest_record": "2011-10-23",
       "contests_per_unit": 1,
       "est_votes": 27000000,
       "effort": 3,
@@ -835,6 +835,36 @@
           "within": null,
           "valid_from": "1991-01-01"
         }
+      ],
+      "dates": [
+        {
+          "date": "2011-10-23",
+          "election_kind": "local",
+          "contests": 264,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mipvr2011/el2011_t1.zip and el2011_t2.zip, round 1: 264 distinct municipalities with a council list"
+        },
+        {
+          "date": "2015-10-25",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 265 distinct municipalities with a council protocol"
+        },
+        {
+          "date": "2019-10-27",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 265 distinct municipalities with a council protocol"
+        },
+        {
+          "date": "2023-10-29",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 265 distinct municipalities with council results"
+        }
       ]
     },
     {
@@ -857,7 +887,7 @@
       "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, part five)",
       "valid_from": "1991-09-17",
       "first_held": "1991-10-13",
-      "earliest_record": "2015-10-25",
+      "earliest_record": "2011-10-23",
       "contests_per_unit": 1,
       "est_votes": 35000000,
       "effort": 3,
@@ -905,6 +935,64 @@
           ],
           "within": null,
           "valid_from": "1991-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-10-23",
+          "election_kind": "local",
+          "contests": 264,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mipvr2011/el2011_t1.zip and el2011_t2.zip, round 1: 264 distinct municipalities with a mayoral candidate"
+        },
+        {
+          "date": "2011-10-30",
+          "election_kind": "runoff",
+          "contests": 173,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mipvr2011/el2011_t1.zip and el2011_t2.zip, round 2: 173 distinct municipalities with a mayoral candidate"
+        },
+        {
+          "date": "2015-10-25",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 265 distinct municipalities with a mayoral protocol"
+        },
+        {
+          "date": "2015-11-01",
+          "election_kind": "runoff",
+          "contests": 133,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 2: 133 distinct municipalities with a mayoral protocol"
+        },
+        {
+          "date": "2019-10-27",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 265 distinct municipalities with a mayoral protocol"
+        },
+        {
+          "date": "2019-11-03",
+          "election_kind": "runoff",
+          "contests": 105,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 2: 105 distinct municipalities with a mayoral protocol"
+        },
+        {
+          "date": "2023-10-29",
+          "election_kind": "local",
+          "contests": 265,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 265 distinct municipalities with a mayoral protocol"
+        },
+        {
+          "date": "2023-11-05",
+          "election_kind": "runoff",
+          "contests": 91,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 2: 91 distinct municipalities with a mayoral protocol"
         }
       ]
     },
@@ -974,6 +1062,50 @@
           "within": null,
           "valid_from": "1991-01-01"
         }
+      ],
+      "dates": [
+        {
+          "date": "2015-10-25",
+          "election_kind": "local",
+          "contests": 35,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 35 distinct city districts with a mayoral protocol"
+        },
+        {
+          "date": "2015-11-01",
+          "election_kind": "runoff",
+          "contests": 25,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 2: 25 distinct city districts with a mayoral protocol"
+        },
+        {
+          "date": "2019-10-27",
+          "election_kind": "local",
+          "contests": 35,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 35 distinct city districts with a mayoral protocol"
+        },
+        {
+          "date": "2019-11-03",
+          "election_kind": "runoff",
+          "contests": 31,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 2: 31 distinct city districts with a mayoral protocol"
+        },
+        {
+          "date": "2023-10-29",
+          "election_kind": "local",
+          "contests": 35,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 35 distinct city districts with a mayoral protocol"
+        },
+        {
+          "date": "2023-11-05",
+          "election_kind": "runoff",
+          "contests": 31,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 2: 31 distinct city districts with a mayoral protocol"
+        }
       ]
     },
     {
@@ -989,11 +1121,11 @@
           "bg.sik"
         ]
       },
-      "note": "Held only in mayoralties that meet the population bar on the day the decree calling the election is published: 350 residents under the Act on Administrative-Territorial Division art. 16 item 1 (Electoral Code 2011, § 16 of the transitional provisions), and more than 100 residents by permanent address under § 17 of the transitional provisions of the 2014 Electoral Code. Smaller places get an appointed deputy mayor (кметски наместник). So the elected count is below the register's 3,041 kmetstva, and dates are listed without counts until the CIK's per-election counts are cited.",
+      "note": "Held only in mayoralties that meet the population bar on the day the decree calling the election is published: 350 residents under the Act on Administrative-Territorial Division art. 16 item 1 (Electoral Code 2011, § 16 of the transitional provisions), and more than 100 residents by permanent address under § 17 of the transitional provisions of the 2014 Electoral Code. Smaller places get an appointed deputy mayor (кметски наместник). So the elected count is below the register's 3,041 kmetstva, and contest counts come from the CIK's own per-election files (a mayoralty counts when it has a protocol or a candidate in the file).",
       "source": "ik2014",
       "locator": "https://dv.parliament.bg/ (ДВ бр. 19/2014, § 17 ПЗР)",
       "valid_from": "1991-09-17",
-      "earliest_record": "2015-10-25",
+      "earliest_record": "2011-10-23",
       "contests_per_unit": 1,
       "est_votes": 7000000,
       "effort": 3,
@@ -1047,19 +1179,58 @@
           "date": "2011-10-23",
           "election_kind": "local",
           "source": "ik2011",
-          "quote": "§ 16 ПЗР: Избори за кметове на кметства се произвеждат само в тези кметства, които към датата на обнародване на указа на президента за насрочване на изборите за общински съветници и кметове отговарят на изискванията на чл. 16, т. 1 от Закона за административно-териториалното устройство на Република България."
+          "quote": "§ 16 ПЗР: Избори за кметове на кметства се произвеждат само в тези кметства, които към датата на обнародване на указа на президента за насрочване на изборите за общински съветници и кметове отговарят на изискванията на чл. 16, т. 1 от Закона за административно-териториалното устройство на Република България.",
+          "contests": 2012,
+          "note": "results.cik.bg/mipvr2011/el2011_t1.zip and el2011_t2.zip, round 1: 2012 distinct mayoralties with a candidate"
+        },
+        {
+          "date": "2011-10-30",
+          "election_kind": "runoff",
+          "contests": 845,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mipvr2011/el2011_t1.zip and el2011_t2.zip, round 2: 845 distinct mayoralties with a candidate"
         },
         {
           "date": "2015-10-25",
-          "election_kind": "local"
+          "election_kind": "local",
+          "contests": 3188,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 3188 distinct mayoralties with a protocol and candidates"
+        },
+        {
+          "date": "2015-11-01",
+          "election_kind": "runoff",
+          "contests": 970,
+          "source": "cik_results",
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 2: 970 distinct mayoralties with a protocol and candidates"
         },
         {
           "date": "2019-10-27",
-          "election_kind": "local"
+          "election_kind": "local",
+          "contests": 1966,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 1966 distinct mayoralties with a protocol and candidates"
+        },
+        {
+          "date": "2019-11-03",
+          "election_kind": "runoff",
+          "contests": 441,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2019/csv.zip, round 2: 441 distinct mayoralties with a protocol and candidates"
         },
         {
           "date": "2023-10-29",
-          "election_kind": "local"
+          "election_kind": "local",
+          "contests": 3032,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 3032 distinct mayoralties with a protocol"
+        },
+        {
+          "date": "2023-11-05",
+          "election_kind": "runoff",
+          "contests": 451,
+          "source": "cik_results",
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 2: 451 distinct mayoralties with a protocol"
         }
       ]
     },
