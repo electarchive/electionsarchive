@@ -12,7 +12,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.cl import servel
+from ea.sources.cl import plebiscitos, servel
 
 SOURCE = "cl.plebiscitos_historicos"
 CHILE = servel.CHILE
@@ -267,17 +267,8 @@ def build(day: date) -> Package:
 
     rows: list[tuple[str, str | None, int, int]] = []
     for region, row in spec.rows.items():
-        unit = p.id("unit", region)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=CHILE,
-            scheme_code="cl.region",
-            code=str(region),
-            area_relation="equals",
-            area_id=servel.area("cl.region", str(region)),
-            kind="standard",
-        )
+        unit = plebiscitos.region_unit(region)
+        p.external.add(unit)
         rows += [(unit, options[0], 1, row.yes), (unit, options[1], 1, row.no), (unit, None, 3, row.total)]
         if row.null is not None:
             rows.append((unit, None, 5, row.null))

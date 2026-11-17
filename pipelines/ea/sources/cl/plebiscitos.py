@@ -112,6 +112,15 @@ ELECTIONS: dict[date, Spec] = {
 }
 
 
+def region_unit(region: int) -> str:
+    """The archive's reporting unit for a region (scheme cl.region), which another Chile load already holds.
+
+    The id is the one `Changeset` derives from the unit's natural key, so these packages reference the unit rather
+    than mint one: a unit code is unique within its scheme.
+    """
+    return str(uuid5(package.NAMESPACE, f"unit:cl.region@None\x1f{region}"))
+
+
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
@@ -226,17 +235,8 @@ def build(day: date) -> Package:
 
     rows: list[tuple[str, str | None, int, int]] = []
     for region, row in votes.items():
-        unit = p.id("unit", region)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=CHILE,
-            scheme_code="cl.region",
-            code=str(region),
-            area_relation="equals",
-            area_id=servel.area("cl.region", str(region)),
-            kind="standard",
-        )
+        unit = region_unit(region)
+        p.external.add(unit)
         rows += [
             (unit, options[0], 1, row.yes),
             (unit, options[1], 1, row.no),
