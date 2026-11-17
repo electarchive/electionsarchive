@@ -1114,6 +1114,8 @@ def totals(spec: Spec, munis: dict[str, Muni]) -> None:
             code = "ÜKSIK"
         if code in mine and mine[code] != votes:
             raise ValueError(f"{spec.key} {label}: {mine[code]} votes, the office prints {votes}")
+    matched = sum(1 for code, _ in official.lists.values() if code in mine)
+    print(f"{spec.key}: {valid:,} valid votes and {matched} lists' votes match the office's national figures")
 
 
 # ---------------------------------------------------------------- the archive pages of 1993 to 2009
