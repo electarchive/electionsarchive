@@ -89,11 +89,22 @@ class Election(NamedTuple):
 
 
 Z = BASE + "/"
-FIRST_ROUND = {"pr-2016-11-13": "pr-2016-11-06", "pr-2011-10-30": "pr-2011-10-23"}
+FIRST_ROUND = {
+    "pr-2016-11-13": "pr-2016-11-06",
+    "pr-2011-10-30": "pr-2011-10-23",
+    "pr-2021-11-21": "pr-2021-11-14",
+    "pr-2026-11-01": "pr-2026-10-25",
+}
+SECOND_ROUND = {first: second for second, first in FIRST_ROUND.items()}
+# Packages that share a bundle with an earlier package they depend on, which holds the artifact row.
+SHARED_BUNDLE = {"pr-2016-11-13": "pr-2016-11-06", "ns-2021-11-14": "pr-2021-11-14"}
+# Rounds whose first-round package is already loaded and is not rebuilt here.
+KEEP_FIRST = {"pr-2026-10-25"}
 ELECTIONS = [
     Election("ns-2005-06-25", "ns", date(2005, 6, 25), "http://pi2005.cik.bg/results/export.zip", "ns2005"),
     Election("pr-2011-10-23", "pres", date(2011, 10, 23), Z + "mipvr2011/el2011_t1.zip", "pres2011", None, 1),
     Election("pr-2011-10-30", "pres", date(2011, 10, 30), Z + "mipvr2011/el2011_t2.zip", "pres2011", None, 2),
+    Election("ep-2009-06-07", "ep", date(2009, 6, 7), "https://ep2009.cik.bg/exports.zip", "ep2009"),
     Election("ns-2013-05-12", "ns", date(2013, 5, 12), Z + "pi2013/export.zip", "ns2013"),
     Election("ref-2013-01-27", "ref", date(2013, 1, 27), Z + "referendum/export.zip", "ref2013"),
     Election("ep-2014-05-25", "ep", date(2014, 5, 25), Z + "ep2014/export.zip", "ep2014"),
@@ -105,6 +116,9 @@ ELECTIONS = [
     Election("ns-2017-03-26", "ns", date(2017, 3, 26), Z + "pi2017/export.zip", "ns2017"),
     Election("ep-2019-05-26", "ep", date(2019, 5, 26), Z + "ep2019/csv.zip", "ep2019"),
     Election("ns-2021-07-11", "ns", date(2021, 7, 11), Z + "pi2021_07/export.zip", "ns2021a"),
+    Election("pr-2021-11-14", "pres", date(2021, 11, 14), Z + "pvrns2021/tur1/export.zip", "pres2021", 1, 1),
+    Election("ns-2021-11-14", "ns", date(2021, 11, 14), Z + "pvrns2021/tur1/export.zip", "ns2022", 0),
+    Election("pr-2021-11-21", "pres", date(2021, 11, 21), Z + "pvrns2021/tur2/export.zip", "pres2021", None, 2),
     Election("ns-2022-10-02", "ns", date(2022, 10, 2), Z + "ns2022/export.zip", "ns2022"),
     Election("ns-2023-04-02", "ns", date(2023, 4, 2), Z + "ns2023/export.zip", "ns2023", 0),
     Election("ep-2024-06-09", "ep", date(2024, 6, 9), Z + "europe2024/opendata/export.zip", "ns2024a", 0),
@@ -112,15 +126,14 @@ ELECTIONS = [
     Election("ns-2024-10-27", "ns", date(2024, 10, 27), Z + "pe202410/opendata/export.zip", "ns2024"),
     Election("ns-2026-04-19", "ns", date(2026, 4, 19), Z + "pe202604/opendata/export.zip", "ns2024"),
     Election("pr-2026-10-25", "pres", date(2026, 10, 25), Z + "pvr202610/tur1/opendata/export.zip", "pres2026"),
+    Election(
+        "pr-2026-11-01", "pres", date(2026, 11, 1), Z + "pvr202610/tur2/opendata/export.zip", "pres2026b", None, 2
+    ),
 ]
 # Files the CIK publishes that this module does not read yet, or that production could not reach in the last round.
 BLOCKED = [
     "https://pi2009.cik.bg/results/proportional/index.html",
     "https://pi2009.cik.bg/?page=6",
-    "https://ep2009.cik.bg/results/exports.zip",
-    "https://results.cik.bg/pvr202610/tur2/opendata/export.zip",
-    "https://results.cik.bg/pvrns2021/tur1/export.zip",
-    "https://results.cik.bg/pvrns2021/tur2/export.zip",
 ]
 
 
@@ -181,6 +194,15 @@ LAYOUTS: dict[str, Layout] = {
         3,
         True,
         3,
+    ),
+    "ep2009": Layout(
+        None,
+        0,
+        {"*": {"reg": (3,), "voters": (14,), "box": (15,), "inv": (19,), "valid": (23,)}},
+        "ep2009",
+        0,
+        False,
+        0,
     ),
     "ns2005": Layout(None, 0, {"*": {"box": (10,), "inv": (14,), "valid": (15,)}}, "ns2005", 0),
     "pres2011": Layout(
@@ -365,6 +387,12 @@ def _members(e: Election) -> dict[str, str]:
             "votes": "sikproto.txt",
             "header": "pe2005_export.csv",
         }
+    if e.layout == "ep2009":
+        return {
+            "sections": "euro2009_sections.txt",
+            "protocols": "euro2009_protocols.txt",
+            "votes": "euro2009_protocols.txt",
+        }
     if e.layout == "pres2011":
         names = [n for n in names if "_president_" in n.rpartition("/")[2]]
     folders = list(dict.fromkeys(n.rpartition("/")[0] for n in names))
@@ -391,8 +419,8 @@ def rows(e: Election, role: str) -> list[list[str]]:
 
 def cite(p: Package, e: Election) -> None:
     artifact = raw.cached(SOURCE, e.url)
-    if e.id == "pr-2016-11-13":
-        p.uses(artifact)  # the first round's package, a dependency, already holds the artifact row
+    if e.id in SHARED_BUNDLE:
+        p.uses(artifact)  # the package this one depends on already holds the artifact row
     else:
         p.artifact(artifact, CIK_SOURCE)
 
@@ -420,6 +448,8 @@ def sections(e: Election) -> dict[str, Section]:
             code, place, ekatte, mobile, ship = r[1], r[4], r[5], r[0] == "П", r[0] == "К"
         elif e.layout == "ns2005":
             code, place, ekatte, mobile, ship = r[0], r[1], "", False, False
+        elif e.layout == "ep2009":
+            code, place, ekatte, mobile, ship = r[0], r[1], r[2], False, False
         elif layout.votes in ("order_pairs",):
             code, place, ekatte = r[0], r[1], r[2]
             mobile, ship = r[3] == "1", r[4] == "1"
@@ -461,6 +491,11 @@ def party_votes(e: Election) -> dict[str, dict[str, int]]:
             for index, text in enumerate(r[15:], start=1):
                 out[r[0]][str(index)] += int(text) if text.strip().isdigit() else 0
             continue
+        if layout.votes == "ep2009":
+            for index, text in enumerate(r[24:], start=1):
+                if text.strip().isdigit():
+                    out[r[0]][str(index)] += int(text)
+            continue
         if layout.votes == "blank_pairs":
             section, body, step, at = r[1], r[2:], 2, 1
         elif layout.votes == "order_pairs":
@@ -483,6 +518,31 @@ def party_votes(e: Election) -> dict[str, dict[str, int]]:
     return out
 
 
+# The 2026 second round: a hybrid section's protocol also holds the machine votes (points 9 and 11), and a section
+# that votes by machine alone has its votes in the machine data forms.
+_HYBRID = {
+    "reg": (9,),
+    "voters": (11,),
+    "box": (12, 18, 22),
+    "inv": (13, 21, 25),
+    "valid": (15, 19, 20, 23, 24),
+    "none": (17, 20, 24),
+}
+LAYOUTS["pres2026b"] = Layout(
+    0,
+    1,
+    {
+        **_same({"reg": (9,), "voters": (11,), "box": (12,), "inv": (13,), "valid": (15,), "none": (17,)}, "24", "28"),
+        **_same(_HYBRID, "26", "30"),
+        **_same({"reg": (9,), "voters": (11,), "box": (14,)}, "25", "29"),
+        **_same({"valid": (27, 28), "none": (28,)}, "32", "41"),
+    },
+    "triples",
+    6,
+    True,
+    3,
+)
+LAYOUTS["pres2021"] = LAYOUTS["ns2022"]  # the 2021 presidential protocols number their points like the 2022 ones
 LAYOUTS["ref2013"] = Layout(0, 1, {}, "none")
 LAYOUTS["ref2015"] = Layout(0, 1, {}, "none", flags=3)
 LAYOUTS["ref2016"] = Layout(0, 1, {}, "none", flags=3)
@@ -632,6 +692,10 @@ def party_kind(name: str) -> str:
 
 
 def parties(e: Election) -> dict[str, str]:
+    if e.layout == "ep2009":
+        text = _decode(_archive(e.url).read("ReadMe.txt"))
+        found = (re.match(r"\s*\d+\)\s*Гласове за:\s*(\d+)\.\s*(.+?)\s*$", line) for line in text.splitlines())
+        return {m[1]: m[2] for m in found if m}
     if e.layout == "ns2005":
         found = (re.match(r"(\d+)\.\s*(.+)$", c.strip()) for c in (rows(e, "header") or [[]])[0])
         return {m[1]: m[2].strip() for m in found if m}
@@ -709,6 +773,7 @@ def build(e: Election) -> Package:
             f"{SOURCE}/geo",
             f"{SOURCE}/registry",
             *([f"{SOURCE}/{FIRST_ROUND[e.id]}"] if e.id in FIRST_ROUND else []),
+            *([f"{SOURCE}/{SHARED_BUNDLE[e.id]}"] if e.id in SHARED_BUNDLE and e.id not in FIRST_ROUND else []),
         ],
     )
     p.external.add(BULGARIA)
@@ -972,8 +1037,8 @@ def build(e: Election) -> Package:
                 p.add(
                     "outcome", result_set_id=sets[m], option_id=options[(m, n)], candidacy_id=candidacy, kind="elected"
                 )
-    second = _round(2)
-    if e.id == "pr-2016-11-06" and second is not None:
+    second = next((x for x in ELECTIONS if x.id == SECOND_ROUND.get(e.id)), None)
+    if second is not None and e.id not in KEEP_FIRST:
         finalists = {x.name for x in candidates(second)}
         for c in cands:
             kind = "advanced" if c.name in finalists else "eliminated"
@@ -1041,11 +1106,6 @@ def build(e: Election) -> Package:
     p.frame("result_value", frame)
     accept(p, e, figures, votes, secs)
     return p
-
-
-@functools.cache
-def _round(n: int) -> Election | None:
-    return next((x for x in ELECTIONS if x.kind == "pres" and x.round == n and x.day.year == 2016), None)
 
 
 def accept(
