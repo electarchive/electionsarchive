@@ -192,6 +192,9 @@ def _suffix(url: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.au import aec_cd
+
+    aec_cd.fetch()
     fetch_html()
     for event in EVENTS:
         if event.id in HTML_ONLY:
@@ -407,6 +410,14 @@ def _divisions() -> dict[str, tuple[str, list[tuple[date, str]]]]:
         state, name = _heading_2001(url)
         id = named.get((state, name.lower()), f"{state}-{name}")
         seen.setdefault(id, (state, []))[1].append((V2001.day, name))
+    from ea.sources.au import aec_cd
+
+    for year, state, name in aec_cd.division_names():
+        id = named.get((state, name.lower()), f"{state}-{name}")
+        entry = seen.setdefault(id, (state, []))
+        if entry[0] != state:
+            raise ValueError(f"division {id} is in {entry[0]} and {state}")
+        entry[1].append((year.day, name))
     return seen
 
 
@@ -432,7 +443,9 @@ def _geo_files() -> list[str]:
         for event in EVENTS
         if event.id not in HTML_ONLY
     ]
-    return [*files, *pages_2001()[0]]
+    from ea.sources.au import aec_cd
+
+    return [*files, *pages_2001()[0], aec_cd.ZIP]
 
 
 def geo() -> Package:
@@ -441,7 +454,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         f"Australia's 8 states and territories and the {len(divisions)} federal electoral divisions that have "
-        "returned results to the Australian Electoral Commission's Tally Room since 2001",
+        "returned results to the Australian Electoral Commission since 1993",
     )
     p.external |= {AUSTRALIA, COUNTRY}
     _source_row(p)
@@ -497,6 +510,10 @@ def _party_names() -> dict[str, str]:
     for row in cells(page(PARTY_CODES)):
         if len(row) == 2 and re.fullmatch(r"[A-Z0-9]{2,4}", row[0]) and row[0] not in NO_PARTY:
             names.setdefault(row[0], row[1])
+    from ea.sources.au import aec_cd
+
+    for ab, name in aec_cd.party_names().items():
+        names.setdefault(ab, name)
     return names
 
 
@@ -506,7 +523,7 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         f"Australia's House of Representatives and Senate, their electoral systems, and the {len(names)} party "
-        "abbreviations on the Australian Electoral Commission's results since 2001, with the source files "
+        "abbreviations on the Australian Electoral Commission's results since 1993, with the source files "
         "every election package cites",
         depends=[f"{SOURCE}/geo"],
     )
@@ -1088,7 +1105,9 @@ def referendum(p: Package, event: Event, election: str, path: str, units: Units,
 
 
 def days() -> list[date]:
-    return sorted({V2001.day, *(event.day for event in EVENTS)})
+    from ea.sources.au import aec_cd
+
+    return sorted({V2001.day, *(event.day for event in EVENTS), *aec_cd.DAYS})
 
 
 def packages() -> list[str]:
@@ -1165,6 +1184,11 @@ def election(day: date) -> Package:
 
 
 def build(day: date) -> Package:
+    from ea.sources.au import aec_cd
+
+    for year in aec_cd.YEARS:
+        if day == year.day:
+            return aec_cd.election(year)
     if day == V2001.day:
         return election_html(V2001)
     if day == WERRIWA.day:
