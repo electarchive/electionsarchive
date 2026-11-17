@@ -7,7 +7,8 @@ separate structure file holds the places and the voters registered at each cente
 
 The local elections of 14 May 2023 are on the same platform: each of the 61 municipalities elects a mayor and a council,
 and the platform prints both ballots' votes at each voting center, with each municipality's declared totals and the
-council seats. The platform also serves the mayoral by-elections held since then, one results site per election day.
+council seats; its results page (results2023/results2023.htm) loads these files from its input folder and its scripts. The
+platform also serves the mayoral by-elections held since then, one results site per election day.
 """
 
 import functools
