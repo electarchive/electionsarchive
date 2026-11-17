@@ -1,0 +1,3081 @@
+{
+ "polity": "PT",
+ "name": "Portugal",
+ "sources": {
+  "crp": {
+   "title": "Constituição da República Portuguesa (VII revisão constitucional, 2005)",
+   "publisher": "Assembleia da República",
+   "url": "https://www.parlamento.pt/Legislacao/Paginas/ConstituicaoRepublicaPortuguesa.aspx",
+   "kind": "official_body"
+  },
+  "lear": {
+   "title": "Lei Eleitoral da Assembleia da República, Lei n.º 14/79, de 16 de maio (consolidada, atualizada em 23-07-2026)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lear_consolidada_2026-07.pdf",
+   "kind": "official_body"
+  },
+  "lepr": {
+   "title": "Lei Eleitoral do Presidente da República, Decreto-Lei n.º 319-A/76, de 3 de maio (consolidada, 2026-07)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lepr_consolidada_2026-07.pdf",
+   "kind": "official_body"
+  },
+  "lepe": {
+   "title": "Lei Eleitoral do Parlamento Europeu, Lei n.º 14/87, de 29 de abril (atualizada 2022)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lepe_atualiz-2022.pdf",
+   "kind": "official_body"
+  },
+  "lealraa": {
+   "title": "Lei Eleitoral da Assembleia Legislativa da Região Autónoma dos Açores (atualizada em 16-10-2026)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lealraa_atualizada_16-10-2026_vf.pdf",
+   "kind": "official_body"
+  },
+  "lealram": {
+   "title": "Lei Eleitoral da Assembleia Legislativa da Região Autónoma da Madeira (atualizada)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lealram_atualizada.pdf",
+   "kind": "official_body"
+  },
+  "leoal": {
+   "title": "Lei Eleitoral dos Órgãos das Autarquias Locais, Lei Orgânica n.º 1/2001, de 14 de agosto (atualizada em 2021-06-04)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_leoal_2021_06_04.pdf",
+   "kind": "official_body"
+  },
+  "lei169": {
+   "title": "Lei n.º 169/99, de 18 de setembro, quadro de competências e regime jurídico de funcionamento dos órgãos dos municípios e das freguesias (atualizada 2021)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lei_169_99_atualiz-2021.pdf",
+   "kind": "official_body"
+  },
+  "rjal": {
+   "title": "Lei n.º 75/2013, de 12 de setembro, regime jurídico das autarquias locais e das entidades intermunicipais (atualizada 2020)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_lei_75_2013_rjal_atualiz-2020.pdf",
+   "kind": "official_body"
+  },
+  "ccp_lei": {
+   "title": "Lei n.º 66-A/2007, de 11 de dezembro, competências, modo de organização e funcionamento do Conselho das Comunidades Portuguesas (atualizada 2023-08-21)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/legis_ccp_66_a_2007_atualizada_2023-08-21.pdf",
+   "kind": "official_body"
+  },
+  "cne_index": {
+   "title": "Eleições / Referendos: lista de todos os atos eleitorais e referendários desde 1975",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/content/eleicoes-referendos",
+   "kind": "official_body"
+  },
+  "cne_maps": {
+   "title": "Eleições / Referendos: resultados oficiais (mapas oficiais)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+   "kind": "official_body"
+  },
+  "cne_al2025": {
+   "title": "Eleições autárquicas de 12 de outubro de 2025: Mapa Oficial n.º 2-B/2025, resultados em folha de cálculo (inclui retificações)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/eleicoes/2025_al/docs_geral/2025al-mapa-oficial_retificado.zip",
+   "kind": "official_body"
+  },
+  "cne_al2021": {
+   "title": "Eleições autárquicas de 26 de setembro de 2021: Mapa Oficial n.º 1-B/2021, resultados em folha de cálculo",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/2021al_mapa_oficial.zip",
+   "kind": "official_body"
+  },
+  "cne_al2017": {
+   "title": "Eleições autárquicas de 1 de outubro de 2017: Mapa Oficial n.º 1-A/2017, resultados em folha de cálculo (consolidado)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/al2017_mapaoficial_retif02_01out2018.zip",
+   "kind": "official_body"
+  },
+  "cne_al2013": {
+   "title": "Eleições autárquicas de 29 de setembro de 2013: Mapa Oficial n.º 1-A/2013, resultados em folha de cálculo (consolidado)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/al2013_mapaoficial_retif.zip",
+   "kind": "official_body"
+  },
+  "cne_al2009": {
+   "title": "Eleições autárquicas de 11 de outubro de 2009: Mapa Oficial n.º 1-A/2010, resultados (ficheiro excel)",
+   "publisher": "Comissão Nacional de Eleições",
+   "url": "https://www.cne.pt/sites/default/files/dl/resultados_al2009.xls",
+   "kind": "official_body"
+  },
+  "caop": {
+   "title": "Carta Administrativa Oficial de Portugal (CAOP)",
+   "publisher": "Direção-Geral do Território",
+   "url": "https://www.dgterritorio.gov.pt/cartografia/cartografia-tematica/caop",
+   "kind": "official_body"
+  },
+  "caop2025": {
+   "title": "CAOP2025: áreas das freguesias, municípios, distritos e país (com notas e resumo)",
+   "publisher": "Direção-Geral do Território",
+   "url": "https://www.dgterritorio.gov.pt/sites/default/files/ficheiros-cartografia/Areas_Freg_Mun_Dist_Pais_CAOP2025.zip",
+   "kind": "official_body"
+  },
+  "ar_monarquia": {
+   "title": "A Monarquia Constitucional (1820-1910)",
+   "publisher": "Assembleia da República",
+   "url": "https://www.parlamento.pt/Parlamento/Paginas/monarquia.aspx",
+   "kind": "official_body"
+  },
+  "ar_republica": {
+   "title": "A 1.ª República (1910-1926)",
+   "publisher": "Assembleia da República",
+   "url": "https://www.parlamento.pt/Parlamento/Paginas/republica.aspx",
+   "kind": "official_body"
+  },
+  "ar_estadonovo": {
+   "title": "O Estado Novo (1933-1974)",
+   "publisher": "Assembleia da República",
+   "url": "https://www.parlamento.pt/Parlamento/Paginas/EstadoNovo.aspx",
+   "kind": "official_body"
+  },
+  "museu_pr": {
+   "title": "Presidentes da República Portuguesa: biografias",
+   "publisher": "Museu da Presidência da República",
+   "url": "https://www.museu.presidencia.pt/pt/conhecer/presidentes-da-republica/",
+   "kind": "official_body"
+  },
+  "mai": {
+   "title": "Election results sites (eleicoes.mai.gov.pt)",
+   "publisher": "Ministério da Administração Interna, Secretaria-Geral, Administração Eleitoral",
+   "url": "https://www.eleicoes.mai.gov.pt/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "República Portuguesa",
+   "name_en": "Portuguese Republic",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "crp"
+  },
+  {
+   "key": "regiao_autonoma",
+   "name": "Regiões autónomas",
+   "name_en": "Autonomous regions",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "pt.distrito",
+   "source": "crp",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 2,
+     "source": "caop2025",
+     "locator": "Areas_Freg_Mun_Dist_Pais_CAOP2025_Notas.txt (Áreas: Região Autónoma dos Açores 2321.96 km2; Região Autónoma da Madeira 801.10 km2)"
+    }
+   ]
+  },
+  {
+   "key": "distrito",
+   "name": "Distritos",
+   "name_en": "Districts",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "pt.distrito",
+   "elects": false,
+   "source": "crp",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 18,
+     "source": "caop2025",
+     "locator": "Areas_Distrito_CAOP2025.csv (18 rows with nuts1_dsg Continente; the 'Distritos/Ilhas 29' of the summary adds the 11 island units of the autonomous regions)"
+    }
+   ]
+  },
+  {
+   "key": "municipio",
+   "name": "Municípios",
+   "name_en": "Municipalities",
+   "parent": "distrito",
+   "polity_kind": "municipality",
+   "scheme": "pt.concelho",
+   "source": "crp",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 308,
+     "source": "caop2025",
+     "locator": "Areas_Freg_Mun_Dist_Pais_CAOP2025_Notas.txt (Número de divisões administrativas: Municípios 308)"
+    },
+    {
+     "date": "2013-09-29",
+     "value": 308,
+     "source": "cne_al2013",
+     "locator": "Parte1_resultadosv7_retif.xls (308 rows with órgão CM)"
+    }
+   ]
+  },
+  {
+   "key": "freguesia",
+   "name": "Freguesias",
+   "name_en": "Parishes",
+   "parent": "municipio",
+   "polity_kind": "submunicipal",
+   "scheme": "pt.freguesia",
+   "source": "crp",
+   "counts": [
+    {
+     "date": "2025-12-31",
+     "value": 3259,
+     "source": "caop2025",
+     "locator": "Areas_Freg_Mun_Dist_Pais_CAOP2025_Notas.txt (Número de divisões administrativas: Freguesias 3259; Corvo is counted for statistics only)"
+    },
+    {
+     "date": "2025-10-12",
+     "value": 3259,
+     "source": "cne_al2025",
+     "locator": "mapa_1_resultados_retificado.xlsx (3,259 rows with órgão AF)"
+    },
+    {
+     "date": "2021-09-26",
+     "value": 3091,
+     "source": "cne_al2021",
+     "locator": "mapa_1_resultados.xlsx (3,091 rows with órgão AF: the 3,092 parishes of the 2013 reform less Corvo)"
+    },
+    {
+     "date": "2013-09-29",
+     "value": 3091,
+     "source": "cne_al2013",
+     "locator": "Parte1_resultadosv7_retif.xls (3,091 rows with órgão AF, the first election after Lei n.º 11-A/2013)"
+    },
+    {
+     "date": "2009-10-11",
+     "value": 4259,
+     "source": "cne_al2009",
+     "locator": "resultados_al2009.xls (4,259 rows with órgão AF)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "assembleia_republica",
+   "tier": "national",
+   "name": "Eleições para a Assembleia da República",
+   "name_en": "Assembly of the Republic elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "pt.distrito",
+     "pt.circulo",
+     "pt.cne.circulo"
+    ],
+    "fine": [
+     "pt.concelho",
+     "pt.freguesia",
+     "pt.posto"
+    ]
+   },
+   "finest_note": "The Ministry's sites publish every election since 1999 by parish at home and by consular post or country abroad; CNE's official maps from 1976 give circle totals (spreadsheets by circle 1976-1995).",
+   "note": "230 deputies (Constitution art. 148.º: between 180 and 230) in 22 multi-member circles, closed-list PR by the d'Hondt method (art. 149.º); 263 deputies in 1976 and 250 from 1979 to 1987 per the electoral law's history.",
+   "source": "crp",
+   "valid_from": "1976-04-25",
+   "first_held": "1976-04-25",
+   "earliest_record": "1976-04-25",
+   "contests_per_unit": 22,
+   "est_votes": 105000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "2025-05-18",
+     "administered_by": "Ministério da Administração Interna (Administração Eleitoral) and the Comissão Nacional de Eleições",
+     "source": "crp",
+     "locator": "Constituição, art. 171.º (A legislatura tem a duração de quatro sessões legislativas) and art. 172.º (dissolution)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list (Lei n.º 14/79)"
+    },
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1976-04-25",
+     "valid_to": "2025-05-18",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "crp",
+     "locator": "Constituição, art. 171.º; the Assembly was dissolved early in 1979, 1983, 1985, 1987, 2002, 2005, 2011, 2022, 2024, and 2025"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-10-10",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1975-04-25",
+     "finest": "pt.cne.circulo",
+     "evidence": "Official results map (mapa oficial) of every legislative election since 1975 as published in the Diário da República; the 1976-1995 maps also come as spreadsheets by circle.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "name_pattern": "^(Assembly of the Republic|Assembleia da República)$",
+     "iso_pattern": "PT",
+     "valid_from": "1976-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-04-25",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleições para a Assembleia da República 1976",
+     "note": "First Assembly of the Republic, elected under Decreto-Lei n.º 93-C/76 before Lei n.º 14/79 fixed the 22 circles; circle and seat counts not yet read from an official text."
+    },
+    {
+     "date": "1979-12-02",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "lear",
+     "quote": "Os círculos eleitorais do continente coincidem com as áreas dos distritos administrativos ... Há um círculo eleitoral na Região Autónoma da Madeira e um círculo eleitoral na Região Autónoma dos Açores ... Os eleitores residentes fora do território nacional são agrupados em dois círculos eleitorais",
+     "note": "18 district circles, Azores, Madeira, Europe, and outside Europe (Lei n.º 14/79, art. 12.º)."
+    },
+    {
+     "date": "1980-10-05",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "lear",
+     "quote": "Os círculos eleitorais do continente coincidem com as áreas dos distritos administrativos ... Há um círculo eleitoral na Região Autónoma da Madeira e um círculo eleitoral na Região Autónoma dos Açores ... Os eleitores residentes fora do território nacional são agrupados em dois círculos eleitorais",
+     "note": "18 district circles, Azores, Madeira, Europe, and outside Europe (Lei n.º 14/79, art. 12.º)."
+    },
+    {
+     "date": "1983-04-25",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "lear",
+     "quote": "Os círculos eleitorais do continente coincidem com as áreas dos distritos administrativos ... Há um círculo eleitoral na Região Autónoma da Madeira e um círculo eleitoral na Região Autónoma dos Açores ... Os eleitores residentes fora do território nacional são agrupados em dois círculos eleitorais",
+     "note": "18 district circles, Azores, Madeira, Europe, and outside Europe (Lei n.º 14/79, art. 12.º)."
+    },
+    {
+     "date": "1985-10-06",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "lear",
+     "quote": "Os círculos eleitorais do continente coincidem com as áreas dos distritos administrativos ... Há um círculo eleitoral na Região Autónoma da Madeira e um círculo eleitoral na Região Autónoma dos Açores ... Os eleitores residentes fora do território nacional são agrupados em dois círculos eleitorais",
+     "note": "18 district circles, Azores, Madeira, Europe, and outside Europe (Lei n.º 14/79, art. 12.º); CNE's index prints this election as 05/10/1985, the day before polling day."
+    },
+    {
+     "date": "1987-07-19",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "lear",
+     "quote": "Os círculos eleitorais do continente coincidem com as áreas dos distritos administrativos ... Há um círculo eleitoral na Região Autónoma da Madeira e um círculo eleitoral na Região Autónoma dos Açores ... Os eleitores residentes fora do território nacional são agrupados em dois círculos eleitorais",
+     "note": "18 district circles, Azores, Madeira, Europe, and outside Europe (Lei n.º 14/79, art. 12.º)."
+    },
+    {
+     "date": "1991-10-06",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "1995-10-01",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "1999-10-10",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2002-03-17",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2005-02-20",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2009-09-27",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2011-06-05",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2015-10-04",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2019-10-06",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2022-01-30",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2024-03-10",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "general",
+     "contests": 22,
+     "seats": 230,
+     "source": "lear",
+     "quote": "O número total de deputados é de 230 ... A cada um dos círculos eleitorais referidos no n.º 4 do artigo anterior correspondem dois deputados"
+    }
+   ]
+  },
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Eleição do Presidente da República",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.distrito",
+     "pt.concelho",
+     "pt.freguesia",
+     "pt.posto"
+    ]
+   },
+   "finest_note": "Parish and consular post on the Ministry's sites from 2001; district in CNE's maps for 1976-1996.",
+   "note": "Direct two-round election: a candidate needs more than half of the valid votes, otherwise the two leading candidates meet in a second round (Constitution art. 126.º); five-year term (art. 128.º), one consecutive re-election.",
+   "source": "crp",
+   "valid_from": "1976-06-27",
+   "first_held": "1976-06-27",
+   "earliest_record": "1976-06-27",
+   "est_votes": 65000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 1,
+     "term_years": 5,
+     "called": false,
+     "month": 1,
+     "runoff": "majority",
+     "runoff_rule": "The two leading candidates meet in a second ballot within 21 days (Constitution art. 126.º)",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "crp",
+     "locator": "Constituição, arts. 126.º and 128.º (O mandato do Presidente da República tem a duração de cinco anos)",
+     "vacancy_rule": "A new election within 60 days; the newly elected President starts a new five-year term (art. 128.º n.º 2)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-01-14",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-06-27",
+     "finest": "pt.distrito",
+     "evidence": "Official results maps of every presidential election since 1976 as PDFs.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1976-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-06-27",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 27/06/1976"
+    },
+    {
+     "date": "1980-12-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 07/12/1980"
+    },
+    {
+     "date": "1986-01-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 26/01/1986 1.º sufrágio"
+    },
+    {
+     "date": "1986-02-16",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 16/02/1986 2.º sufrágio"
+    },
+    {
+     "date": "1991-01-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 13/01/1991"
+    },
+    {
+     "date": "1996-01-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 14/01/1996"
+    },
+    {
+     "date": "2001-01-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 14/01/2001"
+    },
+    {
+     "date": "2006-01-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 22/01/2006"
+    },
+    {
+     "date": "2011-01-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 23/01/2011"
+    },
+    {
+     "date": "2016-01-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 24/01/2016"
+    },
+    {
+     "date": "2021-01-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 24/01/2021"
+    },
+    {
+     "date": "2026-01-18",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 18/01/2026 1.º sufrágio"
+    },
+    {
+     "date": "2026-02-08",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "cne_index",
+     "quote": "Presidencial 08/02/2026 2.º sufrágio"
+    }
+   ]
+  },
+  {
+   "key": "parlamento_europeu",
+   "tier": "national",
+   "name": "Eleições para o Parlamento Europeu",
+   "name_en": "European Parliament elections in Portugal",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.distrito",
+     "pt.concelho",
+     "pt.freguesia",
+     "pt.posto"
+    ]
+   },
+   "finest_note": "One national circle; the Ministry's sites publish every election from 2004 by parish.",
+   "note": "Members elected in a single national circle by closed-list PR (d'Hondt); 24 or 25 members up to 1999, 21 since 2014.",
+   "source": "lepe",
+   "valid_from": "1987-07-19",
+   "first_held": "1987-07-19",
+   "earliest_record": "1987-07-19",
+   "est_votes": 30000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": false,
+     "month": 6,
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "lepe",
+     "locator": "Lei n.º 14/87, art. 3.º (É instituído um círculo eleitoral único, com sede em Lisboa)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-06-13",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1987-07-19",
+     "finest": "pt.distrito",
+     "evidence": "Official results maps of every European election since 1987 as PDFs.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1987-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null,
+     "valid_from": "1987-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1987-07-19",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 19/07/1987"
+    },
+    {
+     "date": "1989-06-18",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 18/06/1989"
+    },
+    {
+     "date": "1994-06-12",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 12/06/1994"
+    },
+    {
+     "date": "1999-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 13/06/1999"
+    },
+    {
+     "date": "2004-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 13/06/2004"
+    },
+    {
+     "date": "2009-06-07",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 07/06/2009"
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 25/05/2014"
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 26/05/2019"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Europeia 09/06/2024"
+    }
+   ]
+  },
+  {
+   "key": "referendo_nacional",
+   "tier": "national",
+   "name": "Referendos nacionais",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.distrito",
+     "pt.concelho",
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "The 2007 referendum by parish on the Ministry's site; the 1998 maps by district.",
+   "note": "Binding referendums called by the President on a proposal of the Assembly or the Government (Constitution art. 115.º); binding only with turnout above half of the registered voters. The 1998 regionalization referendum put a national question and one question per proposed region (art. 256.º).",
+   "source": "crp",
+   "first_held": "1998-06-28",
+   "earliest_record": "1998-06-28",
+   "est_votes": 12000000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-02-11",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1998-06-28",
+     "finest": "pt.distrito",
+     "evidence": "Official results maps of the 1998 and 2007 referendums.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1976-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1998-06-28",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Nacional 28/06/1998",
+     "note": "Decriminalization of abortion."
+    },
+    {
+     "date": "1998-11-08",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cne_index",
+     "quote": "Referendo Nacional 08/11/1998",
+     "note": "Institution of the administrative regions: the national question and the question on the voter's own region (counted as two)."
+    },
+    {
+     "date": "2007-02-11",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Nacional 11/02/2007",
+     "note": "Decriminalization of abortion."
+    }
+   ]
+  },
+  {
+   "key": "assembleia_constituinte_1975",
+   "tier": "national",
+   "name": "Eleições para a Assembleia Constituinte (1975)",
+   "name_en": "Constituent Assembly election (1975)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.distrito"
+    ]
+   },
+   "note": "Elected on 25 April 1975 by closed-list PR; it wrote the Constitution of 2 April 1976.",
+   "source": "cne_index",
+   "valid_from": "1975-04-25",
+   "valid_to": "1976-04-02",
+   "first_held": "1975-04-25",
+   "earliest_record": "1975-04-25",
+   "est_votes": 5700000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1975-04-25",
+     "finest": "pt.distrito",
+     "evidence": "Official results map of the Constituent Assembly election.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1975-01-01",
+     "valid_to": "1976-04-02"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1975-04-25",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleições para a Assembleia Constituinte 1975"
+    }
+   ]
+  },
+  {
+   "key": "alraa",
+   "tier": "regiao_autonoma",
+   "name": "Eleição da Assembleia Legislativa da Região Autónoma dos Açores",
+   "name_en": "Azores Legislative Assembly elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "pt.circulo",
+     "pt.distrito",
+     "pt.cne.circulo"
+    ],
+    "fine": [
+     "pt.concelho",
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "By parish on the Ministry's site for 2024; by island circle in CNE's maps for 2000-2020.",
+   "note": "At most 57 deputies: nine island circles and, since 2008, a five-seat regional compensation circle; list PR by d'Hondt (Constitution art. 231.º).",
+   "source": "lealraa",
+   "valid_from": "1976-06-27",
+   "first_held": "1976-06-27",
+   "earliest_record": "1976-06-27",
+   "contests_per_unit": 10,
+   "est_votes": 1300000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "2024-02-04",
+     "administered_by": "Comissão Nacional de Eleições and the Região Autónoma dos Açores",
+     "source": "crp",
+     "locator": "Constituição, art. 231.º (eleita por sufrágio universal, direto e secreto, de harmonia com o princípio da representação proporcional) and the Estatuto Político-Administrativo (four-year legislature)"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1976-06-27",
+     "valid_to": "2024-02-04",
+     "month": 10,
+     "administered_by": "Comissão Nacional de Eleições and the Região Autónoma dos Açores",
+     "source": "cne_index",
+     "locator": "https://www.cne.pt/content/eleicoes-referendos (October elections every four years 1976-2020)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2024-02-04",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-06-27",
+     "finest": "pt.cne.circulo",
+     "evidence": "Official maps by island circle (and the compensation circle from 2008).",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "name_pattern": "Azores|Açores",
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-06-27",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1976",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1980-10-05",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1980",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1984-10-14",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1984",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1988-10-09",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1988",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1992-10-11",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1992",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1996-10-13",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 1996",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2000-10-15",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 2000",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2004-10-17",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma dos Açores 2004",
+     "note": "Elected by island circles before the compensation circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2008-10-19",
+     "election_kind": "general",
+     "contests": 10,
+     "source": "lealraa",
+     "quote": "No território eleitoral há nove círculos eleitorais coincidentes com cada uma das ilhas da Região ... e um círculo regional de compensação",
+     "note": "Nine island circles and the regional compensation circle (five seats); at most 57 deputies."
+    },
+    {
+     "date": "2012-10-14",
+     "election_kind": "general",
+     "contests": 10,
+     "source": "lealraa",
+     "quote": "No território eleitoral há nove círculos eleitorais coincidentes com cada uma das ilhas da Região ... e um círculo regional de compensação",
+     "note": "Nine island circles and the regional compensation circle (five seats); at most 57 deputies."
+    },
+    {
+     "date": "2016-10-16",
+     "election_kind": "general",
+     "contests": 10,
+     "source": "lealraa",
+     "quote": "No território eleitoral há nove círculos eleitorais coincidentes com cada uma das ilhas da Região ... e um círculo regional de compensação",
+     "note": "Nine island circles and the regional compensation circle (five seats); at most 57 deputies."
+    },
+    {
+     "date": "2020-10-25",
+     "election_kind": "general",
+     "contests": 10,
+     "source": "lealraa",
+     "quote": "No território eleitoral há nove círculos eleitorais coincidentes com cada uma das ilhas da Região ... e um círculo regional de compensação",
+     "note": "Nine island circles and the regional compensation circle (five seats); at most 57 deputies."
+    },
+    {
+     "date": "2024-02-04",
+     "election_kind": "general",
+     "contests": 10,
+     "source": "lealraa",
+     "quote": "No território eleitoral há nove círculos eleitorais coincidentes com cada uma das ilhas da Região ... e um círculo regional de compensação",
+     "note": "Nine island circles and the regional compensation circle (five seats); at most 57 deputies."
+    }
+   ]
+  },
+  {
+   "key": "alram",
+   "tier": "regiao_autonoma",
+   "name": "Eleição da Assembleia Legislativa da Região Autónoma da Madeira",
+   "name_en": "Madeira Legislative Assembly elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.concelho",
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "By parish on the Ministry's sites from 2007.",
+   "note": "47 deputies elected in a single regional circle since 2007 (municipal circles before), list PR by d'Hondt.",
+   "source": "lealram",
+   "valid_from": "1976-06-27",
+   "first_held": "1976-06-27",
+   "earliest_record": "1976-06-27",
+   "est_votes": 1900000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "2025-03-23",
+     "administered_by": "Comissão Nacional de Eleições and the Região Autónoma da Madeira",
+     "source": "crp",
+     "locator": "Constituição, art. 231.º and the Estatuto Político-Administrativo (four-year legislature); early elections in 2007, 2015, 2024, and 2025"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1976-06-27",
+     "valid_to": "2025-03-23",
+     "administered_by": "Comissão Nacional de Eleições and the Região Autónoma da Madeira",
+     "source": "cne_index",
+     "locator": "https://www.cne.pt/content/eleicoes-referendos (Madeira regional elections 1976-2025)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-05-06",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-06-27",
+     "finest": "pt.distrito",
+     "evidence": "Official maps of every Madeira regional election.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "name_pattern": "Madeira",
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-06-27",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1976",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1980-10-05",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1980",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1984-10-14",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1984",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1988-10-09",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1988",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1992-10-11",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1992",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "1996-10-13",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 1996",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2000-10-15",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 2000",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2004-10-17",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Eleição para a Assembleia Legislativa da Região Autónoma da Madeira 2004",
+     "note": "Elected by municipal circles before the single regional circle of 2006; circle and seat counts not yet read from the official map."
+    },
+    {
+     "date": "2007-05-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2011-10-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2015-03-29",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2019-09-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2023-09-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2024-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    },
+    {
+     "date": "2025-03-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 47,
+     "source": "lealram",
+     "quote": "A Assembleia Legislativa da Região Autónoma da Madeira é composta por 47 deputados eleitos ... por um único círculo eleitoral"
+    }
+   ]
+  },
+  {
+   "key": "referendo_regional",
+   "tier": "regiao_autonoma",
+   "name": "Referendos regionais",
+   "name_en": "Regional referendums (Azores and Madeira)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A regional legislative assembly may propose a binding regional referendum, called by the President (Constitution art. 232.º n.º 2); none has been held.",
+   "source": "crp",
+   "est_votes": 0,
+   "effort": 1,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "schemes": [
+      "pt.distrito"
+     ],
+     "iso_pattern": "PT",
+     "name_pattern": "Azores|Açores|Madeira"
+    }
+   ]
+  },
+  {
+   "key": "camara_municipal",
+   "tier": "municipio",
+   "name": "Eleição das câmaras municipais",
+   "name_en": "Municipal chamber elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "pt.concelho"
+    ],
+    "fine": [
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "By parish on the Ministry's sites from 2001 (the legacy 2001-2007 pages and the JSON sites from 2009); CNE's maps by municipality.",
+   "note": "The municipal executive, elected directly by list PR (d'Hondt); its president is the first candidate of the most-voted list (Constitution art. 239.º n.º 3), so the mayor has no separate contest.",
+   "source": "crp",
+   "valid_from": "1976-12-12",
+   "first_held": "1976-12-12",
+   "earliest_record": "1976-12-12",
+   "contests_per_unit": 1,
+   "est_votes": 75000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "month": 10,
+     "valid_from": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "leoal",
+     "locator": "Lei Orgânica n.º 1/2001, art. 15.º n.º 2 (As eleições gerais realizam-se entre os dias 22 de Setembro e 14 de Outubro) and art. 220.º (O mandato dos órgãos autárquicos é de quatro anos)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list; when a body can no longer be completed, an intercalary election is held within 60 days (art. 222.º)"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "month": 12,
+     "valid_from": "1976-01-01",
+     "valid_to": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "cne_index",
+     "locator": "https://www.cne.pt/content/eleicoes-referendos (Autárquica Gerais 12/12/1976, 16/12/1979, 12/12/1982, 15/12/1985)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-12-16",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-12-12",
+     "finest": "pt.concelho",
+     "evidence": "Official maps of every general local election; spreadsheets from 2009.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "name_pattern": "Municipal Chamber|Câmara Municipal",
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1976",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1979-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/1979",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1982-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1982",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1985-12-15",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 15/12/1985",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1989-12-17",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 17/12/1989",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1993-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1993",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1997-12-14",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 14/12/1997",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2001-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/2001",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2005-10-09",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 09/10/2005",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2009-10-11",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 11/10/2009",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2013-09-29",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2013",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão CM"
+    },
+    {
+     "date": "2017-10-01",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2017",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão CM"
+    },
+    {
+     "date": "2021-09-26",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2021",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão CM"
+    },
+    {
+     "date": "2025-10-12",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2025",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão CM"
+    }
+   ]
+  },
+  {
+   "key": "assembleia_municipal",
+   "tier": "municipio",
+   "name": "Eleição das assembleias municipais",
+   "name_en": "Municipal assembly elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "pt.concelho"
+    ],
+    "fine": [
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "By parish on the Ministry's sites from 2001.",
+   "note": "The municipal deliberative body: directly elected members by list PR, more numerous than the parish presidents who sit in it ex officio (Constitution art. 251.º).",
+   "source": "crp",
+   "valid_from": "1976-12-12",
+   "first_held": "1976-12-12",
+   "earliest_record": "1976-12-12",
+   "contests_per_unit": 1,
+   "est_votes": 75000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "month": 10,
+     "valid_from": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "leoal",
+     "locator": "Lei Orgânica n.º 1/2001, art. 15.º n.º 2 (As eleições gerais realizam-se entre os dias 22 de Setembro e 14 de Outubro) and art. 220.º (O mandato dos órgãos autárquicos é de quatro anos)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list; when a body can no longer be completed, an intercalary election is held within 60 days (art. 222.º)"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "month": 12,
+     "valid_from": "1976-01-01",
+     "valid_to": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "cne_index",
+     "locator": "https://www.cne.pt/content/eleicoes-referendos (Autárquica Gerais 12/12/1976, 16/12/1979, 12/12/1982, 15/12/1985)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-12-16",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-12-12",
+     "finest": "pt.concelho",
+     "evidence": "Official maps of every general local election; spreadsheets from 2009.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "name_pattern": "Municipal Assembly|Assembleia Municipal",
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1976",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1979-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/1979",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1982-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1982",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1985-12-15",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 15/12/1985",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1989-12-17",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 17/12/1989",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1993-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1993",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1997-12-14",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 14/12/1997",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2001-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/2001",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2005-10-09",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 09/10/2005",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2009-10-11",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 11/10/2009",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2013-09-29",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2013",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão AM"
+    },
+    {
+     "date": "2017-10-01",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2017",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão AM"
+    },
+    {
+     "date": "2021-09-26",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2021",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão AM"
+    },
+    {
+     "date": "2025-10-12",
+     "election_kind": "local",
+     "contests": 308,
+     "source": "cne_al2025",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 308 linhas com o órgão AM"
+    }
+   ]
+  },
+  {
+   "key": "assembleia_freguesia",
+   "tier": "freguesia",
+   "name": "Eleição das assembleias de freguesia",
+   "name_en": "Parish assembly elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "pt.concelho"
+    ],
+    "fine": [
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "Each parish is one contest; the Ministry's sites publish parish totals only (no polling-station figures).",
+   "note": "Every parish elects an assembly by list PR; the first candidate of the most-voted list becomes president of the parish executive (junta). Parishes of 150 voters or fewer meet as a plenário of all voters instead (Lei n.º 169/99, art. 21.º).",
+   "source": "crp",
+   "valid_from": "1976-12-12",
+   "first_held": "1976-12-12",
+   "earliest_record": "1976-12-12",
+   "contests_per_unit": 1,
+   "est_votes": 75000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "month": 10,
+     "valid_from": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "leoal",
+     "locator": "Lei Orgânica n.º 1/2001, art. 15.º n.º 2 (As eleições gerais realizam-se entre os dias 22 de Setembro e 14 de Outubro) and art. 220.º (O mandato dos órgãos autárquicos é de quatro anos)",
+     "vacancy_rule": "A vacant seat passes to the next candidate on the same list; when a body can no longer be completed, an intercalary election is held within 60 days (art. 222.º)"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "month": 12,
+     "valid_from": "1976-01-01",
+     "valid_to": "1989-01-01",
+     "administered_by": "Ministério da Administração Interna and the Comissão Nacional de Eleições",
+     "source": "cne_index",
+     "locator": "https://www.cne.pt/content/eleicoes-referendos (Autárquica Gerais 12/12/1976, 16/12/1979, 12/12/1982, 15/12/1985)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Resultados eleitorais (eleicoes.mai.gov.pt)",
+     "url": "https://www.eleicoes.mai.gov.pt/<eleição><ano>/",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-12-16",
+     "finest": "pt.freguesia",
+     "evidence": "One site per election from 1999; the sites from 2009 read static JSON files per territory and organ down to each parish and consular post; the 1999-2007 sites are static HTML pages to the parish.",
+     "source": "mai",
+     "role": "administers"
+    },
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1976-12-12",
+     "finest": "pt.freguesia",
+     "evidence": "Official maps of every general local election, with each parish assembly; spreadsheets from 2009.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "name_pattern": "Parish Assembly|Assembleia de Freguesia",
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1976-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1976",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1979-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/1979",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1982-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1982",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1985-12-15",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 15/12/1985",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1989-12-17",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 17/12/1989",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1993-12-12",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 12/12/1993",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "1997-12-14",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 14/12/1997",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2001-12-16",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 16/12/2001",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2005-10-09",
+     "election_kind": "local",
+     "source": "cne_index",
+     "quote": "Autárquica Gerais 09/10/2005",
+     "note": "Municipalities and parishes not yet counted from the official map."
+    },
+    {
+     "date": "2009-10-11",
+     "election_kind": "local",
+     "contests": 4259,
+     "source": "cne_al2009",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 4259 linhas com o órgão AF"
+    },
+    {
+     "date": "2013-09-29",
+     "election_kind": "local",
+     "contests": 3091,
+     "source": "cne_al2013",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 3091 linhas com o órgão AF",
+     "note": "Every parish assembly in the official map; Corvo has no parish (municipality with no freguesia), and parishes of 150 voters or fewer meet as a plenário instead of electing an assembly."
+    },
+    {
+     "date": "2017-10-01",
+     "election_kind": "local",
+     "contests": 3091,
+     "source": "cne_al2017",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 3091 linhas com o órgão AF",
+     "note": "Every parish assembly in the official map; Corvo has no parish (municipality with no freguesia), and parishes of 150 voters or fewer meet as a plenário instead of electing an assembly."
+    },
+    {
+     "date": "2021-09-26",
+     "election_kind": "local",
+     "contests": 3091,
+     "source": "cne_al2021",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 3091 linhas com o órgão AF",
+     "note": "Every parish assembly in the official map; Corvo has no parish (municipality with no freguesia), and parishes of 150 voters or fewer meet as a plenário instead of electing an assembly."
+    },
+    {
+     "date": "2025-10-12",
+     "election_kind": "local",
+     "contests": 3259,
+     "source": "cne_al2025",
+     "quote": "I - RESULTADOS DA VOTAÇÃO: 3259 linhas com o órgão AF",
+     "note": "Every parish assembly in the official map; Corvo has no parish (municipality with no freguesia), and parishes of 150 voters or fewer meet as a plenário instead of electing an assembly."
+    }
+   ]
+  },
+  {
+   "key": "intercalares",
+   "tier": "freguesia",
+   "name": "Eleições autárquicas intercalares",
+   "name_en": "Intercalary local elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "CNE publishes each intercalary election's official map; the Ministry's sites carry only the 2007 Lisbon chamber by-election.",
+   "note": "Held within 60 days when a municipal chamber, municipal assembly, or parish assembly can no longer be completed or is dissolved; the body serves out the remaining term (Lei Orgânica n.º 1/2001, arts. 220.º and 222.º). CNE lists 562 such acts from 1978 to 2027, mostly parish assemblies (538), with 23 chambers and one municipal assembly.",
+   "source": "leoal",
+   "first_held": "1978-01-01",
+   "earliest_record": "1978-01-01",
+   "est_votes": 1500000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1978-04-02",
+     "finest": "pt.freguesia",
+     "evidence": "One page and official map per intercalary election.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "name_pattern": "Municipal Chamber|Câmara Municipal|Municipal Assembly|Assembleia Municipal|Parish Assembly|Assembleia de Freguesia",
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1978-01-01",
+     "election_kind": "by_election",
+     "contests": 11,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 11 atos com data de 1978",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1979-01-01",
+     "election_kind": "by_election",
+     "contests": 25,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 25 atos com data de 1979",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1980-01-01",
+     "election_kind": "by_election",
+     "contests": 17,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 17 atos com data de 1980",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1981-01-01",
+     "election_kind": "by_election",
+     "contests": 66,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 66 atos com data de 1981",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1982-01-01",
+     "election_kind": "by_election",
+     "contests": 23,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 23 atos com data de 1982",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1983-01-01",
+     "election_kind": "by_election",
+     "contests": 17,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 17 atos com data de 1983",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1984-01-01",
+     "election_kind": "by_election",
+     "contests": 36,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 36 atos com data de 1984",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1985-01-01",
+     "election_kind": "by_election",
+     "contests": 16,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 16 atos com data de 1985",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1986-01-01",
+     "election_kind": "by_election",
+     "contests": 51,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 51 atos com data de 1986",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1987-01-01",
+     "election_kind": "by_election",
+     "contests": 35,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 35 atos com data de 1987",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1988-01-01",
+     "election_kind": "by_election",
+     "contests": 68,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 68 atos com data de 1988",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1989-01-01",
+     "election_kind": "by_election",
+     "contests": 6,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 6 atos com data de 1989",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1990-01-01",
+     "election_kind": "by_election",
+     "contests": 13,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 13 atos com data de 1990",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1991-01-01",
+     "election_kind": "by_election",
+     "contests": 8,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 8 atos com data de 1991",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1992-01-01",
+     "election_kind": "by_election",
+     "contests": 12,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 12 atos com data de 1992",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1993-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 1993",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1994-01-01",
+     "election_kind": "by_election",
+     "contests": 5,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 5 atos com data de 1994",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1995-01-01",
+     "election_kind": "by_election",
+     "contests": 2,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 2 atos com data de 1995",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1996-01-01",
+     "election_kind": "by_election",
+     "contests": 8,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 8 atos com data de 1996",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1997-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 1997",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1998-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 1998",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "1999-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 1999",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2000-01-01",
+     "election_kind": "by_election",
+     "contests": 9,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 9 atos com data de 2000",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2002-01-01",
+     "election_kind": "by_election",
+     "contests": 20,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 20 atos com data de 2002",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2003-01-01",
+     "election_kind": "by_election",
+     "contests": 7,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 7 atos com data de 2003",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2004-01-01",
+     "election_kind": "by_election",
+     "contests": 8,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 8 atos com data de 2004",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2006-01-01",
+     "election_kind": "by_election",
+     "contests": 9,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 9 atos com data de 2006",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2007-01-01",
+     "election_kind": "by_election",
+     "contests": 9,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 9 atos com data de 2007",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2008-01-01",
+     "election_kind": "by_election",
+     "contests": 7,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 7 atos com data de 2008",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2009-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 2009",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2010-01-01",
+     "election_kind": "by_election",
+     "contests": 9,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 9 atos com data de 2010",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2011-01-01",
+     "election_kind": "by_election",
+     "contests": 6,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 6 atos com data de 2011",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2013-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 2013",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2014-01-01",
+     "election_kind": "by_election",
+     "contests": 8,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 8 atos com data de 2014",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2015-01-01",
+     "election_kind": "by_election",
+     "contests": 4,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 4 atos com data de 2015",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2016-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 2016",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2017-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 2017",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2018-01-01",
+     "election_kind": "by_election",
+     "contests": 5,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 5 atos com data de 2018",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2019-01-01",
+     "election_kind": "by_election",
+     "contests": 6,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 6 atos com data de 2019",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2020-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 2020",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2022-01-01",
+     "election_kind": "by_election",
+     "contests": 9,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 9 atos com data de 2022",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2023-01-01",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 3 atos com data de 2023",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2024-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 2024",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2026-01-01",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Eleição Autárquica Intercalar: 1 atos com data de 2026",
+     "note": "Intercalary elections of single municipal chambers (C.M.), municipal assemblies (A.M.), and parish assemblies (A.F.), as CNE lists them.",
+     "precision": "year"
+    },
+    {
+     "date": "2027-01-10",
+     "election_kind": "by_election",
+     "contests": 3,
+     "source": "cne_index",
+     "quote": "10/01/2027 A.F. de Ferreira do Alentejo ... A.F. de Paçô ... A.F. de Rapoula do Côa",
+     "note": "Scheduled: three parish assemblies."
+    },
+    {
+     "date": "2021-12-12",
+     "election_kind": "by_election",
+     "source": "cne_index",
+     "quote": "Novos atos eleitorais (Gerais) 12/12/2021 | Mapa Oficial n.º 1-D/2021, de 20 de dezembro",
+     "note": "Repeated votes after the 2021 general local elections (also 26 December 2021 and 9 January 2022); bodies not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "referendo_local",
+   "tier": "municipio",
+   "name": "Referendos locais",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "pt.freguesia"
+    ]
+   },
+   "finest_note": "CNE publishes each local referendum's official map or the general count's minutes.",
+   "note": "Municipalities and parishes may put matters within their bodies' powers to their voters (Constitution art. 240.º, Lei Orgânica n.º 4/2000). CNE lists 11 held from 1999 to 2023 (Vizela's 2020 vote was cancelled).",
+   "source": "crp",
+   "first_held": "1999-04-25",
+   "earliest_record": "1999-04-25",
+   "est_votes": 200000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-04-25",
+     "finest": "pt.freguesia",
+     "evidence": "Official map or general-count minutes for each local referendum.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "schemes": [
+      "pt.concelho",
+      "pt.freguesia"
+     ],
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-04-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local 1999 (Assembleia de Freguesia de Serreleis)"
+    },
+    {
+     "date": "1999-06-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local 1999 (Assembleia Municipal de Tavira)"
+    },
+    {
+     "date": "2009-01-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local 2009 (Presidente da Assembleia Municipal de Viana do Castelo)"
+    },
+    {
+     "date": "2011-12-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local de 18 de dezembro de 2011 (Presidente da Assembleia Municipal do Cartaxo)"
+    },
+    {
+     "date": "2012-09-16",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local de 16 de Setembro de 2012 (Presidente da Assembleia de Freguesia de Milheirós de Poiares)"
+    },
+    {
+     "date": "2020-09-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local no município de Chaves 2020"
+    },
+    {
+     "date": "2022-08-15",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local na Freguesia de Barroselas e Carvoeiro (Viana do Castelo)"
+    },
+    {
+     "date": "2023-01-08",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local no município de Vizela 2023"
+    },
+    {
+     "date": "2023-01-29",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local na freguesia de Sacavém e Prior Velho (Loures)"
+    },
+    {
+     "date": "2023-02-12",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo Local na freguesia de Benfica (Lisboa)"
+    },
+    {
+     "date": "2023-08-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cne_index",
+     "quote": "Referendo local na Freguesia de Mazedo e Cortes (Monção)"
+    }
+   ]
+  },
+  {
+   "key": "conselho_comunidades",
+   "tier": "national",
+   "name": "Eleição do Conselho das Comunidades Portuguesas",
+   "name_en": "Council of Portuguese Communities elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Results by consular circle on CNE's pages.",
+   "note": "Up to 90 members elected for four years by Portuguese citizens resident abroad, by circles matching consular areas, list PR (d'Hondt) (Lei n.º 66-A/2007, arts. 2.º, 7.º, and 10.º).",
+   "source": "ccp_lei",
+   "valid_from": "1997-04-27",
+   "first_held": "1997-04-27",
+   "earliest_record": "1997-04-27",
+   "est_votes": 200000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Ministério dos Negócios Estrangeiros (consular posts)",
+     "source": "ccp_lei",
+     "locator": "Lei n.º 66-A/2007, art. 7.º n.º 2 (Os membros são eleitos para mandatos de quatro anos, por sufrágio universal, direto, secreto)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comissão Nacional de Eleições: mapas oficiais (cne.pt)",
+     "url": "https://www.cne.pt/content/eleicoes-referendos-resultados-oficiais",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1997-04-27",
+     "evidence": "Official results and elected councillors for 1997, 2003, 2008, 2015, and 2023.",
+     "source": "cne_maps"
+    }
+   ],
+   "match": [
+    {
+     "name_pattern": "Comunidades Portuguesas|Portuguese Communities",
+     "iso_pattern": "PT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-04-27",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Conselho das Comunidades Portuguesas 27/04/1997"
+    },
+    {
+     "date": "2003-03-30",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Conselho das Comunidades Portuguesas 30/03/2003"
+    },
+    {
+     "date": "2008-04-20",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Conselho das Comunidades Portuguesas 20/04/2008"
+    },
+    {
+     "date": "2015-09-06",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Conselho das Comunidades Portuguesas 06/09/2015"
+    },
+    {
+     "date": "2023-11-26",
+     "election_kind": "general",
+     "source": "cne_index",
+     "quote": "Conselho das Comunidades Portuguesas 26/11/2023"
+    }
+   ]
+  },
+  {
+   "key": "cortes_monarquia",
+   "tier": "national",
+   "name": "Eleições para as Cortes e a Câmara dos Deputados (1820-1910)",
+   "name_en": "Cortes and Chamber of Deputies elections (1820-1910)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "From the indirect election of the constituent Cortes in December 1820 (parish, comarca, and province juntas, after the Cádiz system) through the census-suffrage Chambers of Deputies of the constitutional monarchy; the Chamber of Peers was appointed or hereditary.",
+   "source": "ar_monarquia",
+   "valid_from": "1820-12-01",
+   "valid_to": "1910-10-05",
+   "first_held": "1820-12-25",
+   "est_votes": 3000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house",
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PT",
+     "valid_to": "1910-10-05"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1820-12-25",
+     "election_kind": "general",
+     "source": "ar_monarquia",
+     "quote": "Todo este intrincado processo eleitoral das primeiras eleições portuguesas ficou concluído no dia de Natal de 1820",
+     "note": "Indirect election of the Cortes Gerais, Extraordinárias e Constituintes."
+    },
+    {
+     "date": "1822-01-01",
+     "through": "1910-08-28",
+     "election_kind": "general",
+     "note": "Elections to the Cortes and the Chamber of Deputies under the 1822 Constitution, the 1826 Charter, and the 1838 Constitution; not yet counted from the Assembly's historical records."
+    }
+   ]
+  },
+  {
+   "key": "constituinte_1911",
+   "tier": "national",
+   "name": "Assembleia Nacional Constituinte (1911)",
+   "name_en": "National Constituent Assembly (1911)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected in May 1911 by literate men and heads of family over 21, with d'Hondt PR in Lisbon and Porto; it adopted the 1911 Constitution and split into the Chamber of Deputies and the Senate until 1915.",
+   "source": "ar_republica",
+   "valid_from": "1911-05-28",
+   "valid_to": "1915-06-13",
+   "first_held": "1911-05-28",
+   "est_votes": 250000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1911-01-01",
+     "valid_to": "1912-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1911-05-28",
+     "election_kind": "general",
+     "source": "ar_republica",
+     "quote": "A Assembleia Nacional Constituinte foi eleita num sufrágio em que só houve eleições em cerca de metade dos círculos eleitorais",
+     "note": "Unopposed circles proclaimed their candidates elected without a vote.",
+     "precision": "month"
+    }
+   ]
+  },
+  {
+   "key": "congresso_republica",
+   "tier": "national",
+   "name": "Eleições para o Congresso da República (1915-1925)",
+   "name_en": "Congress of the Republic elections (1915-1925)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Direct elections of the Chamber of Deputies and the Senate under the 1911 Constitution, from 1915 until the 1926 coup; the 1918 elections followed Sidónio Pais's decree.",
+   "source": "ar_republica",
+   "valid_from": "1915-06-13",
+   "valid_to": "1926-05-28",
+   "first_held": "1915-06-13",
+   "est_votes": 1500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1912-01-01",
+     "valid_to": "1926-05-28"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1915-01-01",
+     "through": "1925-12-31",
+     "election_kind": "general",
+     "precision": "year",
+     "note": "Congress elections of 1915, 1918, 1919, 1921, 1922, and 1925; not yet counted from the Assembly's historical records."
+    }
+   ]
+  },
+  {
+   "key": "assembleia_nacional",
+   "tier": "national",
+   "name": "Eleições para a Assembleia Nacional (1934-1973)",
+   "name_en": "National Assembly elections (1934-1973)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Estado Novo single-chamber assembly, first elected in 1934 by direct suffrage of citizens over 21 with literacy or tax qualifications; list voting by district, opposition lists withdrew or were barred in most years.",
+   "source": "ar_estadonovo",
+   "valid_from": "1934-12-16",
+   "valid_to": "1974-04-25",
+   "first_held": "1934-12-16",
+   "est_votes": 12000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1934-01-01",
+     "valid_to": "1974-04-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1934-01-01",
+     "election_kind": "general",
+     "source": "ar_estadonovo",
+     "quote": "A primeira Assembleia Nacional foi eleita em 1934 por sufrágio direto dos cidadãos maiores de 21 anos ou emancipados",
+     "precision": "year"
+    },
+    {
+     "date": "1938-01-01",
+     "through": "1973-12-31",
+     "election_kind": "general",
+     "precision": "year",
+     "note": "Elections of 1938, 1942, 1945, 1949, 1953, 1957, 1961, 1965, 1969, and 1973; not yet counted from the Assembly's records."
+    }
+   ]
+  },
+  {
+   "key": "plebiscito_1933",
+   "tier": "national",
+   "name": "Plebiscito constitucional de 1933",
+   "name_en": "1933 constitutional plebiscite",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The 1933 Constitution was approved by plebiscite; abstentions and blank ballots counted as votes in favor.",
+   "source": "ar_estadonovo",
+   "valid_from": "1933-01-01",
+   "valid_to": "1933-12-31",
+   "first_held": "1933-03-19",
+   "est_votes": 1300000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1933-01-01",
+     "valid_to": "1934-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1933-01-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ar_estadonovo",
+     "quote": "a Constituição de 1933 foi plebiscitada ... Esta foi a única Constituição a ser aprovada por sufrágio referendário",
+     "precision": "year"
+    }
+   ]
+  },
+  {
+   "key": "presidente_historico",
+   "tier": "national",
+   "name": "Eleições presidenciais diretas (1918-1958)",
+   "name_en": "Direct presidential elections (1918-1958)",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Sidónio Pais's direct election of April 1918, and the Estado Novo's direct elections of 1928, 1935, 1942, 1949 (no contest after the opposition withdrew), 1951, and 1958 for a seven-year term; the 1959 revision moved the election to an electoral college.",
+   "source": "museu_pr",
+   "valid_from": "1918-04-28",
+   "valid_to": "1959-08-29",
+   "first_held": "1918-04-28",
+   "est_votes": 6000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PT",
+     "valid_from": "1918-01-01",
+     "valid_to": "1959-08-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1918-01-01",
+     "through": "1958-12-31",
+     "election_kind": "general",
+     "precision": "year",
+     "note": "Direct presidential elections of 1918, 1928, 1935, 1942, 1949, 1951, and 1958; not yet counted from an official list."
+    }
+   ]
+  },
+  {
+   "key": "presidente_indireto",
+   "tier": "national",
+   "name": "Eleição indireta do Presidente da República (1911-1925, 1965-1972)",
+   "name_en": "Indirect presidential elections (1911-1925, 1965-1972)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "museu_pr",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Under the 1911 Constitution the Congress elected the President (Bernardino Machado was elected in 1915 and 1925), and after the 1959 revision an electoral college of legislators and local delegates did (1965, 1972); voters had no ballot.",
+   "valid_from": "1911-08-24",
+   "valid_to": "1974-04-25"
+  },
+  {
+   "key": "camara_corporativa",
+   "tier": "national",
+   "name": "Câmara Corporativa (1935-1974)",
+   "name_en": "Corporative Chamber (1935-1974)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "ar_estadonovo",
+   "disposition": "out_of_scope",
+   "disposition_reason": "A consultative chamber of corporative, local, and cultural representatives designated by their bodies, not elected by voters.",
+   "valid_from": "1935-01-11",
+   "valid_to": "1974-04-25"
+  },
+  {
+   "key": "senado_1911",
+   "tier": "national",
+   "name": "Senado eleito pela Constituinte (1911)",
+   "name_en": "Senate chosen by the Constituent Assembly (1911)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "ar_republica",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The 71 senators of 1911 were elected by and from the constituent deputies; no popular vote.",
+   "valid_from": "1911-08-24",
+   "valid_to": "1915-06-13"
+  },
+  {
+   "key": "governo",
+   "tier": "national",
+   "name": "Governo e Primeiro-Ministro",
+   "name_en": "Government and Prime Minister",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Prime Minister is appointed by the President in light of the election results; there is no direct election."
+  },
+  {
+   "key": "governo_regional",
+   "tier": "regiao_autonoma",
+   "name": "Governo Regional e Representante da República",
+   "name_en": "Regional Government and Representative of the Republic",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The regional president is appointed by the Representative of the Republic in light of the election results, and the Representative by the President (Constitution art. 231.º)."
+  },
+  {
+   "key": "presidente_camara",
+   "tier": "municipio",
+   "name": "Presidente da câmara municipal",
+   "name_en": "Mayors (presidente da câmara)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The mayor is the first candidate of the most-voted list for the municipal chamber (Constitution art. 239.º n.º 3); the camara_municipal class holds that contest."
+  },
+  {
+   "key": "junta_freguesia",
+   "tier": "freguesia",
+   "name": "Junta de freguesia",
+   "name_en": "Parish executives (junta de freguesia)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "lei169",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The junta's president is the head of the most-voted list for the parish assembly and its members are chosen by the assembly (Lei n.º 169/99); the assembleia_freguesia class holds the vote."
+  },
+  {
+   "key": "plenario_cidadaos",
+   "tier": "freguesia",
+   "name": "Plenário de cidadãos eleitores",
+   "name_en": "Parish plenary of voters",
+   "category": "direct_democracy",
+   "goal": "local",
+   "measure": {},
+   "source": "lei169",
+   "disposition": "out_of_scope",
+   "disposition_reason": "In parishes of 150 voters or fewer the assembly is replaced by a plenary meeting of all voters (Lei n.º 169/99, art. 21.º), which elects the junta's president by a show of hands or open vote; there is no ballot or published result."
+  },
+  {
+   "key": "assembleia_distrital",
+   "tier": "distrito",
+   "name": "Assembleias distritais",
+   "name_en": "District assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "District assemblies are composed of municipal representatives (Constitution art. 291.º n.º 2), not elected by voters."
+  },
+  {
+   "key": "entidades_intermunicipais",
+   "tier": "municipio",
+   "name": "Áreas metropolitanas e comunidades intermunicipais",
+   "name_en": "Metropolitan areas and intermunicipal communities",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "rjal",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Their councils are formed by the member municipalities' chamber presidents and assemblies (Lei n.º 75/2013); no direct election."
+  },
+  {
+   "key": "regioes_administrativas",
+   "tier": "national",
+   "name": "Regiões administrativas",
+   "name_en": "Administrative regions",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Constitution provides elected regional assemblies (arts. 255.º-262.º), but the regions were rejected in the 8 November 1998 referendum and have never been instituted."
+  },
+  {
+   "key": "juizes",
+   "tier": "national",
+   "name": "Magistrados e juízes do Tribunal Constitucional",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are career magistrates; ten of the thirteen Constitutional Court judges are chosen by the Assembly of the Republic and three co-opted. Voters elect none."
+  },
+  {
+   "key": "selecao_candidatos",
+   "tier": "national",
+   "name": "Escolha de candidatos pelos partidos",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "lear",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose their lists under their own statutes; the state runs no primary and publishes no nominating vote."
+  },
+  {
+   "key": "macau",
+   "tier": "national",
+   "name": "Assembleia Legislativa de Macau (1976-1999)",
+   "name_en": "Macau Legislative Assembly (1976-1999)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "lear",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Macau's elections under Portuguese administration belong to Macau's own census (MO in the world tier); Portugal's own voters in Macau voted in the Fora da Europa circle (Lei n.º 14/79, art. 12.º n.º 4).",
+   "valid_from": "1976-01-01",
+   "valid_to": "1999-12-20"
+  },
+  {
+   "key": "conselhos_ultramarinos",
+   "tier": "national",
+   "name": "Conselhos legislativos e eleições ultramarinas",
+   "name_en": "Colonial legislative councils",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "ar_estadonovo",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections held in the former overseas provinces (Angola, Mozambique, Cape Verde, Guinea, São Tomé, Goa, Timor) belong to those countries' own censuses.",
+   "valid_to": "1975-11-11"
+  },
+  {
+   "key": "estruturas_representativas",
+   "tier": "national",
+   "name": "Comissões de trabalhadores, ordens profissionais e outras eleições internas",
+   "name_en": "Workers' committees, professional orders, and other internal elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "crp",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held inside workplaces, unions, and professional orders under their own statutes; the state publishes no results."
+  },
+  {
+   "key": "camaras_historicas",
+   "tier": "municipio",
+   "name": "Eleições municipais e paroquiais (1822-1974)",
+   "name_en": "Municipal and parish elections before 1976",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "ar_monarquia",
+   "valid_to": "1974-04-25",
+   "disposition": "blocked",
+   "disposition_reason": "Municipal councils were elected under the monarchy and the First Republic (the Estado Novo appointed mayors and elected councils by corporative suffrage), but no official register lists these elections or their results; they sit in municipal minutes and the regional press."
+  }
+ ]
+}
