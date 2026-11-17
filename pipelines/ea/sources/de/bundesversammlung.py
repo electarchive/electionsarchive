@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from datetime import date
@@ -10,13 +11,14 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.licenses import UNLICENSED
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "de.bundesversammlung"
-VERSION = "1"
+VERSION = "2"
 URL = "https://www.btg-bestellservice.de/pdf/20205000.pdf"
 TITLE = "Stichwort: Die Bundesversammlung. Die Wahl der Bundespräsidentin oder des Bundespräsidenten"
 PUBLISHER = "Deutscher Bundestag"
+PARSED = DATA / "parsed" / SOURCE / "conventions.json"
 MONTHS = {
     "Januar": 1,
     "Februar": 2,
@@ -92,6 +94,75 @@ NOTE = (
     "table and its summary line. Each ballot's candidate votes, abstentions, and invalid votes were checked against the "
     "ballots cast it prints."
 )
+PEOPLE = {
+    "Albrecht Glaser": "Q20645389",
+    "Alexander Hold": "Q2642282",
+    "Alfred Loritz": "Q101543",
+    "Alfred Weber": "Q76514",
+    "Annemarie Renger": "Q66138",
+    "Beate Klarsfeld": "Q65113",
+    "Carlo Schmid": "Q67511",
+    "Christian Wulff": "Q2540",
+    "Christoph Butterwegge": "Q1084664",
+    "Dagmar Schipanski": "Q215379",
+    "Engelbert Sonneborn": "Q28736609",
+    "Ernst-August von Hannover": "Q61079",
+    "Ewald Bucher": "Q71345",
+    "Frank Rennicke": "Q72436",
+    "Frank-Walter Steinmeier": "Q76658",
+    "Franz-Josef Wuermeling": "Q280029",
+    "Gerhard Schröder": "Q60781",
+    "Gerhard Trabert": "Q19283912",
+    "Gesine Schwan": "Q215888",
+    "Gustav Heinemann": "Q2573",
+    "Hans Hirzel": "Q100809",
+    "Hans Schlange-Schöningen": "Q216242",
+    "Heinrich Lübke": "Q2582",
+    "Hildegard Hamm-Brücher": "Q215201",
+    "Horst Köhler": "Q2542",
+    "Jens Reich": "Q91307",
+    "Joachim Gauck": "Q2538",
+    "Johannes Rau": "Q2551",
+    "Josef Müller": "Q73204",
+    "Karl Arnold": "Q75808",
+    "Karl Carstens": "Q2569",
+    "Karl Dönitz": "Q76437",
+    "Konrad Adenauer": "Q2492",
+    "Kurt Schumacher": "Q57465",
+    "Louis Ferdinand von Hohenzollern": "Q311442",
+    "Luise Rinser": "Q69178",
+    "Lukrezia Jochimsen": "Q85796",
+    "Marie-Elisabeth Lüders": "Q70950",
+    "Max Becker": "Q126964",
+    "Max Otte": "Q72817",
+    "Olaf Rose": "Q77847",
+    "Peter Sodann": "Q95929",
+    "Richard von Weizsäcker": "Q2567",
+    "Roman Herzog": "Q2563",
+    "Rudolf Amelunxen": "Q71363",
+    "Stefanie Gebauer": "Q110812930",
+    "Theodor Heuss": "Q2594",
+    "Uta Ranke-Heinemann": "Q63834",
+    "Walter Scheel": "Q2571",
+}
+PARTIES = {
+    "AfD": "Q6721203",
+    "BÜNDNIS 90 / DIE GRÜNEN": "Q49766",
+    "CDU": "Q49762",
+    "CSU": "Q49763",
+    "DIE LINKE.": "Q49764",
+    "DP": "Q674695",
+    "DVU": "Q505829",
+    "Die Grünen": "Q49766",
+    "FDP": "Q13124",
+    "Freie Wähler": "Q327389",
+    "KPD": "Q153401",
+    "NPD": "Q156019",
+    "PDS": "Q152554",
+    "Piraten": "Q13129",
+    "REP": "Q269316",
+    "SPD": "Q49768",
+}
 LINE = re.compile(r"(\S.*?)\s{2,}(?:(.*?)\s{2,})?([\d.]+)\s+(\d+,\d+)\s*$")
 GAUCK = re.compile(r"(Joachim Gauck) (.*?)\s{2,}([\d.]+)\s+(\d+,\d+)\s*$")
 NEXT = re.compile(r"Mitglieder;|^Enthaltungen|^ungültige|^abgegebene|^nicht abgegebene|Nein-Stimmen")
@@ -111,7 +182,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".pdf")
 
 
-def parse() -> list[dict[str, Any]]:
+def parse() -> None:
     path = raw.cached(SOURCE, URL).path
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
     lines = [line.lstrip("\f").replace(" ", " ") for line in text.split("\n")]
@@ -143,7 +214,8 @@ def parse() -> list[dict[str, Any]]:
         if not ballot["tail"]:
             row = GAUCK.match(line) or (LINE.match(line) if "Mitglieder" not in line else None)
             if row:
-                ballot["candidates"].append((re.sub(r"\s*\(.*\)$", "", row[1]).strip(), number(row[3])))
+                proposers = [part.strip() for part in (row[2] or "").split(",") if part.strip()]
+                ballot["candidates"].append((re.sub(r"\s*\(.*\)$", "", row[1]).strip(), number(row[3]), proposers))
                 continue
         if NEXT.search(line.strip()) or (ballot["tail"] and re.match(r"\s*(ungültige|abgegebene|Enthaltungen)", line)):
             ballot["tail"] += " " + line.strip()
@@ -163,21 +235,25 @@ def parse() -> list[dict[str, Any]]:
         raise ValueError(f"expected 17 conventions, found {len(out)}")
     for election in out:
         for index, ballot in enumerate(election["ballots"], 1):
-            counted = sum(votes for _, votes in ballot["candidates"])
+            counted = sum(votes for _, votes, _ in ballot["candidates"])
             total = counted + sum(ballot[k] or 0 for k in ("abstentions", "invalid", "no"))
             if total != ballot["cast"] and (election["number"], index) not in CAVEATS:
                 raise ValueError(f"convention {election['number']} ballot {index}: {total} against {ballot['cast']}")
-    return out
+    PARSED.parent.mkdir(parents=True, exist_ok=True)
+    PARSED.write_text(json.dumps(out, default=str, ensure_ascii=False, indent=1))
 
 
 def emit() -> Path:
-    conventions = parse()
+    conventions = json.loads(PARSED.read_text())
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Federal Conventions electing the Federal President of Germany, 1949–2022, with every ballot",
+            summary=(
+                "Federal Conventions electing the Federal President of Germany, 1949–2022, with every ballot, the parties "
+                "that proposed each candidate, and each candidate's Wikidata item"
+            ),
             polity="DE",
         )
 
@@ -230,6 +306,15 @@ def emit() -> Path:
         name(system, "Election of the Federal President by the Federal Convention")
         cs.add("note", entity_id=system, kind="methodology", body_md=METHODOLOGY)
 
+        held = dict(
+            conn.execute(
+                """select x.value, c.pipeline from external_id x join changeset c on c.id = x.changeset_id
+                   where x.scheme = 'wikidata' and x.value = any(%s)""",
+                [[*PEOPLE.values(), *PARTIES.values()]],
+            ).fetchall()
+        )
+        if missing := {label for label, item in PARTIES.items() if item not in held}:
+            raise ValueError(f"no party holds the Wikidata item of {sorted(missing)}")
         persons: dict[str, UUID] = {}
 
         def person(full: str) -> UUID:
@@ -238,12 +323,18 @@ def emit() -> Path:
                 if persons[full] in cs.minted:
                     cs.add("person", id=persons[full])
                     name(persons[full], full, "de")
+                item = PEOPLE[full]
+                if held.get(item, SOURCE) == SOURCE:
+                    cs.add("external_id", entity_id=persons[full], scheme="wikidata", value=item)
+                else:
+                    cs.merge(persons[full], cs.key("wikidata", item))
+                    persons[full] = cs.survivors.get(persons[full], persons[full])
             return persons[full]
 
         values = []
         for convention in conventions:
             no = convention["number"]
-            day = convention["date"]
+            day = date.fromisoformat(convention["date"])
             election = cs.key("de.election", f"{day}:bundespraesident")
             cs.add(
                 "election",
@@ -316,15 +407,13 @@ def emit() -> Path:
                     )
 
                 won = None
-                for candidate, votes in ballot["candidates"]:
+                for candidate, votes, proposers in ballot["candidates"]:
                     option = cs.key("de.option", f"{key}:{slug(candidate)}")
                     cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=candidate)
-                    cs.add(
-                        "candidacy",
-                        id=cs.key("de.candidacy", f"{key}:{slug(candidate)}"),
-                        person_id=person(candidate),
-                        option_id=option,
-                    )
+                    candidacy = cs.key("de.candidacy", f"{key}:{slug(candidate)}")
+                    cs.add("candidacy", id=candidacy, person_id=person(candidate), option_id=option)
+                    for party in dict.fromkeys(cs.key("wikidata", PARTIES[label]) for label in proposers):
+                        cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party, kind="nominated")
                     value(VOTES, option, votes)
                     if candidate == WINNERS[no]:
                         won = option
