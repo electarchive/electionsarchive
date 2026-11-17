@@ -37,6 +37,7 @@ PS = {
     1996: ("ps1996", date(1996, 5, 31), date(1996, 6, 1)),
     1998: ("ps1998", date(1998, 6, 19), date(1998, 6, 20)),
 }
+PAGES = {1990: "cnr1990", 1992: "cnr1992", 1996: "ps1996", 1998: "ps1998"}
 STATIC = ("u1", "u3", "u4", "u5", "u52", "u53", "u6", "u64", "u65", "u66", "u67", "u68", "u69", "u610")
 VOTES, PREFERENCE = 1, 7
 ACCOUNTING = ((2, 3), (14, 4), (3, 6), (4, 7))
@@ -79,7 +80,7 @@ WORKERS = 12
 
 def link(year: int, name: str, **query: object) -> str:
     tail = "&".join(f"{k}={v}" for k, v in query.items())
-    return f"{BASE}/pls/ps{year}/{name}" + (f"?{tail}" if tail else "")
+    return f"{BASE}/pls/{PAGES[year]}/{name}" + (f"?{tail}" if tail else "")
 
 
 def read(year: int, name: str, **query: object) -> str:
@@ -102,37 +103,42 @@ def whole(text: str) -> int:
 
 def fetch() -> None:
     for year in PS:
-        for name in STATIC:
-            raw.fetch(SOURCE, link(year, name), suffix=".html")
-        tree = read(year, "u53")
-        okresy = sorted(set(re.findall(r"u5312\?xkraj=(\d+)&xokres=(\d+)", tree)), key=lambda p: (int(p[0]), int(p[1])))
-        raw.fetch_many(
-            SOURCE,
-            [link(year, "u5312", xkraj=k, xokres=o) for k, o in okresy]
-            + [link(year, "u5311", xkraj=k, xokres=o) for k, o in okresy],
-            suffix=".html",
-            workers=WORKERS,
-        )
-        obce = obec_list(year)
-        raw.fetch_many(
-            SOURCE,
-            [link(year, "u53111", xkraj=k, xokres=o, xobec=c) for k, o, c in obce],
-            suffix=".html",
-            workers=WORKERS,
-        )
-        raw.fetch_many(
-            SOURCE,
-            [link(year, "u531111", xkraj=k, xokres=o, xobec=c, xokrsek=n) for k, o, c, n in okrsek_list(year)],
-            suffix=".html",
-            workers=WORKERS,
-        )
-        raw.fetch(SOURCE, link(year, "u32", xpl=0, xtr=2), suffix=".html")
-        raw.fetch_many(
-            SOURCE,
-            [link(year, "u321", xpl=0, xtr=2, xvstrana=v, xkraj=k) for v, k in list_pages(year)],
-            suffix=".html",
-            workers=WORKERS,
-        )
+        fetch_year(year)
+
+
+def fetch_year(year: int) -> None:
+    """Every results page of one election, which the packages cite."""
+    for name in STATIC:
+        raw.fetch(SOURCE, link(year, name), suffix=".html")
+    tree = read(year, "u53")
+    okresy = sorted(set(re.findall(r"u5312\?xkraj=(\d+)&xokres=(\d+)", tree)), key=lambda p: (int(p[0]), int(p[1])))
+    raw.fetch_many(
+        SOURCE,
+        [link(year, "u5312", xkraj=k, xokres=o) for k, o in okresy]
+        + [link(year, "u5311", xkraj=k, xokres=o) for k, o in okresy],
+        suffix=".html",
+        workers=WORKERS,
+    )
+    obce = obec_list(year)
+    raw.fetch_many(
+        SOURCE,
+        [link(year, "u53111", xkraj=k, xokres=o, xobec=c) for k, o, c in obce],
+        suffix=".html",
+        workers=WORKERS,
+    )
+    raw.fetch_many(
+        SOURCE,
+        [link(year, "u531111", xkraj=k, xokres=o, xobec=c, xokrsek=n) for k, o, c, n in okrsek_list(year)],
+        suffix=".html",
+        workers=WORKERS,
+    )
+    raw.fetch(SOURCE, link(year, "u32", xpl=0, xtr=2), suffix=".html")
+    raw.fetch_many(
+        SOURCE,
+        [link(year, "u321", xpl=0, xtr=2, xvstrana=v, xkraj=k) for v, k in list_pages(year)],
+        suffix=".html",
+        workers=WORKERS,
+    )
 
 
 def okres_list(year: int) -> list[tuple[str, str]]:
