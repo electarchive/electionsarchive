@@ -1,6 +1,7 @@
 """Mongolia's General Election Commission: presidential and parliamentary elections by polling section."""
 
 import functools
+from dataclasses import dataclass
 from datetime import date
 from uuid import uuid5
 
@@ -111,18 +112,56 @@ def parliament_keys() -> list[str]:
     return [str(parliament.DAY_2024)]
 
 
-LOCAL_2020 = date(2020, 10, 15)
 PLACE_LIST_2020 = "1fa2007c"
-RESULTS_LOCAL_2020 = "cacc51cc"
+
+
+@dataclass(frozen=True)
+class LocalElection:
+    key: str
+    date_from: date
+    date_to: date
+    precision: str
+    original_text: str | None
+    english: str
+    native: str
+    blocks: list[local.Block]
+    files: list[str]
+    note: str | None = None
+
+
+NATIVE_LOCAL = "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын {year} оны ээлжит сонгууль"
 
 
 @functools.cache
-def local_2020() -> list[local.Block]:
-    return local.blocks(RESULTS_LOCAL_2020, local.section_places(PLACE_LIST_2020))
-
-
-def local_files() -> list[str]:
-    return [sheets.url(RESULTS_LOCAL_2020), sheets.url(PLACE_LIST_2020)]
+def local_elections() -> list[LocalElection]:
+    locate = local.section_places(PLACE_LIST_2020)
+    results_2020 = "cacc51cc"
+    results_2024 = "1c20b694"
+    blocks_2024 = local.blocks(results_2024, locate, "Аймаг 10-11") + local.blocks(results_2024, locate, "Сум 10-11")
+    return [
+        LocalElection(
+            "2020-10-15",
+            date(2020, 10, 15),
+            date(2020, 10, 15),
+            "day",
+            None,
+            "2020 Mongolian local council elections",
+            NATIVE_LOCAL.format(year=2020),
+            local.blocks(results_2020, locate),
+            [sheets.url(results_2020), sheets.url(PLACE_LIST_2020)],
+        ),
+        LocalElection(
+            "2024-10",
+            date(2024, 10, 1),
+            date(2024, 10, 31),
+            "month",
+            "The results workbook's tabs are dated 10-11; its supplementary tabs are dated 10-13 and 10-19.",
+            "2024 Mongolian local council elections",
+            NATIVE_LOCAL.format(year=2024),
+            blocks_2024,
+            [sheets.url(results_2024), sheets.url(PLACE_LIST_2020)],
+        ),
+    ]
 
 
 def council_name(council: local.Council) -> tuple[str, str | None]:
@@ -166,7 +205,7 @@ def packages() -> list[str]:
         f"{SOURCE}/registry",
         *(f"{SOURCE}/{poll.key}" for poll in all_polls()),
         *(f"{SOURCE}/{day}" for day in parliament_keys()),
-        f"{SOURCE}/{LOCAL_2020}",
+        *(f"{SOURCE}/{election.key}" for election in local_elections()),
     ]
 
 
@@ -184,7 +223,8 @@ def parse() -> None:
     for poll in all_polls():
         election(poll).write()
     legislature_2024().write()
-    councils_2020().write()
+    for election_ in local_elections():
+        councils(election_).write()
 
 
 def emit() -> None:
@@ -195,11 +235,12 @@ def _places() -> dict[str, places.Place]:
     found: dict[str, places.Place] = {}
     rows = [row for poll in all_polls() for row in poll.rows]
     rows += [row for contest in parliament_2024() for row in contest.rows]
-    rows += [row for block in local_2020() for row in block.rows]
+    blocks = [block for election_ in local_elections() for block in election_.blocks]
+    rows += [row for block in blocks for row in block.rows]
     for row in rows:
         if row.place is not None:
             found.setdefault(row.place.code, row.place)
-    for block in local_2020():
+    for block in blocks:
         if block.council.place is not None:
             found.setdefault(block.council.place.code, block.council.place)
     return found
@@ -236,13 +277,14 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         p.name(id, f"{parliament.DAY_2024.year} constituency {contest.number}", "en", "official")
         p.name(id, f"{contest.number}-р тойрог", "mn", "native", False)
-    for block in local_2020():
-        code = f"{LOCAL_2020}:{block.council.key}:{block.number}"
-        id = area("mn.council_constituency", code)
-        p.add("area", id=id, scheme_code="mn.council_constituency")
-        p.add("area_code", area_id=id, code=code)
-        p.add("area_parent", area_id=id, parent_id=council_area(block.council))
-        p.name(id, f"{council_name(block.council)[0]}, {block.number}-р тойрог", "mn", "native")
+    for election_ in local_elections():
+        for block in election_.blocks:
+            code = f"{election_.key}:{block.council.key}:{block.number}"
+            id = area("mn.council_constituency", code)
+            p.add("area", id=id, scheme_code="mn.council_constituency")
+            p.add("area_code", area_id=id, code=code)
+            p.add("area_parent", area_id=id, parent_id=council_area(block.council))
+            p.name(id, f"{council_name(block.council)[0]}, {block.number}-р тойрог", "mn", "native")
     for code, place in sorted(_places().items()):
         id = area("mn.soum", code)
         p.add("area", id=id, scheme_code="mn.soum")
@@ -271,7 +313,7 @@ def registry() -> Package:
     )
     files = {url for poll in all_polls() for url in poll.files}
     files |= {url for contest in parliament_2024() for url in contest.files}
-    files |= set(local_files())
+    files |= {url for election_ in local_elections() for url in election_.files}
     for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
     p.add("office", id=PRESIDENCY, polity_id=MONGOLIA, kind="head_of_state")
@@ -308,7 +350,7 @@ def registry() -> Package:
     )
     p.add("note", id=key("note", BLOCK_2024), entity_id=BLOCK_2024, kind="methodology", body_md=BLOCK_METHOD, lang="en")
     seen: set[str] = set()
-    for block in local_2020():
+    for block in [block for election_ in local_elections() for block in election_.blocks]:
         if block.council.key in seen:
             continue
         seen.add(block.council.key)
@@ -607,29 +649,33 @@ def legislature_2024() -> Package:
     return p
 
 
-def councils_2020() -> Package:
-    day = LOCAL_2020
-    blocks = local_2020()
+def councils(spec: LocalElection) -> Package:
+    day = spec.key
+    blocks = spec.blocks
     p = Package(
         f"{SOURCE}/{day}",
         SOURCE,
-        "The 2020 Mongolian local council elections (capital, aimag, district, and soum councils) by polling "
-        "section and constituency from the General Election Commission",
+        f"The {spec.english} (capital, aimag, district, and soum councils) by polling section and constituency "
+        "from the General Election Commission",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {MONGOLIA, TERRITORY}
-    for url in local_files():
+    for url in spec.files:
         p.uses(raw.cached(SOURCE, url))
     election_id = key("election", str(day))
-    p.add("election", id=election_id, polity_id=MONGOLIA, kind="local", date_from=day, date_to=day, status="held")
-    p.name(election_id, "2020 Mongolian local council elections", "en", "official")
-    p.name(
-        election_id,
-        "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын 2020 оны ээлжит сонгууль",
-        "mn",
-        "native",
-        False,
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=MONGOLIA,
+        kind="local",
+        date_from=spec.date_from,
+        date_to=spec.date_to,
+        date_precision=spec.precision,
+        original_text=spec.original_text,
+        status="held",
     )
+    p.name(election_id, spec.english, "en", "official")
+    p.name(election_id, spec.native, "mn", "native", False)
     path = f"mn/{day}-local"
     p.add("slug", path=path, entity_id=election_id, is_current=True)
     units: dict[str, str] = {}

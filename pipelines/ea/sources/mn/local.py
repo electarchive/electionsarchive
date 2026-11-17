@@ -88,8 +88,26 @@ def section_places(name: str) -> dict[str, places.Place]:
     return out
 
 
-def blocks(name: str, locate: dict[str, places.Place]) -> list[Block]:
-    rows = [[decode(cell) for cell in row] for row in sheets.sheet_rows(name, 0)]
+def widen(locate: dict[str, places.Place]) -> dict[str, places.Place]:
+    """Section code to place for sections a later list adds: a soum's sections share its first two code parts, and a
+    capital district's share its first part."""
+    by_prefix: dict[str, places.Place] = {}
+    for code, place in locate.items():
+        first, second, _ = code.split("-")
+        by_prefix[first if int(first) >= 22 else f"{first}-{second}"] = place
+    return by_prefix
+
+
+def resolve(code: str, locate: dict[str, places.Place], by_prefix: dict[str, places.Place]) -> places.Place | None:
+    if code in locate:
+        return locate[code]
+    first, second, _ = code.split("-")
+    return by_prefix.get(first if int(first) >= 22 else f"{first}-{second}")
+
+
+def blocks(name: str, locate: dict[str, places.Place], sheet: str | int = 0) -> list[Block]:
+    rows = [[decode(cell) for cell in row] for row in sheets.sheet_rows(name, sheet)]
+    by_prefix = widen(locate)
     out: list[Block] = []
     title: re.Match[str] | None = None
     current: Block | None = None
@@ -116,7 +134,7 @@ def blocks(name: str, locate: dict[str, places.Place]) -> list[Block]:
             out.append(current)
         elif current is not None and CODE.match(cells[0][1]):
             values = [sheets.number(row[i]) for i in columns]
-            place = locate.get(cells[0][1])
+            place = resolve(cells[0][1], locate, by_prefix)
             current.rows.append(polls.Row(cells[0][1], place, cells[0][1], values))
         elif current is not None and cells[0][1] == "Нийт":
             current.declared = [sheets.number(row[i]) or 0 for i in columns]
