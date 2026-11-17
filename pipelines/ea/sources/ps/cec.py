@@ -3,10 +3,13 @@
 The Commission publishes the results of its three national polls as PDF tables, by electoral district, the finest
 unit it prints: the first general elections of 1996 (the presidency, and the winners of each district's seats), the
 presidential election of 2005, and the second legislative elections of 2006 (the national lists, with district
-tables). The 2005 and 1996 tables have a text layer, which is read here; the 2006 district tables are keyed from the
-printed pages and checked against the totals the Commission prints.
+tables, and the district candidates). The 2005 and 1996 tables have a text layer, which is read here; the 2006 list
+tables by district are keyed from the printed pages and checked against the totals the Commission prints. The 2006
+district candidate tables print each candidate's votes in a text layer, which is read here with each number's page and
+box, and print the names as images, which were read from the page images (`candidates_2006`).
 """
 
+import html
 import re
 import subprocess
 import unicodedata
@@ -16,6 +19,7 @@ from uuid import uuid5
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.ps import candidates_2006
 
 SOURCE = "ps.cec"
 SITE = "https://www.elections.ps"
@@ -37,6 +41,9 @@ FILES = {
     "2006-districts": f"{PDF}/PLC2006-ResultsVotesNOForLists-DistLevel_AR.pdf",
     "2006-ballots": f"{PDF}/PLC2006-ResultsBallotsStatisticsOnDistLevelForListsElections_AR.pdf",
     "2006-voters": f"{PDF}/PLC2006-ResultsVotersStatisticsOnDistLevel_AR.pdf",
+    "2006-candidates": f"{PDF}/PLC2006-Results-DistCandAndThereVotesNo_AR.pdf",
+    "2006-district-ballots": f"{PDF}/PLC2006-ResultsBallotsStatisticsOnDistLevelForDistsElections_AR.pdf",
+    "2006-winners": f"{PDF}/PLC2006-ResultsDistrictsWinners.pdf",
 }
 DAYS = {"1996-01-20": date(1996, 1, 20), "2005-01-09": date(2005, 1, 9), "2006-01-25": date(2006, 1, 25)}
 
@@ -51,6 +58,7 @@ PRESIDENCY = key("office", "president")
 SYSTEM_PRESIDENT = key("electoral_system", "president")
 SYSTEM_BLOCK = key("electoral_system", "district_block")
 SYSTEM_LIST = key("electoral_system", "list_2006")
+SYSTEM_DISTRICT = key("electoral_system", "district_block_2006")
 FATAH = key("party", "fatah")
 PARTIES = {
     "fatah": ("حركة فتح", "party"),
@@ -59,6 +67,23 @@ PARTIES = {
     "ppp": ("حزب الشعب", "party"),
     "freedom": ("كتلة الحرية والاستقلال", "bloc"),
     "national": ("الائتلاف الوطني الديموقراطي", "bloc"),
+}
+# Parties that nominated district candidates in 2006 and appear in no other table.
+PARTIES_2006 = {
+    "pflp": "الجبهة الشعبية لتحرير فلسطين",
+    "ppsf": "جبهة النضال الشعبي الفلسطيني",
+    "arab_front": "الجبهة العربية الفلسطينية",
+}
+# The party behind each nomination label of the 2006 district tables; independents have none.
+LABELS_2006 = {
+    "change": key("party", "list2006", 6),
+    "alternative": key("party", "list2006", 1),
+    "abu_ali": key("party", "list2006", 3),
+    "fatah": FATAH,
+    "fida": key("party", "fida"),
+    "dflp": key("party", "dflp"),
+    **{name: key("party", name) for name in PARTIES_2006},
+    "independent": None,
 }
 LIST_NAMES = {
     1: "قائمة البديل (الائتلاف الجبهة الديمقراطية وحزب الشعب وفدا ومستقلين)",
@@ -321,12 +346,25 @@ def registry() -> Package:
                 "voting."
             ),
         ),
+        (
+            SYSTEM_DISTRICT,
+            {"formula": "block"},
+            (
+                "In 2006, each of sixteen districts elected its seats by plurality block voting: each voter could mark "
+                "as many candidates as the district had seats. Six seats were reserved for Christians, two each in "
+                "Jerusalem and Bethlehem and one each in Ramallah and al-Bireh and in Gaza, and went to the Christian "
+                "candidates with the most votes there."
+            ),
+        ),
     )
     for id, rules, body in systems:
         p.add("electoral_system", id=id, polity_id=PALESTINE, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=body, lang="en")
     for name, (label, kind) in PARTIES.items():
         p.add("party", id=key("party", name), kind=kind, polity_id=PALESTINE)
+        p.name(key("party", name), label, "ar", "official")
+    for name, label in PARTIES_2006.items():
+        p.add("party", id=key("party", name), kind="party", polity_id=PALESTINE)
         p.name(key("party", name), label, "ar", "official")
     for number, label in LIST_NAMES.items():
         if number == 11:
@@ -600,7 +638,7 @@ def president_2005(p: Package, day: date) -> None:
 
 
 def legislative_2006(p: Package, day: date) -> None:
-    _uses(p, "2006-lists", "2006-districts", "2006-ballots", "2006-voters")
+    _uses(p, "2006-lists", "2006-districts", "2006-ballots", "2006-voters", *DISTRICT_FILES)
     p.uses(raw.cached(SOURCE, PAGES["2006"]))
     election = _election(
         p, "2006", day, "2006 Palestinian legislative election", "الانتخابات التشريعية الفلسطينية الثانية 2006"
@@ -619,8 +657,8 @@ def legislative_2006(p: Package, day: date) -> None:
     )
     note = (
         f"{METHOD} This is the national list vote, which elected 66 of the 132 members. The Commission prints the "
-        "votes of the 66 members elected in the districts by candidate in separate tables, which this package "
-        "does not hold. Registered voters are the electors on the register in each district."
+        "votes of the 66 members elected in the districts by candidate in separate tables, held here as the "
+        "district contests. Registered voters are the electors on the register in each district."
     )
     result_set = _result_set(p, election, contest, "2006:lists", note)
     options: dict[int, str] = {}
@@ -640,9 +678,241 @@ def legislative_2006(p: Package, day: date) -> None:
         p.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=seats)
     for measure, value in zip((REGISTERED, CAST, VALID, INVALID, BLANK), NATIONAL_BALLOTS_2006, strict=True):
         _declare(p, result_set, None, measure, value)
-    for number, name in DISTRICTS_2006.items():
-        unit = _unit(p, day, f"{number:02d}", name)
+    units = {number: _unit(p, day, f"{number:02d}", name) for number, name in DISTRICTS_2006.items()}
+    for number, unit in units.items():
         for list_number, votes in zip(LIST_NAMES, LISTS_2006[number], strict=True):
             _put(p, result_set, unit, options[list_number], VOTES, votes)
         for measure, value in zip((REGISTERED, CAST, VALID, INVALID, BLANK), BALLOTS_2006[number], strict=True):
             _put(p, result_set, unit, None, measure, value)
+    district_contests(p, day, election, units)
+
+
+# --- 2006 districts -------------------------------------------------------------------------------------------------
+
+DISTRICT_FILES = ("2006-candidates", "2006-district-ballots", "2006-winners")
+Box = tuple[int, float, float, float, float]  # page, then x0, y0, x1, y1 as fractions of the page
+
+
+def _words(name: str) -> dict[int, tuple[float, float, list[tuple[float, float, float, float, str]]]]:
+    """Each page's size in points and its words, with their boxes in points from the top left."""
+    path: Path = raw.cached(SOURCE, FILES[name]).path
+    out = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    pages = {}
+    for number, page in enumerate(out.split("<page ")[1:], 1):
+        size = re.match(r'width="([\d.]+)" height="([\d.]+)"', page)
+        if size is None:
+            raise ValueError(f"{name} page {number} has no size")
+        words = [
+            (float(a), float(b), float(c), float(d), html.unescape(text))
+            for a, b, c, d, text in re.findall(
+                r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<', page
+            )
+        ]
+        pages[number] = (float(size[1]), float(size[2]), words)
+    return pages
+
+
+def _join(page: int, width: float, height: float, words: list[tuple[float, float, float, float, str]]) -> Box:
+    return (
+        page,
+        min(w[0] for w in words) / width,
+        min(w[1] for w in words) / height,
+        max(w[2] for w in words) / width,
+        max(w[3] for w in words) / height,
+    )
+
+
+def read_2006_candidates() -> tuple[dict[int, tuple[int, int, int]], dict[int, list[tuple[int, int, Box]]]]:
+    """Each district's printed candidates, seats, and Christian seats, and its rows (rank, votes, and the votes' box).
+
+    The text layer holds the ranks, the votes, and the district headers, one glyph run per word: a number printed
+    with a thousands separator comes as two words on the same line. Rows are taken in reading order, so a district
+    that runs on to the next page keeps its rows."""
+    heads: dict[int, tuple[int, int, int]] = {}
+    rows: dict[int, list[tuple[int, int, Box]]] = {}
+    Head = tuple[int, int, int, int]
+    Row = tuple[int, int, Box]
+    events: list[tuple[int, float, Head | None, Row | None]] = []
+    for page, (width, height, words) in _words("2006-candidates").items():
+
+        def line(y: float, within: float = 4.0) -> list[tuple[float, float, float, float, str]]:
+            return [w for w in words if abs((w[1] + w[3]) / 2 - y) < within]
+
+        for w in words:
+            middle = (w[1] + w[3]) / 2
+            if 255 < w[0] < 290 and re.fullmatch(r"\d\d", w[4]):
+                numbers = [x for x in line(middle) if re.fullmatch(r"\d+", x[4]) and x[2] < 135]
+                below = [x for x in words if 8 < (x[1] + x[3]) / 2 - middle < 20 and re.fullmatch(r"\d+", x[4])]
+                seats = [int(x[4]) for x in below if x[0] > 400]
+                quota = [int(x[4]) for x in below if 200 < x[0] < 240]
+                if len(numbers) != 1 or len(seats) != 1:
+                    raise ValueError(f"2006 district header on page {page} is not as expected")
+                events.append((page, middle, (int(w[4]), int(numbers[0][4]), seats[0], sum(quota)), None))
+            elif 490 <= w[0] and w[2] <= 516 and re.fullmatch(r"\d+", w[4]) and 80 < w[1] < 730:
+                votes = sorted(
+                    (x for x in line(middle, 5.0) if 130 <= x[0] and x[2] <= 200 and re.fullmatch(r"[\d,]+", x[4])),
+                    key=lambda x: x[0],
+                )
+                if not votes:
+                    raise ValueError(f"2006 candidate {w[4]} on page {page} has no votes")
+                value = int("".join(x[4] for x in votes).replace(",", ""))
+                events.append((page, middle, None, (int(w[4]), value, _join(page, width, height, votes))))
+    district = 0
+    for _, _, head, row in sorted(events, key=lambda e: (e[0], e[1])):
+        if head is not None:
+            district, count, seats, quota = head
+            heads[district] = (count, seats, quota)
+            rows[district] = []
+        elif row is not None:
+            rows[district].append(row)
+    for number, (count, _, _) in heads.items():
+        if [rank for rank, _, _ in rows[number]] != list(range(1, count + 1)):
+            raise ValueError(f"2006 district {number} does not list its {count} candidates in order")
+    return heads, rows
+
+
+def read_2006_ballots() -> dict[int, tuple[tuple[int, Box], ...]]:
+    """Each district's registered voters, ballots cast, and valid, invalid, and blank ballots, with their boxes, from the
+    Commission's ballot statistics for the district elections; the key 0 holds the printed total."""
+    width, height, words = _words("2006-district-ballots")[1]
+    lines: dict[int, list[tuple[float, float, float, float, str]]] = {}
+    for w in words:
+        if re.fullmatch(r"[\d,.%]+", w[4]) and w[1] > 200:
+            lines.setdefault(round((w[1] + w[3]) / 2), []).append(w)
+    # Printed from the right: number, registered, cast, turnout, valid, share, invalid, share, blank, share. A number
+    # is split into words at its separators, so each count is the words whose right edge falls in its column.
+    columns = ((550, 662), (460, 545), (300, 366), (180, 252), (100, 162))
+    out: dict[int, tuple[tuple[int, Box], ...]] = {}
+    for found in lines.values():
+        code = [w for w in found if w[0] > 700 and re.fullmatch(r"\d\d", w[4])]
+        number = int(code[0][4]) if code else 0
+        cells = []
+        for low, high in columns:
+            cell = sorted((w for w in found if low <= w[2] <= high and "%" not in w[4]), key=lambda w: w[0])
+            cells.append((int("".join(w[4] for w in cell).replace(",", "")), _join(1, width, height, cell)))
+        registered, cast, valid, invalid, blank = cells
+        out[number] = (registered, cast, valid, invalid, blank)
+    if sorted(out) != list(range(17)):
+        raise ValueError(f"2006 district ballots hold {sorted(out)}")
+    return out
+
+
+def district_contests(p: Package, day: date, election: str, units: dict[int, str]) -> None:
+    heads, rows = read_2006_candidates()
+    ballots = read_2006_ballots()
+    if sum(seats for _, seats, _ in heads.values()) != 66 or sum(q for _, _, q in heads.values()) != 6:
+        raise ValueError("2006 districts do not hold 66 seats with six reserved for Christians")
+    for measure, column in zip((REGISTERED, CAST, VALID, INVALID, BLANK), range(5), strict=True):
+        if sum(ballots[n][column][0] for n in DISTRICTS_2006) != ballots[0][column][0]:
+            raise ValueError(f"2006 district ballots do not add up to the printed total for measure {measure}")
+    for number in DISTRICTS_2006:
+        registered, cast, valid, invalid, blank = (value for value, _ in ballots[number])
+        if valid + invalid + blank != cast or cast > registered:
+            raise ValueError(f"2006 district {number} ballots do not add up")
+    artifacts = {name: raw.cached(SOURCE, FILES[name]) for name in DISTRICT_FILES}
+    pages: dict[tuple[str, int], str] = {}
+    for name in ("2006-candidates", "2006-district-ballots"):
+        artifact = artifacts[name]
+        artifact_id = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{CEC_SOURCE}\x1f{artifact.storage_key}"))
+        for page, (width, height, _) in _words(name).items():
+            pages[name, page] = key("page", name, page)
+            p.add(
+                "source_page",
+                id=pages[name, page],
+                artifact_id=artifact_id,
+                page_number=page,
+                image_key=f"pages/{SOURCE}/{artifact.path.stem}/{page}.png",
+                width=round(width),
+                height=round(height),
+            )
+    note = (
+        f"{METHOD} Each voter could mark as many candidates as the district had seats, so the candidates' votes add "
+        "up to more than the valid ballots. The votes are read from the text layer of the Commission's district "
+        "candidate tables, and each keeps its page and box there; the names and nomination labels are printed as "
+        "images and were read from the page images. The ballot figures come from the Commission's ballot statistics "
+        "for the district elections, and the winners match its list of district winners."
+    )
+    winners_total = 0
+    for number, name in DISTRICTS_2006.items():
+        count, seats, quota = heads[number]
+        printed = candidates_2006.CANDIDATES[number]
+        if len(printed) != count:
+            raise ValueError(f"2006 district {number} has {len(printed)} names for {count} candidates")
+        winners = dict(candidates_2006.WINNERS[number])
+        reserved = {rank for district, rank in candidates_2006.CHRISTIAN_QUOTA if district == number}
+        if len(winners) != seats or len(reserved) != quota or not reserved <= set(winners):
+            raise ValueError(f"2006 district {number} winners do not fill its {seats} seats")
+        tag = f"2006:district:{number}"
+        contest = _contest(
+            p,
+            tag,
+            election,
+            f"ps/{day}-general/legislative-council-{number:02d}",
+            f"2006 Palestinian Legislative Council election, {number:02d}",
+            f"انتخابات المجلس التشريعي 2006، دائرة {name}",
+            kind="body_seats",
+            body_id=COUNCIL,
+            magnitude=seats,
+            electoral_system_id=SYSTEM_DISTRICT,
+        )
+        result_set = _result_set(p, election, contest, tag, note)
+        unit = units[number]
+        for (rank, votes, box), (label, nomination) in zip(rows[number], printed, strict=True):
+            option = key("option", tag, rank)
+            party = LABELS_2006[nomination]
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party,
+                ballot_position=rank,
+                ballot_label=label,
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", tag, rank),
+                person_id=_person(p, f"{tag}:{rank}", label),
+                option_id=option,
+                role="head",
+                ballot_name=label,
+                is_independent=party is None,
+            )
+            _put(p, result_set, unit, option, VOTES, votes)
+            _locate(p, result_set, unit, option, VOTES, pages["2006-candidates", box[0]], box)
+            if rank in winners:
+                if winners[rank] != votes:
+                    raise ValueError(f"2006 district {number} winner {rank} has {votes} votes, not {winners[rank]}")
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                winners_total += 1
+        for measure, (value, box) in zip((REGISTERED, CAST, VALID, INVALID, BLANK), ballots[number], strict=True):
+            _put(p, result_set, unit, None, measure, value)
+            _locate(p, result_set, unit, None, measure, pages["2006-district-ballots", 1], box)
+        if max(votes for _, votes, _ in rows[number]) > ballots[number][2][0]:
+            raise ValueError(f"2006 district {number} has a candidate with more votes than valid ballots")
+    p.accept(
+        "accounting.votes_valid",
+        "In the three single-seat districts the candidates' printed votes do not add up to the valid ballots the "
+        "Commission prints for the district elections: Tubas 16,704 against 16,706, Salfit 21,066 against 21,310, "
+        "and Jericho 11,793 against 11,788. Both figures are stored as printed.",
+    )
+    if winners_total != 66:
+        raise ValueError(f"2006 districts elect {winners_total} members, not 66")
+
+
+def _locate(p: Package, result_set: str, unit: str, option: str | None, measure: int, page: str, box: Box) -> None:
+    p.add(
+        "value_locator",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        page_id=page,
+        source_id=CEC_SOURCE,
+        x0=box[1],
+        y0=box[2],
+        x1=box[3],
+        y1=box[4],
+    )
