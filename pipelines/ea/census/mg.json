@@ -1,0 +1,1327 @@
+{
+  "polity": "MG",
+  "name": "Madagascar",
+  "sources": {
+    "constitution": {
+      "title": "Constitution de la Quatrième République (11 décembre 2010)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf",
+      "kind": "official_body",
+      "note": "Art. 45-47 (President), 69-70 (National Assembly), 80-81 (Senate), 141-159 (decentralized collectivities: communes, regions, provinces; the fokontany is not a collectivity, Art. 152), 164 (adopted by referendum).",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "lo2018_008": {
+      "title": "Loi organique n° 2018-008 relative au régime général des élections et des référendums (version compilée avec l'ordonnance n° 2019-002)",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2016/05/Loi-organique-n°2018-008-version-compilée-REGIME-ELECTIONS.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "lo2018_009": {
+      "title": "Loi organique n° 2018-009 relative à l'élection du Président de la République (promulguée le 11 mai 2018)",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2018/08/Loi-orga-n°2018-009-version-FINALE-PROMULGUEE-11-mai-2018.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "lo2018_010": {
+      "title": "Loi organique n° 2018-010 relative à l'élection des députés à l'Assemblée nationale",
+      "publisher": "Centre National de Législation (CNLEGIS)",
+      "url": "https://cnlegis.gov.mg/page_acces_pdf/eoVfpUisR44",
+      "kind": "official_body",
+      "note": "Art. 4 as first passed: single-member plurality; rewritten by loi organique n° 2019-002 (HCC décision n° 06-HCC/D3 of 13 February 2019).",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_d3_2019": {
+      "title": "Décision n° 06-HCC/D3 du 13 février 2019 relative à la loi organique n° 2019-002 modifiant la loi organique n° 2018-010",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=4890",
+      "kind": "official_body",
+      "note": "Art. 4 as rewritten: plurality in single-seat constituencies; one-round closed-list proportional representation, highest average, in constituencies of several seats.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "loi2015_002": {
+      "title": "Loi n° 2015-002 modifiant et complétant la loi n° 2014-020 relative aux ressources des Collectivités territoriales décentralisées, aux modalités d'élections, ainsi qu'à l'organisation, au fonctionnement et aux attributions de leurs organes",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2016/05/Loi_2015-_002.pdf",
+      "kind": "official_body",
+      "note": "Annex 01 lists the provinces, regions, and districts.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "decret2024_1495": {
+      "title": "Décret n° 2024-1495 du 6 août 2024 portant convocation des électeurs pour les élections des maires et des conseillers municipaux et communaux",
+      "publisher": "Centre National de Législation (CNLEGIS)",
+      "url": "https://www.cnlegis.gov.mg/uploads/D2024-1495-VF.pdf",
+      "kind": "official_body",
+      "note": "Art. 2 quotes Art. 306 of loi n° 2014-020 as amended by loi n° 2023-023: one list ballot, five-year term, the head of the leading list becomes mayor, electoral quotient and largest remainder; Art. 63 gives final results to the administrative courts. The preamble lists the amendments to loi n° 2014-020 (lois 2015-002, 2018-011, 2021-010, 2023-023, 2024-002) and the special-status laws for Antananarivo (2015-011), Nosy Be (2015-009), and Sainte Marie (2015-010).",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_rapport2019": {
+      "title": "Rapport annuel d'activités 2019",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2020/01/RAPPORT-ANNUEL-DACTIVITES-2019.pdf",
+      "kind": "official_body",
+      "note": "22 regions, 119 districts, 25,388 polling stations for the legislative election of 27 May 2019; 1,686 communal electoral commissions plus 9 communes without one (1,695 communes) for the communal elections of 27 November 2019, with mayors and councillors on separate ballots.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_rapport_pres2023": {
+      "title": "Rapport de l'élection présidentielle 2023",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/01/VF-du-RAPPORT-DE-LELECTION-PRESIDENTIELLE-2023.pdf",
+      "kind": "official_body",
+      "note": "27,375 polling stations, 19,340 fokontany, 119 districts, 11,043,836 registered voters.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_rapport_com2024": {
+      "title": "Rapport de l'organisation des élections communales et municipales du 11 décembre 2024",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2025/01/RAPPORT-DE-ORGANISATION-DES-ELECTIONS-COMMUNALES-ET-MUNICIPALES-2024.pdf",
+      "kind": "official_body",
+      "note": "28,124 polling stations, 1,695 communes, 19,640 fokontany, 120 districts, 11,631,156 registered voters; the logistics list names 24 regions, including Vatovavy, Fitovinany, and Ambatosoa.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_fin_mandat": {
+      "title": "Rapport de fin de mandat (présentation)",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2016/05/Slide-du-rapport-de-fin-de-mandat.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_pres2023": {
+      "title": "Résultats provisoires de l'élection présidentielle du 16 novembre 2023, récapitulation nationale",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2023/11/RECAP-NATIONALE-ELECTION-PRESIDENTIELLE-16-11-2023.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_pres2018": {
+      "title": "Résultats provisoires de l'élection présidentielle du 7 novembre 2018, récapitulation par bureau de vote",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2019/02/1recapparbv.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_leg2019": {
+      "title": "Résultats provisoires des élections législatives du 27 mai 2019 par district",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2021/12/Resultats-legislatifs-2019-par-district.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_leg2024": {
+      "title": "Résultats provisoires des élections législatives du 29 mai 2024 par district",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/06/Resultat-provisoire-legislatives-2024-1.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_leg2024_bv": {
+      "title": "Tableau récapitulatif par commune et bureau de vote, élections législatives du 29 mai 2024",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/06/Tableau-recap-par-Commune-Legislatives-2024_sur-serveur.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_maire2019": {
+      "title": "Résultats provisoires de l'élection des maires du 27 novembre 2019",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2021/12/Election_provisoire_maire_2019.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_com2024": {
+      "title": "Résultats provisoires des élections communales et municipales du 11 décembre 2024",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/resultats-provisoires-des-elections-communales-et-municipales-du-11-decembre-2024/",
+      "kind": "official_body",
+      "note": "One PDF per district (for example RESULTAT-MAHABO.pdf), by commune with polling-station annexes.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ceni_sen2020": {
+      "title": "Rapport des élections sénatoriales 2020",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2021/01/RAPPORT-DES-ELECTIONS-SENATORIALES-2020-du-25.01.21-VF-p40-corrigé-1.pdf",
+      "kind": "official_body",
+      "note": "Reproduces décret n° 2020-1110: 12 senators elected, two per province, by 12,465 mayors and municipal and communal councillors; 6 appointed.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "ordonnance2019_006": {
+      "title": "Ordonnance n° 2019-006 du 28 mai 2019 modifiant la loi organique n° 2015-007 relative au Sénat",
+      "publisher": "Commission Électorale Nationale Indépendante (CENI)",
+      "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2020/10/Ordonnance-n°2019-006-du-28.05.19.pdf",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "senat_historique": {
+      "title": "Historique du Sénat",
+      "publisher": "Sénat de Madagascar",
+      "url": "https://senat.mg/historique-2/",
+      "kind": "official_body",
+      "note": "First Republic Senate of 54 (two thirds elected by provincial and communal bodies, one third appointed, six-year terms renewed by half); the 2001 Senate of 90 (60 elected, 30 appointed) under ordonnance n° 2001-001; the 1975 and 1992 constitutional referendums.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2006": {
+      "title": "Arrêt n° 05-HCC/AR du 23 décembre 2006 (élection présidentielle du 3 décembre 2006)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=709",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2013_1": {
+      "title": "Arrêt n° 01-CES/AR du 22 novembre 2013 (premier tour de l'élection présidentielle du 25 octobre 2013)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=1218",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2013_2": {
+      "title": "Arrêt n° 10-CES/AR du 17 janvier 2014 (second tour de l'élection présidentielle du 20 décembre 2013)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=1286",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2018_1": {
+      "title": "Arrêt n° 11-HCC/AR du 28 novembre 2018 (premier tour de l'élection présidentielle du 7 novembre 2018)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=4151",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2018_2": {
+      "title": "Arrêt n° 01-HCC/AR du 8 janvier 2019 (second tour de l'élection présidentielle du 19 décembre 2018)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=4760",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_pres2023": {
+      "title": "Arrêt n° 08-HCC/AR du 1er décembre 2023 (premier tour de l'élection présidentielle du 16 novembre 2023)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=8619",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_leg2007": {
+      "title": "Arrêt n° 18-HCC/AR du 13 octobre 2007 (élection des députés du 23 septembre 2007)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=526",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_leg2013": {
+      "title": "Arrêt n° 11-CES/AR du 6 février 2014 (élections législatives du 20 décembre 2013)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=1342",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_leg2019": {
+      "title": "Arrêt n° 45-HCC/AR du 2 juillet 2019 (élections législatives du 27 mai 2019)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=5461",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_leg2019_pv": {
+      "title": "Résultats officiels des élections législatives du 27 mai 2019 par circonscription",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?page_id=5492",
+      "kind": "official_body",
+      "note": "One PDF per constituency with its seats to fill: 119 constituencies, 87 of one seat and 32 of two (151 seats).",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_leg2024": {
+      "title": "Arrêt n° 31-HCC/AR du 27 juin 2024 (élections législatives du 29 mai 2024)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=9194",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_deputes2024": {
+      "title": "Liste des Députés élus le 29 mai 2024",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "http://www.hcc.gov.mg/wp-content/uploads/2024/07/Liste-des-Députés.pdf",
+      "kind": "official_body",
+      "note": "Arrêté au nombre de 163 Députés: 120 constituencies, 77 of one seat and 43 of two.",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_sen2008": {
+      "title": "Arrêt n° 02-HCC/AR du 25 avril 2008 (élection des membres du Sénat du 20 avril 2008)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=541",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_sen2015": {
+      "title": "Arrêt n° 02-HCC/AR du 22 janvier 2016 (élection des membres du Sénat du 29 décembre 2015)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=2096",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_sen2020": {
+      "title": "Arrêt n° 01-HCC/AR du 7 janvier 2021 (élections sénatoriales du 11 décembre 2020)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=6480",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    },
+    "hcc_ref2007": {
+      "title": "Arrêt n° 01-HCC/AR du 27 avril 2007 (référendum du 4 avril 2007 relatif à la révision de la Constitution)",
+      "publisher": "Haute Cour Constitutionnelle (HCC)",
+      "url": "https://www.hcc.gov.mg/?p=489",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Repoblikan'i Madagasikara / République de Madagascar",
+      "name_en": "Republic of Madagascar",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "constitution"
+    },
+    {
+      "key": "province",
+      "name": "Faritany / Provinces",
+      "name_en": "Provinces",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2015-02-26",
+          "value": 6,
+          "source": "loi2015_002",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2016/05/Loi_2015-_002.pdf (Annex 01: Antananarivo, Antsiranana, Fianarantsoa, Mahajanga, Toamasina, Toliara)"
+        }
+      ]
+    },
+    {
+      "key": "region",
+      "name": "Faritra / Régions",
+      "name_en": "Regions",
+      "parent": "province",
+      "polity_kind": "region",
+      "scheme": "mg.region",
+      "elects": false,
+      "valid_from": "2004-01-01",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2019-05-27",
+          "value": 22,
+          "source": "ceni_rapport2019",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2020/01/RAPPORT-ANNUEL-DACTIVITES-2019.pdf (22 régions for the legislative election of 27 May 2019)"
+        },
+        {
+          "date": "2024-12-11",
+          "value": 24,
+          "source": "ceni_rapport_com2024",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2025/01/RAPPORT-DE-ORGANISATION-DES-ELECTIONS-COMMUNALES-ET-MUNICIPALES-2024.pdf (logistics list of 24 regions, with Vatovavy and Fitovinany (loi n° 2021-012) and Ambatosoa (loi n° 2023-012))"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Distrika / Districts",
+      "name_en": "Districts",
+      "parent": "region",
+      "scheme": "mg.district",
+      "elects": false,
+      "source": "loi2015_002",
+      "counts": [
+        {
+          "date": "2019-05-27",
+          "value": 119,
+          "source": "ceni_rapport2019",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2020/01/RAPPORT-ANNUEL-DACTIVITES-2019.pdf (119 districts)"
+        },
+        {
+          "date": "2023-11-16",
+          "value": 119,
+          "source": "ceni_rapport_pres2023",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/01/VF-du-RAPPORT-DE-LELECTION-PRESIDENTIELLE-2023.pdf (119 districts)"
+        },
+        {
+          "date": "2024-12-11",
+          "value": 120,
+          "source": "ceni_rapport_com2024",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2025/01/RAPPORT-DE-ORGANISATION-DES-ELECTIONS-COMMUNALES-ET-MUNICIPALES-2024.pdf (les 120 districts)"
+        }
+      ]
+    },
+    {
+      "key": "commune",
+      "name": "Kaominina / Communes",
+      "name_en": "Communes (urban and rural)",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "mg.commune",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2019-11-27",
+          "value": 1695,
+          "source": "ceni_rapport2019",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2020/01/RAPPORT-ANNUEL-DACTIVITES-2019.pdf (1,686 communal electoral commissions plus 9 communes without one)"
+        },
+        {
+          "date": "2024-12-11",
+          "value": 1695,
+          "source": "ceni_rapport_com2024",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2025/01/RAPPORT-DE-ORGANISATION-DES-ELECTIONS-COMMUNALES-ET-MUNICIPALES-2024.pdf (1695 communes)"
+        }
+      ]
+    },
+    {
+      "key": "fokontany",
+      "name": "Fokontany",
+      "name_en": "Fokontany (villages and urban neighborhoods)",
+      "parent": "commune",
+      "polity_kind": "submunicipal",
+      "elects": false,
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2023-11-16",
+          "value": 19340,
+          "source": "ceni_rapport_pres2023",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/01/VF-du-RAPPORT-DE-LELECTION-PRESIDENTIELLE-2023.pdf (19 340 fokontany)"
+        },
+        {
+          "date": "2024-12-11",
+          "value": 19640,
+          "source": "ceni_rapport_com2024",
+          "locator": "https://www.ceni-madagascar.mg/wp-content/uploads/2025/01/RAPPORT-DE-ORGANISATION-DES-ELECTIONS-COMMUNALES-ET-MUNICIPALES-2024.pdf (19 640 fokontany)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Fifidianana ny Filohan'ny Repoblika / Élection présidentielle",
+      "name_en": "President, direct",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "mg.bv"
+        ]
+      },
+      "finest_note": "Polling station (CENI provisional results for 2018 and 2023); the HCC's arrêts give national totals.",
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 45: direct universal suffrage, five-year term renewable once; Art. 47: absolute majority of votes cast, else a runoff of the two leaders within 30 days of the official first-round results)",
+      "valid_from": "1965-03-30",
+      "first_held": "1965-03-30",
+      "earliest_record": "2006-12-03",
+      "note": "Direct since 1965; Philibert Tsiranana was first chosen by Parliament on 1 May 1959 (class president_parlement). Elections in 1965, 1972, 1982, 1989, 1992-93, 1996, 2001, 2006, 2013, 2018, and 2023; the dates before 2006 are not on an official site and are listed without a source. In 1975 Didier Ratsiraka was confirmed by the referendum of 21 December 1975 (class referendum). The 2013 rounds were judged by the Cour Électorale Spéciale. The transition that began in October 2025 leaves the next date open.",
+      "contests_per_unit": 1,
+      "est_votes": 60000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MG"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "month": 11,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "An absolute majority of votes cast wins; otherwise the two leading candidates meet within 30 days of the official first-round results (Art. 47).",
+          "administered_by": "Commission Électorale Nationale Indépendante (CENI); final results by the Haute Cour Constitutionnelle",
+          "valid_from": "2010-12-11",
+          "source": "lo2018_009"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI uploads (ceni-madagascar.mg/wp-content/uploads)",
+          "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2023/11/Recapitulation_par_Commune.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2018-11-07",
+          "last_date": "2023-11-16",
+          "source": "ceni_pres2023",
+          "evidence": "Provisional results by polling station for 2018 (both rounds: 1recapparbv.pdf, recapparbv.pdf) and 2023 (Recapitulation_par_Commune.pdf), with commune and national recapitulations; text layer.",
+          "finest": "mg.bv"
+        },
+        {
+          "platform": "Haute Cour Constitutionnelle, arrêts (hcc.gov.mg)",
+          "url": "https://www.hcc.gov.mg/?p=8619",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2006-12-03",
+          "last_date": "2023-11-16",
+          "source": "hcc_pres2023",
+          "evidence": "Official national results in the arrêt of each election from 2006 (2013 by the Cour Électorale Spéciale); older rulings are not online.",
+          "finest": "world.country"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1965-03-30",
+          "precision": "day"
+        },
+        {
+          "date": "1972-01-30",
+          "precision": "day"
+        },
+        {
+          "date": "1982-11-07",
+          "precision": "day"
+        },
+        {
+          "date": "1989-03-12",
+          "precision": "day"
+        },
+        {
+          "date": "1992-11-25",
+          "precision": "day"
+        },
+        {
+          "date": "1993-02-10",
+          "precision": "day",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "1996-11-03",
+          "precision": "day"
+        },
+        {
+          "date": "1996-12-29",
+          "precision": "day",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2001-12-16",
+          "precision": "day"
+        },
+        {
+          "date": "2006-12-03",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2006",
+          "quote": "Arrêt n°05-HCC/AR du 23 décembre 2006 portant proclamation des résultats officiels de l'élection du Président de la République du 3 décembre 2006"
+        },
+        {
+          "date": "2013-10-25",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2013_1",
+          "quote": "résultats définitifs du premier tour de l'élection présidentielle du 25 octobre 2013"
+        },
+        {
+          "date": "2013-12-20",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2013_2",
+          "quote": "résultats définitifs du second tour de l'élection présidentielle du 20 décembre 2013"
+        },
+        {
+          "date": "2018-11-07",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2018_1",
+          "quote": "résultats officiels du premier tour de l'élection présidentielle du 7 novembre 2018"
+        },
+        {
+          "date": "2018-12-19",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2018_2",
+          "quote": "résultats officiels du second tour de l'élection présidentielle du 19 décembre 2018"
+        },
+        {
+          "date": "2023-11-16",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "hcc_pres2023",
+          "quote": "résultats officiels du premier tour de l'élection présidentielle du 16 novembre 2023"
+        }
+      ]
+    },
+    {
+      "key": "assemblee_nationale",
+      "tier": "national",
+      "name": "Fifidianana ny Solombavambahoaka / Élections législatives (Assemblée nationale)",
+      "name_en": "National Assembly (People's National Assembly 1977-1989)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "fine": [
+          "mg.bv"
+        ]
+      },
+      "finest_note": "Polling station for 2024 (CENI) and constituency (district) for 2019; the HCC's arrêts list the elected deputies and, for 2019, one result sheet per constituency.",
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 69: deputies elected by direct universal suffrage for five years, the system set by organic law; Art. 70: the number of seats and the constituencies set by decree)",
+      "valid_from": "1960-09-04",
+      "first_held": "1960-09-04",
+      "earliest_record": "2007-09-23",
+      "note": "Since 2019, plurality in single-seat constituencies and one-round closed-list PR (highest average) in two-seat constituencies (loi organique n° 2019-002). 151 seats in 119 constituencies in 2019 (87 single, 32 double) and 163 in 120 in 2024 (77 single, 43 double). The First Republic Assembly was elected in 1960, 1965, and 1970 and suspended after the 1972 referendum; the People's National Assembly in 1977, 1983, and 1989; the National Assembly again from 1993 (1993, 1998, 2002, 2007, 2013, 2019, 2024). Dates before 2007 are not on an official site and are listed without a source. Partial elections rerun annulled constituencies.",
+      "contests_per_unit": 1,
+      "est_votes": 40000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "MG",
+          "valid_from": "1958-10-14"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Commission Électorale Nationale Indépendante (CENI); final results by the Haute Cour Constitutionnelle",
+          "valid_from": "2010-12-11",
+          "source": "lo2018_010",
+          "vacancy_rule": "A deputy is replaced by the substitute elected with them (loi organique n° 2018-010)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI uploads (ceni-madagascar.mg/wp-content/uploads)",
+          "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2024/06/Tableau-recap-par-Commune-Legislatives-2024_sur-serveur.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2019-05-27",
+          "last_date": "2024-05-29",
+          "source": "ceni_leg2024_bv",
+          "evidence": "2024 provisional results by commune and polling station, with one district sheet per constituency (Resultat-provisoire-legislatives-2024-1.pdf); 2019 by district (Resultats-legislatifs-2019-par-district.pdf).",
+          "finest": "mg.bv"
+        },
+        {
+          "platform": "Haute Cour Constitutionnelle, arrêts (hcc.gov.mg)",
+          "url": "https://www.hcc.gov.mg/?page_id=5492",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2007-09-23",
+          "last_date": "2024-05-29",
+          "source": "hcc_leg2019_pv",
+          "evidence": "Official results by constituency for 2019 and the list of elected deputies for 2007, 2013, 2019, and 2024 in the arrêts.",
+          "finest": "mg.district"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-09-04",
+          "precision": "day"
+        },
+        {
+          "date": "1965-08-08",
+          "precision": "day"
+        },
+        {
+          "date": "1970-09-06",
+          "precision": "day"
+        },
+        {
+          "date": "1977-06-30",
+          "precision": "day",
+          "note": "People's National Assembly (Assemblée nationale populaire)."
+        },
+        {
+          "date": "1983-08-28",
+          "precision": "day",
+          "note": "People's National Assembly."
+        },
+        {
+          "date": "1989-05-28",
+          "precision": "day",
+          "note": "People's National Assembly."
+        },
+        {
+          "date": "1993-06-16",
+          "precision": "day"
+        },
+        {
+          "date": "1998-05-17",
+          "precision": "day"
+        },
+        {
+          "date": "2002-12-15",
+          "precision": "day"
+        },
+        {
+          "date": "2007-09-23",
+          "election_kind": "general",
+          "note": "Early election after the dissolution by décret n° 2007-717; seats set by décret n° 2007-721.",
+          "source": "hcc_leg2007",
+          "quote": "Arrêt n°18-HCC/AR du 13 octobre 2007 portant proclamation des résultats officiels de l'élection des députés à l'Assemblée Nationale du 23 septembre 2007"
+        },
+        {
+          "date": "2013-12-20",
+          "election_kind": "general",
+          "source": "hcc_leg2013",
+          "quote": "Arrêt n°11-CES/AR du 06 février 2014 portant proclamation des résultats définitifs des élections législatives du 20 décembre 2013"
+        },
+        {
+          "date": "2019-05-27",
+          "election_kind": "general",
+          "contests": 119,
+          "seats": 151,
+          "source": "hcc_leg2019_pv",
+          "quote": "119 constituency sheets, 87 with one seat and 32 with two (Siège(s) à pourvoir)"
+        },
+        {
+          "date": "2024-05-29",
+          "election_kind": "general",
+          "contests": 120,
+          "seats": 163,
+          "source": "hcc_deputes2024",
+          "quote": "Arrêté au nombre de 163 Députés; 120 constituencies, 77 with one seat and 43 with two"
+        }
+      ]
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Fifidianana ny Loholona / Élections sénatoriales",
+      "name_en": "Senate (elected part)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "finest_note": "Province (2015, 2020) or region (2008), by list; the 2015 arrêt has polling-station annexes per province.",
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 80: five-year term; Art. 81: two thirds elected in equal numbers per province, one third appointed by the President)",
+      "valid_from": "2001-01-05",
+      "first_held": "2001-04-18",
+      "earliest_record": "2008-04-20",
+      "note": "Indirect: mayors and municipal and communal councillors (and regional councillors where they sat) elect senators by list in each province (2001, 2015, 2020) or region (2008). 60 of 90 elected in 2001, 22 of 33 in 2008, 42 of 63 in 2015, 12 of 18 in 2020 (ordonnance n° 2019-006). The First Republic Senate is the class senat_premiere_republique.",
+      "contests_per_unit": 1,
+      "est_votes": 40000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "MG",
+          "valid_from": "2001-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Commission Électorale Nationale Indépendante (CENI); final results by the Haute Cour Constitutionnelle",
+          "valid_from": "2010-12-11",
+          "source": "ordonnance2019_006"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Haute Cour Constitutionnelle, arrêts (hcc.gov.mg)",
+          "url": "https://www.hcc.gov.mg/?p=2096",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2008-04-20",
+          "last_date": "2020-12-11",
+          "source": "hcc_sen2015",
+          "evidence": "Electors, voters, and list votes per province with seat allocation in the 2015 and 2020 arrêts (2020 as one PDF per province); 2008 list of elected senators.",
+          "finest": "mg.bv"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-04-18",
+          "election_kind": "indirect",
+          "contests": 6,
+          "seats": 60,
+          "source": "senat_historique",
+          "quote": "Les 60 sénateurs élus lors de l'élection du 18 avril 2001"
+        },
+        {
+          "date": "2008-04-20",
+          "election_kind": "indirect",
+          "seats": 22,
+          "source": "hcc_sen2008",
+          "quote": "Arrêt n°02-HCC/AR du 25 avril 2008 portant proclamation des résultats officiels de l'élection des membres du Sénat du 20 avril 2008"
+        },
+        {
+          "date": "2015-12-29",
+          "election_kind": "indirect",
+          "contests": 6,
+          "seats": 42,
+          "source": "hcc_sen2015",
+          "quote": "FARITANY: 1 ANTANANARIVO ... résultats et les élus membres du Sénat (six provinces, seven seats each)"
+        },
+        {
+          "date": "2020-12-11",
+          "election_kind": "indirect",
+          "contests": 6,
+          "seats": 12,
+          "source": "ceni_sen2020",
+          "quote": "12 sénateurs élus, deux par province, par 12 465 grands électeurs (décret n° 2020-1110)"
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Fitsapan-kevitry ny vahoaka / Référendum",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "finest_note": "National totals in the HCC's arrêt for 2007; earlier and 2010 results are not on an official site.",
+      "source": "lo2018_008",
+      "first_held": "1972-10-08",
+      "earliest_record": "2007-04-04",
+      "note": "Referendums of 8 October 1972 (full powers to General Ramanantsoa), 21 December 1975 (Charter of the Socialist Revolution, Constitution of the Second Republic, and Didier Ratsiraka as President), 19 August 1992 (Third Republic), 17 September 1995, 15 March 1998 (autonomous provinces), 4 April 2007, and 17 November 2010 (Fourth Republic). A 2019 referendum was convened by décret n° 2019-790 and not held. The French constitutional referendum of 28 September 1958 belongs to the France census.",
+      "contests_per_unit": 1,
+      "est_votes": 30000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "MG"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Haute Cour Constitutionnelle, arrêts (hcc.gov.mg)",
+          "url": "https://www.hcc.gov.mg/?p=489",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2007-04-04",
+          "last_date": "2007-04-04",
+          "source": "hcc_ref2007",
+          "evidence": "National totals for 4 April 2007 (7,381,091 registered, 3,224,088 voters, 2,378,650 yes); no official page carries the other referendums.",
+          "finest": "world.country"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1972-10-08",
+          "precision": "day"
+        },
+        {
+          "date": "1975-12-21",
+          "election_kind": "referendum",
+          "source": "senat_historique",
+          "quote": "La Constitution de la Deuxième République, adoptée le 21 décembre 1975 par référendum"
+        },
+        {
+          "date": "1992-08-19",
+          "election_kind": "referendum",
+          "source": "senat_historique",
+          "quote": "La Constitution de 1992 adoptée par référendum le 19 août 1992"
+        },
+        {
+          "date": "1995-09-17",
+          "precision": "day"
+        },
+        {
+          "date": "1998-03-15",
+          "precision": "day"
+        },
+        {
+          "date": "2007-04-04",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "hcc_ref2007",
+          "quote": "Electeurs inscrits : 7 381 091 Votants : 3 224 088 ... O U I : 2 378 650 (75,33%)"
+        },
+        {
+          "date": "2010-11-17",
+          "precision": "day"
+        }
+      ]
+    },
+    {
+      "key": "communales",
+      "tier": "commune",
+      "name": "Fifidianana ny Ben'ny tanàna sy ny Mpanolotsaina / Élections communales et municipales",
+      "name_en": "Communal elections: mayors and municipal and communal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "mg.commune"
+        ]
+      },
+      "finest_note": "Commune (CENI provisional results for 2019 and 2024; the 2024 district PDFs annex polling-station sheets); final results are judgments of the six administrative courts and are not published as data.",
+      "source": "decret2024_1495",
+      "locator": "https://www.cnlegis.gov.mg/uploads/D2024-1495-VF.pdf (Art. 2, quoting Art. 306 of loi n° 2014-020 as amended by loi n° 2023-023: one list ballot, five-year term, the head of the leading list becomes mayor, electoral quotient and largest remainder)",
+      "first_held": "1995-11-05",
+      "earliest_record": "2019-11-27",
+      "note": "Mayors and councils of all 1,695 communes, urban (municipal councils) and rural (communal councils); Antananarivo, Nosy Be, and Sainte Marie have special status. In 2015 and from 2024 one list ballot elects the council and its head becomes mayor; in 2019 the mayor and the council were on separate ballots (CENI 2019 report), so 2019 counts two contests per commune. Communal elections under earlier laws were held from 1995 to 2008 but are not counted from an official list. Mandates lapsed on 10 January 2024 and were extended by HCC avis n° 01-HCC/AV of 25 January 2024.",
+      "contests_per_unit": 1,
+      "est_votes": 25000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "MG",
+          "valid_from": "1959-01-01"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "MG",
+          "valid_from": "1959-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 12,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission Électorale Nationale Indépendante (CENI); final results by the administrative courts (tribunaux administratifs)",
+          "valid_from": "2023-01-31",
+          "source": "decret2024_1495"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI uploads (ceni-madagascar.mg/wp-content/uploads)",
+          "url": "https://www.ceni-madagascar.mg/wp-content/uploads/2021/12/Election_provisoire_maire_2019.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2019-11-27",
+          "last_date": "2024-12-11",
+          "source": "ceni_maire2019",
+          "evidence": "2019 mayors and councillors by commune (Election_provisoire_maire_2019.pdf, Election_provisoire_conseiller_2019.pdf); 2024 one PDF per district by commune (RESULTAT-<district>.pdf) linked from the results page.",
+          "finest": "mg.commune"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "through": "2008-12-31",
+          "note": "Communal elections of 1995, 1999, 2003, and 2007-2008 under earlier laws; not counted from an official list."
+        },
+        {
+          "date": "2015-07-31",
+          "precision": "day"
+        },
+        {
+          "date": "2019-11-27",
+          "election_kind": "local",
+          "contests": 3390,
+          "source": "ceni_rapport2019",
+          "quote": "élections des maires et des conseillers ... suivant deux modes de scrutin différents; 1,695 communes"
+        },
+        {
+          "date": "2024-12-11",
+          "election_kind": "local",
+          "contests": 1695,
+          "source": "ceni_rapport_com2024",
+          "quote": "1695 communes"
+        }
+      ]
+    },
+    {
+      "key": "region_elue",
+      "tier": "region",
+      "name": "Conseil régional et Chef de région",
+      "name_en": "Regional councils and regional heads",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 154-155: the chef de région and the regional council elected by universal suffrage; deputies and senators sit by right)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Never held: no regional election has been organized under the 2010 Constitution or loi n° 2014-020; chefs de région are appointed by decree.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "province_elue",
+      "tier": "province",
+      "name": "Conseil provincial et Chef de province",
+      "name_en": "Provincial councils and provincial heads (2010 Constitution)",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 158-159)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Never held: the provinces of the 2010 Constitution have no elected organs yet.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "conseil_provincial_autonome",
+      "tier": "province",
+      "name": "Conseils provinciaux des provinces autonomes",
+      "name_en": "Councils of the autonomous provinces",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "senat_historique",
+      "valid_from": "1998-04-08",
+      "valid_to": "2007-04-27",
+      "first_held": "2000-12-03",
+      "note": "Created by the 1998 revision (referendum of 15 March 1998); the councils were elected on 3 December 2000 and elected the 2001 Senate; the 2007 revision abolished the autonomous provinces.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the 3 December 2000 provincial-council results online: the HCC's arrêts start in 2004 and CENI did not exist.",
+      "est_votes": 4000000,
+      "effort": 5,
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "MG-*",
+          "valid_to": "2007-04-27"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-12-03",
+          "precision": "day"
+        }
+      ]
+    },
+    {
+      "key": "collectivites_revolutionnaires",
+      "tier": "fokontany",
+      "name": "Fokontany, Firaisampokontany, Fivondronampokontany, Faritany (Deuxième République)",
+      "name_en": "People's councils and executive committees of the Second Republic",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "senat_historique",
+      "valid_from": "1975-12-31",
+      "valid_to": "1992-09-12",
+      "first_held": "1977-03-01",
+      "note": "The 1975 Constitution built the decentralized collectivities on elected people's assemblies at the fokontany, firaisana, fivondronana, and faritany levels; elections were held from 1977 into the 1980s.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes results of the Second Republic's collectivity elections online.",
+      "est_votes": 10000000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1977-01-01",
+          "precision": "year",
+          "through": "1989-12-31",
+          "note": "Collectivity elections of the Second Republic; not counted from an official list."
+        }
+      ]
+    },
+    {
+      "key": "senat_premiere_republique",
+      "tier": "national",
+      "name": "Sénat de la Première République",
+      "name_en": "Senate of the First Republic",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "senat_historique",
+      "valid_from": "1959-04-29",
+      "valid_to": "1972-10-08",
+      "first_held": "1959-07-01",
+      "note": "54 members: two thirds elected by provincial and communal bodies (five per province in 1959, by the congress of provincial assemblies), one third appointed; six-year terms renewed by half every three years. Suspended after the 1972 referendum.",
+      "disposition": "blocked",
+      "disposition_reason": "Results appear only in the Journal officiel of the First Republic, which no official body publishes online; senat.mg gives only dates.",
+      "est_votes": 5000,
+      "effort": 5,
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "MG",
+          "valid_to": "1972-10-08"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "note": "Five senators per province elected by the congress of provincial assemblies for a provisional term (seated 1 July 1959); later elections dated 2 October 1963 and 3 May 1967 on senat.mg do not fit its own periods."
+        }
+      ]
+    },
+    {
+      "key": "president_parlement",
+      "tier": "national",
+      "name": "Élection du Président de la République par le Parlement (1959)",
+      "name_en": "President, chosen by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "senat_historique",
+      "valid_from": "1959-04-29",
+      "valid_to": "1965-03-30",
+      "first_held": "1959-05-01",
+      "note": "Philibert Tsiranana was elected by the two chambers on 1 May 1959; from 1965 the President is elected directly.",
+      "disposition": "blocked",
+      "disposition_reason": "The parliamentary vote is recorded only in the Journal officiel of 1959, which is not online from an official body.",
+      "est_votes": 200,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MG",
+          "valid_to": "1965-03-30"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1959-05-01",
+          "precision": "day"
+        }
+      ]
+    },
+    {
+      "key": "assemblees_coloniales",
+      "tier": "national",
+      "name": "Assemblée représentative et assemblées provinciales (1945-1958)",
+      "name_en": "Colonial representative and provincial assemblies, and the 1958 constituent congress",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "senat_historique",
+      "valid_to": "1958-10-14",
+      "first_held": "1946-01-01",
+      "note": "The territory's representative assembly and the provincial assemblies (last elected 31 March 1957), whose congress proclaimed the Malagasy Republic on 14 October 1958 and sat as the constituent and legislative assembly until 1960.",
+      "disposition": "blocked",
+      "disposition_reason": "Results appear only in the colonial Journal officiel, which no Malagasy official body publishes online.",
+      "est_votes": 3000000,
+      "effort": 5,
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "MG",
+          "valid_to": "1958-10-14"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "through": "1957-03-31",
+          "note": "Colonial assembly elections; not counted from an official list."
+        }
+      ]
+    },
+    {
+      "key": "parlement_francais",
+      "tier": "national",
+      "name": "Élections au Parlement français",
+      "name_en": "French Parliament and the 1958 French referendum",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "senat_historique",
+      "valid_to": "1958-10-14",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections of deputies and senators to the French Parliament from Madagascar, and the referendum of 28 September 1958, belong to the France census.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "chef_fokontany",
+      "tier": "fokontany",
+      "name": "Chef fokontany",
+      "name_en": "Fokontany heads",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 152: the fokontany is an administrative subdivision of the commune, not a decentralized collectivity)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The chef fokontany is named by arrêté of the district head; any residents' designation before it is not an election administered by CENI and no official body publishes its results.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "hcc_juges",
+      "tier": "national",
+      "name": "Haute Cour Constitutionnelle et magistrature",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.hcc.gov.mg/wp-content/uploads/2015/09/CONSTITUTION-IV.pdf (Art. 114: nine HCC judges, three appointed by the President, two elected by the National Assembly, one by the Senate, three by the Conseil supérieur de la magistrature)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No judge is popularly elected: HCC judges are appointed or chosen by the chambers and the magistracy council, and other judges are appointed.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "primaires",
+      "tier": "national",
+      "name": "Primaires",
+      "name_en": "Nominating contests",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lo2018_009",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The state runs no nominating contest: parties and groups nominate candidates, and the HCC validates candidacies.",
+      "est_votes": 0,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "MG*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "chambres_professionnelles",
+      "tier": "national",
+      "name": "Chambres de commerce et d'industrie, chambres d'agriculture",
+      "name_en": "Professional chambers",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lo2018_008",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chamber members are chosen by their own members outside the general electoral regime of loi organique n° 2018-008; CENI does not administer them and no official body publishes results.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "districts_speciaux",
+      "tier": "commune",
+      "name": "Établissements publics et organismes de coopération intercommunale",
+      "name_en": "Special-purpose bodies",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loi2015_002",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No special-purpose district is popularly elected; intercommunal bodies (OPCI) are made up of delegates of the member communes.",
+      "est_votes": 0,
+      "effort": 5,
+      "dates": []
+    }
+  ]
+}
