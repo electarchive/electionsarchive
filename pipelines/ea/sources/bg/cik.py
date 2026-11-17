@@ -329,6 +329,20 @@ LAYOUTS: dict[str, Layout] = {
         False,
         3,
     ),
+    # The Constitutional Court's recount database: the protocol points sit where they do in `ns2024`, the sections file
+    # gains a last column naming the recount ordered for the section, and each list has a fifth field with the votes
+    # added by the Court's decision.
+    "ns2024k": Layout(
+        0,
+        1,
+        _same(
+            {"reg": (8,), "voters": (10,), "box": (10,), "inv": (14, 15, 18), "valid": (16, 19)}, "24", "26", "28", "30"
+        ),
+        "form_pairs",
+        5,
+        False,
+        4,
+    ),
     "pres2026": Layout(
         0,
         1,
@@ -358,7 +372,7 @@ def url_of(name: str) -> str:
 
 def fetch() -> None:
     early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS)]
-    for url in dict.fromkeys([*(e.url for e in ELECTIONS), LISTS_2009, *early]):
+    for url in dict.fromkeys([*(e.url for e in ELECTIONS), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early]):
         try:
             raw.fetch(SOURCE, url, suffix=".zip" if url.endswith(".zip") else ".html")
         except httpx.HTTPError as failure:
@@ -1175,6 +1189,204 @@ def build(e: Election) -> Package:
     )
     p.frame("result_value", frame)
     accept(p, e, figures, votes, secs)
+    return p
+
+
+RECOUNT_ID = "ns-2024-10-27-recount"
+RECOUNT_URL = Z + "pe202410_ks/opendata/export.zip"
+RECOUNT_PAGE = Z + "pe202410_ks/opendata/index.html"
+RECOUNT_METHOD = (
+    "The Central Election Commission (CIK) published this database after it entered the Constitutional Court's "
+    "decision on the 27 October 2024 election, which ordered the section commissions' paper and machine ballots, or "
+    "their invalid votes, counted again in the sections the Court named. It uses the same files as the original "
+    "count. Registered voters, voters, ballots in the box, and invalid ballots are the figures printed in the section "
+    "protocols; votes for each list are the list totals of the votes file, which include any votes the decision "
+    "added. The valid-ballots point of the protocol is stored as printed, and it was not updated for the "
+    "recount in every section. Preference votes are not stored here yet."
+)
+RECOUNT_FLAGS = {"0": "not recounted", "1": "paper and machine ballots recounted", "2": "invalid votes recounted"}
+
+
+def _percent(part: int, whole: int) -> str:
+    return f"{100 * part / whole:.2f}"
+
+
+def recount() -> Package:
+    """The October 2024 election after the Constitutional Court's recount, as a result set that supersedes each
+    constituency's official one. It holds the same sections, lists, and contests as the original count."""
+    official = next(x for x in ELECTIONS if x.id == "ns-2024-10-27")
+    revised = official._replace(url=RECOUNT_URL, layout="ns2024k")
+    e = official
+    p = Package(
+        f"{SOURCE}/{RECOUNT_ID}",
+        SOURCE,
+        "The 27 October 2024 Bulgarian parliamentary election by polling section after the Constitutional Court's "
+        "recount, from the CIK's open data",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{e.id}"],
+    )
+    p.artifact(raw.cached(SOURCE, RECOUNT_URL), CIK_SOURCE)
+    p.uses(raw.cached(SOURCE, RECOUNT_PAGE))
+    p.uses(raw.cached(SOURCE, e.url))
+
+    secs, figures, votes = sections(revised), protocol_figures(revised), party_votes(revised)
+    old_secs, old_figures, old_votes = sections(e), protocol_figures(e), party_votes(e)
+    if set(secs) != set(old_secs) or set(figures) != set(old_figures) or set(votes) != set(old_votes):
+        raise ValueError("the recount database does not hold the same sections as the original count")
+    if any(secs[c] != old_secs[c] for c in secs):
+        raise ValueError("the recount database describes a section differently from the original count")
+    decided = {r[0]: r[-1] for r in rows(revised, "sections")}
+    codes = sorted(secs)
+    names = parties(e)
+    cands = candidates(e)
+    nominators = {c.party: c.party_name for c in cands}
+
+    # The options of the original count: a list is an option where the constituency's lists or its votes name it.
+    local = local_lists(e)
+    seen: dict[int, set[str]] = defaultdict(set)
+    for code, per in old_votes.items():
+        seen[mir_of(e, code)].update(per)
+    constituencies = sorted(seen)
+    options: dict[tuple[int, str], str] = {}
+    for m in constituencies:
+        for n in [*local.get(m, []), *sorted(seen[m] - set(local.get(m, [])), key=int)]:
+            options[(m, n)] = key("option", e.id, f"{m:02d}", n)
+    for code, per in votes.items():
+        for n in per:
+            if (mir_of(e, code), n) not in options:
+                raise ValueError(f"section {code} holds votes for list {n}, which the original count does not have")
+
+    def name_of(n: str) -> str:
+        return names.get(n) or nominators.get(n) or f"List {n}"
+
+    # What changed, section by section and in each constituency.
+    def figure(code: str, kind: str, source: dict[str, dict[str, int]]) -> int:
+        return source[code].get(kind, 0)
+
+    changed: dict[str, list[str]] = {}
+    for code in codes:
+        what = [k for k in MEASURES if figure(code, k, figures) != figure(code, k, old_figures)]
+        if any(votes[code].get(n, 0) != old_votes[code].get(n, 0) for n in {*votes[code], *old_votes[code]}):
+            what.append("votes")
+        if what:
+            changed[code] = what
+    if any(decided[c] == "0" for c in changed):
+        raise ValueError("a section the decision did not name differs from the original count")
+
+    def total(source: dict[str, dict[str, int]], kind: str, within: list[str]) -> int:
+        return sum(source[c].get(kind, 0) for c in within)
+
+    def list_total(source: dict[str, dict[str, int]], within: list[str]) -> int:
+        return sum(sum(source[c].values()) for c in within)
+
+    by_mir: dict[int, list[str]] = defaultdict(list)
+    for code in codes:
+        by_mir[mir_of(e, code)].append(code)
+
+    def story(within: list[str], where: str) -> str:
+        moved = [c for c in within if c in changed]
+        named = [c for c in within if decided[c] != "0"]
+        paper = sum(1 for c in named if decided[c] == "1")
+        votes_before, votes_after = list_total(old_votes, within), list_total(votes, within)
+        invalid_before, invalid_after = total(old_figures, "inv", within), total(figures, "inv", within)
+        lists: dict[str, int] = defaultdict(int)
+        for c in moved:
+            for n in {*votes[c], *old_votes[c]}:
+                lists[n] += votes[c].get(n, 0) - old_votes[c].get(n, 0)
+        gains = sorted(lists.items(), key=lambda kv: (-abs(kv[1]), int(kv[0])))[:5]
+        stale = sum(1 for c in within if figure(c, "valid", figures) != sum(votes[c].values()))
+        old_stale = sum(1 for c in within if figure(c, "valid", old_figures) != sum(old_votes[c].values()))
+        text = (
+            f"{where}: the decision names {len(named):,} of {len(within):,} sections ({paper:,} for a recount of "
+            f"paper and machine ballots, {len(named) - paper:,} for a recount of invalid votes), and {len(moved):,} "
+            f"of them differ from the original count in a figure or a list's votes. Votes for lists go from "
+            f"{votes_before:,} to {votes_after:,} ({votes_after - votes_before:+,}); invalid ballots from "
+            f"{invalid_before:,} to {invalid_after:,} ({invalid_after - invalid_before:+,}). "
+            f"Registered voters, voters, and ballots in the box are the same in every section"
+        )
+        if any(figure(c, k, figures) != figure(c, k, old_figures) for c in within for k in ("reg", "voters", "box")):
+            raise ValueError(f"{where}: the recount moves a figure the note says it keeps")
+        text += (
+            f". The valid ballots printed in the protocol differ from the list votes in {stale:,} sections "
+            f"({old_stale:,} in the original count)."
+        )
+        if gains and moved:
+            text += " Largest net changes by list: " + "; ".join(f"{name_of(n)} {d:+,}" for n, d in gains if d) + "."
+        return text
+
+    election_note = story(codes, "Nationally")
+    sets: dict[int, str] = {}
+    for m in constituencies:
+        ckey = f"{m:02d}"
+        contest = key("contest", e.id, ckey)
+        original = key("result_set", e.id, ckey)
+        revised_set = sets[m] = key("result_set", RECOUNT_ID, ckey)
+        # The original set stays in its own package, which holds its facts; this one points at it.
+        p.add(
+            "result_set",
+            id=revised_set,
+            election_id=key("election", e.id),
+            contest_id=contest,
+            stage="court_revised",
+            kind="counted",
+            source_id=CIK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+            supersedes_id=original,
+        )
+        p.add(
+            "note",
+            id=key("note", revised_set),
+            entity_id=revised_set,
+            kind="methodology",
+            body_md=RECOUNT_METHOD,
+            lang="en",
+        )
+        en = MIR.get(m, ABROAD)[0]
+        p.add(
+            "note",
+            id=key("note", revised_set, "changes"),
+            entity_id=revised_set,
+            kind="caveat",
+            body_md=(
+                "This set supersedes the original count of the constituency. "
+                + story(by_mir[m], f"{m:02d}. {en}")
+                + " "
+                + election_note
+            ),
+            lang="en",
+        )
+
+    cols: dict[str, list[object]] = {c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "value")}
+
+    def put(rs: str, unit: str, option: str | None, measure: int, value: int) -> None:
+        cols["result_set_id"].append(rs)
+        cols["unit_id"].append(unit)
+        cols["option_id"].append(option)
+        cols["measure"].append(measure)
+        cols["value"].append(value)
+
+    for code in codes:
+        m = mir_of(e, code)
+        rs, unit = sets[m], p.id("unit", e.id, code)
+        for name, measure in MEASURES.items():
+            if name in figures[code]:
+                put(rs, unit, None, measure, figures[code][name])
+        for n, count in votes[code].items():
+            put(rs, unit, options[(m, n)], VOTES, count)
+    frame = values_frame(cols).with_columns(
+        channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+    )
+    p.frame("result_value", frame)
+    accept(p, revised, figures, votes, secs)
+    stale = sum(1 for c in codes if figure(c, "valid", figures) != sum(votes[c].values()))
+    p.accept(
+        "accounting.votes_valid",
+        f"in {stale:,} sections the votes printed for the lists do not add up to the valid ballots printed in the "
+        "protocol: the Constitutional Court's database changes the list votes and the invalid ballots of the "
+        "sections it named but leaves the protocol's valid-ballots point as it was in the original count; "
+        "stored as printed",
+    )
     return p
 
 
@@ -2678,7 +2890,11 @@ def build_early(id: str) -> Package:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{x}" for x in [*(e.id for e in ELECTIONS), *EARLY])]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{x}" for x in [*(e.id for e in ELECTIONS), RECOUNT_ID, *EARLY]),
+    ]
 
 
 def parse() -> None:
@@ -2686,6 +2902,7 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         build(e).write()
+    recount().write()
     for id in EARLY:
         build_early(id).write()
 
