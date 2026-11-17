@@ -927,15 +927,13 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
         )
     counts: dict[str, list[int]] = {}
     touched_ids: dict[str, list[str]] = {}
+    deferred: list[str] = []
     for table in reversed(TABLES):
         try:
-            counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
-        except errors.ForeignKeyViolation as error:
-            raise ValueError(
-                f"{key} v{version} would delete {table} rows that other packages still use "
-                f"({error.diag.message_detail}); a package must keep every row other packages reference, "
-                "so build it from a full parse of its pipeline"
-            ) from None
+            with conn.transaction():
+                counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
+        except errors.ForeignKeyViolation:
+            deferred.append(table)
     for table in TABLES:
         if table not in staged:
             continue
@@ -984,6 +982,15 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
                 )
             ).rowcount
         counts.setdefault(table, [0, 0])[0] = written
+    for table in deferred:
+        try:
+            counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
+        except errors.ForeignKeyViolation as error:
+            raise ValueError(
+                f"{key} v{version} would delete {table} rows that other packages still use "
+                f"({error.diag.message_detail}); a package must keep every row other packages reference, "
+                "so build it from a full parse of its pipeline"
+            ) from None
     sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts)
     _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts)
     current = conn.execute(
