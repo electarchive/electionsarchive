@@ -2937,6 +2937,10 @@ SYSTEMS.append(
 )
 
 
+# The office's 1994-2010 files call the Roma nationality "cigány"; from 2014 it writes "Roma".
+NATION_NAMES = {"Cigány": "Roma"}
+
+
 def nationality_body(level: str, place: str, nation: str) -> str:
     id = key("body", "nationality", level, place, nation)
     LOCAL_BODIES[id] = ("body", f"nationality-{level}", f"{place}|{nation}")
@@ -2964,6 +2968,7 @@ def county_unit(d: Day, maz: str, suffix: str = "") -> str:
 def nationality_contest(local: Local, level: str, place: str, nation: str) -> str:
     """level: national (lists, nationwide), territorial (lists, one county), settlement (candidates)."""
     d = local.d
+    nation = NATION_NAMES.get(nation.capitalize(), nation)
     tag = f"nemz:{local.year}:{level}:{place}:{changeset.slug(nation)}"
     if tag in d.sets:
         return tag
@@ -3471,9 +3476,12 @@ def mid_local(d: Day) -> None:
     found = places()
     registered_at = -6 if year == 2010 else -7
     nominators: dict[tuple[str, ...], list[str]] = defaultdict(list)
-    for stem, width in (("polgsz", 3), ("ejelersz", 4), ("kislersz", 3), ("fopolgsz", 1)):
+    for stem, width in (("polgsz", 3), ("ejelersz", 4), ("kislersz", 3), ("kisersz", 4), ("fopolgsz", 1)):
         for row in _txt(name, stem):
-            nominators[(stem[:-2], *row[:width])].append(row[width + 2] if stem != "fopolgsz" else row[3])
+            cells = row[:width]
+            if stem == "kisersz" and year == 2010:
+                cells[2] = cells[2].lstrip("0")
+            nominators[(stem[:-2], *cells)].append(row[width + 2] if stem != "fopolgsz" else row[3])
     areas: dict[tuple[str, str], str] = {}
 
     def area_of(maz: str, taz: str, town: str) -> str:
@@ -3590,26 +3598,59 @@ def mid_local(d: Day) -> None:
                 d.outcome(tag, option, "won", number(row[5]))
     # Minority self-governments: candidate votes per polling station; seats from the settlement protocols
     nations: dict[str, str] = {}
+    for row in _txt(name, "kiseref"):
+        nations[row[4]] = row[5].strip().capitalize()
+    by_station: set[str] = set()
     for row in _txt(name, "kisersf"):
-        code, nation = (row[4], row[6]) if year == 2002 else (row[5], row[6])
-        nations[code] = nation.strip().capitalize()
-        area_of(row[0], row[2], row[3])
+        code, sorsz = (row[4], row[5]) if year == 2002 else (row[5], row[4])
+        code = code.lstrip("0") if year == 2010 else code
+        area = area_of(row[0], row[2], row[3])
+        tag = nationality_contest(local, "settlement", area, nations.get(code, code))
+        by_station.add(tag)
+        unit = d.unit(area, sorsz)
+        nums = [number(cell) for cell in row[7:]]
+        if year == 2002:
+            # Only the last two figures belong to this nationality; the rest count the station's ballots for all of them.
+            d.value(tag, unit, None, 4, nums[11])
+        elif year == 2006:
+            d.accounting(tag, unit, nums[0], nums[2], nums[3], nums[5], nums[6])
+        else:
+            d.accounting(tag, unit, nums[0], nums[1], nums[2], nums[4], nums[5])
     for row in _txt(name, "kisersj"):
         if year == 2002:
             maz, taz, code, _, sorsz, position, title, printed, votes = row[:9]
         else:
             maz, taz, sorsz, code, position, title, printed, votes = row[:8]
+        code = code.lstrip("0") if year == 2010 else code
         area = areas.get((maz, taz)) or area_of(maz, taz, "")
         tag = nationality_contest(local, "settlement", area, nations.get(code, code))
-        candidate(tag, d.unit(area, sorsz), position, title, printed, votes, "")
+        nominator = ",".join(nominators.get(("kiser", maz, taz, code, position), []))
+        candidate(tag, d.unit(area, sorsz), position, title, printed, votes, nominator)
     for row in _txt(name, "kiserej"):
         area = areas.get((row[0], row[1]))
         if area is None:
             continue
-        tag = nationality_contest(local, "settlement", area, nations.get(row[2], row[2]))
+        code = row[2].lstrip("0") if year == 2010 else row[2]
+        tag = nationality_contest(local, "settlement", area, nations.get(code, code))
         option = d.options.get((tag, seat_key(row[3], f"{row[4]} {row[5]}")))
-        if option and number(row[7]):
+        if option is None:
+            continue
+        d.declare(tag, option, 1, number(row[6]))
+        if number(row[7]):
             d.outcome(tag, option, "elected")
+    # The settlement protocols' valid ballots for each nationality, declared against the polling-station sums
+    valid_at = {2002: 20, 2006: 15, 2010: 13}[year]
+    for row in _txt(name, "kiseref"):
+        area = areas.get((row[0], row[2]))
+        if area is None:
+            continue
+        code = row[4].lstrip("0") if year == 2010 else row[4]
+        tag = nationality_contest(local, "settlement", area, nations.get(row[4], code))
+        if tag in by_station:
+            d.declare(tag, None, 4, number(row[valid_at]))
+        else:
+            # No polling-station protocols for it: the settlement's own figure is the only count.
+            d.value(tag, d.settlement_unit(area), None, 4, number(row[valid_at]))
 
 
 for _year, (_, _day) in MID_LOCAL.items():
@@ -3724,6 +3765,10 @@ def old_local(d: Day) -> None:
         d.value(tag, county_unit(d, maz, f":{row[2]}"), option, 1, number(votes))
         if number(seats):
             d.outcome(tag, option, "won", number(seats))
+    for row in stem("kiseret"):
+        area = area_of(row)
+        tag = nationality_contest(local, "settlement", area, row[5].capitalize())
+        d.value(tag, d.settlement_unit(area), None, 4, number(row[10]))
     items(
         "kiseretj",
         lambda row: (
