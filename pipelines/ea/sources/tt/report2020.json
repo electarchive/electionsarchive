@@ -1,0 +1,43 @@
+{
+  "cells": {
+    "191:1765-01:6": {
+      "value": 491,
+      "note": "Electors, read from the page; the scan reads 49."
+    },
+    "191:1770-01:6": {
+      "value": 491,
+      "note": "Electors, read from the page; the scan reads 49."
+    },
+    "358:3265-01:5": {
+      "value": 510,
+      "note": "Electors, read from the page; the scan reads 310."
+    },
+    "358:3265-02:5": {
+      "value": 513,
+      "note": "Electors, read from the page; the scan reads 313."
+    }
+  },
+  "candidates": {
+    "POINTEAPIERRE": [
+      [
+        "ABDULAH, DAVID",
+        "M.S.J."
+      ],
+      [
+        "DOOKIE, DANIEL",
+        "P.N.M."
+      ],
+      [
+        "HOWARD, MARVYN LYNDEN",
+        "P.E.P."
+      ],
+      [
+        "LEE, DAVID ANTHONY",
+        "U.N.C."
+      ]
+    ]
+  },
+  "notes": {
+    "POINTEAPIERRE": "The heading prints HOWARD MARVYN LYNDEN without the comma after the surname; the comma is added so the name reads surname first like the others."
+  }
+}
