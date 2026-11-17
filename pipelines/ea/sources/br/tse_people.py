@@ -12,7 +12,7 @@ from ea.sources.br import municipais, tse_history
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_people"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ROSTERS = [
     *((municipais.SOURCE, year, municipais.FILES[(year, "roster")]) for year in municipais.YEARS),
@@ -56,11 +56,14 @@ def parse() -> None:
                 candidate=pl.col("SQ_CANDIDATO"),
                 title=pl.col("NR_TITULO_ELEITORAL_CANDIDATO").str.strip_chars(),
                 cpf=cpf.str.strip_chars(),
+                name=pl.col("NM_CANDIDATO").str.strip_chars(),
+                birth=pl.col("DT_NASCIMENTO").str.to_date("%d/%m/%Y", strict=False),
             )
             .filter(pl.col("title").str.contains(DIGITS))
             .with_columns(
                 title=pl.col("title").str.strip_chars_start("0"),
                 cpf=pl.when(pl.col("cpf").str.contains(DIGITS)).then(pl.col("cpf").str.strip_chars_start("0")),
+                name=pl.col("name").map_elements(municipais.slug, return_dtype=pl.String).replace("", None),
             )
             .unique()
             .collect()
@@ -72,12 +75,111 @@ def parse() -> None:
     titles.join(checked, on="title").write_parquet(PARSED / "titles.parquet")
 
 
+CANDIDACY = ["year", "place", "candidate"]
+
+
+def components(nodes: int, edges: pl.DataFrame) -> list[int]:
+    """Label each node with the smallest node it connects to through the `node` and `root` columns of `edges`."""
+    parent = list(range(nodes))
+
+    def find(node: int) -> int:
+        while parent[node] != node:
+            parent[node] = parent[parent[node]]
+            node = parent[node]
+        return node
+
+    for node, root in edges.iter_rows():
+        first, second = find(node), find(root)
+        if first != second:
+            parent[max(first, second)] = min(first, second)
+    return [find(node) for node in range(nodes)]
+
+
+def identities(titles: pl.DataFrame) -> pl.DataFrame:
+    """Join candidacies into one identity by exact keys only.
+
+    Two candidacies are one person when they carry the same voter title and the same tax number, the same voter
+    title and the same name and birth date, or the same tax number and the same birth date. A title the rosters give
+    at most one tax number then joins all its candidacies when each year's candidacies under it are already one
+    identity, so a title that two people share in one year stays apart.
+    """
+    nodes = titles.select(CANDIDACY).unique().sort(CANDIDACY).with_row_index("node")
+    rows = titles.join(nodes, on=CANDIDACY)
+
+    def edges(frame: pl.DataFrame, keys: list[str]) -> pl.DataFrame:
+        return (
+            frame.drop_nulls(keys)
+            .select("node", root=pl.col("node").min().over(keys))
+            .filter(pl.col("node") != pl.col("root"))
+        )
+
+    exact = pl.concat(
+        [edges(rows, ["title", "cpf"]), edges(rows, ["title", "name", "birth"]), edges(rows, ["cpf", "birth"])]
+    )
+    label = pl.Series("identity", components(nodes.height, exact), pl.UInt32)
+    rows = rows.with_columns(identity=label.gather(rows["node"]))
+    split = rows.group_by("title", "year").agg(pl.col("identity").n_unique()).filter(pl.col("identity") > 1)
+    single = (
+        rows.group_by("title")
+        .agg(pl.col("cpf").drop_nulls().n_unique())
+        .filter(pl.col("cpf") <= 1)
+        .join(split, on="title", how="anti")
+        .select("title")
+    )
+    title = edges(rows.join(single, on="title"), ["title"])
+    label = pl.Series("identity", components(nodes.height, pl.concat([exact, title])), pl.UInt32)
+    return nodes.with_columns(identity=label.gather(nodes["node"])).drop("node")
+
+
+def plan(titles: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
+    """Group the persons of the held candidacies by identity, survivor first, and write what the merge skips."""
+    ambiguous = titles.group_by(CANDIDACY).agg(pl.col("title").n_unique()).filter(pl.col("title") > 1)
+    titles = titles.join(ambiguous.select(CANDIDACY), on=CANDIDACY, how="anti")
+    joined = held.join(titles.unique(CANDIDACY, keep="first", maintain_order=True), on=CANDIDACY).join(
+        identities(titles), on=CANDIDACY
+    )
+    people = joined.group_by("title").agg(
+        identities=pl.col("identity").n_unique(),
+        cpfs=pl.col("cpf").drop_nulls().n_unique(),
+        years=pl.col("year").n_unique(),
+        candidacies=pl.struct(CANDIDACY).n_unique(),
+    )
+    merging = joined.group_by("identity").agg(pl.col("person").n_unique()).filter(pl.col("person") > 1)
+    split = (
+        joined.group_by("person")
+        .agg(pl.col("identity").n_unique(), titles=pl.col("title").n_unique())
+        .filter(pl.col("identity") > 1)
+    )
+    skipped = people.filter(pl.col("identities") > 1)
+    print(
+        f"titles {people.height}, identities merging {merging.height}, "
+        f"titles split between identities {skipped.height}, "
+        f"of which with several tax numbers {skipped.filter(pl.col('cpfs') > 1).height}, "
+        f"persons in several identities {split.height}, candidacies with two titles {ambiguous.height}"
+    )
+    PARSED.mkdir(parents=True, exist_ok=True)
+    split.write_parquet(PARSED / "split.parquet")
+    skipped.write_parquet(PARSED / "skipped.parquet")
+    groups = (
+        joined.join(merging.select("identity"), on="identity")
+        .filter(~pl.col("person").is_in(split["person"].implode()))
+        .group_by("identity", "person")
+        .agg(pl.col("misread").all(), pl.col("rank").min(), pl.col("birth").first(), first=pl.col("year").min())
+        .sort("identity", "misread", "rank", "first", "person")
+    )
+    births = (
+        groups.filter(~pl.col("misread"))
+        .group_by("identity")
+        .agg(pl.col("birth").drop_nulls().n_unique())
+        .filter(pl.col("birth") > 1)
+    )
+    print(f"merged identities whose persons' birth dates differ {births.height}")
+    births.write_parquet(PARSED / "births.parquet")
+    return groups
+
+
 def emit() -> Path:
     titles = pl.read_parquet(PARSED / "titles.parquet")
-    ambiguous = (
-        titles.group_by("year", "place", "candidate").agg(pl.col("title").n_unique()).filter(pl.col("title") > 1)
-    )
-    titles = titles.join(ambiguous.select("year", "place", "candidate"), on=["year", "place", "candidate"], how="anti")
     with connect() as conn:
         held = pl.DataFrame(
             conn.execute(
@@ -111,50 +213,15 @@ def emit() -> Path:
             misread=(pl.col("pipeline") == tse_history.SOURCE)
             & pl.col("key").str.slice(0, 4).cast(pl.Int32).is_in(MISREAD),
         )
-        joined = held.join(titles, on=["year", "place", "candidate"])
-        people = joined.group_by("title").agg(
-            persons=pl.col("person").n_unique(),
-            cpfs=pl.col("cpf").drop_nulls().n_unique(),
-            years=pl.col("year").n_unique(),
-            candidacies=pl.struct("year", "place", "candidate").n_unique(),
-        )
-        clashes = people.filter(pl.col("cpfs") > 1)
-        doubled = people.filter(pl.col("candidacies") > pl.col("years"))
-        merging = people.filter(
-            (pl.col("persons") > 1) & (pl.col("cpfs") <= 1) & (pl.col("candidacies") == pl.col("years"))
-        )
-        split = joined.group_by("person").agg(pl.col("title").n_unique()).filter(pl.col("title") > 1)
-        print(
-            f"titles {people.height}, merging {merging.height}, cpf clashes {clashes.height}, "
-            f"several candidacies in one year {doubled.height}, persons with several titles {split.height}, "
-            f"candidacies with two titles {ambiguous.height}"
-        )
-        PARSED.mkdir(parents=True, exist_ok=True)
-        split.write_parquet(PARSED / "split.parquet")
-        pl.concat([clashes, doubled]).unique("title").write_parquet(PARSED / "skipped.parquet")
-        groups = (
-            joined.join(merging.select("title"), on="title")
-            .filter(~pl.col("person").is_in(split["person"].implode()))
-            .group_by("title", "person")
-            .agg(pl.col("misread").all(), pl.col("rank").min(), pl.col("birth").first(), first=pl.col("year").min())
-            .sort("title", "misread", "rank", "first", "person")
-        )
-        births = (
-            groups.filter(~pl.col("misread"))
-            .group_by("title")
-            .agg(pl.col("birth").drop_nulls().n_unique())
-            .filter(pl.col("birth") > 1)
-        )
-        print(f"merged titles whose persons' birth dates differ {births.height}")
-        births.write_parquet(PARSED / "births.parquet")
+        groups = plan(titles, held)
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Brazilian candidates recorded more than once merged by their voter registration number",
+            summary="Brazilian candidates recorded more than once merged by their voter registration and tax numbers",
             polity="BR",
         )
-        for group in groups.partition_by("title", maintain_order=True):
+        for group in groups.partition_by("identity", maintain_order=True):
             survivor, *duplicates = [UUID(person) for person in group["person"]]
             for duplicate in duplicates:
                 cs.merge(duplicate, survivor)
