@@ -177,7 +177,12 @@ DAYS = (
         "general",
         "2024 Dominican Republic general election",
         "Elecciones generales de 2024",
-        (Sheet("president", entry(30612), ".xlsx", "2024"),),
+        (
+            Sheet("president", entry(30612), ".xlsx", "2024"),
+            Sheet("senate", entry(30617), ".pdf", "relation"),
+            Sheet("deputies", entry(30613), ".pdf", "relation"),
+            Sheet("abroad", entry(30614), ".pdf", "relation"),
+        ),
         (("president", entry(30616), ".pdf"),),
     ),
 )
@@ -332,6 +337,14 @@ METHOD = (
     "Board counts observed ballots in ballots cast apart from valid and null ballots. A party whose column is zero in "
     "every college of a contest is left out of that contest. Colleges abroad and in prisons are placed in no area."
 )
+RELATION = (
+    "Counted by the Junta Central Electoral and published in the definitive results tables (relación general "
+    "definitiva del cómputo electoral) of its transparency portal, one table per province for the Senate and one per "
+    "circumscription for the deputies, with no figures per electoral college. Each party's votes are those of its "
+    "ballot line, whether it ran alone or in an alliance; the alliance totals the Board prints are not stored. Null "
+    "ballots are stored as invalid ballots and observed (objected) ballots as objected ballots. The preferential "
+    "votes the deputies tables print by candidate number, without names, are not stored."
+)
 ADJUSTED = (
     " For each municipality the Board also prints a row with college code 9999, the distribution of null and "
     "observed ballots (distribución de nulos y observados del municipio): the ballots its review moved between null, "
@@ -434,6 +447,8 @@ class Count(NamedTuple):
 
 @functools.cache
 def count(s: Sheet) -> Count:
+    if s.layout == "relation":
+        return relation_count(s)
     frame = _sheet_frame(s)
     fields, skip = LAYOUTS[s.layout]
     lower = {c.strip().lower(): c for c in frame.columns}
@@ -484,6 +499,7 @@ def count(s: Sheet) -> Count:
     if s.layout == "2008":
         rows = _coded(rows)
     rows = rows.with_columns(
+        grain=pl.lit(None, pl.String),
         adjustment=pl.col("col") == ADJUSTMENT,
         where=pl.when(pl.col("prov_name").fill_null("").str.contains("PENITENCIARIO"))
         .then(pl.lit("prison"))
@@ -501,6 +517,125 @@ def count(s: Sheet) -> Count:
         .otherwise(pl.col("dm")),
     )
     return Count(s, rows, tuple(parties))
+
+
+# --- Provincial and circumscription tables of 2024: a row per province or circumscription, and party.
+
+RELATION_LABELS = (
+    ("TOTAL DE INSCRITOS", "registered"),
+    ("VOTOS VALIDOS", "valid"),
+    ("VOTOS NULOS", "null"),
+    ("VOTOS OBSERVADOS", "observed"),
+    ("VOTOS EMITIDOS", "cast"),
+)
+PARTY_LINE = re.compile(r"^(?P<indent> *)(?P<body>\S.*?)\s{2,}(?P<votes>\d[\d,]*)(?P<rest>(?:\s+[\d.,%]+)*)\s*$")
+
+
+def _relation_page(text: str, level: str) -> tuple[tuple[int, int | None], dict[str, int], list[tuple[str, int, bool]]]:
+    """One page of a definitive table: its place, accounting figures, and party lines as (acronym, votes, alliance)."""
+    place = re.search(r"Provincia\s*:\s*(\d+)", text)
+    circ = re.search(r"Circunscripci\S+\s*:\s*(\d+)", text)
+    if level == "abroad":
+        if circ is None:
+            raise ValueError("abroad page without a circumscription")
+        prov, number = ABROAD, int(circ[1])
+    elif place is None:
+        raise ValueError(f"{level} page without a province: {text[:200]!r}")
+    else:
+        prov, number = int(place[1]), (int(circ[1]) if circ else 1 if level == "deputies" else None)
+    figures: dict[str, int] = {}
+    for label, field in RELATION_LABELS:
+        found = re.search(rf"{label}\s*:\s*([\d,]+)", text)
+        if found is None:
+            raise ValueError(f"{level} {prov} {number}: no {label}")
+        figures[field] = _int(found[1])
+    lines: list[tuple[int, str, int]] = []
+    started = False
+    for line in text.splitlines():
+        if "ORGANIZACI" in line:
+            started = True
+            continue
+        if not started:
+            continue
+        indent = len(line) - len(line.lstrip())
+        if level == "senate":
+            cells = re.split(r"\s{2,}", line.strip())
+            if len(cells) == 4 and re.fullmatch(r"[\d.]+%", cells[3]) and re.fullmatch(r"[\d,]+", cells[2]):
+                lines.append((indent, sigla(cells[1]), _int(cells[2])))
+            continue
+        found = PARTY_LINE.match(line)
+        if found is None:
+            continue
+        parts = found["body"].split(None, 1)
+        if len(parts) == 2 and re.fullmatch(r"\d\d", parts[0]):
+            lines.append((indent, sigla(parts[1]), _int(found["votes"])))
+    if not lines:
+        raise ValueError(f"{level} {prov} {number}: no party lines")
+    floor = min(indent for indent, _, _ in lines)
+    parties: list[tuple[str, int, bool]] = []
+    index = 0
+    while index < len(lines):
+        indent, code, votes = lines[index]
+        members: list[tuple[str, int]] = []
+        index += 1
+        while index < len(lines) and lines[index][0] > floor:
+            members.append((lines[index][1], lines[index][2]))
+            index += 1
+        if indent != floor:
+            raise ValueError(f"{level} {prov} {number}: {code} is indented without an alliance")
+        if members:
+            parties.extend((c, v, True) for c, v in members)
+        else:
+            parties.append((code, votes, False))
+    return (prov, number), figures, parties
+
+
+@functools.cache
+def relation_count(s: Sheet) -> Count:
+    """A definitive table by province or circumscription, one page each, as a Count with a row per place."""
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, s.url).path), "-"], check=True, capture_output=True, text=True
+    ).stdout
+    pages = [page for page in text.split("\f") if "RELACION GENERAL DEFINITIVA" in page]
+    seen: dict[tuple[int, int | None], tuple[dict[str, int], list[tuple[str, int, bool]]]] = {}
+    for page in pages:
+        place, figures, parties = _relation_page(page, s.level)
+        if place in seen:
+            raise ValueError(f"{s.url}: two pages for {place}")
+        if sum(v for _, v, _ in parties) != figures["valid"]:
+            raise ValueError(
+                f"{s.url} {place}: parties sum to {sum(v for _, v, _ in parties)}, valid {figures['valid']}"
+            )
+        seen[place] = (figures, parties)
+    codes = list(dict.fromkeys(code for _, parties in seen.values() for code, _, _ in parties))
+    records: list[dict[str, object]] = []
+    for (prov, circ), (figures, parties) in sorted(seen.items(), key=lambda item: (item[0][0], item[0][1] or 0)):
+        grain = f"x:{circ}" if prov == ABROAD else f"c:{prov:02d}:{circ}" if circ is not None else f"p:{prov:02d}"
+        votes = {code: v for code, v, _ in parties}
+        records.append(
+            {
+                "prov": prov,
+                "prov_name": None,
+                "mun": None,
+                "mun_name": None,
+                "dm": None,
+                "dm_name": None,
+                "circ": circ,
+                "col": "",
+                "letter": None,
+                "level": None,
+                **{m: figures.get(m) for m in MEASURES},
+                **{f"p:{code}": votes.get(code) for code in codes},
+                "grain": grain,
+                "adjustment": False,
+                "where": "abroad" if prov == ABROAD else "home",
+            }
+        )
+    rows = pl.DataFrame(records, infer_schema_length=None).with_columns(
+        pl.col("prov", "circ", "mun", "dm", *MEASURES).cast(pl.Int64),
+        pl.col("prov_name", "mun_name", "dm_name", "letter", "level", "col").cast(pl.String),
+    )
+    return Count(s, rows, tuple((code, code) for code in codes))
 
 
 @functools.cache
@@ -567,7 +702,8 @@ def unit_code(day: Day) -> pl.Expr:
         + pl.lit(":")
         + pl.col("level").fill_null("")
     )
-    return pl.lit(f"{day.key}:") + place + pl.lit(":") + pl.col("col") + extra.otherwise(pl.lit(""))
+    college = pl.lit(f"{day.key}:") + place + pl.lit(":") + pl.col("col") + extra.otherwise(pl.lit(""))
+    return pl.when(pl.col("grain").is_not_null()).then(pl.lit(f"{day.key}:") + pl.col("grain")).otherwise(college)
 
 
 # --- Local elections of 2024: a row per college, office, and party.
@@ -616,7 +752,7 @@ def local_count() -> Count:
     rows = (
         long.select(*index, party=pl.lit("p:") + pl.col("party"), votes="votes")
         .pivot(on="party", index=index, values="votes")
-        .with_columns(adjustment=pl.lit(False), where=pl.lit("home"))
+        .with_columns(adjustment=pl.lit(False), where=pl.lit("home"), grain=pl.lit(None, pl.String))
     )
     homes = rows.filter(pl.col("dm").is_not_null()).select("mun", "col", home_dm="dm", home_dm_name="dm_name").unique()
     if homes.select("mun", "col").is_duplicated().any():
@@ -1205,7 +1341,7 @@ def _units(p: Package, d: Day, contest_list: list[Contest]) -> None:
         pl.concat(
             [
                 c.rows.select(
-                    "prov", "prov_name", "mun", "mun_name", "dm", "col", "circ", "level", "adjustment", "where"
+                    "prov", "prov_name", "mun", "mun_name", "dm", "col", "circ", "level", "adjustment", "where", "grain"
                 )
                 for c in contest_list
             ],
@@ -1216,10 +1352,28 @@ def _units(p: Package, d: Day, contest_list: list[Contest]) -> None:
         .unique("code", keep="first", maintain_order=True)
     )
     units: list[dict[str, object]] = []
-    for code, where, adjustment, mun, dm, prov_name, mun_name in rows.select(
-        "code", "where", "adjustment", "mun", "dm", "prov_name", "mun_name"
+    for code, where, adjustment, mun, dm, prov_name, mun_name, grain, prov, circ in rows.select(
+        "code", "where", "adjustment", "mun", "dm", "prov_name", "mun_name", "grain", "prov", "circ"
     ).iter_rows():
         id = key("unit", code)
+        if grain is not None:
+            scheme, area_code = (
+                ("do.provincia", f"{prov:02d}")
+                if grain.startswith("p:")
+                else ("do.circunscripcion", f"exterior:{circ}" if grain.startswith("x:") else f"{prov:02d}:{circ}")
+            )
+            units.append(
+                {
+                    "id": id,
+                    "polity_id": DOMINICAN,
+                    "scheme_code": scheme,
+                    "code": code,
+                    "area_relation": "equals",
+                    "area_id": area(scheme, area_code),
+                    "kind": "aggregate",
+                }
+            )
+            continue
         if where == "home":
             place = area("do.distrito_municipal", str(dm)) if dm is not None else area("do.municipio", str(mun))
             if dm is not None and dm not in found.districts:
@@ -1397,7 +1551,7 @@ def election(d: Day) -> Package:
         )
         adjusted = bool(c.rows["adjustment"].any())
         method = (
-            METHOD
+            (RELATION if c.rows["grain"].is_not_null().any() else METHOD)
             + (ADJUSTED if adjusted else "")
             + (CONGRESS if c.level == "congress" else "")
             + (MUNICIPAL if c.level == "municipal" else "")
