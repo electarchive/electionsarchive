@@ -1,22 +1,37 @@
-"""Guyana's local government elections of 2018 and 2023, from the Elections Commission's Form 31 declarations, one
-document per local authority area: list votes, rejected ballots, seats, and candidate votes for each constituency."""
+"""Guyana's local government elections of 2016, 2018, and 2023, from the Elections Commission's Form 31 declarations,
+one document per local authority area: list votes, rejected ballots, seats, and candidate votes for each constituency.
+
+The 2016 declarations are scans whose figures are typed or handwritten, and many 2018 declarations have no usable
+text layer, so both years are read from the page images. For 2016 two independent readings were reconciled figure by
+figure; for 2018 each reading was checked against the numbers the text layer prints, where it has one. The readings,
+each figure with its page and box, are kept in `gecom_lge_forms/{year}.json`, and the parse checks each declaration's
+arithmetic again. The 2023 declarations are parsed from their text layer."""
 
 import difflib
 import json
 import re
+import subprocess
+from collections.abc import Iterator
+from datetime import date
 from functools import cache
+from pathlib import Path
 from typing import NamedTuple
 from urllib.parse import unquote
+from uuid import uuid5
 
-from ea import raw
+from ea import package, raw
+from ea.package import Package
 
 SOURCE = "gy.gecom_lge"
 SITE = "https://gecom.org.gy/public"
 PAGES = {
+    "all": "https://www.gecom.org.gy/public/home/results",
     "2018": f"{SITE}/home/results/lge2018",
     "2023": f"{SITE}/home/resource_hub/lge2023",
 }
 FORM31 = f"{SITE}/assets/docs/lge2023/form31s/"
+FORMS = Path(__file__).with_name("gecom_lge_forms")
+DPI = 150  # the resolution at which the transcribed boxes were read
 
 
 def tree(page: str) -> list[tuple[str, str]]:
@@ -42,6 +57,14 @@ def tree(page: str) -> list[tuple[str, str]]:
 @cache
 def files(day: str) -> list[tuple[str, str]]:
     """The folder-and-name and URL of each declaration of one election day."""
+    if day == "2016":
+        # The tree also keeps superseded copies (named _OLD or "incorrect"); only the current declaration counts.
+        prefix = "2016 - Local Government Elections/"
+        return [
+            (path.removeprefix(prefix), url)
+            for path, url in tree("all")
+            if path.startswith(prefix) and path.endswith(".pdf") and "incorrect" not in path
+        ]
     if day == "2018":
         return tree("2018")
     page = raw.cached(SOURCE, PAGES["2023"]).path.read_text(errors="replace")
@@ -53,7 +76,7 @@ def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     count = 0
-    for day in PAGES:
+    for day in DAYS:
         for _, url in files(day):
             raw.fetch(SOURCE, url, suffix=".pdf")
             count += 1
@@ -126,6 +149,9 @@ ALIASES = {
 def party_key(label: str) -> str:
     """A short key for a party label, from its abbreviation or its words, so that spelling variants meet."""
     upper = label.upper()
+    bracketed = re.search(r"\(([^()]+)\)\s*$", upper)
+    if bracketed and bracketed.start() > 0:
+        return party_key(bracketed.group(1))  # the printed abbreviation decides, not words in the name
     if re.search(r"AFC|ALLIANCE FOR CHANGE", upper) and re.search(r"APNU|PARTNERSHIP", upper):
         return "APNU+AFC"
     if re.search(r"APNU|A\.P\.N\.U|PARTNERSHIP|PARTNERS|PARTHNER|PARETNER|PARTERS", upper):
@@ -365,17 +391,10 @@ def problems(form: Form) -> tuple[list[str], list[int]]:
     return bad, out
 
 
-import subprocess
-from collections.abc import Iterator
-from datetime import date
-from uuid import uuid5
-
-from ea import package
-from ea.package import Package
-
 COUNTRY = str(uuid5(package.NAMESPACE, "polity\x1fGY"))
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
-DAYS = {"2018": date(2018, 11, 12), "2023": date(2023, 6, 12)}
+DAYS = {"2016": date(2016, 3, 18), "2018": date(2018, 11, 12), "2023": date(2023, 6, 12)}
+TRANSCRIBED = {"2016", "2018"}
 MUNICIPALITIES = {
     "mabaruma",
     "anna-regina",
@@ -436,19 +455,59 @@ AREAS_2023 = {
     "6.21": "Crabwood Creek Moleson Creek",
     "10.02": "Kwakwani",
 }
-# The file names misspell some areas' names.
-DISPLAY = {
-    "Haurarunui Yarowkabra": "Hauraruni Yarowkabra",
-    "Hague Blakenburg": "Hague Blankenburg",
-    "Annadale Riverstown": "Annandale Riverstown",
-    "Buxton Fouls": "Buxton Foulis",
-    "Mon Repos La Reconnisance": "Mon Repos La Reconnaissance",
-    "Seafield Tempe": "Seafield Tempie",
-    "La Jalousie Novelle Flanders": "La Jalousie Nouvelle Flanders",
-    "Gilbraltar Fyrish": "Gibraltar Fyrish",
-    "Better Hope LBI": "Better Hope La Bonne Intention",
-    "Adventure Bushlot": "Adventure Bushlot",
-    "Kintyre Borlam": "Kintyre Borlam",
+# The file names spell some areas differently from year to year; each variant maps to one slug.
+SAME = {
+    "adventure-no-28-or-bush-lot": "adventure-bush-lot",
+    "adventure-bushlot": "adventure-bush-lot",
+    "annadale-riverstown": "annandale-riverstown",
+    "better-hope-lbi": "better-hope-la-bonne-intention",
+    "blairmont-no-3-gelderland": "blairmont-gelderland",
+    "buxton-fouls": "buxton-foulis",
+    "cane-field-enterprise": "canefield-enterprise",
+    "charity": "charity-urasara",
+    "crabwood-creek-moleson": "crabwood-creek-moleson-creek",
+    "ramsburg-eccles": "eccles-ramsburg",
+    "gilbraltar-fyrish": "gibraltar-fyrish",
+    "diamond-place-golden-grove": "golden-grove-diamond-place",
+    "caledonia-good-success": "good-success-caledonia",
+    "hague-blakenburg": "hague-blankenburg",
+    "haurarunui-yarowkabra": "hauraruni-yarowkabra",
+    "kintyre-no-37-borlam": "kintyre-borlam",
+    "la-jalousie-novelle-flanders": "la-jalousie-nouvelle-flanders",
+    "mon-repos-la-reconnisance": "mon-repos-la-reconnaissance",
+    "ordnance-fortlands-no-28": "ordnance-fortlands",
+    "ordnance-fort-lands-no-38": "ordnance-fortlands",
+    "port-kaituma-matthews-ridge-arakaka": "port-kaituma",
+    "port-mourant-john": "port-mourant-johns",
+    "seafield-tempe": "seafield-tempie",
+    "the-best-klien-pouderoyen": "the-best-klein-pouderoyen",
+}
+# The name shown for an area whose file names misspell or shorten it.
+NAMES = {
+    "adventure-bush-lot": "Adventure Bush Lot",
+    "annandale-riverstown": "Annandale Riverstown",
+    "better-hope-la-bonne-intention": "Better Hope La Bonne Intention",
+    "blairmont-gelderland": "Blairmont Gelderland",
+    "buxton-foulis": "Buxton Foulis",
+    "canefield-enterprise": "Canefield Enterprise",
+    "charity-urasara": "Charity Urasara",
+    "crabwood-creek-moleson-creek": "Crabwood Creek Moleson Creek",
+    "eccles-ramsburg": "Eccles Ramsburg",
+    "gibraltar-fyrish": "Gibraltar Fyrish",
+    "golden-grove-diamond-place": "Golden Grove Diamond Place",
+    "good-success-caledonia": "Good Success Caledonia",
+    "hague-blankenburg": "Hague Blankenburg",
+    "hauraruni-yarowkabra": "Hauraruni Yarowkabra",
+    "kintyre-borlam": "Kintyre Borlam",
+    "la-jalousie-nouvelle-flanders": "La Jalousie Nouvelle Flanders",
+    "mon-repos-la-reconnaissance": "Mon Repos La Reconnaissance",
+    "ordnance-fortlands": "Ordnance Fortlands",
+    "port-kaituma": "Port Kaituma Matthews Ridge Arakaka",
+    "port-mourant-johns": "Port Mourant Johns",
+    "seafield-tempie": "Seafield Tempie",
+    "the-best-klein-pouderoyen": "The Best Klein Pouderoyen",
+    "no-52-no-74": "No. 52 No. 74",
+    "good-hope-no-51": "Good Hope No. 51",
 }
 BLOCS = {"APNU", "APNU+AFC"}
 FULL = {
@@ -462,20 +521,32 @@ METHOD = (
     "areas elect half their councillors from party and group lists over the whole area, allocated by the largest "
     "remainder method, and half in single-member constituencies."
 )
+READ = " The figures were read from the scanned declaration; each one links to its place on the page."
 
 
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
+def bare(stem: str) -> str:
+    stem = re.sub(r"\s+", " ", stem.replace("_", " ")).strip()
+    return re.sub(r"^(the\s+)?(municipality|town) of\s+", "", stem, flags=re.IGNORECASE)
+
+
 def slug_of(stem: str) -> str:
-    stem = re.sub(r"^(the\s+)?(municipality|town) of\s+", "", stem.strip(), flags=re.IGNORECASE)
-    return re.sub(r"[^a-z0-9]+", "-", stem.lower()).strip("-")
+    slug = re.sub(r"[^a-z0-9]+", "-", bare(stem).lower()).strip("-")
+    return SAME.get(slug, slug)
 
 
 def display(stem: str) -> str:
-    stem = re.sub(r"^(the\s+)?(municipality|town) of\s+", "", re.sub(r"\s+", " ", stem.strip()), flags=re.IGNORECASE)
-    return DISPLAY.get(stem, stem)
+    slug = slug_of(stem)
+    if slug in NAMES:
+        return NAMES[slug]
+    name = bare(stem)
+    return name.title() if name.isupper() else name
+
+
+Box = tuple[int, tuple[float, float, float, float]]  # a page number and a box in fractions of the page
 
 
 class Area(NamedTuple):
@@ -488,6 +559,10 @@ class Area(NamedTuple):
     ok: list[int]  # constituencies that load
     skipped: list[int]
     reasons: list[str]
+    winners: dict[int, int]  # the elected candidate's index in each constituency that loads
+    boxes: dict[tuple[object, ...], Box]  # where each transcribed figure is printed
+    caveats: list[str]  # published with the list contest
+    uncontested: bool = False  # a single list took the list seats without a poll
 
 
 def text_of(url: str) -> str:
@@ -495,26 +570,208 @@ def text_of(url: str) -> str:
     return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
 
 
-@cache
-def areas(day: str) -> list[Area]:
-    """Each declaration of the day whose text reads cleanly, with the contests that pass their own checks."""
+def loosely(a: str, b: str) -> bool:
+    """Whether two spellings of a name share a word, as the vote and elected sections of one form do."""
+    words = [{w for w in re.findall(r"[a-z]{3,}", n.lower()) if w not in ("mr", "mrs", "miss")} for n in (a, b)]
+    return bool(words[0] & words[1])
+
+
+def winner(candidates: list[Candidate], elected: str | None, side: str | None = None) -> int | None:
+    """The index of the elected candidate: the one the declaration names, else the one with the most votes. Where the
+    elected section spells the name differently, or the votes are printed by party only, the candidate with the most
+    votes counts as elected if the name shares a word with it or the party agrees."""
+
+    def agrees(c: Candidate) -> bool:
+        if elected is None:
+            return True
+        if c.name:
+            return same_person(c.name, elected) or loosely(c.name, elected)
+        return side is None or (c.party is not None and party_key(c.party) == party_key(side))
+
+    if len(candidates) == 1:
+        return 0 if agrees(candidates[0]) else None
+    if any(c.votes is None for c in candidates):
+        return None
+    named = [i for i, c in enumerate(candidates) if elected is not None and c.name and same_person(c.name, elected)]
+    if len(named) == 1:
+        return named[0]
+    top = max(c.votes or 0 for c in candidates)
+    leaders = [i for i, c in enumerate(candidates) if c.votes == top]
+    if len(leaders) == 1 and agrees(candidates[leaders[0]]):
+        return leaders[0]
+    return None
+
+
+def parsed(day: str) -> list[Area]:
+    """The 2023 declarations whose text reads cleanly, with the contests that pass their own checks."""
     out: list[Area] = []
     for name, url in files(day):
         text = text_of(url)
-        if len(text) < 600:
-            continue  # a scan with no text layer
-        if day == "2018":
-            stem = name.rsplit("/", 1)[1][:-4]
-        elif name[:-4] in AREAS_2023:
-            stem = AREAS_2023[name[:-4]]
-        else:
-            continue
+        if len(text) < 600 or name[:-4] not in AREAS_2023:
+            continue  # a scan with no text layer, or a file whose area is not known
+        stem = AREAS_2023[name[:-4]]
         form = parse_form(text)
         bad, skipped = problems(form)
         ok = [n for n in sorted(form.constituencies) if n not in skipped]
         if bad and not ok:
             continue
-        out.append(Area(day, slug_of(stem), display(stem), url, form, not bad, ok, skipped, bad))
+        winners = {n: w for n in ok if (w := winner(form.constituencies[n], None)) is not None}
+        ok = [n for n in ok if n in winners]
+        out.append(Area(day, slug_of(stem), display(stem), url, form, not bad, ok, skipped, bad, winners, {}, []))
+    return out
+
+
+def number(field: object) -> tuple[int | None, Box | None]:
+    """A transcribed figure and where it is printed."""
+    if not isinstance(field, dict):
+        return None, None
+    value, page, box = field.get("value"), field.get("page"), field.get("box")
+    located = (int(page), (box[0], box[1], box[2], box[3])) if isinstance(page, int) and isinstance(box, list) else None
+    return (value if isinstance(value, int) else None), located
+
+
+def place(entry: dict[str, object]) -> Box | None:
+    page, box = entry.get("page"), entry.get("box")
+    if isinstance(page, int) and isinstance(box, list) and len(box) == 4:
+        return page, (float(box[0]), float(box[1]), float(box[2]), float(box[3]))
+    return None
+
+
+def transcribed(day: str) -> list[Area]:
+    """Every declaration of a day whose page images were transcribed, checked again here."""
+    urls = dict(files(day))
+    forms: dict[str, dict[str, object]] = json.loads((FORMS / f"{day}.json").read_text())
+    if set(forms) != set(urls):
+        raise ValueError(f"{day}: transcriptions {sorted(set(forms) ^ set(urls))} do not match the published files")
+    out: list[Area] = []
+    for name, t in forms.items():
+        stem = name.rsplit("/", 1)[1][:-4]
+        boxes: dict[tuple[object, ...], Box] = {}
+        lists: list[tuple[str, int]] = []
+        listed = t.get("lists")
+        entries = [e for e in listed if isinstance(e, dict)] if isinstance(listed, list) else []
+        complete = bool(entries)
+        # A single list printed as "NO CONTEST" takes every list seat without a poll.
+        uncontested = len(entries) == 1 and not isinstance(entries[0].get("votes"), int)
+        for e in entries:
+            label, abbr, votes = str(e["label"]), str(e["abbr"]), e.get("votes")
+            if f"({abbr})" not in label.replace(" ", "") and party_key(label) != party_key(abbr):
+                label = f"{label} ({abbr})"
+            if uncontested:
+                lists.append((label, 0))
+                continue
+            if not isinstance(votes, int):
+                complete = False
+                continue
+            lists.append((label, votes))
+            located = place(e)
+            if located:
+                boxes[("list", party_key(label))] = located
+        valid, at = number(t.get("valid")) if not uncontested else (None, None)
+        if at and valid == sum(v for _, v in lists):
+            boxes[("valid",)] = at
+        rejected, at = number(t.get("rejected")) if not uncontested else (None, None)
+        if at:
+            boxes[("rejected",)] = at
+        seats: dict[str, int] = {}
+        allotted = t.get("seats")
+        for e in allotted if isinstance(allotted, list) else []:
+            if isinstance(e, dict) and isinstance(e.get("seats"), int):
+                seats[party_key(str(e["abbr"]))] = int(e["seats"])
+        constituencies: dict[int, list[Candidate]] = {}
+        labels: dict[int, str] = {}
+        status: dict[int, str] = {}
+        found = t.get("constituencies")
+        for c in found if isinstance(found, list) else []:
+            if not isinstance(c, dict):
+                continue
+            n = int(c["number"])
+            status[n] = str(c.get("status"))
+            if c.get("label"):
+                labels[n] = str(c["label"])
+            people: list[Candidate] = []
+            listed_people = c.get("candidates")
+            for position, e in enumerate(listed_people if isinstance(listed_people, list) else [], 1):
+                abbr = str(e.get("abbr") or "")
+                party = "INDEPENDENT" if abbr == "IND" else abbr or None
+                votes = e.get("votes")
+                who = str(e.get("name") or "").strip()
+                people.append(Candidate(who, party, votes if isinstance(votes, int) else None))
+                located = place(e)
+                if located:
+                    boxes[("candidate", n, position)] = located
+            constituencies[n] = people
+        elected: dict[int, str] = {}
+        sides: dict[int, str] = {}  # the party of each elected councillor
+        named = t.get("elected")
+        for e in named if isinstance(named, list) else []:
+            if isinstance(e, dict) and isinstance(e.get("number"), int):
+                elected[int(e["number"])] = str(e["name"])
+                if e.get("abbr"):
+                    sides[int(e["number"])] = str(e["abbr"])
+        form = Form(lists, rejected, seats, constituencies, elected, valid, labels)
+        reasons: list[str] = []
+        keys = [party_key(label) for label, _ in lists]
+        if not complete:
+            reasons.append("a list's votes are not legible")
+        if len(set(keys)) != len(keys):
+            raise ValueError(f"{day} {name}: two lists share a key")
+        for k in [k for k, v in seats.items() if k not in keys and not v]:
+            del seats[k]  # a nil seat line for a party with no list
+        if set(seats) < set(keys) and sum(seats.values()) == len(constituencies):
+            # Some declarations print seats only for the lists that won any.
+            seats.update({k: 0 for k in keys if k not in seats})
+        if set(seats) != set(keys):
+            reasons.append(f"seats {sorted(seats)} do not match lists {keys}")
+        caveats: list[str] = [str(t["note"])] if t.get("note") else []
+        if not reasons and not uncontested:
+            got = hare(dict(zip(keys, (v for _, v in lists), strict=True)), sum(seats.values()))
+            if got != seats:
+                caveats.append(
+                    "The seats are stored as the declaration gives them; a largest remainder allocation of the "
+                    "declared votes would give " + ", ".join(f"{k} {got[k]}" for k in keys) + "."
+                )
+        if valid is not None and valid != sum(v for _, v in lists):
+            caveats.append(f"The declaration prints {valid:,} valid votes, which is not the sum of the list votes.")
+        winners: dict[int, int] = {}
+        skipped: list[int] = []
+        for n, people in sorted(constituencies.items()):
+            tacit = status[n] == "unopposed" and len(people) == 1
+            counted = status[n] == "counted" and people and all(c.votes is not None for c in people)
+            w = winner(people, elected.get(n), sides.get(n)) if tacit or counted else None
+            if w is None:
+                skipped.append(n)
+                continue
+            if not people[w].name and n in elected:
+                # The votes are printed by party; the elected section names the winner.
+                people[w] = people[w]._replace(name=elected[n])
+            if tacit:
+                constituencies[n] = [people[0]._replace(votes=None)]
+            winners[n] = w
+        ok = sorted(winners)
+        out.append(
+            Area(
+                day,
+                slug_of(stem),
+                display(stem),
+                urls[name],
+                form,
+                not reasons,
+                ok,
+                skipped,
+                reasons,
+                winners,
+                boxes,
+                caveats,
+                uncontested,
+            )
+        )
+    return out
+
+
+@cache
+def areas(day: str) -> list[Area]:
+    out = transcribed(day) if day in TRANSCRIBED else parsed(day)
     slugs = [a.slug for a in out]
     if len(set(slugs)) != len(slugs):
         raise ValueError(f"{day}: two declarations for one area")
@@ -544,8 +801,8 @@ def party_names() -> dict[str, str]:
     found: dict[str, str] = {}
     for area in kinds():
         labels = [name for name, _ in area.form.lists] if area.list_ok else []
-        for candidates in area.form.constituencies.values():
-            labels += [c.party for c in candidates if c.party and c.party != "INDEPENDENT"]
+        for n in area.ok:
+            labels += [c.party for c in area.form.constituencies[n] if c.party and c.party != "INDEPENDENT"]
         for label in labels:
             k = party_key(label)
             if k in FULL:
@@ -563,11 +820,15 @@ def party_names() -> dict[str, str]:
     return found
 
 
+def council_name(slug: str, name: str) -> str:
+    return f"Municipality of {name}" if slug in MUNICIPALITIES else f"{name} Neighbourhood Democratic Council"
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Local authority area councils of Guyana, their parties, and their electoral systems",
+        "Local authority area councils of Guyana, their parties and groups, and their electoral systems",
     )
     p.external.add(COUNTRY)
     p.add(
@@ -576,7 +837,7 @@ def registry() -> Package:
         kind="official_body",
         publisher="Guyana Elections Commission",
         title="Form 31 declarations of the local government elections published by the Guyana Elections Commission",
-        url=f"{SITE}/home/results",
+        url=PAGES["all"],
         license="Official publication; reuse terms are not stated",
         attribution="Guyana Elections Commission",
     )
@@ -587,13 +848,7 @@ def registry() -> Package:
         seen.setdefault(area.slug, area.name)
     for slug, name in sorted(seen.items()):
         p.add("body", id=council(slug), polity_id=COUNTRY, kind="council")
-        town = slug in MUNICIPALITIES
-        p.name(
-            council(slug),
-            f"Municipality of {name}" if town else f"{name} Neighbourhood Democratic Council",
-            "en",
-            "official",
-        )
+        p.name(council(slug), council_name(slug, name), "en", "official")
     p.add("electoral_system", id=SYSTEM_LIST, polity_id=COUNTRY, rules={"formula": "hare"}, rules_version=1)
     p.add(
         "note",
@@ -625,13 +880,39 @@ def registry() -> Package:
             polity_id=COUNTRY,
         )
         p.name(party, k, "en", "abbreviation")
-        p.name(party, name, "en", "official", False)
+        if name != k:
+            p.name(party, name, "en", "official", False)
     return p
 
 
-def _put(p: Package, rs: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
-    if value is not None:
-        p.add(
+@cache
+def sizes(url: str) -> dict[int, tuple[int, int]]:
+    """Each page's size in pixels at the resolution the boxes were read at."""
+    out = subprocess.run(
+        ["pdfinfo", "-f", "1", "-l", "9999", str(raw.cached(SOURCE, url).path)],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return {
+        int(n): (round(float(w) * DPI / 72), round(float(h) * DPI / 72))
+        for n, w, h in re.findall(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+) pts", out)
+    }
+
+
+class Writer:
+    """Adds the values of one package, with the page and box of each transcribed figure."""
+
+    def __init__(self, p: Package) -> None:
+        self.p = p
+        self.pages: set[tuple[str, int]] = set()
+
+    def put(
+        self, area: Area, rs: str, unit: str, option: str | None, measure: int, value: int | None, at: Box | None
+    ) -> None:
+        if value is None:
+            return
+        self.p.add(
             "result_value",
             result_set_id=rs,
             unit_id=unit,
@@ -642,32 +923,49 @@ def _put(p: Package, rs: str, unit: str, option: str | None, measure: int, value
             flags=0,
             value=value,
         )
+        if at is None:
+            return
+        page, (x0, y0, x1, y1) = at
+        width, height = sizes(area.url)[page]
+        self.pages.add((area.url, page))
+        self.p.add(
+            "value_locator",
+            result_set_id=rs,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            page_id=key("page", area.url, page),
+            source_id=None,
+            x0=round(x0 * width, 1),
+            y0=round(y0 * height, 1),
+            x1=round(x1 * width, 1),
+            y1=round(y1 * height, 1),
+        )
 
 
 def build(day: str) -> Package:
     first = DAYS[day]
     chosen = areas(day)
     p = Package(
-        f"{SOURCE}/{day}",
+        f"{SOURCE}/{first.isoformat()}",
         SOURCE,
         f"The Guyanese local government elections of {first}: party list votes and seats for each local authority "
         "area and candidate votes for each constituency, from the Form 31 declarations",
         depends=[f"{SOURCE}/registry"],
     )
     p.external.add(COUNTRY)
-    for area in chosen:
-        p.artifact(raw.cached(SOURCE, area.url), SOURCE_ID)
+    artifacts = {area.url: p.artifact(raw.cached(SOURCE, area.url), SOURCE_ID) for area in chosen}
+    out = Writer(p)
     election = key("election", day)
     p.add("election", id=election, polity_id=COUNTRY, kind="local", date_from=first, date_to=first, status="held")
     p.add("slug", path=f"gy/{day}-local", entity_id=election, is_current=True)
     p.name(election, f"{first.year} Guyanese local government elections", "en", "official")
+    method = METHOD + (READ if day in TRANSCRIBED else "")
     for area in chosen:
         f = area.form
-        council_name = (
-            f"Municipality of {area.name}"
-            if area.slug in MUNICIPALITIES
-            else f"{area.name} Neighbourhood Democratic Council"
-        )
+        title = council_name(area.slug, area.name)
         locator = {"url": area.url}
         if area.list_ok:
             unit = key("unit", day, area.slug)
@@ -693,9 +991,9 @@ def build(day: str) -> Package:
                 magnitude=sum(seats.values()),
                 round_number=1,
                 electoral_system_id=SYSTEM_LIST,
-                default_result_kind="counted",
+                default_result_kind="tacit" if area.uncontested else "counted",
             )
-            p.name(contest, f"{first.year} {council_name} election, list seats", "en", "official")
+            p.name(contest, f"{first.year} {title} election, list seats", "en", "official")
             p.add("slug", path=f"gy/{day}-local/{area.slug}", entity_id=contest, is_current=True)
             rs = key("result_set", day, area.slug, "list")
             p.add(
@@ -704,18 +1002,31 @@ def build(day: str) -> Package:
                 election_id=election,
                 contest_id=contest,
                 stage="official",
-                kind="counted",
+                kind="tacit" if area.uncontested else "counted",
                 source_id=SOURCE_ID,
                 status="active",
                 is_default=True,
-                completeness=1.0,
+                completeness=0.0 if area.uncontested else 1.0,
             )
-            p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=METHOD, lang="en")
+            body = (
+                (METHOD + " Only one list stood, and it took every list seat without a poll.")
+                if area.uncontested
+                else method
+            )
+            p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=body, lang="en")
+            if area.caveats:
+                p.add(
+                    "note",
+                    id=key("note", rs, "caveat"),
+                    entity_id=rs,
+                    kind="caveat",
+                    body_md=" ".join(area.caveats),
+                    lang="en",
+                )
             p.add("citation", id=key("citation", rs), entity_id=rs, source_id=SOURCE_ID, locator=locator)
-            _put(p, rs, unit, None, INVALID, f.rejected)
-            total = sum(v for _, v in f.lists)
+            out.put(area, rs, unit, None, INVALID, f.rejected, area.boxes.get(("rejected",)))
             if f.valid is not None:
-                _put(p, rs, unit, None, VALID, total)
+                out.put(area, rs, unit, None, VALID, sum(v for _, v in f.lists), area.boxes.get(("valid",)))
                 p.add("declared", result_set_id=rs, option_id=None, measure=VALID, value=f.valid)
             for position, (label, votes) in enumerate(f.lists, 1):
                 k = party_key(label)
@@ -729,34 +1040,32 @@ def build(day: str) -> Package:
                     ballot_position=position,
                     ballot_label=FULL.get(k, label),
                 )
-                _put(p, rs, unit, option, VOTES, votes)
-                if k in seats:
-                    p.add(
-                        "outcome",
-                        result_set_id=rs,
-                        option_id=option,
-                        kind="won" if seats[k] else "lost",
-                        seats=seats[k],
-                    )
-        for number in area.ok:
-            candidates = f.constituencies[number]
-            label = f.labels.get(number)
-            unit = key("unit", day, area.slug, number)
+                if not area.uncontested:
+                    out.put(area, rs, unit, option, VOTES, votes, area.boxes.get(("list", k)))
+                p.add(
+                    "outcome",
+                    result_set_id=rs,
+                    option_id=option,
+                    kind="won" if seats[k] else "lost",
+                    seats=seats[k],
+                )
+        for n in area.ok:
+            candidates = f.constituencies[n]
+            label = f.labels.get(n)
+            unit = key("unit", day, area.slug, n)
             p.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=COUNTRY,
                 scheme_code="gy.constituency",
-                code=f"{day}:{area.slug}:{number}",
+                code=f"{day}:{area.slug}:{n}",
                 area_relation="unlocated",
                 area_id=None,
                 kind="aggregate",
             )
-            p.name(
-                unit, f"{area.name}, constituency {number}" + (f" ({label.title()})" if label else ""), "en", "official"
-            )
+            p.name(unit, f"{area.name}, constituency {n}" + (f" ({label.title()})" if label else ""), "en", "official")
             tacit = len(candidates) == 1 and candidates[0].votes is None
-            contest = key("contest", day, area.slug, "constituency", number)
+            contest = key("contest", day, area.slug, "constituency", n)
             p.add(
                 "contest",
                 id=contest,
@@ -768,9 +1077,9 @@ def build(day: str) -> Package:
                 electoral_system_id=SYSTEM_FPTP,
                 default_result_kind="tacit" if tacit else "counted",
             )
-            p.name(contest, f"{first.year} {council_name} election, constituency {number}", "en", "official")
-            p.add("slug", path=f"gy/{day}-local/{area.slug}/constituency-{number}", entity_id=contest, is_current=True)
-            rs = key("result_set", day, area.slug, "constituency", number)
+            p.name(contest, f"{first.year} {title} election, constituency {n}", "en", "official")
+            p.add("slug", path=f"gy/{day}-local/{area.slug}/constituency-{n}", entity_id=contest, is_current=True)
+            rs = key("result_set", day, area.slug, "constituency", n)
             p.add(
                 "result_set",
                 id=rs,
@@ -783,17 +1092,14 @@ def build(day: str) -> Package:
                 is_default=True,
                 completeness=0.0 if tacit else 1.0,
             )
-            body = METHOD + (" The only candidate was returned unopposed." if tacit else "")
+            body = (METHOD + " The only candidate was returned unopposed.") if tacit else method
             p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=body, lang="en")
             p.add("citation", id=key("citation", rs), entity_id=rs, source_id=SOURCE_ID, locator=locator)
-            top = max((c.votes or 0 for c in candidates), default=0)
             for position, c in enumerate(candidates, 1):
-                option = key("option", day, area.slug, "constituency", number, position)
-                person = key("person", day, area.slug, number, position)
+                option = key("option", day, area.slug, "constituency", n, position)
+                person = key("person", day, area.slug, n, position)
                 solo = c.party == "INDEPENDENT"
                 party = None if solo or not c.party else party_id(c.party)
-                p.add("person", id=person)
-                p.name(person, c.name.title() if c.name.isupper() else c.name, "en", "official")
                 p.add(
                     "contest_option",
                     id=option,
@@ -801,9 +1107,18 @@ def build(day: str) -> Package:
                     kind="candidate",
                     party_id=party,
                     ballot_position=position,
-                    ballot_label=c.name,
+                    # A candidate the declaration gives by party only is labelled with the party.
+                    ballot_label=c.name or f"{FULL.get(party_key(c.party or ''), c.party or 'Independent')} candidate",
                 )
-                candidacy = key("candidacy", day, area.slug, number, position)
+                if area.winners[n] == position - 1:
+                    p.add("outcome", result_set_id=rs, option_id=option, kind="elected", seats=1)
+                if not tacit:
+                    out.put(area, rs, unit, option, VOTES, c.votes, area.boxes.get(("candidate", n, position)))
+                if not c.name:
+                    continue
+                p.add("person", id=person)
+                p.name(person, c.name.title() if c.name.isupper() else c.name, "en", "official")
+                candidacy = key("candidacy", day, area.slug, n, position)
                 p.add(
                     "candidacy",
                     id=candidacy,
@@ -814,15 +1129,34 @@ def build(day: str) -> Package:
                     member_of_party_id=party,
                     is_independent=solo,
                 )
-                if tacit or c.votes == top:
-                    p.add("outcome", result_set_id=rs, option_id=option, kind="elected", seats=1)
-                if not tacit:
-                    _put(p, rs, unit, option, VOTES, c.votes)
+    wrong = sorted(
+        a.name
+        for a in chosen
+        if a.list_ok and a.form.valid is not None and a.form.valid != sum(v for _, v in a.form.lists)
+    )
+    if wrong:
+        p.accept(
+            "accounting.declared",
+            f"The declarations for {', '.join(wrong)} print a total of valid votes that is not the sum of their own "
+            "list votes; the total is kept as printed and the values are the list votes.",
+        )
+    for url, page in sorted(out.pages):
+        width, height = sizes(url)[page]
+        sha = raw.cached(SOURCE, url).sha256
+        p.add(
+            "source_page",
+            id=key("page", url, page),
+            artifact_id=artifacts[url],
+            page_number=page,
+            image_key=f"pages/{SOURCE}/{sha}/{page}.png",
+            width=width,
+            height=height,
+        )
     return p
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS)]
+    return [f"{SOURCE}/registry", *(f"{SOURCE}/{DAYS[day].isoformat()}" for day in DAYS)]
 
 
 def parse() -> None:
