@@ -4,7 +4,7 @@ The Elections and Boundaries Department (now Commission) publishes one PDF per e
 electoral division. The text layer of each PDF is read with `pdftotext -layout`, and every division is checked
 against its own printed totals: candidate votes plus rejected ballots must equal the votes cast.
 
-The returns for 1993 and 1998 are image-only scans. Their figures were read from the page images into
+The returns for 1993 and 1998 are image-only scans, and the 2003 Cayo South by-election return holds its candidates in an image. Their figures were read from the page images into
 `ebc_scans.json`, each with its page and bounding box (pixels of the page rendered at 100 dpi), and `scanned` checks
 them against the totals each return prints.
 """
@@ -43,6 +43,7 @@ URLS = {
     "2015": f"{BASE}/2023/12/2015-General-Election-Results.pdf",
     "2020": f"{BASE}/2023/12/2020-General-Election-Results-1.pdf",
     "2025": f"{BASE}/2025/03/GENERAL-ELECTION-12TH-MARCH-2025.pdf",
+    "2003-cayo-south": f"{BASE}/2023/12/2003-Cayo-South-By-Results.pdf",
     "2015-dangriga": f"{BASE}/2023/12/2015-Dangriga-Official-By-Results.pdf",
     "2021-corozal-bay": f"{BASE}/2023/12/2021-Corozal-Official-By-Election-Results-1.pdf",
     "2024-toledo-east": f"{BASE}/2024/07/FINAL-Toledo-East-By-Election-Results-2024-1-2.pdf",
@@ -128,6 +129,16 @@ HELD = (
         "2003 Belize general election",
         None,
         "The results page is dated 13 March 2003, after the election of 5 March 2003.",
+    ),
+    Held(
+        "2003-cayo-south",
+        date(2003, 10, 29),
+        "by_election",
+        "scan-2003-cayo-south",
+        ("2003-cayo-south",),
+        "2003 Cayo South by-election",
+        "October 29, 2003",
+        "The candidates' table is an image in the PDF; only the summary has a text layer.",
     ),
     Held("2008", date(2008, 2, 7), "general", "block", ("2008",), "2008 Belize general election"),
     Held("2012", date(2012, 3, 7), "general", "inline", ("2012",), "2012 Belize general election", "March 7, 2012"),
@@ -688,6 +699,7 @@ NAME_FIXES = {
 COUNTED = {"2015-dangriga"}
 
 
+CAST_KEYS = {"1998", "2003-cayo-south"}
 SCANS = json.loads(Path(__file__).with_name("ebc_scans.json").read_text())
 
 
@@ -724,7 +736,7 @@ def _check_division(key: str, race: Race) -> None:
         race.derived_winner = True
         return
     total = sum(v for v in votes if v is not None)
-    if key == "1998" and total + (race.rejected or 0) != race.cast:
+    if key in CAST_KEYS and total + (race.rejected or 0) != race.cast:
         raise ValueError(f"{key} {race.division}: candidates {total} plus rejected {race.rejected} is not {race.cast}")
     if key == "1993-freetown" and total != race.valid:
         raise ValueError(f"{key} {race.division}: candidates {total} is not the printed total {race.valid}")
@@ -1077,6 +1089,10 @@ SCAN_METHOD = {
         "the shares are stored as printed, to a tenth of a percent, and no counts are derived from them. A "
         "division's total votes are stored as valid votes: the 29 divisional totals add up to the 70,431 votes the "
         "return prints as the total voted, and the 499 rejected ballots it prints are given for the country only."
+    ),
+    "2003-cayo-south": (
+        f"{METHOD} {DIGITIZED_METHOD} The candidates' votes plus the rejected ballots equal the votes cast. The "
+        "return also prints 6,422 ballots used and 20 spoilt, which are not stored. Percentages are not stored."
     ),
     "1993-freetown": (
         f"Counted for the electoral division and published by the Elections and Boundaries Department. "
