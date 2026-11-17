@@ -468,7 +468,7 @@ class Builder:
                 id=id,
                 polity_id=ARGENTINA,
                 scheme_code=scheme,
-                code=f"{self.day}:{code}",
+                code=f"{self.tag}:{code}",
                 area_relation="within",
                 area_id=area("ar-s.departamento", secc),
                 kind="standard",
