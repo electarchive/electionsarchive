@@ -1,0 +1,1541 @@
+{
+  "polity": "ME",
+  "name": "Montenegro",
+  "sources": {
+    "ustav": {
+      "title": "Ustav Crne Gore (Službeni list Crne Gore, br. 1/2007)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/297951",
+      "kind": "official_body",
+      "note": "Adopted 19 October 2007. Arts. 82-84 (Skupština, deputies elected directly, four-year term), 95-97 (President elected directly for five years, at most twice), 113-118 (local self-government), 154 (Constitutional Court judges elected by the Skupština), 157 (referendum on amending core articles). Amended 2013 (Amendments I-XVI) and 2026 (Amendments XVII-XXI, judiciary)."
+    },
+    "ustav_1992": {
+      "title": "Ustav Republike Crne Gore (Službeni list Republike Crne Gore, br. 48/1992)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/297605",
+      "kind": "official_body",
+      "note": "Constitution of 12 October 1992 for the Republic of Montenegro within the Federal Republic of Yugoslavia; replaced by the 2007 Constitution."
+    },
+    "zakon_izbori": {
+      "title": "Zakon o izboru odbornika i poslanika (prečišćeni tekst)",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf",
+      "kind": "official_body",
+      "note": "Law of 1998 (Sl. list RCG 4/98) consolidated through Sl. list CG 114/26. Arts. 3 (30 councillors plus one per 5,000 voters), 4-5 (party lists; four-year term), 12 (each municipality and the whole country one constituency), 13-13b (general local elections in all municipalities every fourth year on the second Sunday in June; deputies' elections called by the President), 94-95 (3% threshold, minority exceptions at 0.7% and 0.35% for Croat lists, D'Hondt), 120b (first general local elections 13 June 2027). The 2025 amendments renamed the State Election Commission the Central Election Commission."
+    },
+    "zakon_predsjednik": {
+      "title": "Zakon o izboru predsjednika Crne Gore (prečišćeni tekst)",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_predsjednika_Crne_Gore.pdf",
+      "kind": "official_body",
+      "note": "Sl. list CG 17/07, 8/09, 12/16, 73/18. Arts. 1 (direct election, five-year term), 2 (called by the Speaker at least 120 days before the term ends), 16-17 (majority of valid votes of those who voted; otherwise a second round of the top two 14 days later)."
+    },
+    "zakon_predsjednik_1992": {
+      "title": "Zakon o izboru predsjednika Republike (Službeni list Republike Crne Gore, br. 49/1992)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/296213",
+      "kind": "official_body",
+      "note": "Presidential election law of 1992; election valid only if more than half the registered voters took part (art. 16), the rule that voided the votes of December 2002 and February 2003. Replaced by the law of Sl. list RCG 11/2003."
+    },
+    "zakon_predsjednik_opstine": {
+      "title": "Zakon o izboru predsjednika opštine (Službeni list Republike Crne Gore, br. 42/2003)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/307015",
+      "kind": "official_body",
+      "note": "Published 16 July 2003. Art. 1 (mayor elected by citizens directly and by secret ballot), 2 (five-year term), 4 (called by the municipal assembly), 22-23 (majority of valid votes, otherwise a second round of the top two 14 days later)."
+    },
+    "zls_2018": {
+      "title": "Zakon o lokalnoj samoupravi (Službeni list Crne Gore, br. 2/2018)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/335784",
+      "kind": "official_body",
+      "note": "Local self-government law of 2018: municipal assembly elected directly, mayor elected by the assembly; local communities (mjesne zajednice) set up by municipal decision."
+    },
+    "zls_2026": {
+      "title": "Zakon o lokalnoj samoupravi (Službeni list Crne Gore, br. 133/2026)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/398067",
+      "kind": "official_body",
+      "note": "Adopted 4 September 2026, published 11 September 2026, applied from 13 June 2027. Art. 2 (units: opština, grad, Glavni grad, Prijestonica; mjesna zajednica and gradska opština as sub-units), 51 (assembly elected directly), 72-73 (the assembly elects the mayor from the list leaders and candidates of the last local elections, for four years)."
+    },
+    "zto_2011": {
+      "title": "Zakon o teritorijalnoj organizaciji Crne Gore (Službeni list Crne Gore, br. 54/2011)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/337267",
+      "kind": "official_body",
+      "note": "Published 17 November 2011. Art. 5 (Glavni grad Podgorica, with the urban municipalities Golubovci and Tuzi), 6 (Prijestonica Cetinje), 7 (19 municipalities: Andrijevica, Bar, Berane, Bijelo Polje, Budva, Danilovgrad, Žabljak, Kotor, Kolašin, Mojkovac, Nikšić, Plav, Plužine, Pljevlja, Rožaje, Tivat, Ulcinj, Herceg Novi, Šavnik)."
+    },
+    "zto_2013": {
+      "title": "Zakon o izmjeni i dopuni Zakona o teritorijalnoj organizaciji Crne Gore (Službeni list Crne Gore, br. 27/2013)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/348003",
+      "kind": "official_body",
+      "note": "Published 11 June 2013: adds Opština Petnjica to art. 7."
+    },
+    "zto_2014": {
+      "title": "Zakon o izmjenama i dopunama Zakona o teritorijalnoj organizaciji Crne Gore (Službeni list Crne Gore, br. 12/2014)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/334168",
+      "kind": "official_body",
+      "note": "Published 7 March 2014: adds Opština Gusinje to art. 7."
+    },
+    "zto_2017": {
+      "title": "Zakon o izmjenama i dopunama Zakona o teritorijalnoj organizaciji Crne Gore (Službeni list Crne Gore, br. 31/2017)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/335860",
+      "kind": "official_body",
+      "note": "Published 12 May 2017: adds Opština Tuzi to art. 7, ending the urban municipality of Tuzi."
+    },
+    "zto_2022": {
+      "title": "Zakon o izmjenama i dopunama Zakona o teritorijalnoj organizaciji Crne Gore (Službeni list Crne Gore, br. 92/2022)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/339092",
+      "kind": "official_body",
+      "note": "Published 22 August 2022: adds Opština Zeta (seat Golubovci) to art. 7, ending the urban municipality of Golubovci."
+    },
+    "zakon_referendum": {
+      "title": "Zakon o referendumu (Službeni list Republike Crne Gore, br. 9/2001)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/348209",
+      "kind": "official_body",
+      "note": "Republic, municipal, and local-community referendums; amended Sl. list CG 73/10."
+    },
+    "manjine_pravila": {
+      "title": "Pravila za izbore članova Savjeta manjinskog naroda ili druge manjinske nacionalne zajednice (Službeni list Crne Gore, br. 58/2017)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/337684",
+      "kind": "official_body",
+      "note": "Under art. 33 of the Zakon o manjinskim pravima i slobodama: each council is made up of ex officio members and members elected at an electoral assembly (elektorska skupština) of electors who each gather 30 to 100 supporting signatures."
+    },
+    "cik_izbori": {
+      "title": "Izbori (arhiva rezultata)",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/dik-izbori",
+      "kind": "official_body",
+      "note": "Results pages for the parliamentary elections of 2006-2023, the presidential elections of 2008-2023, and the 2006 referendum, with xls/xlsx and pdf files by polling station; the local-election pages for 2020-2022 read 'Stranica je trenutno u izradi' on 17 November 2026."
+    },
+    "cik_oik": {
+      "title": "Opštinske izborne komisije",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/oik-podgorica-pocetna",
+      "kind": "official_body",
+      "note": "One page per municipal election commission (25 on 17 November 2026: Andrijevica, Bar, Berane, Bijelo Polje, Budva, Cetinje, Danilovgrad, Gusinje, Herceg Novi, Kolašin, Kotor, Mojkovac, Nikšić, Petnjica, Plav, Pljevlja, Plužine, Podgorica, Rožaje, Šavnik, Tivat, Tuzi, Ulcinj, Žabljak, Zeta), each with sections for council, parliamentary, and presidential elections and final results per election, usually by polling station."
+    },
+    "dacg_ustavi": {
+      "title": "Na Cetinju svečano je otvorena izložba „Ustavi Crne Gore“",
+      "publisher": "Državni arhiv Crne Gore",
+      "url": "https://dacg.me/na-cetinju-svecano-je-otvorena-izlozba-ustavi-crne-gore-autora-danila-mrvaljevica-direktora-drzavnog-arhiva-crne-gore/",
+      "kind": "official_body",
+      "note": "State Archives notice of 2 November 2026: seven constitutional acts from the Ustav za Knjaževinu Crnu Goru of 1905 to the Constitution of 2007; the first session of the Crnogorska narodna skupština was held in 1906 in the Zetski dom, Cetinje."
+    },
+    "odluka_1992": {
+      "title": "Odluka o raspisivanju izbora za odbornike u skupštine opština i poslanike u Skupštini Republike Crne Gore (Službeni list Republike Crne Gore, br. 49/1992)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/295069",
+      "kind": "official_body"
+    },
+    "odluka_1996": {
+      "title": "Odluka o raspisivanju izbora za odbornike skupština opština i poslanike Skupštine Republike Crne Gore (Službeni list Republike Crne Gore, br. 22/1996)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/294858",
+      "kind": "official_body"
+    },
+    "odluka_1998": {
+      "title": "Odluka o raspisivanju izbora za odbornike skupština opština i poslanike Skupštine Republike Crne Gore (Službeni list Republike Crne Gore, br. 9/1998)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/295998",
+      "kind": "official_body"
+    },
+    "odluka_2001": {
+      "title": "Odluka o raspisivanju prijevremenih izbora za poslanike Skupštine Republike Crne Gore (Službeni list Republike Crne Gore, br. 8/2001)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/292069",
+      "kind": "official_body"
+    },
+    "rezultati_2002": {
+      "title": "Konačni rezultati izbora za poslanike u Skupštinu Republike Crne Gore (Službeni list Republike Crne Gore, br. 58/2002)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/298267",
+      "kind": "official_body",
+      "note": "Published 1 November 2002."
+    },
+    "rezultati_2006": {
+      "title": "Konačni rezultati izbora za poslanike u Skupštinu Republike Crne Gore (Službeni list Republike Crne Gore, br. 58/2006)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/300837",
+      "kind": "official_body"
+    },
+    "rezultati_2009": {
+      "title": "Konačni rezultati izbora za poslanike u Skupštinu Crne Gore (Službeni list Crne Gore, br. 27/2009)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/299327",
+      "kind": "official_body"
+    },
+    "rezultati_2012": {
+      "title": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore (Službeni list Crne Gore, br. 53/2012)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/307923",
+      "kind": "official_body"
+    },
+    "rezultati_2016": {
+      "title": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore (Službeni list Crne Gore, br. 68/2016)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/330693",
+      "kind": "official_body"
+    },
+    "rezultati_2020": {
+      "title": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore (Službeni list Crne Gore, br. 94/2020)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/314494",
+      "kind": "official_body"
+    },
+    "rezultati_2023": {
+      "title": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore (Službeni list Crne Gore, br. 72/2023)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/360813",
+      "kind": "official_body"
+    },
+    "odluka_pr_1992": {
+      "title": "Odluka o raspisivanju izbora za predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 49/1992)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/295978",
+      "kind": "official_body"
+    },
+    "izvjestaj_pr_1993": {
+      "title": "Izvještaj o rezultatima izbora za predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 2/1993)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/297175",
+      "kind": "official_body"
+    },
+    "odluka_pr_1997": {
+      "title": "Odluka o raspisivanju izbora za predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 24/1997)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/295038",
+      "kind": "official_body"
+    },
+    "odluka_pr_2002": {
+      "title": "Odluka o raspisivanju izbora za predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 56/2002)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/300037",
+      "kind": "official_body"
+    },
+    "odluka_pr_2003_ponavljanje": {
+      "title": "Odluka o ponavljanju izbornog postupka za izbor predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 10/2003)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/300530",
+      "kind": "official_body"
+    },
+    "odluka_pr_2003": {
+      "title": "Odluka o raspisivanju izbora za predsjednika Republike Crne Gore (Službeni list Republike Crne Gore, br. 13/2003)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/301813",
+      "kind": "official_body"
+    },
+    "rezultati_pr_2008": {
+      "title": "Konačni rezultati izbora za Predsjednika Crne Gore (Službeni list Crne Gore, br. 26/2008)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/324951",
+      "kind": "official_body"
+    },
+    "rezultati_pr_2013": {
+      "title": "Konačni rezultati izbora za Predsjednika Crne Gore (Službeni list Crne Gore, br. 20/2013)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/309448",
+      "kind": "official_body"
+    },
+    "rezultati_pr_2018": {
+      "title": "Konačni rezultati izbora za predsjednika Crne Gore (Službeni list Crne Gore, br. 29/2018)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/321847",
+      "kind": "official_body"
+    },
+    "rezultati_pr_2023": {
+      "title": "Konačni rezultati izbora za predsjednika Crne Gore (Službeni list Crne Gore, br. 39/2023)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/363301",
+      "kind": "official_body"
+    },
+    "izvjestaj_ref_1992": {
+      "title": "Izvještaj o rezultatima republičkog referenduma raspisanog radi prethodnog izjašnjavanja građana Crne Gore o tome da li žele da nastave da žive u zajedničkoj državi ravnopravnih republika (Službeni list Republike Crne Gore, br. 10/1992)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/296161",
+      "kind": "official_body"
+    },
+    "odluka_ref_2006": {
+      "title": "Odluka o raspisivanju republičkog referenduma o državno-pravnom statusu Republike Crne Gore (Službeni list Republike Crne Gore, br. 13/2006)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/305331",
+      "kind": "official_body"
+    },
+    "ref_zelenika_2008": {
+      "title": "Odluka o raspisivanju opštinskog referenduma radi izjašnjavanja građana o izgradnji silosa za pretovar rasutog cementa u luci Zelenika (Službeni list Crne Gore, br. 5/2008)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/298647",
+      "kind": "official_body"
+    },
+    "ref_petnjica_2012": {
+      "title": "Izvještaj o konačnim rezultatima glasanja na opštinskom referendumu o osnivanju Opštine Petnjica koji je održan 4. avgusta 2012. godine (Službeni list Crne Gore, br. 27/2012)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/305187",
+      "kind": "official_body"
+    },
+    "ref_gusinje_2013": {
+      "title": "Zaključak o Izvještaju Komisije za sprovođenje referenduma (konsultativnog referenduma) radi prethodnog izjašnjavanja građana o osnivanju opštine Gusinje, o rezultatima referenduma održanog 08.01.2013. godine (Službeni list Crne Gore, br. 6/2013)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/313108",
+      "kind": "official_body"
+    },
+    "ref_botun_2025": {
+      "title": "Odluka o raspisivanju opštinskog referenduma radi izjašnjavanja građana o izgradnji Sistema za prečišćavanje otpadnih voda Podgorice u Botunu (Službeni list Crne Gore, br. 50/2025)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/388480",
+      "kind": "official_body",
+      "note": "Decision of the Skupština opštine Zeta of 7 October 2025: referendum on 14 December 2025; results noted in Sl. list CG 70/2025 (Zaključak o konstatovanju rezultata referenduma)."
+    },
+    "ref_mjesni_2025": {
+      "title": "Odluka o raspisivanju mjesnog referenduma za teritoriju Mjesne zajednice Gračanica radi izjašnjavanja građana o osnivanju mjesne zajednice Zoriće (Službeni list Crne Gore, br. 5/2025)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/377044",
+      "kind": "official_body"
+    },
+    "po_tivat_2004": {
+      "title": "Odluka o raspisivanju izbora za odbornike Skupštine opštine Tivat i predsjednika Opštine Tivat (Službeni list Republike Crne Gore, br. 8/2004)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/298135",
+      "kind": "official_body"
+    },
+    "po_zabljak_2004": {
+      "title": "Odluka o raspisivanju izbora za odbornike Skupštine opštine Žabljak i predsjednika Opštine Žabljak (Službeni list Republike Crne Gore, br. 38/2004)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/300053",
+      "kind": "official_body"
+    },
+    "po_kotor_2004": {
+      "title": "Odluka o raspisivanju izbora za odbornike Skupštine opštine Kotor i predsjednika Opštine Kotor (Službeni list Republike Crne Gore, br. 63/2004)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/299732",
+      "kind": "official_body"
+    },
+    "po_budva_2005": {
+      "title": "Odluka o raspisivanju izbora za odbornike Skupštine opštine Budva i predsjednika Opštine Budva (Službeni list Republike Crne Gore, br. 16/2005)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/298328",
+      "kind": "official_body"
+    },
+    "po_mojkovac_2005": {
+      "title": "Odluka o raspisivanju izbora za odbornike Skupštine opštine Mojkovac i predsjednika Opštine Mojkovac (Službeni list Republike Crne Gore, br. 64/2005)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/325488",
+      "kind": "official_body"
+    },
+    "po_tivat_2009": {
+      "title": "Odluka o raspisivanju izbora za predsjednika Opštine Tivat (Službeni list Crne Gore, br. 5/2009)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/298996",
+      "kind": "official_body"
+    },
+    "po_kotor_2009": {
+      "title": "Izvještaj o konačnim rezultatima izbora za predsjednika Opštine Kotor (Službeni list Crne Gore, br. 36/2009)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/304900",
+      "kind": "official_body"
+    },
+    "lok_tivat_2008": {
+      "title": "Izvještaj o konačnim rezultatima izbora za odbornike na području Opštine Tivat održanim 6. aprila 2008. godine (Službeni list Crne Gore, br. 11/2008)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/297800",
+      "kind": "official_body"
+    },
+    "lok_zabljak_2014": {
+      "title": "Javno objavljivanje podataka o konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 25. maja 2014. godine (Službeni list Crne Gore, br. 18/2014)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/301616",
+      "kind": "official_body"
+    },
+    "lok_golubovci_2014": {
+      "title": "Izvještaj o rezultatima glasanja za izbor odbornika u Gradskoj opštini Golubovci (Službeni list Crne Gore, br. 19/2014)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/301734",
+      "kind": "official_body"
+    },
+    "lok_zabljak_2018": {
+      "title": "Javno objavljuje podatke o konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 27. maja 2018. godine (Službeni list Crne Gore, br. 20/2018)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/377006",
+      "kind": "official_body"
+    },
+    "lok_zabljak_2022": {
+      "title": "Javno objavljivanje podataka o konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 23. oktobra 2022. godine (Službeni list Crne Gore, br. 55/2022)",
+      "publisher": "JU Službeni list Crne Gore",
+      "url": "https://www.sluzbenilist.me/propisi/332400",
+      "kind": "official_body"
+    },
+    "oik_podgorica_2024": {
+      "title": "OIK Podgorica: izbori za odbornike SO 2024, konačni rezultati po biračkim mjestima",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/oik-podgorica-izbori/oik-podgorica-izbori-za-odbornike-so/oik-podgorica-izbori-za-odbornike-so-2024/konacni-rezultati-po-birackim-mjestima",
+      "kind": "official_body",
+      "note": "PODGORICA_2024_09_29.xlsx and Podgorica_2024_09_29.pdf: final results of the Podgorica assembly election of 29 September 2024 by polling station."
+    },
+    "oik_hn_2025": {
+      "title": "OIK Herceg Novi: izbori za odbornike SO 2025",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/oik-herceg-novi-izbori/oik-herceg-novi-izbori-za-odbornike-so/oik-herceg-novi-izbori-za-odbornike-so-2025",
+      "kind": "official_body",
+      "note": "Konacni_rezultati_2025.pdf and Privremeni_rezultati_za_izbor_odbornika_u_SOHN_13042025.pdf."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Crna Gora",
+      "name_en": "Montenegro",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "me.country",
+      "source": "ustav"
+    },
+    {
+      "key": "opstina",
+      "name": "Opštine, Glavni grad i Prijestonica",
+      "name_en": "Municipalities, the Capital City, and the Old Royal Capital",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "me.opstina",
+      "source": "zto_2011",
+      "counts": [
+        {
+          "date": "2011-11-17",
+          "value": 21,
+          "source": "zto_2011",
+          "locator": "https://www.sluzbenilist.me/propisi/337267 (arts. 5-7: Glavni grad Podgorica, Prijestonica Cetinje, and 19 municipalities)"
+        },
+        {
+          "date": "2013-06-11",
+          "value": 22,
+          "source": "zto_2013",
+          "locator": "https://www.sluzbenilist.me/propisi/348003 (art. 7 stav 1: adds Petnjica)"
+        },
+        {
+          "date": "2014-03-07",
+          "value": 23,
+          "source": "zto_2014",
+          "locator": "https://www.sluzbenilist.me/propisi/334168 (art. 7 stav 1: adds Gusinje)"
+        },
+        {
+          "date": "2017-05-12",
+          "value": 24,
+          "source": "zto_2017",
+          "locator": "https://www.sluzbenilist.me/propisi/335860 (art. 7 stav 1: adds Tuzi)"
+        },
+        {
+          "date": "2022-08-22",
+          "value": 25,
+          "source": "zto_2022",
+          "locator": "https://www.sluzbenilist.me/propisi/339092 (art. 7 stav 1: adds Zeta)"
+        },
+        {
+          "date": "2026-11-17",
+          "value": 25,
+          "source": "cik_oik",
+          "locator": "https://cik.me/oik-podgorica-pocetna (Opštinske izborne komisije: 25 commissions listed)"
+        }
+      ]
+    },
+    {
+      "key": "gradska_opstina",
+      "name": "Gradske opštine",
+      "name_en": "Urban municipalities",
+      "parent": "opstina",
+      "polity_kind": "submunicipal",
+      "source": "zto_2011",
+      "counts": [
+        {
+          "date": "2011-11-17",
+          "value": 2,
+          "source": "zto_2011",
+          "locator": "https://www.sluzbenilist.me/propisi/337267 (art. 5: Gradska opština Golubovci and Gradska opština Tuzi within Glavni grad Podgorica)"
+        },
+        {
+          "date": "2017-05-12",
+          "value": 1,
+          "source": "zto_2017",
+          "locator": "https://www.sluzbenilist.me/propisi/335860 (Tuzi becomes a municipality)"
+        },
+        {
+          "date": "2022-08-22",
+          "value": 0,
+          "source": "zto_2022",
+          "locator": "https://www.sluzbenilist.me/propisi/339092 (Golubovci becomes the municipality of Zeta)"
+        }
+      ]
+    },
+    {
+      "key": "mjesna_zajednica",
+      "name": "Mjesne zajednice",
+      "name_en": "Local communities",
+      "parent": "opstina",
+      "polity_kind": "submunicipal",
+      "source": "zls_2026"
+    },
+    {
+      "key": "srcg",
+      "name": "Narodna (Socijalistička) Republika Crna Gora",
+      "name_en": "People's (Socialist) Republic of Montenegro within Yugoslavia (1945-1992)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1945-01-01",
+      "valid_to": "1992-10-12",
+      "source": "ustav_1992"
+    },
+    {
+      "key": "knjazevina",
+      "name": "Knjaževina i Kraljevina Crna Gora",
+      "name_en": "Principality and Kingdom of Montenegro (1905-1918)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1905-12-19",
+      "valid_to": "1918-11-26",
+      "source": "dacg_ustavi"
+    }
+  ],
+  "classes": [
+    {
+      "key": "skupstina",
+      "tier": "national",
+      "name": "Izbori za poslanike u Skupštinu Crne Gore",
+      "name_en": "Parliament (Skupština) elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "me.country"
+        ],
+        "fine": [
+          "me.opstina",
+          "me.bm"
+        ]
+      },
+      "finest_note": "The Commission publishes results by polling station for 2006-2023; the elections of 1992-2002 survive as the Republic Election Commission's reports in the gazette, by municipality at best.",
+      "note": "81 deputies since 2006, party-list PR in a single national constituency (since 2011), D'Hondt with a 3% threshold and minority exceptions (0.7% combined lists of up to three seats; one seat for the best Croat list at 0.35%). 1998-2006 elected four or five deputies at separate polling stations in Albanian-majority areas. Seats: 125 (1990), 85 (1992), 71 (1996), 78 (1998), 77 (2001), 75 (2002), 81 (2006-).",
+      "source": "ustav",
+      "locator": "https://www.sluzbenilist.me/propisi/297951 (arts. 83-84)",
+      "valid_from": "1990-12-09",
+      "first_held": "1990-12-09",
+      "earliest_record": "1992-12-20",
+      "contests_per_unit": 1,
+      "est_votes": 4300000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Centralna izborna komisija (Državna izborna komisija until 2025; Republička izborna komisija until 2006) and the municipal election commissions",
+          "source": "zakon_izbori",
+          "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf (arts. 5, 12, 13b, 15, 94-95)",
+          "vacancy_rule": "A vacated seat passes to the next candidate on the same list; early elections after dissolution or a shortened term (art. 15)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Centralna izborna komisija: Izbori",
+          "url": "https://cik.me/dik-izbori",
+          "format": "xls, xlsx, and pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2006-09-10",
+          "last_date": "2023-06-11",
+          "finest": "me.bm",
+          "evidence": "Final results by polling station for every parliamentary election from 2006 (xls or xlsx to 2020, pdf for 2023), plus the final national decisions.",
+          "source": "cik_izbori"
+        },
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "1992-12-20",
+          "last_date": "2002-10-20",
+          "finest": "me.opstina",
+          "evidence": "Republic Election Commission reports and final results for 1992 (Sl. list RCG 1/1993), 2001 (23/2001), and 2002 (58/2002) as page images.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "ME",
+          "valid_from": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-12-09",
+          "election_kind": "general",
+          "seats": 125,
+          "note": "First multiparty election to the Assembly of the Socialist Republic of Montenegro, held with the presidency and municipal elections; no official online record was found."
+        },
+        {
+          "date": "1992-12-20",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 85,
+          "source": "odluka_1992",
+          "quote": "Odluka o raspisivanju izbora za odbornike u skupštine opština i poslanike u Skupštini Republike Crne Gore",
+          "note": "Results: Sl. list RCG 1/1993."
+        },
+        {
+          "date": "1996-11-03",
+          "election_kind": "general",
+          "seats": 71,
+          "source": "odluka_1996",
+          "quote": "Izbori odbornika i poslanika održaće se na dan 3. novembra 1996. godine."
+        },
+        {
+          "date": "1998-05-31",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 78,
+          "source": "odluka_1998",
+          "quote": "održaće se na dan 31. maja 1998"
+        },
+        {
+          "date": "2001-04-22",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 77,
+          "source": "odluka_2001",
+          "quote": "održaće se na dan 22. aprila 2001",
+          "note": "Early election."
+        },
+        {
+          "date": "2002-10-20",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 75,
+          "source": "rezultati_2002",
+          "quote": "Konačni rezultati izbora za poslanike u Skupštinu Republike Crne Gore",
+          "note": "Early election, first set for 6 October 2002 (Sl. list RCG 37/2002) and moved to 20 October (47/2002)."
+        },
+        {
+          "date": "2006-09-10",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2006",
+          "quote": "Konačni rezultati izbora za poslanike u Skupštinu Republike Crne Gore"
+        },
+        {
+          "date": "2009-03-29",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2009",
+          "quote": "Konačni rezultati izbora za poslanike u Skupštinu Crne Gore",
+          "note": "Early election."
+        },
+        {
+          "date": "2012-10-14",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2012",
+          "quote": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore",
+          "note": "Early election."
+        },
+        {
+          "date": "2016-10-16",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2016",
+          "quote": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore"
+        },
+        {
+          "date": "2020-08-30",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2020",
+          "quote": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore"
+        },
+        {
+          "date": "2023-06-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 81,
+          "source": "rezultati_2023",
+          "quote": "Konačni rezultati za izbor poslanika u Skupštinu Crne Gore",
+          "note": "Early election."
+        }
+      ]
+    },
+    {
+      "key": "predsjednik",
+      "tier": "national",
+      "name": "Izbori za predsjednika Crne Gore",
+      "name_en": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "me.country"
+        ],
+        "fine": [
+          "me.opstina",
+          "me.bm"
+        ]
+      },
+      "finest_note": "By polling station for 2008-2018 and the 2023 first round; the 2023 runoff by municipality; 1992-2003 only in the gazette.",
+      "note": "Two-round majority: a candidate needs more than half the valid votes, otherwise the top two meet 14 days later. Under the 1992 law an election was valid only if more than half the registered voters took part, which voided the votes of 22 December 2002 and 9 February 2003. In 1990 voters elected the President of the Presidency of the Socialist Republic.",
+      "source": "ustav",
+      "locator": "https://www.sluzbenilist.me/propisi/297951 (arts. 95-97)",
+      "valid_from": "1990-12-09",
+      "first_held": "1990-12-09",
+      "earliest_record": "1992-12-20",
+      "contests_per_unit": 1,
+      "est_votes": 3600000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Majority of the votes cast with more than half the registered voters taking part; otherwise a second round, and a repeat of the whole procedure when turnout stayed below half (Zakon o izboru predsjednika Republike, 1992).",
+          "valid_from": "1992-12-20",
+          "valid_to": "2003-05-11",
+          "administered_by": "Republička izborna komisija and the municipal election commissions",
+          "source": "zakon_predsjednik_1992"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "valid_from": "2003-05-11",
+          "runoff_rule": "More than half the valid votes; otherwise the two leading candidates meet in a second round 14 days later (Zakon o izboru predsjednika Crne Gore arts. 16-17).",
+          "administered_by": "Centralna izborna komisija and the municipal election commissions",
+          "source": "zakon_predsjednik",
+          "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_predsjednika_Crne_Gore.pdf (arts. 1, 2, 16, 17)",
+          "vacancy_rule": "Called by the Speaker at least 120 days before the term ends; 60 to 90 days between the call and polling day (art. 2)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Centralna izborna komisija: Izbori",
+          "url": "https://cik.me/dik-izbori",
+          "format": "xls, xlsx, and pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2008-04-06",
+          "last_date": "2023-04-02",
+          "finest": "me.bm",
+          "evidence": "Results by polling station for 2008, 2013, 2018, and the 2023 first round; the 2023 second round by municipality.",
+          "source": "cik_izbori"
+        },
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "1992-12-20",
+          "last_date": "2003-05-11",
+          "finest": "me.opstina",
+          "evidence": "Republic Election Commission decisions and reports for 1992-1993, 1997, and 2002-2003 as page images.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "ME",
+          "valid_from": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-12-09",
+          "election_kind": "general",
+          "note": "President of the Presidency of the Socialist Republic; second round 23 December 1990. No official online record was found."
+        },
+        {
+          "date": "1992-12-20",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "odluka_pr_1992",
+          "quote": "Odluka o raspisivanju izbora za predsjednika Republike Crne Gore",
+          "note": "Second round 10 January 1993 (report, Sl. list RCG 2/1993)."
+        },
+        {
+          "date": "1993-01-10",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "izvjestaj_pr_1993",
+          "quote": "Izvještaj o rezultatima izbora za predsjednika Republike Crne Gore"
+        },
+        {
+          "date": "1997-10-05",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "odluka_pr_1997",
+          "quote": "Izbori za predsjednika Republike Crne Gore održaće se 5. oktobra 1997.",
+          "note": "Second round 19 October 1997."
+        },
+        {
+          "date": "1997-10-19",
+          "election_kind": "runoff",
+          "note": "Second round between the two leading candidates of 5 October."
+        },
+        {
+          "date": "2002-12-22",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "odluka_pr_2002",
+          "quote": "Izbori za predsjednika Republike Crne Gore održaće se u nedjelju, 22. decembra 2002. godine",
+          "note": "Void: turnout below half the registered voters."
+        },
+        {
+          "date": "2003-02-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "odluka_pr_2003_ponavljanje",
+          "quote": "na ponovnom glasanju za izbor predsjednika Republike 9. februara 2003. godine, na 1.019 biračkih mjesta, glasalo 213.142 birača, odnosno 47,5% birača",
+          "note": "Repeat vote, void for the same reason; the whole procedure was repeated."
+        },
+        {
+          "date": "2003-05-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "odluka_pr_2003",
+          "quote": "održaće se u nedjelju 11. maja 2003"
+        },
+        {
+          "date": "2008-04-06",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "rezultati_pr_2008",
+          "quote": "Konačni rezultati izbora za Predsjednika Crne Gore"
+        },
+        {
+          "date": "2013-04-07",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "rezultati_pr_2013",
+          "quote": "Konačni rezultati izbora za Predsjednika Crne Gore"
+        },
+        {
+          "date": "2018-04-15",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "rezultati_pr_2018",
+          "quote": "Konačni rezultati izbora za predsjednika Crne Gore"
+        },
+        {
+          "date": "2023-03-19",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "rezultati_pr_2023",
+          "quote": "Konačni rezultati izbora za predsjednika Crne Gore"
+        },
+        {
+          "date": "2023-04-02",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "rezultati_pr_2023",
+          "quote": "Konačni rezultati izbora za predsjednika Crne Gore"
+        },
+        {
+          "date": "2028-03-01",
+          "precision": "month",
+          "election_kind": "general",
+          "note": "Next regular election, five years after the term that began in May 2023; the Speaker sets the day."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Republički referendum",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "schemes": [
+          "me.country"
+        ],
+        "fine": [
+          "me.opstina",
+          "me.bm"
+        ]
+      },
+      "finest_note": "2006 by polling station from the Commission; 1992 by municipality in the gazette report.",
+      "note": "The Skupština calls republic referendums (Zakon o referendumu); amending the core articles of the Constitution needs a referendum with three fifths of voters (Ustav art. 157). The 2006 independence referendum required 55% of valid votes and a majority turnout.",
+      "source": "zakon_referendum",
+      "first_held": "1992-03-01",
+      "earliest_record": "1992-03-01",
+      "est_votes": 700000,
+      "effort": 2,
+      "access": [
+        {
+          "platform": "Centralna izborna komisija: Izbori",
+          "url": "https://cik.me/dik-izbori",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2006-05-21",
+          "last_date": "2006-05-21",
+          "finest": "me.bm",
+          "evidence": "Final results by polling station and by municipality (pdf).",
+          "source": "cik_izbori"
+        },
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "1992-03-01",
+          "last_date": "1992-03-01",
+          "finest": "me.opstina",
+          "evidence": "Republic Election Commission report on the referendum of 1 March 1992 (Sl. list RCG 10/1992), in Cyrillic.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "ME"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-03-01",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "izvjestaj_ref_1992",
+          "quote": "Referendum je, prema Odluci o raspisivanju referenduma, održan dana 1. marta 1992. godine ... ZA 267.076 građana, odnosno 95,94%",
+          "note": "Whether Montenegro should remain in a common state, Yugoslavia, with the other republics that wished to; 421,548 registered, 278,382 voted."
+        },
+        {
+          "date": "2006-05-21",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "odluka_ref_2006",
+          "quote": "Referendum će se održati 21. maja 2006. godine.",
+          "note": "State-legal status (independence)."
+        }
+      ]
+    },
+    {
+      "key": "skupstina_opstine",
+      "tier": "opstina",
+      "name": "Izbori za odbornike u skupštine opština, Glavnog grada i Prijestonice",
+      "name_en": "Municipal assembly elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "me.opstina"
+        ],
+        "fine": [
+          "me.bm"
+        ]
+      },
+      "finest_note": "The municipal commissions' pages on cik.me carry final results, mostly by polling station, for elections from 2014 on (pdf; xlsx for Podgorica 2024); earlier results are in the gazette as page images, by municipality.",
+      "note": "Party-list PR with each municipality one constituency: 30 councillors plus one per 5,000 voters, D'Hondt, 3% threshold, minority lists exempt where the minority is 1.5-15% of the municipality. Held together with parliament in 1990-1998, then on each municipality's own cycle; the 2025 amendments set general local elections in every municipality on one day every four years, on the second Sunday in June, first on 13 June 2027.",
+      "source": "zakon_izbori",
+      "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf (arts. 3, 5, 12, 13, 13a, 94, 120b)",
+      "valid_from": "1990-12-09",
+      "first_held": "1990-12-09",
+      "earliest_record": "1992-12-20",
+      "contests_per_unit": 1,
+      "est_votes": 2800000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "valid_to": "2027-06-13",
+          "administered_by": "Municipal election commissions (opštinske izborne komisije); each municipal assembly calls its own election",
+          "source": "zakon_izbori",
+          "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf (arts. 5, 15)",
+          "vacancy_rule": "Early election after dissolution or a shortened term (art. 15)."
+        },
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 6,
+          "day_rule": "second Sunday in June",
+          "term_years": 4,
+          "called": false,
+          "valid_from": "2027-06-13",
+          "administered_by": "Centralna izborna komisija (calls the election) and the municipal election commissions",
+          "source": "zakon_izbori",
+          "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf (arts. 13, 13a, 120b)",
+          "vacancy_rule": "After a dissolution the Central Election Commission calls an election for the rest of the current term (art. 5)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Centralna izborna komisija: opštinske izborne komisije",
+          "url": "https://cik.me/oik-{municipality}-izbori/oik-{municipality}-izbori-za-odbornike-so",
+          "format": "pdf (xlsx for Podgorica 2024)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2014-05-25",
+          "last_date": "2025-04-13",
+          "finest": "me.bm",
+          "evidence": "Per-municipality pages with final results for the latest two or three council elections, many by polling station (for example Bijelo Polje 2014-2022, Cetinje 2021, Podgorica 2022 and 2024, Herceg Novi 2025).",
+          "source": "cik_oik"
+        },
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "1992-12-20",
+          "last_date": "2025-12-31",
+          "finest": "me.opstina",
+          "evidence": "Municipal commissions' final results and reports in the gazette as page images (for example Tivat 2008, Žabljak 2014, 2018, and 2022, Podgorica 2014).",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-12-09",
+          "election_kind": "local",
+          "note": "Held with the first multiparty republic election; no official online record was found."
+        },
+        {
+          "date": "1992-12-20",
+          "election_kind": "local",
+          "source": "odluka_1992",
+          "quote": "Odluka o raspisivanju izbora za odbornike u skupštine opština i poslanike u Skupštini Republike Crne Gore"
+        },
+        {
+          "date": "1996-11-03",
+          "election_kind": "local",
+          "source": "odluka_1996",
+          "quote": "Izbori odbornika i poslanika održaće se na dan 3. novembra 1996. godine."
+        },
+        {
+          "date": "1998-05-31",
+          "election_kind": "local",
+          "source": "odluka_1998",
+          "quote": "Odluka o raspisivanju izbora za odbornike skupština opština i poslanike Skupštine Republike Crne Gore ... održaće se na dan 31. maja 1998"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "through": "2026-11-17",
+          "note": "From 2000 each municipality held its own regular and early elections; the gazette carries each calling decision and result."
+        },
+        {
+          "date": "2008-04-06",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "lok_tivat_2008",
+          "quote": "Izvještaj o konačnim rezultatima izbora za odbornike na području Opštine Tivat održanim 6. aprila 2008. godine"
+        },
+        {
+          "date": "2014-05-25",
+          "election_kind": "local",
+          "source": "lok_zabljak_2014",
+          "quote": "konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 25. maja 2014. godine",
+          "note": "Common day for several municipalities, Podgorica among them (Sl. list CG 19/2014)."
+        },
+        {
+          "date": "2018-05-27",
+          "election_kind": "local",
+          "source": "lok_zabljak_2018",
+          "quote": "konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 27. maja 2018. godine",
+          "note": "Common day for several municipalities."
+        },
+        {
+          "date": "2022-10-23",
+          "election_kind": "local",
+          "source": "lok_zabljak_2022",
+          "quote": "konačnim rezultatima izbora za izbor odbornika u Skupštinu opštine Žabljak od 23. oktobra 2022. godine",
+          "note": "Common day for 14 municipalities, Podgorica and the new municipality of Zeta among them."
+        },
+        {
+          "date": "2024-09-29",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "oik_podgorica_2024",
+          "quote": "PODGORICA_2024_09_29.xlsx",
+          "note": "Early election in Podgorica."
+        },
+        {
+          "date": "2025-04-13",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "oik_hn_2025",
+          "quote": "Privremeni_rezultati_za_izbor_odbornika_u_SOHN_13042025"
+        },
+        {
+          "date": "2027-06-13",
+          "election_kind": "local",
+          "contests": 25,
+          "source": "zakon_izbori",
+          "quote": "Prvi opšti lokalni izbori održaće se 13. juna 2027. godine.",
+          "note": "First general local election in every municipality on one day."
+        }
+      ]
+    },
+    {
+      "key": "skupstina_gradske_opstine",
+      "tier": "gradska_opstina",
+      "name": "Izbori za odbornike u skupštine gradskih opština",
+      "name_en": "Urban municipality assembly elections (Golubovci and Tuzi)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "me.bm"
+        ]
+      },
+      "note": "The urban municipalities of Golubovci and Tuzi within Podgorica elected their own assemblies under the same law, on the day of the Podgorica election; Tuzi became a municipality in 2017 (first elected 2019) and Golubovci the municipality of Zeta in 2022.",
+      "source": "zakon_izbori",
+      "locator": "https://cik.me/images/DIK-media/legislativa/zakoni/Zakon_o_izboru_odbornika_i_poslanika.pdf (art. 1: skupština opštine, gradske opštine, Glavnog grada i Prijestonice)",
+      "valid_to": "2022-08-22",
+      "earliest_record": "2014-05-25",
+      "contests_per_unit": 1,
+      "est_votes": 60000,
+      "effort": 3,
+      "access": [
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2014-05-25",
+          "last_date": "2018-05-27",
+          "finest": "me.opstina",
+          "evidence": "Reports for Golubovci and Tuzi, Sl. list CG 19/2014.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2014-05-25",
+          "election_kind": "local",
+          "contests": 2,
+          "source": "lok_golubovci_2014",
+          "quote": "Izvještaj o rezultatima glasanja za izbor odbornika u Gradskoj opštini Golubovci",
+          "note": "With Tuzi (Sl. list CG 19/2014)."
+        }
+      ]
+    },
+    {
+      "key": "predsjednik_opstine",
+      "tier": "opstina",
+      "name": "Neposredni izbori za predsjednika opštine",
+      "name_en": "Direct mayoral elections (2004-2009)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "me.opstina"
+        ],
+        "fine": [
+          "me.bm"
+        ]
+      },
+      "finest_note": "Only the municipal commissions' reports in the gazette, by municipality.",
+      "note": "From the 2003 law, voters elected mayors for five years by two-round majority, usually with the assembly; the amendments of December 2009 (in force 8 January 2010) gave the choice back to the assembly. Kotor's election of 8 November 2009 was among the last.",
+      "source": "zakon_predsjednik_opstine",
+      "valid_from": "2003-07-16",
+      "valid_to": "2010-01-08",
+      "first_held": "2004-04-18",
+      "earliest_record": "2004-04-18",
+      "contests_per_unit": 1,
+      "est_votes": 400000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "More than half the valid votes; otherwise the top two meet 14 days later (Zakon o izboru predsjednika opštine arts. 22-23).",
+          "valid_from": "2003-07-16",
+          "valid_to": "2010-01-08",
+          "administered_by": "Municipal election commissions",
+          "source": "zakon_predsjednik_opstine"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2004-04-18",
+          "last_date": "2009-11-08",
+          "finest": "me.opstina",
+          "evidence": "Calling decisions and municipal commissions' reports for direct mayoral elections.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "2003-07-16",
+          "valid_to": "2010-01-08"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-04-18",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_tivat_2004",
+          "quote": "Izbor odbornika Skupštine opštine Tivat i predsjednika Opštine Tivat održaće se dana 18. aprila 2004."
+        },
+        {
+          "date": "2004-08-29",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_zabljak_2004",
+          "quote": "Izbor odbornika Skupštine opštine Žabljak i predsjednika Opštine Žabljak održaće se dana 29. avgusta 2004. godine."
+        },
+        {
+          "date": "2004-12-12",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_kotor_2004",
+          "quote": "Izbor odbornika Skupštine opštine Kotor i predsjednika Opštine Kotor održaće se dana 12. decembra 2004. godine."
+        },
+        {
+          "date": "2005-05-22",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_budva_2005",
+          "quote": "Izbor odbornika Skupštine opštine Budva i predsjednika Opštine Budva održaće se 22. maja 2005. godine."
+        },
+        {
+          "date": "2005-12-29",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_mojkovac_2005",
+          "quote": "Izbor odbornika Skupštine opštine Mojkovac i predsjednika Opštine Mojkovac održaće se 29. decembra 2005"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "through": "2009-12-31",
+          "note": "Every municipality elected its mayor directly in this period on its own cycle; the list above is from the decisions read so far."
+        },
+        {
+          "date": "2009-03-29",
+          "election_kind": "local",
+          "contests": 2,
+          "seats": 2,
+          "source": "po_tivat_2009",
+          "quote": "Izbor za predsjednika Opštine Tivat održaće se 29.03.2009. godine.",
+          "note": "Tivat and Herceg Novi (Sl. list CG 5/2009)."
+        },
+        {
+          "date": "2009-11-08",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 1,
+          "source": "po_kotor_2009",
+          "quote": "Izbori za predsjednika Opštine Kotor održani su 08. 11. 2009. godine."
+        }
+      ]
+    },
+    {
+      "key": "lokalni_referendum",
+      "tier": "opstina",
+      "name": "Opštinski i mjesni referendumi",
+      "name_en": "Municipal and local-community referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Municipal assemblies call municipal referendums, binding or consultative, and local-community referendums for part of their territory (Zakon o referendumu; Zakon o lokalnoj samoupravi). Run by a commission each assembly appoints; results appear in the gazette. Consultative referendums preceded the creation of Petnjica (2012) and Gusinje (2013); one for Tuzi was called and withdrawn in 2010.",
+      "source": "zakon_referendum",
+      "first_held": "2008-04-06",
+      "earliest_record": "2012-08-04",
+      "est_votes": 40000,
+      "effort": 3,
+      "access": [
+        {
+          "platform": "Službeni list Crne Gore: propisi",
+          "url": "https://www.sluzbenilist.me/propisi",
+          "format": "html (page images of the printed gazette)",
+          "access": "open",
+          "checked_at": "2026-11-17T00:00:00Z",
+          "first_date": "2012-08-04",
+          "last_date": "2025-12-14",
+          "finest": "me.opstina",
+          "evidence": "Commission reports for Petnjica 2012, Gusinje 2013, and Zeta (Botun) 2025.",
+          "source": "rezultati_2002"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-04-06",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref_zelenika_2008",
+          "quote": "održati 6. aprila 2008",
+          "note": "Herceg Novi: cement silo at the port of Zelenika."
+        },
+        {
+          "date": "2012-08-04",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref_petnjica_2012",
+          "quote": "opštinskom referendumu o osnivanju Opštine Petnjica koji je održan 4. avgusta 2012. godine"
+        },
+        {
+          "date": "2013-01-08",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref_gusinje_2013",
+          "quote": "o rezultatima referenduma održanog 08.01.2013. godine"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "source": "ref_mjesni_2025",
+          "quote": "Odluka o raspisivanju mjesnog referenduma za teritoriju Mjesne zajednice Gračanica",
+          "note": "Local-community referendums on new local communities (Gračanica/Zoriće, Sjenožeta-Gnjili Potok)."
+        },
+        {
+          "date": "2025-12-14",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref_botun_2025",
+          "quote": "Referendum će se održati 14. 12. 2025. godine.",
+          "note": "Zeta: the Podgorica wastewater plant at Botun."
+        }
+      ]
+    },
+    {
+      "key": "skupstina_srcg",
+      "tier": "srcg",
+      "name": "Izbori za Skupštinu Narodne (Socijalističke) Republike Crne Gore",
+      "name_en": "Assembly of the People's (Socialist) Republic, 1946-1986",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ustav_1992",
+      "valid_from": "1945-01-01",
+      "valid_to": "1990-12-09",
+      "est_votes": 3000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "Single-list and delegate-system elections from the Constituent Assembly to 1986; results were published only in the printed Službeni list NRCG/SRCG, whose online register starts in 1992, and no official online copy was found.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect"
+          ],
+          "iso_pattern": "ME",
+          "valid_to": "1990-01-01"
+        }
+      ]
+    },
+    {
+      "key": "narodna_skupstina_1905",
+      "tier": "knjazevina",
+      "name": "Izbori za Crnogorsku narodnu skupštinu",
+      "name_en": "National Assembly of the Principality and Kingdom, 1905-1914",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dacg_ustavi",
+      "valid_from": "1905-12-19",
+      "valid_to": "1918-11-26",
+      "est_votes": 200000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "Elections under the 1905 Constitution (first session 1906, last election 1914) were reported only in the period's official gazette and Assembly records held by the State Archives; no official online copy of the results was found."
+    },
+    {
+      "key": "savezni_izbori",
+      "tier": "national",
+      "name": "Savezni izbori (SFRJ, SRJ, Srbija i Crna Gora)",
+      "name_en": "Federal elections held in Montenegro, 1945-2006",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {},
+      "source": "ustav_1992",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections to the Yugoslav federal assemblies, the 2000 federal presidency, and the Assembly of Serbia and Montenegro (chosen by the republic parliaments in 2003) belong to the federal polity's census, not Montenegro's."
+    },
+    {
+      "key": "savjeti_manjina",
+      "tier": "national",
+      "name": "Izbori za savjete manjinskih naroda",
+      "name_en": "Minority national councils",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {},
+      "source": "manjine_pravila",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council is made up of ex officio members (deputies, councillors, and other officials of the minority) and members chosen at an electoral assembly of electors who each gathered 30 to 100 signatures; no electorate votes and the election commissions do not run them."
+    },
+    {
+      "key": "mjesne_zajednice",
+      "tier": "mjesna_zajednica",
+      "name": "Izbor savjeta mjesnih zajednica",
+      "name_en": "Local community councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {},
+      "source": "zls_2018",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each municipality sets how local-community councils are chosen in its own decision (citizens' meetings or local ballots run by the municipality); the election commissions do not run them and no register of results exists."
+    },
+    {
+      "key": "posredni",
+      "tier": "national",
+      "name": "Posredni izbori",
+      "name_en": "Indirect elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "ustav",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by elected bodies: the Prime Minister and Government and the Speaker by the Skupština; the President of the Presidency's members in 1990-1992; mayors by the municipal assembly before 2004 and since 2010 (Zakon o lokalnoj samoupravi 2018 and 2026); assembly chairs; the Ombudsman. No electorate votes."
+    },
+    {
+      "key": "sudstvo",
+      "tier": "national",
+      "name": "Izbor sudija i tužilaca",
+      "name_en": "Judges and prosecutors",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {},
+      "source": "ustav",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed by the Judicial Council and Constitutional Court judges elected by the Skupština on nominations of the President and the Skupština (Ustav arts. 127-128, 154); no judge is elected by voters."
+    },
+    {
+      "key": "stranacki_izbori",
+      "tier": "national",
+      "name": "Stranački unutrašnji izbori",
+      "name_en": "Party nominations",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {},
+      "source": "zakon_izbori",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties and groups of voters nominate lists and candidates under their own statutes; the law provides no state-run primary and the commissions publish no such votes."
+    }
+  ]
+}
