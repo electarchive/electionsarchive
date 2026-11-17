@@ -72,6 +72,20 @@
       "url": "https://kqz-ks.org/rezultatet/",
       "kind": "official_body",
       "note": "The Commission's results archive for assembly and local elections since 2000. On 16 November 2026 the site answered automated clients with a browser challenge (HTTP 403)."
+    },
+    "vendim-09-2026": {
+      "title": "Vendim për caktimin dhe shpalljen e zgjedhjeve të parakohshme për Kuvendin e Republikës së Kosovës (PRS-09/2026)",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=119488",
+      "kind": "official_body",
+      "note": "Decision of the acting President of the Republic, signed 30 April 2026 and published in the Official Gazette the same day, setting the early Assembly election for 7 June 2026 under Constitution arts. 66(2) and 82(1)(3)."
+    },
+    "vendim-11-041-2026": {
+      "title": "Vendim për zgjedhjen e Presidentit të Republikës së Kosovës (KUV-11-V-041-V)",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=125155",
+      "kind": "official_body",
+      "note": "Decision of the Assembly, Legislature XI, dated 6 October 2026 and published 7 October 2026, electing Justina Shiroka Pula President in the first ballot of its extraordinary session of 6 October 2026."
     }
   },
   "tiers": [
@@ -213,6 +227,12 @@
           "note": "Early election after the Assembly elected in February 2025 failed to elect a government.",
           "source": "dekret-210-2025",
           "quote": "Dekret për caktimin dhe shpalljen e zgjedhjeve të parakohshme për Kuvendin e Republikës së Kosovës, PRS-210/2025-DKR"
+        },
+        {
+          "date": "2026-06-07",
+          "note": "Early election after the Assembly elected in December 2025 failed to elect a President; the acting President set it on 30 April 2026 and the Central Election Commission certified the results on 8 July 2026.",
+          "source": "vendim-09-2026",
+          "quote": "Zgjedhjet e parakohshme për Kuvendin e Republikës së Kosovës do të mbahen më 07.06.2026."
         }
       ],
       "est_votes": 6000000,
@@ -357,6 +377,12 @@
         },
         {
           "date": "2021-04-04"
+        },
+        {
+          "date": "2026-10-06",
+          "note": "Elected in the first ballot by the Assembly of Legislature XI: Justina Shiroka Pula.",
+          "source": "vendim-11-041-2026",
+          "quote": "Znj. Justina Shiroka Pula, zgjedhet Presidente e Republikës së Kosovës."
         }
       ],
       "est_votes": 1000,
