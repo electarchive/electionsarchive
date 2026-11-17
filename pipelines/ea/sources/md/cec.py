@@ -141,6 +141,7 @@ PS2019_DISTRICT = {
 }
 SUFFIX = {"ps2014": ".xls", "ps2014-districts": ".xls", "ps2014-totals": ".xls", "ps2019-totals": ".pdf"}
 DAYS = {
+    "2010-11-28": date(2010, 11, 28),
     "2014-11-30": date(2014, 11, 30),
     "2016-10-30": date(2016, 10, 30),
     "2016-11-13": date(2016, 11, 13),
@@ -467,6 +468,9 @@ def fetch() -> None:
     for url in [*PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     decisions.fetch()
+    from ea.sources.md import early2010
+
+    early2010.fetch()
 
 
 def parse() -> None:
@@ -747,7 +751,11 @@ def build(day: str) -> Package:
         depends=["md.cec/registry", *EARLIER.get(day, [])],
     )
     p.external.add(MOLDOVA)
-    if day in ("2014-11-30", "2021-07-11", "2025-09-28"):
+    if day == "2010-11-28":
+        from ea.sources.md import early2010
+
+        early2010.build(p, day, first)
+    elif day in ("2014-11-30", "2021-07-11", "2025-09-28"):
         _parliament(p, day, first)
     elif day == "2019-02-24":
         _parliament_2019(p, day, first)
