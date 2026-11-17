@@ -549,7 +549,9 @@ def election(day: str) -> Package:
         package_key(day),
         SOURCE,
         f"The {english} by polling station from the State Electoral Commission",
-        [f"{SOURCE}/registry"],
+        # The councils and assemblies come from the local elections' registry; the areas and the polling-station
+        # scheme from the national geography.
+        [f"{SOURCE}/registry", f"{lokalni.SOURCE}/registry", f"{lokalni.IZBORI}/geo"],
     )
     p.external.add(CROATIA)
     p.artifact(raw.cached(SOURCE, zip_url(day)), SOURCE_ID)
