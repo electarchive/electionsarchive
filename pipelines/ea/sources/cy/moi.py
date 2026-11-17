@@ -25,6 +25,12 @@ COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fCYP"))
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 ABROAD_DISTRICT = 7
 SEATS = 56
+# Seats of each constituency, by the Ministry's district id: the First Schedule of Law 124/1985 for the elections
+# from 2001 to 2021, and the First Schedule as replaced by Law 226(I)/2025 for the 2026 election.
+DISTRICTS = {1: "Nicosia", 2: "Kyrenia", 3: "Famagusta", 4: "Larnaca", 5: "Limassol", 6: "Paphos"}
+SEATS_1985 = {1: 21, 2: 3, 3: 11, 4: 5, 5: 12, 6: 4}
+SEATS_2025 = {1: 19, 2: 3, 3: 11, 4: 6, 5: 12, 6: 5}
+SEAT_LAW_2025 = date(2026, 1, 1)
 
 
 @dataclass(frozen=True)
@@ -68,7 +74,9 @@ METHOD = (
     "named by its polling station and box. Registered voters are the electoral roll of the box, ballots cast are "
     "the voters who voted, and the valid, invalid, and blank ballots add up to the ballots cast. The site types "
     "every ballot line of a list election as a party, including lines of independent candidates. The site prints no "
-    "seat counts, so no seats are stored."
+    "seat counts, so no seats are stored. A House election is split into the six constituencies, each with the "
+    "ballot boxes of its district; the constituency's seats are those of the First Schedule to the law on the "
+    "election of members of the House of Representatives (Law 124/1985, replaced by Law 226(I)/2025 from 2026)."
 )
 RUNOFF = {
     date(2008, 2, 24): date(2008, 2, 17),
@@ -351,127 +359,150 @@ def election(e: Election) -> Package:
     p.name(election_id, title, "el", "native", False)
     path = f"cy/{day}-{slug}" + ("-runoff" if e.round == 2 else "")
     p.add("slug", path=path, entity_id=election_id, is_current=True)
-    contest = key("contest", day)
-    previous = key("contest", first.day) if first is not None else None
-    p.add(
-        "contest",
-        id=contest,
-        election_id=election_id,
-        kind={"president": "office", "parliament": "list_allocation", "euro": "list_allocation"}[e.family],
-        office_id=PRESIDENCY if e.family == "president" else None,
-        body_id=HOUSE if e.family == "parliament" else None,
-        district_area_id=COUNTRY,
-        magnitude={"president": 1, "parliament": SEATS, "euro": 6}[e.family],
-        round_number=e.round,
-        previous_round_id=previous,
-        electoral_system_id=PRESIDENT_SYSTEM if e.family == "president" else None,
-        default_result_kind="counted",
-    )
-    p.name(contest, english, "en", "official")
-    p.name(contest, f"{title}", "el", "native", False)
-    p.add(
-        "slug",
-        path=f"{path}/{ {'president': 'president', 'parliament': 'house', 'euro': 'cyprus-seats'}[e.family] }",
-        entity_id=contest,
-        is_current=True,
-    )
-    result_set = key("result_set", day)
-    p.add(
-        "result_set",
-        id=result_set,
-        election_id=election_id,
-        contest_id=contest,
-        stage="official",
-        kind="counted",
-        source_id=MOI_SOURCE,
-        status="active",
-        is_default=True,
-        completeness=1.0,
-    )
-    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
-    who: dict[str, list[str]] = dict(island["who"])
-    en_who = document["english"]["island"]["who"]
-    order = [str(c[0]) for c in island["c"]]
-    boxes = _boxes(e.site)
-    for _, _, _, _, result in boxes:
-        for cid, name in result["who"].items():
-            who.setdefault(cid, name)
-            if cid not in order:
-                order.append(cid)
-    options: dict[str, str] = {}
-    for position, cid in enumerate(order, 1):
-        name = party_name(who[cid][0])
-        option = options[cid] = key("option", day, cid)
-        if e.family == "president":
-            person = key("person", day, cid)
-            p.add("person", id=person)
-            p.name(person, name, "el", "official")
-            if cid in en_who:
-                p.name(person, party_name(en_who[cid][0]), "en", "english", False)
-            p.add(
-                "contest_option",
-                id=option,
-                contest_id=contest,
-                kind="candidate",
-                ballot_position=position,
-                ballot_label=name,
-            )
-            p.add(
-                "candidacy",
-                id=key("candidacy", day, cid),
-                person_id=person,
-                option_id=option,
-                role="head",
-                ballot_name=name,
-            )
-        else:
-            p.add(
-                "contest_option",
-                id=option,
-                contest_id=contest,
-                kind="list",
-                party_id=key("party", name),
-                ballot_position=position,
-                ballot_label=name,
-            )
     values = Facts()
     seen: set[object] = set()
-    for district, place, station, box, result in boxes:
-        if box["id"] in seen:
-            raise ValueError(f"{package_key(e)}: ballot box {box['id']} appears twice")
-        seen.add(box["id"])
-        unit = key("unit", day, box["id"])
-        district_id = district["node"][0]
+    boxes = _boxes(e.site)
+    if e.family == "parliament":
+        seats = SEATS_2025 if e.day >= SEAT_LAW_2025 else SEATS_1985
+        if sum(seats.values()) != SEATS:
+            raise ValueError("constituency seats do not add up to the House")
+        known = {d["district"]["node"][0] for d in document["districts"]}
+        stray = {box[0]["node"][0] for box in boxes} - set(seats)
+        if stray or not set(seats) <= known:
+            raise ValueError(f"{package_key(e)}: unexpected districts {sorted(stray)}")
+        scopes: list[tuple[int | None, str]] = [(d, d_name) for d, d_name in DISTRICTS.items()]
+    else:
+        scopes = [(None, "")]
+    sets: list[str] = []
+    for district, district_name in scopes:
+        if district is None:
+            scope_boxes, total, contest_name = boxes, island, english
+            suffix: tuple[object, ...] = ()
+            area_id, magnitude = COUNTRY, {"president": 1, "euro": 6}[e.family]
+            slug_path = f"{path}/{ {'president': 'president', 'euro': 'cyprus-seats'}[e.family] }"
+            greek = f"{title}"
+        else:
+            scope_boxes = [box for box in boxes if box[0]["node"][0] == district]
+            total = next(d["district"] for d in document["districts"] if d["district"]["node"][0] == district)
+            contest_name = f"{english}, {district_name}"
+            suffix = (district,)
+            area_id, magnitude = area("cy.district", district), seats[district]
+            slug_path = f"{path}/{district_name.lower()}"
+            greek = f"{title} - {total['node'][1]}"
+        contest = key("contest", day, *suffix)
+        previous = key("contest", first.day) if first is not None else None
         p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=CYPRUS,
-            scheme_code="cy.ballot_box",
-            code=f"{day}:{box['id']}",
-            area_relation="within",
-            area_id=area("cy.community", place["node"][0]),
-            kind="abroad_mission" if district_id == ABROAD_DISTRICT else "standard",
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind={"president": "office", "parliament": "list_allocation", "euro": "list_allocation"}[e.family],
+            office_id=PRESIDENCY if e.family == "president" else None,
+            body_id=HOUSE if e.family == "parliament" else None,
+            district_area_id=area_id,
+            magnitude=magnitude,
+            round_number=e.round,
+            previous_round_id=previous,
+            electoral_system_id=PRESIDENT_SYSTEM if e.family == "president" else None,
+            default_result_kind="counted",
         )
-        label = station["node"][1] if station["node"][1] == box["name"] else f"{station['node'][1]} - {box['name']}"
-        p.name(unit, label, "el", "official")
+        p.name(contest, contest_name, "en", "official")
+        p.name(contest, greek, "el", "native", False)
+        p.add("slug", path=slug_path, entity_id=contest, is_current=True)
+        result_set = key("result_set", day, *suffix)
+        sets.append(result_set)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=MOI_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+        who: dict[str, list[str]] = dict(total["who"] if district is not None else island["who"])
+        en_who = document["english"]["island"]["who"]
+        order = [str(c[0]) for c in (total["c"] if district is not None else island["c"])]
+        for *_, result in scope_boxes:
+            for cid, name in result["who"].items():
+                who.setdefault(cid, name)
+                if cid not in order:
+                    order.append(cid)
+        options: dict[str, str] = {}
+        for position, cid in enumerate(order, 1):
+            name = party_name(who[cid][0])
+            option = options[cid] = key("option", day, *suffix, cid)
+            if e.family == "president":
+                person = key("person", day, cid)
+                p.add("person", id=person)
+                p.name(person, name, "el", "official")
+                if cid in en_who:
+                    p.name(person, party_name(en_who[cid][0]), "en", "english", False)
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=position,
+                    ballot_label=name,
+                )
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", day, cid),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=name,
+                )
+            else:
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="list",
+                    party_id=key("party", name),
+                    ballot_position=position,
+                    ballot_label=name,
+                )
+        for unit_district, place, station, box, result in scope_boxes:
+            if box["id"] in seen:
+                raise ValueError(f"{package_key(e)}: ballot box {box['id']} appears twice")
+            seen.add(box["id"])
+            unit = key("unit", day, box["id"])
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=CYPRUS,
+                scheme_code="cy.ballot_box",
+                code=f"{day}:{box['id']}",
+                area_relation="within",
+                area_id=area("cy.community", place["node"][0]),
+                kind="abroad_mission" if unit_district["node"][0] == ABROAD_DISTRICT else "standard",
+            )
+            label = station["node"][1] if station["node"][1] == box["name"] else f"{station['node'][1]} - {box['name']}"
+            p.name(unit, label, "el", "official")
+            for measure, field in ACCOUNTING:
+                values.add(result_set, unit, None, measure, result[field])
+            for cid, count in result["c"]:
+                values.add(result_set, unit, options[str(cid)], VOTES, count)
         for measure, field in ACCOUNTING:
-            values.add(result_set, unit, None, measure, result[field])
-        for cid, count in result["c"]:
-            values.add(result_set, unit, options[str(cid)], VOTES, count)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=total[field])
+        for cid, count in total["c"]:
+            p.add("declared", result_set_id=result_set, option_id=options[str(cid)], measure=VOTES, value=count)
+        _compare(f"{package_key(e)} {district_name}".strip(), scope_boxes, total)
+        if e.family == "president":
+            _outcomes(p, e, result_set, options, island)
     p.frame("result_value", values.frame())
-    declared = {field: island[field] for _, field in ACCOUNTING}
-    for measure, field in ACCOUNTING:
-        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=declared[field])
-    for cid, count in island["c"]:
-        p.add("declared", result_set_id=result_set, option_id=options[str(cid)], measure=VOTES, value=count)
-    _compare(e, boxes, island)
-    _overcount(p, result_set, boxes)
-    if e.family == "president":
-        _outcomes(p, e, result_set, options, island)
+    if e.family == "parliament":
+        _compare(f"{package_key(e)} island", boxes, island)
+    _overcount(p, sets, boxes)
     return p
 
 
-def _compare(e: Election, boxes: Sequence[tuple[dict[str, Any], ...]], island: dict[str, Any]) -> None:
+def _compare(label: str, boxes: Sequence[tuple[dict[str, Any], ...]], island: dict[str, Any]) -> None:
     sums = {field: 0 for _, field in ACCOUNTING}
     votes: dict[int, int] = {}
     for *_, result in boxes:
@@ -482,9 +513,9 @@ def _compare(e: Election, boxes: Sequence[tuple[dict[str, Any], ...]], island: d
     printed = {cid: count for cid, count in island["c"]}
     off = {field: (sums[field], island[field]) for field in sums if sums[field] != island[field]}
     if off or votes != printed:
-        raise ValueError(f"{package_key(e)}: ballot boxes disagree with the island totals: {off}")
+        raise ValueError(f"{label}: ballot boxes disagree with the island totals: {off}")
     print(
-        f"{package_key(e)}: {len(boxes)} boxes, island totals match "
+        f"{label}: {len(boxes)} boxes, totals match "
         f"(registered {sums['reg']}, voted {sums['voted']}, valid {sums['valid']})",
         flush=True,
     )
@@ -504,14 +535,22 @@ def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str],
         p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
 
 
-def _overcount(p: Package, result_set: str, boxes: Sequence[tuple[dict[str, Any], ...]]) -> None:
+def _overcount(p: Package, result_sets: Sequence[str], boxes: Sequence[tuple[dict[str, Any], ...]]) -> None:
     over = [result for *_, result in boxes if (result["voted"] or 0) > (result["reg"] or 0)]
     if not over:
         return
     extra = sum(result["voted"] - result["reg"] for result in over)
     text = (
-        f"The Ministry's own ballot box figures show more voters who voted than registered voters in {len(over)} "
-        f"ballot box{'es' if len(over) > 1 else ''} ({extra} more in all). They are stored as printed."
+        f"Across the election, the Ministry's own ballot box figures show more voters who voted than registered voters "
+        f"in {len(over)} ballot box{'es' if len(over) > 1 else ''} ({extra} more in all). They are stored as printed."
     )
     p.accept("accounting.turnout", text)
-    p.add("note", id=key("note", result_set, "overcount"), entity_id=result_set, kind="caveat", body_md=text, lang="en")
+    for result_set in result_sets:
+        p.add(
+            "note",
+            id=key("note", result_set, "overcount"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=text,
+            lang="en",
+        )
