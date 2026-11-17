@@ -1,0 +1,44 @@
+# bp-1986-2: bpw_1986.pdf, second round (Zweiter Wahlgang, 8 Jun 1986): Tabelle 3 "Die Wahlbeteiligung sowie gültige und ungültige Stimmen in den Wahlkreisen" (page 11) and Tabelle 4 "Die Verteilung der Stimmen auf die Wahlwerber in den Wahlkreisen" (page 12); Wahlkreise = Länder
+# Note: Tabelle 3 prints no Wahlberechtigte for the second round; per the text (page 8, § 20 Abs. 1 BPWG) the first-round Wählerverzeichnisse applied unchanged, so the registered figures are taken from the first-round rows of Tabelle 3 (page 11) as their own table block.
+# Note: abgegebene Stimmen include Wahlkarten voters from other Wahlkreise (footnote to Tabelle 3).
+option STEYRER Dr. Kurt Steyrer
+option WALDHEIM Dr. Kurt Waldheim
+table page=11 rotate=0
+columns registered
+x 0.4001 0.4595
+row 1 @0.1937:0.2052 200096
+row 2 @0.2142:0.2257 391196
+row 3 @0.2347:0.2471 1037489
+row 4 @0.2557:0.2668 902867
+row 5 @0.2766:0.2873 313787
+row 6 @0.2967:0.3078 856353
+row 7 @0.3172:0.3275 407497
+row 8 @0.3373:0.3480 196636
+row 9 @0.3583:0.3698 1130925
+total AT @0.3788:0.3908 5436846
+table page=11 rotate=0
+columns cast invalid valid
+x 0.4931 0.5495 0.5843 0.6293 0.6635 0.7199
+row 1 @0.4523:0.4617 198998 4164 194834
+row 2 @0.4724:0.4823 365091 15660 349431
+row 3 @0.4929:0.5028 974684 24790 949894
+row 4 @0.5135:0.5233 778432 24660 753772
+row 5 @0.5340:0.5438 262308 9187 253121
+row 6 @0.5554:0.5639 805500 35886 769614
+row 7 @0.5750:0.5844 376832 20494 356338
+row 8 @0.5956:0.6050 183187 12519 170668
+row 9 @0.6161:0.6255 800817 26679 774138
+total AT @0.6375:0.6469 4745849 174039 4571810
+table page=12 rotate=0
+columns valid STEYRER WALDHEIM
+x 0.3395 0.3965 0.4145 0.4709 0.4787 0.5345
+row 1 @0.4275:0.4369 194834 98793 96041
+row 2 @0.4472:0.4575 349431 180785 168646
+row 3 @0.4677:0.4788 949894 419505 530389
+row 4 @0.4882:0.4994 753772 353357 400415
+row 5 @0.5092:0.5195 253121 105893 147228
+row 6 @0.5297:0.5400 769614 352038 417576
+row 7 @0.5494:0.5596 356338 111459 244879
+row 8 @0.5699:0.5802 170668 49790 120878
+row 9 @0.5904:0.6007 774138 435403 338735
+total AT @0.6118:0.6229 4571810 2107023 2464787

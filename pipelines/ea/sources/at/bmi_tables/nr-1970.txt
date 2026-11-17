@@ -1,0 +1,48 @@
+# nr-1970: nationalratswahl-131970.pdf, original result of 1 March 1970 (before the 4 Oct 1970 repeat vote in Vienna Wahlkreise 1, 3 and 5). Tabelle 3 "Die Wahlbeteiligung 1966 und 1970 in den Wahlkreisen, Wahlkreisverbänden und Bundesländern" (p. 43, 1970 columns), Tabelle 4 "Die gültigen und ungültigen Stimmen nach Wahlkreisen, Wahlkreisverbänden und Bundesländern" (p. 44), Tabelle 6 "Die Parteisummen in den Wahlkreisen, Wahlkreisverbänden und Bundesländern, a) Grundzahlen" (p. 46); Bundesland rows only. Party names and seats from "Die Hauptergebnisse der Nationalratswahl vom 1. März 1970" (p. 33).
+option OEVP Österreichische Volkspartei
+option SPOE Sozialistische Partei Österreichs
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option DFP Demokratische Fortschrittliche Partei (DFP)-Wahlgemeinschaft Franz Olah
+option NDP Nationaldemokratische Partei
+option MRF Adolf Glantschnig — Für Menschlichkeit, Recht und Freiheit in Österreich
+table page=43 rotate=0
+columns registered cast
+x 0.6300 0.6874 0.7769 0.8331
+row 9 @0.7148:0.7217 1269030 1116260
+row 3 @0.7298:0.7371 958394 909852
+row 4 @0.7452:0.7525 775094 728015
+row 5 @0.7606:0.7678 256194 231378
+row 7 @0.7760:0.7832 329088 310540
+row 8 @0.7914:0.7982 156323 149947
+row 6 @0.8063:0.8136 782640 749353
+row 2 @0.8217:0.8286 336452 309670
+row 1 @0.8367:0.8440 182626 173720
+total AT @0.8799:0.8867 5045841 4678735
+table page=44 rotate=0
+columns valid invalid
+x 0.3851 0.4407 0.4873 0.5248
+row 9 @0.7200:0.7268 1108970 7290
+row 3 @0.7354:0.7422 902713 7139
+row 4 @0.7507:0.7576 722053 5962
+row 5 @0.7657:0.7730 229763 1615
+row 7 @0.7811:0.7879 305994 4546
+row 8 @0.7961:0.8033 147541 2406
+row 6 @0.8115:0.8187 739546 9807
+row 2 @0.8268:0.8341 307314 2356
+row 1 @0.8422:0.8495 172199 1521
+total AT @0.8850:0.8923 4636093 42642
+table page=46 rotate=0
+columns OEVP SPOE FPOE KPOE DFP NDP MRF valid
+x 0.3791 0.4383 0.4589 0.5193 0.5508 0.5992 0.6155 0.6572 0.6747 0.7152 0.7406 0.7745 0.8102 0.8331 0.8561 0.9135
+row 9 @0.7247:0.7319 398025 636847 44120 17628 11497 853 - 1108970
+row 3 @0.7401:0.7473 459691 408129 24037 8148 2169 539 - 902713
+row 4 @0.7555:0.7623 332284 335931 48120 4152 466 1100 - 722053
+row 5 @0.7708:0.7777 100186 97698 29850 1360 432 - 237 229763
+row 7 @0.7862:0.7926 177103 109926 16960 1278 727 - - 305994
+row 8 @0.8012:0.8080 80763 45726 20038 722 292 - - 147541
+row 6 @0.8166:0.8234 337463 354023 36877 8988 1203 992 - 739546
+row 2 @0.8316:0.8388 109682 163636 29722 3655 619 - - 307314
+row 1 @0.8469:0.8542 82813 83989 4639 758 - - - 172199
+total AT @0.8906:0.8974 2078010 2235905 254363 46689 17405 3484 237 4636093
+seats page=33 SPOE 81 OEVP 79 FPOE 5 KPOE 0 DFP 0 NDP 0 MRF 0

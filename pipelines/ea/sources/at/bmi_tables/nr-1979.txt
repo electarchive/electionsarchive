@@ -1,0 +1,20 @@
+# nr-1979: nationalratswahl-651979.pdf, Tabelle 12 Zusammenfassung "Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (page 43, folio 47); Wahlkreise = Länder, Wahlkreisverband subtotal rows skipped; seats from b) Reststimmen und Mandate (page 43)
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option CSA Christlich-Soziale-Arbeitsgemeinschaft
+table page=43 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE KPOE CSA
+x 0.2503 0.3053 0.3585 0.4129 0.4226 0.4589 0.4661 0.5206 0.5828 0.6360 0.6548 0.7098 0.7455 0.7890 0.8047 0.8422 0.8585 0.8881
+row 1 @0.1984:0.2074 192225 182448 1731 180717 95688 79394 4941 694 -
+row 3 @0.2189:0.2279 984013 928215 8702 919513 445116 434799 32738 6860 -
+row 9 @0.2394:0.2480 1179919 1017021 9876 1007145 610360 334088 47694 15003 -
+row 2 @0.3164:0.3249 364432 332356 3525 328831 184899 107355 32947 3630 -
+row 4 @0.3369:0.3459 831469 776185 8402 767783 385853 320995 55347 5588 -
+row 5 @0.3574:0.3668 284273 257253 2404 254849 114510 109676 29084 1579 -
+row 6 @0.3779:0.3869 811261 779044 11269 767775 394397 317651 47184 8543 -
+row 7 @0.3985:0.4074 365334 344576 5729 338847 127664 187782 19272 1866 2263
+row 8 @0.4190:0.4284 173809 167075 3284 163791 54739 89999 17536 1517 -
+total AT @0.4951:0.5049 5186735 4784173 54922 4729251 2413226 1981739 286743 45280 2263
+seats page=43 SPOE 95 OEVP 77 FPOE 11

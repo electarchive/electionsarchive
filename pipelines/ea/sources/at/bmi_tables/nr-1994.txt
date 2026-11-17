@@ -1,0 +1,54 @@
+# nr-1994: nationalratswahl-9101994.pdf, Tabellenteil B: "B.3 Veränderung der Zahl der abgegebenen Stimmen gegenüber 1990" (page 118, block "Nationalratswahl 1994") and "B.4 Verteilung der Parteistimmen" (pages 119-120, block "Parteistimmen insgesamt", i.e. including Wahlkarten); Landeswahlkreise = Länder; seats and party names from "3.2 Hauptergebnisse der Nationalratswahl vom 9. Oktober 1994" (page 86)
+option SPOE Sozialdemokratische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option GRUENE Die Grünen - Die Grüne Alternative
+option LIF Liberales Forum - Heide Schmidt
+option VGOE Vereinte Grüne Österreichs - Liste Adi Pinter
+option KPOE Kommunistische Partei Österreichs
+option BGOE Bürgerliche Grüne Österreichs Freie Demokraten - Die Liberalen Verband der Sozialversicherten Bürgerlisten und Unabhängige
+option NEIN Nein - Bürgerinitiative gegen den Verkauf Österreichs
+option CWG Christliche - Wähler - Gemeinschaft
+option OENP Österreichische Naturgesetz - Partei
+option GEORG Fritz Georg
+option DBP Die Beste Partei
+table page=118 rotate=0
+columns registered cast invalid valid
+x 0.2999 0.3573 0.3954 0.4528 0.6040 0.6433 0.7775 0.8356
+total AT @0.1697:0.1791 5774000 4730987 97873 4633114
+row 1 @0.1958:0.2052 212341 187240 4000 183240
+row 2 @0.2086:0.2180 419648 345332 6819 338513
+row 3 @0.2219:0.2313 1113723 959777 22330 937447
+row 4 @0.2347:0.2441 972264 816464 16505 799959
+row 5 @0.2480:0.2569 346798 273709 5430 268279
+row 6 @0.2608:0.2702 905719 793151 20457 772694
+row 7 @0.2736:0.2835 454205 369465 10202 359263
+row 8 @0.2869:0.2963 221450 160342 1747 158595
+row 9 @0.3001:0.3091 1127852 825507 10383 815124
+table page=119 rotate=0
+columns valid SPOE OEVP FPOE GRUENE LIF VGOE
+x 0.3162 0.3736 0.4063 0.4631 0.4952 0.5514 0.5840 0.6403 0.6820 0.7291 0.7715 0.8180 0.8748 0.9069
+total AT @0.1826:0.1903 4633114 1617804 1281846 1042332 338538 276580 5776
+row 1 @0.2086:0.2168 183240 81120 57719 30640 6872 5532 126
+row 2 @0.2215:0.2296 338513 133783 55399 113456 19844 12795 556
+row 3 @0.2347:0.2428 937447 326639 317810 170881 53766 53856 901
+row 4 @0.2475:0.2557 799959 275744 231201 180293 60460 37789 1371
+row 5 @0.2604:0.2689 268279 83256 77768 64182 21841 17038 366
+row 6 @0.2736:0.2817 772694 282781 212122 181051 47683 38057 1052
+row 7 @0.2869:0.2950 359263 87728 130218 79269 34293 18998 483
+row 8 @0.3001:0.3083 158595 33075 59921 37354 14236 10371 254
+row 9 @0.3125:0.3211 815124 313678 139688 185206 79543 82144 667
+table page=120 rotate=0
+columns KPOE BGOE NEIN CWG OENP GEORG DBP
+x 0.1288 0.1669 0.2249 0.2576 0.3071 0.3458 0.4021 0.4341 0.4909 0.5230 0.5895 0.6112 0.6790 0.6989
+total AT @0.1838:0.1928 11919 2504 41492 9051 4209 482 581
+row 1 @0.2099:0.2176 182 80 969 - - - -
+row 2 @0.2227:0.2313 509 - 1590 - - - 581
+row 3 @0.2356:0.2437 2497 755 10342 - - - -
+row 4 @0.2488:0.2574 1584 - 6333 3751 1433 - -
+row 5 @0.2625:0.2698 - - 2408 1420 - - -
+row 6 @0.2745:0.2826 2960 573 6415 - - - -
+row 7 @0.2877:0.2963 650 - 4147 2547 930 - -
+row 8 @0.3010:0.3095 - 350 799 1333 420 482 -
+row 9 @0.3138:0.3224 3537 746 8489 - 1426 - -
+seats page=86 SPOE 65 OEVP 52 FPOE 42 GRUENE 13 LIF 11

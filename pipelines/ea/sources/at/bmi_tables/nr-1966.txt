@@ -1,0 +1,48 @@
+# nr-1966: nationalratswahl-631966.pdf, Tabelle 3 "Die Wahlbeteiligung 1962 und 1966 in den Wahlkreisen, Wahlkreisverbänden und Bundesländern" (p. 22, 1966 columns), Tabelle 4 "Die gültigen und ungültigen Stimmen nach Wahlkreisen, Wahlkreisverbänden und Bundesländern" (p. 23), Tabelle 6 "Die Parteisummen in den Wahlkreisen, Wahlkreisverbänden und Bundesländern, a) Grundzahlen" (p. 25); Bundesland rows only. Party names and seats from "Die Hauptergebnisse der Nationalratswahlen" (p. 12). The errata sheet (p. 5) corrects only Wahlkreis 21 and the second-count tables, not these Land figures.
+option OEVP Österreichische Volkspartei
+option SPOE Sozialistische Partei Österreichs
+option FPOE Freiheitliche Partei Österreichs
+option DFP Demokratische Fortschrittliche Partei, DFP-Liste Franz Olah
+option KPOE_LS Kommunisten und Linkssozialisten
+option LPOE Liberale Partei Österreichs
+option MLOE Marxisten-Leninisten Österreichs
+table page=22 rotate=0
+columns registered cast
+x 0.6493 0.7092 0.7950 0.8549
+row 9 @0.7289:0.7358 1266375 1140648
+row 3 @0.7443:0.7507 937781 895695
+row 4 @0.7593:0.7661 742058 702735
+row 5 @0.7743:0.7815 238308 219633
+row 7 @0.7897:0.7965 309926 296223
+row 8 @0.8050:0.8119 146891 141464
+row 6 @0.8204:0.8273 752162 727606
+row 2 @0.8358:0.8422 316740 291052
+row 1 @0.8512:0.8576 176577 168914
+total AT @0.9042:0.9115 4886818 4583970
+table page=23 rotate=0
+columns valid invalid
+x 0.3845 0.4432 0.5163 0.5562
+row 9 @0.7435:0.7503 1129222 11426
+row 3 @0.7589:0.7657 886399 9296
+row 4 @0.7738:0.7811 695650 7085
+row 5 @0.7892:0.7961 217530 2103
+row 7 @0.8046:0.8115 291426 4797
+row 8 @0.8200:0.8264 139173 2291
+row 6 @0.8354:0.8418 717056 10550
+row 2 @0.8504:0.8572 288008 3044
+row 1 @0.8658:0.8726 167421 1493
+total AT @0.9188:0.9256 4531885 52085
+table page=25 rotate=0
+columns OEVP SPOE FPOE DFP KPOE_LS LPOE MLOE valid
+x 0.4184 0.4758 0.4988 0.5562 0.5889 0.6360 0.6433 0.7001 0.7086 0.7545 0.7696 0.8089 0.8283 0.8634 0.8755 0.9341
+row 9 @0.7456:0.7537 427760 557496 45527 79069 18636 248 486 1129222
+row 3 @0.7610:0.7674 478978 367173 20699 19549 - - - 886399
+row 4 @0.7760:0.7828 357015 280310 44810 13118 - 397 - 695650
+row 5 @0.7914:0.7982 104552 78564 27154 7260 - - - 217530
+row 7 @0.8068:0.8136 187986 82073 14367 6548 - 452 - 291426
+row 8 @0.8221:0.8290 85994 30787 17905 4487 - - - 139173
+row 6 @0.8375:0.8444 356703 313763 34976 11331 - 283 - 717056
+row 2 @0.8525:0.8593 106421 142813 33113 5661 - - - 288008
+row 1 @0.8679:0.8747 85700 76006 4019 1505 - 191 - 167421
+total AT @0.9213:0.9295 2191109 1928985 242570 148528 18636 1571 486 4531885
+seats page=12 OEVP 85 SPOE 74 FPOE 6 DFP 0 KPOE_LS 0 LPOE 0 MLOE 0

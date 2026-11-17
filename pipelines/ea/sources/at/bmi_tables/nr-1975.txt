@@ -1,0 +1,21 @@
+# nr-1975: nationalratswahl-5101975.pdf, Tabelle 12 "Zusammenfassung. Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden, a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (p. 43); each of the 9 Wahlkreise is one Bundesland, so the Wahlkreis rows are the Land rows (Wahlkreisverband rows skipped). Party names and seats from "Die Hauptergebnisse der Nationalratswahl vom 5. Oktober 1975" (p. 28).
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option STEINACHER Liste Steinacher Franz
+option GRM Gruppe Revolutionäre Marxisten
+table page=43 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE KPOE STEINACHER GRM
+x 0.2551 0.3126 0.3628 0.4196 0.4268 0.4661 0.4716 0.5278 0.5834 0.6403 0.6524 0.7074 0.7170 0.7618 0.7769 0.8150 0.8277 0.8489 0.8767 0.9081
+row 1 @0.2009:0.2078 183683 175265 1705 173560 89827 78565 4396 772 - -
+row 3 @0.2215:0.2283 950592 903952 8595 895357 429621 430843 25970 8923 - -
+row 9 @0.2420:0.2488 1198647 1050991 8065 1042926 624072 354453 42638 20739 - 1024
+row 2 @0.3194:0.3262 344797 315558 3723 311835 170719 105572 31059 4485 - -
+row 4 @0.3399:0.3467 788957 745070 7760 737310 359473 322026 49696 6115 - -
+row 5 @0.3608:0.3677 268589 242873 2003 240870 106977 102507 29194 1752 440 -
+row 6 @0.3814:0.3882 779866 750536 10033 740503 372219 325372 33936 8976 - -
+row 7 @0.4019:0.4091 342841 323436 4787 318649 118543 181062 16967 2077 - -
+row 8 @0.4224:0.4297 161305 155003 2581 152422 54750 80891 15588 1193 - -
+total AT @0.4994:0.5066 5019277 4662684 49252 4613432 2326201 1981291 249444 55032 440 1024
+seats page=28 SPOE 93 OEVP 80 FPOE 10 KPOE 0 STEINACHER 0 GRM 0

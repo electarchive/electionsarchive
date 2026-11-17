@@ -1,0 +1,23 @@
+# nr-1986: nationalratswahl-23111986.pdf, Tabelle 12 Zusammenfassung "Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (page 47, folio 51); Wahlkreise = Länder, Wahlkreisverband subtotal rows skipped; seats from b) Reststimmen und Mandate (page 47); party names from "Die Wahlvorschläge" (page 9)
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option GRUENE Die Grüne Alternative-Liste Freda Meissner-Blau
+option GAL Die Grünalternativen — Demokratische Liste
+option KTNG Kärntner Grüne — VGÖ — VÖGA — Unabhängige Gemeinderäte
+option MIR Aktionsliste „Mir reicht's“
+table page=47 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE KPOE GRUENE GAL KTNG MIR
+x 0.2177 0.2684 0.3253 0.3767 0.3875 0.4220 0.4329 0.4843 0.5514 0.6022 0.6167 0.6663 0.6802 0.7213 0.7370 0.7715 0.7823 0.8229 0.8325 0.8597 0.8761 0.9027 0.9184 0.9462
+row 1 @0.1860:0.1954 200572 188069 2572 185497 90862 79418 9985 626 4606 - - -
+row 3 @0.2061:0.2150 1042311 964345 14219 950126 402735 449637 57828 5815 34111 - - -
+row 9 @0.2266:0.2351 1131318 921979 9767 912212 477557 303109 52525 9345 55571 6005 - 8100
+row 2 @0.2988:0.3074 393327 369366 7376 361990 170704 98452 75735 2341 13699 - 1059 -
+row 4 @0.3189:0.3275 908283 826613 12957 813656 342078 337376 89606 4992 39604 - - -
+row 5 @0.3395:0.3484 316476 274564 3759 270805 99515 110880 43026 1388 15996 - - -
+row 6 @0.3596:0.3681 859323 820081 21189 798892 352219 327557 79364 7160 32592 - - -
+row 7 @0.3796:0.3886 411454 384933 10103 374830 109401 199509 42186 2141 21593 - - -
+row 8 @0.4002:0.4096 198350 190348 6168 184180 46953 97725 21950 1296 16256 - - -
+total AT @0.4711:0.4814 5461414 4940298 88110 4852188 2092024 2003663 472205 35104 234028 6005 1059 8100
+seats page=47 SPOE 80 OEVP 77 FPOE 18 GRUENE 8

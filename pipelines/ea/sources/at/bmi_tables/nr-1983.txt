@@ -1,0 +1,23 @@
+# nr-1983: nationalratswahl-2441983.pdf, Tabelle 12 Zusammenfassung "Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (page 46, folio 51); Wahlkreise = Länder, Wahlkreisverband subtotal rows skipped; seats from b) Reststimmen und Mandate (page 46); party names from "Die Wahlvorschläge" (page 9)
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option VGOE Vereinte Grüne Österreichs — Liste Tollmann
+option ALOE Alternative Liste Österreich
+option OEP Österreich-Partei
+option AUS Ausländer-Halt-Bewegung
+table page=46 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE KPOE VGOE ALOE OEP AUS
+x 0.2128 0.2630 0.3247 0.3742 0.3827 0.4178 0.4323 0.4831 0.5369 0.5877 0.6022 0.6530 0.6693 0.7104 0.7255 0.7606 0.7727 0.8071 0.8192 0.8543 0.8694 0.8972 0.9087 0.9365
+row 1 @0.2146:0.2236 197459 187135 2431 184704 94850 81791 4090 543 1821 1609 - -
+row 3 @0.2347:0.2433 1014506 957340 11846 945494 433819 454890 28586 5636 14227 8336 - -
+row 9 @0.2548:0.2634 1141971 993790 13255 980535 554663 329883 42948 9620 22374 13696 3437 3914
+row 2 @0.3271:0.3356 378661 347283 4346 342937 181497 109949 36775 2562 7006 5148 - -
+row 4 @0.3472:0.3557 872094 816478 10076 806402 373443 351110 48083 4091 18606 11069 - -
+row 5 @0.3677:0.3767 299832 271697 2947 268750 111064 123901 21384 1119 7378 3904 - -
+row 6 @0.3878:0.3963 836331 801368 14301 787067 389179 332668 31265 5991 12195 14361 1408 -
+row 7 @0.4079:0.4164 388957 367655 6428 361227 125856 207292 15926 1459 5515 4173 1006 -
+row 8 @0.4284:0.4374 186625 179708 3407 176301 48158 106324 12732 891 4676 3520 - -
+total AT @0.5002:0.5092 5316436 4922454 69037 4853417 2312529 2097808 241789 31912 93798 65816 5851 3914
+seats page=46 SPOE 90 OEVP 81 FPOE 12
