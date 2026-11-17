@@ -497,7 +497,6 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=str(row["obshtina"]))
         p.add("area_parent", area_id=id, parent_id=oblast(int(code[:2])))
         p.add("external_id", entity_id=id, scheme="bg.cik.obshtina", value=code)
-        p.add("external_id", entity_id=id, scheme="bg.ekatte", value=str(row["ekatte"]))
         p.name(id, english, "en", "official")
         p.name(id, native, "bg", "native", False)
     for unit, row in sorted(where.districts.items(), key=lambda kv: int(kv[0])):

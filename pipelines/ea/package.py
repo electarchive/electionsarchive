@@ -585,6 +585,9 @@ CHECKS = {
                       select result_set_id, unit_id, option_id, channel, measure, count_round, count(*) as n from result_value
                       where hash(result_set_id, unit_id, option_id, channel, measure, count_round) in (select h from repeated)
                       group by all having count(*) > 1""",
+    "unique.external_id": """select scheme, value, count(*) as n from (
+                               select distinct entity_id, scheme, value from all_external_id)
+                             group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
                               select p.result_set_id, p.option_id from pairs p
