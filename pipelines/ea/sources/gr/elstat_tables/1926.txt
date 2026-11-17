@@ -1,0 +1,375 @@
+# Parliament, 7 November 1926. Volume GRESYE_02_2101_00001 (ELSTAT, Statistics of parliamentary elections of 7 November 1926).
+# General tables, pages 16-27: Table I (turnout, p16), Table IV (votes, pp20-21), Table VI (deputies elected, pp24-25).
+# Tables II, III and V (seats/lists/candidate counts, candidates per party, percentages) are not transcribed.
+election parliament 1926-11-07
+# Parties as the column headers of Tables IV and VI print them (genitive in the headers, given here in the nominative).
+party FIL list | Ένωσις Φιλελευθέρων | L'union des libéraux
+party LK list | Λαϊκόν Κόμμα | Le parti populaire
+party KE list | Κόμμα Ελευθεροφρόνων | Le parti de l'opinion libre
+party DE list | Δημοκρατική Ένωσις | L'union républicaine
+party EEM list | Ενιαίον Εκλογικόν Μέτωπον Εργατών, Αγροτών και Προσφύγων | Le front électoral unifié des ouvriers, des paysans et des réfugiés
+party AKE list | Αγροτικόν Κόμμα της Ελλάδος | Le parti agraire de Grèce
+party KAP list | Κόμμα Ανεξαρτήτων και Προσφύγων | Le parti d'indépendants et de réfugiés
+party FPK list | Φιλελεύθερον Προσφυγικόν Κόμμα | Le parti libéral de réfugiés
+party SS list | Σύμπραξις Συντηρητικών | La coalition des conservateurs
+party EPK list | Επαρχιακόν Κόμμα | Le parti provincial
+# LMK is the volume's aggregate column for all other small parties.
+party LMK list | Λοιπά μικρά κόμματα | Les autres petits partis
+party SA independents | Συνδυασμοί Ανεξαρτήτων | Les listes d'indépendants
+party MA independents | Μεμονωμένοι υποψήφιοι | Les candidats isolés
+# Constituencies by the volume's order numbers; subtotals (=) are the nine court of appeal circumscriptions:
+# Athens 1-5, Nauplia 6-9, Patras 10-13, Corfu 14-16, Larissa 17-19, Salonica 20-25, Aegean 26-29, Crete 30-33, Thrace 34-37.
+district 1 | Τέως Δήμος Αθηναίων | Municipalité d'Athènes
+district 2 | Τέως Δήμος Πειραιώς μετά των επαρχιών Αιγίνης, Ύδρας, Τροιζηνίας και της νήσου Σπετσών | Municipalité du Pirée, avec les provinces d'Égine, d'Hydra, de Trézène et avec l'île de Spetzia
+district 3 | Υπόλοιπον Νομού Αττικής και Βοιωτίας μετά την αφαίρεσιν των ανωτέρω περιφερειών | Département d'Attique et Béotie sans les circonscriptions ci-dessus
+district 4 | Νομός Φθιώτιδος και Φωκίδος | Département de Phthiotide et Phocide
+district 5 | Νομός Ευβοίας | Département d'Eubée
+district 6 | Νομός Αργολίδος και Κορινθίας, πλην της επαρχίας Ύδρας και της νήσου Σπετσών | Département d'Argolide et Corinthie, sans la province d'Hydra et sans l'île de Spetzia
+district 7 | Νομός Αρκαδίας | Département d'Arcadie
+district 8 | Νομός Λακωνίας | Département de Laconie
+district 9 | Νομός Μεσσηνίας | Département de Messénie
+district 10 | Νομός Αχαΐας και Ήλιδος | Département d'Achaïe et Élie
+district 11 | Νομός Αιτωλίας και Ακαρνανίας | Département d'Aetolie et Acarnanie
+district 12 | Νομός Ζακύνθου | Département de Zante
+district 13 | Νομός Κεφαλληνίας | Département de Céphalonie
+district 14 | Νομός Κερκύρας | Département de Corfou
+district 15 | Νομός Ιωαννίνων | Département de Jannina
+district 16 | Νομοί Πρεβέζης και Άρτης | Départements de Prévéza et d'Arta
+district 17 | Νομός Λαρίσης | Département de Larissa
+district 18 | Νομός Τρικκάλων | Département de Trikkala
+district 19 | Νομός Κοζάνης | Département de Cozane
+district 20 | Νομός Θεσσαλονίκης, πλην των περιφερειών των Ειρηνοδικείων Κατερίνης, Βερροίας και Ναούσης | Département de Salonique, sans les circonscriptions des Justices de paix de Catérina, de Verria et de Naoussa
+district 21 | Περιφέρειαι των Ειρηνοδικείων Κατερίνης, Βερροίας και Ναούσης | Circonscriptions des Justices de paix de Catérina, de Verria et de Naoussa
+district 22 | Νομός Χαλκιδικής | Département de Chalcidique
+district 23 | Νομός Πέλλης | Département de Pella
+district 24 | Νομός Φλωρίνης | Département de Florina
+district 25 | Νομός Σερρών | Département de Serrès
+district 26 | Νομός Κυκλάδων | Département des Cyclades
+district 27 | Νομός Λέσβου | Département de Lesbos
+district 28 | Νομός Σάμου | Département de Samos
+district 29 | Νομός Χίου | Département de Chio
+district 30 | Νομός Χανίων | Département de la Canée
+district 31 | Νομός Ηρακλείου | Département d'Héraclion
+district 32 | Νομός Λασηθίου | Département de Lassithi
+district 33 | Νομός Ρεθύμνου | Département de Réthymno
+district 34 | Νομός Έβρου | Département d'Hevros
+district 35 | Νομός Ροδόπης | Département de Rhodope
+district 36 | Νομός Δράμας | Département de Drama
+district 37 | Νομός Καβάλλας | Département de Cavalla
+# Pseudo-units for seats Table VI allocates above the constituency (see the seats tables below).
+tier B1 | Σύνολον περιφερείας Εφετείου Αθηνών, β' κατανομή | Total de la circonscription de la cour d'appel d'Athènes, 2ème répartition | Second distribution, Court of Appeal of Athens
+tier B2 | Σύνολον περιφερείας Εφετείου Ναυπλίου, β' κατανομή | Total de la circonscription de la cour d'appel de Nauplie, 2ème répartition | Second distribution, Court of Appeal of Nauplia
+tier B3 | Σύνολον περιφερείας Εφετείου Πατρών, β' κατανομή | Total de la circonscription de la cour d'appel de Patras, 2ème répartition | Second distribution, Court of Appeal of Patras
+tier B4 | Σύνολον περιφερείας Εφετείου Κερκύρας, β' κατανομή | Total de la circonscription de la cour d'appel de Corfou, 2ème répartition | Second distribution, Court of Appeal of Corfu
+tier B5 | Σύνολον περιφερείας Εφετείου Λαρίσης, β' κατανομή | Total de la circonscription de la cour d'appel de Larissa, 2ème répartition | Second distribution, Court of Appeal of Larissa
+tier B6 | Σύνολον περιφερείας Εφετείου Θεσσαλονίκης, β' κατανομή | Total de la circonscription de la cour d'appel de Salonique, 2ème répartition | Second distribution, Court of Appeal of Thessaloniki
+tier B7 | Σύνολον περιφερείας Εφετείου Αιγαίου, β' κατανομή | Total de la circonscription de la cour d'appel d'Égée, 2ème répartition | Second distribution, Court of Appeal of the Aegean
+tier B8 | Σύνολον περιφερείας Εφετείου Κρήτης, β' κατανομή | Total de la circonscription de la cour d'appel de Crète, 2ème répartition | Second distribution, Court of Appeal of Crete
+tier B9 | Σύνολον περιφερείας Εφετείου Θράκης, β' κατανομή | Total de la circonscription de la cour d'appel de Thrace, 2ème répartition | Second distribution, Court of Appeal of Thrace
+tier G | Γενικόν σύνολον, γ' κατανομή | Total général, 3ème répartition | Third distribution, state
+# Table I (page 16): registered electors, electors who voted, invalid ballots. Population and percentages skipped.
+table turnout volume=1 page=16
+columns registered cast invalid
+y .295 .885
+x .452 .500 .538 .585 .625 .665
+1 @0.3016:0.3076 92839 79073 129
+2 @0.3247:0.3307 58023 41862 184
+3 @0.3481:0.3538 43922 29943 146
+4 @0.3558:0.3617 47411 31148 86
+5 @0.3635:0.3694 45118 24998 73
+= @0.3786:0.3848 287313 207024 618
+6 @0.4014:0.4079 48800 28853 86
+7 @0.4099:0.4176 48780 29200 130
+8 @0.4165:0.4242 38558 21255 85
+9 @0.4242:0.4313 60105 42742 133
+= @0.4390:0.4467 196243 122050 434
+10 @0.4561:0.4621 71605 50229 116
+11 @0.4641:0.4698 40134 35117 86
+12 @0.4718:0.4778 12995 8431 30
+13 @0.4792:0.4855 27309 13109 70
+= @0.4949:0.5009 152043 106886 302
+14 @0.5063:0.5165 26939 17407 77
+15 @0.5182:0.5239 54448 20612 102
+16 @0.5265:0.5319 32900 20340 126
+= @0.5410:0.5473 114287 58359 305
+17 @0.5570:0.5630 69957 44595 182
+18 @0.5653:0.5707 60000 31740 85
+19 @0.5727:0.5784 76215 24618 131
+= @0.5881:0.5941 206172 100953 398
+20 @0.6194:0.6249 106735 67878 319
+21 @0.6348:0.6403 26250 14893 83
+22 @0.6428:0.6482 12700 9830 45
+23 @0.6505:0.6562 23000 14313 57
+24 @0.6582:0.6639 23234 16832 154
+25 @0.6659:0.6719 40560 23186 148
+= @0.6813:0.6873 232479 146932 806
+26 @0.6970:0.7027 55420 25136 114
+27 @0.7047:0.7104 46054 25511 82
+28 @0.7127:0.7181 27132 12420 53
+29 @0.7204:0.7261 27037 9292 38
+= @0.7355:0.7414 155643 72359 287
+30 @0.7511:0.7568 39000 18157 21
+31 @0.7588:0.7643 35000 20904 43
+32 @0.7668:0.7725 20648 12796 27
+33 @0.7748:0.7802 16000 12111 18
+= @0.7899:0.7956 110648 63968 109
+34 @0.8025:0.8130 24900 21335 294
+35 @0.8136:0.8190 34224 28964 171
+36 @0.8213:0.8270 27426 16197 136
+37 @0.8290:0.8347 26000 17277 52
+= @0.8441:0.8501 112550 83773 653
+== @0.8751:0.8811 1567378 962304 3912
+# Table IV (pages 20-21): valid ballots and ballots for each party, the independent lists and the isolated candidates.
+table votes volume=1 page=20
+columns valid FIL LK KE DE EEM AKE
+y .29 .90
+x .50 .565 .635 .705 .772 .845 .905 .955
+1 @0.2962:0.3013 78944 37366 29337 5449 2246 2943 158
+2 @0.3113:0.3170 41678 23234 12618 2025 983 1578 -
+3 @0.3264:0.3324 29797 6473 8484 7992 1241 441 1309
+4 @0.3347:0.3401 31062 6393 5933 8096 805 402 -
+5 @0.3418:0.3478 24925 7410 - - 240 485 2725
+= @0.3572:0.3632 206406 80876 56372 23562 5515 5849 4192
+6 @0.3834:0.3891 28767 6209 12566 4592 - 104 1106
+7 @0.3914:0.3968 29070 3717 4380 10488 5320 - 325
+8 @0.3991:0.4045 21170 3638 7217 5146 1981 - 1202
+9 @0.4068:0.4125 42609 7608 13823 10439 1531 171 1034
+= @0.4219:0.4279 121616 21172 37986 30665 8832 275 3667
+10 @0.4399:0.4461 50113 16651 18218 4869 - 433 865
+11 @0.4475:0.4538 35031 9549 8708 10351 - 677 1177
+12 @0.4558:0.4615 8401 2243 1402 4753 - - -
+13 @0.4638:0.4692 13039 3973 1072 7388 137 323 146
+= @0.4786:0.4846 106584 32416 29400 27361 137 1433 2188
+14 @0.4969:0.5026 17330 2436 10351 - 244 475 940
+15 @0.5046:0.5103 20510 8268 4482 1103 1511 586 2378
+16 @0.5125:0.5182 20214 4091 1473 8241 - - 3902
+= @0.5274:0.5336 58054 14795 16306 9344 1755 1061 7220
+17 @0.5459:0.5513 44413 10525 11951 5053 2281 6598 4600
+18 @0.5536:0.5593 31655 5519 6656 8833 4431 1649 1149
+19 @0.5616:0.5670 24487 9487 - 2853 1689 - -
+= @0.5764:0.5827 100555 25531 18607 16739 8401 8247 5749
+20 @0.6026:0.6086 67559 23477 3053 11160 8007 7376 723
+21 @0.6257:0.6317 14810 6179 2651 3148 1172 771 -
+22 @0.6340:0.6394 9785 2539 1461 1520 953 241 -
+23 @0.6417:0.6471 14256 3850 - 1406 2176 1070 -
+24 @0.6491:0.6551 16678 4713 610 3931 - 1357 1090
+25 @0.6571:0.6631 23038 6346 4647 3105 5424 841 1664
+= @0.6725:0.6802 146126 47104 12422 24270 17732 11656 3477
+26 @0.6901:0.6961 25022 7406 11908 1918 - - -
+27 @0.6984:0.7038 25429 10567 - - - 1366 -
+28 @0.7058:0.7118 12367 - - 5853 1 - -
+29 @0.7138:0.7198 9254 1448 - 1762 - - -
+= @0.7289:0.7346 72072 19421 11908 9533 1 1366 -
+30 @0.7474:0.7529 18136 7196 2412 - - 536 -
+31 @0.7548:0.7605 20861 11476 5768 - - 565 -
+32 @0.7628:0.7685 12769 4269 221 3543 - - 272
+33 @0.7705:0.7762 12093 6385 2740 - - - -
+= @0.7856:0.7916 63859 29326 11141 3543 - 1101 272
+34 @0.8042:0.8099 21041 4323 - 999 4183 3369 -
+35 @0.8121:0.8176 28793 10177 - 2587 10132 3886 1141
+36 @0.8201:0.8255 16061 7564 101 1948 2971 1173 234
+37 @0.8278:0.8332 17225 10435 - 493 2427 2566 178
+= @0.8424:0.8483 83120 32499 101 6027 19713 10994 1553
+== @0.8737:0.8794 958392 303140 194243 151044 62086 41982 28318
+# Bands for this block are the page-20 bands mapped onto page 21 (fit on the order numbers of both halves of the spread),
+# centered for the page's skew: the left columns sit about half a line higher than the right ones.
+table votes volume=1 page=21
+columns KAP FPK SS EPK LMK SA MA
+y .33 .93
+anchor .605 .64
+x .12 .20 .27 .34 .40 .47 .54 .605
+1 @0.3388:0.3464 176 350 - - 866 - 53
+2 @0.3539:0.3621 2 176 - - 1041 5 16
+3 @0.3691:0.3776 1217 35 - - 2484 - 121
+4 @0.3774:0.3853 - - 3984 - - 5437 12
+5 @0.3845:0.3930 - - - - - 14065 -
+= @0.3999:0.4085 1395 561 3984 - 4391 19507 202
+6 @0.4262:0.4344 - - 3960 - - - 230
+7 @0.4342:0.4421 - - 4717 - - - 123
+8 @0.4419:0.4499 - - - - 1851 - 135
+9 @0.4497:0.4579 - - - - 4684 3036 283
+= @0.4648:0.4733 - - 8677 - 6535 3036 771
+10 @0.4828:0.4916 3092 - - - - 5403 582
+11 @0.4905:0.4993 2927 - - - - - 1642
+12 @0.4988:0.5070 - - - - - - 3
+13 @0.5068:0.5147 - - - - - - -
+= @0.5216:0.5301 6019 - - - - 5403 2227
+14 @0.5400:0.5482 - - - - - 2747 137
+15 @0.5477:0.5559 - - - - 137 1023 1022
+16 @0.5556:0.5638 - - - - 685 1816 6
+= @0.5706:0.5793 - - - - 822 5586 1165
+17 @0.5891:0.5970 2539 - - - - 584 282
+18 @0.5968:0.6050 - - - - - 3418 -
+19 @0.6048:0.6127 - - - - - 9746 712
+= @0.6197:0.6285 2539 - - - - 13748 994
+20 @0.6459:0.6544 - - - - 11359 1769 635
+21 @0.6691:0.6776 - - - - 745 106 38
+22 @0.6774:0.6853 - - - - 1846 409 816
+23 @0.6851:0.6930 - 3444 - - 2136 168 6
+24 @0.6925:0.7011 - - - - 4224 749 4
+25 @0.7006:0.7091 - - - - 997 - 14
+= @0.7160:0.7262 - 3444 - - 21307 3201 1513
+26 @0.7336:0.7422 - - - - - 3498 292
+27 @0.7420:0.7499 - 1920 - - 7449 3428 699
+28 @0.7494:0.7579 18 6122 - - - - 373
+29 @0.7574:0.7659 - - - - 114 5930 -
+= @0.7725:0.7808 18 8042 - - 7563 12856 1364
+30 @0.7911:0.7991 7439 - - - - - 553
+31 @0.7985:0.8067 - 175 - 2877 - - -
+32 @0.8065:0.8147 - - - 4403 - - 61
+33 @0.8142:0.8225 - - - 2448 520 - -
+= @0.8294:0.8379 7439 175 - 9728 520 - 614
+34 @0.8480:0.8562 - 1576 - - 69 5850 672
+35 @0.8559:0.8640 - - - - 823 - 47
+36 @0.8640:0.8719 - - - - 356 1714 -
+37 @0.8717:0.8796 - - - - 1126 - -
+= @0.8863:0.8947 - 1576 - - 2374 7564 719
+== @0.9177:0.9259 17410 13798 12661 9728 43512 70901 9569
+# Table VI (pages 24-25): deputies elected by party. Seats were allocated in three rounds (footnote: α', β', γ' = elected in
+# the 1st, 2nd and 3rd distribution). Constituency rows print only the 1st-distribution (α') seats; each court of appeal
+# subtotal prints α' and β' (2nd distribution, made at court of appeal level and not broken down by constituency); the grand
+# total prints α', β' and γ' (3rd distribution, national). So the constituency rows, '=' rows and '==' rows below are α' only;
+# the β' lines are the rows B1-B9 (with their printed national β' total) and the γ' line is row G.
+# A constituency's party seats therefore do not add up to its seats, and the total seats column is left out; as printed
+# (Table VI, first column): 1:13 2:9 3:8 4:9 5:7 (=46) 6:8 7:8 8:7 9:11 (=34) 10:13 11:10 12:2 13:5 (=30) 14:5 15:9 16:6 (=20)
+# 17:12 18:9 19:9 (=30) 20:22 21:4 22:3 23:5 24:6 25:7 (=47) 26:10 27:11 28:4 29:4 (=29) 30:5 31:6 32:3 33:3 (=17)
+# 34:6 35:8 36:5 37:7 (=26), total 279 = 208 α' + 56 β' + 15 γ'.
+# Bands: from the OCR of the seats column (first column of Table VI, not transcribed), with gaps interpolated;
+# page-25 bands are the same rows mapped onto page 25 and shifted onto the data lines.
+table seats volume=1 page=24
+columns FIL LK KE DE EEM AKE
+y .28 .875
+anchor .15 .19
+x .575 .645 .71 .775 .84 .905 .96
+1 @0.2854:0.2921 6 5 - - - -
+2 @0.3008:0.3075 5 3 - - - -
+3 @0.3165:0.3232 1 2 2 - - -
+4 @0.3240:0.3307 2 1 2 - - -
+5 @0.3316:0.3383 2 - - - - -
+= @0.3467:0.3534 16 11 4 - - -
+6 @0.3758:0.3825 1 3 1 - - -
+7 @0.3838:0.3905 1 1 3 1 - -
+8 @0.3912:0.3979 1 2 1 - - -
+# Row 9 KE: the glyph is blurred and looks like 5; read as 2 from the subtotal (α' 7) and the seats left after the other parties.
+9 @0.3992:0.4059 2 3 2 - - -
+= @0.4140:0.4207 5 9 7 1 - -
+10 @0.4319:0.4386 4 5 1 - - -
+11 @0.4399:0.4466 2 2 3 - - -
+12 @0.4476:0.4543 - - 1 - - -
+13 @0.4553:0.4620 1 - 3 - - -
+= @0.4704:0.4771 7 7 8 - - -
+14 @0.4886:0.4953 - 3 - - - -
+15 @0.4964:0.5031 4 2 - - - 1
+16 @0.5042:0.5109 1 - 2 - - 1
+= @0.5195:0.5262 5 5 2 - - 2
+17 @0.5377:0.5444 3 3 1 - 1 1
+18 @0.5454:0.5521 1 2 2 1 - -
+19 @0.5534:0.5601 3 - 1 - - -
+= @0.5679:0.5746 7 5 4 1 1 1
+20 @0.5970:0.6037 7 1 3 2 2 -
+21 @0.6121:0.6188 2 - 1 - - -
+22 @0.6201:0.6268 1 - - - - -
+23 @0.6278:0.6345 1 - - - - -
+24 @0.6355:0.6422 1 - 1 - - -
+25 @0.6435:0.6502 2 1 1 1 - -
+= @0.6583:0.6650 14 2 6 3 2 -
+26 @0.6765:0.6832 3 5 - - - -
+27 @0.6845:0.6912 4 - - - - -
+28 @0.6922:0.6989 - - 2 - - -
+29 @0.7002:0.7069 - - - - - -
+= @0.7150:0.7217 7 5 2 - - -
+30 @0.7336:0.7403 2 - - - - -
+31 @0.7414:0.7481 3 1 - - - -
+32 @0.7492:0.7559 1 - 1 - - -
+33 @0.7563:0.7630 2 - - - - -
+= @0.7714:0.7781 8 1 1 - - -
+34 @0.7897:0.7964 1 - - 1 1 -
+35 @0.7982:0.8049 3 - - 3 1 -
+36 @0.8051:0.8118 2 - - 1 - -
+37 @0.8131:0.8198 4 - - 1 1 -
+= @0.8282:0.8349 10 - - 6 3 -
+== @0.8514:0.8581 79 45 34 11 6 3
+table seats volume=1 page=25
+columns KAP FPK SS EPK LMK SA MA
+y .32 .91
+anchor .62 .65
+x .145 .215 .285 .355 .42 .49 .55 .60
+1 @0.3223:0.3290 - - - - - - -
+2 @0.3377:0.3444 - - - - - - -
+3 @0.3534:0.3602 - - - - - - -
+4 @0.3610:0.3677 - - 1 - - 1 -
+5 @0.3686:0.3753 - - - - - 4 -
+= @0.3837:0.3904 - - 1 - - 5 -
+6 @0.4129:0.4196 - - 1 - - - -
+7 @0.4209:0.4276 - - 1 - - - -
+8 @0.4283:0.4350 - - - - - - -
+9 @0.4363:0.4431 - - - - 1 - -
+= @0.4512:0.4579 - - 2 - 1 - -
+10 @0.4691:0.4758 - - - - - 1 -
+11 @0.4771:0.4838 - - - - - - -
+12 @0.4849:0.4916 - - - - - - -
+13 @0.4926:0.4993 - - - - - - -
+= @0.5077:0.5144 - - - - - 1 -
+14 @0.5259:0.5327 - - - - - - -
+15 @0.5338:0.5405 - - - - - - -
+16 @0.5416:0.5483 - - - - - - -
+= @0.5569:0.5636 - - - - - - -
+17 @0.5752:0.5819 - - - - - - -
+18 @0.5829:0.5896 - - - - - 1 -
+19 @0.5909:0.5976 - - - - - 3 -
+= @0.6054:0.6121 - - - - - 4 -
+20 @0.6346:0.6413 - - - - 1 - -
+21 @0.6497:0.6565 - - - - - - -
+22 @0.6578:0.6645 - - - - - - -
+23 @0.6655:0.6722 - 1 - - - - -
+24 @0.6732:0.6799 - - - - 1 - -
+25 @0.6812:0.6879 - - - - - - -
+= @0.6960:0.7028 - 1 - - 2 - -
+26 @0.7143:0.7210 - - - - - - -
+27 @0.7223:0.7290 - - - - 3 1 -
+28 @0.7300:0.7367 - 2 - - - - -
+29 @0.7380:0.7448 - - - - - 3 -
+= @0.7529:0.7596 - 2 - - 3 4 -
+30 @0.7715:0.7782 2 - - - - - -
+31 @0.7793:0.7861 - - - - - - -
+32 @0.7872:0.7939 - - - 1 - - -
+33 @0.7943:0.8010 - - - - - - -
+= @0.8094:0.8161 2 - - 1 - - -
+34 @0.8278:0.8345 - - - - - 1 -
+35 @0.8363:0.8430 - - - - - - -
+36 @0.8432:0.8499 - - - - - - -
+37 @0.8512:0.8579 - - - - - - -
+= @0.8663:0.8731 - - - - - 1 -
+== @0.8896:0.8963 2 3 3 1 6 15 -
+# β' (2nd distribution) lines of the court of appeal subtotals and of the grand total, page 24. Bands set from the subtotal rows.
+table seats volume=1 page=24
+columns FIL LK KE DE EEM AKE
+y .28 .875
+x .575 .645 .71 .775 .84 .905 .96
+B1 @0.3545:0.3612 3 2 3 - - -
+B2 @0.4218:0.4285 1 2 2 1 - -
+B3 @0.4782:0.4849 3 2 2 - - -
+B4 @0.5273:0.5340 1 1 1 - - 1
+B5 @0.5757:0.5824 1 - 1 1 1 -
+B6 @0.6661:0.6728 2 2 2 3 2 -
+B7 @0.7228:0.7295 2 - 2 - - -
+B8 @0.7792:0.7859 1 1 - - - -
+B9 @0.8360:0.8427 3 - - 1 1 -
+== @0.8592:0.8659 17 10 13 6 4 1
+# γ' (3rd distribution) line of the grand total, page 24.
+G @0.8670:0.8737 6 5 4 - - -
+table seats volume=1 page=25
+columns KAP FPK SS EPK LMK SA MA
+y .32 .91
+x .145 .215 .285 .355 .42 .49 .55 .60
+B1 @0.3915:0.3982 - - - - - - -
+B2 @0.4590:0.4657 - - - - - - -
+B3 @0.5155:0.5222 - - - - - - -
+B4 @0.5647:0.5715 - - - - - - -
+B5 @0.6133:0.6200 - - - - - - -
+B6 @0.7039:0.7106 - - - - 3 - -
+B7 @0.7607:0.7674 - 1 - - - - -
+B8 @0.8172:0.8239 - - - 1 - - -
+B9 @0.8742:0.8809 - - - - - - -
+== @0.8974:0.9041 - 1 - 1 3 - -
+G @0.9052:0.9119 - - - - - - -
