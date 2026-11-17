@@ -456,6 +456,7 @@ class Place:
     county: str
     names: dict[str, int] = field(default_factory=dict)
     codes: dict[str, list[int]] = field(default_factory=dict)
+    coded: list[tuple[date, str]] = field(default_factory=list)
     first: Spec | None = None
     first_code: str = ""
     elections: list[str] = field(default_factory=list)
@@ -490,11 +491,28 @@ def places() -> tuple[dict[str, Place], dict[tuple[str, str], str]]:
             place.names[muni.name] = spec.year
             if muni.coded:
                 place.codes.setdefault(code, []).append(spec.year)
+                place.coded.append((spec.day, code))
                 by_code[code] = place_id
             place.elections.append(spec.key)
             index[(spec.key, code)] = place_id
             by_name[name_key] = place_id
     return found, index
+
+
+def code_rows(place: Place) -> list[tuple[str, date | None, date | None]]:
+    """A place's codes, each valid from the election that first printed it until the election that printed another.
+
+    An area holds one code at a time, so a place the office coded differently over the years gets one dated row per
+    run of elections under the same code; the first row is open at its start and the last at its end."""
+    runs: list[tuple[date, str]] = []
+    for day, code in sorted(place.coded):
+        if not runs or runs[-1][1] != code:
+            runs.append((day, code))
+    rows: list[tuple[str, date | None, date | None]] = []
+    for i, (day, code) in enumerate(runs):
+        end = runs[i + 1][0] if i + 1 < len(runs) else None
+        rows.append((code, day if i else None, end))
+    return rows
 
 
 def place_name(place: Place) -> str:
@@ -668,8 +686,8 @@ def geo() -> Package:
     found, index = places()
     for place in sorted(found.values(), key=lambda x: x.id):
         p.add("area", id=place.id, scheme_code="ee.vald")
-        for code, years in sorted(place.codes.items()):
-            p.add("area_code", area_id=place.id, code=code)
+        for code, start, end in code_rows(place):
+            p.add("area_code", area_id=place.id, code=code, valid_from=start, valid_to=end)
         latest = max(place.names.values())
         for name, year in sorted(place.names.items()):
             p.name(place.id, name, "et", "official", year == latest)
