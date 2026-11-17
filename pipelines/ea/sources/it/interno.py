@@ -942,7 +942,7 @@ def emit() -> Path:
             name(region_ids[code], label, "it")
 
         comune_ids = {
-            code: str(cs.area("it.comune", code) if matched else cs.key("it.eligendo.comune", code))
+            code: str(cs.area("it.comune", code) if matched else cs.key("it.eligendo_comune", code))
             for code, matched in comuni.select("code", "matched").iter_rows()
         }
         comune_names = dict(comuni.select("code", "name").iter_rows())
