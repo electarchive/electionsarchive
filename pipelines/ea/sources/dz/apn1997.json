@@ -1,0 +1,1989 @@
+{
+ "issue": 40,
+ "page_of_turnout": 21,
+ "page_of_nationwide_table": 20,
+ "constituencies": [
+  {
+   "code": "01",
+   "registered": 118504,
+   "voters": 79792,
+   "abstentions": 38712,
+   "valid": 76506,
+   "turnout_page": 21,
+   "turnout_y": 393,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 5,
+     "y": 592
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 758
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 858
+    }
+   ]
+  },
+  {
+   "code": "02",
+   "registered": 438738,
+   "voters": 240802,
+   "abstentions": 197936,
+   "valid": 240769,
+   "turnout_page": 21,
+   "turnout_y": 423,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 5,
+     "y": 984
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 3,
+     "derived": false,
+     "page": 5,
+     "y": 1150
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 5,
+     "y": 1348
+    },
+    {
+     "label": "Independant n° 1 (Hamadouche A)",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 1482
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 1582
+    }
+   ]
+  },
+  {
+   "code": "03",
+   "registered": 162913,
+   "voters": 119386,
+   "abstentions": 43527,
+   "valid": 115030,
+   "turnout_page": 21,
+   "turnout_y": 454,
+   "lists": [
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 5,
+     "y": 1679
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 1812
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 5,
+     "y": 1914
+    }
+   ]
+  },
+  {
+   "code": "04",
+   "registered": 279531,
+   "voters": 224766,
+   "abstentions": 54765,
+   "valid": 220497,
+   "turnout_page": 21,
+   "turnout_y": 485,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 6,
+     "y": 368
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 6,
+     "y": 566
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 6,
+     "y": 666
+    }
+   ]
+  },
+  {
+   "code": "05",
+   "registered": 495509,
+   "voters": 349560,
+   "abstentions": 145949,
+   "valid": 342254,
+   "turnout_page": 21,
+   "turnout_y": 515,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 6,
+     "derived": false,
+     "page": 6,
+     "y": 798
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 4,
+     "derived": false,
+     "page": 6,
+     "y": 1128
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 6,
+     "y": 1294
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 6,
+     "y": 1394
+    }
+   ]
+  },
+  {
+   "code": "06",
+   "registered": 409718,
+   "voters": 207291,
+   "abstentions": 202427,
+   "valid": 203511,
+   "turnout_page": 21,
+   "turnout_y": 546,
+   "lists": [
+    {
+     "label": "Front des forces socialistes",
+     "seats": 7,
+     "derived": false,
+     "page": 6,
+     "y": 1526
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 3,
+     "derived": false,
+     "page": 6,
+     "y": 1825
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 6,
+     "y": 2024
+    }
+   ]
+  },
+  {
+   "code": "07",
+   "registered": 289221,
+   "voters": 206225,
+   "abstentions": 82996,
+   "valid": 200996,
+   "turnout_page": 21,
+   "turnout_y": 576,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 7,
+     "y": 364
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 7,
+     "y": 530
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 7,
+     "y": 697
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 7,
+     "y": 812
+    }
+   ]
+  },
+  {
+   "code": "08",
+   "registered": 148569,
+   "voters": 119643,
+   "abstentions": 28926,
+   "valid": 112206,
+   "turnout_page": 21,
+   "turnout_y": 606,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 7,
+     "y": 914
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 7,
+     "y": 1078
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 7,
+     "y": 1211
+    }
+   ]
+  },
+  {
+   "code": "09",
+   "registered": 586254,
+   "voters": 359490,
+   "abstentions": 226764,
+   "valid": 335366,
+   "turnout_page": 21,
+   "turnout_y": 637,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 6,
+     "derived": false,
+     "page": 7,
+     "y": 1344
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 4,
+     "derived": false,
+     "page": 7,
+     "y": 1709
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 7,
+     "y": 1974
+    }
+   ]
+  },
+  {
+   "code": "10",
+   "registered": 351633,
+   "voters": 232564,
+   "abstentions": 119069,
+   "valid": 224396,
+   "turnout_page": 21,
+   "turnout_y": 668,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 8,
+     "y": 390
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 590
+    },
+    {
+     "label": "Front des forces socialistes",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 690
+    },
+    {
+     "label": "Independant n° 1 (Mazouni O.)",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 791
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 888
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 988
+    }
+   ]
+  },
+  {
+   "code": "11",
+   "registered": 62381,
+   "voters": 39862,
+   "abstentions": 22519,
+   "valid": 38877,
+   "turnout_page": 21,
+   "turnout_y": 698,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 8,
+     "y": 1094
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 1260
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 1360
+    }
+   ]
+  },
+  {
+   "code": "12",
+   "registered": 291501,
+   "voters": 199991,
+   "abstentions": 91510,
+   "valid": 193749,
+   "turnout_page": 21,
+   "turnout_y": 729,
+   "lists": [
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 8,
+     "y": 1476
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 8,
+     "y": 1608
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 1774
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 8,
+     "y": 1907
+    }
+   ]
+  },
+  {
+   "code": "13",
+   "registered": 515804,
+   "voters": 383927,
+   "abstentions": 131877,
+   "valid": 362405,
+   "turnout_page": 21,
+   "turnout_y": 760,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 5,
+     "derived": false,
+     "page": 9,
+     "y": 372
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 9,
+     "y": 588
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 686
+    },
+    {
+     "label": "Parti des travailleurs",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 761
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 836
+    },
+    {
+     "label": "Parti républicain progressiste",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 903
+    }
+   ]
+  },
+  {
+   "code": "14",
+   "registered": 384590,
+   "voters": 268435,
+   "abstentions": 116155,
+   "valid": 255385,
+   "turnout_page": 21,
+   "turnout_y": 790,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 9,
+     "y": 1002
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 9,
+     "y": 1151
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 9,
+     "y": 1268
+    },
+    {
+     "label": "Independant n° 1 (Guidoum E)",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 1383
+    },
+    {
+     "label": "Independant n° 2 (Saadi M)",
+     "seats": 1,
+     "derived": false,
+     "page": 9,
+     "y": 1483
+    }
+   ]
+  },
+  {
+   "code": "15",
+   "registered": 548990,
+   "voters": 287325,
+   "abstentions": 261665,
+   "valid": 281897,
+   "turnout_page": 21,
+   "turnout_y": 820,
+   "lists": [
+    {
+     "label": "Front des forces socialistes",
+     "seats": 7,
+     "derived": false,
+     "page": 9,
+     "y": 1585
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 7,
+     "derived": false,
+     "page": 9,
+     "y": 1867
+    }
+   ]
+  },
+  {
+   "code": "16",
+   "registered": 1248887,
+   "voters": 531781,
+   "abstentions": 717106,
+   "valid": 500998,
+   "turnout_page": 21,
+   "turnout_y": 850,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 6,
+     "derived": false,
+     "page": 10,
+     "y": 404
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 5,
+     "derived": false,
+     "page": 10,
+     "y": 670
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 4,
+     "derived": false,
+     "page": 10,
+     "y": 900
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 3,
+     "derived": false,
+     "page": 10,
+     "y": 1098
+    },
+    {
+     "label": "Front des forces socialistes",
+     "seats": 2,
+     "derived": false,
+     "page": 10,
+     "y": 1265
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 10,
+     "y": 1396
+    },
+    {
+     "label": "Parti des travailleurs",
+     "seats": 2,
+     "derived": false,
+     "page": 10,
+     "y": 1529
+    }
+   ]
+  },
+  {
+   "code": "17",
+   "registered": 345376,
+   "voters": 260329,
+   "abstentions": 85047,
+   "valid": 254547,
+   "turnout_page": 21,
+   "turnout_y": 881,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 6,
+     "derived": false,
+     "page": 10,
+     "y": 1697
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 10,
+     "y": 1962
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 10,
+     "y": 2062
+    }
+   ]
+  },
+  {
+   "code": "18",
+   "registered": 323372,
+   "voters": 210217,
+   "abstentions": 113155,
+   "valid": 206136,
+   "turnout_page": 21,
+   "turnout_y": 912,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 11,
+     "y": 408
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 608
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 707
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 808
+    }
+   ]
+  },
+  {
+   "code": "19",
+   "registered": 662031,
+   "voters": 477929,
+   "abstentions": 184102,
+   "valid": 457395,
+   "turnout_page": 21,
+   "turnout_y": 942,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 7,
+     "derived": false,
+     "page": 11,
+     "y": 940
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 3,
+     "derived": false,
+     "page": 11,
+     "y": 1240
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 3,
+     "derived": false,
+     "page": 11,
+     "y": 1406
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 11,
+     "y": 1571
+    },
+    {
+     "label": "Parti des travailleurs",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 1703
+    }
+   ]
+  },
+  {
+   "code": "20",
+   "registered": 161528,
+   "voters": 116550,
+   "abstentions": 44978,
+   "valid": 110653,
+   "turnout_page": 21,
+   "turnout_y": 973,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 11,
+     "y": 1804
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 1935
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 11,
+     "y": 2035
+    }
+   ]
+  },
+  {
+   "code": "21",
+   "registered": 432910,
+   "voters": 310538,
+   "abstentions": 122372,
+   "valid": 288230,
+   "turnout_page": 21,
+   "turnout_y": 1003,
+   "lists": [
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 3,
+     "derived": false,
+     "page": 12,
+     "y": 410
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 3,
+     "derived": false,
+     "page": 12,
+     "y": 608
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 12,
+     "y": 808
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 12,
+     "y": 972
+    }
+   ]
+  },
+  {
+   "code": "22",
+   "registered": 340721,
+   "voters": 274222,
+   "abstentions": 66499,
+   "valid": 252704,
+   "turnout_page": 21,
+   "turnout_y": 1034,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 12,
+     "y": 1106
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 12,
+     "y": 1340
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 12,
+     "y": 1504
+    }
+   ]
+  },
+  {
+   "code": "23",
+   "registered": 333664,
+   "voters": 233483,
+   "abstentions": 100181,
+   "valid": 223514,
+   "turnout_page": 21,
+   "turnout_y": 1064,
+   "lists": [
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 3,
+     "derived": false,
+     "page": 12,
+     "y": 1670
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 12,
+     "y": 1838
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 12,
+     "y": 1968
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 12,
+     "y": 2068
+    }
+   ]
+  },
+  {
+   "code": "24",
+   "registered": 255986,
+   "voters": 206789,
+   "abstentions": 49197,
+   "valid": 200225,
+   "turnout_page": 21,
+   "turnout_y": 1094,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 13,
+     "y": 412
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 543
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 642
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 742
+    }
+   ]
+  },
+  {
+   "code": "25",
+   "registered": 494211,
+   "voters": 339926,
+   "abstentions": 154285,
+   "valid": 325635,
+   "turnout_page": 21,
+   "turnout_y": 1125,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 6,
+     "derived": false,
+     "page": 13,
+     "y": 843
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 13,
+     "y": 1140
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 1274
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 1372
+    }
+   ]
+  },
+  {
+   "code": "26",
+   "registered": 425945,
+   "voters": 259061,
+   "abstentions": 166884,
+   "valid": 243667,
+   "turnout_page": 21,
+   "turnout_y": 1155,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 13,
+     "y": 1473
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 13,
+     "y": 1672
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 13,
+     "y": 1804
+    },
+    {
+     "label": "Independant n° 1 (Chekou A.)",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 1937
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 13,
+     "y": 2036
+    }
+   ]
+  },
+  {
+   "code": "27",
+   "registered": 337802,
+   "voters": 286232,
+   "abstentions": 51570,
+   "valid": 227261,
+   "turnout_page": 21,
+   "turnout_y": 1186,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 14,
+     "y": 406
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 14,
+     "y": 604
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 14,
+     "y": 736
+    },
+    {
+     "label": "Independant n° 1 (Tchouka A.)",
+     "seats": 1,
+     "derived": false,
+     "page": 14,
+     "y": 838
+    }
+   ]
+  },
+  {
+   "code": "28",
+   "registered": 384985,
+   "voters": 258640,
+   "abstentions": 126345,
+   "valid": 252577,
+   "turnout_page": 21,
+   "turnout_y": 1216,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 5,
+     "derived": false,
+     "page": 14,
+     "y": 936
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 14,
+     "y": 1203
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 14,
+     "y": 1334
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 14,
+     "y": 1466
+    }
+   ]
+  },
+  {
+   "code": "29",
+   "registered": 371017,
+   "voters": 259147,
+   "abstentions": 111870,
+   "valid": 241727,
+   "turnout_page": 21,
+   "turnout_y": 1246,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 14,
+     "y": 1568
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 3,
+     "derived": false,
+     "page": 14,
+     "y": 1768
+    },
+    {
+     "label": "Union pour la démocratie et les libertés",
+     "seats": 1,
+     "derived": true,
+     "page": 14,
+     "y": 1932
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 14,
+     "y": 2064
+    }
+   ]
+  },
+  {
+   "code": "30",
+   "registered": 199316,
+   "voters": 128014,
+   "abstentions": 71302,
+   "valid": 121752,
+   "turnout_page": 21,
+   "turnout_y": 1277,
+   "lists": [
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 15,
+     "y": 422
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 15,
+     "y": 621
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 15,
+     "y": 752
+    }
+   ]
+  },
+  {
+   "code": "31",
+   "registered": 768239,
+   "voters": 506979,
+   "abstentions": 261260,
+   "valid": 464038,
+   "turnout_page": 21,
+   "turnout_y": 1308,
+   "lists": [
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 5,
+     "derived": false,
+     "page": 15,
+     "y": 887
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 5,
+     "derived": false,
+     "page": 15,
+     "y": 1186
+    },
+    {
+     "label": "Parti républicain progressiste",
+     "seats": 2,
+     "derived": false,
+     "page": 15,
+     "y": 1486
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 15,
+     "y": 1586
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 15,
+     "y": 1684
+    }
+   ]
+  },
+  {
+   "code": "32",
+   "registered": 118179,
+   "voters": 91125,
+   "abstentions": 27054,
+   "valid": 88209,
+   "turnout_page": 21,
+   "turnout_y": 1338,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 15,
+     "y": 1784
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 15,
+     "y": 1932
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 15,
+     "y": 2033
+    }
+   ]
+  },
+  {
+   "code": "33",
+   "registered": 19532,
+   "voters": 13928,
+   "abstentions": 5604,
+   "valid": 13590,
+   "turnout_page": 21,
+   "turnout_y": 1369,
+   "lists": [
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 426
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 494
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 559
+    },
+    {
+     "label": "Parti social libéral",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 626
+    }
+   ]
+  },
+  {
+   "code": "34",
+   "registered": 277065,
+   "voters": 194989,
+   "abstentions": 82076,
+   "valid": 187760,
+   "turnout_page": 21,
+   "turnout_y": 1399,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 16,
+     "y": 693
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 16,
+     "y": 826
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 16,
+     "y": 926
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1026
+    }
+   ]
+  },
+  {
+   "code": "35",
+   "registered": 459257,
+   "voters": 297212,
+   "abstentions": 162045,
+   "valid": 280645,
+   "turnout_page": 21,
+   "turnout_y": 1430,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 5,
+     "derived": false,
+     "page": 16,
+     "y": 1094
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 16,
+     "y": 1292
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1391
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1457
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1556
+    },
+    {
+     "label": "Front des forces socialistes",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1624
+    }
+   ]
+  },
+  {
+   "code": "36",
+   "registered": 202044,
+   "voters": 163797,
+   "abstentions": 38247,
+   "valid": 160446,
+   "turnout_page": 21,
+   "turnout_y": 1460,
+   "lists": [
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 16,
+     "y": 1689
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1790
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 1857
+    }
+   ]
+  },
+  {
+   "code": "37",
+   "registered": 41051,
+   "voters": 37393,
+   "abstentions": 3658,
+   "valid": 36889,
+   "turnout_page": 21,
+   "turnout_y": 1490,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 16,
+     "y": 1939
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 16,
+     "y": 2070
+    }
+   ]
+  },
+  {
+   "code": "38",
+   "registered": 136490,
+   "voters": 113738,
+   "abstentions": 22752,
+   "valid": 110734,
+   "turnout_page": 21,
+   "turnout_y": 1521,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 17,
+     "y": 432
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 598
+    }
+   ]
+  },
+  {
+   "code": "39",
+   "registered": 223690,
+   "voters": 137010,
+   "abstentions": 86680,
+   "valid": 133622,
+   "turnout_page": 21,
+   "turnout_y": 1552,
+   "lists": [
+    {
+     "label": "Independant n° 2 (Mehri Djilali)",
+     "seats": 3,
+     "derived": false,
+     "page": 17,
+     "y": 700
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 17,
+     "y": 848
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 948
+    }
+   ]
+  },
+  {
+   "code": "40",
+   "registered": 166718,
+   "voters": 114551,
+   "abstentions": 52167,
+   "valid": 113572,
+   "turnout_page": 21,
+   "turnout_y": 1582,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 17,
+     "y": 1024
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1124
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1190
+    }
+   ]
+  },
+  {
+   "code": "41",
+   "registered": 213996,
+   "voters": 147523,
+   "abstentions": 66473,
+   "valid": 142632,
+   "turnout_page": 21,
+   "turnout_y": 1613,
+   "lists": [
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1255
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1324
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1390
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1456
+    }
+   ]
+  },
+  {
+   "code": "42",
+   "registered": 504601,
+   "voters": 354187,
+   "abstentions": 150414,
+   "valid": 347816,
+   "turnout_page": 21,
+   "turnout_y": 1643,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 4,
+     "derived": false,
+     "page": 17,
+     "y": 1524
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 17,
+     "y": 1720
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 17,
+     "y": 1854
+    },
+    {
+     "label": "Front des forces socialistes",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 1970
+    },
+    {
+     "label": "Independant n° 1 (Fekair N)",
+     "seats": 1,
+     "derived": false,
+     "page": 17,
+     "y": 2071
+    }
+   ]
+  },
+  {
+   "code": "43",
+   "registered": 363371,
+   "voters": 249597,
+   "abstentions": 113774,
+   "valid": 241433,
+   "turnout_page": 21,
+   "turnout_y": 1673,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 3,
+     "derived": false,
+     "page": 18,
+     "y": 426
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 18,
+     "y": 559
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 2,
+     "derived": false,
+     "page": 18,
+     "y": 660
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 759
+    }
+   ]
+  },
+  {
+   "code": "44",
+   "registered": 354029,
+   "voters": 249233,
+   "abstentions": 104796,
+   "valid": 240875,
+   "turnout_page": 21,
+   "turnout_y": 1703,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 5,
+     "derived": false,
+     "page": 18,
+     "y": 826
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 18,
+     "y": 1064
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1169
+    }
+   ]
+  },
+  {
+   "code": "45",
+   "registered": 89289,
+   "voters": 62523,
+   "abstentions": 26766,
+   "valid": 59716,
+   "turnout_page": 21,
+   "turnout_y": 1734,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1248
+    },
+    {
+     "label": "Mouvement Ennahda",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1324
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1401
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1481
+    }
+   ]
+  },
+  {
+   "code": "46",
+   "registered": 203972,
+   "voters": 162315,
+   "abstentions": 41657,
+   "valid": 151556,
+   "turnout_page": 21,
+   "turnout_y": 1765,
+   "lists": [
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 2,
+     "derived": false,
+     "page": 18,
+     "y": 1558
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 2,
+     "derived": false,
+     "page": 18,
+     "y": 1674
+    }
+   ]
+  },
+  {
+   "code": "47",
+   "registered": 156663,
+   "voters": 105279,
+   "abstentions": 51384,
+   "valid": 100864,
+   "turnout_page": 21,
+   "turnout_y": 1795,
+   "lists": [
+    {
+     "label": "Independant n° 1 (Beyoud A.)",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1790
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1868
+    },
+    {
+     "label": "Mouvement de la société pour la paix",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 1946
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 18,
+     "y": 2022
+    }
+   ]
+  },
+  {
+   "code": "48",
+   "registered": 327207,
+   "voters": 277641,
+   "abstentions": 49566,
+   "valid": 274678,
+   "turnout_page": 21,
+   "turnout_y": 1826,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 7,
+     "derived": false,
+     "page": 19,
+     "y": 418
+    },
+    {
+     "label": "Parti du front de libération nationale",
+     "seats": 2,
+     "derived": false,
+     "page": 19,
+     "y": 816
+    }
+   ]
+  },
+  {
+   "code": "1997:1",
+   "registered": 404659,
+   "voters": 120842,
+   "abstentions": 283817,
+   "valid": 115721,
+   "turnout_page": 21,
+   "turnout_y": 1856,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 984
+    },
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1084
+    }
+   ]
+  },
+  {
+   "code": "1997:2",
+   "registered": 258592,
+   "voters": 96599,
+   "abstentions": 161993,
+   "valid": 91528,
+   "turnout_page": 21,
+   "turnout_y": 1887,
+   "lists": [
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1249
+    },
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1382
+    }
+   ]
+  },
+  {
+   "code": "1997:3",
+   "registered": 36190,
+   "voters": 11717,
+   "abstentions": 24473,
+   "valid": 11106,
+   "turnout_page": 21,
+   "turnout_y": 1917,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1515
+    }
+   ]
+  },
+  {
+   "code": "1997:4",
+   "registered": 32366,
+   "voters": 12315,
+   "abstentions": 20051,
+   "valid": 11619,
+   "turnout_page": 21,
+   "turnout_y": 1948,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1648
+    }
+   ]
+  },
+  {
+   "code": "1997:5",
+   "registered": 3338,
+   "voters": 3159,
+   "abstentions": 179,
+   "valid": 2980,
+   "turnout_page": 21,
+   "turnout_y": 1977,
+   "lists": [
+    {
+     "label": "Rassemblement national démocratique",
+     "seats": 1,
+     "derived": false,
+     "page": 19,
+     "y": 1846
+    }
+   ]
+  },
+  {
+   "code": "1997:6",
+   "registered": 5164,
+   "voters": 3570,
+   "abstentions": 1594,
+   "valid": 3458,
+   "turnout_page": 21,
+   "turnout_y": 2008,
+   "lists": [
+    {
+     "label": "Rassemblement pour la culture et la démocratie",
+     "seats": 1,
+     "derived": true,
+     "page": 19,
+     "y": 2012
+    }
+   ]
+  }
+ ],
+ "nationwide": [
+  {
+   "label": "Rassemblement national démocratique",
+   "votes": 3533434,
+   "seats": 155
+  },
+  {
+   "label": "Mouvement de la société pour la paix",
+   "votes": 1553154,
+   "seats": 69
+  },
+  {
+   "label": "Front de libération nationale",
+   "votes": 1497285,
+   "seats": 64
+  },
+  {
+   "label": "Mouvement Ennahda",
+   "votes": 915446,
+   "seats": 34
+  },
+  {
+   "label": "Front des forces socialistes",
+   "votes": 527848,
+   "seats": 19
+  },
+  {
+   "label": "Rassemblement pour la culture et la démocratie",
+   "votes": 442271,
+   "seats": 19
+  },
+  {
+   "label": "Indépendants",
+   "votes": 459233,
+   "seats": 11
+  },
+  {
+   "label": "Parti des travailleurs",
+   "votes": 194493,
+   "seats": 4
+  },
+  {
+   "label": "Parti républicain progressiste",
+   "votes": 65371,
+   "seats": 3
+  },
+  {
+   "label": "Union pour la démocratie et les libertés",
+   "votes": 51090,
+   "seats": 1
+  },
+  {
+   "label": "Parti social libéral",
+   "votes": 36374,
+   "seats": 1
+  }
+ ],
+ "nationwide_total_votes": 9275999,
+ "totals": {
+  "registered": 16767309,
+  "voters": 10999139,
+  "abstentions": 5768170,
+  "valid": 10496352,
+  "invalid": 502787
+ }
+}

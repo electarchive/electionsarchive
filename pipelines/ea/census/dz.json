@@ -86,6 +86,48 @@
    "url": "https://ina-elections.dz/",
    "kind": "official_body",
    "note": "ANIE (Loi organique 19-07, then Ordinance 21-01) has run and announced every election since December 2019; before that the Ministry of the Interior did. The host reset the connection from a cloud network on 2026-11-16, and the Ministry's host failed TLS verification."
+  },
+  "p01-cc-02": {
+   "title": "Proclamation n° 01/P.CC/02 du 21 Rabie El Aouel 1423 correspondant au 3 juin 2002 relative aux résultats de l'élection des membres de l'Assemblée populaire nationale (Journal officiel n° 43 du 23 juin 2002)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2002/F2002043.pdf",
+   "kind": "official_body",
+   "note": "Tables of elected candidates and of results by constituency (annexes 1 to 3): 48 wilayas and Zones 1 to 6 abroad."
+  },
+  "p03-cc-07": {
+   "title": "Proclamation n° 03/P.CC/07 du 4 Joumada El Oula 1428 correspondant au 21 mai 2007 portant résultats de l'élection des membres de l'Assemblée populaire nationale (Journal officiel n° 45 du 11 juillet 2007)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2007/F2007045.pdf",
+   "kind": "official_body",
+   "note": "Tables 1 to 4: elected candidates, votes by list nationwide, representation rates, and results by constituency (48 wilayas and Zones 1 to 6 abroad)."
+  },
+  "p01-cc-12": {
+   "title": "Proclamation n° 01/P.CC/12 du 24 Joumada Ethania 1433 correspondant au 15 mai 2012 portant résultats de l'élection des membres de l'Assemblée Populaire Nationale (Journal officiel n° 32 du 26 mai 2012)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2012/F2012032.pdf",
+   "kind": "official_body",
+   "note": "Tables 1 to 4: elected candidates, votes by list nationwide, representation rates, and results by constituency (48 wilayas and Zones 1 to 4 abroad)."
+  },
+  "p01-cc-17": {
+   "title": "Proclamation n° 01/P.CC/17 du 21 Chaâbane 1438 correspondant au 18 mai 2017 portant résultats définitifs de l'élection des membres de l'Assemblée Populaire Nationale (Journal officiel n° 34 du 7 juin 2017)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2017/F2017034.pdf",
+   "kind": "official_body",
+   "note": "Tables 1 to 5, the last giving each party list's votes in each of the 52 constituencies (48 wilayas and four zones abroad)."
+  },
+  "p-cc-26": {
+   "title": "Proclamation du 3 Safar 1448 correspondant au 18 juillet 2026 portant résultats définitifs de l'élection des membres de l'Assemblée Populaire Nationale (Journal officiel n° 54 du 25 juillet 2026)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/2026/F2026054.pdf",
+   "kind": "official_body",
+   "note": "Tables 1 to 3: elected candidates, seats by group, and results by constituency (69 wilayas and Zones 1 to 8 abroad)."
+  },
+  "p01-97-cc": {
+   "title": "Proclamation n° 01-97/P-CC du 4 Safar 1418 correspondant au 9 juin 1997 relative aux résultats de l'élection des membres de l'Assemblée populaire nationale (Journal officiel n° 40 du 11 juin 1997)",
+   "publisher": "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)",
+   "url": "https://www.joradp.dz/FTP/jo-francais/1997/F1997040.pdf",
+   "kind": "official_body",
+   "note": "Scanned issue with no text layer. Tableau 1 (elected candidates), tableau 2 (votes and seats by list nationwide), and tableau 3 (participation by constituency: 48 wilayas and Zones 1 to 6 abroad)."
   }
  },
  "tiers": [
@@ -349,23 +391,38 @@
     },
     {
      "date": "1997-06-05",
-     "seats": 380
+     "contests": 54,
+     "source": "p01-97-cc",
+     "seats": 380,
+     "note": "54 constituencies: the 48 wilayas and Zones 1 to 6 abroad."
     },
     {
      "date": "2002-05-30",
-     "seats": 389
+     "contests": 54,
+     "source": "p01-cc-02",
+     "seats": 389,
+     "note": "54 constituencies: the 48 wilayas and Zones 1 to 6 abroad."
     },
     {
      "date": "2007-05-17",
-     "seats": 389
+     "contests": 54,
+     "source": "p03-cc-07",
+     "seats": 389,
+     "note": "54 constituencies: the 48 wilayas and Zones 1 to 6 abroad."
     },
     {
      "date": "2012-05-10",
-     "seats": 462
+     "contests": 52,
+     "source": "p01-cc-12",
+     "seats": 462,
+     "note": "52 constituencies: the 48 wilayas and Zones 1 to 4 abroad."
     },
     {
      "date": "2017-05-04",
-     "seats": 462
+     "contests": 52,
+     "source": "p01-cc-17",
+     "seats": 462,
+     "note": "52 constituencies: the 48 wilayas and Zones 1 to 4 abroad."
     },
     {
      "date": "2021-06-12",
@@ -377,7 +434,10 @@
     },
     {
      "date": "2026-07-02",
-     "note": "Proclaimed by the Constitutional Court on 18 July 2026; the issue carrying the proclamation is not yet tied here."
+     "contests": 77,
+     "source": "p-cc-26",
+     "seats": 407,
+     "note": "77 constituencies: the 69 wilayas and Zones 1 to 8 abroad; proclaimed by the Constitutional Court on 18 July 2026."
     }
    ],
    "cadence": [
