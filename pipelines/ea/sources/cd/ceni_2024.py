@@ -99,7 +99,7 @@ def build_geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "The provinces of Kwilu and Nord-Ubangi and the territories of Masi-Manimba and Yakoma, "
-        "with outlines from geoBoundaries",
+        "with outlines from geoBoundaries, and the electoral commission's results portal",
     )
     p.external |= {CONGO, COUNTRY}
     shapes = raw.cached(SHAPES, OUTLINES)
@@ -116,6 +116,19 @@ def build_geo() -> Package:
         attribution="geoBoundaries (William & Mary geoLab); original data from the Référentiel Géographique Commun",
     )
     p.artifact(shapes, SHAPE_SOURCE)
+    p.add(
+        "source",
+        id=CENI,
+        kind="official_body",
+        publisher="Commission électorale nationale indépendante",
+        title="Résultats des élections combinées du 15 décembre 2024 pour les circonscriptions de Masi-Manimba "
+        "et de Yakoma (Bosolo results portal)",
+        url=PORTAL,
+        license="Official publication; reuse terms are not stated",
+        attribution="Commission électorale nationale indépendante de la République démocratique du Congo",
+    )
+    for url in (PROVINCES, *map(api, PROVINCE_FILES), DISPATCH):
+        p.artifact(raw.cached(SOURCE, url), CENI)
     p.add("scheme", code=PROVINCE, polity_id=CONGO, kind="administrative", rank=1, noun="province")
     p.add("scheme", code=CIRCONSCRIPTION, polity_id=CONGO, kind="electoral_district", rank=2, noun="circonscription")
     p.add("scheme", code=BUREAU, polity_id=CONGO, kind="precinct", rank=3, noun="polling station")
@@ -173,23 +186,10 @@ def build_registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         "The parties on the 15 December 2024 ballots in Masi-Manimba and Yakoma, the National Assembly and the "
-        "provincial assemblies, the open-list system, and the electoral commission",
+        "provincial assemblies, and the open-list system",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(CONGO)
-    p.add(
-        "source",
-        id=CENI,
-        kind="official_body",
-        publisher="Commission électorale nationale indépendante",
-        title="Résultats des élections combinées du 15 décembre 2024 pour les circonscriptions de Masi-Manimba "
-        "et de Yakoma (Bosolo results portal)",
-        url=PORTAL,
-        license="Official publication; reuse terms are not stated",
-        attribution="Commission électorale nationale indépendante de la République démocratique du Congo",
-    )
-    for url in (PROVINCES, *map(api, PROVINCE_FILES), DISPATCH):
-        p.artifact(raw.cached(SOURCE, url), CENI)
     p.add("body", id=NATIONAL_ASSEMBLY, polity_id=CONGO, kind="lower_house")
     p.name(NATIONAL_ASSEMBLY, "National Assembly of the Democratic Republic of the Congo", "en", "official")
     p.name(NATIONAL_ASSEMBLY, "Assemblée nationale", "fr", "native", False)
