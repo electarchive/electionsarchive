@@ -1,0 +1,1623 @@
+{
+ "polity": "IN",
+ "name": "India",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "India",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "भारत",
+    "lang": "hi",
+    "kind": "native"
+   }
+  ],
+  "slug": "in",
+  "wikidata": "Q668",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "The Constitution of India, part-wise text (Parts V, VI, VIII, IX, IXA, XV and the First, Fourth, and Sixth Schedules)",
+   "publisher": "Ministry of External Affairs, Government of India",
+   "url": "https://www.mea.gov.in/constitution-of-india",
+   "kind": "official_body",
+   "note": "Each Part and Schedule is a PDF under https://www.mea.gov.in/images/pdf1/ (Part5.pdf, Part6.pdf, Part8.pdf, Part9.pdf, Part15.pdf, S1.pdf, S4.pdf, S6.pdf). This copy predates the Andhra Pradesh Reorganisation Act, 2014 and the Jammu and Kashmir Reorganisation Act, 2019, so its First Schedule still lists Jammu and Kashmir as a state and has no Telangana; current unit counts come from the Local Government Directory. legislative.gov.in and indiacode.nic.in refused this session (HTTP 403)."
+  },
+  "lgd": {
+   "title": "Local Government Directory (LGD): Statistical/Analytical Summary on the home page",
+   "publisher": "Ministry of Panchayati Raj, Government of India",
+   "url": "https://lgdirectory.gov.in/welcome.do",
+   "kind": "official_body",
+   "note": "The national register of land regions and local governments that the Ministry of Panchayati Raj keeps with the States; read on 2026-11-16. Its summary gives 36 States/UTs (28 States, 8 Union Territories), 790 districts, 675 district panchayats, 6,768 block panchayats, 258,448 gram panchayats, 14,163 traditional local bodies (14 district, 47 block, and 14,102 village level), and 5,050 urban local bodies, of which 276 municipal corporations, 2,005 municipalities, and 2,416 town panchayats. The bulk downloads sit behind a CAPTCHA and were not used."
+  },
+  "pib_ge": {
+   "title": "General Election 2024 (e-book), section 5: Facts about successive General Elections 1951-52 to 2019",
+   "publisher": "Press Information Bureau, Government of India",
+   "url": "https://static.pib.gov.in/WriteReadData/userfiles/GE2024/files/basic-html/page25.html",
+   "kind": "official_body",
+   "note": "Table of seats, candidates, electorate, votes polled, and polling stations for each Lok Sabha general election from 1952 to 2019, with footnotes on the seats polled late in 1980, 1984-85, 1989, and 1991-92."
+  },
+  "pib_panchayat": {
+   "title": "Rashtriya Panchayati Raj Diwas: Strengthening Grassroots Democracy in India (backgrounder, 24 April 2026)",
+   "publisher": "Press Information Bureau, Government of India",
+   "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/apr/doc2026424855701.pdf",
+   "kind": "official_body",
+   "note": "\"With over 2.5 lakh Panchayats and 24.04 lakh elected representatives, including 49.75% women\"; describes the gram, intermediate, and district levels."
+  },
+  "eci_pn_president_2022": {
+   "title": "Press Note No. ECI/PN/56/2022: Election to the Office of President of India, 2022 (16th Presidential Election)",
+   "publisher": "Election Commission of India (copy hosted by the Chief Electoral Officer, Manipur)",
+   "url": "https://www.ceomanipur.nic.in/Documents/PressNote/presidential%20Election%202022/PN_56_09062022.pdf",
+   "kind": "official_body",
+   "note": "Schedule and electoral college of the 2022 presidential election under Article 324, the Presidential and Vice-Presidential Elections Act, 1952, and the 1974 Rules; calls it the 16th presidential election."
+  },
+  "vp_office": {
+   "title": "Election of the Vice-President",
+   "publisher": "Office of the Vice-President of India",
+   "url": "https://vicepresidentofindia.nic.in/election-of-the-vice-president/",
+   "kind": "official_body",
+   "note": "The Election Commission conducts the election; election within 60 days of the term's expiry; preferential ballot counted to a quota of half the valid votes plus one; disputes go to the Supreme Court."
+  },
+  "sec_delhi": {
+   "title": "State Election Commission, NCT of Delhi: Municipal Corporation of Delhi general elections (1997-2022) and by-elections (2009-2025)",
+   "publisher": "State Election Commission, Government of NCT of Delhi",
+   "url": "https://sec.delhi.gov.in/",
+   "kind": "official_body",
+   "note": "Links result PDFs for the MCD general elections of 1997, 2002, 2007, 2012, 2017, and 2022 and the by-elections of 2009, 2010, 2013, 2016, 2021, and 2025 (result summary, elected councillors, party vote share)."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "भारत गणराज्य",
+   "name_en": "Republic of India (the Union)",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "in.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "province",
+   "name": "Provinces of British India",
+   "name_en": "Provinces of British India (Governor's and Chief Commissioner's provinces)",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "constitution",
+   "valid_to": "1950-01-26"
+  },
+  {
+   "key": "state",
+   "name": "राज्य",
+   "name_en": "States",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "in.state",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 28,
+     "source": "lgd",
+     "locator": "Home page counter: \"States/UTs 36 28 States 8 Union Territories\""
+    }
+   ]
+  },
+  {
+   "key": "ut",
+   "name": "संघ राज्यक्षेत्र",
+   "name_en": "Union territories",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "in.state",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 8,
+     "source": "lgd",
+     "locator": "Home page counter: \"States/UTs 36 28 States 8 Union Territories\"; Delhi, Puducherry, and Jammu and Kashmir elect legislative assemblies"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "ज़िला",
+   "name_en": "Districts (administrative)",
+   "parent": "state",
+   "polity_kind": "county",
+   "scheme": "in.district",
+   "source": "lgd",
+   "elects": false,
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 790,
+     "source": "lgd",
+     "locator": "Statistical/Analytical Summary: \"No. of Districts 790\""
+    }
+   ]
+  },
+  {
+   "key": "district_panchayat",
+   "name": "ज़िला पंचायत / ज़िला परिषद",
+   "name_en": "District panchayats (zilla parishads)",
+   "parent": "state",
+   "polity_kind": "county",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 675,
+     "source": "lgd",
+     "locator": "Statistical/Analytical Summary: \"No. of District Panchayats 675\""
+    }
+   ]
+  },
+  {
+   "key": "block_panchayat",
+   "name": "क्षेत्र पंचायत / पंचायत समिति",
+   "name_en": "Intermediate (block) panchayats",
+   "parent": "district_panchayat",
+   "polity_kind": "county",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 6768,
+     "source": "lgd",
+     "locator": "Statistical/Analytical Summary: \"No. of Block Panchayats 6768\""
+    }
+   ]
+  },
+  {
+   "key": "gram_panchayat",
+   "name": "ग्राम पंचायत",
+   "name_en": "Village (gram) panchayats",
+   "parent": "block_panchayat",
+   "polity_kind": "municipality",
+   "scheme": "in.gram_panchayat",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 258448,
+     "source": "lgd",
+     "locator": "Statistical/Analytical Summary: \"No. of Gram Panchayats 258448\""
+    }
+   ]
+  },
+  {
+   "key": "traditional_body",
+   "name": "Traditional local bodies",
+   "name_en": "Traditional local bodies (village councils and durbars outside Part IX)",
+   "parent": "state",
+   "polity_kind": "submunicipal",
+   "source": "lgd",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 14163,
+     "source": "lgd",
+     "locator": "Home page counter: \"14163 Traditional Localbodies 14 47 14102 District Level Block Level Village Level\""
+    }
+   ]
+  },
+  {
+   "key": "municipal_corporation",
+   "name": "नगर निगम",
+   "name_en": "Municipal corporations",
+   "parent": "state",
+   "polity_kind": "municipality",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 276,
+     "source": "lgd",
+     "locator": "Home page counter: \"5050 Urban Localbodies 276 2005 2416 Municipal Corporation Municipality Town Panchayats\""
+    }
+   ]
+  },
+  {
+   "key": "municipality",
+   "name": "नगर पालिका परिषद",
+   "name_en": "Municipalities (municipal councils)",
+   "parent": "state",
+   "polity_kind": "municipality",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 2005,
+     "source": "lgd",
+     "locator": "Home page counter: \"5050 Urban Localbodies 276 2005 2416 Municipal Corporation Municipality Town Panchayats\""
+    }
+   ]
+  },
+  {
+   "key": "nagar_panchayat",
+   "name": "नगर पंचायत",
+   "name_en": "Nagar (town) panchayats",
+   "parent": "state",
+   "polity_kind": "municipality",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 2416,
+     "source": "lgd",
+     "locator": "Home page counter: \"5050 Urban Localbodies 276 2005 2416 Municipal Corporation Municipality Town Panchayats\""
+    }
+   ]
+  },
+  {
+   "key": "autonomous_council",
+   "name": "Autonomous district and regional councils",
+   "name_en": "Autonomous district councils (Sixth Schedule) and statutory autonomous councils",
+   "parent": "state",
+   "polity_kind": "region",
+   "source": "constitution"
+  },
+  {
+   "key": "cantonment",
+   "name": "छावनी बोर्ड",
+   "name_en": "Cantonment boards",
+   "parent": "national",
+   "polity_kind": "special_district",
+   "source": "lgd"
+  }
+ ],
+ "classes": [
+  {
+   "key": "lok_sabha",
+   "tier": "national",
+   "name": "लोक सभा आम चुनाव",
+   "name_en": "House of the People (Lok Sabha) general elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "in.pc"
+    ],
+    "fine": [
+     "in.ac",
+     "in.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 81 and 83(2): at most 530 members from the States and 20 from the Union territories, chosen by direct election from territorial constituencies, for five years from the first meeting unless sooner dissolved)",
+   "first_held": "1951-10-25",
+   "earliest_record": "1951-10-25",
+   "note": "First past the post in single-member parliamentary constituencies since 1962 (two- and three-member constituencies in 1951-52 and 1957), with seats reserved for Scheduled Castes and Scheduled Tribes; 543 seats since 1977 under the 1976 and 2008 delimitations. The House can be dissolved early, so elections fell in 1977, 1980, 1984, 1989, 1991, 1996, 1998, and 1999 off a five-year rhythm. Two nominated Anglo-Indian seats ended in 2020.",
+   "finest_note": "The Commission's statistical reports give candidate votes by parliamentary constituency and by assembly segment; Form 20 polling-station returns are posted by each State's Chief Electoral Officer for recent elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "IN"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 4,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Election Commission of India",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Art. 83(2): \"shall continue for five years from the date appointed for its first meeting and no longer\"; Art. 324: the Election Commission conducts elections to Parliament)",
+     "valid_from": "2024-06-24",
+     "vacancy_rule": "A by-election within six months of the vacancy under the Representation of the People Act, 1951 (class lok_sabha_by)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1951-10-25",
+     "evidence": "Statistical reports for every general election since 1951-52 are listed on eci.gov.in, which answered HTTP 406 to the archive's User-Agent from this session on 2026-11-16 (results.eci.gov.in answered with a redirect and 404s for past result paths).",
+     "finest": "in.pc"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1952 489* 1874 1,73,212,343 - 1,96,084",
+     "seats": 489,
+     "note": "Polling ran from October 1951 to February 1952; up to 1957 some constituencies returned two or three members (PIB footnote *), so the 489 seats sat in fewer constituencies."
+    },
+    {
+     "date": "1957-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1957 494* 1519 1,93,652,179 1,20,513,915 2,20,478",
+     "seats": 494,
+     "note": "Two-member constituencies still in use (PIB footnote *); they were abolished before 1962."
+    },
+    {
+     "date": "1962-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1962 494 1985 2,16,361,569 1,19,904,284 2,38,031",
+     "seats": 494,
+     "contests": 494
+    },
+    {
+     "date": "1967-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1967 520 2369 2,50,207,401 1,52,724,611 2,43,693",
+     "seats": 520,
+     "contests": 520
+    },
+    {
+     "date": "1971-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1971 518 2784 2,74,189,132 1,51,536,802 3,42,918",
+     "seats": 518,
+     "contests": 518
+    },
+    {
+     "date": "1977-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1977 542 2439 3,21,174,327 1,94,263,915 3,73,910",
+     "seats": 542,
+     "contests": 542
+    },
+    {
+     "date": "1980-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1980 529/542** 4629 3,56,205,329 2,02,752,893 4,36,813",
+     "seats": 542,
+     "contests": 529,
+     "note": "\"In General Elections 1980 (7th Lok Sabha) the Elections on 12 seats of Assam & 01 seat of Meghalaya were not held along with whole country.\""
+    },
+    {
+     "date": "1984-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1984-85 541/542*** 5492 4,00,375,333 2,56,294,963 5,06,058",
+     "seats": 542,
+     "contests": 541,
+     "note": "\"In General Elections, 1984 (8th Lok Sabha) the Elections on 14 seats of Assam & 13 seats of Punjab were held in 1985.\" The 541 count includes those 27 seats polled in 1985."
+    },
+    {
+     "date": "1989-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1989 529/543**** 6160 4,98,906,129 3,09,050,495 5,80,798",
+     "seats": 543,
+     "contests": 529,
+     "note": "\"In General Elections ,1989 (9th Lok Sabha) the Elections on 14 seats of Assam were not held.\""
+    },
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1991-92 534/543***** 8749 5,11,533,598 2,85,856,465 5,91,020",
+     "seats": 543,
+     "contests": 534,
+     "note": "\"the Elections on 13 seats of Punjab & 6 seats of Jammu & Kashmir were not held\"; Punjab's 13 seats were polled in 1992 and are in the 534."
+    },
+    {
+     "date": "1996-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1996 543 13952 5,92,572,288 3,43,308,090 7,67,462",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "1998-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1998 543 4750 6,05,880,192 3,75,441,739 7,73,494",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "1999-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "1999 543 4648 6,19,536,947 3,71,669,104 7,74,651",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "2004 543 5435 6,71,487,930 3,89,948,330 6,87,402",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "2009-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "2009 543 8070 71,69,85,101 41,72,36,311 8,30,866",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "2014-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "2014 543 8251 83,40,82,814 55,41,75,255 9,27,553",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "2019-01-01",
+     "precision": "year",
+     "source": "pib_ge",
+     "quote": "2019 543 8054 91,19,50,734 614172823 10,37,848",
+     "seats": 543,
+     "contests": 543
+    },
+    {
+     "date": "2024-01-01",
+     "precision": "year",
+     "note": "18th Lok Sabha, polled in seven phases from 19 April to 1 June 2024 for all 543 seats; not counted here because the Commission's own 2024 statistical report was out of reach (eci.gov.in answered HTTP 406)."
+    }
+   ],
+   "est_votes": 5800000000,
+   "effort": 3
+  },
+  {
+   "key": "lok_sabha_by",
+   "tier": "national",
+   "name": "लोक सभा उप-चुनाव",
+   "name_en": "Lok Sabha by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "in.pc"
+    ],
+    "fine": [
+     "in.ac"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 81; Art. 324)",
+   "first_held": "1952-01-01",
+   "note": "By-elections fill seats vacated by death, resignation, or disqualification, usually within six months under the Representation of the People Act, 1951; the Commission groups them into a few rounds a year with State by-elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "IN"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1952-01-01",
+     "evidence": "Bye-election results are filed under each year's statistical reports on eci.gov.in (HTTP 406 from this session).",
+     "finest": "in.pc"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2026-12-31",
+     "note": "By-elections held in most years; not yet counted from an official list."
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 4
+  },
+  {
+   "key": "rajya_sabha",
+   "tier": "national",
+   "name": "राज्य सभा द्विवार्षिक चुनाव",
+   "name_en": "Council of States (Rajya Sabha) elections by State legislators",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "in.state"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 80(4): elected by the elected members of the Legislative Assembly of the State by proportional representation by means of the single transferable vote; Art. 83(1): one third retire every second year; Fourth Schedule: 233 seats)",
+   "first_held": "1952-03-27",
+   "note": "233 seats filled by State and Union territory assemblies by STV (open ballot since 2003), plus 12 members nominated by the President. One third retire every two years, so elections run in rounds through each year; many seats are filled unopposed.",
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "IN"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1952-03-27",
+     "evidence": "Results are issued as press notes by the Commission and the returning officers (eci.gov.in answered HTTP 406)."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2026-12-31",
+     "note": "Biennial and casual elections in most years; not yet counted."
+    }
+   ],
+   "est_votes": 300000,
+   "effort": 4
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "राष्ट्रपति निर्वाचन",
+   "name_en": "President, by an electoral college of MPs and MLAs",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "in.state"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 54 and 55: electoral college of the elected members of both Houses and of the State Legislative Assemblies (including Delhi and Puducherry), weighted votes, single transferable vote; Art. 56: five-year term; Art. 62)",
+   "first_held": "1952-05-02",
+   "note": "Weighted single transferable vote in an electoral college of about 4,800 MPs and MLAs; the 2022 election was the 16th (ECI/PN/56/2022). Votes are counted by State, so each State's ballot value is published.",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "IN"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 7,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Election Commission of India",
+     "source": "eci_pn_president_2022",
+     "locator": "https://www.ceomanipur.nic.in/Documents/PressNote/presidential%20Election%202022/PN_56_09062022.pdf (\"The term of office of Shri Ram Nath Kovind, President of India, is ending on 24th July, 2022 ... an election to fill the vacancy ... is required to be completed before the expiration of the term\")",
+     "vacancy_rule": "A vacancy by death, resignation, or removal is filled by an election within six months (Art. 62(2)), and the winner serves a full five years."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2022-12-31",
+     "note": "Sixteen elections from 1952 to 2022 (ECI/PN/56/2022 calls 2022 the 16th); dates not yet listed from an official table."
+    }
+   ],
+   "est_votes": 70000,
+   "effort": 2
+  },
+  {
+   "key": "vice_president",
+   "tier": "national",
+   "name": "उपराष्ट्रपति निर्वाचन",
+   "name_en": "Vice-President, by the members of both Houses",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 66(1): elected by the members of an electoral college consisting of the members of both Houses of Parliament by the single transferable vote; Art. 67: five-year term)",
+   "first_held": "1952-04-25",
+   "note": "Members of both Houses, elected and nominated, vote by preferential ballot to a quota of half the valid votes plus one (Office of the Vice-President). Several early elections were unopposed. After the resignation of 21 July 2025 an early election was held on 9 September 2025, so the next term ends in 2030.",
+   "match": [
+    {
+     "office_kinds": [
+      "other"
+     ],
+     "name_pattern": "(?i)vice.?president",
+     "iso_pattern": "IN"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 8,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Election Commission of India",
+     "source": "vp_office",
+     "locator": "https://vicepresidentofindia.nic.in/election-of-the-vice-president/ (\"The election of the next Vice-President is to be held within 60 days of the expiry of the term of office of the outgoing Vice-President.\")",
+     "valid_from": "2025-09-09",
+     "vacancy_rule": "A vacancy is filled by an election held as soon as possible (Art. 68(2)); the winner serves a full five years."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2025-12-31",
+     "note": "Elections from 1952 to 2025, several unopposed; not yet listed from an official table."
+    }
+   ],
+   "est_votes": 12000,
+   "effort": 2
+  },
+  {
+   "key": "plebiscite",
+   "tier": "national",
+   "name": "जनमत संग्रह",
+   "name_en": "Plebiscites and opinion polls under Union law",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Part XV (Arts. 324-329) provides for no referendum; the polls were held under special laws)",
+   "first_held": "1948-02-20",
+   "note": "The Constitution has no referendum. Two territorial votes were held by the Union: the Junagadh plebiscite of 20 February 1948 and the Goa, Daman and Diu opinion poll of 16 January 1967, which the Election Commission ran under the Goa, Daman and Diu (Opinion Poll) Act, 1966. Sikkim's 1975 referendum was held by Sikkim before it joined the Union and belongs to its own record.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "IN*"
+    }
+   ],
+   "est_votes": 500000,
+   "effort": 5
+  },
+  {
+   "key": "constituent_assembly",
+   "tier": "national",
+   "name": "संविधान सभा",
+   "name_en": "Constituent Assembly, elected by the provincial assemblies (1946)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india",
+   "valid_from": "1946-07-01",
+   "valid_to": "1950-01-26",
+   "first_held": "1946-07-01",
+   "note": "Members for the British Indian provinces were elected in July and August 1946 by the provincial legislative assemblies, by community, through the single transferable vote under the Cabinet Mission plan; the princely states' members were nominated. After Partition the Assembly sat as India's provisional Parliament until 1952.",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "IN",
+     "valid_to": "1950-01-26"
+    }
+   ],
+   "est_votes": 1600,
+   "effort": 5
+  },
+  {
+   "key": "central_legislative_assembly",
+   "tier": "national",
+   "name": "Central Legislative Assembly",
+   "name_en": "Central (Indian) Legislative Assembly of British India",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india",
+   "valid_from": "1920-11-01",
+   "valid_to": "1947-08-15",
+   "first_held": "1920-11-01",
+   "note": "Elected under the Government of India Act, 1919 in 1920, 1923, 1926, 1930, 1934, and 1945 by a property-qualified electorate in communal and general constituencies, alongside the Council of State. Its territory is shared with Pakistan, Bangladesh, and (to 1937) Myanmar.",
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "IN",
+     "valid_to": "1947-08-15"
+    }
+   ],
+   "est_votes": 3000000,
+   "effort": 5
+  },
+  {
+   "key": "provincial_legislatures",
+   "tier": "province",
+   "name": "Provincial legislative councils and assemblies",
+   "name_en": "Provincial legislatures of British India",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india",
+   "valid_from": "1920-11-01",
+   "valid_to": "1950-01-26",
+   "first_held": "1920-11-01",
+   "note": "Legislative councils elected in 1920, 1923, 1926, and 1930 under dyarchy, and legislative assemblies elected in 1937 and 1945-46 under the Government of India Act, 1935, in communal, general, and special constituencies. The provinces of 1946 became the Part A States of 1950.",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "iso_pattern": "IN-*",
+     "valid_to": "1950-01-26"
+    }
+   ],
+   "est_votes": 40000000,
+   "effort": 5
+  },
+  {
+   "key": "vidhan_sabha",
+   "tier": "state",
+   "name": "विधान सभा आम चुनाव",
+   "name_en": "State legislative assemblies (Vidhan Sabha) general elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "in.state"
+    ],
+    "fine": [
+     "in.ac",
+     "in.polling_station"
+    ],
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 168, 170 (direct election from territorial constituencies, 60 to 500 members), and 172(1) (five years from the first meeting unless sooner dissolved))",
+   "first_held": "1951-10-25",
+   "earliest_record": "1951-10-25",
+   "note": "First past the post in single-member assembly constituencies (some two-member seats in 1951-52 and 1957), about 4,000 seats in all; each assembly keeps its own five-year term unless dissolved early or suspended under President's rule, so elections are staggered across the years and often share a polling season. Counted as one election per State; the 1951-52 and 1957 rounds also elected the assemblies of the Part A, B, and C States.",
+   "finest_note": "Candidate votes by assembly constituency in the Commission's statistical reports; Form 20 polling-station returns from each Chief Electoral Officer for recent elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "federal_unit"
+     ],
+     "iso_pattern": "IN-*",
+     "valid_from": "1950-01-26"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Election Commission of India",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Art. 172(1): \"shall continue for five years from the date appointed for its first meeting and no longer\"; Art. 324)",
+     "vacancy_rule": "A by-election within six months (class vidhan_sabha_by)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1951-10-25",
+     "evidence": "State assembly statistical reports for every general election since 1951-52 are listed on eci.gov.in (HTTP 406 from this session).",
+     "finest": "in.ac"
+    }
+   ],
+   "est_votes": 5500000000,
+   "effort": 3
+  },
+  {
+   "key": "vidhan_sabha_by",
+   "tier": "state",
+   "name": "विधान सभा उप-चुनाव",
+   "name_en": "State assembly by-elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "in.ac"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 170 and 324)",
+   "first_held": "1952-01-01",
+   "note": "Held in rounds each year with Lok Sabha by-elections.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "federal_unit"
+     ],
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1952-01-01",
+     "evidence": "Bye-election results under each year's statistical reports on eci.gov.in (HTTP 406 from this session).",
+     "finest": "in.ac"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2026-12-31",
+     "note": "By-elections held in most years; not yet counted."
+    }
+   ],
+   "est_votes": 300000000,
+   "effort": 4
+  },
+  {
+   "key": "vidhan_parishad",
+   "tier": "state",
+   "name": "विधान परिषद चुनाव",
+   "name_en": "State legislative councils (Vidhan Parishad)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 171(3)-(4): a third elected by local authorities, a twelfth by graduates, a twelfth by teachers, a third by the assembly, the rest nominated; STV in territorial constituencies)",
+   "first_held": "1952-01-01",
+   "note": "Six States have councils today (Andhra Pradesh, Bihar, Karnataka, Maharashtra, Telangana, and Uttar Pradesh); others were abolished or created under Art. 169 over time. Graduates' and teachers' constituencies are the only directly elected seats, with electorates of their own registered voters; local-authority and assembly seats are indirect. One third retire every two years.",
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1952-01-01",
+     "evidence": "Council results are issued as press notes and returning-officer declarations (eci.gov.in HTTP 406 from this session)."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2026-12-31",
+     "note": "Biennial rounds in each State with a council; not yet counted."
+    }
+   ],
+   "est_votes": 20000000,
+   "effort": 5
+  },
+  {
+   "key": "ut_assembly",
+   "tier": "ut",
+   "name": "संघ राज्यक्षेत्र विधान सभा",
+   "name_en": "Union territory legislative assemblies (Delhi, Puducherry, Jammu and Kashmir, and former UTs)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "in.ac",
+     "in.polling_station"
+    ]
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 239A (legislatures for Union territories by Parliament's law) and Art. 239AA (Legislative Assembly of the National Capital Territory of Delhi, chosen by direct election from territorial constituencies))",
+   "first_held": "1952-01-01",
+   "note": "Delhi elected an assembly as a Part C State in 1952, a Metropolitan Council from 1966, and an assembly again since 1993; Puducherry since 1964; Jammu and Kashmir as a Union territory since 2024 (as a State before 2019). Himachal Pradesh, Manipur, Tripura, Goa, Mizoram, and Arunachal Pradesh elected Union territory assemblies before statehood. Same rules and publisher as the State assemblies.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IN-DL",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IN-PY",
+     "precedence": 1
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IN-JK",
+     "precedence": 1,
+     "valid_from": "2019-10-31"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Election Commission of India",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Art. 239AA(2)(b))"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Election Commission of India, Statistical Reports",
+     "url": "https://www.eci.gov.in/statistical-reports/",
+     "format": "pdf, xls",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "first_date": "1952-01-01",
+     "evidence": "Listed with the State assembly reports on eci.gov.in (HTTP 406 from this session).",
+     "finest": "in.ac"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-01-01",
+     "precision": "year",
+     "through": "2026-12-31",
+     "note": "Delhi, Puducherry, Jammu and Kashmir, and the former Union territory assemblies; not yet counted."
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 3
+  },
+  {
+   "key": "autonomous_district_council",
+   "tier": "autonomous_council",
+   "name": "Autonomous District Councils",
+   "name_en": "Autonomous district and regional councils of the Sixth Schedule",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Sixth Schedule para. 2(1): \"a District Council for each autonomous district consisting of not more than thirty members, of whom not more than four persons shall be nominated by the Governor and the rest shall be elected on the basis of adult suffrage\"; the Bodoland Territorial Council has 40 elected members)",
+   "first_held": "1952-01-01",
+   "note": "Ten councils in the tribal areas of Assam (Bodoland Territorial, Karbi Anglong, Dima Hasao), Meghalaya (Khasi Hills, Jaintia Hills, Garo Hills), Tripura (Tripura Tribal Areas), and Mizoram (Chakma, Lai, Mara), elected for five years by first past the post and run by the State Election Commissions or the State governments.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(?i)autonomous district|district council|territorial council|regional council",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "est_votes": 30000000,
+   "effort": 5
+  },
+  {
+   "key": "statutory_council",
+   "tier": "autonomous_council",
+   "name": "Statutory autonomous and hill councils",
+   "name_en": "Statutory autonomous councils outside the Sixth Schedule",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "lgd",
+   "locator": "https://lgdirectory.gov.in/welcome.do",
+   "first_held": "1988-01-01",
+   "note": "Councils created by State or Union law rather than the Sixth Schedule, among them the Ladakh Autonomous Hill Development Councils of Leh and Kargil, the Gorkhaland Territorial Administration in Darjeeling, and Assam's statutory councils (Rabha Hasong, Mising, Tiwa, and others), each elected by adult suffrage on its own schedule.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(?i)hill (development )?council|gorkhaland|autonomous council",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "est_votes": 5000000,
+   "effort": 5
+  },
+  {
+   "key": "zilla_parishad",
+   "tier": "district_panchayat",
+   "name": "ज़िला पंचायत सदस्य निर्वाचन",
+   "name_en": "District panchayat (zilla parishad) members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243C(2): all seats filled by persons chosen by direct election from territorial constituencies; Art. 243E: five years)",
+   "first_held": "1994-01-01",
+   "note": "Members elected by first past the post in territorial constituencies with reservations for women (a third or half, by State), SCs, and STs; most States hold all three tiers on one ballot day per district or State. Elections under State law also predate the 73rd Amendment (district boards from the 1880s, panchayati raj from 1959) and are not counted here.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "name_pattern": "(?i)zil+a|district panchayat|jila",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 2500000000,
+   "effort": 5
+  },
+  {
+   "key": "panchayat_samiti",
+   "tier": "block_panchayat",
+   "name": "क्षेत्र पंचायत / पंचायत समिति सदस्य निर्वाचन",
+   "name_en": "Intermediate panchayat (block, samiti, mandal) members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243B and 243C(2); intermediate panchayats may be skipped in States of not more than twenty lakh people (Art. 243B(2)))",
+   "first_held": "1994-01-01",
+   "note": "Directly elected members in territorial constituencies; small States (Goa, Sikkim, Manipur and others under twenty lakh people) have no intermediate tier.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "name_pattern": "(?i)samiti|block panchayat|kshetra|mandal|taluk|union",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 2500000000,
+   "effort": 5
+  },
+  {
+   "key": "gram_panchayat",
+   "tier": "gram_panchayat",
+   "name": "ग्राम पंचायत सदस्य निर्वाचन",
+   "name_en": "Village panchayat ward members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243C(2) and 243E)",
+   "first_held": "1994-01-01",
+   "note": "About 258,000 gram panchayats elect ward members (panches), most of them single-member wards; many seats are filled unopposed. The PIB counts 24.04 lakh elected representatives across all three tiers.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(?i)gram|grama|village panchayat",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 3000000000,
+   "effort": 5
+  },
+  {
+   "key": "sarpanch",
+   "tier": "gram_panchayat",
+   "name": "सरपंच / प्रधान निर्वाचन",
+   "name_en": "Village panchayat heads (sarpanch, pradhan, mukhiya)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243C(5): the chairperson of a village panchayat is elected in such manner as the State law provides)",
+   "first_held": "1994-01-01",
+   "note": "Directly elected in most States (Uttar Pradesh, Bihar, Rajasthan, Madhya Pradesh, Haryana, Punjab, Maharashtra since 2017, and others); chosen by the ward members in Kerala, West Bengal, and some others, which fall under local_indirect_heads.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "muhtar",
+      "other"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(?i)sarpanch|pradhan|mukhiya|president.*panchayat",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 2000000000,
+   "effort": 5
+  },
+  {
+   "key": "municipal_corporation",
+   "tier": "municipal_corporation",
+   "name": "नगर निगम पार्षद निर्वाचन",
+   "name_en": "Municipal corporation councillors",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "in.ward"
+    ],
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243Q(1)(c); Art. 243R(1): all seats filled by persons chosen by direct election from the territorial constituencies (wards); Art. 243U: five years)",
+   "first_held": "1994-01-01",
+   "note": "Councillors (corporators) elected by first past the post in single-member wards. Corporations such as Bombay, Calcutta, and Madras elected councils long before 1992 under their own Acts; those elections are not yet counted. Delhi's corporation (unified again in 2022) is run by the Delhi State Election Commission, whose site carries results since 1997.",
+   "finest_note": "Ward results; polling-station returns where the State commission posts them. Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(?i)corporation|nagar nigam|mahanagar",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "State Election Commission, NCT of Delhi",
+     "url": "https://sec.delhi.gov.in/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-16",
+     "first_date": "1997-01-01",
+     "source": "sec_delhi",
+     "evidence": "Pages for the MCD general elections of 1997, 2002, 2007, 2012, 2017, and 2022 and by-elections from 2009 to 2025; the 2025 by-election result summary and party vote share are PDFs."
+    }
+   ],
+   "est_votes": 700000000,
+   "effort": 4
+  },
+  {
+   "key": "mayor_direct",
+   "tier": "municipal_corporation",
+   "name": "महापौर प्रत्यक्ष निर्वाचन",
+   "name_en": "Directly elected mayors and municipal chairpersons",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243R(2)(b): the Legislature of a State may by law provide for the manner of election of the chairperson of a municipality)",
+   "first_held": "1994-01-01",
+   "note": "Mayors and chairpersons are elected directly by the voters in some States (Uttar Pradesh, Uttarakhand, Madhya Pradesh, Chhattisgarh, Jharkhand, Haryana, and others, varying over time) and by the councillors elsewhere (local_indirect_heads). The States switch back and forth, so the class has no fixed unit count.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "est_votes": 600000000,
+   "effort": 5
+  },
+  {
+   "key": "municipal_council",
+   "tier": "municipality",
+   "name": "नगर पालिका परिषद सदस्य निर्वाचन",
+   "name_en": "Municipal council members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "in.ward"
+    ],
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243Q(1)(b), 243R(1), and 243U)",
+   "first_held": "1994-01-01",
+   "note": "Ward councillors of the municipalities for smaller urban areas, elected by first past the post.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(?i)municipal council|nagar palika|municipality",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 400000000,
+   "effort": 5
+  },
+  {
+   "key": "nagar_panchayat",
+   "tier": "nagar_panchayat",
+   "name": "नगर पंचायत सदस्य निर्वाचन",
+   "name_en": "Nagar (town) panchayat members",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "cycle": true
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243Q(1)(a), 243R(1), and 243U)",
+   "first_held": "1994-01-01",
+   "note": "Ward members of the councils of transitional areas between rural and urban.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(?i)nagar panchayat|town panchayat|notified area",
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "State Election Commission of each State",
+     "source": "constitution",
+     "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(1) and 243U(1): five years from the first meeting; Arts. 243K and 243ZA: State Election Commissions conduct the elections)"
+    }
+   ],
+   "est_votes": 150000000,
+   "effort": 5
+  },
+  {
+   "key": "local_by",
+   "tier": "state",
+   "name": "स्थानीय निकाय उप-चुनाव",
+   "name_en": "Panchayat and municipal by-elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Arts. 243E(3)(b) and 243U(3)(b): an election to constitute a dissolved body within six months)",
+   "first_held": "1994-01-01",
+   "note": "Each State Election Commission holds by-elections for vacant ward and head seats, often twice a year.",
+   "finest_note": "Each State Election Commission publishes its own returns, one site and format per State (PDF result sheets, HTML portals, or gazette notifications); no national compilation exists. From this session sec.delhi.gov.in answered, while the Kerala, Uttar Pradesh, Andhra Pradesh, Maharashtra, and Tamil Nadu commissions reset the connection or refused it.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "polity_kinds": [
+      "county",
+      "municipality"
+     ],
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "est_votes": 50000000,
+   "effort": 5
+  },
+  {
+   "key": "local_recall",
+   "tier": "municipality",
+   "name": "वापस बुलाने का मतदान",
+   "name_en": "Recall votes on municipal and panchayat heads",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243R(2)(b) and 243C(5) leave the manner of choosing and removing chairpersons to State law)",
+   "first_held": "2000-01-01",
+   "note": "Some State laws let voters recall a directly elected municipal chairperson or sarpanch by a ballot of 'full chair, empty chair' (Madhya Pradesh, Chhattisgarh, Rajasthan, Bihar, and others), held by the State Election Commission on a petition of the councillors or voters.",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "IN-*"
+    }
+   ],
+   "est_votes": 2000000,
+   "effort": 5
+  },
+  {
+   "key": "cantonment_board",
+   "tier": "cantonment",
+   "name": "छावनी बोर्ड निर्वाचन",
+   "name_en": "Cantonment board members",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "lgd",
+   "locator": "https://lgdirectory.gov.in/welcome.do",
+   "first_held": "1924-01-01",
+   "note": "Civil areas of military cantonments elect ward members to cantonment boards under the Cantonments Act (1924, replaced in 2006), run by the Ministry of Defence's Directorate General Defence Estates, not the State Election Commissions; several boards are being merged into neighboring municipalities.",
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "(?i)cantonment",
+     "iso_pattern": "IN*"
+    }
+   ],
+   "est_votes": 5000000,
+   "effort": 5
+  },
+  {
+   "key": "local_indirect_heads",
+   "tier": "district_panchayat",
+   "name": "Indirectly elected panchayat and municipal heads",
+   "name_en": "Chairpersons and mayors elected by council members",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 243C(5)(b): the chairperson of a panchayat at the intermediate or district level shall be elected by, and from amongst, the elected members thereof)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Votes of the elected members within each panchayat or council at its first meeting, like a speaker's election; the archive records the public elections that chose those members, not the internal choice of their heads.",
+   "note": "District and intermediate panchayat chairpersons by constitutional rule, and mayors and village heads in States that choose them indirectly."
+  },
+  {
+   "key": "traditional_bodies",
+   "tier": "traditional_body",
+   "name": "Traditional local bodies",
+   "name_en": "Traditional village councils outside Part IX",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "lgd",
+   "locator": "https://lgdirectory.gov.in/welcome.do",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Part IX does not apply to Nagaland, Meghalaya, Mizoram, and the Sixth Schedule areas (Art. 243M); their 14,163 traditional bodies (village councils, durbars, and headmen) are chosen by customary practice under State or district council law, not in elections run by an election commission.",
+   "note": "Counted by LGD as 14 district-level, 47 block-level, and 14,102 village-level traditional local bodies."
+  },
+  {
+   "key": "cooperatives",
+   "tier": "state",
+   "name": "सहकारी समिति निर्वाचन",
+   "name_en": "Cooperative society boards",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Boards elected by each society's own members under State cooperative laws (and the Cooperative Election Authority for multi-State societies); private membership electorates, not public elections."
+  },
+  {
+   "key": "market_committees",
+   "tier": "state",
+   "name": "कृषि उपज मंडी समिति निर्वाचन",
+   "name_en": "Agricultural produce market committees",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Where State market laws still elect committee members, the electorates are licensed farmers, traders, and commission agents of each market yard, and many States now nominate the committees; limited-franchise bodies outside the public election system."
+  },
+  {
+   "key": "primaries",
+   "tier": "national",
+   "name": "Party candidate selection",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Part XV)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No law provides a state-run nominating contest; parties choose candidates internally and the Election Commission only receives nominations."
+  },
+  {
+   "key": "judiciary",
+   "tier": "national",
+   "name": "न्यायाधीश",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "office"
+   },
+   "source": "constitution",
+   "locator": "https://www.mea.gov.in/constitution-of-india (Art. 124(2) and Art. 217(1): judges are appointed by the President)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges of the Supreme Court and the High Courts are appointed by the President (Arts. 124 and 217), and subordinate judges by the Governors; no judicial or law-enforcement office in India is elected."
+  }
+ ]
+}
