@@ -265,11 +265,11 @@ def printed_totals() -> dict[str, int]:
 DAY_2008 = date(2008, 2, 18)
 PAGE_2008 = "https://web.archive.org/web/20251122094303id_/https://ecp.gov.pk/general-elections-2008"
 VOLUME = "https://web.archive.org/web/20250406190549id_/https://ecp.gov.pk/storage/files/1/ge2008-2.pdf"
-PARTY_VOTES = "https://web.archive.org/web/20230712135121if_/https://ecp.gov.pk/storage/files/1/ge2008-nrp2.pdf"
-TURNOUT_NA = "https://web.archive.org/web/20230710144517if_/https://ecp.gov.pk/storage/files/1/ge2008-t1.pdf"
-TURNOUT_PA = "https://web.archive.org/web/20240513151720if_/https://ecp.gov.pk/storage/files/1/ge2008-t2.pdf"
-POSITION_NA = "https://web.archive.org/web/20240227123057if_/https://ecp.gov.pk/storage/files/1/ge2008-p1.pdf"
-POSITION_PA = "https://web.archive.org/web/20240227122941if_/https://ecp.gov.pk/storage/files/1/ge2008-p2.pdf"
+PARTY_VOTES = "https://web.archive.org/web/20251231160933id_/https://ecp.gov.pk/storage/files/1/ge2008-nrp2.pdf"
+TURNOUT_NA = "https://web.archive.org/web/20240627001835id_/https://ecp.gov.pk/storage/files/1/ge2008-t1.pdf"
+TURNOUT_PA = "https://web.archive.org/web/20240627001838id_/https://ecp.gov.pk/storage/files/1/ge2008-t2.pdf"
+POSITION_NA = "https://web.archive.org/web/20260208114539id_/https://ecp.gov.pk/storage/files/1/ge2008-p1.pdf"
+POSITION_PA = "https://web.archive.org/web/20260217104208id_/https://ecp.gov.pk/storage/files/1/ge2008-p2.pdf"
 # The notifications of the candidates returned on 1 March 2008, by assembly. The Sindh notification is not archived.
 RETURNED = {
     "NA": "https://web.archive.org/web/20240627001823id_/https://ecp.gov.pk/storage/files/1/ge2008-g1.pdf",
@@ -912,9 +912,11 @@ def registry() -> Package:
     )
     names = {party_name(c.party): None for v in VOLUMES for seat in constituencies(v) for c in seat.candidates}
     names |= {c.party: None for seat in seats_2008() for c in seat.candidates}
+    seen: set[str] = set()
     for name in sorted(names):
-        if name == "Independent":
+        if name == "Independent" or name.casefold() in seen:
             continue
+        seen.add(name.casefold())
         id = party_id(name)
         p.add("party", id=id, kind="party", polity_id=PAKISTAN)
         p.name(id, name, "en", "official")
