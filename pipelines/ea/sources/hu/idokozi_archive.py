@@ -426,8 +426,7 @@ def protocol_blocks(page: str) -> list[Block]:
                         break
                 else:
                     break
-            if not status:
-                status = " ".join(rest[i:])
+            status = " ".join(rest[i:])
         blocks.append(Block(kind[0], kind[1], kind[2], kind[3], day, roll, candidates, status))
     return blocks
 
