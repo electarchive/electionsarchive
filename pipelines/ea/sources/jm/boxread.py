@@ -253,7 +253,7 @@ def anchors(page: Page) -> tuple[list[tuple[Token, Token | None]], list[Token]]:
     best: tuple[int, list[float], list[float] | None, bool] | None = None
     for right in (False, True):
         edges = [float(w.x1 if right else w.x0) for line in rows for w in line]
-        groups = [g for g in clusters(edges, 15) if len(g) >= 3 and g[-1] - g[0] <= 45]
+        groups = [g for g in clusters(edges, 15) if len(g) >= 2 and g[-1] - g[0] <= 45]
         for a, b in itertools.combinations(groups, 2):
             if 60 <= float(np.median(b)) - float(np.median(a)) <= 320 and (
                 best is None or min(len(a), len(b)) > best[0]
@@ -284,7 +284,8 @@ def anchors(page: Page) -> tuple[list[tuple[Token, Token | None]], list[Token]]:
         for j in range(i + 1, len(found)):
             if numbers[j] >= numbers[run[-1]] and numbers[j] - numbers[run[-1]] <= 3:
                 run.append(j)
-        if len(run) > len(best):
+        # On a tie the lower run wins: the readings of the headings come first.
+        if len(run) >= len(best):
             best = run
     return [found[i] for i in best], totals
 
@@ -346,7 +347,7 @@ def table(page: Page, expected: int, share: bool | None = None) -> Table | None:
     """Reads the station rows of one page, with `expected` numeric columns right of the locations."""
     image = page.image
     keys, totals = anchors(page)
-    if len(keys) < 2:
+    if not keys:
         return None
     height = float(np.median([pd.y1 - pd.y0 for pd, _ in keys]))
     ys = [pd.yc for pd, _ in keys]
@@ -358,7 +359,11 @@ def table(page: Page, expected: int, share: bool | None = None) -> Table | None:
     top = page.height // 12
     label = min((t.y0 for t in totals if t.y0 > keys[0][0].y0), default=None)
     bottom = int(
-        min(max(last + height * 3.2, last + pitch * 6), label + height * 2.5 if label else 1e9, page.height - 40)
+        min(
+            max(last + height * 3.2, last + pitch * 6, last + page.height * 0.15),
+            label + height * 2.5 if label else 1e9,
+            page.height - 40,
+        )
     )
     body = int(max(top, keys[0][0].y0 - height))
     spans = []
