@@ -1,0 +1,79 @@
+{
+  "_note": "Transcribed by eye from the scanned pages of six reports whose PDFs carry no text layer. Votes and names are as printed; national identity numbers are left out.",
+  "3511 Hvalfjarðarsveit": {
+    "kind": "personal",
+    "registered": 532, "cast": 329, "valid": 321, "blank": 7, "invalid": 1,
+    "people": [
+      ["Andrea Ýr Arnarsdóttir", 241, 0], ["Helga Harðardóttir", 148, 0], ["Helgi Pétur Ottesen", 139, 0],
+      ["Elín Ósk Gunnarsdóttir", 116, 0], ["Inga María Sigurðardóttir", 116, 0], ["Ómar Kristófersson", 103, 0],
+      ["Birkir Snær Guðlaugsson", 96, 0], ["Ása Hólmarsdóttir", 85, 1], ["Dagný Hauksdóttir", 96, 2],
+      ["Sæmundur Víglundsson", 89, 3], ["Marie Greve Rasmussen", 82, 4], ["Salvör Lilja Brandsdóttir", 74, 5],
+      ["Ásgeir Pálmason", 71, 6], ["Haraldur Benediktsson", 71, 7]
+    ]
+  },
+  "3811 Dalabyggð": {
+    "kind": "personal",
+    "registered": 517, "cast": 319, "valid": 309, "blank": 8, "invalid": 2,
+    "people": [
+      ["Ingibjörg Þóranna Steinudóttir", 199, 0], ["Eyjólfur Ingvi Bjarnason", 195, 0],
+      ["Garðar Freyr Vilhjálmsson", 191, 0], ["Guðlaug Kristinsdóttir", 185, 0], ["Einar Jón Geirsson", 168, 0],
+      ["Þuríður Jóney Sigurðardóttir", 132, 0], ["Skúli Hreinn Guðbjörnsson", 132, 0],
+      ["Sindri Geir Sigurðarson", 97, 1], ["Alexandra Rut Jónsdóttir", 129, 2], ["Jón Egill Jónsson", 88, 3],
+      ["Ragnheiður Pálsdóttir", 81, 4], ["Anna Berglind Halldórsdóttir", 67, 5], ["Guðrún Erna Magnúsdóttir", 68, 6],
+      ["Bjarnheiður Jóhannsdóttir", 96, 7]
+    ]
+  },
+  "4803 Súðavíkurhreppur": {
+    "kind": "personal",
+    "registered": 175, "cast": 112, "valid": 111, "blank": 1, "invalid": 0,
+    "people": [
+      ["Bragi Þór Thoroddsen", 57, 0], ["Aníta Björk Pálínudóttir", 47, 0], ["Yordan Slavov Yordanov", 39, 0],
+      ["Jónas Ólafur Skúlason", 34, 0], ["Kristján Rúnar Kristjánsson", 34, 0], ["Eiríkur Valgeir Scott", 34, 1],
+      ["Kjartan Geir Karlsson", 33, 2], ["Dagbjört Sigrún Hjaltadóttir", 33, 3], ["Sigurdís Samúelsdóttir", 35, 4],
+      ["Anne Berit Vikse", 36, 5]
+    ]
+  },
+  "4902 Kaldrananeshreppur": {
+    "kind": "personal",
+    "registered": 92, "cast": 60, "valid": 59, "blank": 1, "invalid": 0,
+    "people": [
+      ["Finnur Ólafsson", 51, 0], ["Halldór Logi Friðgeirsson", 39, 0], ["Isabella B. Lundshöj Petersen", 31, 0],
+      ["Hildur Aradóttir", 27, 0], ["Arnlín Þ. Óladóttir", 22, 0], ["Franklin B. Qvarsson", 21, 1],
+      ["Ingólfur Arni Haraldsson", 22, 2], ["Bjarni Þórisson", 28, 3], ["Aðalbjörg Óskarsdóttir", 18, 4],
+      ["Sunna Einarsdóttir", 15, 5]
+    ]
+  },
+  "7505 Fljótsdalshreppur": {
+    "kind": "personal",
+    "registered": 85, "cast": 61, "valid": 58, "blank": 2, "invalid": 1,
+    "people": [
+      ["Jóhann Frímann Þórhallsson", 50, 0], ["Lárus Heiðarsson", 35, 0], ["Kjartan Benediktsson", 32, 0],
+      ["Halla Auðunsdóttir", 27, 0], ["Anna Jóna Árnmarsdóttir", 18, 0], ["Urður Gunnarsdóttir", 18, 1],
+      ["Guðni Jónsson", 18, 2], ["Sólrún Júlía Hjartardóttir Kjerúlf", 18, 3], ["Gunnar Gunnarsson", 17, 4],
+      ["Þórhallur Jóhannsson", 18, 5]
+    ]
+  },
+  "7300 Fjarðabyggð": {
+    "kind": "lists",
+    "registered": 3689, "cast": 2395, "valid": 2317, "blank": 67, "invalid": 11,
+    "lists": [
+      {"letter": "B", "label": "Framsóknarflokkur", "votes": 695, "seats": 3, "changed": 21,
+       "candidates": [
+         ["Jón Björn Hákonarson", "683.83", 1, 11], ["Þuríður Lillý Sigurðardóttir", "579.33", 2, 2],
+         ["Birgir Jónsson", "464.50", 3, 1], ["Arnfríður Eide Hafþórsdóttir", "348.83", 4, 1],
+         ["Elís Pétur Elísson", "230.50", 5, 9], ["Pálína Margeirsdóttir", "118.17", 6, 3]]},
+      {"letter": "D", "label": "Sjálfstæðisflokkur", "votes": 941, "seats": 4, "changed": 47,
+       "candidates": [
+         ["Ragnar Sigurðsson", "933.25", 1, 7], ["Kristinn Þór Jónasson", "811.13", 2, 14],
+         ["Þórdís Mjöll Benediktsdóttir", "702.13", 3, 8], ["Jóhanna Sigfúsdóttir", "590.75", 4, 2],
+         ["Heimir Snær Gylfason", "474.88", 5, 1], ["Sigurjón Rúnarsson", "357.13", 6, 1],
+         ["Guðbjörg Sandra Óðinsdóttir Hjelm", "239.38", 7, 0], ["Benedikt Jónsson", "121.75", 8, 0]]},
+      {"letter": "L", "label": "Fjarðarlistinn", "votes": 540, "seats": 2, "changed": 13,
+       "candidates": [
+         ["Stefán Þór Eysteinsson", "540.00", 1, 0], ["Hjördís Helga Seljan Þóroddsdóttir", "405.00", 2, 0],
+         ["Arndís Bára Pétursdóttir", "270.00", 3, 0], ["Birta Sæmundsdóttir", "134.25", 4, 3]]},
+      {"letter": "V", "label": "Vinstri hreyfingin grænt framboð", "votes": 141, "seats": 0, "changed": 0,
+       "candidates": []}
+    ]
+  }
+}
