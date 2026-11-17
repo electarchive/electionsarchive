@@ -3,14 +3,21 @@
 The Elections and Boundaries Department (now Commission) publishes one PDF per election with the result for each
 electoral division. The text layer of each PDF is read with `pdftotext -layout`, and every division is checked
 against its own printed totals: candidate votes plus rejected ballots must equal the votes cast.
+
+The returns for 1993 and 1998 are image-only scans. Their figures were read from the page images into
+`ebc_scans.json`, each with its page and bounding box (pixels of the page rendered at 100 dpi), and `scanned` checks
+them against the totals each return prints.
 """
 
 import functools
+import json
 import re
 import subprocess
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
+from pathlib import Path
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -21,11 +28,15 @@ PAGE = "https://elections.gov.bz/general-election-results/"
 BASE = "https://elections.gov.bz/wp-content/uploads"
 BELIZE = str(uuid5(package.NAMESPACE, "polity\x1fBZ"))
 VOTES, REGISTERED, CAST, INVALID = 1, 2, 3, 5
+VALID, VOTE_SHARE = 4, 13
+SHARES, DIGITIZED = 4, 8
 SCHEME = "bz.division"
 
 URLS = {
     "1979": f"{BASE}/2023/12/GENERAL-ELECTIONS-1979.pdf",
     "1984-1989": f"{BASE}/2025/03/Belize-General-Elections-Results-1984-and-1989.docx.pdf",
+    "1993": f"{BASE}/2023/12/1993-General-Election-Results.pdf",
+    "1998": f"{BASE}/2023/12/1998-General-Elections-Results.pdf",
     "2003": f"{BASE}/2023/12/2003-General-Elections-Results.pdf",
     "2008": f"{BASE}/2023/12/2008-General-Elections-Results.pdf",
     "2012": f"{BASE}/2023/12/2012-General-Elections-Results.pdf",
@@ -50,6 +61,10 @@ class Held:
     english: str
     printed: str | None = None
     note: str | None = None
+    date_to: date | None = None
+    precision: str = "day"
+    package: str | None = None
+    slug: str | None = None
 
 
 GENERAL_NOTE = (
@@ -66,6 +81,41 @@ HELD = (
         "1979 Belize general election",
         "24th November 1979",
         "The results page is headed 24th November 1979; the general election was held on 21 November 1979.",
+    ),
+    Held(
+        "1993",
+        date(1993, 6, 30),
+        "general",
+        "scan-1993",
+        ("1993",),
+        "1993 Belize general election",
+        None,
+        'The scanned return is headed only "Election results 1993" and prints no election date; the general '
+        "election was held on 30 June 1993.",
+    ),
+    Held(
+        "1993-freetown",
+        date(1993, 1, 1),
+        "by_election",
+        "scan-1993-freetown",
+        ("1993",),
+        "1993 Freetown by-election",
+        None,
+        "The scanned return prints no election date, only its source, the Gazette of 30 January 1993, so the day is "
+        "not stated; the by-election was held in January 1993.",
+        date(1993, 1, 31),
+        "month",
+        "1993-01",
+        "bz/1993-01-by-election-freetown",
+    ),
+    Held(
+        "1998",
+        date(1998, 8, 27),
+        "general",
+        "scan-1998",
+        ("1998",),
+        "1998 Belize general election",
+        "Thursday, 27 August, 1998",
     ),
     Held("1984", date(1984, 12, 14), "general", "ballots-1984", ("1984-1989",), "1984 Belize general election"),
     Held("1989", date(1989, 9, 4), "general", "ballots-1989", ("1984-1989",), "1989 Belize general election"),
@@ -184,9 +234,14 @@ ALIASES = {
 }
 PARTIAL = {"Lake", "Orange Walk", "Belize Rural", "Cayo North", "Corozal South", "Caribbean"}
 SUFFIX = {"Independence", "Central", "North", "South", "East", "West", "Shores"}
-PARTY_ALIASES = {"UPD": "UDP", "INDP": "IND", "NRTCP": "NRTCP"}
+PARTY_ALIASES = {"UPD": "UDP", "INDP": "IND", "NRTCP": "NRTCP", "P.U.P.": "PUP", "U.D.P.": "UDP"}
 INDEPENDENT = {"IND"}
-PARTY_NAMES = {"PUP": "People's United Party", "UDP": "United Democratic Party"}
+PARTY_NAMES = {
+    "PUP": "People's United Party",
+    "UDP": "United Democratic Party",
+    "PDP": "People's Democratic Party",
+    "NABR": "National Alliance for Belize Rights",
+}
 NUMBER = r"\d[\d,]*"
 
 
@@ -199,6 +254,12 @@ class Race:
     # (name, party label, votes, elected, uncontested)
     cands: list[tuple[str, str, int | None, bool, bool]] = field(default_factory=list)
     answers: dict[str, int] = field(default_factory=dict)
+    # scanned returns: valid votes (when printed as such), each candidate's printed share, and the page and box of each
+    # stored figure, keyed "registered", "cast", "rejected", "valid", or ("votes", position) and ("share", position)
+    valid: int | None = None
+    shares: list[str | None] = field(default_factory=list)
+    boxes: dict[object, tuple[int, list[int]]] = field(default_factory=dict)
+    derived_winner: bool = False
 
 
 def n(text: str) -> int:
@@ -627,18 +688,99 @@ NAME_FIXES = {
 COUNTED = {"2015-dangriga"}
 
 
+SCANS = json.loads(Path(__file__).with_name("ebc_scans.json").read_text())
+
+
+def scanned(key: str) -> list[Race]:
+    """The digitized returns of 1993 and 1998, checked division by division and against the national totals printed."""
+    data = SCANS[key]
+    found: list[Race] = []
+    for entry in data["divisions"]:
+        race = Race(canonical(entry["division"]))
+        for name in ("registered", "cast", "rejected", "valid"):
+            if name in entry:
+                setattr(race, name, entry[name][0])
+                race.boxes[name] = (entry["page"], entry[name][1])
+        for position, cand in enumerate(entry["candidates"]):
+            kind = "votes" if "votes" in cand else "share"
+            race.cands.append((cand["name"], cand["party"], cand.get("votes"), bool(cand.get("elected")), False))
+            race.shares.append(cand.get("share"))
+            race.boxes[(kind, position)] = (entry["page"], cand["box"])
+        found.append(race)
+        _check_division(key, race)
+    _check_national(key, data["printed"], found)
+    return found
+
+
+def _check_division(key: str, race: Race) -> None:
+    votes = [c[2] for c in race.cands]
+    if key == "1993":
+        # The return prints only percentages, so the winner is the candidate with the highest printed share.
+        shown = [Decimal(s) for s in race.shares if s is not None]
+        if len(shown) == len(race.shares) and abs(sum(shown) - 100) > Decimal("0.25"):
+            raise ValueError(f"{key} {race.division}: printed shares add up to {sum(shown)}")
+        best = max(range(len(shown)), key=lambda i: shown[i])
+        race.cands[best] = (*race.cands[best][:3], True, False)
+        race.derived_winner = True
+        return
+    total = sum(v for v in votes if v is not None)
+    if key == "1998" and total + (race.rejected or 0) != race.cast:
+        raise ValueError(f"{key} {race.division}: candidates {total} plus rejected {race.rejected} is not {race.cast}")
+    if key == "1993-freetown" and total != race.valid:
+        raise ValueError(f"{key} {race.division}: candidates {total} is not the printed total {race.valid}")
+    elected = [c for c in race.cands if c[3]]
+    if len(elected) != 1 or elected[0][2] != max(v for v in votes if v is not None):
+        raise ValueError(f"{key} {race.division}: the printed winner does not hold the most votes")
+    if key == "1993-freetown":
+        race.derived_winner = True
+
+
+def _check_national(key: str, printed: dict, found: list[Race]) -> None:
+    """Compare the divisions' sums with the totals the return prints; 1993's candidates carry shares only."""
+    sums: defaultdict[str, float] = defaultdict(float)
+    for race in found:
+        sums["registered"] += race.registered or 0
+        sums["cast"] += race.cast or 0
+        sums["rejected"] += race.rejected or 0
+        sums["valid"] += race.valid or 0
+        shown = sum(Decimal(s) for s in race.shares if s is not None)
+        for (_, label, votes, _, _), share in zip(race.cands, race.shares, strict=True):
+            party = party_of(label)
+            if votes is not None:
+                sums[party] += votes
+            elif race.valid is not None:
+                # an illegible share is taken as the rest of the division, for this comparison only
+                rest = Decimal(share) if share is not None else 100 - shown
+                sums[party] += float(rest * race.valid / 100)
+    if key == "1998":
+        sums["valid"] = sums["cast"] - sums["rejected"]
+    for name in ("registered", "cast", "rejected", "valid"):
+        if name in printed and not (key == "1993" and name == "rejected") and sums[name] != printed[name]:
+            raise ValueError(f"{key}: divisions add up to {name} {sums[name]}, the return prints {printed[name]}")
+    # 1993's shares are rounded to a tenth of a percent, so each party's implied votes may differ by a few dozen
+    slack = 60 if key == "1993" else 0
+    for party in printed["parties"].keys() | {p for p in sums if p.isupper() and p not in printed["parties"]}:
+        if party in ("registered", "cast", "rejected", "valid"):
+            continue
+        if abs(sums[party] - printed["parties"].get(party, 0)) > slack:
+            raise ValueError(
+                f"{key}: {party} votes add up to {sums[party]}, the return prints {printed['parties'].get(party)}"
+            )
+
+
 def races(held: Held) -> list[Race]:
-    body = text(held.files[0])
-    if held.layout == "modern":
-        found = modern(body)
+    if held.layout.startswith("scan-"):
+        found = scanned(held.layout.removeprefix("scan-"))
+    elif held.layout == "modern":
+        found = modern(text(held.files[0]))
     elif held.layout == "inline":
-        found = inline(body, {})
+        found = inline(text(held.files[0]), {})
     elif held.layout == "block":
-        found = block(body)
+        found = block(text(held.files[0]))
     elif held.layout.startswith("ballots-"):
-        found = ballots(body, int(held.layout[-4:]))
+        found = ballots(text(held.files[0]), int(held.layout[-4:]))
     else:
-        found = referendum(body)
+        found = referendum(text(held.files[0]))
     for race in found:
         for position, (name, party, votes, rem, unc) in enumerate(race.cands):
             party = PARTY_FIXES.get((held.key, race.division, position), party)
@@ -668,10 +810,11 @@ def party(label: str) -> str:
     return key("party", party_of(label))
 
 
-def days() -> dict[date, list[Held]]:
-    found: dict[date, list[Held]] = {}
+def days() -> dict[str, list[Held]]:
+    """The elections grouped into packages, named by their day (or by their month, where the day is not known)."""
+    found: dict[str, list[Held]] = {}
     for held in HELD:
-        found.setdefault(held.day, []).append(held)
+        found.setdefault(held.package or str(held.day), []).append(held)
     return found
 
 
@@ -764,7 +907,7 @@ METHOD = (
 )
 
 
-def build(day: date) -> Package:
+def build(day: str) -> Package:
     held = days()[day]
     p = Package(
         f"{SOURCE}/{day}",
@@ -777,7 +920,14 @@ def build(day: date) -> Package:
         for name in h.files:
             p.uses(raw.cached(SOURCE, url(name)))
         _election(p, h)
-    if day == date(2008, 2, 7):
+    if day == "1993-06-30":
+        p.accept(
+            "accounting.votes_valid",
+            "the scanned return prints each candidate's percentage of the votes but no candidate counts, so a "
+            "division's valid votes (its printed total votes) have no candidate votes to add up to; the shares are "
+            "stored as printed instead",
+        )
+    if day == "2008-02-07":
         p.accept(
             "accounting.declared",
             "the referendum results page prints national totals that differ from the sum of its own divisional rows: "
@@ -791,15 +941,17 @@ def build(day: date) -> Package:
 def _election(p: Package, held: Held) -> None:
     election = key("election", held.key)
     label = {"general": "general", "by_election": "by-election", "referendum": "referendum"}[held.kind]
-    path = f"bz/{held.day}-{label}" + (f"-{held.key.split('-', 1)[1]}" if held.kind == "by_election" else "")
+    path = held.slug or f"bz/{held.day}-{label}" + (
+        f"-{held.key.split('-', 1)[1]}" if held.kind == "by_election" else ""
+    )
     p.add(
         "election",
         id=election,
         polity_id=BELIZE,
         kind=held.kind,
         date_from=held.day,
-        date_to=held.day,
-        date_precision="day",
+        date_to=held.date_to or held.day,
+        date_precision=held.precision,
         original_text=held.printed,
         status="held",
     )
@@ -808,6 +960,8 @@ def _election(p: Package, held: Held) -> None:
     if held.note:
         p.add("note", id=key("note", election), entity_id=election, kind="caveat", body_md=held.note, lang="en")
     found = races(held)
+    if held.layout.startswith("scan-"):
+        _pages(p, held)
     units: dict[str, str] = {}
     for race in found:
         unit = units[race.division] = key("unit", held.key, race.division)
@@ -828,7 +982,16 @@ def _election(p: Package, held: Held) -> None:
             _contest(p, held, election, path, race, units[race.division])
 
 
-def _put(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
+def _put(
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    value: int | Decimal | None,
+    flags: int = 0,
+    where: tuple[str, list[int]] | None = None,
+) -> None:
     if value is None:
         return
     p.add(
@@ -839,9 +1002,46 @@ def _put(p: Package, result_set: str, unit: str, option: str | None, measure: in
         channel=0,
         measure=measure,
         count_round=0,
-        flags=0,
+        flags=flags,
         value=value,
     )
+    if where is not None:
+        page, (x0, y0, x1, y1) = where
+        p.add(
+            "value_locator",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            page_id=page,
+            source_id=None,
+            x0=x0,
+            y0=y0,
+            x1=x1,
+            y1=y1,
+        )
+
+
+def _page(p: Package, held: Held, number: int) -> str:
+    return p.id("page", raw.cached(SOURCE, url(held.files[0])).sha256, number)
+
+
+def _pages(p: Package, held: Held) -> None:
+    """Register the pages of a scanned return; boxes are in pixels of each page rendered at 100 dpi."""
+    stored = raw.cached(SOURCE, url(held.files[0]))
+    artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{EBC_SOURCE}\x1f{stored.storage_key}"))
+    for number, (width, height) in SCANS[held.layout.removeprefix("scan-")]["pages"].items():
+        p.add(
+            "source_page",
+            id=_page(p, held, int(number)),
+            artifact_id=artifact,
+            page_number=int(number),
+            image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
+            width=width,
+            height=height,
+        )
 
 
 def _result_set(p: Package, tag: str, election: str, contest: str, tacit: bool, method: str) -> str:
@@ -860,6 +1060,36 @@ def _result_set(p: Package, tag: str, election: str, contest: str, tacit: bool, 
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     return result_set
+
+
+DIGITIZED_METHOD = (
+    "Digitized from the Department's scanned return: every figure was read from the page image, checked against the "
+    "totals the return prints, and keeps its page and bounding box."
+)
+SCAN_METHOD = {
+    "1998": (
+        f"{METHOD} {DIGITIZED_METHOD} Each division's candidates' votes plus its spoilt and rejected ballots equal "
+        "its votes cast. Percentages are not stored."
+    ),
+    "1993": (
+        "Counted for each electoral division and published by the Elections and Boundaries Department. "
+        f"{DIGITIZED_METHOD} The return prints each candidate's percentage of the votes but no candidate counts, so "
+        "the shares are stored as printed, to a tenth of a percent, and no counts are derived from them. A "
+        "division's total votes are stored as valid votes: the 29 divisional totals add up to the 70,431 votes the "
+        "return prints as the total voted, and the 499 rejected ballots it prints are given for the country only."
+    ),
+    "1993-freetown": (
+        f"Counted for the electoral division and published by the Elections and Boundaries Department. "
+        f"{DIGITIZED_METHOD} The return prints the votes polled, which do not include its 7 spoilt and rejected "
+        "ballots, so they are stored as valid votes. Percentages are not stored."
+    ),
+}
+SCAN_WINNER = {
+    "1993": (
+        " The return does not mark the winners; the candidate with the highest printed share is stored as elected."
+    ),
+    "1993-freetown": " The return does not mark the winner; the candidate with the most votes is stored as elected.",
+}
 
 
 def _contest(p: Package, held: Held, election: str, path: str, race: Race, unit: str) -> None:
@@ -891,6 +1121,23 @@ def _contest(p: Package, held: Held, election: str, path: str, race: Race, unit:
             "Counted for the electoral division and published by the Elections and Boundaries Department. The "
             "Department prints the votes counted, which exclude rejected ballots, so they are stored as valid votes."
         )
+    scan = held.layout.startswith("scan-")
+    shared = any(share is not None for share in race.shares)
+    if scan:
+        method = SCAN_METHOD[held.key]
+        if race.derived_winner:
+            method += SCAN_WINNER[held.key]
+        if shared and None in race.shares:
+            method += (
+                " The return prints ERR in place of one candidate's percentage in this division, so no share is "
+                "stored for that candidate."
+            )
+    flags = DIGITIZED if scan else 0
+
+    def at(name: object) -> tuple[str, list[int]] | None:
+        found = race.boxes.get(name) if scan else None
+        return None if found is None else (_page(p, held, found[0]), found[1])
+
     result_set = _result_set(p, tag, election, contest, uncontested, method)
     for position, (name, label, votes, elected, _) in enumerate(race.cands):
         option = key("option", tag, position)
@@ -921,16 +1168,25 @@ def _contest(p: Package, held: Held, election: str, path: str, race: Race, unit:
             )
         if uncontested or elected:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
-        if not uncontested:
-            _put(p, result_set, unit, option, VOTES, votes)
+        if uncontested:
+            continue
+        if shared:
+            share = race.shares[position]
+            if share is not None:
+                _put(
+                    p, result_set, unit, option, VOTE_SHARE, Decimal(share), DIGITIZED | SHARES, at(("share", position))
+                )
+        else:
+            _put(p, result_set, unit, option, VOTES, votes, flags, at(("votes", position)))
     if uncontested:
         return
     if held.key in COUNTED:
         _put(p, result_set, unit, None, 4, race.cast)
     else:
-        _put(p, result_set, unit, None, CAST, race.cast)
-    _put(p, result_set, unit, None, REGISTERED, race.registered)
-    _put(p, result_set, unit, None, INVALID, race.rejected)
+        _put(p, result_set, unit, None, CAST, race.cast, flags, at("cast"))
+    _put(p, result_set, unit, None, VALID, race.valid, flags, at("valid"))
+    _put(p, result_set, unit, None, REGISTERED, race.registered, flags, at("registered"))
+    _put(p, result_set, unit, None, INVALID, race.rejected, flags, at("rejected"))
 
 
 REFERENDUM_METHOD = (
