@@ -39,6 +39,34 @@
    "url": "https://www.izbori.ba/Documents/Documents/Rezultati%20izbora%2096-2002/98results/seats_allocation_all.pdf",
    "kind": "official_body"
   },
+  "rez_2002": {
+   "title": "Opći izbori 2002, potvrđeni rezultati (puna verzija)",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/?Lang=3&CategoryId=227&Tag=113",
+   "kind": "official_body",
+   "note": "Results by race as PDF files, one per electoral unit."
+  },
+  "rez_2006": {
+   "title": "Opći izbori 2006, potvrđeni rezultati",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/rezultati/konacni/",
+   "kind": "official_body",
+   "note": "Results site by race, electoral unit, municipality, and polling station."
+  },
+  "rez_2010": {
+   "title": "Opći izbori 2010, potvrđeni rezultati",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Finalni2010/Finalni/PredsjednistvoBiH/Default.aspx",
+   "kind": "official_body",
+   "note": "Results application by race, electoral unit, municipality, and polling station."
+  },
+  "rez_2014": {
+   "title": "Opći izbori 2014, potvrđeni rezultati",
+   "publisher": "Centralna izborna komisija Bosne i Hercegovine",
+   "url": "https://www.izbori.ba/Potvrdjeni2014/Finalni/PredsjednistvoBiH/Default.aspx",
+   "kind": "official_body",
+   "note": "Results application by race, electoral unit, municipality, and polling station."
+  },
   "pokazatelji": {
    "title": "Election indicators 2002-2014",
    "publisher": "Centralna izborna komisija Bosne i Hercegovine",
@@ -485,32 +513,32 @@
      "contests": 10,
      "seats": 42,
      "note": "Eight constituencies plus two compensatory lists.",
-     "source": "izborni_zakon",
-     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+     "source": "rez_2002",
+     "quote": "PartijskiGlasoviIzborneJedinice-511 ... -515 and -521 ... -523 (8 electoral units)"
     },
     {
      "date": "2006-10-01",
      "contests": 10,
      "seats": 42,
      "note": "Eight constituencies plus two compensatory lists.",
-     "source": "izborni_zakon",
-     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+     "source": "rez_2006",
+     "quote": "parlament_bih: 511 ... 515 and 521 ... 523 (8 electoral units); 501 and 502 - ZBIRNI REZULTATI"
     },
     {
      "date": "2010-10-03",
      "contests": 10,
      "seats": 42,
-     "note": "Eight constituencies plus two compensatory lists.",
-     "source": "izborni_zakon",
-     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+     "note": "Eight constituencies electing 30 plus 12 compensatory seats.",
+     "source": "rez_2010",
+     "quote": "511 - IZBORNA JEDINICA 1 3 ZASTUPNIKA / PREDSTAVNIKA ... 523 - IZBORNA JEDINICA 3 3 ZASTUPNIKA"
     },
     {
      "date": "2014-10-12",
      "contests": 10,
      "seats": 42,
-     "note": "Eight constituencies plus two compensatory lists.",
-     "source": "izborni_zakon",
-     "quote": "Art. 9.1-9.2a: 42 members, 21 from five Federation constituencies plus 7 compensatory, 9 from three Republika Srpska constituencies plus 5 compensatory"
+     "note": "Eight constituencies electing 30 plus 12 compensatory seats.",
+     "source": "rez_2014",
+     "quote": "511 - IZBORNA JEDINICA 1 3 ZASTUPNIKA / PREDSTAVNIKA ... 523 - IZBORNA JEDINICA 3 3 ZASTUPNIKA"
     },
     {
      "date": "2018-10-07",
@@ -608,7 +636,7 @@
     "unit": "contest"
    },
    "finest_note": "Polling-station results from 2014 in the JSON service.",
-   "note": "140 members until 2000, 98 since 2002. List PR in twelve constituencies plus a compensatory list since 2000; one Federation-wide list in 1996 and 1998. Constituency counts for 2002-2014 are not yet confirmed from the CEC's HTML sites.",
+   "note": "140 members until 2000, 98 since 2002. List PR in twelve constituencies plus a compensatory list since 2000; one Federation-wide list in 1996 and 1998. The CEC's 2002-2014 result sites confirm the twelve constituencies.",
    "source": "izborni_zakon",
    "valid_from": "1996-09-14",
    "first_held": "1996-09-14",
@@ -700,27 +728,35 @@
     },
     {
      "date": "2002-10-05",
+     "contests": 13,
      "seats": 98,
-     "source": "izborni_zakon",
-     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+     "note": "Twelve constituencies plus the compensatory list.",
+     "source": "rez_2002",
+     "quote": "PartijskiGlasoviIzborneJedinice-401 ... -412 (12 electoral units)"
     },
     {
      "date": "2006-10-01",
+     "contests": 13,
      "seats": 98,
-     "source": "izborni_zakon",
-     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+     "note": "Twelve constituencies plus the compensatory list.",
+     "source": "rez_2006",
+     "quote": "parlament_fbih: 401 - IZBORNA JEDINICA 1 ... 412 - IZBORNA JEDINICA 12; 400 - ZBIRNI REZULTATI, Broj mjesta za dodjelu 98"
     },
     {
      "date": "2010-10-03",
+     "contests": 13,
      "seats": 98,
-     "source": "izborni_zakon",
-     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+     "note": "Twelve constituencies electing 73 plus 25 compensatory seats.",
+     "source": "rez_2010",
+     "quote": "401 - IZBORNA JEDINICA 1 9 ZASTUPNIKA ... 412 - IZBORNA JEDINICA 12 3 ZASTUPNIKA"
     },
     {
      "date": "2014-10-12",
+     "contests": 13,
      "seats": 98,
-     "source": "izborni_zakon",
-     "quote": "Art. 10.1-10.2: 98 members elected from at least ten multi-member constituencies, 23-27% of them compensatory mandates from the Federation as a whole"
+     "note": "Twelve constituencies electing 73 plus 25 compensatory seats.",
+     "source": "rez_2014",
+     "quote": "401 - IZBORNA JEDINICA 1 9 ZASTUPNIKA ... 412 - IZBORNA JEDINICA 12 3 ZASTUPNIKA"
     },
     {
      "date": "2018-10-07",
@@ -840,7 +876,7 @@
     "unit": "contest"
    },
    "finest_note": "Polling-station results from 2014 in the JSON service.",
-   "note": "83 members by list PR. One list for the whole entity in 1996-1998, six constituencies plus a compensatory list in 2000, nine constituencies plus a compensatory list by 2018. The November 1997 early election was run by the OSCE Provisional Election Commission.",
+   "note": "83 members by list PR. One list for the whole entity in 1996-1998, six constituencies plus a compensatory list from 2000 to 2010, and nine constituencies plus a compensatory list since 2014. The November 1997 early election was run by the OSCE Provisional Election Commission.",
    "source": "izborni_zakon",
    "valid_from": "1996-09-14",
    "first_held": "1996-09-14",
@@ -936,27 +972,35 @@
     },
     {
      "date": "2002-10-05",
+     "contests": 7,
      "seats": 83,
-     "source": "izborni_zakon",
-     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+     "note": "Six constituencies plus the compensatory list.",
+     "source": "rez_2002",
+     "quote": "PartijskiGlasoviIzborneJedinice-301 ... -306 (6 electoral units)"
     },
     {
      "date": "2006-10-01",
+     "contests": 7,
      "seats": 83,
-     "source": "izborni_zakon",
-     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+     "note": "Six constituencies plus the compensatory list.",
+     "source": "rez_2006",
+     "quote": "narodna_skupstina_rs: 301 ... 306 (6 electoral units); 300 - ZBIRNI REZULTATI, Broj mjesta za dodjelu 83"
     },
     {
      "date": "2010-10-03",
+     "contests": 7,
      "seats": 83,
-     "source": "izborni_zakon",
-     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+     "note": "Six constituencies electing 62 plus 21 compensatory seats.",
+     "source": "rez_2010",
+     "quote": "301 - IZBORNA JEDINICA 1 13 ZASTUPNIKA ... 306 - IZBORNA JEDINICA 6 7 ZASTUPNIKA"
     },
     {
      "date": "2014-10-12",
+     "contests": 10,
      "seats": 83,
-     "source": "izborni_zakon",
-     "quote": "Art. 11.1-11.2: 83 members elected from at least six multi-member constituencies, 23-27% of them compensatory mandates from the Republika Srpska as a whole"
+     "note": "Nine constituencies plus the compensatory list.",
+     "source": "rez_2014",
+     "quote": "301 - IZBORNA JEDINICA 1 7 ZASTUPNIKA ... 309 - IZBORNA JEDINICA 9 7 ZASTUPNIKA"
     },
     {
      "date": "2018-10-07",
@@ -1356,8 +1400,9 @@
     {
      "date": "2006-10-01",
      "contests": 10,
-     "source": "izborni_zakon",
-     "quote": "Art. 13.3: between 20 and 35 members per Cantonal Assembly by registered voters"
+     "seats": 289,
+     "source": "rez_2006",
+     "quote": "kantoni: 201 - SKUPŠTINA KANTONA 1 ... 210 - SKUPŠTINA KANTONA 10 (Broj mjesta za dodjelu 30, 21, 35, 35, 25, 30, 30, 23, 35, 25)"
     },
     {
      "date": "2010-10-03",
@@ -1369,8 +1414,9 @@
     {
      "date": "2014-10-12",
      "contests": 10,
-     "source": "izborni_zakon",
-     "quote": "Art. 13.3: between 20 and 35 members per Cantonal Assembly by registered voters"
+     "seats": 289,
+     "source": "rez_2014",
+     "quote": "201 - UNSKO - SANSKI KANTON 30 ZASTUPNIKA ... 210 - KANTON 10 25 ZASTUPNIKA (289 seats)"
     },
     {
      "date": "2018-10-07",
