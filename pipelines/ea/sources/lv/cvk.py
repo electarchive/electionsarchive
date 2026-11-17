@@ -908,9 +908,12 @@ TN_SLUGS = {
     "2007-07-07": "par-grozijumu-nacionalas-drosibas-likuma-un-valsts-drosibas-iestazu-likuma-atcelsanu-2007",
     "2008-08-02": "par-grozijumiem-satversme-2008",
     "2008-08-23": "par-grozijumu-likuma-par-valsts-pensijam-2008",
+    "1991-03-03": "iedzivotaju-aptauja-par-latvijas-republikas-neatkaribu",
 }
 TN_AGAINST = ("Pret", "Against")
 TN_FOR = ("Par", "For")
+TN_YES = ("Jā", "Yes")
+TN_NO = ("Nē", "No")
 TN_FOR_REPEAL = ("Par atcelšanu", "For repeal")
 TN_AGAINST_REPEAL = ("Pret atcelšanu", "Against repeal")
 
@@ -934,6 +937,21 @@ class Vote:
 
 
 TN: dict[str, Vote] = {
+    "1991-03-03": Vote(
+        "1991 Latvian independence poll",
+        "1991. gada iedzīvotāju aptauja par Latvijas Republikas neatkarību",
+        [
+            Question(
+                "question",
+                "Are you for a democratic and independent Republic of Latvia?",
+                "Vai jūs esat par demokrātisku un valstiski neatkarīgu Latvijas Republiku?",
+                "plebiscite",
+                (TN_YES, TN_NO),
+                {2: 1902802, 14: 1666128, 5: 27192},
+                (1227562, 411374),
+            )
+        ],
+    ),
     "1998-10-03": Vote(
         "1998 Latvian referendum on the repeal of the amendments to the Citizenship Law",
         "1998. gada tautas nobalsošana par likuma „Grozījumi Pilsonības likumā” atcelšanu",
@@ -1045,6 +1063,7 @@ TN_METHOD_2003 = (
     "ballots between the polling station and the voter's location; the split is not stored here."
 )
 TN_FIGURES = {
+    2: "Registered voters are the residents entered in the poll's lists.",
     14: "Voters are the voters who took part.",
     3: "Ballots cast are the ballot papers found in the ballot boxes; the commission counts them as the voters who "
     "took part.",
@@ -1168,7 +1187,7 @@ def referendum_archive(day: str) -> Package:
             method = TN_METHOD_2003
         else:
             method = TN_METHOD.format(
-                figures=" ".join(TN_FIGURES[m] for m in sorted(question.figures, key=lambda m: (m != 14, m)))
+                figures=" ".join(TN_FIGURES[m] for m in sorted(question.figures, key=lambda m: (m != 14, m != 2, m)))
             )
             if question.votes is None:
                 method += " The page does not print the votes for and against."
