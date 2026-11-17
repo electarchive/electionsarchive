@@ -1,0 +1,2062 @@
+{
+ "polity": "MD",
+ "name": "Moldova",
+ "sources": {
+  "constitution": {
+   "title": "Constituția Republicii Moldova, adoptată la 29 iulie 1994",
+   "publisher": "Registrul de stat al actelor juridice (legis.md)",
+   "url": "https://www.legis.md/cautare/getResults?doc_id=145723&lang=ro",
+   "kind": "official_body"
+  },
+  "cod_2022": {
+   "title": "Codul electoral nr. 325/2022",
+   "publisher": "Registrul de stat al actelor juridice (legis.md)",
+   "url": "https://www.legis.md/cautare/getResults?doc_id=155595&lang=ro",
+   "kind": "official_body"
+  },
+  "lege_764": {
+   "title": "Legea nr. 764/2001 privind organizarea administrativ-teritorială a Republicii Moldova",
+   "publisher": "Registrul de stat al actelor juridice (legis.md)",
+   "url": "https://www.legis.md/cautare/getResults?doc_id=149266&lang=ro",
+   "kind": "official_body"
+  },
+  "lege_436": {
+   "title": "Legea nr. 436/2006 privind administrația publică locală",
+   "publisher": "Registrul de stat al actelor juridice (legis.md)",
+   "url": "https://www.legis.md/cautare/getResults?doc_id=155118&lang=ro",
+   "kind": "official_body"
+  },
+  "cec_history": {
+   "title": "Historical background",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/en/historical-background-2767.html",
+   "kind": "official_body"
+  },
+  "cec_alegeri": {
+   "title": "Alegeri şi referendumuri (arhiva scrutinelor)",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-si-referendumuri-2830.html",
+   "kind": "official_body"
+  },
+  "cec_ps2009a": {
+   "title": "Alegeri parlamentare din 05.04.2009",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/5-aprilie-2009-2859.html",
+   "kind": "official_body"
+  },
+  "cec_ps2009b": {
+   "title": "Alegeri parlamentare din 29.07.2009",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/29-iulie-2009-2843.html",
+   "kind": "official_body"
+  },
+  "cec_ps2010": {
+   "title": "Alegeri parlamentare din 28.11.2010",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/28-noiembrie-2010-2837.html",
+   "kind": "official_body"
+  },
+  "cec_ps2014": {
+   "title": "Alegeri parlamentare din 30.11.2014",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/30-noiembrie-2014-3010.html",
+   "kind": "official_body"
+  },
+  "cec_ps2019": {
+   "title": "Alegeri parlamentare din 24.02.2019",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/24-februarie-2019-3660.html",
+   "kind": "official_body"
+  },
+  "cec_psn2019": {
+   "title": "Alegeri parlamentare noi din 20.10.2019",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-parlamentare-noi-4585.html",
+   "kind": "official_body"
+  },
+  "cec_psn2020": {
+   "title": "Alegeri parlamentare noi din 15.03.2020",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/15-martie-2020-6234.html",
+   "kind": "official_body"
+  },
+  "cec_ps2021": {
+   "title": "Alegeri parlamentare din 11.07.2021",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/11-iulie-2021-8251.html",
+   "kind": "official_body"
+  },
+  "cec_ps2025": {
+   "title": "Alegeri parlamentare din 28.09.2025",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/28-septembrie-2025-18166.html",
+   "kind": "official_body"
+  },
+  "cec_pr2016": {
+   "title": "Alegeri prezidențiale din 30.10.2016",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/13-noiembrie-2016-3134.html",
+   "kind": "official_body"
+  },
+  "cec_pr2020": {
+   "title": "Alegeri prezidențiale din 01.11.2020",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/01-noiembrie-2020-7078.html",
+   "kind": "official_body"
+  },
+  "cec_pr2024": {
+   "title": "Alegeri prezidențiale din 20.10.2024",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/20-octombrie-2024-18425.html",
+   "kind": "official_body"
+  },
+  "cec_ref2017": {
+   "title": "Referendumuri 2017",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/referendumuri-2017-3212.html",
+   "kind": "official_body"
+  },
+  "cec_ref2019": {
+   "title": "Referendum din 24.02.2019",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/24-februarie-2019-3943.html",
+   "kind": "official_body"
+  },
+  "cec_ref2024": {
+   "title": "Referendum republican constituțional din 20.10.2024",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/referendum-republican-constitutional-20-octombrie-2024-16225.html",
+   "kind": "official_body"
+  },
+  "cec_loc1999": {
+   "title": "Alegeri locale generale din 23.05.1999",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/23-mai-1999-3281.html",
+   "kind": "official_body"
+  },
+  "cec_loc2003": {
+   "title": "Alegeri locale generale din 25.05.2003",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/25-mai-2003-3296.html",
+   "kind": "official_body"
+  },
+  "cec_loc2007": {
+   "title": "Alegeri locale generale din 03.06.2007",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/3-iunie-2007-3312.html",
+   "kind": "official_body"
+  },
+  "cec_loc2011": {
+   "title": "Alegeri locale generale din 05.06.2011",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/5-iunie-2011-2908.html",
+   "kind": "official_body"
+  },
+  "cec_loc2015": {
+   "title": "Alegeri locale generale din 14.06.2015",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/14-iunie-2015-3049.html",
+   "kind": "official_body"
+  },
+  "cec_loc2019": {
+   "title": "Alegeri locale generale din 20.10.2019",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/20-octombrie-2019-4847.html",
+   "kind": "official_body"
+  },
+  "cec_loc2023": {
+   "title": "Alegeri locale generale din 05.11.2023",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/05-noiembrie-2023-14547.html",
+   "kind": "official_body"
+  },
+  "cec_loc2023_raport": {
+   "title": "Raportul Comisiei Electorale Centrale privind rezultatele organizării și desfășurării alegerilor locale generale din 5 noiembrie 2023",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/storage/ckfinder/files/2355_Anexa_Raport%20ALG%205%20nov%202023.pdf",
+   "kind": "official_body"
+  },
+  "cec_loc2023_ce": {
+   "title": "Numărul circumscripțiilor electorale și secțiilor de votare (alegerile locale generale din 5 noiembrie 2023)",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/numarul-circumscriptiilor-electorale-si-sectiilor-de-votare-15130.html",
+   "kind": "official_body"
+  },
+  "cec_aln": {
+   "title": "Alegeri noi (alegeri locale noi)",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-noi-2836.html",
+   "kind": "official_body"
+  },
+  "cec_reg2023": {
+   "title": "Alegeri regionale din 30.04.2023",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-regionale-din-30042023-14278.html",
+   "kind": "official_body"
+  },
+  "cec_reg2026": {
+   "title": "Alegeri regionale din 15.11.2026 (Adunarea Populară a Găgăuziei)",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-regionale-din-15112026-23956.html",
+   "kind": "official_body"
+  },
+  "cec_md_workbooks": {
+   "title": "Election results workbooks published by the Central Electoral Commission",
+   "publisher": "Comisia Electorală Centrală a Republicii Moldova",
+   "url": "https://a.cec.md/index.php/ro/alegeri-si-referendumuri-2830.html",
+   "kind": "official_body"
+  },
+  "nsg_history": {
+   "title": "История Народного Собрания Гагаузии (история созывов)",
+   "publisher": "Народное Собрание Гагаузии (Halk Topluşu)",
+   "url": "https://halktoplushu.md/istoriya",
+   "kind": "official_body"
+  },
+  "cc_h7_2016": {
+   "title": "Hotărârea nr. 7 din 04.03.2016 privind controlul constituţionalităţii unor prevederi ale Legii nr. 1115-XIV din 5 iulie 2000 cu privire la modificarea şi completarea Constituţiei",
+   "publisher": "Curtea Constituțională a Republicii Moldova",
+   "url": "https://constcourt.md/ccdocview.php?l=ro&tip=hotariri&docid=558",
+   "kind": "official_body"
+  },
+  "cc_h30_2020": {
+   "title": "Hotărârea nr. 30 din 10.12.2020 cu privire la confirmarea rezultatelor alegerilor și la validarea mandatului de Președinte al Republicii Moldova",
+   "publisher": "Curtea Constituțională a Republicii Moldova",
+   "url": "https://constcourt.md/ccdocview.php?l=ro&tip=hotariri&docid=751",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republica Moldova",
+   "name_en": "Republic of Moldova",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "nivel2",
+   "name": "Unități administrativ-teritoriale de nivelul al doilea (raioane, municipiile Chișinău și Bălți)",
+   "name_en": "Second-level units (districts and the municipalities of Chișinău and Bălți)",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "md.raion",
+   "source": "lege_764",
+   "counts": [
+    {
+     "date": "2023-11-05",
+     "value": 34,
+     "source": "cec_loc2023_raport",
+     "locator": "Raport ALG 2023, cap. 3: în cele 32 de consilii raionale ... cele 2 consilii municipale Chișinău și Bălți (1086 consilieri de nivelul al doilea)"
+    }
+   ]
+  },
+  {
+   "key": "nivel1",
+   "name": "Unități administrativ-teritoriale de nivelul întâi (municipii, orașe, comune, sate)",
+   "name_en": "First-level units (municipalities, towns, communes, and villages)",
+   "parent": "nivel2",
+   "polity_kind": "municipality",
+   "scheme": "md.localitate",
+   "source": "lege_764",
+   "counts": [
+    {
+     "date": "2023-11-05",
+     "value": 896,
+     "source": "cec_loc2023_ce",
+     "locator": "Numărul CE de nivelul întâi constituite în CE de nivelul doi: Total 896 (35 circumscripții de nivelul al doilea, inclusiv UTA Găgăuzia nr. 36)"
+    }
+   ]
+  },
+  {
+   "key": "uta_gagauzia",
+   "name": "Unitatea teritorială autonomă Găgăuzia (Gagauz Yeri)",
+   "name_en": "Autonomous Territorial Unit of Gagauzia",
+   "parent": "national",
+   "polity_kind": "region",
+   "source": "lege_764",
+   "valid_from": "1995-01-14",
+   "counts": [
+    {
+     "date": "2023-11-05",
+     "value": 1,
+     "source": "cec_loc2023_ce",
+     "locator": "35. CE UTA Găgăuzia nr. 36 (26 circumscripții de nivelul întâi)"
+    }
+   ]
+  },
+  {
+   "key": "judet",
+   "name": "Județe (1999-2003)",
+   "name_en": "Counties (1999-2003)",
+   "parent": "national",
+   "polity_kind": "county",
+   "source": "cec_loc1999",
+   "valid_from": "1999-01-01",
+   "valid_to": "2003-05-25"
+  },
+  {
+   "key": "stinga_nistrului",
+   "name": "Unitățile administrativ-teritoriale din stînga Nistrului",
+   "name_en": "Administrative-territorial units on the left bank of the Dniester (Transnistria)",
+   "parent": "national",
+   "polity_kind": "region",
+   "elects": false,
+   "source": "lege_764"
+  },
+  {
+   "key": "rssm",
+   "name": "Republica Sovietică Socialistă Moldovenească",
+   "name_en": "Moldavian Soviet Socialist Republic",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "source": "cec_history",
+   "valid_from": "1940-08-02",
+   "valid_to": "1991-08-27"
+  }
+ ],
+ "classes": [
+  {
+   "key": "parlament",
+   "tier": "national",
+   "name": "Alegeri parlamentare (circumscripția națională)",
+   "name_en": "Parliament elections (national list)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "world.country"
+    ],
+    "fine": [
+     "md.circumscription",
+     "md.sv"
+    ]
+   },
+   "finest_note": "One national constituency; the CEC publishes results by polling station (workbooks since 2014, PDF protocols for 2009-2010), grouped in level-two circumscriptions with separate ones abroad and for the left bank of the Dniester.",
+   "note": "101 deputies (104 in 1994) in one national constituency by closed-list PR (D'Hondt) with legal thresholds that varied by election; four-year term. In 2019 only 50 seats were list seats.",
+   "source": "constitution",
+   "valid_from": "1994-02-27",
+   "first_held": "1994-02-27",
+   "earliest_record": "1994-02-27",
+   "est_votes": 17000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1994-02-27",
+     "administered_by": "Comisia Electorală Centrală a Republicii Moldova",
+     "source": "cod_2022",
+     "locator": "Codul electoral nr. 325/2022, Titlul III (alegerea Parlamentului); Constituția, art. 61-63 (mandat de 4 ani)",
+     "vacancy_rule": "A vacant list seat passes to the next candidate on the same list"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/upload/{hash}/{page_id}/attached_files",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2014-11-30",
+     "finest": "md.sv",
+     "evidence": "Polling-station workbooks for 2014, 2021, and 2025 linked from each election's page; read by the md.cec pipeline.",
+     "source": "cec_md_workbooks",
+     "license": "Official publication; reuse terms are not stated"
+    },
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/rezultatele-alegerilor-2850.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2009-04-05",
+     "finest": "md.sv",
+     "evidence": "Polling-station tables of the 2010 election in two PDF volumes (Electorala 2010); the 2009 pages carry scanned protocols.",
+     "source": "cec_ps2010",
+     "license": "Official publication; reuse terms are not stated",
+     "last_date": "2010-11-28"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "1994-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-02-27",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 104,
+     "source": "cec_history",
+     "quote": "there was established a new Central Electoral Commission for the early elections to the Parliament that were set for 27 February 1994",
+     "note": "Early election; 104 seats in one national constituency (Constitution of 1994, art. 60)."
+    },
+    {
+     "date": "1998-03-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_history",
+     "quote": "the Commission organised and conducted the parliamentary elections on 22 March 1998"
+    },
+    {
+     "date": "2001-02-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_history",
+     "quote": "early parliamentary elections on 25 February 2001",
+     "note": "Early election."
+    },
+    {
+     "date": "2005-03-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_history",
+     "quote": "there was established the date of 6 March 2005 for parliamentary elections"
+    },
+    {
+     "date": "2009-04-05",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2009a",
+     "quote": "Alegeri parlamentare din 05.04.2009"
+    },
+    {
+     "date": "2009-07-29",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2009b",
+     "quote": "Alegeri parlamentare din 29.07.2009",
+     "note": "Early election after Parliament failed to elect a president."
+    },
+    {
+     "date": "2010-11-28",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2010",
+     "quote": "Alegeri parlamentare din 28.11.2010",
+     "note": "Early election."
+    },
+    {
+     "date": "2014-11-30",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2014",
+     "quote": "Alegeri parlamentare din 30.11.2014"
+    },
+    {
+     "date": "2019-02-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 50,
+     "source": "cec_ps2019",
+     "quote": "Alegeri parlamentare din 24.02.2019",
+     "note": "Mixed system: 50 seats by national list (this class) and 51 in single-member districts (parlament_uninominal)."
+    },
+    {
+     "date": "2021-07-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2021",
+     "quote": "Alegeri parlamentare din 11.07.2021",
+     "note": "Early election."
+    },
+    {
+     "date": "2025-09-28",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 101,
+     "source": "cec_ps2025",
+     "quote": "Alegeri parlamentare din 28.09.2025"
+    }
+   ]
+  },
+  {
+   "key": "parlament_uninominal",
+   "tier": "national",
+   "name": "Alegeri parlamentare (circumscripții uninominale, 2019-2021)",
+   "name_en": "Parliament elections in single-member districts (2019-2021)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "md.circumscription_uninominal"
+    ],
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "51 single-member districts (48 in Moldova proper and on the left bank, 3 abroad); scanned district and polling-station protocols.",
+   "note": "The mixed system of Law 154/2017 elected 51 deputies by plurality in single-member districts in 2019; new elections filled vacant districts in October 2019 and March 2020. Law 200/2019 restored full list PR.",
+   "source": "cec_ps2019",
+   "valid_from": "2019-02-24",
+   "valid_to": "2021-07-11",
+   "first_held": "2019-02-24",
+   "earliest_record": "2019-02-24",
+   "est_votes": 1600000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/procese-verbale-scanate-circumscriptii-uninominale-4292.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-02-24",
+     "finest": "md.sv",
+     "evidence": "Scanned protocols for every single-member district; totals pages per district.",
+     "source": "cec_ps2019",
+     "license": "Official publication; reuse terms are not stated",
+     "last_date": "2020-03-15"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "office",
+      "body_seats"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "2019-01-01",
+     "valid_to": "2021-07-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-02-24",
+     "election_kind": "general",
+     "contests": 51,
+     "seats": 51,
+     "source": "cec_ps2019",
+     "quote": "Procese- verbale scanate_Circumscripții uninominale"
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "by_election",
+     "contests": 4,
+     "seats": 4,
+     "source": "cec_psn2019",
+     "quote": "Alegeri parlamentare noi: Circumscripția uninominală nr. 17, or. Nisporeni; nr. 33, mun. Chișinău; nr. 48, or. Slobozia, mun. Tiraspol și Bender; nr. 50, la vest de Republica Moldova"
+    },
+    {
+     "date": "2020-03-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "cec_psn2020",
+     "quote": "Circumscripția uninominală nr. 38, mun. Hîncești"
+    }
+   ]
+  },
+  {
+   "key": "soviet_suprem_1990",
+   "tier": "rssm",
+   "name": "Sovietul Suprem al RSS Moldovenești (Parlamentul de legislatura XII, 1990)",
+   "name_en": "Supreme Soviet of the Moldavian SSR elected in 1990 (first Parliament)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "First competitive election: 380 deputies in single-member districts by two-round majority in February and March 1990; the body proclaimed independence and served as Parliament until 1994.",
+   "source": "cec_history",
+   "valid_from": "1990-01-01",
+   "valid_to": "1994-02-27",
+   "first_held": "1990-02-25",
+   "est_votes": 2500000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "The CEC of 1989-1993 published no results that survive online; district returns sit only in the 1990 official gazette and the Supreme Soviet's records, which have not been located.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "1990-01-01",
+     "valid_to": "1994-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-01-01",
+     "election_kind": "general",
+     "precision": "year",
+     "source": "cec_history",
+     "quote": "This Central Electoral Commission ... was in charge with conducting the parliamentary elections since 1990",
+     "note": "First round 25 February 1990, runoffs in March."
+    }
+   ]
+  },
+  {
+   "key": "soviet_suprem_rssm",
+   "tier": "rssm",
+   "name": "Sovietul Suprem al RSS Moldovenești (1941-1985)",
+   "name_en": "Supreme Soviet of the Moldavian SSR (1941-1985)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-candidate Soviet elections in single-member districts, every four years from 1941 (five from 1979).",
+   "source": "cec_history",
+   "valid_from": "1940-08-02",
+   "valid_to": "1990-01-01",
+   "disposition": "blocked",
+   "disposition_reason": "Uncontested single-list elections whose district returns are only in Soviet-era gazettes; no official publication is online.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MD",
+     "valid_to": "1990-01-01"
+    }
+   ]
+  },
+  {
+   "key": "soviete_locale_rssm",
+   "tier": "rssm",
+   "name": "Sovietele locale de deputați ai poporului (RSSM)",
+   "name_en": "Local soviets of the Moldavian SSR",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "District, city, and village soviets elected by Soviet single-candidate rules, last in 1990 with the Supreme Soviet; replaced by the councils elected in April 1995.",
+   "source": "cec_history",
+   "valid_from": "1940-08-02",
+   "valid_to": "1995-04-16",
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of local soviet returns is online."
+  },
+  {
+   "key": "presedinte",
+   "tier": "national",
+   "name": "Alegeri prezidențiale",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "world.country"
+    ],
+    "fine": [
+     "md.circumscription",
+     "md.sv"
+    ]
+   },
+   "finest_note": "Polling-station workbooks for 2016 and 2024; result pages for 2020.",
+   "note": "Direct two-round election (majority of votes cast) in 1991 and 1996; Parliament elected the president from 2001 to 2012 (presedinte_parlament); the Constitutional Court restored direct election on 4 March 2016. Four-year term.",
+   "source": "constitution",
+   "valid_from": "1991-12-08",
+   "first_held": "1991-12-08",
+   "earliest_record": "2016-10-30",
+   "est_votes": 15000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "The two leading candidates go to a second round two weeks later when nobody wins a majority of votes cast in the first",
+     "valid_from": "2016-03-04",
+     "administered_by": "Comisia Electorală Centrală a Republicii Moldova",
+     "source": "cc_h7_2016",
+     "locator": "Hotărârea CC nr. 7/2016 (restoring art. 78 of the Constitution in its 1994 wording)",
+     "vacancy_rule": "The Speaker acts as president and a new election follows within two months"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/upload/{hash}/{page_id}/attached_files",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2016-10-30",
+     "finest": "md.sv",
+     "evidence": "Polling-station workbooks for both rounds of 2016 and 2024; read by the md.cec pipeline.",
+     "source": "cec_md_workbooks",
+     "license": "Official publication; reuse terms are not stated"
+    },
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/rezultate-alegeri-turul-i-7695.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2020-11-01",
+     "finest": "md.circumscription",
+     "evidence": "Result pages for both rounds of 2020.",
+     "source": "cec_pr2020",
+     "license": "Official publication; reuse terms are not stated",
+     "last_date": "2020-11-15"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MD",
+     "valid_to": "2001-01-01"
+    },
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "2016-03-04"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-12-01",
+     "election_kind": "general",
+     "precision": "month",
+     "contests": 1,
+     "source": "cec_history",
+     "quote": "was in charge with conducting ... presidential elections since December 1991",
+     "note": "Uncontested election of 8 December 1991."
+    },
+    {
+     "date": "1996-11-17",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_history",
+     "quote": "On 17 November 1996 presidential elections took place in the Republic of Moldova"
+    },
+    {
+     "date": "1996-12-01",
+     "election_kind": "runoff",
+     "note": "Second round; date not yet read from an official text."
+    },
+    {
+     "date": "2016-10-30",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_pr2016",
+     "quote": "Alegeri prezidențiale din 30.10.2016"
+    },
+    {
+     "date": "2016-11-13",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cec_pr2016",
+     "quote": "13 noiembrie 2016"
+    },
+    {
+     "date": "2020-11-01",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_pr2020",
+     "quote": "Alegeri prezidențiale din 01.11.2020"
+    },
+    {
+     "date": "2020-11-15",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cc_h30_2020",
+     "quote": "Hotărârea nr. 30 din 10.12.2020 cu privire la confirmarea rezultatelor alegerilor și la validarea mandatului de Președinte",
+     "note": "Second round of 15 November 2020."
+    },
+    {
+     "date": "2024-10-20",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_pr2024",
+     "quote": "Alegeri prezidențiale din 20.10.2024"
+    },
+    {
+     "date": "2024-11-03",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "cec_pr2024",
+     "quote": "Alegeri prezidențiale din 20.10.2024, turul II"
+    }
+   ]
+  },
+  {
+   "key": "presedinte_parlament",
+   "tier": "national",
+   "name": "Alegerea Președintelui de către Parlament (2001-2012)",
+   "name_en": "Election of the President by Parliament (2001-2012)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under Law 1115/2000 Parliament elected the president by three fifths of deputies (61 votes); failed rounds in 2000 and 2009 forced early parliamentary elections. Ballots: 2001, 2005, 2009 (failed), 2011-2012.",
+   "source": "cc_h7_2016",
+   "valid_from": "2000-07-05",
+   "valid_to": "2016-03-04",
+   "est_votes": 1500,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-12-01",
+     "election_kind": "indirect",
+     "precision": "month",
+     "note": "Failed rounds; Parliament was dissolved."
+    },
+    {
+     "date": "2001-04-04",
+     "election_kind": "indirect",
+     "note": "Date not yet read from Parliament's record."
+    },
+    {
+     "date": "2005-04-04",
+     "election_kind": "indirect",
+     "note": "Date not yet read from Parliament's record."
+    },
+    {
+     "date": "2009-05-01",
+     "election_kind": "indirect",
+     "precision": "month",
+     "note": "Failed rounds of May and June 2009."
+    },
+    {
+     "date": "2009-11-01",
+     "election_kind": "indirect",
+     "precision": "month",
+     "note": "Failed rounds of November and December 2009."
+    },
+    {
+     "date": "2011-01-01",
+     "election_kind": "indirect",
+     "precision": "year",
+     "note": "Failed round of 16 December 2011."
+    },
+    {
+     "date": "2012-03-16",
+     "election_kind": "indirect",
+     "note": "Date not yet read from Parliament's record."
+    }
+   ]
+  },
+  {
+   "key": "referendum_republican",
+   "tier": "national",
+   "name": "Referendumuri republicane",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "world.country"
+    ],
+    "fine": [
+     "md.circumscription",
+     "md.sv"
+    ]
+   },
+   "finest_note": "Polling-station workbooks for 2019 and 2024.",
+   "note": "Constitutional, legislative, and consultative referendums (Constitution art. 75 and 141-143; Electoral Code). A 1994 consultative poll on statehood, consultative votes in 1999 and 2019, the 2010 constitutional referendum (void for low turnout), and the 2024 constitutional referendum on EU accession. The consultative referendum called for 24 September 2017 was annulled before polling day.",
+   "source": "constitution",
+   "first_held": "1994-03-06",
+   "earliest_record": "2019-02-24",
+   "est_votes": 8000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/upload/{hash}/{page_id}/attached_files",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2019-02-24",
+     "finest": "md.sv",
+     "evidence": "Polling-station workbooks for the 2019 and 2024 referendums; read by the md.cec pipeline.",
+     "source": "cec_md_workbooks",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-03-06",
+     "election_kind": "referendum",
+     "note": "Consultative poll on independent statehood; date and count not yet read from an official text."
+    },
+    {
+     "date": "1999-05-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_history",
+     "quote": "the consultative republican referendum on 23 May 1999"
+    },
+    {
+     "date": "2010-09-05",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_history",
+     "quote": "a consultative republican referendum on 5 September 2010",
+     "note": "Constitutional referendum on direct presidential election; void for turnout below one third."
+    },
+    {
+     "date": "2019-02-24",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cec_ref2019",
+     "quote": "Referendum din 24.02.2019"
+    },
+    {
+     "date": "2024-10-20",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cec_ref2024",
+     "quote": "Referendum republican constituțional din 20.10.2024"
+    }
+   ]
+  },
+  {
+   "key": "primar",
+   "tier": "nivel1",
+   "name": "Alegerea primarilor",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "md.localitate"
+    ],
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "Each level-one unit is one circumscription; scanned protocols by polling station.",
+   "note": "Mayors of every village, commune, town, and municipality, the general mayor of Chișinău, and the mayor of Bălți, by two-round majority (a turnout floor applied to both rounds until 2023, to the first only since).",
+   "source": "lege_436",
+   "valid_from": "1995-04-16",
+   "first_held": "1995-04-16",
+   "earliest_record": "2015-06-14",
+   "contests_per_unit": 1,
+   "est_votes": 14000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1995-04-16",
+     "administered_by": "Comisia Electorală Centrală a Republicii Moldova and level-two and level-one district electoral councils",
+     "source": "lege_436",
+     "locator": "Legea nr. 436/2006, art. 11 (numărul de consilieri); Codul electoral nr. 325/2022, Titlul IV (alegerile locale), mandat de 4 ani",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the list; a vacant mayoralty is filled at the next new local elections (alegeri locale noi), held twice a year"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/05-noiembrie-2023-14547.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-06-14",
+     "finest": "md.sv",
+     "evidence": "Scanned district and polling-station protocols for both rounds (2015, 2019, 2023), lists of elected mayors (xlsx) and councillors (xlsx, docx); lists of elected councillors only for 1999-2007.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    },
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://rezultate.cec.md/",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-11-05",
+     "finest": "md.sv",
+     "evidence": "Final results site of the 2023 local elections; answered 403 to a scripted request on 2026-11-17.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-04-16",
+     "election_kind": "local",
+     "source": "cec_history",
+     "quote": "on 16 April 1995 there were conducted the first local elections since the proclamation of independence"
+    },
+    {
+     "date": "1999-05-23",
+     "election_kind": "local",
+     "source": "cec_loc1999",
+     "quote": "Alegeri locale generale din 23.05.1999"
+    },
+    {
+     "date": "2003-05-25",
+     "election_kind": "local",
+     "source": "cec_loc2003",
+     "quote": "Alegeri locale generale din 25.05.2003"
+    },
+    {
+     "date": "2007-06-03",
+     "election_kind": "local",
+     "source": "cec_loc2007",
+     "quote": "Alegeri locale generale din 03.06.2007"
+    },
+    {
+     "date": "2011-06-05",
+     "election_kind": "local",
+     "source": "cec_loc2011",
+     "quote": "Alegeri locale generale din 05.06.2011"
+    },
+    {
+     "date": "2015-06-14",
+     "election_kind": "local",
+     "source": "cec_loc2015",
+     "quote": "Alegeri locale generale din 14.06.2015"
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "local",
+     "source": "cec_loc2019",
+     "quote": "Alegeri locale generale din 20.10.2019"
+    },
+    {
+     "date": "2023-11-05",
+     "election_kind": "local",
+     "contests": 898,
+     "seats": 898,
+     "source": "cec_loc2023_raport",
+     "quote": "alegătorii și-au dat votul pentru primarul general al municipiului Chișinău, primarul municipiului Bălți, precum și primarii celor 896 localități de nivelul întâi ... Primar 898"
+    }
+   ]
+  },
+  {
+   "key": "consiliu_local",
+   "tier": "nivel1",
+   "name": "Alegerea consiliilor locale de nivelul întâi",
+   "name_en": "Village, commune, town, and municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "md.localitate"
+    ],
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "Each level-one unit is one circumscription; scanned protocols by polling station.",
+   "note": "Councils of 9 to 27 members by population (CEC decision before each election), by closed-list PR.",
+   "source": "lege_436",
+   "valid_from": "1995-04-16",
+   "first_held": "1995-04-16",
+   "earliest_record": "2015-06-14",
+   "est_votes": 10000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1995-04-16",
+     "administered_by": "Comisia Electorală Centrală a Republicii Moldova and level-two and level-one district electoral councils",
+     "source": "lege_436",
+     "locator": "Legea nr. 436/2006, art. 11 (numărul de consilieri); Codul electoral nr. 325/2022, Titlul IV (alegerile locale), mandat de 4 ani",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the list; a vacant mayoralty is filled at the next new local elections (alegeri locale noi), held twice a year"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/05-noiembrie-2023-14547.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-06-14",
+     "finest": "md.sv",
+     "evidence": "Scanned district and polling-station protocols for both rounds (2015, 2019, 2023), lists of elected mayors (xlsx) and councillors (xlsx, docx); lists of elected councillors only for 1999-2007.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    },
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://rezultate.cec.md/",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-11-05",
+     "finest": "md.sv",
+     "evidence": "Final results site of the 2023 local elections; answered 403 to a scripted request on 2026-11-17.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-04-16",
+     "election_kind": "local",
+     "source": "cec_history",
+     "quote": "on 16 April 1995 there were conducted the first local elections since the proclamation of independence"
+    },
+    {
+     "date": "1999-05-23",
+     "election_kind": "local",
+     "source": "cec_loc1999",
+     "quote": "Alegeri locale generale din 23.05.1999"
+    },
+    {
+     "date": "2003-05-25",
+     "election_kind": "local",
+     "source": "cec_loc2003",
+     "quote": "Alegeri locale generale din 25.05.2003"
+    },
+    {
+     "date": "2007-06-03",
+     "election_kind": "local",
+     "source": "cec_loc2007",
+     "quote": "Alegeri locale generale din 03.06.2007"
+    },
+    {
+     "date": "2011-06-05",
+     "election_kind": "local",
+     "source": "cec_loc2011",
+     "quote": "Alegeri locale generale din 05.06.2011"
+    },
+    {
+     "date": "2015-06-14",
+     "election_kind": "local",
+     "source": "cec_loc2015",
+     "quote": "Alegeri locale generale din 14.06.2015"
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "local",
+     "source": "cec_loc2019",
+     "quote": "Alegeri locale generale din 20.10.2019"
+    },
+    {
+     "date": "2023-11-05",
+     "election_kind": "local",
+     "contests": 896,
+     "seats": 9972,
+     "source": "cec_loc2023_raport",
+     "quote": "Consilier în consiliul local de nivelul întâi (municipale/orășenești/comunale/sătești) 9972"
+    }
+   ]
+  },
+  {
+   "key": "consiliu_raional",
+   "tier": "nivel2",
+   "name": "Alegerea consiliilor raionale și municipale (nivelul al doilea)",
+   "name_en": "District and municipal council elections (Chișinău, Bălți, and 32 districts)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "md.raion"
+    ],
+    "fine": [
+     "md.localitate",
+     "md.sv"
+    ]
+   },
+   "finest_note": "Each level-two unit is one circumscription; scanned protocols by level-one circumscription and polling station.",
+   "note": "District councils of 27 to 35 members and the municipal councils of Chișinău (51) and Bălți (35) by closed-list PR; the old districts in 1995, the counties in 1999 (consiliu_judetean), the districts again from 2003.",
+   "source": "lege_436",
+   "valid_from": "1995-04-16",
+   "first_held": "1995-04-16",
+   "earliest_record": "2015-06-14",
+   "est_votes": 9000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1995-04-16",
+     "administered_by": "Comisia Electorală Centrală a Republicii Moldova and level-two and level-one district electoral councils",
+     "source": "lege_436",
+     "locator": "Legea nr. 436/2006, art. 11 (numărul de consilieri); Codul electoral nr. 325/2022, Titlul IV (alegerile locale), mandat de 4 ani",
+     "vacancy_rule": "A vacant council seat passes to the next candidate on the list; a vacant mayoralty is filled at the next new local elections (alegeri locale noi), held twice a year"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/05-noiembrie-2023-14547.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-06-14",
+     "finest": "md.sv",
+     "evidence": "Scanned district and polling-station protocols for both rounds (2015, 2019, 2023), lists of elected mayors (xlsx) and councillors (xlsx, docx); lists of elected councillors only for 1999-2007.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    },
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://rezultate.cec.md/",
+     "format": "html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-11-05",
+     "finest": "md.sv",
+     "evidence": "Final results site of the 2023 local elections; answered 403 to a scripted request on 2026-11-17.",
+     "source": "cec_loc2023",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "iso_pattern": "MD",
+     "valid_to": "1999-01-01"
+    },
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "2003-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-04-16",
+     "election_kind": "local",
+     "source": "cec_history",
+     "quote": "on 16 April 1995 there were conducted the first local elections since the proclamation of independence"
+    },
+    {
+     "date": "2003-05-25",
+     "election_kind": "local",
+     "source": "cec_loc2003",
+     "quote": "Alegeri locale generale din 25.05.2003"
+    },
+    {
+     "date": "2007-06-03",
+     "election_kind": "local",
+     "source": "cec_loc2007",
+     "quote": "Alegeri locale generale din 03.06.2007"
+    },
+    {
+     "date": "2011-06-05",
+     "election_kind": "local",
+     "source": "cec_loc2011",
+     "quote": "Alegeri locale generale din 05.06.2011"
+    },
+    {
+     "date": "2015-06-14",
+     "election_kind": "local",
+     "source": "cec_loc2015",
+     "quote": "Alegeri locale generale din 14.06.2015"
+    },
+    {
+     "date": "2019-10-20",
+     "election_kind": "local",
+     "source": "cec_loc2019",
+     "quote": "Alegeri locale generale din 20.10.2019"
+    },
+    {
+     "date": "2023-11-05",
+     "election_kind": "local",
+     "contests": 34,
+     "seats": 1086,
+     "source": "cec_loc2023_raport",
+     "quote": "în cele 32 de consilii raionale ... cele 2 consilii municipale Chișinău și Bălți ... Consilier în consiliul local de nivelul al doilea 1086"
+    }
+   ]
+  },
+  {
+   "key": "consiliu_judetean",
+   "tier": "judet",
+   "name": "Alegerea consiliilor județene (1999)",
+   "name_en": "County council elections (1999)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The 1998 reform (Law 191/1998) replaced the districts with counties and the municipality of Chișinău; their councils were elected once, on 23 May 1999, by closed-list PR. Law 764/2001 restored the districts in 2003.",
+   "source": "cec_loc1999",
+   "valid_from": "1999-01-01",
+   "valid_to": "2003-05-25",
+   "first_held": "1999-05-23",
+   "est_votes": 1200000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/23-mai-1999-3281.html",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1999-05-23",
+     "evidence": "Only the list of elected county councillors; no vote counts.",
+     "source": "cec_loc1999",
+     "license": "Official publication; reuse terms are not stated",
+     "last_date": "1999-05-23"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "iso_pattern": "MD",
+     "valid_from": "1999-01-01",
+     "valid_to": "2003-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-05-23",
+     "election_kind": "local",
+     "source": "cec_loc1999",
+     "quote": "Lista consilierilor județeni"
+    }
+   ]
+  },
+  {
+   "key": "alegeri_locale_noi",
+   "tier": "nivel1",
+   "name": "Alegeri locale noi",
+   "name_en": "New local elections (mayoral and council by-elections)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "md.localitate"
+    ],
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "Scanned protocols and result pages per circumscription on each round's CEC page.",
+   "note": "Elections to fill vacant mayoralties and dissolved councils, held on fixed days in spring and autumn (two rounds for mayors); the Chișinău mayoral elections of 2005 failed four times for low turnout.",
+   "source": "cec_aln",
+   "valid_from": "1995-04-16",
+   "earliest_record": "2010-05-01",
+   "est_votes": 600000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/alegeri-noi-2836.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-05-01",
+     "finest": "md.sv",
+     "evidence": "Each new-elections page links scanned protocols and, since 2020, a results page.",
+     "source": "cec_aln",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "MD"
+    },
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "county"
+     ],
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2005-11-27",
+     "election_kind": "by_election",
+     "source": "cec_history",
+     "quote": "organising the elections of the mayor of Chişinău municipality, scheduled for 27 November 2005"
+    },
+    {
+     "date": "2010-05-01",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 01.05.2010"
+    },
+    {
+     "date": "2011-11-13",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 13.11.2011"
+    },
+    {
+     "date": "2012-05-13",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 13.05.2012"
+    },
+    {
+     "date": "2012-11-25",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 25.11.2012"
+    },
+    {
+     "date": "2013-05-19",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 19.05.2013"
+    },
+    {
+     "date": "2013-11-10",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 10.11.2013"
+    },
+    {
+     "date": "2014-05-01",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 01.05.2014"
+    },
+    {
+     "date": "2015-11-15",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 15.11.2015"
+    },
+    {
+     "date": "2016-05-15",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 15.05.2016"
+    },
+    {
+     "date": "2016-10-30",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 30.10.2016"
+    },
+    {
+     "date": "2017-05-14",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 14.05.2017"
+    },
+    {
+     "date": "2017-11-19",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 19.11.2017"
+    },
+    {
+     "date": "2018-05-20",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 20.05.2018"
+    },
+    {
+     "date": "2020-09-06",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 06.09.2020"
+    },
+    {
+     "date": "2020-11-01",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 01.11.2020"
+    },
+    {
+     "date": "2021-11-21",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 21.11.2021"
+    },
+    {
+     "date": "2022-05-29",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 29.05.2022"
+    },
+    {
+     "date": "2022-10-16",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 16.10.2022"
+    },
+    {
+     "date": "2024-05-19",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 19.05.2024"
+    },
+    {
+     "date": "2024-11-17",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 17.11.2024"
+    },
+    {
+     "date": "2025-05-18",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 18.05.2025"
+    },
+    {
+     "date": "2025-11-16",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 16.11.2025"
+    },
+    {
+     "date": "2026-05-17",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 17.05.2026"
+    },
+    {
+     "date": "2026-11-01",
+     "election_kind": "by_election",
+     "source": "cec_alegeri",
+     "quote": "Alegeri locale noi din 01.11.2026"
+    }
+   ]
+  },
+  {
+   "key": "referendum_local",
+   "tier": "nivel1",
+   "name": "Referendumuri locale",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "md.localitate"
+    ],
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "Scanned protocols and the CEC's report for each referendum.",
+   "note": "Referendums of a level-one or level-two unit, chiefly to recall a mayor; valid with a third of voters taking part. The Chișinău referendum of 19 November 2017 voted on recalling the general mayor.",
+   "source": "cod_2022",
+   "earliest_record": "2012-10-21",
+   "est_votes": 300000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/referendumuri-2017-3212.html",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2012-10-21",
+     "finest": "md.sv",
+     "evidence": "Each local referendum page links scanned protocols and a results report.",
+     "source": "cec_ref2017",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "local"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "county"
+     ],
+     "iso_pattern": "MD",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2012-10-21",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 21.10.2012"
+    },
+    {
+     "date": "2013-07-07",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 07.07.2013"
+    },
+    {
+     "date": "2013-12-29",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 29.12.2013"
+    },
+    {
+     "date": "2014-05-01",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 01.05.2014"
+    },
+    {
+     "date": "2014-06-01",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 01.06.2014"
+    },
+    {
+     "date": "2016-10-30",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 30.10.2016"
+    },
+    {
+     "date": "2017-11-19",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 19.11.2017"
+    },
+    {
+     "date": "2026-05-17",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 17.05.2026"
+    },
+    {
+     "date": "2026-06-21",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 21.06.2026"
+    },
+    {
+     "date": "2026-11-01",
+     "election_kind": "referendum",
+     "source": "cec_alegeri",
+     "quote": "Referendum din 01.11.2026"
+    }
+   ]
+  },
+  {
+   "key": "adunarea_populara_gagauzia",
+   "tier": "uta_gagauzia",
+   "name": "Alegerea Adunării Populare a Găgăuziei (Halk Topluşu)",
+   "name_en": "People's Assembly of Gagauzia elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "finest_note": "35 single-member districts.",
+   "note": "35 deputies by two-round majority in single-member districts for four years, under the autonomy's own electoral code; run by Gagauzia's Central Electoral Commission, inside the national electoral system since the Electoral Code of 2022 (the CEC publishes the 2026 election).",
+   "source": "nsg_history",
+   "valid_from": "1995-01-14",
+   "first_held": "1995-05-28",
+   "est_votes": 600000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "runoff": "majority",
+     "administered_by": "Consiliul Electoral Central al Găgăuziei, under the Comisia Electorală Centrală a Republicii Moldova since 2023",
+     "source": "nsg_history",
+     "locator": "Народное Собрание Гагаузии состоит из 35 депутатов ... Срок полномочий депутата — четыре года"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/alegeri-regionale-din-15112026-23956.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2026-11-15",
+     "evidence": "CEC page of the 2026 election; results not yet posted on 2026-11-17. Earlier results sit with Gagauzia's own electoral commission, whose site did not answer.",
+     "source": "cec_reg2026",
+     "license": "Official publication; reuse terms are not stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "name_pattern": "Găgăuz|Gagauz|Гагауз",
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-05-28",
+     "election_kind": "general",
+     "source": "nsg_history",
+     "quote": "Выборы депутатов НСГ I созыва прошли 28 мая и 11 июня 1995 года"
+    },
+    {
+     "date": "1999-08-22",
+     "election_kind": "general",
+     "source": "nsg_history",
+     "quote": "Выборы депутатов НСГ II созыва прошли 22 августа и 5 сентября 1999 года"
+    },
+    {
+     "date": "2003-11-16",
+     "election_kind": "general",
+     "contests": 35,
+     "seats": 35,
+     "source": "nsg_history",
+     "quote": "Выборы депутатов НСГ прошли 16 и 30 ноября 2003 года по мажоритарной системе в 35 округах"
+    },
+    {
+     "date": "2008-01-01",
+     "election_kind": "general",
+     "precision": "year",
+     "note": "Fourth convocation (2008-2012); date not yet read from an official text."
+    },
+    {
+     "date": "2012-09-09",
+     "election_kind": "general",
+     "contests": 35,
+     "seats": 35,
+     "source": "nsg_history",
+     "quote": "Выборы депутатов НСГ V созыва прошли в сентябре 2012 года (9 и 23 сентября) по 35 одномандатным округам"
+    },
+    {
+     "date": "2016-11-20",
+     "election_kind": "general",
+     "source": "nsg_history",
+     "quote": "Выборы депутатов Народного Собрания Гагаузии VI созыва прошли в два этапа 20 ноября и 4 декабря 2016"
+    },
+    {
+     "date": "2021-09-19",
+     "election_kind": "general",
+     "source": "nsg_history",
+     "quote": "Выборы депутатов Народного Собрания Гагаузии прошли в два этапа 19 сентября и 3 октября 2021 года"
+    },
+    {
+     "date": "2026-11-15",
+     "election_kind": "general",
+     "contests": 35,
+     "seats": 35,
+     "source": "cec_reg2026",
+     "quote": "Alegeri regionale din 15.11.2026: Alegeri pentru Adunarea Populară a Găgăuziei"
+    }
+   ]
+  },
+  {
+   "key": "bascan_gagauzia",
+   "tier": "uta_gagauzia",
+   "name": "Alegerea Guvernatorului (Bașcanului) Găgăuziei",
+   "name_en": "Governor (Bashkan) of Gagauzia elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "md.sv"
+    ]
+   },
+   "note": "Directly elected head of the autonomy by two-round majority for four years; the Bashkan is also a member of the national government. Elections in 1995, 1999, 2002, 2006, 2010, 2015, 2019, and 2023.",
+   "source": "lege_764",
+   "valid_from": "1995-01-14",
+   "first_held": "1995-05-28",
+   "est_votes": 700000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": true,
+     "runoff": "majority",
+     "administered_by": "Consiliul Electoral Central al Găgăuziei, under the Comisia Electorală Centrală a Republicii Moldova since 2023",
+     "source": "cec_reg2023",
+     "locator": "Alegeri regionale din 30.04.2023"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Comisia Electorală Centrală (a.cec.md)",
+     "url": "https://a.cec.md/index.php/ro/alegeri-regionale-din-30042023-14278.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-04-30",
+     "evidence": "CEC page of the 2023 election with campaign reports only; results are with Gagauzia's electoral commission.",
+     "source": "cec_reg2023",
+     "license": "Official publication; reuse terms are not stated",
+     "last_date": "2023-05-14"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "name_pattern": "Găgăuz|Gagauz|Гагауз",
+     "iso_pattern": "MD"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-01-01",
+     "election_kind": "general",
+     "through": "2019-12-31",
+     "note": "Elections of 1995, 1999, 2002, 2006, 2010, 2015, and 2019; not yet counted from an official text."
+    },
+    {
+     "date": "2023-04-30",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "cec_reg2023",
+     "quote": "Alegeri regionale din 30.04.2023"
+    }
+   ]
+  },
+  {
+   "key": "referendum_gagauzia",
+   "tier": "uta_gagauzia",
+   "name": "Referendumuri în UTA Găgăuzia",
+   "name_en": "Gagauzia referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "The local referendums of 5 March 1995 that fixed which localities joined the autonomy, and the regional vote of 2 February 2014 on foreign policy and secession, which Moldovan courts declared unlawful.",
+   "source": "lege_764",
+   "valid_from": "1995-01-14",
+   "disposition": "blocked",
+   "disposition_reason": "Results were published only by Gagauzia's own electoral commission, whose site did not answer from here; the 2014 vote was held against a court ban and has no national publication.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "name_pattern": "Găgăuz|Gagauz|Гагауз",
+     "iso_pattern": "MD"
+    }
+   ]
+  },
+  {
+   "key": "transnistria_de_facto",
+   "tier": "stinga_nistrului",
+   "name": "Alegeri organizate de autoritățile de facto din stînga Nistrului",
+   "name_en": "Elections held by the de facto authorities of Transnistria",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "lege_764",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held outside Moldovan law by an unrecognized administration; Moldova's own elections cover left-bank voters at special polling stations on the right bank, which the national classes already count."
+  },
+  {
+   "key": "guvern_indirect",
+   "tier": "national",
+   "name": "Alegeri indirecte (Prim-ministru, Președintele Parlamentului, președinții de raion, viceprimari)",
+   "name_en": "Indirect elections of the Prime Minister, Speaker, district presidents, and deputy mayors",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by votes of Parliament or of the councils, not at a public election; the President is the only indirect office the census tracks (presedinte_parlament)."
+  },
+  {
+   "key": "judecatori",
+   "tier": "national",
+   "name": "Judecători",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed by the President on the proposal of the Superior Council of Magistracy; none is elected by voters."
+  },
+  {
+   "key": "desemnare_candidati",
+   "tier": "national",
+   "name": "Desemnarea candidaților de către partide",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "cod_2022",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose their lists and candidates under their own statutes; the state runs no primary."
+  },
+  {
+   "key": "urss",
+   "tier": "rssm",
+   "name": "Alegeri în organele URSS (Sovietul Suprem al URSS, Congresul deputaților poporului 1989)",
+   "name_en": "Elections to Soviet Union bodies held in the Moldavian SSR",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "cec_history",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of all-Union bodies belong to the Soviet Union's history, not to Moldova's own institutions; Moldova boycotted the all-Union referendum of 17 March 1991."
+  },
+  {
+   "key": "sfatul_tarii",
+   "tier": "national",
+   "name": "Sfatul Țării (1917-1918)",
+   "name_en": "Sfatul Țării (1917-1918)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "cec_history",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Its members were delegated by congresses, soviets, and national organizations of Bessarabia, not elected by voters; the interwar elections in Bessarabia were Romanian elections."
+  }
+ ]
+}
