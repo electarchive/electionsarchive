@@ -31,7 +31,10 @@ DOWNLOAD = SITE + "/wp-content/plugins/download-attachments/includes/download.ph
 
 
 def url(name: str) -> str:
-    """The URL a file was cached under: a site download id written `dl:<id>`, or a name saved in the browser."""
+    """The URL a file was cached under: a full URL, a site download id written `dl:<id>`, or a name saved in the
+    browser."""
+    if name.startswith("https://"):
+        return name
     return DOWNLOAD + name[3:] if name.startswith("dl:") else BROWSER + name
 
 
@@ -549,6 +552,15 @@ TICKETS = {
         Ticket("Solidaridad", "Guillermo Endara Galimany", ("Guillermo Ford", "Alejandro Posse"), 11, ("SOL",)),
         Ticket("Cambio Democrático", "Ricardo Martinelli", ("Roberto Henríquez", "Roxana Méndez"), 13, ("CAM DEM",)),
     ],
+    2019: [
+        Ticket("Uniendo Fuerzas", "Laurentino Cortizo Cohen", ("José Gabriel Carrizo Jaén",), 2, ("PRD", "MOLIRENA")),
+        Ticket("Panamá Podemos", "José Isabel Blandón Figueroa", ("Nilda Iris Quijano Peña",), 6, ("PAN", "Popular")),
+        Ticket("Un Cambio para Despertar", "Rómulo Alberto Roux Moses", ("Luis Gabriel Casis Aguilar",), 10, ("CD", "Alianza")),
+        Ticket("Frente Amplio por la Democracia", "Saúl Méndez Rodríguez", ("Maribel Gordon Calderón",), 14, ("FAD",)),
+        Ticket("Celeste", "Ana Matilde Gómez Ruiloba", ("Jorge Arango Arias",), 16, ("CELESTE",)),
+        Ticket("Verde", "Marco Antonio Ameglio Samudio", ("Mario Antonio Boyd Galindo",), 18, ("VERDE",)),
+        Ticket("Chocolate", "Ricardo Alberto Lombana González", ("Guillermo Márquez Amado",), 20, ("CHOCOLATE",)),
+    ],
     2009: [
         Ticket("Un País para Todos", "Balbina del Carmen Herrera Araúz", ("Juan Carlos Navarro Quelquejeu",), 2, ("PRD", "POPULAR", "LIBERAL")),
         Ticket("Alianza por el Cambio", "Ricardo Alberto Martinelli Berrocal", ("Juan Carlos Varela Rodríguez",), 7, ("MOLIRENA", "PAN", "CD", "UNIÓN PATRIOTICA")),
@@ -597,6 +609,20 @@ def load_2024() -> Election:
     }  # fmt: skip
     e.files = [f"{base}{n}.xlsx" for n in names.values()]
     president_table(2024, next(iter(grids(e.files[0]).values())), C1, grids(e.files[1])["PRESID2"], e)
+    party_table(next(iter(grids(e.files[2]).values())), "dep", e, "c", "deputy")
+    party_table(next(iter(grids(e.files[3]).values())), "mayor", e, 2, "mayor")
+    party_table(next(iter(grids(e.files[4]).values())), "rep", e, 3, "rep")
+    party_table(next(iter(grids(e.files[5]).values())), "council", e, 2, "council")
+    return e
+
+
+def load_2019() -> Election:
+    e = Election(2019, date(2019, 5, 5), [])
+    base = SITE + "/wp-content/uploads/2019/06/Cuadro-"
+    names = ["01-Presidente", "02-Presidente", "04-Diputado-PP", "08-Alcalde-PP", "11-Representantes-PP",
+             "14-Concejal-PP"]  # fmt: skip
+    e.files = [f"{base}{n}.xlsx" for n in names]
+    president_table(2019, grids(e.files[0])["PRESID1"], C1, grids(e.files[1])["PRESID2"], e)
     party_table(next(iter(grids(e.files[2]).values())), "dep", e, "c", "deputy")
     party_table(next(iter(grids(e.files[3]).values())), "mayor", e, 2, "mayor")
     party_table(next(iter(grids(e.files[4]).values())), "rep", e, 3, "rep")
@@ -655,6 +681,7 @@ PARTIES: dict[str, tuple[str, str]] = {
     "molirena": ("MOLIRENA", "Movimiento Liberal Republicano Nacionalista"),
     "pan": ("PAN", "Partido Panameñista"),
     "p. panamenista": ("PAN", "Partido Panameñista"),
+    "panamenista": ("PAN", "Partido Panameñista"),
     "cam dem": ("CD", "Cambio Democrático"),
     "cd": ("CD", "Cambio Democrático"),
     "lib": ("LIB", "Partido Liberal"),
@@ -663,6 +690,7 @@ PARTIES: dict[str, tuple[str, str]] = {
     "union patriotica": ("UP", "Unión Patriótica"),
     "vmp": ("VMP", "Vanguardia Moral de la Patria"),
     "p. alianza": ("ALIANZA", "Partido Alianza"),
+    "alianza": ("ALIANZA", "Partido Alianza"),
     "rm": ("RM", "Realizando Metas"),
     "pais": ("PAIS", "PAIS"),
     "moca": ("MOCA", "Movimiento Otro Camino"),
@@ -698,7 +726,8 @@ def alliance_id(label: str) -> str:
 @functools.cache
 def elections() -> dict[int, Election]:
     loaders = {
-        1994: load_1994, 1999: load_1999, 2004: load_2004, 2009: load_2009, 2014: load_2014, 2024: load_2024,
+        1994: load_1994, 1999: load_1999, 2004: load_2004, 2009: load_2009, 2014: load_2014, 2019: load_2019,
+        2024: load_2024,
     }  # fmt: skip
     return {year: load() for year, load in sorted(loaders.items())}
 
@@ -785,6 +814,21 @@ def district_key(unit: Unit) -> str:
     return f"{district}@{place_key(unit.path[0])}" if district in colliding() else district
 
 
+# Corregimientos a later table spells without the native name, or with another preposition, keyed by district, so that
+# a name another district uses as printed keeps its own key.
+CORREGIMIENTO_ALIASES = {
+    ("omar torrijos herrera", "san juan del turbe"): "san juan de turbe",
+    ("santa catalina o calovebora", "alto bilingue"): "alto bilingue (gdogueshia)",
+    ("santa catalina o calovebora", "san pedrito"): "san pedrito (jikui)",
+    ("santa catalina o calovebora", "valle bonito"): "valle bonito (dogata)",
+}
+
+
+def corregimiento_key(unit: Unit) -> str:
+    key_ = place_key(unit.path[2])
+    return CORREGIMIENTO_ALIASES.get((district_key(unit), key_), key_)
+
+
 @dataclass
 class Places:
     provinces: dict[str, list[tuple[int, str]]] = field(default_factory=dict)
@@ -814,7 +858,7 @@ def places() -> Places:
                 out.districts.setdefault(district, []).append((e.year, unit.path[1]))
                 out.parents.setdefault(district, []).append((e.day, province))
                 if unit.scheme == "corregimiento":
-                    out.corregimientos.setdefault((district, place_key(unit.path[2])), []).append(
+                    out.corregimientos.setdefault((district, corregimiento_key(unit)), []).append(
                         (e.year, unit.path[2])
                     )
     return out
@@ -1044,7 +1088,7 @@ def area_of(unit: Unit) -> tuple[str, str] | None:
     if unit.scheme == "distrito":
         return "pa.distrito", district_key(unit)
     if unit.scheme == "corregimiento":
-        return "pa.corregimiento", f"{district_key(unit)}:{place_key(unit.path[2])}"
+        return "pa.corregimiento", f"{district_key(unit)}:{corregimiento_key(unit)}"
     return None
 
 
@@ -1219,7 +1263,7 @@ def election(e: Election) -> Package:
                     "electoral_system_id": SYSTEM_PLURALITY,
                 }
             elif office == "rep":
-                label = f"{best(places().corregimientos[(district_key(u), place_key(u.path[2]))])}, {district_label(u)}"
+                label = f"{best(places().corregimientos[(district_key(u), corregimiento_key(u))])}, {district_label(u)}"
                 parts = [found[1]]
                 fields = {
                     "kind": "office",
