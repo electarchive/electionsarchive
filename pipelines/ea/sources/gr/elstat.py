@@ -218,7 +218,11 @@ def _verify(e: Election) -> None:
             t == table and c in codes and (column is None or col is None or col == column) for t, c, col in owned
         )
 
+    def kind(code: str) -> str:
+        return "tier" if code in e.tiers else "place" if territorial(code) else "body"
+
     problems: list[str] = []
+    earlier: dict[str, list[tuple[Block, Row]]] = {}
     for block in e.blocks:
         if len(block.edges) not in (len(block.columns) + 1, 2 * len(block.columns)):
             problems.append(f"{block.name} p{block.page}: {len(block.edges)} edges for {len(block.columns)} columns")
@@ -231,9 +235,18 @@ def _verify(e: Election) -> None:
                 codes = [r.code for r in scope]
                 for j, column in enumerate(block.columns):
                     summed = sum(r.values[j] or 0 for r in scope)
+                    if row.code == "==":
+                        # a table split over several pages prints its total once, after its last part
+                        found = [
+                            r.values[b.columns.index(column)] or 0
+                            for b, r in [*earlier.get(block.name, []), *((block, r) for r in everything)]
+                            if column in b.columns and kind(r.code) in {kind(x.code) for x in everything}
+                        ]
+                        summed = sum(found)
+                        codes = [r.code for _, r in earlier.get(block.name, [])] + codes
                     if summed != (row.values[j] or 0) and not excused(block.name, codes, column):
                         problems.append(f"{block.name} p{block.page} {row.code} {column}: {summed} <> {row.values[j]}")
-                    if row.code == "==" and subtotals:
+                    if row.code == "==" and subtotals and block.name not in earlier:
                         summed = sum(r.values[j] or 0 for r in subtotals)
                         if summed != (row.values[j] or 0):
                             problems.append(f"{block.name} p{block.page} == {column}: subtotals {summed}")
@@ -249,6 +262,7 @@ def _verify(e: Election) -> None:
                 problems.append(f"{block.name} p{block.page}: row {row.code} has no band")
             group.append(row)
             everything.append(row)
+        earlier.setdefault(block.name, []).extend((block, r) for r in everything)
     for code, figures in district_values(e).items():
         votes = [v for column, v in figures.items() if column.startswith("votes:")]
         if votes and "valid" in figures and sum(votes) != figures["valid"] and not excused("votes", [code], None):
