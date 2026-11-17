@@ -1,0 +1,1614 @@
+{
+ "polity": "MY",
+ "name": "Malaysia",
+ "sources": {
+  "constitution": {
+   "title": "Perlembagaan Persekutuan (Federal Constitution), as amended",
+   "publisher": "Jabatan Peguam Negara (Attorney General's Chambers), Laws of Malaysia",
+   "url": "https://lom.agc.gov.my/federal-constitution.php",
+   "kind": "official_body"
+  },
+  "spr_perundangan": {
+   "title": "Perundangan: Perlembagaan Persekutuan, Akta, dan Peraturan pilihan raya",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/perundangan/",
+   "kind": "official_body"
+  },
+  "spr_part4": {
+   "title": "Perlembagaan Persekutuan: Jadual Ketiga Belas (penyempadanan bahagian pilihan raya)",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/wp-content/uploads/2024/10/bab-4-badan-perundangan-persekutuan.pdf",
+   "kind": "official_body"
+  },
+  "spr_art120": {
+   "title": "Perlembagaan Persekutuan: Perkara 120, pemilihan terus ke Dewan Negara",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/wp-content/uploads/2024/10/perkara-120-pemilihan-terus-ke-dewan-negara.pdf",
+   "kind": "official_body"
+  },
+  "act19": {
+   "title": "Akta Pilihan Raya 1958 [Akta 19], cetakan semula",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/wp-content/uploads/2024/10/akta-19-cetakan-semula.pdf",
+   "kind": "official_body"
+  },
+  "act171": {
+   "title": "Local Government Act 1976 [Act 171]",
+   "publisher": "Jabatan Peguam Negara (Attorney General's Chambers), Laws of Malaysia",
+   "url": "https://lom.agc.gov.my/principal.php?type=updated",
+   "kind": "official_body"
+  },
+  "spr_sejarah": {
+   "title": "Sejarah penubuhan Suruhanjaya Pilihan Raya",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/sejarah-penubuhan-suruhan-jaya-pilihan-raya/",
+   "kind": "official_body"
+  },
+  "spr_opendata": {
+   "title": "Portal Data Terbuka SPR: katalog set data",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://opendata.spr.gov.my/data/_index.json",
+   "kind": "official_body",
+   "note": "No license stated; terms at https://opendata.spr.gov.my/dasar-dasar-dan-hak-cipta"
+  },
+  "spr_list": {
+   "title": "Portal Data Terbuka SPR: List DPPR (senarai pilihan raya, 1959-2026)",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://opendata.spr.gov.my/data/list-dppr.json",
+   "kind": "official_body"
+  },
+  "spr_pru": {
+   "title": "Portal Data Terbuka SPR: Keputusan PRU (2008-2022)",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://opendata.spr.gov.my/data/keputusan-pru.json",
+   "kind": "official_body"
+  },
+  "spr_dun": {
+   "title": "Portal Data Terbuka SPR: Keputusan PRU DUN (2016-2026)",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://opendata.spr.gov.my/data/keputusan-pru-dun.json",
+   "kind": "official_body"
+  },
+  "spr_prk": {
+   "title": "Portal Data Terbuka SPR: Keputusan PRK (2008-2026)",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://opendata.spr.gov.my/data/keputusan-prk.json",
+   "kind": "official_body"
+  },
+  "spr_dashboard": {
+   "title": "Dashboard Keputusan SPR: senarai pilihan raya dan tarikh pengundian",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://dashboard.spr.gov.my/api/v1/pilihanraya",
+   "kind": "official_body"
+  },
+  "spr_dashboard_dun": {
+   "title": "Dashboard Keputusan SPR: bahagian pilihan raya negeri bagi PRU DUN Melaka ke-16",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://dashboard.spr.gov.my/api/v1/2026-03/dun",
+   "kind": "official_body"
+  },
+  "spr_dashboard_par": {
+   "title": "Dashboard Keputusan SPR: bahagian pilihan raya persekutuan bagi PRU ke-15",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://dashboard.spr.gov.my/api/v1/2022-02/parlimen",
+   "kind": "official_body"
+  },
+  "spr_dashboard_dun22": {
+   "title": "Dashboard Keputusan SPR: bahagian pilihan raya negeri bagi PRU ke-15",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://dashboard.spr.gov.my/api/v1/2022-02/dun",
+   "kind": "official_body"
+  },
+  "spr_sarawak13": {
+   "title": "Laman khas Pilihan Raya Umum Dewan Undangan Negeri Sarawak ke-13",
+   "publisher": "Suruhanjaya Pilihan Raya Malaysia (SPR)",
+   "url": "https://spr.gov.my/prudunsarawak13/",
+   "kind": "official_body"
+  },
+  "dosm_district": {
+   "title": "OpenDOSM: Population by District (population_district)",
+   "publisher": "Jabatan Perangkaan Malaysia (Department of Statistics Malaysia)",
+   "url": "https://storage.dosm.gov.my/population/population_district.parquet",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "jkt_faq": {
+   "title": "Soalan lazim: Umum - JKT & PBT (bilangan pihak berkuasa tempatan)",
+   "publisher": "Jabatan Kerajaan Tempatan, Kementerian Perumahan dan Kerajaan Tempatan",
+   "url": "https://jkt.kpkt.gov.my/en/about-lgd/faqs/general-lgd-la",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Persekutuan Malaysia",
+   "name_en": "Federation of Malaysia (Federation of Malaya until 16 September 1963)",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "state",
+   "name": "Negeri",
+   "name_en": "States",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "my.negeri",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2022-11-19",
+     "value": 13,
+     "source": "spr_dashboard_dun22",
+     "locator": "https://dashboard.spr.gov.my/api/v1/2022-02/dun (state constituencies in 13 states: Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Sarawak, Selangor, Terengganu; Art. 1(2))"
+    }
+   ]
+  },
+  {
+   "key": "federal_territory",
+   "name": "Wilayah Persekutuan",
+   "name_en": "Federal territories",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "my.negeri",
+   "elects": false,
+   "source": "constitution",
+   "valid_from": "1974-02-01",
+   "counts": [
+    {
+     "date": "2022-11-19",
+     "value": 3,
+     "source": "spr_dashboard_par",
+     "locator": "https://dashboard.spr.gov.my/api/v1/2022-02/parlimen (W.P KUALA LUMPUR 11, W.P LABUAN 1, W.P PUTRAJAYA 1 parliamentary constituencies; Art. 1(4); no territory has an assembly)"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "Daerah",
+   "name_en": "Administrative districts",
+   "parent": "state",
+   "polity_kind": "county",
+   "elects": false,
+   "source": "dosm_district",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 163,
+     "source": "dosm_district",
+     "locator": "https://storage.dosm.gov.my/population/population_district.parquet (166 distinct state and district pairs dated 2026-01-01, less the three federal territories counted as one district each)"
+    }
+   ]
+  },
+  {
+   "key": "local_authority",
+   "name": "Pihak Berkuasa Tempatan",
+   "name_en": "Local authorities (city, municipal, and district councils)",
+   "parent": "state",
+   "polity_kind": "municipality",
+   "elects": false,
+   "source": "act171",
+   "counts": [
+    {
+     "date": "2026-11-17",
+     "value": 151,
+     "source": "jkt_faq",
+     "locator": "https://jkt.kpkt.gov.my/en/about-lgd/faqs/general-lgd-la (\"Jumlah PBT adalah sebanyak 151 buah PBT (termasuk Dewan Bandaraya Kuala Lumpur), iaitu 19 buah Dewan/Majlis Bandaraya, 40 buah Majlis Perbandaran dan 92 buah Majlis Daerah\"; read on 17 November 2026)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "dewan_rakyat",
+   "tier": "national",
+   "name": "Pilihan Raya Umum Dewan Rakyat",
+   "name_en": "House of Representatives (Dewan Rakyat) general elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "my.parlimen"
+    ],
+    "fine": [
+     "my.parlimen"
+    ]
+   },
+   "finest_note": "The Commission's open data gives each candidate's votes per parliamentary constituency, with rejected and unreturned ballots and the electorate; polling-district and stream (saluran) counts are not published.",
+   "note": "222 members since 2004 (Art. 46: Johor 26, Kedah 15, Kelantan 14, Melaka 6, Negeri Sembilan 8, Pahang 14, Pulau Pinang 13, Perak 24, Perlis 3, Sabah 25, Sarawak 31, Selangor 22, Terengganu 8, Kuala Lumpur 11, Labuan 1, Putrajaya 1), each elected by plurality in a single-member constituency. Parliament lasts five years from its first sitting unless dissolved earlier, and a general election follows within sixty days of dissolution (Art. 55). Voting age 18 with automatic registration since 2021.",
+   "source": "constitution",
+   "locator": "https://lom.agc.gov.my/federal-constitution.php (Arts. 46, 55, and 113-119)",
+   "valid_from": "1957-08-31",
+   "first_held": "1959-01-01",
+   "earliest_record": "2008-03-08",
+   "est_votes": 95000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "administered_by": "Suruhanjaya Pilihan Raya Malaysia (Election Commission)",
+     "valid_from": "1957-08-31",
+     "source": "constitution",
+     "locator": "https://lom.agc.gov.my/federal-constitution.php (Art. 55(3): Parliament continues for five years from its first meeting and then stands dissolved; Art. 55(4): a general election within sixty days of dissolution)",
+     "vacancy_rule": "A casual vacancy is filled by a by-election within sixty days, except within two years of Parliament's expiry unless the Speaker notifies that the majority is affected (Art. 54)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Portal Data Terbuka SPR (opendata.spr.gov.my)",
+     "url": "https://opendata.spr.gov.my/data/keputusan-pru.json",
+     "first_date": "2008-03-08",
+     "last_date": "2022-12-07",
+     "finest": "my.parlimen",
+     "evidence": "Candidate votes, majority, rejected and unreturned ballots, turnout, and electorate for every parliamentary and concurrent state seat of the 12th to 15th general elections (2008-2022); earlier general elections are only in the list of elections.",
+     "source": "spr_pru",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "license": "No license stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "MY",
+     "valid_from": "1957-08-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1959, \"PILIHAN RAYA\": \"PRU KE-1\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1964-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1964, \"PILIHAN RAYA\": \"PRU KE-2\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1969-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1969, \"PILIHAN RAYA\": \"PRU KE-3\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1974-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1974, \"PILIHAN RAYA\": \"PRU KE-4\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1978-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1978, \"PILIHAN RAYA\": \"PRU KE-5\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1982-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1982, \"PILIHAN RAYA\": \"PRU KE-6\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1986-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1986, \"PILIHAN RAYA\": \"PRU KE-7\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1990, \"PILIHAN RAYA\": \"PRU KE-8\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1995, \"PILIHAN RAYA\": \"PRU KE-9\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "1999-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1999, \"PILIHAN RAYA\": \"PRU KE-10\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 2004, \"PILIHAN RAYA\": \"PRU KE-11\"",
+     "note": "General election listed by the Commission by year only; polling day and seat count not yet read from an official report."
+    },
+    {
+     "date": "2008-03-08",
+     "election_kind": "general",
+     "contests": 222,
+     "seats": 222,
+     "source": "spr_pru",
+     "quote": "222 parliamentary constituencies (PARLIMEN P.001-P.222) in the 12th general election rows of Keputusan PRU, TAHUN PILIHAN RAYA 2008",
+     "note": "Polling day from the Commission's dashboard (\"NamaSingkatan\":\"PRU KE-12 (2008)\",\"TarikhPengundian\":\"2008-03-08\")."
+    },
+    {
+     "date": "2013-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "contests": 222,
+     "seats": 222,
+     "source": "spr_pru",
+     "quote": "222 parliamentary constituencies (PARLIMEN P.001-P.222) in the 13th general election rows of Keputusan PRU, TAHUN PILIHAN RAYA 2013",
+     "note": "Dated to the year: the Commission's dashboard lists PRU KE-13 with TarikhPengundian 2013-04-10, which is not the polling day, and the open data gives only the year."
+    },
+    {
+     "date": "2018-05-09",
+     "election_kind": "general",
+     "contests": 222,
+     "seats": 222,
+     "source": "spr_pru",
+     "quote": "222 parliamentary constituencies (PARLIMEN P.001-P.222) in the 14th general election rows of Keputusan PRU, TAHUN PILIHAN RAYA 2018",
+     "note": "Polling day from the Commission's dashboard (\"NamaSingkatan\":\"PRU KE-14 (2018)\",\"TarikhPengundian\":\"2018-05-09\")."
+    },
+    {
+     "date": "2022-11-19",
+     "election_kind": "general",
+     "contests": 221,
+     "seats": 221,
+     "source": "spr_pru",
+     "quote": "221 parliamentary constituencies (PARLIMEN P.001-P.222) in the 15th general election rows of Keputusan PRU, TAHUN PILIHAN RAYA 2022",
+     "note": "Polling day from the Commission's dashboard (\"NamaSingkatan\":\"PRU KE - 15 (2022)\",\"TarikhPengundian\":\"2022-11-19\"). P.017 Padang Serai polled on 7 December 2022 after a candidate's death and is listed separately."
+    },
+    {
+     "date": "2022-12-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRU KE - 15 P.017  PADANG SERAI (2022)\",\"TarikhPengundian\":\"2022-12-07\"",
+     "note": "Postponed poll of the 15th general election in P.017 Padang Serai, Kedah."
+    }
+   ]
+  },
+  {
+   "key": "dewan_rakyat_by",
+   "tier": "national",
+   "name": "Pilihan Raya Kecil Parlimen",
+   "name_en": "House of Representatives by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "my.parlimen"
+    ],
+    "fine": [
+     "my.parlimen"
+    ]
+   },
+   "finest_note": "Published per constituency, as for general elections.",
+   "note": "By-elections fill casual vacancies within sixty days (Art. 54). By-elections due in 2021 (P.166 Labuan among them) were suspended under the emergency proclamation; the dashboard lists Labuan with no polling day.",
+   "source": "constitution",
+   "locator": "https://lom.agc.gov.my/federal-constitution.php (Art. 54)",
+   "valid_from": "1957-08-31",
+   "first_held": "1959-01-01",
+   "earliest_record": "2008-08-26",
+   "est_votes": 3500000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Portal Data Terbuka SPR (opendata.spr.gov.my)",
+     "url": "https://opendata.spr.gov.my/data/keputusan-prk.json",
+     "first_date": "2008-08-26",
+     "last_date": "2026-01-24",
+     "finest": "my.parlimen",
+     "evidence": "Candidate votes, majority, rejected and unreturned ballots, turnout, and electorate for each parliamentary and state by-election since 2008.",
+     "source": "spr_prk",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "license": "No license stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "MY"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-01-01",
+     "through": "2008-08-25",
+     "precision": "year",
+     "election_kind": "by_election",
+     "note": "By-elections before the first one in the Commission's dashboard and open data (26 August 2008); not yet counted from the Commission's reports."
+    },
+    {
+     "date": "2008-08-26",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.044 PERMATANG PAUH, PULAU PINANG (2008)\",\"TarikhPengundian\":\"2008-08-26\""
+    },
+    {
+     "date": "2009-01-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.036 KUALA TERENGGANU, TERENGGANU (2009)\",\"TarikhPengundian\":\"2009-01-17\""
+    },
+    {
+     "date": "2009-04-07",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.059 BUKIT GANTANG, PERAK (2009)\",\"TarikhPengundian\":\"2009-04-07\""
+    },
+    {
+     "date": "2010-04-25",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.094 HULU SELANGOR, SELANGOR (2010)\",\"TarikhPengundian\":\"2010-04-25\""
+    },
+    {
+     "date": "2010-05-16",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.212 SIBU, SARAWAK (2010)\",\"TarikhPengundian\":\"2010-05-16\""
+    },
+    {
+     "date": "2010-11-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.185 BATU SAPI, SABAH (2010)\",\"TarikhPengundian\":\"2010-11-04\""
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.051 BUKIT GELUGOR, PULAU PINANG (2014)\",\"TarikhPengundian\":\"2014-05-25\""
+    },
+    {
+     "date": "2014-05-31",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.076 TELOK INTAN, PERAK (2014)\",\"TarikhPengundian\":\"2014-05-31\""
+    },
+    {
+     "date": "2015-05-05",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.091 ROMPIN, PAHANG (2015)\",\"TarikhPengundian\":\"2015-05-05\""
+    },
+    {
+     "date": "2015-05-07",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.044 PERMATANG PAUH, PULAU PINANG (2015)\",\"TarikhPengundian\":\"2015-05-07\""
+    },
+    {
+     "date": "2016-06-18",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.067 KUALA KANGSAR, PERAK (2016)\",\"TarikhPengundian\":\"2016-06-18\"; \"NamaSingkatan\":\"PRK PARLIMEN P.093 SUNGAI BESAR, SELANGOR (2016)\",\"TarikhPengundian\":\"2016-06-18\""
+    },
+    {
+     "date": "2018-10-13",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.132 PORT DICKSON, NEGERI SEMBILAN (2018)\",\"TarikhPengundian\":\"2018-10-13\""
+    },
+    {
+     "date": "2019-01-26",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.078 CAMERON HIGHLANDS, PAHANG (2019)\",\"TarikhPengundian\":\"2019-01-26\""
+    },
+    {
+     "date": "2019-05-11",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.186 SANDAKAN, SABAH (2019)\",\"TarikhPengundian\":\"2019-05-11\""
+    },
+    {
+     "date": "2019-11-16",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.165 TANJUNG PIAI, JOHOR (2019)\",\"TarikhPengundian\":\"2019-11-16\""
+    },
+    {
+     "date": "2020-01-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.176 KIMANIS, SABAH (2020)\",\"TarikhPengundian\":\"2020-01-18\""
+    },
+    {
+     "date": "2023-08-12",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.036  KUALA TERENGGANU (2023)\",\"TarikhPengundian\":\"2023-08-12\""
+    },
+    {
+     "date": "2023-09-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.161  PULAI (2023)\",\"TarikhPengundian\":\"2023-09-09\""
+    },
+    {
+     "date": "2023-12-02",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.040  KEMAMAN (2023)\",\"TarikhPengundian\":\"2023-12-02\""
+    },
+    {
+     "date": "2026-01-24",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK PARLIMEN P.187 KINABATANGAN\",\"TarikhPengundian\":\"2026-01-24\""
+    }
+   ]
+  },
+  {
+   "key": "dewan_undangan_negeri",
+   "tier": "state",
+   "name": "Pilihan Raya Umum Dewan Undangan Negeri",
+   "name_en": "State Legislative Assembly elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "my.dun"
+    ],
+    "fine": [
+     "my.dun"
+    ]
+   },
+   "finest_note": "Published per state constituency in the open data (with the general election file for concurrent polls); polling-district and stream counts are not published.",
+   "note": "Thirteen single-chamber assemblies elected by plurality in single-member state constituencies: Perlis 15, Kedah 36, Kelantan 45, Terengganu 32, Pulau Pinang 40, Perak 59, Pahang 42, Selangor 56, Negeri Sembilan 36, Melaka 28, Johor 56, Sabah 73 (plus nominated members), and Sarawak 82 at its 2021 election. An assembly lasts five years from its first sitting and polls within sixty days of dissolution (Eighth Schedule, Part I, and the state constitutions); most Peninsular states dissolve with Parliament, while Sabah and Sarawak, and since 2021 Melaka, Johor, and six others, poll on their own dates. Sabah's first direct state election was in 1967 and Sarawak's in 1970; Singapore held a state election in September 1963 as a state of Malaysia.",
+   "source": "constitution",
+   "locator": "https://lom.agc.gov.my/federal-constitution.php (Art. 113 and Arts. 116-117; Eighth Schedule, Part I)",
+   "valid_from": "1957-08-31",
+   "first_held": "1959-01-01",
+   "earliest_record": "2008-03-08",
+   "est_votes": 85000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "administered_by": "Suruhanjaya Pilihan Raya Malaysia (Election Commission)",
+     "valid_from": "1957-08-31",
+     "source": "constitution",
+     "locator": "https://lom.agc.gov.my/federal-constitution.php (Eighth Schedule, Part I: a State Legislative Assembly continues for five years from its first meeting; a general election within sixty days of dissolution)",
+     "vacancy_rule": "A casual vacancy is filled by a by-election within sixty days, except within two years of the assembly's expiry"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Portal Data Terbuka SPR (opendata.spr.gov.my)",
+     "url": "https://opendata.spr.gov.my/data/keputusan-pru-dun.json",
+     "first_date": "2016-01-01",
+     "last_date": "2026-08-01",
+     "finest": "my.dun",
+     "evidence": "Candidate votes per state constituency for every state election held apart from a general election since Sarawak 2016 (Sabah 2020 and 2025, Melaka and Sarawak 2021, Johor 2022 and 2026, the six states of 2023, Negeri Sembilan 2026); concurrent state polls of 2008-2022 are in Keputusan PRU.",
+     "source": "spr_dun",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "license": "No license stated"
+    },
+    {
+     "platform": "Portal Data Terbuka SPR (opendata.spr.gov.my)",
+     "url": "https://opendata.spr.gov.my/data/keputusan-pru.json",
+     "first_date": "2008-03-08",
+     "last_date": "2022-12-07",
+     "finest": "my.dun",
+     "evidence": "State seats contested with the 12th to 15th general elections, in the same file as the parliamentary seats.",
+     "source": "spr_pru",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "license": "No license stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MY",
+     "valid_from": "1957-08-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1959, \"PILIHAN RAYA\": \"PRU KE-1\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1964-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1964, \"PILIHAN RAYA\": \"PRU KE-2\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1967-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1967, \"PILIHAN RAYA\": \"PRN SABAH KE-1\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1969-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1969, \"PILIHAN RAYA\": \"PRU KE-3\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1971-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1971, \"PILIHAN RAYA\": \"PRN SABAH KE-2\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1974-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1974, \"PILIHAN RAYA\": \"PRU KE-4\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1976-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1976, \"PILIHAN RAYA\": \"PRN SABAH KE-3\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1978-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1978, \"PILIHAN RAYA\": \"PRU KE-5\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1979-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1979, \"PILIHAN RAYA\": \"PRN SARAWAK KE-3\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1981-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1981, \"PILIHAN RAYA\": \"PRN SABAH KE-4\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1982-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1982, \"PILIHAN RAYA\": \"PRU KE-6\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1983-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1983, \"PILIHAN RAYA\": \"PRN SARAWAK KE-4\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1985, \"PILIHAN RAYA\": \"PRN SABAH KE-5\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1986-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1986, \"PILIHAN RAYA\": \"PRU KE-7\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1987-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1987, \"PILIHAN RAYA\": \"PRN SARAWAK KE-5\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1990, \"PILIHAN RAYA\": \"PRU KE-8\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1991, \"PILIHAN RAYA\": \"PRN SARAWAK KE-6\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1994, \"PILIHAN RAYA\": \"PRN SABAH KE-8\", \"Negeri\": \"SABAH\"",
+     "note": "Sabah state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1995, \"PILIHAN RAYA\": \"PRU KE-9\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "1996-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1996, \"PILIHAN RAYA\": \"PRN SARAWAK KE-7\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "1999-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 1999, \"PILIHAN RAYA\": \"PRU KE-10\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "2001-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 2001, \"PILIHAN RAYA\": \"PRN SARAWAK KE-8\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 2004, \"PILIHAN RAYA\": \"PRU KE-11\"",
+     "note": "State assembly elections held with the general election in the states that dissolved with Parliament; dates and seat counts not yet read from an official report."
+    },
+    {
+     "date": "2006-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "source": "spr_list",
+     "quote": "\"TAHUN\": 2006, \"PILIHAN RAYA\": \"PRN SARAWAK KE-9\", \"Negeri\": \"SARAWAK\"",
+     "note": "Sarawak state election held apart from the general election; date and seat count not yet read from an official report."
+    },
+    {
+     "date": "2008-03-08",
+     "election_kind": "general",
+     "contests": 505,
+     "seats": 505,
+     "source": "spr_pru",
+     "quote": "505 state constituencies in 12 states (Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Selangor, Terengganu) in the Keputusan PRU rows of TAHUN PILIHAN RAYA 2008"
+    },
+    {
+     "date": "2013-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "contests": 505,
+     "seats": 505,
+     "source": "spr_pru",
+     "quote": "505 state constituencies in 12 states (Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Selangor, Terengganu) in the Keputusan PRU rows of TAHUN PILIHAN RAYA 2013",
+     "note": "Held with the 13th general election; dated to the year as the Parliament row is."
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "contests": 82,
+     "seats": 82,
+     "source": "spr_dun",
+     "quote": "Sarawak: 82 state constituencies",
+     "note": "Sarawak's 11th state election, dated to the year: the Commission's dashboard gives TarikhPengundian 2016-10-07 for it, which is not the polling day, and the open data gives only the year."
+    },
+    {
+     "date": "2018-05-09",
+     "election_kind": "general",
+     "contests": 505,
+     "seats": 505,
+     "source": "spr_pru",
+     "quote": "505 state constituencies in 12 states (Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Selangor, Terengganu) in the Keputusan PRU rows of TAHUN PILIHAN RAYA 2018"
+    },
+    {
+     "date": "2020-09-26",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "spr_dun",
+     "quote": "Sabah: 73 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DUN SABAH KALI KE-16 (2020)\",\"TarikhPengundian\":\"2020-09-26\"."
+    },
+    {
+     "date": "2021-11-20",
+     "election_kind": "general",
+     "contests": 28,
+     "seats": 28,
+     "source": "spr_dun",
+     "quote": "Melaka: 28 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DUN MELAKA KE-15 (2021)\",\"TarikhPengundian\":\"2021-11-20\"."
+    },
+    {
+     "date": "2021-12-18",
+     "election_kind": "general",
+     "contests": 82,
+     "seats": 82,
+     "source": "spr_dun",
+     "quote": "Sarawak: 82 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DUN SARAWAK KE-12 (2021)\",\"TarikhPengundian\":\"2021-12-18\"."
+    },
+    {
+     "date": "2022-03-12",
+     "election_kind": "general",
+     "contests": 56,
+     "seats": 56,
+     "source": "spr_dun",
+     "quote": "Johor: 56 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DEWAN NEGERI JOHOR KE-15 (2022)\",\"TarikhPengundian\":\"2022-03-12\"."
+    },
+    {
+     "date": "2022-11-19",
+     "election_kind": "general",
+     "contests": 115,
+     "seats": 115,
+     "source": "spr_pru",
+     "quote": "115 state constituencies in 3 states (Pahang, Perak, Perlis) in the Keputusan PRU rows of TAHUN PILIHAN RAYA 2022",
+     "note": "Perlis, Perak, and Pahang dissolved with Parliament; N.42 Tioman, Pahang, polled on 7 December 2022 and is listed separately."
+    },
+    {
+     "date": "2022-12-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRU KE - 15 N.42 TIOMAN (2022)\",\"TarikhPengundian\":\"2022-12-07\"",
+     "note": "Postponed poll of the Pahang state election of 2022 in N.42 Tioman."
+    },
+    {
+     "date": "2023-08-12",
+     "election_kind": "general",
+     "contests": 245,
+     "seats": 245,
+     "source": "spr_dun",
+     "quote": "Kedah: 36 state constituencies; Kelantan: 45 state constituencies; Negeri Sembilan: 36 state constituencies; Selangor: 56 state constituencies; Terengganu: 32 state constituencies; Pulau Pinang: 40 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DEWAN NEGERI KEDAH KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"; \"NamaSingkatan\":\"PRU DEWAN NEGERI KELANTAN KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"; \"NamaSingkatan\":\"PRU DEWAN NEGERI NEGERI SEMBILAN KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"; \"NamaSingkatan\":\"PRU DEWAN NEGERI SELANGOR KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"; \"NamaSingkatan\":\"PRU DUN TERENGGANU KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"; \"NamaSingkatan\":\"PRU DEWAN UNDANGAN PULAU PINANG KE - 15 (2023)\",\"TarikhPengundian\":\"2023-08-12\"."
+    },
+    {
+     "date": "2025-11-29",
+     "election_kind": "general",
+     "contests": 73,
+     "seats": 73,
+     "source": "spr_dun",
+     "quote": "Sabah: 73 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DEWAN UNDANGAN SABAH KE-17\",\"TarikhPengundian\":\"2025-11-29\"."
+    },
+    {
+     "date": "2026-07-11",
+     "election_kind": "general",
+     "contests": 56,
+     "seats": 56,
+     "source": "spr_dun",
+     "quote": "Johor: 56 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DEWAN NEGERI JOHOR KE-16\",\"TarikhPengundian\":\"2026-07-11\"."
+    },
+    {
+     "date": "2026-08-01",
+     "election_kind": "general",
+     "contests": 36,
+     "seats": 36,
+     "source": "spr_dun",
+     "quote": "Negeri Sembilan: 36 state constituencies",
+     "note": "Polling day from the Commission's dashboard: \"NamaSingkatan\":\"PRU DEWAN NEGERI, NEGERI SEMBILAN KE-16\",\"TarikhPengundian\":\"2026-08-01\"."
+    },
+    {
+     "date": "2026-11-14",
+     "election_kind": "general",
+     "contests": 28,
+     "seats": 28,
+     "source": "spr_dashboard_dun",
+     "quote": "28 KodDUN rows, all NEGERI MELAKA, for the PRU DUN Melaka ke-16 (Kod 2026-03)",
+     "note": "Melaka's 16th state election; polling day from the Commission's dashboard (\"NamaSingkatan\":\"PRU DUN MELAKA KE-16\",\"TarikhPengundian\":\"2026-11-14\"). Results are not yet in the open data."
+    },
+    {
+     "date": "2026-12-12",
+     "election_kind": "general",
+     "note": "Sarawak's 13th state election, scheduled (\"NamaSingkatan\":\"PRU DUN SARAWAK KE-13\",\"TarikhPengundian\":\"2026-12-12\"); the dashboard does not yet list its constituencies."
+    }
+   ]
+  },
+  {
+   "key": "dewan_undangan_negeri_by",
+   "tier": "state",
+   "name": "Pilihan Raya Kecil Dewan Undangan Negeri",
+   "name_en": "State Legislative Assembly by-elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "my.dun"
+    ],
+    "fine": [
+     "my.dun"
+    ]
+   },
+   "finest_note": "Published per state constituency.",
+   "note": "By-elections to state assemblies run by the Election Commission; the 2021 emergency suspended those then due (N.66 Bugaya, Sabah, polled with the 2022 general election).",
+   "source": "constitution",
+   "locator": "https://lom.agc.gov.my/federal-constitution.php (Art. 113; Eighth Schedule, Part I)",
+   "valid_from": "1957-08-31",
+   "first_held": "1959-01-01",
+   "earliest_record": "2009-04-07",
+   "est_votes": 4000000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Portal Data Terbuka SPR (opendata.spr.gov.my)",
+     "url": "https://opendata.spr.gov.my/data/keputusan-prk.json",
+     "first_date": "2009-04-07",
+     "last_date": "2026-01-24",
+     "finest": "my.dun",
+     "evidence": "Every state by-election since 2009 except the three Perlis by-elections of 21 March 2026, which the dashboard lists but the results file does not yet hold.",
+     "source": "spr_prk",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "license": "No license stated"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MY"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-01-01",
+     "through": "2008-08-25",
+     "precision": "year",
+     "election_kind": "by_election",
+     "note": "By-elections before the first one in the Commission's dashboard and open data (26 August 2008); not yet counted from the Commission's reports."
+    },
+    {
+     "date": "2009-04-07",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.29 BATANG AIR, SARAWAK (2009)\",\"TarikhPengundian\":\"2009-04-07\"; \"NamaSingkatan\":\"PRK DUN N.25 BUKIT SELAMBAU, KEDAH (2009)\",\"TarikhPengundian\":\"2009-04-07\""
+    },
+    {
+     "date": "2009-05-31",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.12 PENANTI, PULAU PINANG (2009)\",\"TarikhPengundian\":\"2009-05-31\""
+    },
+    {
+     "date": "2009-07-14",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.41 MANEK URAI, KELANTAN (2009)\",\"TarikhPengundian\":\"2009-07-14\""
+    },
+    {
+     "date": "2009-08-25",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.11 PERMATANG PASIR, PULAU PINANG (2009)\",\"TarikhPengundian\":\"2009-08-25\""
+    },
+    {
+     "date": "2009-10-11",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.31 BAGAN PINANG, NEGERI SEMBILAN (2009)\",\"TarikhPengundian\":\"2009-10-11\""
+    },
+    {
+     "date": "2010-11-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.45 GALAS, KELANTAN (2010)\",\"TarikhPengundian\":\"2010-11-04\""
+    },
+    {
+     "date": "2011-01-30",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.05 TENANG, JOHOR (2011)\",\"TarikhPengundian\":\"2011-01-30\""
+    },
+    {
+     "date": "2011-03-06",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.28 KERDAU, PAHANG (2011)\",\"TarikhPengundian\":\"2011-03-06\"; \"NamaSingkatan\":\"PRK DUN N.27 MERLIMAU, MELAKA (2011)\",\"TarikhPengundian\":\"2011-03-06\""
+    },
+    {
+     "date": "2013-07-24",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.01 KUALA BESUT, TERENGGANU (2013)\",\"TarikhPengundian\":\"2013-07-24\""
+    },
+    {
+     "date": "2013-11-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.20 SUNGAI LIMAU, KEDAH (2013)\",\"TarikhPengundian\":\"2013-11-04\""
+    },
+    {
+     "date": "2014-03-23",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.25 KAJANG, SELANGOR (2014)\",\"TarikhPengundian\":\"2014-03-23\""
+    },
+    {
+     "date": "2014-03-29",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.51 BALINGIAN, SARAWAK (2014)\",\"TarikhPengundian\":\"2014-03-29\""
+    },
+    {
+     "date": "2014-09-25",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.01 PENGKALAN KUBOR, KELANTAN (2014)\",\"TarikhPengundian\":\"2014-09-25\""
+    },
+    {
+     "date": "2015-03-22",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.06 CHEMPAKA, KELANTAN (2015)\",\"TarikhPengundian\":\"2015-03-22\""
+    },
+    {
+     "date": "2017-02-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.03 TANJONG DATU, SARAWAK (2017)\",\"TarikhPengundian\":\"2017-02-18\""
+    },
+    {
+     "date": "2018-08-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.49 SUNGAI KANDIS, SELANGOR (2018)\",\"TarikhPengundian\":\"2018-08-04\""
+    },
+    {
+     "date": "2018-09-08",
+     "election_kind": "by_election",
+     "contests": 2,
+     "seats": 2,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.32 SERI SETIA, SELANGOR (2018)\",\"TarikhPengundian\":\"2018-09-08\"; \"NamaSingkatan\":\"PRK DUN N.27 BALAKONG, SELANGOR (2018)\",\"TarikhPengundian\":\"2018-09-08\""
+    },
+    {
+     "date": "2019-03-02",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.24 SEMENYIH, SELANGOR (2019)\",\"TarikhPengundian\":\"2019-03-02\""
+    },
+    {
+     "date": "2019-04-13",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.27 RANTAU, NEGERI SEMBILAN (2019)\",\"TarikhPengundian\":\"2019-04-13\""
+    },
+    {
+     "date": "2020-07-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.23 CHINI, PAHANG (2020)\",\"TarikhPengundian\":\"2020-07-04\""
+    },
+    {
+     "date": "2020-08-29",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.58 SLIM, PERAK (2020)\",\"TarikhPengundian\":\"2020-08-29\""
+    },
+    {
+     "date": "2022-11-19",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK N.66 BUGAYA (2022)\",\"TarikhPengundian\":\"2022-11-19\""
+    },
+    {
+     "date": "2023-09-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.13 SIMPANG JERAM (2023)\",\"TarikhPengundian\":\"2023-09-09\""
+    },
+    {
+     "date": "2023-10-07",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.36 PELANGAI, PAHANG (2023)\",\"TarikhPengundian\":\"2023-10-07\""
+    },
+    {
+     "date": "2023-11-04",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DUN N.67 JEPAK (2023)\",\"TarikhPengundian\":\"2023-11-04\""
+    },
+    {
+     "date": "2024-05-11",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.06 KUALA KUBU BAHARU, SELANGOR\",\"TarikhPengundian\":\"2024-05-11\""
+    },
+    {
+     "date": "2024-07-06",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN UNDANGAN N.20 SUNGAI BAKAP, PULAU PINANG\",\"TarikhPengundian\":\"2024-07-06\""
+    },
+    {
+     "date": "2024-08-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.43 NENGGIRI, KELANTAN\",\"TarikhPengundian\":\"2024-08-17\""
+    },
+    {
+     "date": "2024-09-28",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.29 MAHKOTA, JOHOR\",\"TarikhPengundian\":\"2024-09-28\""
+    },
+    {
+     "date": "2025-04-26",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK N.48 AYER KUNING, PERAK\",\"TarikhPengundian\":\"2025-04-26\""
+    },
+    {
+     "date": "2026-01-24",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN UNDANGAN N.58 LAMAG, SABAH\",\"TarikhPengundian\":\"2026-01-24\""
+    },
+    {
+     "date": "2026-03-21",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 3,
+     "source": "spr_dashboard",
+     "quote": "\"NamaSingkatan\":\"PRK DEWAN NEGERI N.13 GUAR SANJI, PERLIS\",\"TarikhPengundian\":\"2026-03-21\"; \"NamaSingkatan\":\"PRK DEWAN NEGERI N.06 BINTONG, PERLIS\",\"TarikhPengundian\":\"2026-03-21\"; \"NamaSingkatan\":\"PRK DEWAN NEGERI N.03 CHUPING, PERLIS\",\"TarikhPengundian\":\"2026-03-21\""
+    }
+   ]
+  },
+  {
+   "key": "majlis_perundangan_persekutuan",
+   "tier": "national",
+   "name": "Pilihan Raya Majlis Perundangan Persekutuan",
+   "name_en": "Federal Legislative Council election (Federation of Malaya)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The first federal election in Malaya, on 27 July 1955, filled 52 elected seats of the 98-member Federal Legislative Council by plurality; the Council gave way to Parliament under the 1957 Constitution, whose first Dewan Rakyat was elected in 1959. Date and seat count not yet read from an official text; the Election Commission was set up only in 1957 and its list of elections starts in 1959.",
+   "source": "spr_sejarah",
+   "valid_from": "1955-01-01",
+   "valid_to": "1959-08-19",
+   "first_held": "1955-07-27",
+   "est_votes": 1000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MY",
+     "name_pattern": "Legislative Council|Majlis Perundangan",
+     "precedence": 1,
+     "valid_from": "1955-01-01",
+     "valid_to": "1959-08-19"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1955-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "Federal Legislative Council election; not yet counted from an official report."
+    }
+   ]
+  },
+  {
+   "key": "majlis_negeri_1954",
+   "tier": "state",
+   "name": "Pilihan Raya Majlis Negeri dan Majlis Undangan Negeri Selat",
+   "name_en": "State and Settlement Council elections before independence",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected seats on the State Councils of the Malay states and the Settlement Councils of Penang and Malacca, first filled in 1954-1955 under the Federation of Malaya Agreement 1948; replaced by the State Legislative Assemblies elected in 1959. Not yet read from an official text.",
+   "source": "constitution",
+   "valid_to": "1957-08-31",
+   "first_held": "1954-01-01",
+   "est_votes": 600000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MY",
+     "valid_to": "1957-08-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1954-01-01",
+     "through": "1957-08-30",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "State and Settlement Council elections; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "dewan_rakyat_tidak_langsung_1963",
+   "tier": "national",
+   "name": "Pemilihan ahli Dewan Rakyat oleh Dewan Undangan Sabah, Sarawak, dan Singapura",
+   "name_en": "Dewan Rakyat members chosen by the Sabah, Sarawak, and Singapore assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "At Malaysia's formation the members for Sabah, Sarawak, and Singapore were chosen by their state legislatures, not by voters, until each held a direct parliamentary election (Sabah 1969, Sarawak 1970).",
+   "source": "constitution",
+   "valid_from": "1963-09-16",
+   "valid_to": "1970-12-31",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "MY"
+    }
+   ]
+  },
+  {
+   "key": "dewan_negara",
+   "tier": "national",
+   "name": "Pemilihan Senator Dewan Negara oleh Dewan Undangan Negeri",
+   "name_en": "Senate (Dewan Negara) members elected by the state assemblies",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Each State Legislative Assembly elects two senators by resolution (Art. 45(1)(a)); the other 44 are appointed. The Election Commission runs no poll and no count is published, and the direct election of senators that Art. 45(4) and Art. 120 allow has never been enacted.",
+   "source": "spr_art120"
+  },
+  {
+   "key": "yang_di_pertuan_agong",
+   "tier": "national",
+   "name": "Pemilihan Yang di-Pertuan Agong oleh Majlis Raja-Raja",
+   "name_en": "Election of the Supreme Head of the Federation by the Conference of Rulers",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "The nine hereditary Rulers elect the Yang di-Pertuan Agong and his deputy for five years by secret ballot in the Conference of Rulers (Art. 32 and Third Schedule); there is no public vote and no published count.",
+   "source": "constitution",
+   "valid_from": "1957-08-31"
+  },
+  {
+   "key": "eksekutif",
+   "tier": "national",
+   "name": "Perdana Menteri, Menteri Besar, Ketua Menteri, dan Yang di-Pertua Negeri",
+   "name_en": "Federal and state executives",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Prime Minister (Art. 43) and each state's Menteri Besar or Chief Minister are appointed from the assembly majority, the Rulers are hereditary, the governors of Melaka, Pulau Pinang, Sabah, and Sarawak are appointed by the Yang di-Pertuan Agong, and Negeri Sembilan's Ruler is chosen by its four Undang; no executive is elected by voters.",
+   "source": "constitution"
+  },
+  {
+   "key": "kerajaan_tempatan",
+   "tier": "local_authority",
+   "name": "Pilihan Raya Kerajaan Tempatan",
+   "name_en": "Local council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Municipal, town, and local council elections began with George Town in December 1951 and Kuala Lumpur in February 1952, spread to Sarawak's district councils and North Borneo's local councils before 1963, and were suspended in March 1965 during the confrontation with Indonesia; the Local Government Act 1976 made all councillors appointed (s. 15 ends local government elections). Penang's 2012 enactment to restore them was held void by the Federal Court in 2014. The class ends in 1976, the year of Act 171; the dates of the first and last polls are not yet read from an official text.",
+   "source": "act171",
+   "locator": "Local Government Act 1976 [Act 171], s. 15 (cesser of local government elections)",
+   "valid_to": "1976-01-01",
+   "first_held": "1951-12-01",
+   "est_votes": 2500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "MY*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1951-12-01",
+     "through": "1965-03-01",
+     "precision": "month",
+     "election_kind": "local",
+     "note": "Local council elections from George Town's first in December 1951 to the suspension of March 1965; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "jkkk",
+   "tier": "local_authority",
+   "name": "Jawatankuasa Pembangunan dan Keselamatan Kampung dan ketua kampung",
+   "name_en": "Village committees and village heads",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Village heads (ketua kampung, penghulu) and village development and security committees are appointed by the state governments; no public election is held.",
+   "source": "act171"
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referendum",
+   "name_en": "Referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Neither the Federal Constitution nor the Elections Act 1958 provides for a referendum or a recall, and none has been held; constitutional amendments pass by two-thirds of each house of Parliament (Art. 159).",
+   "source": "constitution"
+  },
+  {
+   "key": "hakim",
+   "tier": "national",
+   "name": "Hakim mahkamah atasan dan mahkamah syariah",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Superior court judges are appointed by the Yang di-Pertuan Agong on the Prime Minister's advice after consulting the Conference of Rulers (Art. 122B), and syariah judges by the state Rulers; none is elected.",
+   "source": "constitution"
+  },
+  {
+   "key": "pencalonan_parti",
+   "tier": "national",
+   "name": "Pemilihan calon parti",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose candidates under their own constitutions; the Election Commission runs no primary and candidates are nominated directly on nomination day (Elections Act 1958 and its regulations).",
+   "source": "act19"
+  },
+  {
+   "key": "badan_bukan_wilayah",
+   "tier": "national",
+   "name": "Pilihan raya persatuan, kesatuan sekerja, koperasi, dan majlis pelajar",
+   "name_en": "Associations, trade unions, cooperatives, and student councils",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held by each body under its own rules (the Commission only lends equipment and training for some school and university polls); they elect no public office.",
+   "source": "act19"
+  }
+ ]
+}
