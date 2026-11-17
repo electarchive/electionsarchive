@@ -1,0 +1,2244 @@
+{
+ "polity": "SI",
+ "name": "Slovenia",
+ "sources": {
+  "ustava": {
+   "title": "Ustava Republike Slovenije (uradno prečiščeno besedilo, objavljeno na spletni strani Državne volilne komisije)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf",
+   "kind": "official_body"
+  },
+  "zakonodaja": {
+   "title": "Zakonodaja: zakoni o volitvah in referendumih",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/o-komisiji/zakonodaja/",
+   "kind": "official_body"
+  },
+  "zvdz": {
+   "title": "Zakon o volitvah v državni zbor (ZVDZ)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO185",
+   "kind": "official_body"
+  },
+  "zdvedz": {
+   "title": "Zakon o določitvi volilnih enot za volitve poslancev v državni zbor (ZDVEDZ)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO281",
+   "kind": "official_body"
+  },
+  "zvpr": {
+   "title": "Zakon o volitvah predsednika republike",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO100",
+   "kind": "official_body"
+  },
+  "zvpep": {
+   "title": "Zakon o volitvah poslancev iz Republike Slovenije v evropski parlament (ZVPEP)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO3401",
+   "kind": "official_body"
+  },
+  "zdsve": {
+   "title": "Zakon o državnem svetu (ZDSve)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO229",
+   "kind": "official_body"
+  },
+  "zdveds": {
+   "title": "Zakon o določitvi volilnih enot za volitve predstavnikov lokalnih interesov v državni svet (ZDVEDS)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO230",
+   "kind": "official_body"
+  },
+  "zlv": {
+   "title": "Zakon o lokalnih volitvah (ZLV)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO308",
+   "kind": "official_body"
+  },
+  "zrli": {
+   "title": "Zakon o referendumu in o ljudski iniciativi (ZRLI)",
+   "publisher": "Pravno-informacijski sistem Republike Slovenije (PISRS)",
+   "url": "https://pisrs.si/pregledPredpisa?id=ZAKO324",
+   "kind": "official_body"
+  },
+  "zls_izvlecek": {
+   "title": "Izvleček iz Zakona o lokalni samoupravi (ZLS): pravna podlaga za referendum o ustanovitvi občin",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve/referendum_2006/29_1/izvlecek-iz-Zakona-o-lokalni-samoupravi-_ZLS---pravna-podlaga-za-referendum_.pdf",
+   "kind": "official_body"
+  },
+  "gov_obcine": {
+   "title": "Občine",
+   "publisher": "Ministrstvo za javno upravo (gov.si)",
+   "url": "https://www.gov.si/podrocja/drzava-in-druzba/lokalna-samouprava-in-regionalni-razvoj/lokalna-samouprava/obcine/",
+   "kind": "official_body"
+  },
+  "gov_ls": {
+   "title": "Lokalna samouprava",
+   "publisher": "Ministrstvo za javno upravo (gov.si)",
+   "url": "https://www.gov.si/podrocja/drzava-in-druzba/lokalna-samouprava-in-regionalni-razvoj/lokalna-samouprava/",
+   "kind": "official_body"
+  },
+  "dvk_dz": {
+   "title": "Državni zbor RS: volitve in arhiv volitev",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/arhiv-volitev-drzavnega-zbora-rs/",
+   "kind": "official_body"
+  },
+  "dvk_dz_splosno": {
+   "title": "Državni zbor RS",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/",
+   "kind": "official_body"
+  },
+  "dvk_pr": {
+   "title": "Predsednik republike: volitve in arhiv volitev",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/arhiv-volitev-predsednika-rs/",
+   "kind": "official_body"
+  },
+  "dvk_ep": {
+   "title": "Evropski parlament: volitve in arhiv volitev",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/arhiv-volitev-evropskega-parlamenta/",
+   "kind": "official_body"
+  },
+  "dvk_ds": {
+   "title": "Državni svet RS: volitve in arhiv volitev",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/arhiv-volitev-drzavnega-sveta-rs/",
+   "kind": "official_body"
+  },
+  "dvk_ds_splosno": {
+   "title": "Državni svet RS",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/",
+   "kind": "official_body"
+  },
+  "dvk_lv": {
+   "title": "Lokalne volitve: volitve in arhiv lokalnih volitev",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/arhiv-lokalnih-volitev/",
+   "kind": "official_body"
+  },
+  "dvk_lv_splosno": {
+   "title": "Lokalne volitve",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_lv2026": {
+   "title": "Lokalne volitve 2026",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_lv2022_data": {
+   "title": "Lokalne volitve 2022: podatki za Slovenijo (prvi krog)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/arhivi/volitve2022/lv2022/data/prvikrog/data.json",
+   "kind": "official_body"
+  },
+  "dvk_ref": {
+   "title": "Referendumi: arhiv referendumov",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/arhiv-referendumov/",
+   "kind": "official_body"
+  },
+  "dvk_ref_splosno": {
+   "title": "Referendumi",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/",
+   "kind": "official_body"
+  },
+  "dvk_ref_obcine": {
+   "title": "Referendum občine (29. 1. 2006)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-obcine-29-1/",
+   "kind": "official_body"
+  },
+  "dvk_ref_obcine2": {
+   "title": "Referendum občine (9. 4. 2006)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-obcine-9-4/",
+   "kind": "official_body"
+  },
+  "dvk_roma2015": {
+   "title": "Volitve člana občinskega sveta, predstavnika romske skupnosti – občina Grosuplje (2015)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/volitve-clana-obcinskega-sveta-predstavnika-romske-skupnosti-obcina-grosuplje/",
+   "kind": "official_body"
+  },
+  "dvk_polling": {
+   "title": "Volitve v Državni zbor 2022: končni izid po voliščih",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve/DZ/2022/izidi_volitev/VoliscaDZ20220506Koncni.xlsx",
+   "kind": "official_body"
+  },
+  "dvk_dz_1992": {
+   "title": "Volitve v Državni zbor 1992",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-4/",
+   "kind": "official_body"
+  },
+  "dvk_dz_1996": {
+   "title": "Volitve v Državni zbor 1996",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-1/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2000": {
+   "title": "Volitve v Državni zbor 2000",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-2/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2004": {
+   "title": "Volitve v Državni zbor 2004",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-3/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2008": {
+   "title": "Volitve v Državni zbor 2008",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2011": {
+   "title": "Volitve v Državni zbor 2011",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-predcasne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2014": {
+   "title": "Volitve v Državni zbor 2014",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/drzavni-zbor-rs-leto-2014-predcasne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2018": {
+   "title": "Volitve v Državni zbor 2018",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/predcasne-volitve-v-drzavni-zbor-rs-2018/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2022": {
+   "title": "Volitve v Državni zbor 2022",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/volitve-v-dz-2022/",
+   "kind": "official_body"
+  },
+  "dvk_dz_2026": {
+   "title": "Volitve v Državni zbor 2026",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-zbor-rs/volitve-drzavnega-zbora-rs/volitve-v-drzavni-zbor/",
+   "kind": "official_body"
+  },
+  "dvk_pr_1992": {
+   "title": "Volitve predsednika RS 1992",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-1992/",
+   "kind": "official_body"
+  },
+  "dvk_pr_1997": {
+   "title": "Volitve predsednika RS 1997",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-1997/",
+   "kind": "official_body"
+  },
+  "dvk_pr_2002": {
+   "title": "Volitve predsednika RS 2002",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-2002/",
+   "kind": "official_body"
+  },
+  "dvk_pr_2007": {
+   "title": "Volitve predsednika RS 2007",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-2007/",
+   "kind": "official_body"
+  },
+  "dvk_pr_2012": {
+   "title": "Volitve predsednika RS 2012",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-2012/",
+   "kind": "official_body"
+  },
+  "dvk_pr_2017": {
+   "title": "Volitve predsednika RS 2017",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-2017/",
+   "kind": "official_body"
+  },
+  "dvk_pr_2022": {
+   "title": "Volitve predsednika RS 2022",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/volitve-predsednika-rs/volitve-predsednika-rs-leto-2022/",
+   "kind": "official_body"
+  },
+  "dvk_ep_2004": {
+   "title": "Volitve v Evropski parlament 2004",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/volitve-evropskega-parlamenta/volitve-v-evropski-parlament-2004/",
+   "kind": "official_body"
+  },
+  "dvk_ep_2009": {
+   "title": "Volitve v Evropski parlament 2009",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/volitve-evropskega-parlamenta/volitve-v-evropski-parlament-2009/",
+   "kind": "official_body"
+  },
+  "dvk_ep_2014": {
+   "title": "Volitve v Evropski parlament 2014",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/volitve-evropskega-parlamenta/volitve-v-evropski-parlament-2014/",
+   "kind": "official_body"
+  },
+  "dvk_ep_2019": {
+   "title": "Volitve v Evropski parlament 2019",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/volitve-evropskega-parlamenta/volitve-v-evropski-parlament-2019/",
+   "kind": "official_body"
+  },
+  "dvk_ep_2024": {
+   "title": "Volitve v Evropski parlament 2024",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/volitve-evropskega-parlamenta/volitve-v-evropski-parlament/",
+   "kind": "official_body"
+  },
+  "dvk_ref_1996-12-08": {
+   "title": "Referendum 1996-12-08",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-za-volitve-v-drzavni-zbor-rs/",
+   "kind": "official_body"
+  },
+  "dvk_ref_1999-01-10": {
+   "title": "Referendum 1999-01-10",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-financiranju-izgradnje-tet-3/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2001-06-17": {
+   "title": "Referendum 2001-06-17",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/naknadni-zakonodajni-referendum-o-zdravljenju-neplodnosti-in-postopkih-oploditve-z-biomedicinsko-pomocjo/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2003-01-19": {
+   "title": "Referendum 2003-01-19",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-zeleznice-in-telekomunikacije-2003/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2003-03-23": {
+   "title": "Referendum 2003-03-23",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-eu-in-nato/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2003-09-21": {
+   "title": "Referendum 2003-09-21",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-trgovina/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2004-04-04": {
+   "title": "Referendum 2004-04-04",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-tehnicni-zakon/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2005-09-25": {
+   "title": "Referendum 2005-09-25",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-rtvs/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2007-11-11": {
+   "title": "Referendum 2007-11-11",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zavarovalnice/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2008-06-22": {
+   "title": "Referendum 2008-06-22",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/posvetovalni-referendum-pokrajine/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2010-06-06": {
+   "title": "Referendum 2010-06-06",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zakonu-o-arbitraznem-sporazumu/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2010-12-12": {
+   "title": "Referendum 2010-12-12",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zakonu-o-rtv-slovenija-2/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2011-04-10": {
+   "title": "Referendum 2011-04-10",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zakonu-o-malem-delu/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2011-06-05": {
+   "title": "Referendum 2011-06-05",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zakonu-o-pokojninskem-in-invalidskem-zavarovanju/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2012-03-25": {
+   "title": "Referendum 2012-03-25",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-druzinskem-zakoniku/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2014-06-08": {
+   "title": "Referendum 2014-06-08",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-arhivih/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2015-12-20": {
+   "title": "Referendum 2015-12-20",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zzzdr-d/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2017-09-24": {
+   "title": "Referendum 2017-09-24",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-ziugdt-1/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2018-05-13": {
+   "title": "Referendum 2018-05-13",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/ponovno-glasovanje-na-referendumu-o-ziugdt/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2021-07-11": {
+   "title": "Referendum 2021-07-11",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-o-zakonu-o-spremembah-in-dopolnitvah-zakona-o-vodah-zv-1g/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2022-11-27": {
+   "title": "Referendum 2022-11-27",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendumi-2022/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2024-06-09": {
+   "title": "Referendum 2024-06-09",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/posvetovalni-referendumi-9-6-2024/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2025-05-11": {
+   "title": "Referendum 2025-05-11",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-zdpidu/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2025-11-23": {
+   "title": "Referendum 2025-11-23",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-zppkz/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2026-10-11": {
+   "title": "Referendum 2026-10-11",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-zppre-b-in-posvetovalni-referendumi-lokalne-voliltve-socialni-prejemki-in-rtv/",
+   "kind": "official_body"
+  },
+  "dvk_ref_2026-12-06": {
+   "title": "Referendum 2026-12-06",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/zakonodajni-referendum-o-ziurs/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-nadomestne-volitve-1997": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-nadomestne-volitve-1997)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-nadomestne-volitve-1997/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-4": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-4)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-4/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-3": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-3)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-3/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-2": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-2)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-2/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-1": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-1)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-1/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-nadomestne-volitve": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-nadomestne-volitve)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-nadomestne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-2017": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-2017)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-2017/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-leto-2018-nadomestne-volitve": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-leto-2018-nadomestne-volitve)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-leto-2018-nadomestne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-leto-2020-1-nadomestne-volitve": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-leto-2020-1-nadomestne-volitve)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-leto-2020-1-nadomestne-volitve/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-rs-leto-2020-2-nadomestne-volitve-clana-ds-2020-6-ve-velenje-1": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-rs-leto-2020-2-nadomestne-volitve-clana-ds-2020-6-ve-velenje-1)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-rs-leto-2020-2-nadomestne-volitve-clana-ds-2020-6-ve-velenje-1/",
+   "kind": "official_body"
+  },
+  "dvk_ds_volitve-v-drzavni-svet-2022": {
+   "title": "Volitve v Državni svet (volitve-v-drzavni-svet-2022)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/volitve-v-drzavni-svet-2022/",
+   "kind": "official_body"
+  },
+  "dvk_ds_nadomestne-volitve-v-drzavni-svet-2024-lokalni-interesi": {
+   "title": "Volitve v Državni svet (nadomestne-volitve-v-drzavni-svet-2024-lokalni-interesi)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/nadomestne-volitve-v-drzavni-svet-2024-lokalni-interesi/",
+   "kind": "official_body"
+  },
+  "dvk_ds_nadomestne-volitve-v-drzavni-svet-2026-lokalni-interesi": {
+   "title": "Volitve v Državni svet (nadomestne-volitve-v-drzavni-svet-2026-lokalni-interesi)",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/volitve-drzavnega-sveta-rs/nadomestne-volitve-v-drzavni-svet-2026-lokalni-interesi/",
+   "kind": "official_body"
+  },
+  "dvk_lv_1998": {
+   "title": "Lokalne volitve 1998",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-5/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2002": {
+   "title": "Lokalne volitve 2002",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-4/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2006": {
+   "title": "Lokalne volitve 2006",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-3/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2010": {
+   "title": "Lokalne volitve 2010",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-2/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2014": {
+   "title": "Lokalne volitve 2014",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-2014/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2018": {
+   "title": "Lokalne volitve 2018",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-2018/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2022": {
+   "title": "Lokalne volitve 2022",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve-2022/",
+   "kind": "official_body"
+  },
+  "dvk_lv_2026": {
+   "title": "Lokalne volitve 2026",
+   "publisher": "Državna volilna komisija",
+   "url": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/lokalne-volitve/lokalne-volitve/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republika Slovenija",
+   "name_en": "Republic of Slovenia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "ustava",
+   "valid_from": "1991-06-25"
+  },
+  {
+   "key": "obcina",
+   "name": "Občine in mestne občine",
+   "name_en": "Municipalities and urban municipalities",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "scheme": "si.obcina",
+   "source": "gov_ls",
+   "valid_from": "1994-12-04",
+   "counts": [
+    {
+     "date": "2026-11-17",
+     "value": 212,
+     "source": "gov_obcine",
+     "locator": "https://www.gov.si/podrocja/drzava-in-druzba/lokalna-samouprava-in-regionalni-razvoj/lokalna-samouprava/obcine/ (V Sloveniji lokalno samoupravo predstavlja 212 občin, od tega jih ima 12 status mestne občine)"
+    },
+    {
+     "date": "2022-11-20",
+     "value": 212,
+     "source": "dvk_lv2022_data",
+     "locator": "https://www.dvk-rs.si/arhivi/volitve2022/lv2022/data/prvikrog/data.json (slovenija.rez.stat_zup: mayors elected in the first round 6 urban + 159 other, not elected 6 urban + 41 other, so 212 mayoral contests)"
+    }
+   ]
+  },
+  {
+   "key": "ozji_del",
+   "name": "Ožji deli občin (krajevne, vaške in četrtne skupnosti)",
+   "name_en": "Sub-municipal communities (local, village, and city-district communities)",
+   "parent": "obcina",
+   "polity_kind": "submunicipal",
+   "source": "dvk_lv_splosno",
+   "valid_from": "1994-12-04"
+  },
+  {
+   "key": "srs",
+   "name": "Socialistična republika Slovenija",
+   "name_en": "Socialist Republic of Slovenia (within Yugoslavia)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "elects": true,
+   "source": "ustava",
+   "valid_from": "1945-05-05",
+   "valid_to": "1991-06-25"
+  },
+  {
+   "key": "jugoslavija",
+   "name": "Kraljevina SHS / Jugoslavija in FLRJ / SFRJ",
+   "name_en": "Yugoslavia (Kingdom and federation), 1918-1991",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "source": "ustava",
+   "valid_from": "1918-12-01",
+   "valid_to": "1991-06-25"
+  },
+  {
+   "key": "avstrija",
+   "name": "Avstrijske dežele (Kranjska, Štajerska, Koroška, Primorje)",
+   "name_en": "Austrian crown lands (Carniola, Styria, Carinthia, the Littoral), before 1918",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "source": "ustava",
+   "valid_to": "1918-10-29"
+  }
+ ],
+ "classes": [
+  {
+   "key": "dz",
+   "tier": "national",
+   "name": "Volitve poslancev v Državni zbor",
+   "name_en": "National Assembly elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "si.ve"
+    ],
+    "fine": [
+     "si.vo",
+     "si.volisce"
+    ]
+   },
+   "finest_note": "Polling-station (volišče) workbooks since 2011; HTML archives by electoral unit (1992) and by electoral district (volilni okraj) from 1996 to 2008.",
+   "note": "90 deputies (Ustava art. 80): 88 by list PR in 8 electoral units of 11 deputies each, every unit split into 11 districts (volilni okraji) in which one candidate of each list stands; Droop quota in the units and national remainder seats by D'Hondt, with a 4% national threshold since the 2000 constitutional amendment (3 seats' worth before). One deputy each of the Italian and Hungarian national communities is elected in two special units by Borda count. Counted here as 10 contests per election (8 units and 2 community units). Seats never go to by-elections: a vacancy passes to the next candidate on the list.",
+   "source": "ustava",
+   "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (80. člen: Državni zbor ... šteje 90 poslancev)",
+   "valid_from": "1992-12-06",
+   "first_held": "1992-12-06",
+   "earliest_record": "1992-12-06",
+   "contests_per_unit": 10,
+   "est_votes": 10900000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Državna volilna komisija, with the electoral-unit and district commissions (VKVE, OVK)",
+     "source": "ustava",
+     "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (81. člen: Državni zbor je izvoljen za štiri leta)",
+     "vacancy_rule": "A vacant list seat passes to the next candidate of the same list (ZVDZ); the President may dissolve the Assembly and call early elections when no government is formed (Ustava art. 111, 117).",
+     "valid_from": "1992-12-06"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si): končni izid po voliščih",
+     "url": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/volitve/DZ/2022/izidi_volitev/VoliscaDZ20220506Koncni.xlsx",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2011-12-04",
+     "finest": "si.volisce",
+     "evidence": "One workbook per election with every polling station's registered voters, ballots, and list votes, 2011 to 2022; the 2026 results are served by the commission's results application at dvk-rs.si/arhivi/dz2026.",
+     "source": "dvk_polling"
+    },
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si/arhivi)",
+     "url": "https://www.dvk-rs.si/arhivi/dz1996/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1992-12-06",
+     "last_date": "2008-09-21",
+     "finest": "si.vo",
+     "evidence": "Static result archives dz1992 (national and electoral-unit tables), dz1996, dz2000, dz2004, and dz2008 (national, unit, and district tables, plus the national-community seats).",
+     "source": "dvk_dz"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1992-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-06",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_1992",
+     "quote": "Na volitvah 6. decembra 1992 je imelo pravico voliti skupaj 1.491.374 volilcev.",
+     "note": "First election to the National Assembly, held with the first presidential election."
+    },
+    {
+     "date": "1996-11-10",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_1996",
+     "quote": "DRŽAVNI ZBOR RS 1996; Na volitvah 96 je imelo pravico voliti skupaj 1.542.218 volilcev"
+    },
+    {
+     "date": "2000-10-15",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2000",
+     "quote": "DRŽAVNI ZBOR RS 2000; Na volitvah poslancev v državni zbor je imelo pravico glasovati 1.588.528 volivcev."
+    },
+    {
+     "date": "2004-10-03",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2004",
+     "quote": "DRŽAVNI ZBOR RS 2004; Na volitvah poslancev v Državni zbor je imelo pravico glasovati skupaj 1.634.402 volivcev."
+    },
+    {
+     "date": "2008-09-21",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2008",
+     "quote": "DRŽAVNI ZBOR RS 2008; Na volitvah poslancev v Državni zbor je imelo pravico glasovati skupaj 1.696.437 volivcev."
+    },
+    {
+     "date": "2011-12-04",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2011",
+     "quote": "DRŽAVNI ZBOR RS - (PREDČASNE VOLITVE) 2011",
+     "note": "Early election after the dissolution of the National Assembly."
+    },
+    {
+     "date": "2014-07-13",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2014",
+     "quote": "Predčasne volitve poslancev v Državni zbor Republike Slovenije so bile v nedeljo, 13. julija 2014.",
+     "note": "Early election after the dissolution of the National Assembly."
+    },
+    {
+     "date": "2018-06-03",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2018",
+     "quote": "Predčasne volitve poslancev v Državni zbor RS so bile v nedeljo, 3. 6. 2018.",
+     "note": "Early election after the dissolution of the National Assembly."
+    },
+    {
+     "date": "2022-04-24",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2022",
+     "quote": "Volitve v Državni zbor Republike Slovenije so bile v nedeljo, 24. aprila 2022."
+    },
+    {
+     "date": "2026-03-22",
+     "election_kind": "general",
+     "contests": 10,
+     "seats": 90,
+     "source": "dvk_dz_2026",
+     "quote": "Volitve v Državni zbor Republike Slovenije so bile v nedeljo, 22. marca 2026."
+    }
+   ]
+  },
+  {
+   "key": "predsednik",
+   "tier": "national",
+   "name": "Volitve predsednika republike",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "si.ve",
+     "si.vo",
+     "si.volisce"
+    ]
+   },
+   "finest_note": "Polling-station workbooks for 2017; results applications by district and station for 2022; HTML archives by electoral unit and district from 1997.",
+   "note": "Direct two-round election; a candidate needs a majority of valid votes, otherwise the two leading candidates meet in a second round (Ustava art. 103). Five-year term, at most two consecutive terms.",
+   "source": "ustava",
+   "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (103. člen: Za predsednika republike je kandidat izvoljen z večino veljavnih glasov)",
+   "valid_from": "1992-12-06",
+   "first_held": "1992-12-06",
+   "earliest_record": "1992-12-06",
+   "est_votes": 12200000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "A majority of valid votes elects; otherwise the two candidates with the most votes meet in a second round (Ustava art. 103, Zakon o volitvah predsednika republike).",
+     "administered_by": "Državna volilna komisija",
+     "source": "ustava",
+     "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (103. člen: izvoljen za dobo petih let, vendar največ dvakrat zaporedoma; volitve razpiše predsednik državnega zbora)",
+     "vacancy_rule": "On a vacancy the President of the National Assembly stands in and a new election is called (Ustava art. 106)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si)",
+     "url": "https://www.dvk-rs.si/volitve-in-referendumi/predsednik-republike/arhiv-volitev-predsednika-rs/",
+     "format": "html, xlsx",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1992-12-06",
+     "finest": "si.volisce",
+     "evidence": "A page per election with the commission's report; static archives vp1997, vp2007, vp2012, vp2017, and volitve2022/vp2022; polling-station workbooks for both 2017 rounds.",
+     "source": "dvk_pr"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1992-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_1992",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 6. 12. 1992."
+    },
+    {
+     "date": "1997-11-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_1997",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 23. 11. 1997."
+    },
+    {
+     "date": "2002-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2002",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 10. 11. 2002."
+    },
+    {
+     "date": "2002-12-01",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2002",
+     "quote": "VOLITVE PREDSEDNIKA RS 2002 (drugi krog)"
+    },
+    {
+     "date": "2007-10-21",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2007",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 21. 10. 2007."
+    },
+    {
+     "date": "2007-11-11",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2007",
+     "quote": "VOLITVE PREDSEDNIKA RS 2007 (drugi krog)"
+    },
+    {
+     "date": "2012-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2012",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 11. 11. 2012."
+    },
+    {
+     "date": "2012-12-02",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2012",
+     "quote": "VOLITVE PREDSEDNIKA RS 2012 (drugi krog)"
+    },
+    {
+     "date": "2017-10-22",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2017",
+     "quote": "Volitve predsednika republike so bile v nedeljo, 22. 10. 2017."
+    },
+    {
+     "date": "2017-11-12",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2017",
+     "quote": "Volitve predsednika republike – 2. krog so bile v nedeljo, 12. 11. 2017."
+    },
+    {
+     "date": "2022-10-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2022",
+     "quote": "Volitve predsednika ... prvem krogu (23. oktobra 2022)"
+    },
+    {
+     "date": "2022-11-13",
+     "election_kind": "runoff",
+     "contests": 1,
+     "seats": 1,
+     "source": "dvk_pr_2022",
+     "quote": "V nedeljo, 13. novembra 2022, je potekalo ponovno glasovanje na volitvah predsednika"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Volitve poslancev iz Republike Slovenije v Evropski parlament",
+   "name_en": "European Parliament elections in Slovenia",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "si.ve",
+     "si.vo",
+     "si.volisce"
+    ]
+   },
+   "finest_note": "Polling-station workbook for 2014; results applications by district and station for 2019 and 2024; HTML archives for 2004 and 2009.",
+   "note": "Slovenia is one electoral unit; list PR by D'Hondt with one optional preference vote (ZVPEP).",
+   "source": "zvpep",
+   "valid_from": "2004-06-13",
+   "first_held": "2004-06-13",
+   "earliest_record": "2004-06-13",
+   "est_votes": 2500000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "month": 6,
+     "administered_by": "Državna volilna komisija",
+     "source": "zvpep"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si)",
+     "url": "https://www.dvk-rs.si/volitve-in-referendumi/evropski-parlament/arhiv-volitev-evropskega-parlamenta/",
+     "format": "html, xlsx, json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-06-13",
+     "finest": "si.volisce",
+     "evidence": "A page per election linking the static archives ep2004 to ep2024 and the commission's reports; the 2014 page links a polling-station workbook.",
+     "source": "dvk_ep"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null,
+     "valid_from": "2004-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "2004-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 7,
+     "source": "dvk_ep_2004",
+     "quote": "Volitve poslancev iz RS v Evropski parlament so bile v nedeljo, 13. 6. 2004."
+    },
+    {
+     "date": "2009-06-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 7,
+     "source": "dvk_ep_2009",
+     "quote": "Volitve poslancev iz RS v Evropski parlament so bile v nedeljo, 7. 6. 2009.",
+     "note": "Seven seats elected; an eighth (Ugotovitveni sklep - 8. poslanka) was assigned to Slovenia under the Lisbon Treaty during the term."
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "dvk_ep_2014",
+     "quote": "Volitve poslancev iz RS v Evropski parlament so bile v nedeljo, 25. 5. 2014."
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "dvk_ep_2019",
+     "quote": "Volitve poslancev iz RS v Evropski parlament so bile v nedeljo, 26. 5. 2019."
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 9,
+     "source": "dvk_ep_2024",
+     "quote": "Na volitvah poslancev iz Republike Slovenije v Evropski parlament, ki so bile 9. junija 2024, je bilo izvoljenih devet poslank in poslancev"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Državni referendumi (zakonodajni, ustavnorevizijski, o mednarodnih povezavah, posvetovalni)",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "si.ve",
+     "si.vo",
+     "si.volisce"
+    ]
+   },
+   "finest_note": "Polling-station workbooks from 2012 (and for the 2004 technical law); electoral-unit and district tables and reports before that.",
+   "note": "Legislative referendums (Ustava art. 90; since 2013 only on a demand of 40,000 voters, and a law is rejected when a majority of valid votes is against and the votes against reach a fifth of all voters), constitutional referendums (art. 170), referendums on international associations (art. 3a), and consultative referendums (ZRLI). The JEK2 consultative referendum called for 24 November 2024 was revoked before the vote.",
+   "source": "ustava",
+   "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (90. člen: zakonodajni referendum)",
+   "valid_from": "1991-06-25",
+   "first_held": "1996-12-08",
+   "earliest_record": "1996-12-08",
+   "est_votes": 24000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "called": true,
+     "administered_by": "Državna volilna komisija",
+     "source": "zrli"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si)",
+     "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/arhiv-referendumov/",
+     "format": "html, xlsx, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1996-12-08",
+     "finest": "si.volisce",
+     "evidence": "A page per referendum with the commission's report; polling-station workbooks for 2004 and from 2012; results applications for 2022 to 2026.",
+     "source": "dvk_ref"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "sovereign_state"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1991-06-25"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-12-08",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "dvk_ref_1996-12-08",
+     "quote": "REFERENDUM ZA VOLITVE V DRŽAVNI ZBOR RS 1996; Referendumsko vprašanje a, b, c",
+     "note": "Three competing proposals for the National Assembly's electoral system."
+    },
+    {
+     "date": "1999-01-10",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_1999-01-10",
+     "quote": "Na zakonodajnem referendumu o financiranju izgradnje TET 3 je imelo pravico voliti 1.564.170 volivcev."
+    },
+    {
+     "date": "2001-06-17",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2001-06-17",
+     "quote": "NAKNADNI ZAKONODAJNI REFERENDUM O ZDRAVLJENJU NEPLODNOSTI IN POSTOPKIH OPLODITVE Z BIOMEDICINSKO POMOČJO 2001"
+    },
+    {
+     "date": "2003-01-19",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "dvk_ref_2003-01-19",
+     "quote": "REFERENDUM ŽELEZNICE IN TELEKOMUNIKACIJE (2003): Poročilo o referendumu - telefonija; Poročilo o referendumu - železnice"
+    },
+    {
+     "date": "2003-03-23",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "dvk_ref_2003-03-23",
+     "quote": "REFERENDUM EU IN NATO 2003: Poročilo o referendumu EU; Poročilo o referendumu NATO",
+     "note": "Referendums on international associations (Ustava art. 3a) on joining the European Union and NATO."
+    },
+    {
+     "date": "2003-09-21",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2003-09-21",
+     "quote": "REFERENDUM - TRGOVINA 2003: predhodni zakonodajni referendum"
+    },
+    {
+     "date": "2004-04-04",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2004-04-04",
+     "quote": "REFERENDUM - TEHNIČNI ZAKON 2004: Izid po voliščih"
+    },
+    {
+     "date": "2005-09-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2005-09-25",
+     "quote": "REFERENDUM - RTVS 2005: Poročilo o izidu referenduma RTVS"
+    },
+    {
+     "date": "2007-11-11",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2007-11-11",
+     "quote": "Na referendumu 11. novembra 2007 je imelo pravico glasovati skupaj 1.720.152 volivcev"
+    },
+    {
+     "date": "2008-06-22",
+     "election_kind": "referendum",
+     "source": "dvk_ref_2008-06-22",
+     "quote": "POSVETOVALNI REFERENDUM - POKRAJINE 2008: Na referendumu je imelo pravico glasovati skupaj 1.692.600 volivcev.",
+     "note": "Consultative referendum on establishing provinces, held across the country in referendum areas, each voting on the province proposed for it."
+    },
+    {
+     "date": "2010-06-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2010-06-06",
+     "quote": "Zakonodajni referendum o Zakonu o ratifikaciji Arbitražnega sporazuma ... je potekal 6. 6. 2010."
+    },
+    {
+     "date": "2010-12-12",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2010-12-12",
+     "quote": "REFERENDUM O ZAKONU O RTV SLOVENIJA (2) 2010: Na referendumu je imelo pravico glasovati 1.707.209 volivcev."
+    },
+    {
+     "date": "2011-04-10",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2011-04-10",
+     "quote": "REFERENDUM O ZAKONU O MALEM DELU 2011: Na referendumu je imelo pravico glasovati 1.707.534 volivcev."
+    },
+    {
+     "date": "2011-06-05",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "dvk_ref_2011-06-05",
+     "quote": "Podrobne rezultate si oglejte na http://www.dvk-rs.si/arhivi/junij2011/",
+     "note": "Three legislative referendums the same day: pension and disability insurance, prevention of undeclared work, and documentary and archival material."
+    },
+    {
+     "date": "2012-03-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2012-03-25",
+     "quote": "Na zakonodajnem referendumu o Družinskem zakoniku 2012 je imelo pravico glasovati skupaj 1.709.417 volivcev."
+    },
+    {
+     "date": "2014-06-08",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2014-06-08",
+     "quote": "Glasovanje na referendumu se je izvedlo v nedeljo, 8. 6. 2014."
+    },
+    {
+     "date": "2015-12-20",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2015-12-20",
+     "quote": "Glasovanje na referendumu se je izvedlo v nedeljo, 20. 12. 2015."
+    },
+    {
+     "date": "2017-09-24",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2017-09-24",
+     "quote": "Glasovanje na referendumu se je izvedlo v nedeljo, 24. 9. 2017."
+    },
+    {
+     "date": "2018-05-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2018-05-13",
+     "quote": "Ponovno glasovanje na zakonodajnem referendumu o Zakonu o izgradnji ... (ZIUGDT) je bilo v nedeljo, 13. maja 2018.",
+     "note": "Repeat vote ordered after the Supreme Court annulled the 2017 result."
+    },
+    {
+     "date": "2021-07-11",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2021-07-11",
+     "quote": "Glasovanje na referendumu se je izvedlo v nedeljo, 11. 7. 2021."
+    },
+    {
+     "date": "2022-11-27",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "dvk_ref_2022-11-27",
+     "quote": "V nedeljo, 27. novembra 2022, je potekalo glasovanje na treh zakonodajnih referendumih"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "referendum",
+     "contests": 4,
+     "source": "dvk_ref_2024-06-09",
+     "quote": "Posvetovalni referendumi so bili v nedeljo, 9. junija 2024",
+     "note": "Three consultative decrees with four questions (assisted dying, a preference vote for the National Assembly, medical cannabis, personal cannabis), held with the European Parliament election."
+    },
+    {
+     "date": "2025-05-11",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2025-05-11",
+     "quote": "Glasovanje na zakonodajnem referendumu je bilo v nedeljo, 11. maja 2025."
+    },
+    {
+     "date": "2025-11-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2025-11-23",
+     "quote": "zakonodajnem referendumu o Zakonu o pomoči pri prostovoljnem končanju življenja (ZPPKŽ) in o izidu referenduma, ki je bil 23. novembra 2025"
+    },
+    {
+     "date": "2026-10-11",
+     "election_kind": "referendum",
+     "contests": 4,
+     "source": "dvk_ref_2026-10-11",
+     "quote": "Glasovanje na referendumih je potekalo v nedeljo, 11. oktobra 2026.",
+     "note": "One legislative referendum (ZPPre-B) and three consultative referendums (social assistance, the local franchise, the RTV licence fee)."
+    },
+    {
+     "date": "2026-12-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "dvk_ref_2026-12-06",
+     "quote": "Glasovanje na referendumu bo potekalo v nedeljo, 6. decembra 2026.",
+     "note": "Scheduled."
+    }
+   ]
+  },
+  {
+   "key": "drzavni_svet",
+   "tier": "national",
+   "name": "Volitve članov Državnega sveta",
+   "name_en": "National Council elections",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Electors' votes per candidate in each electoral unit or interest group, in the commission's reports (PDF).",
+   "note": "40 members for five years (Ustava art. 96, 98): 22 representatives of local interests elected by electors whom the municipal councils choose, in 22 electoral units (ZDVEDS), and 18 representatives of employers, employees, farmers, crafts and independent professions, and non-commercial activities, elected by electors of the interest organisations at electoral assemblies (ZDSve). Run by the State Election Commission. The general elections of 1992 and 1997 are not on the commission's archive pages; a repeat election for culture and sport followed a Constitutional Court decision of 19 April 2023.",
+   "source": "ustava",
+   "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (96. člen: Državni svet ima 40 članov)",
+   "earliest_record": "1997-04-20",
+   "contests_per_unit": 22,
+   "est_votes": 25000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "month": 11,
+     "administered_by": "Državna volilna komisija and the electoral-unit commissions",
+     "source": "zdsve",
+     "vacancy_rule": "A by-election (nadomestne volitve) is called by the President of the National Assembly for the vacant seat."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si)",
+     "url": "https://www.dvk-rs.si/volitve-in-referendumi/drzavni-svet-rs/arhiv-volitev-drzavnega-sveta-rs/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1997-04-20",
+     "evidence": "A page per general or by-election with the report on the result (poročilo o izidu, končni izid, zapisnik) and the lists of members elected.",
+     "source": "dvk_ds"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election",
+      "indirect"
+     ],
+     "name_pattern": "Državni svet|National Council",
+     "iso_pattern": "SI",
+     "valid_from": "1992-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-04-20",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-nadomestne-volitve-1997",
+     "quote": "Nadomestne volitve za člana državnega sveta – predstavnika lokalnih interesov v volilni enoti 8 ... so bile v nedeljo, 20. 4. 1997."
+    },
+    {
+     "date": "2002-11-27",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-4",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov lokalnih interesov – so bile v sredo, 27. 11. 2002.",
+     "note": "Local interests (22 electoral units)."
+    },
+    {
+     "date": "2002-11-28",
+     "election_kind": "general",
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-4",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov delodajalcev, ... negospodarskih dejavnosti – so bile v četrtek, 28. 11. 2002.",
+     "note": "Functional interests (18 members)."
+    },
+    {
+     "date": "2007-11-21",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-3",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov lokalnih interesov – so bile v sredo, 21. 11. 2007.",
+     "note": "Local interests."
+    },
+    {
+     "date": "2007-11-22",
+     "election_kind": "general",
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-3",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov delodajalcev, ... – so bile v četrtek, 22. 11. 2007.",
+     "note": "Functional interests."
+    },
+    {
+     "date": "2008-03-12",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-2",
+     "quote": "Naknadne volitve za izvolitev enega člana državnega sveta – predstavnika samostojnih poklicev ... – so bile v sredo, 12. 3. 2008."
+    },
+    {
+     "date": "2008-04-09",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-2",
+     "quote": "Ponovne volitve za izvolitev enega člana državnega sveta – predstavnika lokalnih interesov v 18. volilni enoti ... – so bile v sredo, 9. 4. 2008."
+    },
+    {
+     "date": "2012-11-21",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-1",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov lokalnih interesov – so bile v sredo, 21. 11. 2012.",
+     "note": "Local interests."
+    },
+    {
+     "date": "2012-11-22",
+     "election_kind": "general",
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-1",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov delodajalcev, ... – so bile v četrtek, 22. 11. 2012.",
+     "note": "Functional interests."
+    },
+    {
+     "date": "2014-05-29",
+     "election_kind": "by_election",
+     "contests": 2,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-nadomestne-volitve",
+     "quote": "Nadomestne volitve članov državnega sveta – predstavnikov lokalnih interesov v 3. in 6. volilni enoti ... – so bile v četrtek, 29. 5. 2014."
+    },
+    {
+     "date": "2017-11-22",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-2017",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov lokalnih interesov – so bile v sredo, 22. 11. 2017.",
+     "note": "Local interests."
+    },
+    {
+     "date": "2017-11-23",
+     "election_kind": "general",
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-2017",
+     "quote": "Splošne volitve članov državnega sveta – predstavnikov delodajalcev, ... – so bile v četrtek, 23. 11. 2017.",
+     "note": "Functional interests."
+    },
+    {
+     "date": "2018-12-17",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-leto-2018-nadomestne-volitve",
+     "quote": "Nadomestne volitve člana državnega sveta – predstavnika negospodarskih dejavnosti za področje socialnega varstva – so bile v četrtek, 17. 12. 2018."
+    },
+    {
+     "date": "2020-06-18",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-leto-2020-1-nadomestne-volitve",
+     "quote": "Nadomestne volitve člana državnega sveta – predstavnika lokalnih interesov v 3. volilni enoti ... (Maribor) – so bile v četrtek, 18. 6. 2020."
+    },
+    {
+     "date": "2020-10-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_volitve-v-drzavni-svet-rs-leto-2020-2-nadomestne-volitve-clana-ds-2020-6-ve-velenje-1",
+     "quote": "Nadomestne volitve člana državnega sveta – predstavnika lokalnih interesov v 6. volilni enoti ... (Velenje) – so bile v četrtek, 15. 10. 2020."
+    },
+    {
+     "date": "2022-11-23",
+     "election_kind": "general",
+     "contests": 22,
+     "source": "dvk_ds_volitve-v-drzavni-svet-2022",
+     "quote": "Volitve v državni svet so bile 23. in 24. novembra 2022.",
+     "note": "Local interests (Seznam izvoljenih članov DS - predstavniki lokalnih interesov, 23. 11. 2022)."
+    },
+    {
+     "date": "2022-11-24",
+     "election_kind": "general",
+     "source": "dvk_ds_volitve-v-drzavni-svet-2022",
+     "quote": "Volitve v državni svet so bile 23. in 24. novembra 2022.",
+     "note": "Functional interests (24. 11. 2022)."
+    },
+    {
+     "date": "2024-11-14",
+     "election_kind": "by_election",
+     "contests": 1,
+     "source": "dvk_ds_nadomestne-volitve-v-drzavni-svet-2024-lokalni-interesi",
+     "quote": "Nadomestne volitve so bile 14. novembra 2024.",
+     "note": "13th local-interest unit; nine electors chose between two candidates."
+    },
+    {
+     "date": "2026-08-19",
+     "election_kind": "by_election",
+     "contests": 2,
+     "source": "dvk_ds_nadomestne-volitve-v-drzavni-svet-2026-lokalni-interesi",
+     "quote": "nadomestne volitve pa bodo 19. avgusta 2026",
+     "note": "9th and 12th local-interest units."
+    }
+   ]
+  },
+  {
+   "key": "obcinski_svet",
+   "tier": "obcina",
+   "name": "Volitve članov občinskih (mestnih) svetov",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "si.obcina"
+    ]
+   },
+   "finest_note": "By municipality and by its council electoral units as the municipal commissions report them; no central polling-station files.",
+   "note": "Councils of 7 to 45 members (ZLS): councils of 12 or more members by list PR with a preference vote, smaller ones by plurality in one- or multi-member units (ZLV). Councillors of the Italian and Hungarian national communities in the bilingual areas and of the Roma community in 20 municipalities (ZLS art. 39) are elected in separate contests at the same time and belong to this class (the 2015 Roma by-election in Grosuplje is on the commission's site).",
+   "source": "zlv",
+   "valid_from": "1994-12-04",
+   "first_held": "1994-12-04",
+   "earliest_record": "1998-11-22",
+   "est_votes": 8000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Občinske volilne komisije; called by the President of the National Assembly",
+     "source": "zlv",
+     "vacancy_rule": "A list seat passes to the next candidate; a plurality seat goes to a by-election (nadomestne volitve, ZLV)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si/arhivi): lokalne volitve",
+     "url": "https://www.dvk-rs.si/arhivi/volitve2022/lv2022/",
+     "format": "json, xlsx, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1998-11-22",
+     "finest": "si.obcina",
+     "evidence": "The commission compiles what the municipal election commissions report: national and per-municipality results (data/prvikrog/data.json, obcine-data/, obcine-xlsx/) for 2022, and static archives lv1998, volitve2002, lv2006, lv2010, lv2014, and lv2018. The 1994 elections are not there.",
+     "source": "dvk_lv"
+    },
+    {
+     "role": "administers",
+     "platform": "Občinske volilne komisije (212 municipal election commissions)",
+     "url": "https://www.dvk-rs.si/kontakti/ovk-kontakti/",
+     "format": "html, pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The municipal commissions run local elections and publish their reports in municipal gazettes; the commission's 2026 page directs voters to them (Za izvedbo lokalnih volitev so pristojne občinske volilne komisije).",
+     "source": "dvk_lv2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "1994-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-04",
+     "election_kind": "local",
+     "note": "First local elections under the 1993 Local Self-Government Act, in 147 municipalities; not on the commission's archive pages."
+    },
+    {
+     "date": "1998-11-22",
+     "election_kind": "local",
+     "source": "dvk_lv_1998",
+     "quote": "LOKALNE VOLITVE 1998: 1. Krog lokalnih volitev; V Sloveniji ima pravico glasovati 1.522.475 volivcev."
+    },
+    {
+     "date": "2002-11-10",
+     "election_kind": "local",
+     "source": "dvk_lv_2002",
+     "quote": "LOKALNE VOLITVE 2002: Rezultati volitev v občinske svete"
+    },
+    {
+     "date": "2006-10-22",
+     "election_kind": "local",
+     "source": "dvk_lv_2006",
+     "quote": "LOKALNE VOLITVE 2006"
+    },
+    {
+     "date": "2010-10-10",
+     "election_kind": "local",
+     "source": "dvk_lv_2010",
+     "quote": "LOKALNE VOLITVE 2010"
+    },
+    {
+     "date": "2014-10-05",
+     "election_kind": "local",
+     "source": "dvk_lv_2014",
+     "quote": "Predsednik Državnega zbora RS Janko Veber je 24. 6. 2014 razpisal redne volitve v občinske svete in redne volitve županov.",
+     "note": "Regular elections on 5 October 2014 (ROKOVNIK-LV-5.10.2014)."
+    },
+    {
+     "date": "2018-11-18",
+     "election_kind": "local",
+     "source": "dvk_lv_2018",
+     "quote": "Redne volitve v občinske svete in redne volitve županov so bile v nedeljo, 18. 11. 2018."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "local",
+     "contests": 212,
+     "source": "dvk_lv_2022",
+     "quote": "Lokalne volitve, na katerih volimo župane in člane občinskih svetov ... so bile v nedeljo, 20. novembra 2022."
+    },
+    {
+     "date": "2026-11-15",
+     "election_kind": "local",
+     "source": "dvk_lv_2026",
+     "quote": "Redne volitve v občinske svete in redne volitve županov bodo v nedeljo, 15. 11. 2026."
+    }
+   ]
+  },
+  {
+   "key": "zupan",
+   "tier": "obcina",
+   "name": "Volitve županov",
+   "name_en": "Mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "si.obcina"
+    ]
+   },
+   "finest_note": "By municipality as the municipal commissions report it.",
+   "note": "Direct two-round election of the mayor in each municipality (ZLV): a majority of valid votes elects, otherwise the two leading candidates meet in a second round two weeks later. Early and by-elections follow a vacancy.",
+   "source": "zlv",
+   "valid_from": "1994-12-04",
+   "first_held": "1994-12-04",
+   "earliest_record": "1998-11-22",
+   "est_votes": 10000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": false,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "A majority of valid votes elects; otherwise the two leading candidates meet in a second round (ZLV).",
+     "administered_by": "Občinske volilne komisije",
+     "source": "zlv",
+     "vacancy_rule": "Early election of the mayor (predčasne volitve župana) within the time set by ZLV."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si/arhivi): lokalne volitve",
+     "url": "https://www.dvk-rs.si/arhivi/volitve2022/lv2022/",
+     "format": "json, xlsx, html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1998-11-22",
+     "finest": "si.obcina",
+     "evidence": "The commission compiles what the municipal election commissions report: national and per-municipality results (data/prvikrog/data.json, obcine-data/, obcine-xlsx/) for 2022, and static archives lv1998, volitve2002, lv2006, lv2010, lv2014, and lv2018. The 1994 elections are not there.",
+     "source": "dvk_lv"
+    },
+    {
+     "role": "administers",
+     "platform": "Občinske volilne komisije (212 municipal election commissions)",
+     "url": "https://www.dvk-rs.si/kontakti/ovk-kontakti/",
+     "format": "html, pdf",
+     "access": "manual",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "evidence": "The municipal commissions run local elections and publish their reports in municipal gazettes; the commission's 2026 page directs voters to them (Za izvedbo lokalnih volitev so pristojne občinske volilne komisije).",
+     "source": "dvk_lv2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election",
+      "general"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_from": "1994-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-12-04",
+     "election_kind": "local",
+     "note": "First local elections; not on the commission's archive pages."
+    },
+    {
+     "date": "1998-11-22",
+     "election_kind": "local",
+     "source": "dvk_lv_1998",
+     "quote": "Rezutati volitev za župane - 1. krog"
+    },
+    {
+     "date": "2002-11-10",
+     "election_kind": "local",
+     "source": "dvk_lv_2002",
+     "quote": "LOKALNE VOLITVE 2002: Rezultati volitev za župane"
+    },
+    {
+     "date": "2006-10-22",
+     "election_kind": "local",
+     "source": "dvk_lv_2006",
+     "quote": "LOKALNE VOLITVE 2006"
+    },
+    {
+     "date": "2006-11-12",
+     "election_kind": "runoff",
+     "source": "dvk_lv_2006",
+     "quote": "Do 19:00, dne 12.11.2006, je glasovalo skupaj 378.471 volilcev (drugi krog)"
+    },
+    {
+     "date": "2010-10-10",
+     "election_kind": "local",
+     "source": "dvk_lv_2010",
+     "quote": "LOKALNE VOLITVE 2010"
+    },
+    {
+     "date": "2010-10-24",
+     "election_kind": "runoff",
+     "source": "dvk_lv_2010",
+     "quote": "Do 19.00 dne 24. 10. 2010 je glasovalo 304.718 volivcev (48,81 %)."
+    },
+    {
+     "date": "2014-10-05",
+     "election_kind": "local",
+     "source": "dvk_lv_2014",
+     "quote": "ROKOVNIK-LV-5.10.2014"
+    },
+    {
+     "date": "2018-11-18",
+     "election_kind": "local",
+     "source": "dvk_lv_2018",
+     "quote": "Redne volitve v občinske svete in redne volitve županov so bile v nedeljo, 18. 11. 2018."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "local",
+     "contests": 212,
+     "seats": 212,
+     "source": "dvk_lv2022_data",
+     "quote": "stat_zup: izv st_mest 6, st_ost 159; neizv st_mest 6, st_ost 41"
+    },
+    {
+     "date": "2022-12-04",
+     "election_kind": "runoff",
+     "contests": 47,
+     "source": "dvk_lv_2022",
+     "quote": "Drugi krog županskih volitev v tistih občinah, kjer v prvem krogu nihče izmed kandidatk in kandidat ...",
+     "note": "Runoffs in the 47 municipalities with no first-round winner (6 urban, 41 other)."
+    },
+    {
+     "date": "2026-11-15",
+     "election_kind": "local",
+     "source": "dvk_lv_2026",
+     "quote": "Redne volitve v občinske svete in redne volitve županov bodo v nedeljo, 15. 11. 2026."
+    }
+   ]
+  },
+  {
+   "key": "svet_ozjega_dela",
+   "tier": "ozji_del",
+   "name": "Volitve članov svetov krajevnih, vaških in četrtnih skupnosti",
+   "name_en": "Local, village, and city-district community council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Elected with the municipal councils where a municipality's statute sets up sub-municipal communities (ZLS, ZLV).",
+   "source": "dvk_lv_splosno",
+   "locator": "https://www.dvk-rs.si/volitve-in-referendumi/lokalne-volitve/ (V občinah, kjer so ustanovljeni ožji deli, se volijo tudi člani krajevnih, vaških oziroma četrtnih skupnosti)",
+   "valid_from": "1994-12-04",
+   "disposition": "blocked",
+   "disposition_reason": "Run and published only by each municipal election commission in its own gazette; the State Election Commission does not compile these results, and no official register lists the communities.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "lokalni_referendum",
+   "tier": "obcina",
+   "name": "Občinski referendumi",
+   "name_en": "Municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Municipal councils may call a referendum on a general act or other matter of the municipality (ZLS, applying ZRLI).",
+   "source": "zrli",
+   "disposition": "blocked",
+   "disposition_reason": "Called and run by each municipality, with results only in municipal gazettes; the State Election Commission does not compile them.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "recall"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "referendum_obcine",
+   "tier": "obcina",
+   "name": "Referendumi o ustanovitvi občin",
+   "name_en": "Referendums on establishing municipalities",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Reports per referendum area (PDF).",
+   "note": "Consultative referendums the National Assembly calls in the areas of proposed new municipalities before it changes the municipal map (ZLS). Those of 2006 are on the commission's site; earlier rounds are not.",
+   "source": "zls_izvlecek",
+   "valid_from": "1994-01-01",
+   "earliest_record": "2006-01-29",
+   "est_votes": 60000,
+   "effort": 3,
+   "cadence": [
+    {
+     "called": true,
+     "administered_by": "Državna volilna komisija and the commissions of the referendum areas",
+     "source": "zls_izvlecek"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Državna volilna komisija (dvk-rs.si)",
+     "url": "https://www.dvk-rs.si/volitve-in-referendumi/referendumi/volitve-referenduma/referendum-obcine-29-1/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2006-01-29",
+     "last_date": "2006-04-09",
+     "evidence": "The decrees calling the referendums and the reports on their results for 29 January and 9 April 2006.",
+     "source": "dvk_ref_obcine"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "2006-01-01",
+     "valid_to": "2006-06-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2006-01-29",
+     "election_kind": "referendum",
+     "source": "dvk_ref_obcine",
+     "quote": "REFERENDUM OBČINE (29.1.) 2006: Odlok o razpisu referenduma; Poročilo referenduma"
+    },
+    {
+     "date": "2006-04-09",
+     "election_kind": "referendum",
+     "source": "dvk_ref_obcine2",
+     "quote": "REFERENDUM OBČINE (9.4) 2006: Odlok o razpisu referenduma; Poročilo o izidu referenduma"
+    }
+   ]
+  },
+  {
+   "key": "narodne_skupnosti",
+   "tier": "national",
+   "name": "Volitve v svete samoupravnih narodnih skupnosti",
+   "name_en": "Councils of the Italian and Hungarian self-governing national communities",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Members of the Italian and Hungarian national communities elect the councils of their municipal self-governing communities, which form the two national self-governing communities (Ustava art. 64).",
+   "source": "ustava",
+   "locator": "https://www.dvk-rs.si/fileadmin/user_upload/dokumenti/zakonodaja/ustava.republike.slovenije.pdf (64. člen: samoupravne narodne skupnosti)",
+   "disposition": "blocked",
+   "disposition_reason": "Held on the local-election day but run by the communities' own election commissions; the State Election Commission does not publish the results and no official compilation was found.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "narodn[ae] skupnost|national communit|comunità|nemzeti",
+     "within": null
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "posredni",
+   "tier": "national",
+   "name": "Posredne volitve",
+   "name_en": "Indirect elections",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers chosen by elected bodies, not by voters: the Prime Minister and ministers (National Assembly), the President of the National Assembly, Constitutional Court judges, the Ombudsman, and mayors' deputies and committee chairs by municipal councils.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1991-06-25"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "sodniki",
+   "tier": "national",
+   "name": "Izvolitev sodnikov",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judge is elected by voters: the National Assembly elects judges on the proposal of the Judicial Council (Ustava art. 130), and lay judges are appointed.",
+   "dates": []
+  },
+  {
+   "key": "kandidiranje",
+   "tier": "national",
+   "name": "Določanje kandidatov",
+   "name_en": "Candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose their candidates under their own rules (ZVDZ, ZLV); the state runs no primary and publishes no nominating vote.",
+   "dates": []
+  },
+  {
+   "key": "zbornice",
+   "tier": "national",
+   "name": "Volitve v zbornice in druge nedržavne organe",
+   "name_en": "Chamber and other non-state elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {},
+   "source": "ustava",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Run by the bodies themselves for their members (the Chamber of Agriculture and Forestry, professional chambers, universities, works councils); not public elections.",
+   "dates": []
+  },
+  {
+   "key": "skupscina_srs_1990",
+   "tier": "srs",
+   "name": "Volitve v Skupščino Republike Slovenije 1990",
+   "name_en": "1990 multiparty election to the three chambers of the Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "First multiparty election, in April 1990: the Socio-Political Chamber (80 seats, list PR), the Chamber of Municipalities (80 seats, by municipality), and the Chamber of Associated Labour (80 seats, by workplace electorates). This Assembly adopted the 1991 Constitution and sat until the National Assembly was elected in 1992.",
+   "source": "ustava",
+   "valid_from": "1990-04-08",
+   "valid_to": "1992-12-23",
+   "first_held": "1990-04-08",
+   "est_votes": 2500000,
+   "effort": 4,
+   "disposition": "blocked",
+   "disposition_reason": "Not on the State Election Commission's site, whose archive starts with the 1992 National Assembly election; the 1990 returns were published by the Republic Electoral Commission in print, and no official digital copy was found.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1990-01-01",
+     "valid_to": "1991-06-25"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "predsedstvo_1990",
+   "tier": "srs",
+   "name": "Volitve predsednika in članov Predsedstva Republike Slovenije 1990",
+   "name_en": "1990 election of the President and members of the Presidency",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Direct election in April 1990 of the President of the Presidency (two rounds) and four members; the Presidency served until the first President of the Republic took office in December 1992.",
+   "source": "ustava",
+   "valid_from": "1990-04-08",
+   "valid_to": "1992-12-23",
+   "first_held": "1990-04-08",
+   "est_votes": 2000000,
+   "effort": 4,
+   "disposition": "blocked",
+   "disposition_reason": "Not on the State Election Commission's site (its archive starts in 1992); no official digital copy of the Republic Electoral Commission's 1990 report was found.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state",
+      "other"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1990-01-01",
+     "valid_to": "1991-06-25"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "plebiscit_1990",
+   "tier": "srs",
+   "name": "Plebiscit o samostojnosti in neodvisnosti Republike Slovenije",
+   "name_en": "1990 independence plebiscite",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Plebiscite of 23 December 1990 on an independent and sovereign Slovenia.",
+   "source": "ustava",
+   "valid_from": "1990-12-23",
+   "valid_to": "1990-12-24",
+   "first_held": "1990-12-23",
+   "est_votes": 1300000,
+   "effort": 3,
+   "disposition": "blocked",
+   "disposition_reason": "Not in the State Election Commission's referendum archive, which starts in 1996; no official digital copy of the plebiscite commission's report was found.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1990-01-01",
+     "valid_to": "1991-06-25"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "skupscina_lrs_srs",
+   "tier": "srs",
+   "name": "Volitve v Skupščino LRS/SRS in občinske skupščine, 1945-1986",
+   "name_en": "Assembly and municipal assembly elections of the People's and Socialist Republic, 1945-1986",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-list and, from 1974, delegate elections to the republic's assembly and to the municipal assemblies (občinske skupščine).",
+   "source": "ustava",
+   "valid_from": "1945-05-05",
+   "valid_to": "1990-04-08",
+   "disposition": "blocked",
+   "disposition_reason": "Delegate-system and single-list returns were printed in the period's gazettes and statistical yearbooks; no official digital publication was found.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect",
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house",
+      "unicameral",
+      "constituent_assembly",
+      "council"
+     ],
+     "iso_pattern": "SI",
+     "valid_from": "1945-01-01",
+     "valid_to": "1990-01-01"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "jugoslovanske_volitve",
+   "tier": "jugoslavija",
+   "name": "Volitve v jugoslovansko ustavodajno skupščino, narodno skupščino in zvezno skupščino",
+   "name_en": "Yugoslav state elections held in Slovenia, 1920-1986",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elections of the Kingdom of Serbs, Croats and Slovenes and of Yugoslavia (Constituent Assembly 1920, National Assembly 1923-1938) and of the federal assemblies of 1945-1986, in which Slovenia formed constituencies.",
+   "source": "ustava",
+   "valid_from": "1920-11-28",
+   "valid_to": "1991-06-25",
+   "disposition": "blocked",
+   "disposition_reason": "State elections of Yugoslavia, published in the Kingdom's and the federation's printed election statistics; no official digital publication was found, and no successor authority publishes them.",
+   "dates": []
+  },
+  {
+   "key": "avstrijske_volitve",
+   "tier": "avstrija",
+   "name": "Volitve v deželne zbore in državni zbor (Reichsrat)",
+   "name_en": "Crown-land diet and Reichsrat elections before 1918",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "note": "The diets of Carniola, Styria, Carinthia, Gorizia and Gradisca, and Istria, and the Austrian Reichsrat, in which today's Slovenia voted.",
+   "source": "ustava",
+   "valid_to": "1918-10-29",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of the Austrian half of the monarchy; the archive counts them in Austria's census (census.at, reichsrat and kronland_landtage).",
+   "dates": []
+  }
+ ]
+}
