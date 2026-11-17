@@ -67,6 +67,15 @@ class Election:
         return f"{SITE}/resultater#{self.label.replace(' ', '-')}"
 
 
+# valg.gl lists no elected members for the 2005 election. The Landsting's own annual report for 2005 gives the seats
+# each party held after the election of 15 November 2005, by the site's party letters.
+REPORT_URL = (
+    "https://www.inatsisartut.gl/media/nxylryhd/d-inatsisartut-website-inatsisartutgl-media-7358-2005-aarsberetning-"
+    "for-landstinget-dk.pdf"
+)
+REPORT_SOURCE_ID = key("source", "inatsisartut-annual-report-2005")
+REPORT_SEATS = {"Landstingsvalg 2005": {"S": 10, "IA": 7, "D": 7, "A": 6, "KP": 1}}
+
 ELECTIONS = [
     Election("Landstingsvalg 2005", "inatsisartut", date(2005, 11, 15)),
     Election("Kommunevalg 2005", "local", date(2005, 4, 5)),
@@ -116,6 +125,7 @@ def stamps() -> list[str]:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, REPORT_URL, suffix=".pdf")
     missing = [e for e in ELECTIONS if e.url not in raw.keys(SOURCE)]
     for attempt in range(3):
         if not missing:
@@ -440,6 +450,22 @@ def registry() -> Package:
 # Elections.
 
 
+def report_source(p: Package) -> None:
+    p.add(
+        "source",
+        id=REPORT_SOURCE_ID,
+        kind="official_body",
+        publisher="Inatsisartut, Parliament of Greenland",
+        title="Årsberetning for Landstinget 2005",
+        url=REPORT_URL,
+        license="Official publication of the Parliament of Greenland, published for public use; reuse with the source "
+        "acknowledged",
+        license_url="https://www.inatsisartut.gl/",
+        attribution="Inatsisartut, Parliament of Greenland",
+    )
+    p.artifact(raw.cached(SOURCE, REPORT_URL), REPORT_SOURCE_ID)
+
+
 def election(stamp: str) -> Package:
     held = [e for e in ELECTIONS if e.stamp == stamp]
     p = Package(
@@ -453,6 +479,8 @@ def election(stamp: str) -> Package:
         p.uses(raw.cached(SOURCE, e.url))
     units: dict[str, str] = {}
     for e in held:
+        if e.label in REPORT_SEATS:
+            report_source(p)
         build(p, e, units)
     return p
 
@@ -550,7 +578,8 @@ def contest(
         body = INATSISARTUT if e.family == "inatsisartut" else FOLKETING
         area_id = COUNTRY
         in_scope = list(stations)
-    seats = len(here)
+    official = REPORT_SEATS.get(e.label, {}) if e.family != "local" else {}
+    seats = len(here) or sum(official.values())
     p.add(
         "contest",
         id=contest,
@@ -694,3 +723,18 @@ def contest(
         )
     for letters, n in won.items():
         p.add("outcome", result_set_id=result_set, option_id=options[(letters, "")], kind="won", seats=n)
+    if official and not here:
+        for letters, n in official.items():
+            if (letters, "") not in options:
+                raise ValueError(f"{e.label}: seat list names {letters}, which is not on the ballot")
+            p.add("outcome", result_set_id=result_set, option_id=options[(letters, "")], kind="won", seats=n)
+        p.add(
+            "note",
+            id=key("note", result_set, "seats"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md="valg.gl lists no elected members for this election. The seats of each list are those the "
+            "Parliament of Greenland's annual report for 2005 gives for the members after the election of 15 "
+            f"November 2005, {seats} in all. The report names no elected candidates by list, so none are recorded.",
+            lang="en",
+        )
