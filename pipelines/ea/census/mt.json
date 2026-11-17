@@ -1,0 +1,952 @@
+{
+ "polity": "MT",
+ "name": "Malta",
+ "sources": {
+  "constitution": {
+   "title": "Constitution of Malta (consolidated)",
+   "publisher": "Service of the Attorney General, Legislation Malta (legislation.mt)",
+   "url": "https://legislation.mt/eli/const/eng/pdf",
+   "kind": "official_body"
+  },
+  "cap354": {
+   "title": "General Elections Act (Cap. 354)",
+   "publisher": "Service of the Attorney General, Legislation Malta (legislation.mt)",
+   "url": "https://legislation.mt/eli/cap/354/eng/pdf",
+   "kind": "official_body"
+  },
+  "cap363": {
+   "title": "Local Government Act (Cap. 363)",
+   "publisher": "Service of the Attorney General, Legislation Malta (legislation.mt)",
+   "url": "https://legislation.mt/eli/cap/363/eng/pdf",
+   "kind": "official_body"
+  },
+  "cap237": {
+   "title": "Referenda Act (Cap. 237)",
+   "publisher": "Service of the Attorney General, Legislation Malta (legislation.mt)",
+   "url": "https://legislation.mt/eli/cap/237/eng/pdf",
+   "kind": "official_body"
+  },
+  "cap467": {
+   "title": "European Parliament Elections Act (Cap. 467)",
+   "publisher": "Service of the Attorney General, Legislation Malta (legislation.mt)",
+   "url": "https://legislation.mt/eli/cap/467/eng/pdf",
+   "kind": "official_body"
+  },
+  "ec_results": {
+   "title": "Election results",
+   "publisher": "Electoral Commission of Malta",
+   "url": "https://electoral.gov.mt/ElectionResults/Index",
+   "kind": "official_body",
+   "note": "Refuses scripted requests; results pages are saved from a browser."
+  },
+  "ep_2004": {
+   "title": "National results Malta 2004-2009 (constitutive session)",
+   "publisher": "European Parliament",
+   "url": "https://results.elections.europa.eu/en/national-results/malta/2004-2009/constitutive-session/",
+   "kind": "official_body"
+  },
+  "ep_2009": {
+   "title": "National results Malta 2009-2014 (constitutive session)",
+   "publisher": "European Parliament",
+   "url": "https://results.elections.europa.eu/en/national-results/malta/2009-2014/constitutive-session/",
+   "kind": "official_body"
+  },
+  "ep_2014": {
+   "title": "National results Malta 2014-2019 (constitutive session)",
+   "publisher": "European Parliament",
+   "url": "https://results.elections.europa.eu/en/national-results/malta/2014-2019/constitutive-session/",
+   "kind": "official_body"
+  },
+  "ep_2019": {
+   "title": "National results Malta 2019-2024 (constitutive session)",
+   "publisher": "European Parliament",
+   "url": "https://results.elections.europa.eu/en/national-results/malta/2019-2024/constitutive-session/",
+   "kind": "official_body"
+  },
+  "ep_2024": {
+   "title": "National results Malta 2024-2029",
+   "publisher": "European Parliament",
+   "url": "https://results.elections.europa.eu/en/national-results/malta/2024-2029/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Repubblika ta' Malta",
+   "name_en": "Republic of Malta",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "region",
+   "name": "Reġjuni",
+   "name_en": "Regions",
+   "parent": "national",
+   "polity_kind": "region",
+   "elects": false,
+   "source": "cap363",
+   "counts": [
+    {
+     "date": "2019-01-01",
+     "precision": "year",
+     "value": 6,
+     "source": "cap363",
+     "locator": "https://legislation.mt/eli/cap/363/eng/pdf (art. 37A(1): There shall be six regions as established in the Eleventh Schedule; Eleventh Schedule substituted by XIV.2019.71)"
+    }
+   ]
+  },
+  {
+   "key": "gozo",
+   "name": "Kunsill Ċiviku ta' Għawdex",
+   "name_en": "Gozo (Gozo Civic Council)",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "1961-01-01",
+   "valid_to": "1973-12-31",
+   "source": "constitution"
+  },
+  {
+   "key": "locality",
+   "name": "Lokalitajiet (Kunsilli Lokali)",
+   "name_en": "Localities (local councils)",
+   "parent": "region",
+   "polity_kind": "municipality",
+   "scheme": "mt.locality",
+   "source": "cap363",
+   "counts": [
+    {
+     "date": "2019-01-01",
+     "precision": "year",
+     "value": 68,
+     "source": "cap363",
+     "locator": "https://legislation.mt/eli/cap/363/eng/pdf (Eleventh Schedule, Regions: 9 localities in the Northern, 12 in the Eastern, 10 in the Western, 11 in the Port, 12 in the Southern, and 14 in the Gozo Region)"
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "name": "Komunitajiet",
+   "name_en": "Communities",
+   "parent": "locality",
+   "polity_kind": "submunicipal",
+   "scheme": "mt.community",
+   "source": "cap363",
+   "counts": [
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "value": 16,
+     "source": "cap363",
+     "locator": "https://legislation.mt/eli/cap/363/eng/pdf (Ninth Schedule, last amended by L.N. 230 of 2011: sixteen listed communities, from Fleur-de-Lys in Birkirkara to Baħar iċ-Ċagħaq in Naxxar)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "house",
+   "tier": "national",
+   "name": "Elezzjoni Ġenerali (Kamra tad-Deputati)",
+   "name_en": "General elections (House of Representatives)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "mt.district"
+    ]
+   },
+   "finest_note": "The commission counts all ballots of a division together; results and every STV count are published by electoral division only.",
+   "note": "65 members from thirteen five-member electoral divisions by the single transferable vote (Constitution art. 56; General Elections Act art. 17), plus bonus seats for the party with a majority of first preferences when the count leaves it short (art. 52) and up to twelve seats for the under-represented sex since 2021 (art. 52A). The commission's archive starts with the 1921 Legislative Assembly and includes the 1939 and 1945 Council of Government elections.",
+   "source": "constitution",
+   "valid_from": "1921-01-01",
+   "first_held": "1921-10-01",
+   "earliest_record": "1921-10-01",
+   "est_votes": 7000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Electoral Commission",
+     "source": "constitution",
+     "locator": "https://legislation.mt/eli/const/eng/pdf (art. 76(2): Parliament, unless sooner dissolved, shall continue for five years from the date of its first sitting)",
+     "vacancy_rule": "A casual election re-counts the vacating member's ballots among the unelected candidates of the division (General Elections Act, Thirteenth Schedule)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Malta (electoral.gov.mt)",
+     "url": "https://electoral.gov.mt/ElectionResults/Index",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1921-10-01",
+     "finest": "mt.district",
+     "evidence": "Every general election since 1921 by electoral division, with each candidate's votes at every count; the site refuses scripted requests, so pages are saved from a browser.",
+     "source": "ec_results"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MT",
+     "valid_from": "1921-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1921-10-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Legislative Assembly election under the 1921 self-government constitution. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1924-06-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Legislative Assembly election under the 1921 self-government constitution. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1927-08-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Legislative Assembly election under the 1921 self-government constitution. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1932-06-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Legislative Assembly election under the 1921 self-government constitution. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1939-07-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Council of Government election under the 1939 Letters Patent. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1945-11-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Council of Government election under the 1939 Letters Patent. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1947-10-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1950-09-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1951-05-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1953-12-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1955-02-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1962-02-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1966-03-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1971-06-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1976-09-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1981-12-12",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1987-05-09",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1992-02-22",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1996-10-26",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1998-09-05",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2003-04-12",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2008-03-08",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2013-03-09",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2017-06-03",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2022-03-26",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2026-05-30",
+     "election_kind": "general",
+     "note": "Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Elezzjoni tal-Membri tal-Parlament Ewropew",
+   "name_en": "European Parliament elections in Malta",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "world.country"
+    ]
+   },
+   "finest_note": "One national division; the commission publishes the national count only.",
+   "note": "Malta is one electoral division (Cap. 467 art. 8) electing its members by the single transferable vote (art. 7): five seats in 2004 and 2009, six since the 2011 adjustment.",
+   "source": "cap467",
+   "valid_from": "2004-05-01",
+   "first_held": "2004-06-12",
+   "earliest_record": "2004-06-12",
+   "est_votes": 1300000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 6,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Electoral Commission",
+     "source": "cap467",
+     "locator": "https://legislation.mt/eli/cap/467/eng/pdf (art. 5(1): every five years commencing in 2004, on the second Saturday in June or on such other date as the Prime Minister may establish)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Malta (electoral.gov.mt)",
+     "url": "https://electoral.gov.mt/ElectionResults/Index",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-06-12",
+     "finest": "world.country",
+     "evidence": "Every European Parliament election since 2004, nationally, with each candidate's votes at every count.",
+     "source": "ec_results"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "schemes": [
+      "world.country"
+     ],
+     "iso_pattern": "MT",
+     "valid_from": "2004-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 5,
+     "source": "ep_2004",
+     "quote": "Seats by political group - 2004-2009 Malta - Constitutive session ... PSE 3 ... EPP-ED 2",
+     "note": "Polling day not quoted by this source."
+    },
+    {
+     "date": "2009-06-06",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 5,
+     "source": "ep_2009",
+     "quote": "Seats by political group - 2009-2014 Malta - Constitutive session ... S&D 3 ... EPP 2",
+     "note": "Polling day not quoted by this source; a sixth seat was added in 2011."
+    },
+    {
+     "date": "2014-05-24",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "ep_2014",
+     "quote": "Seats by political group - 2014-2019 Malta - Constitutive session ... S&D 3 ... EPP 3",
+     "note": "Polling day not quoted by this source."
+    },
+    {
+     "date": "2019-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "ep_2019",
+     "quote": "Seats by political group - 2019-2024 Malta - Constitutive session ... S&D 4 ... EPP 2",
+     "note": "Held with the local council elections of 25 May 2019 (Local Government Act art. 8)."
+    },
+    {
+     "date": "2024-06-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "ep_2024",
+     "quote": "Seats by political group - 2024-2029 Malta - Constitutive session ... S&D 3 ... EPP 3",
+     "note": "Polling day not quoted by this source."
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Referendum nazzjonali",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "world.country"
+    ]
+   },
+   "finest_note": "The commission publishes national totals only.",
+   "note": "Referendums under the Referenda Act of 1973: on proposals in a House resolution, on bills under Constitution art. 66(3) (never held), and abrogative referendums on a law requested by electors (Part V, added 2002). Earlier colonial votes in 1870, 1956, and 1964 were called by the government of the day.",
+   "source": "cap237",
+   "first_held": "1870-01-01",
+   "earliest_record": "1870-01-01",
+   "est_votes": 1300000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Electoral Commission of Malta (electoral.gov.mt)",
+     "url": "https://electoral.gov.mt/ElectionResults/Index",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1870-01-01",
+     "finest": "world.country",
+     "evidence": "Referendums from 1870 to 2015, national totals of yes and no.",
+     "source": "ec_results"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "MT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1870-01-01",
+     "election_kind": "referendum",
+     "precision": "year",
+     "note": "On the eligibility of clergy to sit in the Council of Government. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1956-02-01",
+     "election_kind": "referendum",
+     "precision": "month",
+     "note": "On integration with the United Kingdom. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1964-05-01",
+     "election_kind": "referendum",
+     "precision": "month",
+     "note": "On the independence constitution. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2003-03-08",
+     "election_kind": "referendum",
+     "note": "On membership of the European Union. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2011-05-28",
+     "election_kind": "referendum",
+     "note": "On the introduction of divorce. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2015-04-11",
+     "election_kind": "referendum",
+     "note": "Abrogative referendum on the spring hunting regulations, the first under Part V of the Referenda Act; held with the local council elections. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    }
+   ]
+  },
+  {
+   "key": "local_council",
+   "tier": "locality",
+   "name": "Elezzjoni tal-Kunsilli Lokali",
+   "name_en": "Local council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "mt.locality"
+    ]
+   },
+   "finest_note": "Each locality is one division counted together; published by locality only.",
+   "note": "Councillors elected by the single transferable vote (Local Government Act art. 8(1)); from 1993 councils were renewed in groups on a rolling calendar, and since 2019 all 68 councils vote together with the European Parliament election, every five years. The mayor is the councillor of the majority party with most first-count votes (art. 4).",
+   "source": "cap363",
+   "valid_from": "1993-01-01",
+   "first_held": "1993-11-01",
+   "earliest_record": "1993-11-01",
+   "est_votes": 3000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "month": 6,
+     "term_years": 5,
+     "called": false,
+     "valid_from": "2019-01-01",
+     "administered_by": "Electoral Commission",
+     "source": "cap363",
+     "locator": "https://legislation.mt/eli/cap/363/eng/pdf (art. 8(1): every five years; art. 8(6): on the same day of the Elections for the European Parliament)",
+     "vacancy_rule": "A casual election re-counts the ballots of the vacating councillor, or the council co-opts (art. 9 and Third Schedule)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Electoral Commission of Malta (electoral.gov.mt)",
+     "url": "https://electoral.gov.mt/ElectionResults/Index",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1993-11-01",
+     "finest": "mt.locality",
+     "evidence": "Local council elections since 1993 by locality, with each candidate's votes at every count.",
+     "source": "ec_results"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "mt.locality"
+     ],
+     "iso_pattern": "MT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-11-01",
+     "election_kind": "general",
+     "precision": "month",
+     "note": "First elections, in every locality. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "1994-01-01",
+     "through": "2013-12-31",
+     "note": "Rolling elections in groups of councils, not enumerated here. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    },
+    {
+     "date": "2015-04-11",
+     "election_kind": "local",
+     "source": "cap363",
+     "quote": "the publication of the result of the elections of councillors held on the 11th April, 2015"
+    },
+    {
+     "date": "2019-05-25",
+     "election_kind": "local",
+     "source": "cap363",
+     "quote": "the councillors elected in the elections held on 25 May 2019 shall assume office as from 1 July 2019",
+     "note": "All 68 councils, with the European Parliament election."
+    },
+    {
+     "date": "2024-06-08",
+     "election_kind": "local",
+     "note": "All councils, with the European Parliament election (art. 8(6)). Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    }
+   ]
+  },
+  {
+   "key": "community_committee",
+   "tier": "community",
+   "name": "Elezzjoni tal-Kumitati Amministrattivi",
+   "name_en": "Community (administrative) committee elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "mt.community"
+    ]
+   },
+   "finest_note": "Each community is one division; published by community only.",
+   "note": "Committees for the communities of the Ninth Schedule, elected with the local councils by the single transferable vote; since Act XIV of 2019 a councillor resident in the community is assigned to it instead (art. 47A(5)).",
+   "source": "cap363",
+   "est_votes": 60000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Electoral Commission of Malta (electoral.gov.mt)",
+     "url": "https://electoral.gov.mt/ElectionResults/Index",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-01-01",
+     "finest": "mt.community",
+     "evidence": "Community committee elections by community, with each candidate's votes at every count.",
+     "source": "ec_results"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "schemes": [
+      "mt.community"
+     ],
+     "iso_pattern": "MT"
+    }
+   ]
+  },
+  {
+   "key": "local_referendum",
+   "tier": "locality",
+   "name": "Referendum lokali",
+   "name_en": "Local referendums on council bye-laws",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Electors of a locality may seek the abrogation of a council bye-law by referendum under Part V of the Referenda Act, applied by art. 36A of the Local Government Act. None is known to have been held.",
+   "source": "cap363",
+   "est_votes": 0,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "iso_pattern": "MT*"
+    }
+   ]
+  },
+  {
+   "key": "council_of_government",
+   "tier": "national",
+   "name": "Elezzjoni tal-Kunsill tal-Gvern (1849-1903)",
+   "name_en": "Council of Government elections (1849-1903)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected members of the colonial Council of Government under the constitutions of 1849, 1887, and 1903, chosen by restricted franchises in districts; abolished with the 1921 self-government constitution.",
+   "source": "constitution",
+   "valid_from": "1849-01-01",
+   "valid_to": "1921-01-01",
+   "first_held": "1849-01-01",
+   "est_votes": 100000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "MT",
+     "valid_from": "1849-01-01",
+     "valid_to": "1921-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1849-01-01",
+     "through": "1920-12-31",
+     "note": "Not enumerated: no official list of these elections has been reached. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+    }
+   ]
+  },
+  {
+   "key": "senate",
+   "tier": "national",
+   "name": "Senat (1921-1933)",
+   "name_en": "Senate (1921-1933)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Upper house of the 1921 self-government constitution: of 17 senators, 7 were elected by voters with property or education qualifications and 10 by special bodies (clergy, nobility, graduates, chamber of commerce, trade unions); abolished when the constitution was revoked in 1933.",
+   "source": "constitution",
+   "valid_from": "1921-01-01",
+   "valid_to": "1933-11-02",
+   "first_held": "1921-10-01",
+   "est_votes": 20000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of the Senate results has been found; the Electoral Commission's archive, which lists the Legislative Assembly elections of 1921-1932, refused this census, so whether it holds the Senate is unconfirmed.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "MT",
+     "valid_from": "1921-01-01",
+     "valid_to": "1933-12-31"
+    }
+   ]
+  },
+  {
+   "key": "gozo_civic_council",
+   "tier": "gozo",
+   "name": "Kunsill Ċiviku ta' Għawdex",
+   "name_en": "Gozo Civic Council elections (1961-1973)",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "An elected council for Gozo and Comino set up in 1961 and dissolved in 1973 after a Gozo referendum.",
+   "source": "constitution",
+   "valid_from": "1961-01-01",
+   "valid_to": "1973-12-31",
+   "first_held": "1961-01-01",
+   "est_votes": 40000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of its results has been found among the sources this census could reach; the Electoral Commission's archive refused this census.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "Gozo Civic",
+     "iso_pattern": "MT",
+     "valid_from": "1961-01-01",
+     "valid_to": "1974-01-01"
+    }
+   ]
+  },
+  {
+   "key": "gozo_referendum_1973",
+   "tier": "gozo",
+   "name": "Referendum tal-Kunsill Ċiviku ta' Għawdex (1973)",
+   "name_en": "Gozo Civic Council referendum (1973)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Gozo's electors were asked whether to keep the Gozo Civic Council; it was dissolved after the vote.",
+   "source": "constitution",
+   "valid_from": "1973-01-01",
+   "valid_to": "1974-01-01",
+   "first_held": "1973-01-01",
+   "est_votes": 15000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of the result has been found among the sources this census could reach; the Electoral Commission's archive refused this census.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "name_pattern": "Gozo",
+     "iso_pattern": "MT",
+     "valid_from": "1973-01-01",
+     "valid_to": "1974-01-01",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "casual_election",
+   "tier": "national",
+   "name": "Elezzjonijiet każwali",
+   "name_en": "Casual elections (House and local councils)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A vacancy is filled by re-counting the vacating member's ballots among the candidates who stood unsuccessfully (General Elections Act, Thirteenth Schedule; Local Government Act art. 9).",
+   "source": "cap354",
+   "est_votes": 0,
+   "effort": 2,
+   "disposition": "out_of_scope",
+   "disposition_reason": "No elector votes: the commission re-counts ballots already cast at the general or local election, so the count adds no votes beyond the original contest."
+  },
+  {
+   "key": "mayor",
+   "tier": "locality",
+   "name": "Sindku",
+   "name_en": "Mayors",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "note": "The mayor is the councillor of the party with an absolute majority of councillors who had the most first-count votes; otherwise the councillors elect one by open ballot (Local Government Act art. 4 and Seventh Schedule).",
+   "source": "cap363",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No separate ballot: the mayor follows from the council count or is chosen by the councillors."
+  },
+  {
+   "key": "regional_council",
+   "tier": "region",
+   "name": "Kunsilli Reġjonali",
+   "name_en": "Regional councils and their presidents",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "note": "Six regional councils (art. 37A) made up of a representative named by each mayor, chaired by a President of the Region elected from among the region's councillors; regional committees existed from 1993 and councils from 2011.",
+   "source": "cap363",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: members are appointed by the local councils and the president is chosen by councillors, not by the electorate."
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "President ta' Malta",
+   "name_en": "President of Malta",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "note": "Appointed by a resolution of the House supported by two thirds of its members (Constitution art. 48(1)) for a five-year term; before 2020 by a simple majority resolution.",
+   "source": "constitution",
+   "valid_from": "1974-12-13",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: chosen by the House of Representatives, not by the electorate."
+  },
+  {
+   "key": "judges",
+   "tier": "national",
+   "name": "Imħallfin u Maġistrati",
+   "name_en": "Judges and magistrates",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "note": "Appointed by the President on the advice of the Prime Minister after the Judicial Appointments Committee's assessment (Constitution arts. 96 and 100).",
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed; no election is held."
+  },
+  {
+   "key": "candidate_selection",
+   "tier": "national",
+   "name": "Għażla tal-kandidati",
+   "name_en": "Party candidate and leadership selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "note": "Parties choose their candidates and leaders under their own statutes.",
+   "source": "cap354",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The state runs no primary; nomination under the General Elections Act is by nomination paper, and party ballots are internal."
+  },
+  {
+   "key": "local_councils_association",
+   "tier": "national",
+   "name": "Assoċjazzjoni tal-Kunsilli Lokali",
+   "name_en": "Local Councils' Association",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {},
+   "note": "The association every council belongs to (art. 37(3)); its president and executive are chosen by councillors.",
+   "source": "cap363",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect: chosen by local councillors, not by the electorate."
+  }
+ ]
+}
