@@ -13,9 +13,11 @@ from typing import Any
 from uuid import uuid5
 
 import polars as pl
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.no import kartverket
 
 Doc = dict[str, Any]
 SOURCE = "no.valg"
@@ -67,6 +69,7 @@ def fetch() -> None:
                     queue.extend(children(json.loads(artifact.path.read_bytes())))
                 count += len(level)
         print(f"{source}: {count:,} documents", flush=True)
+    kartverket.fetch()
 
 
 # Parsing.
@@ -74,6 +77,9 @@ def fetch() -> None:
 NORWAY = str(uuid5(package.NAMESPACE, "polity\x1fNO"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fNOR"))
 VAL_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1f{SOURCE}"))
+MAP_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1f{kartverket.KARTVERKET}"))
+KLASS_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1f{kartverket.KLASS}"))
+SKIPPED: list[str] = []
 COUNTY = "no.fylke"
 MUNICIPALITY = "no.kommune"
 SAMI = "no.samevalgkrets"
@@ -407,6 +413,11 @@ def geo() -> Package:
     for code, (rank, kind, noun, system_) in SCHEMES.items():
         p.add("scheme", code=code, polity_id=NORWAY, kind=kind, rank=rank, noun=noun, code_system=system_)
     counties, towns, sami = _places()
+    # Codes that stood between reforms and ran in no election still belong in the crosswalk.
+    for scheme, known in ((COUNTY, counties), (MUNICIPALITY, towns)):
+        for change in kartverket.changes(scheme):
+            for code, text in (*change.old, *change.new):
+                known.setdefault(code, clean(text))
 
     def place(scheme: str, code: str, text: str, parent: str) -> None:
         id = area(scheme, code)
@@ -422,7 +433,92 @@ def geo() -> Package:
         place(MUNICIPALITY, code, text, area(COUNTY, county) if county in counties else COUNTRY)
     for code, text in sorted(sami.items()):
         place(SAMI, code, text, COUNTRY)
+    _shapes(p, counties, towns)
+    _lineage(p, counties, towns)
     return p
+
+
+def _shapes(p: Package, counties: dict[str, str], towns: dict[str, str]) -> None:
+    """Kartverket's outlines of the counties and municipalities in force since the 2024 reform. Areas whose code
+    ended before then keep no shape, because Kartverket publishes none for them."""
+    p.add(
+        "source",
+        id=MAP_SOURCE,
+        kind="official_body",
+        publisher="Kartverket",
+        title="Administrative enheter (Kommuneinfo)",
+        url="https://api.kartverket.no/kommuneinfo/v1/",
+        license="Creative Commons Attribution 4.0 International",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="© Kartverket",
+    )
+    for scheme, known in ((COUNTY, counties), (MUNICIPALITY, towns)):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", scheme, kartverket.VINTAGE.year),
+            scheme_code=scheme,
+            vintage=str(kartverket.VINTAGE.year),
+            valid_from=kartverket.VINTAGE,
+            as_of=kartverket.VINTAGE,
+        )
+        for shape in kartverket.shapes(scheme):
+            if shape.code not in known:
+                raise ValueError(f"Kartverket's {scheme} {shape.code} {shape.name} is in no election")
+            p.artifact(shape.artifact, MAP_SOURCE)
+            p.add(
+                "area_geometry",
+                area_id=area(scheme, shape.code),
+                valid_from=kartverket.VINTAGE,
+                geom=shapely.to_wkb(shape.geom, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(shapely.point_on_surface(shape.geom), 4326), hex=True, include_srid=True
+                ),
+                quality="official",
+                source_id=MAP_SOURCE,
+            )
+    p.uses(raw.cached(kartverket.KARTVERKET, kartverket.listing("fylker")))
+    p.uses(raw.cached(kartverket.KARTVERKET, kartverket.listing("kommuner")))
+
+
+def _lineage(p: Package, counties: dict[str, str], towns: dict[str, str]) -> None:
+    """The crosswalk of codes: one event for every set of counties or municipalities whose codes changed on a day,
+    from the 2018 mergers through the 2020 and 2024 reforms, with each old code as a `from` member and each new
+    code as a `to` member."""
+    p.add(
+        "source",
+        id=KLASS_SOURCE,
+        kind="official_body",
+        publisher="Statistics Norway",
+        title="Standard for classification of municipalities and counties (KLASS)",
+        url="https://www.ssb.no/en/klass/klassifikasjoner/131",
+        license="Creative Commons Attribution 4.0 International",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="Statistics Norway",
+    )
+    for scheme, known in ((COUNTY, counties), (MUNICIPALITY, towns)):
+        p.artifact(raw.cached(kartverket.KLASS, kartverket.changes_url(scheme)), KLASS_SOURCE)
+        for change in kartverket.changes(scheme):
+            members = [("from", code, text) for code, text in change.old] + [
+                ("to", code, text) for code, text in change.new
+            ]
+            absent = [code for _, code, _ in members if code not in known]
+            if absent:
+                SKIPPED.append(f"{scheme} {change.day}: {', '.join(absent)}")
+                continue
+            id = p.id("area_event", scheme, change.day, *(f"{r}:{c}" for r, c, _ in members))
+            old = ", ".join(f"{text} ({code})" for code, text in change.old)
+            new = ", ".join(f"{text} ({code})" for code, text in change.new)
+            p.add(
+                "area_event",
+                id=id,
+                kind=change.kind,
+                date=change.day,
+                date_precision="day",
+                source_id=KLASS_SOURCE,
+                notes=f"{old} became {new}",
+            )
+            for role, code, _ in members:
+                p.add("area_event_member", event_id=id, area_id=area(scheme, code), role=role)
 
 
 def region_body(code: str) -> str:
