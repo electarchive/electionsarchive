@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 from urllib.parse import unquote
 from uuid import uuid5
 
+import fastexcel
 import httpx
 
 from ea import package, raw
@@ -53,6 +54,13 @@ SUMMARIES = (
     "voting-place-coordinates.csv",
 )
 REFERENDUM_URL = f"{SITE}/electionresults_2011/referendum_ppresults.csv"
+# The 2020 general election's party lists and the two referendums held with it.
+LISTS_DAY = "2020-10-17"
+LISTS_KEY = f"nz.ec/{LISTS_DAY}-lists"
+REFERENDUMS_KEY = f"nz.ec/{LISTS_DAY}-referendums"
+LIST_FILES = ("party-lists-of-successful-registered-parties.csv", "party-lists-of-unsuccessful-registered-parties.csv")
+REFERENDUMS_PAGE = f"{SITE}/electionresults_2020/referendums-results.html"
+REFERENDUMS_XLSX = f"{SITE}/electionresults_2020/referendums-statistics/ElectorateReferendumResults.xlsx"
 
 METHOD = (
     "Counted per voting place and published by the Electoral Commission. A place open for advance voting and again on "
@@ -165,6 +173,10 @@ def fetch() -> None:
             for number in range(1, 80):
                 _try(page_url(year, vote, number), ".html")
     _try(REFERENDUM_URL, ".csv")
+    for name in LIST_FILES:
+        _try(csv_url(2020, name), ".csv")
+    _try(REFERENDUMS_PAGE, ".html")
+    _try(REFERENDUMS_XLSX, ".xlsx")
 
 
 def _try(url: str, suffix: str) -> None:
@@ -676,7 +688,17 @@ def package_key(day: str) -> str:
 
 def packages() -> list[str]:
     held = [f"nz.ec/{REFERENDUM_DAY}"] if has(REFERENDUM_URL) else []
-    return ["nz.ec/registry", *held, *(package_key(day) for day in days())]
+    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *later()]
+
+
+def later() -> list[str]:
+    """The packages of the 2020 party lists and referendums, once their files are cached."""
+    found = []
+    if all(has(csv_url(2020, name)) for name in LIST_FILES):
+        found.append(LISTS_KEY)
+    if has(REFERENDUMS_PAGE) and has(REFERENDUMS_XLSX):
+        found.append(REFERENDUMS_KEY)
+    return found
 
 
 def parse() -> None:
@@ -685,6 +707,10 @@ def parse() -> None:
         referendum().write()
     for day in days():
         general(day).write()
+    if LISTS_KEY in later():
+        lists().write()
+    if REFERENDUMS_KEY in later():
+        referendums().write()
 
 
 def emit() -> None:
@@ -1306,4 +1332,249 @@ def referendum() -> Package:
         p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=total[0])
         p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=sum(valid))
         p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=total[informal - 2])
+    return p
+
+
+def list_name(text: str) -> str:
+    family, _, given = clean(text).partition(",")
+    return clean(f"{given} {_fold_case(family)}")
+
+
+def _fold_case(family: str) -> str:
+    out = []
+    for word in family.split():
+        if word.isupper():
+            lowered = word.lower()
+            lowered = re.sub(r"(?<![^\W\d_'])[^\W\d_]|(?<=\b[^\W\d_]')[^\W\d_]", lambda m: m.group(0).upper(), lowered)
+            out.append(lowered)
+        else:
+            found = re.fullmatch(r"(Mc|Mac)([A-Z][A-Z]+)", word)
+            out.append(found.group(1) + found.group(2).capitalize() if found else word)
+    return " ".join(out)
+
+
+@dataclass
+class Listed:
+    party: str
+    position: int
+    name: str
+    status: str
+
+
+def party_lists() -> list[Listed]:
+    """Every name on every party list, with the party's name as the summary prints it and its place on the list."""
+    found: list[Listed] = []
+    for name in LIST_FILES:
+        rows = rows_of(csv_url(2020, name))
+        party = ""
+        for row in rows[1:]:
+            if len(row) == 1 and row[0]:
+                party = row[0]
+            elif len(row) >= 2 and row[0].isdigit():
+                found.append(Listed(party, int(row[0]), row[1], row[2] if len(row) > 2 else ""))
+            elif any(row):
+                raise ValueError(f"{name}: unexpected row {row}")
+    return found
+
+
+def lists() -> Package:
+    p = Package(
+        LISTS_KEY,
+        SOURCE,
+        "The party lists of the 2020 New Zealand general election, from the Electoral Commission's statistics",
+        depends=["nz.ec/registry", package_key(LISTS_DAY)],
+    )
+    p.external.add(NEW_ZEALAND)
+    entries = party_lists()
+    for name in LIST_FILES:
+        p.uses(art(csv_url(2020, name)))
+    p.uses(art(csv_url(2020, "overall-results-summary.csv")))
+    summ = summary(2020)
+    printed = {
+        row[0]: int(row[4])
+        for row in rows_of(csv_url(2020, "overall-results-summary.csv"))
+        if len(row) >= 9 and row[0] in summ.votes and row[4].isdigit()
+    }
+    sizes: dict[str, int] = {}
+    for entry in entries:
+        if entry.party not in summ.votes:
+            raise ValueError(f"the list of {entry.party} names no party of the summary")
+        sizes[entry.party] = sizes.get(entry.party, 0) + 1
+    for party, size in sizes.items():
+        if printed.get(party) != size:
+            raise ValueError(f"{party}: the list holds {size} names, the summary prints {printed.get(party)}")
+    if sum(sizes.values()) != 548:
+        raise ValueError(f"the lists hold {sum(sizes.values())} names, the summary prints 548")
+    seen: set[tuple[str, int]] = set()
+    for entry in entries:
+        if (entry.party, entry.position) in seen:
+            raise ValueError(f"{entry.party}: position {entry.position} appears twice")
+        seen.add((entry.party, entry.position))
+        person = key("person", f"{LISTS_DAY}:list", entry.party, entry.position)
+        p.add("person", id=person)
+        p.name(person, list_name(entry.name), "en", "official")
+        party = party_id(entry.party)
+        p.add(
+            "candidacy",
+            id=key("candidacy", f"{LISTS_DAY}:list", entry.party, entry.position),
+            person_id=person,
+            option_id=key("option", f"party-{LISTS_DAY}", entry.party),
+            role="list_member",
+            list_position=entry.position,
+            ballot_name=entry.name,
+            member_of_party_id=party,
+            is_independent=False,
+        )
+    return p
+
+
+REFERENDUM_QUESTIONS = (
+    (
+        "end-of-life-choice",
+        "End of Life Choice",
+        "Do you support the End of Life Choice Act 2019 coming into force?",
+        "End of Life Choice Referendum",
+    ),
+    (
+        "cannabis",
+        "Cannabis Legalisation and Control",
+        "Do you support the proposed Cannabis Legalisation and Control Bill?",
+        "Cannabis Referendum",
+    ),
+)
+
+
+def _referendum_totals() -> dict[str, list[int]]:
+    """Each referendum's yes, no, informal, and total votes, as the results page prints them: one table under each
+    referendum's heading, in the order of the headings."""
+    html = art(REFERENDUMS_PAGE).path.read_text("utf-8")
+    cells = Cells()
+    cells.feed(html)
+    headings = [h for h in re.findall(r"<h3>([^<]+)</h3>", html) if h.endswith(" Referendum")]
+    if headings != [heading for _, _, _, heading in REFERENDUM_QUESTIONS]:
+        raise ValueError(f"the results page lists the referendums {headings}")
+    for _, _, question, _ in REFERENDUM_QUESTIONS:
+        if f'"{question}"' not in html:
+            raise ValueError(f"the results page does not ask {question!r}")
+    tables: list[list[int]] = []
+    for row in cells.rows:
+        if row[:1] in (["Yes"], ["No"]) or row[:1] == ["TOTAL VOTES"] or row[0].startswith("Informal votes"):
+            if row[0] == "Yes":
+                tables.append([])
+            tables[-1].append(number(row[1]))
+    if len(tables) != len(headings) or any(len(table) != 4 for table in tables):
+        raise ValueError("the results page's tables are not yes, no, informal, and total")
+    return dict(zip(headings, tables, strict=True))
+
+
+def _sheet(name: str) -> list[list[str]]:
+    """A sheet of the referendum workbook as rows of text, empty cells as empty strings."""
+    reader = fastexcel.read_excel(str(art(REFERENDUMS_XLSX).path))
+    frame = reader.load_sheet(name, header_row=None, dtypes="string").to_polars()
+    return [[clean(cell or "") for cell in row] for row in frame.iter_rows()]
+
+
+def referendums() -> Package:
+    first = date.fromisoformat(LISTS_DAY)
+    p = Package(
+        REFERENDUMS_KEY,
+        SOURCE,
+        "The 2020 New Zealand referendums on end of life choice and cannabis by electorate, from the Electoral "
+        "Commission's results",
+        depends=["nz.ec/registry"],
+    )
+    p.external.add(NEW_ZEALAND)
+    p.uses(art(REFERENDUMS_PAGE))
+    p.uses(art(REFERENDUMS_XLSX))
+    election = _election(
+        p,
+        f"referendums-{LISTS_DAY}",
+        first,
+        "referendum",
+        "2020 New Zealand referendums",
+        f"nz/{LISTS_DAY}-referendums",
+    )
+    made: list[tuple[str, str, list[str]]] = []
+    for slug_, english, question, _ in REFERENDUM_QUESTIONS:
+        contest = _contest(
+            p,
+            f"referendum-{LISTS_DAY}-{slug_}",
+            election,
+            "ballot_question",
+            f"2020 New Zealand referendum, {english}",
+            f"nz/{LISTS_DAY}-referendums/{slug_}",
+            electoral_system_id=SYSTEM_REFERENDUM,
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.add(
+            "note",
+            id=key("note", contest, "question"),
+            entity_id=contest,
+            kind="context",
+            body_md=f"The referendum asked the question: \u201c{question}\u201d",
+            lang="en",
+        )
+        result_set = _result_set(p, election, contest, f"referendum-{LISTS_DAY}-{slug_}")
+        options = []
+        for position, label in enumerate(("Yes", "No"), 1):
+            option = key("option", f"referendum-{LISTS_DAY}-{slug_}", label)
+            options.append(option)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        made.append((result_set, contest, options))
+    rows: list[tuple[str, str, str, list[str]]] = []
+    for row in _sheet("Ordinary Votes"):
+        if re.fullmatch(r"\d+(/\d+)*", row[0]):
+            rows.append(("ordinary", row[0], row[1], row[2:8]))
+    for row in _sheet("Special Votes"):
+        if row[0].isdigit():
+            rows.append(("special", row[0], row[1], row[2:8]))
+    for kind, numbers, name, values in rows:
+        code = f"{LISTS_DAY}-referendums:{kind}:{numbers}"
+        unit = key("unit", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=NEW_ZEALAND,
+            scheme_code=ELECTORATE_SCHEME,
+            code=code,
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard" if kind == "special" else "aggregate",
+        )
+        label = f"{name}, special votes" if kind == "special" else f"{name}, ordinary votes"
+        p.name(unit, label, "en", "official")
+        for index, (result_set, _, options) in enumerate(made):
+            yes, no, informal = (int(float(value)) for value in values[index * 3 : index * 3 + 3])
+            _put(p, result_set, unit, 0, options[0], VOTES, yes)
+            _put(p, result_set, unit, 0, options[1], VOTES, no)
+            _put(p, result_set, unit, 0, None, CAST, yes + no + informal)
+            _put(p, result_set, unit, 0, None, VALID, yes + no)
+            _put(p, result_set, unit, 0, None, INVALID, informal)
+    printed = _referendum_totals()
+    for (result_set, _, options), (_, _, _, heading) in zip(made, REFERENDUM_QUESTIONS, strict=True):
+        yes, no, informal, total = printed[heading]
+        if yes + no + informal != total:
+            raise ValueError(f"{heading}: the page's votes do not sum to its total")
+        for option, value in zip(options, (yes, no), strict=True):
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=total)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=yes + no)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=informal)
+    p.add(
+        "note",
+        id=key("note", election, "units"),
+        entity_id=election,
+        kind="caveat",
+        body_md="Referendum papers for every electorate went into the same ballot box at a voting place, so the "
+        "ordinary votes are counted only for each group of the electorates where votes were taken, which "
+        "includes the neighboring electorates. Special votes are counted for each electorate.",
+        lang="en",
+    )
     return p
