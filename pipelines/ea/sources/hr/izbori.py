@@ -3,6 +3,7 @@ import functools
 import io
 import json
 import re
+import subprocess
 import unicodedata
 import zipfile
 from collections import Counter
@@ -351,6 +352,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
             except httpx.HTTPStatusError as failure:
                 print(f"{url}: {failure.response.status_code}", flush=True)
+        if d.family == "euparlament":
+            raw.fetch(SOURCE, elected_url(d), suffix=".pdf")
 
 
 @dataclass
@@ -362,6 +365,7 @@ class Option:
     votes: int
     seats: int | None = None
     candidates: list[tuple[int, str, int]] = field(default_factory=list)
+    elected: list[int] = field(default_factory=list)  # ballot numbers of the candidates declared elected
 
 
 @dataclass
@@ -471,6 +475,114 @@ def declared(d: Day, contest: str) -> Declared | None:
     if d.family == "euparlament":
         return _declared_ep_csv(url, rows)
     return _declared_csv(d, url, rows)
+
+
+# The archive already holds each European Parliament election in Croatia as a national result set, from the pipelines
+# that cover every member state. The polling-station sets below supersede those, so they reuse the ids those
+# pipelines derive from their own keys.
+
+
+def _external(scheme: str, value: str) -> str:
+    return str(uuid5(package.NAMESPACE, f"external_id:{scheme}\x1f{value}"))
+
+
+def _minted_source(publisher: str, title: str) -> str:
+    """The id `Changeset.source` mints for a source from its publisher and title."""
+    return str(uuid5(package.NAMESPACE, f"source\x1f{publisher}\x1f{title}"))
+
+
+@dataclass(frozen=True)
+class National:
+    election: str
+    contest: str
+    result_set: str
+    source: str
+
+
+def national(year: int) -> National:
+    contest = f"HR:{year}:eu.member_state:HR"
+    if year == 2024:
+        title = "Izbori članova u Europski parlament iz Republike Hrvatske 2024: rezultati"
+        return National(
+            _external("eu.election", f"HR:{year}:european-parliament"),
+            _external("eu.contest", contest),
+            _external("eu.ep2024.result_set", f"HR:{year}"),
+            _minted_source("Državno izborno povjerenstvo Republike Hrvatske", title),
+        )
+    return National(
+        _external("eu.election", f"HR:{year}:european-parliament"),
+        _external("eu.contest", contest),
+        _external("eu.ep_cadmus.result_set", contest),
+        _minted_source("European University Institute", "EP election results at constituency level, 1979–2019"),
+    )
+
+
+def elected_url(d: Day) -> str:
+    return f"{DATA}/euparlament/{d.year}/izabrani/i_14_000_0000.pdf"
+
+
+def _list_names(lines: list[str]) -> set[str]:
+    return {
+        label(re.sub(r"^kandidacijska lista\s+", "", line.strip(), flags=re.IGNORECASE))
+        for line in lines
+        if line.strip()
+    }
+
+
+def elected(d: Day, target: Declared) -> None:
+    """Fill each list's seats and elected candidates from the commission's decision on the distribution of seats."""
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, elected_url(d)).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    start = re.search(r"^\s*IV\. ", text, re.MULTILINE)
+    if start is None:
+        raise ValueError(f"{d.year}: no distribution of seats")
+    blocks: list[tuple[list[str], int, list[int]]] = []
+    names: list[str] = []
+    seats: int | None = None
+    members: list[int] = []
+    for line in text[start.end() :].splitlines():
+        if re.match(r"^\s*V\. |^\s*PREDSJEDNIK", line, re.IGNORECASE):
+            break
+        found = re.search(r"dobila je (\d+) mjest", line)
+        member = re.search(r"pod rednim brojem (\d+)\.\)", line)
+        header = re.match(r"^\s*\d+\.\s+(\S.*)$", line)
+        if found:
+            seats = int(found.group(1))
+        elif member:
+            members.append(int(member.group(1)))
+        elif header and "(kandidat" not in line:
+            if seats is not None:
+                blocks.append((names, seats, members))
+            names, seats, members = [header.group(1)], None, []
+        elif seats is None and line.strip() and not re.match(r"^\s*(Nositelj|parlament)", line):
+            names.append(line)
+    if seats is not None:
+        blocks.append((names, seats, members))
+    for o in target.options:
+        o.seats = 0
+    used: set[int] = set()
+    for names, seats, members in blocks:
+        wanted = _list_names(names)
+        best = max(
+            (o for o in target.options if o.number not in used),
+            key=lambda o: (
+                len(wanted & _list_names([o.label, *o.parties])) / len(wanted | _list_names([o.label, *o.parties]))
+            ),
+        )
+        have = _list_names([best.label, *best.parties])
+        if len(wanted & have) / len(wanted | have) < 0.5 and not (
+            "grupe biraca" in " ".join(wanted) and "grupe biraca" in " ".join(have)
+        ):
+            raise ValueError(f"{d.year}: no list for {names}")
+        used.add(best.number)
+        best.seats = seats
+        best.elected = members
+        if len(members) != seats:
+            raise ValueError(f"{d.year}: {names[0]} has {seats} seats but {len(members)} elected members")
 
 
 # Polling stations and their counts.
@@ -1255,16 +1367,22 @@ def election(d: Day) -> Package:
             p.artifact(raw.cached(SOURCE, declared_url(d, contest)), SOURCE_ID)
         except LookupError:
             pass
+    eu = national(d.year) if d.family == "euparlament" else None
     election_id = key("election", d.day)
     kind = {
         "parlament": "general",
         "euparlament": "general",
         "predsjednik": "general" if d.round == 1 else "runoff",
     }.get(d.family, "referendum")
-    p.add("election", id=election_id, polity_id=CROATIA, kind=kind, date_from=d.day, date_to=d.day, status="held")
-    p.name(election_id, english, "en", "official")
-    p.name(election_id, native, "hr", "native", False)
-    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    if eu is not None:
+        p.external |= {eu.election, eu.contest, eu.source}
+        p.artifact(raw.cached(SOURCE, elected_url(d)), SOURCE_ID)
+        election_id = eu.election
+    else:
+        p.add("election", id=election_id, polity_id=CROATIA, kind=kind, date_from=d.day, date_to=d.day, status="held")
+        p.name(election_id, english, "en", "official")
+        p.name(election_id, native, "hr", "native", False)
+        p.add("slug", path=path, entity_id=election_id, is_current=True)
     found, printed, problems = stations(d)
     values = Facts()
     seen: Counter[str] = Counter()
@@ -1278,23 +1396,27 @@ def election(d: Day) -> Package:
         contest_id = key("contest", d.day, contest)
         district = area("hr.izborna_jedinica", contest) if contest.isdigit() else COUNTRY
         previous_round = key("contest", previous.day, contest) if previous is not None else None
-        p.add(
-            "contest",
-            id=contest_id,
-            election_id=election_id,
-            kind=ckind,
-            office_id=PRESIDENCY if d.family == "predsjednik" else None,
-            body_id=body,
-            district_area_id=district,
-            magnitude=seats,
-            round_number=d.round,
-            previous_round_id=previous_round,
-            electoral_system_id=rules,
-            default_result_kind="counted",
-        )
-        p.name(contest_id, cname, "en", "official")
-        p.name(contest_id, cnative, "hr", "native", False)
-        p.add("slug", path=f"{path}/{slug}", entity_id=contest_id, is_current=True)
+        if eu is not None:
+            contest_id = eu.contest
+            elected(d, target)
+        else:
+            p.add(
+                "contest",
+                id=contest_id,
+                election_id=election_id,
+                kind=ckind,
+                office_id=PRESIDENCY if d.family == "predsjednik" else None,
+                body_id=body,
+                district_area_id=district,
+                magnitude=seats,
+                round_number=d.round,
+                previous_round_id=previous_round,
+                electoral_system_id=rules,
+                default_result_kind="counted",
+            )
+            p.name(contest_id, cname, "en", "official")
+            p.name(contest_id, cnative, "hr", "native", False)
+            p.add("slug", path=f"{path}/{slug}", entity_id=contest_id, is_current=True)
         if d.family == "referendum":
             p.add("ballot_question", contest_id=contest_id, type=QUESTIONS[d.year][0])
         result_set = key("result_set", d.day, contest)
@@ -1309,8 +1431,11 @@ def election(d: Day) -> Package:
             status="active",
             is_default=True,
             completeness=1.0,
+            supersedes_id=eu.result_set if eu is not None else None,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+        if eu is not None:
+            _supersede(p, d, eu, result_set)
         options = _options(p, d, contest, contest_id, result_set, target, previous)
         _declared_rows(p, result_set, target, options, {m for s in here for m in s.counts} if here else None)
         if not here:
@@ -1335,6 +1460,47 @@ def election(d: Day) -> Package:
     p.frame("result_value", values.frame())
     _accept(p, d, caveats)
     return p
+
+
+def _supersede(p: Package, d: Day, eu: National, result_set: str) -> None:
+    """Hand the contest's default to the polling-station set and keep the national totals as a superseded set.
+
+    The national set is re-staged with its own election, contest, and source. Its completeness is left open: the
+    package holds none of its facts, and a set with facts missing from the package fails the empty-set check.
+    """
+    p.add(
+        "result_set",
+        id=eu.result_set,
+        election_id=eu.election,
+        contest_id=eu.contest,
+        stage="official",
+        kind="counted",
+        source_id=eu.source,
+        status="superseded",
+        is_default=False,
+        completeness=None,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set, "supersedes"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md="This set holds the same contest by polling station, with each candidate's preference votes and the "
+        "seats and elected members from the commission's decision on the distribution of seats. It supersedes "
+        "the set of national totals.",
+        lang="en",
+    )
+    if d.year == 2019:
+        p.add(
+            "note",
+            id=key("note", result_set, "twelfth"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md="The commission's decision lists twelve elected members: eleven for the seats contested on election "
+            "day, and a twelfth that point V of the decision gives to Romana Jerković of the Social Democratic list, "
+            "under the presidential decision calling the election.",
+            lang="en",
+        )
 
 
 class Facts:
@@ -1512,6 +1678,14 @@ def _options(
                 ballot_name=clean(name),
                 is_independent=option_party(o) is None,
             )
+            if number_ in o.elected:
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    candidacy_id=key("candidacy", tag),
+                    kind="elected",
+                )
     return out
 
 
