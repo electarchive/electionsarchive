@@ -214,7 +214,14 @@ BODIES = {
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.slug}" for e in ELECTIONS)]
+    from ea.sources.rs import rik_predsednik
+
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *rik_predsednik.packages(),
+        *(f"{SOURCE}/{e.slug}" for e in ELECTIONS),
+    ]
 
 
 def emit() -> None:
@@ -226,12 +233,18 @@ def parse() -> None:
     registry().write()
     for election in ELECTIONS:
         build(election).write()
+    from ea.sources.rs import rik_predsednik
+
+    rik_predsednik.parse()
 
 
 # fetching ---------------------------------------------------------------------------------------
 
 
 def fetch() -> None:
+    from ea.sources.rs import rik_predsednik
+
+    rik_predsednik.fetch()
     for name, url in FILES.items():
         for attempt in range(4):
             try:
