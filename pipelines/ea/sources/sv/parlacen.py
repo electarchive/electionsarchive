@@ -15,7 +15,7 @@ import polars as pl
 
 from ea import raw
 from ea.package import Package
-from ea.sources.sv import assembly, tse
+from ea.sources.sv import assembly, presidents, tse
 
 SOURCE = tse.SOURCE
 DOCS = assembly.DOCS
@@ -178,7 +178,30 @@ def key(kind: str, *parts: object) -> str:
 
 
 def party(code: str) -> str:
-    return key("party", code)
+    """A party's id: the source-wide id that every sv.tse package uses for the same printed code."""
+    return tse.key("party", code)
+
+
+def held() -> dict[str, str]:
+    """The party codes that loaded sv.tse packages already declare, each with the package declaring it."""
+    out = dict.fromkeys(tse.PARTIES, "sv.tse/registry")
+    for code in sorted({code for e in presidents.ELECTIONS.values() for code in e.parties}):
+        out.setdefault(code, presidents.REGISTRY)
+    return out
+
+
+def codes() -> list[str]:
+    """Every party code on the PARLACEN ballots, in first-seen order."""
+    seen: dict[str, None] = {}
+    for election in ELECTIONS.values():
+        seen.update(dict.fromkeys(election.votes))
+    seen.update(dict.fromkeys(CODES_2015))
+    return list(seen)
+
+
+def holders() -> list[str]:
+    """The earlier packages that declare parties on the PARLACEN ballots."""
+    return sorted({held()[code] for code in codes() if code in held()})
 
 
 def read_2015(text: str) -> tuple[list[Municipality], dict[int, tuple[dict[str, float], int, int, int]]]:
@@ -255,7 +278,7 @@ def registry() -> Package:
         SOURCE,
         "El Salvador's delegation to the Central American Parliament, its electoral systems, and the parties on its "
         "national lists, 1994 to 2015",
-        depends=["sv.tse/geo"],
+        depends=["sv.tse/geo", *holders()],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     p.add("scheme", code="sv.pais", polity_id=tse.EL_SALVADOR, kind="administrative", rank=0, noun="country")
@@ -274,11 +297,9 @@ def registry() -> Package:
             rules_version=1,
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text, lang="en")
-    codes: dict[str, None] = {}
-    for election in ELECTIONS.values():
-        codes.update(dict.fromkeys(election.votes))
-    codes.update(dict.fromkeys(CODES_2015))
-    for code in codes:
+    for code in codes():
+        if code in held():
+            continue  # an earlier sv.tse package already declares this party and its code
         id = party(code)
         p.add("party", id=id, kind="list_vehicle" if code in COALITIONS else "party", polity_id=tse.EL_SALVADOR)
         p.add("external_id", entity_id=id, scheme="sv.tse.party", value=code)
@@ -331,7 +352,7 @@ def parlacen(day: date) -> Package:
         SOURCE,
         f"The {day.year} election of El Salvador's deputies to the Central American Parliament, from the Tribunal "
         "Supremo Electoral",
-        depends=["sv.tse/geo", REGISTRY],
+        depends=["sv.tse/geo", *holders(), REGISTRY],
     )
     p.external |= {tse.EL_SALVADOR, tse.TERRITORY}
     source = key("source", day)
