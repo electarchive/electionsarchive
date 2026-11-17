@@ -1,0 +1,2093 @@
+{
+ "polity": "NP",
+ "name": "Nepal",
+ "sources": {
+  "constitution": {
+   "title": "नेपालको संविधान (Constitution of Nepal, 2072/2015), Unicode text as amended to Bhadra 2081",
+   "publisher": "Nepal Law Commission",
+   "url": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf",
+   "kind": "official_body",
+   "note": "Linked from lawcommission.gov.np (Constitution category). Arts. 56 (three tiers: federation, provinces, and local levels; provinces made of the districts in Schedule 4; rural municipalities, municipalities, and district assemblies at the local level), 62 (President elected by an electoral college of the members of the Federal Parliament and the Provincial Assemblies, with weighted votes, by majority with a runoff), 84 (House of Representatives: 165 members by first-past-the-post from 165 constituencies and 110 by closed-list proportional representation with the whole country as one constituency), 85 (five-year term unless dissolved), 86 (National Assembly: 56 members elected, eight from each province including at least three women, one Dalit, and one person with disability or from a minority, by an electoral college of the Provincial Assembly members and the chairs and vice-chairs of rural municipalities and mayors and deputy mayors of municipalities with weighted votes, plus three nominated; six-year terms with one third retiring every two years), 176 (Provincial Assemblies: twice the province's House constituencies by first-past-the-post, as 60 percent, and 40 percent by proportional representation), 177 (five-year term), 215 and 216 (chair and vice-chair, mayor and deputy mayor by first-past-the-post; four or five women and two or three Dalit or minority executive members elected by the assembly within 15 days), 220 (district assembly of the local chiefs and deputies elects the District Coordination Committee: a chief, a deputy chief, and up to nine members), 222 and 223 (each ward elects a ward chair and four members by first-past-the-post, at least two of them women), 225 (five-year term of the village and municipal assemblies), and 275 (a referendum on a matter of national importance when two thirds of all members of the Federal Parliament so decide)."
+  },
+  "ecn_constitutional": {
+   "title": "Constitutional Provision (Part 24, Arts. 245-247 of the Constitution of Nepal)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/en/page/constitutional-provision",
+   "kind": "official_body",
+   "note": "Art. 246(1): the Election Commission conducts, supervises, directs, and controls the elections of the President, the Vice-President, the Federal Parliament, the Provincial Assemblies, and the local bodies, and prepares the voters' list; Art. 246(2): it holds referendums on subjects of national importance."
+  },
+  "ecn_laws": {
+   "title": "निर्वाचन सम्बन्धी कानूनहरु (Existing Election Laws)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/election-related-laws",
+   "kind": "official_body",
+   "note": "Lists and links the Election Commission Act 2073, Voter Roll Act 2073, Election (Offences and Punishment) Act 2073, Local Level Election Act 2073, Constituency Delimitation Act 2073, Political Parties Act 2073, House of Representatives Member Election Act 2074, Provincial Assembly Member Election Act 2074, President and Vice-President Election Act 2074, and National Assembly Member Election Act 2075."
+  },
+  "ecn_archived_laws": {
+   "title": "पुराना निर्वाचन कानूनहरु (Archived Election Laws)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/archived-election-laws",
+   "kind": "official_body",
+   "note": "Superseded directives, among them the Rural and Municipal Executive Election Directive 2074 and 2078 and the District Coordination Committee Election Directive 2074 and 2078 (the indirect local elections), the Local Level By-election Directive 2076, and the House and Provincial Assembly By-election Directive 2076."
+  },
+  "ecn_result_books": {
+   "title": "निर्वाचन परिणाम पुस्तक (Election Result Book)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/election-result-book",
+   "kind": "official_body",
+   "note": "Links the result books of the House of Representatives elections of 2074, 2079, and 2082, the Provincial Assembly elections of 2074 and 2079 (with one book per province for 2079), and the 2074 local level elections (one book per province)."
+  },
+  "book_hor_2082": {
+   "title": "प्रतिनिधि सभा सदस्य निर्वाचन, २०८२: निर्वाचन परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2082_Final.pdf",
+   "kind": "official_body",
+   "note": "Published Chaitra 2082 (March-April 2026). Gives 165 constituencies, 77 districts, 753 local levels, 6,743 wards, 10,967 polling locations and 23,112 polling centres, 18,903,689 voters, 11,168,032 first-past-the-post and 11,280,817 proportional ballots cast, and the results by constituency."
+  },
+  "book_hor_2079": {
+   "title": "प्रतिनिधि सभा सदस्य निर्वाचन, २०७९: निर्वाचन परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2079_Final.pdf",
+   "kind": "official_body"
+  },
+  "book_pa_2079": {
+   "title": "प्रदेश सभा सदस्य निर्वाचन, २०७९: निर्वाचन परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/PA_2079_Final.pdf",
+   "kind": "official_body"
+  },
+  "book_hor_2074": {
+   "title": "प्रतिनिधि सभा सदस्य निर्वाचन २०७४ को परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "http://www.election.gov.np/ecn/uploads/userfiles/ElectionResultBook/HoR2074.pdf",
+   "kind": "official_body"
+  },
+  "book_pa_2074": {
+   "title": "प्रदेश सभा सदस्य निर्वाचन, २०७४ को परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "http://www.election.gov.np/ecn/uploads/userfiles/ElectionResultBook/PA2074.pdf",
+   "kind": "official_body"
+  },
+  "book_ll_2074": {
+   "title": "स्थानीय तह निर्वाचन २०७४: प्रदेश १ को परिणाम पुस्तक",
+   "publisher": "Election Commission, Nepal",
+   "url": "http://www.election.gov.np/ecn/uploads/userfiles/ElectionResultBook/LocalLevel/LLE_State_1.pdf",
+   "kind": "official_body",
+   "note": "The first of seven provincial books (LLE_State_1 to LLE_State_7) of the 2074 local level results."
+  },
+  "ll_glance_2074": {
+   "title": "Local Level Elections, 2074 A glance (one book per district)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/en/page/local-level-elections-2074-a-glance",
+   "kind": "official_body"
+  },
+  "press": {
+   "title": "प्रेस विज्ञप्ति (press releases, 2017 to date)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/press-release",
+   "kind": "official_body",
+   "note": "Served to the site by its content API, https://election.gov.np/admin/public/api/resources/press-release/?lang=np&per_page=1000, 654 releases on 2026-11-17, each with its date and a linked file."
+  },
+  "result_portal": {
+   "title": "निर्वाचन परिणाम (result.election.gov.np)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://result.election.gov.np/",
+   "kind": "official_body",
+   "note": "Live and final count pages: ElectionResultCentral2079.aspx and ElectionResultState2079.aspx (2022 House and Provincial Assembly by constituency), ElectionResultCentral2079bi.aspx (2023 by-election), LocalElectionResult2079.aspx (2022 local), and the 2082 House count served as JSON by Handlers/SecureJson.ashx."
+  },
+  "na_2082": {
+   "title": "राष्ट्रिय सभा सदस्य निर्वाचन, २०८२ (election programme, voter list, directives)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/navoterlist",
+   "kind": "official_body",
+   "note": "Voter lists of the electoral college per province, in two groups: Provincial Assembly members, and chairs and vice-chairs of rural municipalities and mayors and deputy mayors of municipalities."
+  },
+  "na_by_2079": {
+   "title": "राष्ट्रिय सभा उप-निर्वाचन २०७९",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/national-assembly-bi-election",
+   "kind": "official_body"
+  },
+  "by_2081": {
+   "title": "उपनिर्वाचन २०८० सम्बन्धी सूचनाहरु (by-election notices)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/bi-election-2080",
+   "kind": "official_body"
+  },
+  "pvp": {
+   "title": "रास्ट्रपति/उपराष्ट्रपति निर्वाचन (President and Vice-President election: directives, voter list)",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/np/page/presidentvice-president-election",
+   "kind": "official_body"
+  },
+  "former_commissioners": {
+   "title": "Former Election Commissioners",
+   "publisher": "Election Commission, Nepal",
+   "url": "https://election.gov.np/en/page/former-election-commissioners",
+   "kind": "official_body",
+   "note": "The first Chief Election Commissioner took office on 2008-07-26 BS (1951)."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "संघीय लोकतान्त्रिक गणतन्त्र नेपाल",
+   "name_en": "Federal Democratic Republic of Nepal",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "np.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "province",
+   "name": "प्रदेश",
+   "name_en": "Provinces",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "np.province",
+   "valid_from": "2015-09-20",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2015-09-20",
+     "value": 7,
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 56(3) and Schedule 4: the provinces made of the districts listed in Schedule 4, seven provinces)"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "जिल्ला (जिल्ला सभा)",
+   "name_en": "Districts, each with a district assembly and District Coordination Committee",
+   "parent": "province",
+   "polity_kind": "county",
+   "scheme": "np.district",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-03-05",
+     "value": 77,
+     "source": "book_hor_2082",
+     "locator": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2082_Final.pdf (\"दे शका ७७ र्टै न्जल्लामा\", text layer as extracted: in all 77 districts)"
+    }
+   ]
+  },
+  {
+   "key": "local_level",
+   "name": "स्थानीय तह (गाउँपालिका र नगरपालिका)",
+   "name_en": "Local levels: rural municipalities and municipalities (metropolitan, sub-metropolitan, and other)",
+   "parent": "district",
+   "polity_kind": "municipality",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-03-05",
+     "value": 753,
+     "source": "book_hor_2082",
+     "locator": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2082_Final.pdf (voter education: one election contact person in each of the 753 local levels, \"स्थािीय िहका ७५३ जिा\")"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "वडा",
+   "name_en": "Wards of the rural municipalities and municipalities",
+   "parent": "local_level",
+   "polity_kind": "submunicipal",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2026-03-05",
+     "value": 6743,
+     "source": "book_hor_2082",
+     "locator": "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2082_Final.pdf (one voter education volunteer in each of the country's 6,743 wards, \"दे शभिका ६ हजाि ७४३ र्डामा\")"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "hor_fptp",
+   "tier": "national",
+   "name": "प्रतिनिधि सभा सदस्य निर्वाचन (पहिलो हुने निर्वाचित हुने)",
+   "name_en": "House of Representatives elections: the 165 first-past-the-post constituency seats",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-11-26",
+   "earliest_record": "2017-11-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.hor"
+    ],
+    "fine": [
+     "np.hor"
+    ]
+   },
+   "finest_note": "The constituency. Ballots are counted per constituency after the boxes of its polling centres are brought to the counting site, and the Commission publishes candidate votes by constituency only (result books and result.election.gov.np); no polling-centre or local-level breakdown is published.",
+   "note": "165 single-member constituencies by plurality (Art. 84(1)(a)), elected together with the 110 proportional seats on two ballots. Five-year term unless dissolved (Art. 85). The 1991-1999 and 1959 Houses under earlier constitutions are separate classes.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 84(1)(a): one hundred sixty-five members elected by the first-past-the-post system, one from each of 165 constituencies)",
+   "est_votes": 11168032,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "partisan": true,
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 85(1): five-year term unless dissolved earlier)",
+     "vacancy_rule": "A vacant constituency seat is filled at a by-election (House of Representatives Member Election Act 2074)."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-11-26",
+     "last_date": "2026-03-05",
+     "finest": "np.hor",
+     "evidence": "Result books for 2074, 2079, and 2082 with candidate votes by constituency; the 2082 book (651 pages) has a Unicode text layer with some glyph substitutions. election.gov.np serves an incomplete certificate chain (the Sectigo DV R36 intermediate is missing), so clients must supply that intermediate.",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/ElectionResultCentral2079.aspx",
+     "format": "html, json",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-11-20",
+     "last_date": "2026-03-05",
+     "finest": "np.hor",
+     "evidence": "2079 count pages answer a scripted request; the 2082 count JSON behind Handlers/SecureJson.ashx is served only to a browser session.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-11-26",
+     "election_kind": "general",
+     "contests": 37,
+     "seats": 37,
+     "source": "book_hor_2074",
+     "note": "First phase (2074 Mangsir 10): 37 constituencies in 32 mountain and hill districts, polled with the Provincial Assembly. Counts from the 2074 result book."
+    },
+    {
+     "date": "2017-12-07",
+     "election_kind": "general",
+     "contests": 128,
+     "seats": 128,
+     "source": "book_hor_2074",
+     "note": "Second phase (2074 Mangsir 21): the other 128 constituencies in 45 districts."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "general",
+     "contests": 165,
+     "seats": 165,
+     "source": "book_hor_2079",
+     "note": "2079 Mangsir 4, one phase, polled with the Provincial Assemblies."
+    },
+    {
+     "date": "2026-03-05",
+     "election_kind": "general",
+     "contests": 165,
+     "seats": 165,
+     "source": "book_hor_2082",
+     "quote": "पवहलो हुिे तिर्ाान्चि हुिे तिर्ााचि प्रणालीिफा ६ र्टा िाजिीतिक दलका १६४ जिा ि १ जिा स्र्ितत्र गिी जम्मा १६५ जिा उम्मेदर्ाि तिर्ाान्चि (text layer as extracted)",
+     "note": "2082 Falgun 21, after the House was dissolved on 2082 Bhadra 27 (2025-09-12) following the Bhadra 23-24 uprising; the House alone was elected. 165 members elected, 164 from six parties and one independent."
+    }
+   ]
+  },
+  {
+   "key": "hor_pr",
+   "tier": "national",
+   "name": "प्रतिनिधि सभा सदस्य निर्वाचन (समानुपातिक)",
+   "name_en": "House of Representatives elections: the 110 proportional seats (one national closed list vote)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-11-26",
+   "earliest_record": "2017-11-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.nation"
+    ],
+    "fine": [
+     "np.district",
+     "np.hor"
+    ]
+   },
+   "finest_note": "One national contest; the Commission's result books give the party-list vote by constituency, and result.election.gov.np gives it by district and constituency for 2082.",
+   "note": "110 seats by closed-list proportional representation with the whole country as one constituency (Art. 84(1)(b)), allocated by the Sainte-Lague method among parties passing three percent of the valid list vote and winning at least one first-past-the-post seat (House of Representatives Member Election Act 2074); lists must represent women, Dalit, Adivasi Janajati, Khas Arya, Madhesi, Tharu, Muslim, and backward-region candidates by population (Art. 84(2)).",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 84(1)(b): one hundred ten members elected by the proportional electoral system with the whole country as one constituency)",
+   "est_votes": 11280817,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 85(1))",
+     "vacancy_rule": "A vacant proportional seat goes to the next candidate of the same party's closed list, of the same group and gender."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-11-26",
+     "last_date": "2026-03-05",
+     "finest": "np.hor",
+     "evidence": "The result books give each party's proportional vote nationally and by constituency.",
+     "source": "ecn_result_books"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-11-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 110,
+     "source": "book_hor_2074",
+     "note": "First phase of the 2074 vote; the list contest covers both phases."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 110,
+     "source": "book_hor_2079"
+    },
+    {
+     "date": "2026-03-05",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 110,
+     "source": "book_hor_2082",
+     "quote": "समािुपातिक तिर्ााचि प्रणालीिफा ६ िाजिीतिक दलका ११० जिा उम्मेदर्ाि तिर्ाान्चि (text layer as extracted)",
+     "note": "110 seats to six parties."
+    }
+   ]
+  },
+  {
+   "key": "hor_by",
+   "tier": "national",
+   "name": "प्रतिनिधि सभा सदस्य उपनिर्वाचन",
+   "name_en": "House of Representatives by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2015-09-20",
+   "first_held": "2019-11-30",
+   "earliest_record": "2023-04-23",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.hor"
+    ]
+   },
+   "note": "A vacated first-past-the-post seat is filled at a by-election, usually polled on one day with Provincial Assembly and local by-elections. The 2082 by-elections (Rupandehi 3 among them) were called off after the House was dissolved in 2082 Bhadra.",
+   "source": "ecn_archived_laws",
+   "locator": "https://election.gov.np/np/page/archived-election-laws (प्रतिनिधिसभा सदस्य तथा प्रदेशसभा सदस्य उपनिर्वाचन निर्देशिका, २०७६)",
+   "est_votes": 150000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/ElectionResultCentral2079bi.aspx",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-04-23",
+     "last_date": "2023-04-23",
+     "finest": "np.hor",
+     "evidence": "The 2080 Baishakh by-election count page answers a scripted request; the 2076 and 2081 by-elections are not on the portal's pages found here.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-11-30",
+     "election_kind": "by_election",
+     "source": "ecn_archived_laws",
+     "note": "2076 Mangsir 14, polled with Provincial Assembly and local by-elections under the 2076 by-election directive; seats not counted here."
+    },
+    {
+     "date": "2023-04-23",
+     "election_kind": "by_election",
+     "contests": 3,
+     "seats": 3,
+     "source": "press",
+     "quote": "प्रेस विज्ञप्ति २०८०.०१.१० – उपनिर्वाचन सम्पन्न भएको सम्बन्धमा",
+     "note": "2080 Baishakh 10: Tanahun 1, Chitwan 2, and Bara 2."
+    },
+    {
+     "date": "2024-04-27",
+     "election_kind": "by_election",
+     "contests": 1,
+     "seats": 1,
+     "source": "by_2081",
+     "quote": "२०८१ साल बैशाख १५ गते संम्पन्न हुने प्रतिनिधि सभा सदस्य तथा प्रदेश सभा सदस्य उपनिर्वाचन",
+     "note": "2081 Baishakh 15: Ilam 2, polled with a Provincial Assembly by-election in Bajhang."
+    }
+   ]
+  },
+  {
+   "key": "national_assembly",
+   "tier": "national",
+   "name": "राष्ट्रिय सभा सदस्य निर्वाचन",
+   "name_en": "National Assembly elections: 56 members chosen by provincial electoral colleges",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2015-09-20",
+   "first_held": "2018-02-07",
+   "earliest_record": "2024-01-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.province"
+    ]
+   },
+   "note": "Electoral college of each province: its Provincial Assembly members and the chairs and vice-chairs of rural municipalities and mayors and deputy mayors of municipalities, with weighted votes (Art. 86(2)(a)); about 2,050 voters in all. Eight members per province, at least three women, one Dalit, and one person with disability or from a minority, on separate ballots by group; six-year terms with one third retiring every two years (Art. 86(3)); three more members are nominated by the President (out of scope).",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 86(2)(a))",
+   "est_votes": 2050,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect",
+      "general"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 2,
+     "term_years": 6,
+     "classes": 3,
+     "partisan": true,
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 86(3): six-year terms; one third of the members retire every two years)",
+     "vacancy_rule": "A vacancy is filled by a by-election for the rest of the term (National Assembly Member Election Act 2075)."
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np press releases)",
+     "url": "https://election.gov.np/np/press-release",
+     "format": "pdf, jpg",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2024-01-25",
+     "last_date": "2026-01-24",
+     "finest": "np.province",
+     "evidence": "Vote results are posted as press releases on polling day (2080 Magh 11 and 2082 Magh 11), as scanned images or PDFs in a legacy Nepali font; the electoral college voter lists are posted per province.",
+     "source": "press"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2018-02-07",
+     "election_kind": "indirect",
+     "note": "First election: all 56 seats, terms of two, four, and six years drawn by lot. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here. Counted from the same record: 56 seats."
+    },
+    {
+     "date": "2020-01-23",
+     "election_kind": "indirect",
+     "note": "Biennial third. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2022-01-26",
+     "election_kind": "indirect",
+     "note": "Biennial third. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2024-01-25",
+     "election_kind": "indirect",
+     "source": "press",
+     "quote": "राष्ट्रिय सभा सदस्य निर्वाचनको मतदान शान्तिपूर्ण रुपमा सम्पन्न भएको सम्वन्धमा",
+     "note": "2080 Magh 11; biennial third."
+    },
+    {
+     "date": "2026-01-24",
+     "election_kind": "indirect",
+     "source": "press",
+     "quote": "राष्ट्रिय सभा सदस्य निर्वाचनको मतदान कार्य सम्पन्न भएको सम्बन्धमा",
+     "note": "2082 Magh 11 (dated press releases 2082-10-11; Magh 1 2082 is 2026-01-14); biennial third."
+    }
+   ]
+  },
+  {
+   "key": "national_assembly_by",
+   "tier": "national",
+   "name": "राष्ट्रिय सभा सदस्य उपनिर्वाचन",
+   "name_en": "National Assembly by-elections",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2015-09-20",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.province"
+    ]
+   },
+   "note": "A by-election in one province's electoral college, such as Lumbini's in 2079.",
+   "source": "na_by_2079",
+   "est_votes": 300,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-04-14",
+     "through": "2023-04-13",
+     "precision": "year",
+     "election_kind": "by_election",
+     "note": "Lumbini Province, 2079 BS; day not read here.",
+     "source": "na_by_2079",
+     "quote": "राष्ट्रिय सभा सदस्य उप-निर्वाचन, २०७९को लागि मतदाता नामावली - लुम्बिनी प्रदेश"
+    }
+   ],
+   "locator": "https://election.gov.np/np/page/national-assembly-bi-election"
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "राष्ट्रपतिको निर्वाचन",
+   "name_en": "President, elected by an electoral college",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2008-05-28",
+   "first_held": "2008-07-19",
+   "earliest_record": "2023-03-09",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.nation"
+    ]
+   },
+   "note": "Since 2015 the electoral college is the members of the Federal Parliament and the Provincial Assemblies with weighted votes (Art. 62(1)); a majority of the college's total vote elects, else a runoff of the top two (Art. 62(3)-(5)). Five-year term. In 2008 the Constituent Assembly elected the first President under the Interim Constitution, in a runoff.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 62)",
+   "est_votes": 880,
+   "effort": 1,
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "NP"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "runoff": "majority",
+     "runoff_rule": "Runoff between the top two if no candidate wins a majority of the college's total weighted vote; a further vote if neither passes 50 percent (Art. 62(4)-(5)).",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 62 and 64)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/presidentvice-president-election",
+     "format": "jpg",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-03-09",
+     "last_date": "2023-03-17",
+     "finest": "np.nation",
+     "evidence": "Directives, the voter list, and scanned press releases with the result reported to the President.",
+     "source": "pvp"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-07-21",
+     "election_kind": "indirect",
+     "note": "Runoff in the Constituent Assembly after a first round on 2008-07-19. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2015-10-28",
+     "election_kind": "indirect",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2018-03-13",
+     "election_kind": "indirect",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2023-03-09",
+     "election_kind": "indirect",
+     "source": "press",
+     "quote": "सम्माननीय राष्ट्रपतिसमक्ष राष्ट्रपतिको निर्वाचनको परिणामसहितको प्रतिवेदन पेश",
+     "note": "2079 Falgun 25."
+    }
+   ]
+  },
+  {
+   "key": "vice_president",
+   "tier": "national",
+   "name": "उपराष्ट्रपतिको निर्वाचन",
+   "name_en": "Vice-President, elected by the same electoral college",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "2008-05-28",
+   "first_held": "2008-07-19",
+   "earliest_record": "2023-03-17",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.nation"
+    ]
+   },
+   "note": "Elected as the President is (Art. 67).",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 67)",
+   "est_votes": 880,
+   "effort": 1,
+   "match": [
+    {
+     "office_kinds": [
+      "other"
+     ],
+     "name_pattern": "उपराष्ट्रपति|vice[- ]president",
+     "iso_pattern": "NP"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "runoff": "majority",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 67)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/presidentvice-president-election",
+     "format": "jpg",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2023-03-17",
+     "last_date": "2023-03-17",
+     "finest": "np.nation",
+     "evidence": "Scanned press release of the result.",
+     "source": "pvp"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-07-01",
+     "election_kind": "indirect",
+     "precision": "month",
+     "note": "By the Constituent Assembly, July 2008. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2015-10-31",
+     "election_kind": "indirect",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2018-03-17",
+     "election_kind": "indirect",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2023-03-17",
+     "election_kind": "indirect",
+     "source": "press",
+     "quote": "उपराष्ट्रपतिको निर्वाचन सम्पन्न भएको सम्बन्धमा प्रेस विज्ञप्ति",
+     "note": "2079 Falgun 3."
+    }
+   ]
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "जनमत संग्रह",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1980-05-02",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.nation"
+    ],
+    "fine": [
+     "np.district"
+    ]
+   },
+   "note": "Under Art. 275 a referendum on a matter of national importance is held when two thirds of all members of the Federal Parliament decide; none has been held under the 2015 Constitution. The one national referendum, on 1980-05-02 (2037 Baishakh 20), chose a reformed partyless Panchayat system over a multiparty system.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 275)",
+   "est_votes": 4800000,
+   "effort": 4,
+   "finest_note": "The 1980 result was declared nationally and by district; no official publication of it was found online.",
+   "match": [
+    {
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NP"
+    }
+   ],
+   "cadence": [
+    {
+     "selection": "elected",
+     "called": true,
+     "administered_by": "Election Commission, Nepal",
+     "source": "ecn_constitutional",
+     "locator": "https://election.gov.np/en/page/constitutional-provision (Art. 246(2))"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1980-05-02",
+     "election_kind": "referendum",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    }
+   ]
+  },
+  {
+   "key": "constituent_assembly",
+   "tier": "national",
+   "name": "संविधान सभा सदस्य निर्वाचन",
+   "name_en": "Constituent Assembly elections (2008 and 2013)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "2007-01-15",
+   "valid_to": "2015-09-20",
+   "first_held": "2008-04-10",
+   "contests_per_unit": 1,
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.nation"
+    ]
+   },
+   "note": "601 members under the Interim Constitution 2063: 240 by first-past-the-post from 240 constituencies, 335 by national closed-list proportional representation, and 26 nominated. The second Assembly became the Legislature-Parliament when the Constitution was promulgated on 2015-09-20.",
+   "source": "former_commissioners",
+   "est_votes": 10700000,
+   "effort": 4,
+   "finest_note": "Results by constituency were published in the Commission's 2064 and 2070 result books, which the current site does not carry.",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "NP"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2008-04-10",
+     "election_kind": "general",
+     "note": "2064 Chaitra 28. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here. Counted from the same record: 241 contests, 575 seats."
+    },
+    {
+     "date": "2013-11-19",
+     "election_kind": "general",
+     "note": "2070 Mangsir 4. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here. Counted from the same record: 241 contests, 575 seats."
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "pratinidhi_sabha_1990",
+   "tier": "national",
+   "name": "प्रतिनिधि सभा सदस्य निर्वाचन (२०४७ को संविधान)",
+   "name_en": "House of Representatives elections under the 1990 Constitution (205 seats)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1990-11-09",
+   "valid_to": "2007-01-15",
+   "first_held": "1991-05-12",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.hor"
+    ]
+   },
+   "note": "205 single-member constituencies by plurality under the Constitution of the Kingdom of Nepal 1990; dissolved in 2002 and restored in 2006 until the Interim Constitution took effect. By-elections of the period belong here.",
+   "source": "former_commissioners",
+   "est_votes": 7800000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1990-11-09",
+     "valid_to": "2007-01-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-05-12",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here. Counted from the same record: 205 contests, 205 seats."
+    },
+    {
+     "date": "1994-11-15",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here. Counted from the same record: 205 contests, 205 seats."
+    },
+    {
+     "date": "1999-05-03",
+     "election_kind": "general",
+     "note": "First of two phases. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "1999-05-17",
+     "election_kind": "general",
+     "note": "Second phase. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "pratinidhi_sabha_1959",
+   "tier": "national",
+   "name": "प्रतिनिधि सभा सदस्य निर्वाचन, २०१५",
+   "name_en": "House of Representatives election of 1959 (109 seats), Nepal's first general election",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1959-02-12",
+   "valid_to": "1960-12-15",
+   "first_held": "1959-02-18",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.hor"
+    ]
+   },
+   "note": "109 single-member constituencies, polled in phases from 1959-02-18 to early April 1959 under the Constitution of the Kingdom of Nepal 1959; the House was dissolved on 1960-12-15.",
+   "source": "former_commissioners",
+   "disposition": "blocked",
+   "disposition_reason": "The results exist only in the Election Commission's printed report of 2015 BS; no official digital copy was found on election.gov.np.",
+   "est_votes": 1800000,
+   "effort": 5,
+   "match": [
+    {
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1959-01-01",
+     "valid_to": "1960-12-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1959-02-18",
+     "through": "1959-04-03",
+     "election_kind": "general",
+     "note": "Phased polling. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "mahasabha_1959",
+   "tier": "national",
+   "name": "महासभा (२०१५)",
+   "name_en": "Senate (Mahasabha) of 1959",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1959-02-12",
+   "valid_to": "1960-12-15",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "former_commissioners",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Half of its 36 members were chosen by the House of Representatives and half nominated by the King; no public ballot and no published count.",
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "rastriya_sabha_1990",
+   "tier": "national",
+   "name": "राष्ट्रिय सभा (२०४७ को संविधान)",
+   "name_en": "National Council (Rastriya Sabha) under the 1990 Constitution",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1990-11-09",
+   "valid_to": "2007-01-15",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "60 members: 35 elected by the House of Representatives by single transferable vote, 15 by an electoral college of the chiefs and deputy chiefs of the village, municipal, and district bodies of each development region, and 10 nominated by the King; one third renewed every two years.",
+   "source": "former_commissioners",
+   "disposition": "blocked",
+   "disposition_reason": "No official record of these indirect elections was found online; the Commission's current site carries nothing before 2017.",
+   "est_votes": 4000,
+   "effort": 5,
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1990-11-09",
+     "valid_to": "2007-01-15"
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "rastriya_panchayat",
+   "tier": "national",
+   "name": "राष्ट्रिय पञ्चायत सदस्य निर्वाचन",
+   "name_en": "Rastriya Panchayat (National Panchayat) direct elections, 1981 and 1986",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1962-12-16",
+   "valid_to": "1990-11-09",
+   "first_held": "1981-05-09",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the partyless Panchayat constitution as amended after the 1980 referendum, 112 members were elected directly by district constituencies in 1981 and 1986 (the rest nominated by the King); before 1981 members were chosen indirectly through the zonal panchayats and class organizations.",
+   "source": "former_commissioners",
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of the 1981 or 1986 results was found online.",
+   "est_votes": 4000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1962-12-16",
+     "valid_to": "1990-11-09"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1981-05-09",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "1986-05-12",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "prime_minister",
+   "tier": "national",
+   "name": "प्रधानमन्त्री",
+   "name_en": "Prime Minister",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 76)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the President as the leader of the majority party or coalition in the House of Representatives (Art. 76); a vote of confidence, not an election."
+  },
+  {
+   "key": "speaker",
+   "tier": "national",
+   "name": "सभामुख र अध्यक्ष",
+   "name_en": "Speaker of the House and Chair of the National Assembly",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 91 and 92)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by the members of each house from among themselves (Arts. 91 and 92); parliamentary votes the Commission does not run."
+  },
+  {
+   "key": "pa_fptp",
+   "tier": "province",
+   "name": "प्रदेश सभा सदस्य निर्वाचन (पहिलो हुने निर्वाचित हुने)",
+   "name_en": "Provincial Assembly elections: the 330 first-past-the-post seats",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-11-26",
+   "earliest_record": "2017-11-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.pa"
+    ],
+    "fine": [
+     "np.pa"
+    ]
+   },
+   "finest_note": "The Provincial Assembly constituency, two in each House constituency; published by constituency only.",
+   "note": "Each of the seven Provincial Assemblies elects twice as many first-past-the-post members as its province has House constituencies, 60 percent of its seats (Art. 176(1)(a)); polled with the House. Five-year term unless dissolved (Art. 177). The 2026 House election did not include the Provincial Assemblies, whose next general election is due by late 2027.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 176(1)(a))",
+   "est_votes": 10900000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "partisan": true,
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 177(1))"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-11-26",
+     "last_date": "2022-11-20",
+     "finest": "np.pa",
+     "evidence": "The 2074 and 2079 Provincial Assembly result books (2079: one national book of 596 pages and one per province).",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/ElectionResultState2079.aspx",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-11-20",
+     "last_date": "2022-11-20",
+     "finest": "np.pa",
+     "evidence": "Answers a scripted request.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-11-26",
+     "election_kind": "general",
+     "contests": 74,
+     "seats": 74,
+     "source": "book_pa_2074",
+     "note": "First phase: 74 constituencies in 32 districts."
+    },
+    {
+     "date": "2017-12-07",
+     "election_kind": "general",
+     "contests": 256,
+     "seats": 256,
+     "source": "book_pa_2074",
+     "note": "Second phase: 256 constituencies in 45 districts."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "general",
+     "contests": 330,
+     "seats": 330,
+     "source": "book_pa_2079"
+    }
+   ]
+  },
+  {
+   "key": "pa_pr",
+   "tier": "province",
+   "name": "प्रदेश सभा सदस्य निर्वाचन (समानुपातिक)",
+   "name_en": "Provincial Assembly elections: the 220 proportional seats (one list vote per province)",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-11-26",
+   "earliest_record": "2017-11-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.province"
+    ],
+    "fine": [
+     "np.pa"
+    ]
+   },
+   "note": "40 percent of each Assembly by closed-list proportional representation with the province as one constituency (Art. 176(1)(b)); seven list contests per general election.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 176(1)(b))",
+   "contests_per_unit": 1,
+   "est_votes": 10900000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-11-26",
+     "last_date": "2022-11-20",
+     "finest": "np.pa",
+     "evidence": "The Provincial Assembly result books give each party's list vote by province and constituency.",
+     "source": "ecn_result_books"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-11-26",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 220,
+     "source": "book_pa_2074",
+     "note": "The list contests cover both 2074 phases."
+    },
+    {
+     "date": "2022-11-20",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 220,
+     "source": "book_pa_2079"
+    }
+   ]
+  },
+  {
+   "key": "pa_by",
+   "tier": "province",
+   "name": "प्रदेश सभा सदस्य उपनिर्वाचन",
+   "name_en": "Provincial Assembly by-elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2015-09-20",
+   "first_held": "2019-11-30",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.pa"
+    ]
+   },
+   "note": "Polled with House and local by-elections.",
+   "source": "ecn_archived_laws",
+   "locator": "https://election.gov.np/np/page/archived-election-laws (प्रतिनिधिसभा सदस्य तथा प्रदेशसभा सदस्य उपनिर्वाचन निर्देशिका, २०७६)",
+   "est_votes": 60000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-11-30",
+     "election_kind": "by_election",
+     "source": "ecn_archived_laws",
+     "note": "2076 Mangsir 14; seats not counted here."
+    },
+    {
+     "date": "2024-04-27",
+     "election_kind": "by_election",
+     "source": "by_2081",
+     "quote": "२०८१ साल बैशाख १५ गते संम्पन्न हुने प्रतिनिधि सभा सदस्य तथा प्रदेश सभा सदस्य उपनिर्वाचन",
+     "note": "2081 Baishakh 15: Bajhang."
+    }
+   ]
+  },
+  {
+   "key": "chief_minister",
+   "tier": "province",
+   "name": "मुख्यमन्त्री",
+   "name_en": "Chief Minister of a province",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 168)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the province head as the leader of the majority party or coalition in the Provincial Assembly (Art. 168); not an election."
+  },
+  {
+   "key": "province_head",
+   "tier": "province",
+   "name": "प्रदेश प्रमुख",
+   "name_en": "Province head (governor)",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 163 and 165)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed by the President for five years (Arts. 163 and 165)."
+  },
+  {
+   "key": "dcc",
+   "tier": "district",
+   "name": "जिल्ला समन्वय समिति निर्वाचन",
+   "name_en": "District Coordination Committee: chief, deputy chief, and members, elected by the district assembly",
+   "category": "indirect",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "contests_per_unit": 3,
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.district"
+    ]
+   },
+   "note": "Each district assembly, of the chairs and vice-chairs and mayors and deputy mayors of its local levels, elects a chief, a deputy chief, and up to nine members including at least three women and one Dalit or minority member (Art. 220(3)), within 30 days of the local results; the Commission runs it under its District Coordination Committee Election Directive.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 220)",
+   "disposition": "blocked",
+   "disposition_reason": "Results are declared by each district's election officer and were not found in any central publication of the Commission.",
+   "est_votes": 1500,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "name_pattern": "जिल्ला समन्वय|district coordination",
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "note": "After each of the three 2074 local phases.",
+     "source": "ecn_archived_laws"
+    },
+    {
+     "date": "2022-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "note": "After the 2079 local elections.",
+     "source": "ecn_archived_laws"
+    }
+   ]
+  },
+  {
+   "key": "local_chief",
+   "tier": "local_level",
+   "name": "गाउँपालिका अध्यक्ष र नगरपालिका प्रमुख",
+   "name_en": "Chairs of rural municipalities and mayors of municipalities",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-05-14",
+   "earliest_record": "2017-05-14",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "One per local level by first-past-the-post (Arts. 215(3) and 216(3)); 753 contests per general local election.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 215(3) and 216(3))",
+   "est_votes": 11000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20",
+     "office_kinds": [
+      "mayor"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 225: five-year term from the election; the next election within six months of its end)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-05-14",
+     "last_date": "2017-09-18",
+     "evidence": "Seven provincial result books of the 2074 local elections (LLE_State_1 to 7, about 12 MB each) and 77 district 'at a glance' books; no 2079 local result book is linked.",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/LocalElectionResult2079.aspx",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-13",
+     "last_date": "2022-05-13",
+     "evidence": "The 2079 local result page loads its tables through ASP.NET selections; the data endpoints were not found from a scripted request.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-05-14",
+     "election_kind": "local",
+     "contests": 283,
+     "source": "book_ll_2074",
+     "note": "2074 Baishakh 31, first phase: Provinces 3, 4, and 6 (Bagmati, Gandaki, and Karnali), 283 local levels."
+    },
+    {
+     "date": "2017-06-28",
+     "election_kind": "local",
+     "contests": 334,
+     "source": "book_ll_2074",
+     "note": "2074 Asar 14, second phase: Provinces 1, 5, and 7, 334 local levels."
+    },
+    {
+     "date": "2017-09-18",
+     "election_kind": "local",
+     "contests": 136,
+     "source": "book_ll_2074",
+     "note": "2074 Asoj 2, third phase: Province 2 (Madhesh), 136 local levels."
+    },
+    {
+     "date": "2022-05-13",
+     "election_kind": "local",
+     "contests": 753,
+     "source": "result_portal",
+     "note": "2079 Baishakh 30, one phase."
+    }
+   ]
+  },
+  {
+   "key": "local_deputy",
+   "tier": "local_level",
+   "name": "गाउँपालिका उपाध्यक्ष र नगरपालिका उपप्रमुख",
+   "name_en": "Vice-chairs of rural municipalities and deputy mayors of municipalities",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-05-14",
+   "earliest_record": "2017-05-14",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "One per local level by first-past-the-post, on the same ballot sheet as the chief.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 215(3) and 216(3))",
+   "est_votes": 11000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20",
+     "office_kinds": [
+      "deputy_mayor"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 225: five-year term from the election; the next election within six months of its end)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-05-14",
+     "last_date": "2017-09-18",
+     "evidence": "Seven provincial result books of the 2074 local elections (LLE_State_1 to 7, about 12 MB each) and 77 district 'at a glance' books; no 2079 local result book is linked.",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/LocalElectionResult2079.aspx",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-13",
+     "last_date": "2022-05-13",
+     "evidence": "The 2079 local result page loads its tables through ASP.NET selections; the data endpoints were not found from a scripted request.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-05-14",
+     "election_kind": "local",
+     "contests": 283,
+     "source": "book_ll_2074",
+     "note": "2074 Baishakh 31, first phase: Provinces 3, 4, and 6 (Bagmati, Gandaki, and Karnali), 283 local levels."
+    },
+    {
+     "date": "2017-06-28",
+     "election_kind": "local",
+     "contests": 334,
+     "source": "book_ll_2074",
+     "note": "2074 Asar 14, second phase: Provinces 1, 5, and 7, 334 local levels."
+    },
+    {
+     "date": "2017-09-18",
+     "election_kind": "local",
+     "contests": 136,
+     "source": "book_ll_2074",
+     "note": "2074 Asoj 2, third phase: Province 2 (Madhesh), 136 local levels."
+    },
+    {
+     "date": "2022-05-13",
+     "election_kind": "local",
+     "contests": 753,
+     "source": "result_portal",
+     "note": "2079 Baishakh 30, one phase."
+    }
+   ]
+  },
+  {
+   "key": "ward_chair",
+   "tier": "ward",
+   "name": "वडा अध्यक्ष",
+   "name_en": "Ward chairs",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-05-14",
+   "earliest_record": "2017-05-14",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "One per ward by first-past-the-post (Arts. 222(4) and 223(4)); 6,743 contests. Ward chairs sit on the local executive.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 222(4))",
+   "est_votes": 11000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20",
+     "office_kinds": [
+      "other"
+     ],
+     "name_pattern": "वडा अध्यक्ष|ward chair"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 225: five-year term from the election; the next election within six months of its end)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-05-14",
+     "last_date": "2017-09-18",
+     "evidence": "Seven provincial result books of the 2074 local elections (LLE_State_1 to 7, about 12 MB each) and 77 district 'at a glance' books; no 2079 local result book is linked.",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/LocalElectionResult2079.aspx",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-13",
+     "last_date": "2022-05-13",
+     "evidence": "The 2079 local result page loads its tables through ASP.NET selections; the data endpoints were not found from a scripted request.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-05-14",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Baishakh 31, first phase: Provinces 3, 4, and 6 (Bagmati, Gandaki, and Karnali), 283 local levels."
+    },
+    {
+     "date": "2017-06-28",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Asar 14, second phase: Provinces 1, 5, and 7, 334 local levels."
+    },
+    {
+     "date": "2017-09-18",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Asoj 2, third phase: Province 2 (Madhesh), 136 local levels."
+    },
+    {
+     "date": "2022-05-13",
+     "election_kind": "local",
+     "contests": 6743,
+     "seats": 6743,
+     "source": "result_portal",
+     "note": "One contest in each of the 6,743 wards."
+    }
+   ]
+  },
+  {
+   "key": "ward_member",
+   "tier": "ward",
+   "name": "वडा सदस्य",
+   "name_en": "Ward members: two open seats, one woman member, and one Dalit woman member per ward",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-05-14",
+   "earliest_record": "2017-05-14",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Four members per ward by first-past-the-post (Art. 222(4)), at least two of them women (Art. 222(3)): one two-seat open contest, a woman member, and a Dalit woman member, so three contests and four seats per ward.",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 222(3)-(4) and 223(3)-(4))",
+   "est_votes": 11000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20",
+     "body_kinds": [
+      "council"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "partisan": true,
+     "runoff": "none",
+     "administered_by": "Election Commission, Nepal",
+     "valid_from": "2015-09-20",
+     "source": "constitution",
+     "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 225: five-year term from the election; the next election within six months of its end)"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np)",
+     "url": "https://election.gov.np/np/page/election-result-book",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2017-05-14",
+     "last_date": "2017-09-18",
+     "evidence": "Seven provincial result books of the 2074 local elections (LLE_State_1 to 7, about 12 MB each) and 77 district 'at a glance' books; no 2079 local result book is linked.",
+     "source": "ecn_result_books"
+    },
+    {
+     "platform": "निर्वाचन परिणाम (result.election.gov.np)",
+     "url": "https://result.election.gov.np/LocalElectionResult2079.aspx",
+     "format": "html",
+     "access": "browser",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-13",
+     "last_date": "2022-05-13",
+     "evidence": "The 2079 local result page loads its tables through ASP.NET selections; the data endpoints were not found from a scripted request.",
+     "source": "result_portal",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2017-05-14",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Baishakh 31, first phase: Provinces 3, 4, and 6 (Bagmati, Gandaki, and Karnali), 283 local levels."
+    },
+    {
+     "date": "2017-06-28",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Asar 14, second phase: Provinces 1, 5, and 7, 334 local levels."
+    },
+    {
+     "date": "2017-09-18",
+     "election_kind": "local",
+     "source": "book_ll_2074",
+     "note": "2074 Asoj 2, third phase: Province 2 (Madhesh), 136 local levels."
+    },
+    {
+     "date": "2022-05-13",
+     "election_kind": "local",
+     "contests": 20229,
+     "seats": 26972,
+     "source": "result_portal",
+     "note": "6,743 wards: 20,229 contests for 26,972 seats."
+    }
+   ],
+   "contests_per_unit": 3
+  },
+  {
+   "key": "executive_member",
+   "tier": "local_level",
+   "name": "गाउँ तथा नगर कार्यपालिका सदस्य निर्वाचन",
+   "name_en": "Women and Dalit or minority members of the rural and municipal executives, elected by the assembly",
+   "category": "indirect",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2017-05-14",
+   "contests_per_unit": 2,
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Within 15 days of the local results the village or municipal assembly elects four (five) women and two (three) Dalit or minority members to the executive (Arts. 215(4) and 216(4)).",
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 215(4) and 216(4))",
+   "disposition": "blocked",
+   "disposition_reason": "Declared locally by the election officer of each local level; no central publication of these results was found.",
+   "est_votes": 35000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ]
+  },
+  {
+   "key": "local_by",
+   "tier": "local_level",
+   "name": "स्थानीय तह उपनिर्वाचन",
+   "name_en": "Local level by-elections",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2015-09-20",
+   "first_held": "2019-11-30",
+   "earliest_record": "2024-12-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Vacant chief, deputy, ward chair, and ward member posts, filled at by-elections called by the Commission (Local Level Election Act 2073).",
+   "source": "ecn_archived_laws",
+   "locator": "https://election.gov.np/np/page/archived-election-laws (स्थानीय तह उपनिर्वाचन निर्देशिका, २०७६)",
+   "est_votes": 150000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor",
+      "deputy_mayor",
+      "other"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    },
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "2015-09-20"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Election Commission, Nepal (election.gov.np press releases)",
+     "url": "https://election.gov.np/np/press-release",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2024-12-01",
+     "last_date": "2024-12-01",
+     "evidence": "Programme, party registration, and polling notices of the 2081 local by-election; a result table was not found.",
+     "source": "press"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-11-30",
+     "election_kind": "by_election",
+     "source": "ecn_archived_laws",
+     "note": "2076 Mangsir 14."
+    },
+    {
+     "date": "2024-12-01",
+     "election_kind": "by_election",
+     "source": "press",
+     "quote": "मतदान कार्य सम्पन्न भएको",
+     "note": "2081 Mangsir 16."
+    }
+   ]
+  },
+  {
+   "key": "local_bodies_1990",
+   "tier": "local_level",
+   "name": "स्थानीय निकाय निर्वाचन (गाउँ विकास समिति, नगरपालिका)",
+   "name_en": "Village development committee and municipality elections, 1992-2006",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "1990-11-09",
+   "valid_to": "2015-09-20",
+   "first_held": "1992-05-28",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Chairs, vice-chairs, and ward members of about 4,000 village development committees and the mayors and ward members of the municipalities, elected directly in 1992 and 1997; the elected bodies lapsed in 2002, and the 2006 municipal elections under royal rule were boycotted by the main parties. The district development committees elected by them are a separate indirect class.",
+   "source": "former_commissioners",
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of these results was found on the Commission's site, which carries nothing before 2017.",
+   "est_votes": 7000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1990-11-09",
+     "valid_to": "2015-09-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-05-01",
+     "precision": "month",
+     "election_kind": "local",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "1997-05-01",
+     "precision": "month",
+     "election_kind": "local",
+     "note": "Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    },
+    {
+     "date": "2006-02-08",
+     "election_kind": "local",
+     "note": "Municipalities only, under royal rule. Polling day from the Election Commission's record of the election; the Commission's current site does not carry this election's result book, so it was not re-read here."
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "ddc_1990",
+   "tier": "district",
+   "name": "जिल्ला विकास समिति निर्वाचन",
+   "name_en": "District development committees (1992-2002), elected by the village and municipal members",
+   "category": "indirect",
+   "goal": "local",
+   "valid_from": "1990-11-09",
+   "valid_to": "2015-09-20",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "np.district"
+    ]
+   },
+   "source": "former_commissioners",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Chosen by electoral colleges of the village and municipal office holders, with no official count published.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "iso_pattern": "NP",
+     "valid_from": "1990-11-09",
+     "valid_to": "2015-09-20",
+     "body_kinds": [
+      "council"
+     ]
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "panchayat_local",
+   "tier": "local_level",
+   "name": "गाउँ र नगर पञ्चायत निर्वाचन",
+   "name_en": "Village and town panchayat elections (1962-1990), and the Kathmandu municipal election of 1953",
+   "category": "executive",
+   "goal": "local",
+   "valid_to": "1990-11-09",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Partyless elections of village and town panchayats, whose members in turn chose the district and zonal panchayats; the first election in Nepal was that of the Kathmandu municipality in 1953.",
+   "source": "former_commissioners",
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of these results is known online.",
+   "est_votes": 3000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "iso_pattern": "NP",
+     "valid_to": "1990-11-09"
+    }
+   ],
+   "locator": "https://election.gov.np/en/page/former-election-commissioners"
+  },
+  {
+   "key": "judiciary",
+   "tier": "national",
+   "name": "न्यायाधीश",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 129, 140, 149, and 153)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges of the Supreme Court, High Courts, and District Courts are appointed on the recommendation of the Judicial Council (Arts. 129, 140, 149, and 153); none are elected."
+  },
+  {
+   "key": "non_territorial",
+   "tier": "national",
+   "name": "गैर-क्षेत्रीय निर्वाचन",
+   "name_en": "Non-territorial and out-of-country representation",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Arts. 84(2) and 176)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No seats are elected by a non-territorial electorate: group representation runs through the quotas of the proportional lists (Arts. 84(2) and 176), and voters abroad cannot vote."
+  },
+  {
+   "key": "special_purpose",
+   "tier": "national",
+   "name": "विशेष प्रयोजन निकाय",
+   "name_en": "Special-purpose bodies",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf (Art. 56(5))",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Constitution provides for special, protected, or autonomous areas (Art. 56(5)), but none has an elected body; cooperatives, bar associations, and user committees hold their own elections, which the Commission does not run."
+  },
+  {
+   "key": "nominating",
+   "tier": "national",
+   "name": "उम्मेदवार छनोट",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://giwmscdnone.gov.np/media/pdf_upload/%E0%A4%A8%E0%A5%87%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%95%E0%A5%8B%20%E0%A4%B8_%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8%20unicode%20%E0%A4%AD%E0%A4%BE%E0%A4%A6%E0%A5%8D%E0%A4%B0%20%E0%A5%A8%E0%A5%A6%E0%A5%AE%E0%A5%A7_mtbuyjt.pdf",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose candidates and closed lists under their own statutes (Political Parties Act 2073); the state runs no primary and publishes no nomination vote."
+  }
+ ]
+}
