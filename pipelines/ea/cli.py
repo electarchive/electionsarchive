@@ -89,6 +89,12 @@ def main() -> None:
         help="build the US House, UK, French, and Turkish cartogram and tile layouts, then the other hex tile maps",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser(
+        "names",
+        help="latin: add Latin-script and sentence-case names to entities that have none, then apply and publish "
+        "the add-only changesets (run with --with pyicu==2.17); model: advance the translation and romanization "
+        "batches for the names that pass queued (on the Mac, through anthropic-batch); quote: estimate what model costs",
+    ).add_argument("action", choices=("latin", "model", "quote"))
     releasing = commands.add_parser(
         "release", help="write the bulk release bundles (Parquet, CSV, and GeoParquet) to data/releases/"
     )
@@ -358,6 +364,10 @@ def main() -> None:
             print(hexes.build_tiles())
         case "search":
             print(search.build())
+        case "names":
+            from ea import latin
+
+            print({"latin": latin.run, "model": latin.model, "quote": latin.quote}[args.action]())
         case "release":
             from ea import release
 

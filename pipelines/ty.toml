@@ -1,5 +1,5 @@
 [analysis]
-allowed-unresolved-imports = ["rdata", "scipy", "skimage.**"]
+allowed-unresolved-imports = ["icu", "rdata", "scipy", "skimage.**"]
 
 [[overrides]]
 include = [
