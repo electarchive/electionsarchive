@@ -1,0 +1,4565 @@
+{
+ "polity": "PH",
+ "name": "Philippines",
+ "sources": {
+  "constitution": {
+   "title": "The 1987 Constitution of the Republic of the Philippines",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution",
+   "kind": "official_body"
+  },
+  "omnibus": {
+   "title": "Batas Pambansa Blg. 881, Omnibus Election Code of the Philippines",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/OmnibusElectionCode",
+   "kind": "official_body"
+  },
+  "ra7166": {
+   "title": "Republic Act No. 7166, synchronized national and local elections and electoral reforms (1991)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedNationalandLocal/RA7166",
+   "kind": "official_body"
+  },
+  "ra7160": {
+   "title": "Republic Act No. 7160, Local Government Code of 1991",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/RA7160",
+   "kind": "official_body"
+  },
+  "ra7941": {
+   "title": "Republic Act No. 7941, Party-List System Act (1995)",
+   "publisher": "Congress of the Philippines (text reproduced by the LawPhil Project)",
+   "url": "https://lawphil.net/statutes/repacts/ra1995/ra_7941_1995.html",
+   "kind": "official_body"
+  },
+  "ra6734": {
+   "title": "Republic Act No. 6734, Organic Act for the Autonomous Region in Muslim Mindanao (1989)",
+   "publisher": "Congress of the Philippines (text reproduced by the LawPhil Project)",
+   "url": "https://lawphil.net/statutes/repacts/ra1989/ra_6734_1989.html",
+   "kind": "official_body"
+  },
+  "ra9054": {
+   "title": "Republic Act No. 9054, expanded Organic Act for the Autonomous Region in Muslim Mindanao (2001)",
+   "publisher": "Congress of the Philippines (text reproduced by the LawPhil Project)",
+   "url": "https://lawphil.net/statutes/repacts/ra2001/ra_9054_2001.html",
+   "kind": "official_body"
+  },
+  "armm_laws": {
+   "title": "Election laws: ARMM and BARMM elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/ARMM",
+   "kind": "official_body"
+  },
+  "ra11054": {
+   "title": "Republic Act No. 11054, Organic Law for the Bangsamoro Autonomous Region in Muslim Mindanao (2018)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/ARMM/ra11054",
+   "kind": "official_body"
+  },
+  "bpe2026": {
+   "title": "2026 BARMM Parliamentary Elections (RA 12317)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=2025BARMMPE",
+   "kind": "official_body"
+  },
+  "bske_laws": {
+   "title": "Election laws: synchronized barangay and Sangguniang Kabataan elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK",
+   "kind": "official_body"
+  },
+  "ra9164": {
+   "title": "Republic Act No. 9164, synchronized barangay and Sangguniang Kabataan elections (2002)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK/RA9164",
+   "kind": "official_body"
+  },
+  "ra10742": {
+   "title": "Republic Act No. 10742, Sangguniang Kabataan Reform Act of 2015",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK/RA10742",
+   "kind": "official_body"
+  },
+  "ra12326": {
+   "title": "Republic Act No. 12326, five-year term of barangay and Sangguniang Kabataan officials (2026)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK/RA12326",
+   "kind": "official_body"
+  },
+  "bske_res": {
+   "title": "COMELEC Resolutions: Barangay and Sangguniang Kabataan Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/BSKE",
+   "kind": "official_body"
+  },
+  "bske2023": {
+   "title": "2023 Barangay and Sangguniang Kabataan Elections, Resolution No. 10905",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=2023BSKE",
+   "kind": "official_body"
+  },
+  "res11050": {
+   "title": "Resolution No. 11050, allocation of seats for the 12 May 2025 NLE and BARMM parliamentary elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Resolutions/com_res_11050.pdf",
+   "kind": "official_body"
+  },
+  "nle2022": {
+   "title": "2022 National and Local Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=2022NLE",
+   "kind": "official_body"
+  },
+  "nle2019": {
+   "title": "2019 National and Local Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=2019NLE",
+   "kind": "official_body"
+  },
+  "nle2016": {
+   "title": "2016 Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=2016NLE",
+   "kind": "official_body"
+  },
+  "res2010_pres": {
+   "title": "2010 National and Local Elections - President and Vice-President",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/PresVP",
+   "kind": "official_body"
+  },
+  "res2010_citymun": {
+   "title": "2010 National and Local Elections - City/Municipality (certified lists of elected candidates)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/CityMun",
+   "kind": "official_body"
+  },
+  "res_senate": {
+   "title": "Election results: Senators, 2004, 2007, 2010, and 2013 National and Local Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=Results/2013NLE/Senatorial",
+   "kind": "official_body"
+  },
+  "res_partylist": {
+   "title": "Election results: Party-list, 2004, 2007, 2010, and 2013 National and Local Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=Results/2013NLE/Partylist",
+   "kind": "official_body"
+  },
+  "results2025": {
+   "title": "2025 National and Local Elections results (transparency server)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://2025electionresults.comelec.gov.ph/",
+   "kind": "official_body"
+  },
+  "results2022": {
+   "title": "2022 National and Local Elections results (transparency server)",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://2022electionresults.comelec.gov.ph/",
+   "kind": "official_body"
+  },
+  "plebiscites": {
+   "title": "COMELEC Resolutions: Plebiscites",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/Plebiscites",
+   "kind": "official_body"
+  },
+  "special": {
+   "title": "COMELEC Resolutions: Special Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/SpecialElections",
+   "kind": "official_body"
+  },
+  "recall": {
+   "title": "COMELEC Resolutions: Recall Elections",
+   "publisher": "Commission on Elections (COMELEC)",
+   "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/RecallElections",
+   "kind": "official_body"
+  },
+  "almanac": {
+   "title": "Philippine Electoral Almanac, Revised and Expanded (2015)",
+   "publisher": "Presidential Communications Development and Strategic Planning Office",
+   "url": "https://archive.org/details/philippine-electoral-almanac-revised-and-expanded",
+   "kind": "official_body"
+  },
+  "psgc": {
+   "title": "Philippine Standard Geographic Code (PSGC), summary as of 30 June 2024",
+   "publisher": "Philippine Statistics Authority",
+   "url": "https://psa.gov.ph/classification/psgc",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republika ng Pilipinas",
+   "name_en": "Republic of the Philippines",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "region",
+   "name": "Rehiyon",
+   "name_en": "Administrative regions",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "ph.region",
+   "elects": false,
+   "source": "psgc",
+   "counts": [
+    {
+     "date": "2024-06-30",
+     "value": 18,
+     "source": "psgc",
+     "locator": "https://psa.gov.ph/classification/psgc (PSGC summary as of 30 June 2024: 18 regions, after the creation of the Negros Island Region by Republic Act No. 12000)"
+    }
+   ]
+  },
+  {
+   "key": "autonomous_region",
+   "name": "Rehiyong Awtonomo",
+   "name_en": "Autonomous region (ARMM 1990-2019, BARMM since 2019)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "ph.region",
+   "valid_from": "1990-02-17",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2024-09-04",
+     "value": 1,
+     "source": "res11050",
+     "locator": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Resolutions/com_res_11050.pdf (the Philippines consists of one (1) autonomous region)"
+    }
+   ]
+  },
+  {
+   "key": "province",
+   "name": "Lalawigan",
+   "name_en": "Provinces",
+   "parent": "region",
+   "polity_kind": "county",
+   "scheme": "ph.province",
+   "source": "ra7160",
+   "counts": [
+    {
+     "date": "2024-09-04",
+     "value": 82,
+     "source": "res11050",
+     "locator": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Resolutions/com_res_11050.pdf (eighty-two (82) provinces)"
+    }
+   ]
+  },
+  {
+   "key": "legislative_district",
+   "name": "Distritong pambatas",
+   "name_en": "Legislative districts (House of Representatives)",
+   "parent": "province",
+   "scheme": "ph.legislative_district",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2024-09-04",
+     "value": 254,
+     "source": "res11050",
+     "locator": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Resolutions/com_res_11050.pdf (two hundred fifty-four (254) legislative districts)"
+    }
+   ]
+  },
+  {
+   "key": "city_municipality",
+   "name": "Lungsod at bayan",
+   "name_en": "Cities and municipalities",
+   "parent": "province",
+   "polity_kind": "municipality",
+   "scheme": "ph.city_municipality",
+   "source": "ra7160",
+   "counts": [
+    {
+     "date": "2024-09-04",
+     "value": 1642,
+     "source": "res11050",
+     "locator": "https://www.comelec.gov.ph/php-tpls-attachments/2025NLE/Resolutions/com_res_11050.pdf (one hundred forty-nine (149) cities, and one thousand four hundred ninety-three (1,493) municipalities)"
+    }
+   ]
+  },
+  {
+   "key": "barangay",
+   "name": "Barangay",
+   "name_en": "Barangays",
+   "parent": "city_municipality",
+   "polity_kind": "submunicipal",
+   "scheme": "ph.barangay",
+   "source": "ra7160",
+   "counts": [
+    {
+     "date": "2024-06-30",
+     "value": 42004,
+     "source": "psgc",
+     "locator": "https://psa.gov.ph/classification/psgc (PSGC summary as of 30 June 2024: 42,004 barangays)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "Halalan sa Pangulo",
+   "name_en": "Presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct (clustered precinct) election returns on the transparency sites since 2016; before automation (2010) only the national canvass by province and city is official.",
+   "note": "Direct election by plurality, single round, six-year term with no re-election since 1987 (Art. VII, Sec. 4). Under the 1935 Constitution a four-year term with one re-election (1935 six years, no re-election); the 1973 Constitution as amended in 1981 brought the 1981 direct election, and the 1986 snap election was called by Batas Pambansa Blg. 883. The 1943 choice by the KALIBAPI National Assembly is the separate class president_1943. Overseas voting since 2004.",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article7 (Section 4: elected by direct vote of the people for a term of six years)",
+   "valid_from": "1935-09-16",
+   "first_held": "1935-09-16",
+   "earliest_record": "1935-09-16",
+   "est_votes": 520000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "month": 11,
+     "valid_from": "1935-09-16",
+     "valid_to": "1972-09-21",
+     "administered_by": "Department of the Interior until 1940, then the Commission on Elections",
+     "runoff": "none",
+     "source": "almanac"
+    },
+    {
+     "period_years": 6,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 6,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "runoff": "none",
+     "vacancy_rule": "The Vice-President succeeds for the rest of the term (Art. VII, Sec. 8)",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article7 (Section 4)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, election results",
+     "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/PresVP",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-05-10",
+     "last_date": "2010-05-10",
+     "finest": "world.country",
+     "evidence": "National canvass for president and vice president in 2010, split into overseas, local absentee, and provincial/district/city certificates of canvass; no lower unit.",
+     "source": "res2010_pres"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1935-09-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1935 Elections (table of contents)"
+    },
+    {
+     "date": "1941-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1941 Elections (table of contents)"
+    },
+    {
+     "date": "1946-04-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1946 Elections (table of contents)"
+    },
+    {
+     "date": "1949-11-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1949 Elections (table of contents)"
+    },
+    {
+     "date": "1953-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1953 Elections (table of contents)"
+    },
+    {
+     "date": "1957-11-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1957 Elections (table of contents)"
+    },
+    {
+     "date": "1961-11-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1961 Elections (table of contents)"
+    },
+    {
+     "date": "1965-11-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1965 Elections (table of contents)"
+    },
+    {
+     "date": "1969-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1969 Elections (table of contents)"
+    },
+    {
+     "date": "1981-06-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1981 Elections (table of contents)",
+     "note": "Held under the amended 1973 Constitution, which had no vice president until the 1984 amendment."
+    },
+    {
+     "date": "1986-02-07",
+     "election_kind": "special",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1986 Elections (table of contents)",
+     "note": "Snap election called under Batas Pambansa Blg. 883."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "res2010_pres",
+     "quote": "2010 National and Local Elections - President and Vice-President"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    }
+   ]
+  },
+  {
+   "key": "vice_president",
+   "tier": "national",
+   "name": "Halalan sa Pangalawang Pangulo",
+   "name_en": "Vice-presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "As for president: precinct returns since 2016 on the transparency sites; national canvass only before.",
+   "note": "Elected separately from the president on the same ballot (split tickets are common), plurality, six-year term since 1987, at most two successive terms. The office lapsed from 1973 until restored by the 1984 amendment; none was elected in 1981.",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article7 (Section 3 and 4)",
+   "valid_from": "1935-09-16",
+   "first_held": "1935-09-16",
+   "earliest_record": "1935-09-16",
+   "est_votes": 480000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "month": 11,
+     "valid_from": "1935-09-16",
+     "valid_to": "1972-09-21",
+     "runoff": "none",
+     "source": "almanac"
+    },
+    {
+     "period_years": 6,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 6,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "runoff": "none",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article7 (Section 4)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    }
+   ],
+   "match": [
+    {
+     "name_pattern": "(?i)vice[- ]?president|pangalawang pangulo",
+     "iso_pattern": "PH",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1935-09-16",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1935 Elections (table of contents)"
+    },
+    {
+     "date": "1941-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1941 Elections (table of contents)"
+    },
+    {
+     "date": "1946-04-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1946 Elections (table of contents)"
+    },
+    {
+     "date": "1949-11-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1949 Elections (table of contents)"
+    },
+    {
+     "date": "1953-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1953 Elections (table of contents)"
+    },
+    {
+     "date": "1957-11-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1957 Elections (table of contents)"
+    },
+    {
+     "date": "1961-11-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1961 Elections (table of contents)"
+    },
+    {
+     "date": "1965-11-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1965 Elections (table of contents)"
+    },
+    {
+     "date": "1969-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1969 Elections (table of contents)"
+    },
+    {
+     "date": "1986-02-07",
+     "election_kind": "special",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1986 Elections (table of contents)",
+     "note": "Snap election called under Batas Pambansa Blg. 883."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "res2010_pres",
+     "quote": "2010 National and Local Elections - President and Vice-President"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 1,
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    }
+   ]
+  },
+  {
+   "key": "senate",
+   "tier": "national",
+   "name": "Halalan sa Senado",
+   "name_en": "Senate elections (at large)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns since 2016 on the transparency sites; national canvass (ranked candidates) on the COMELEC website for 2004-2013.",
+   "note": "24 senators elected nationwide at large, half every three years since 1992 (all 24 in 1987 and 1992), by plurality block vote with up to twelve votes per ballot; six-year terms, two consecutive at most (Art. VI, Sec. 2 and 4). From 1941 to 1971 eight seats every two years (24 in 1941, 16 in 1946). The Senate was abolished in 1935-1941 and 1972-1987. The 1916-1934 district Senate is senate_1916.",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article6 (Section 2: twenty-four Senators who shall be elected at large)",
+   "valid_from": "1941-11-11",
+   "first_held": "1941-11-11",
+   "earliest_record": "1941-11-11",
+   "contests_per_unit": 1,
+   "est_votes": 4500000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 2,
+     "phase": 1,
+     "month": 11,
+     "term_years": 6,
+     "classes": 3,
+     "valid_from": "1941-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 6,
+     "classes": 2,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "vacancy_rule": "A vacancy may be filled in a special election, the senator so elected serving only the unexpired term (Art. VI, Sec. 9)",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article6 (Sections 2 and 4)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, election results",
+     "url": "https://www.comelec.gov.ph/?r=Results/2013NLE/Senatorial",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-05-10",
+     "last_date": "2013-05-13",
+     "finest": "world.country",
+     "evidence": "National senatorial canvass by rank for 2004, 2007, 2010 (with overseas and absentee splits), and 2013 (winners only).",
+     "source": "res_senate"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "PH",
+     "valid_from": "1941-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1941-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 24,
+     "source": "almanac",
+     "quote": "1941 Elections (table of contents)"
+    },
+    {
+     "date": "1946-04-23",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 16,
+     "source": "almanac",
+     "quote": "1946 Elections (table of contents)"
+    },
+    {
+     "date": "1947-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1947 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1949-11-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1949 Elections (table of contents)"
+    },
+    {
+     "date": "1951-11-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1951 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1953-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1953 Elections (table of contents)"
+    },
+    {
+     "date": "1955-11-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1957-11-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1957 Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1961-11-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1961 Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1965-11-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1965 Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1969-11-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1969 Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 8,
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1987-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 24,
+     "source": "almanac",
+     "quote": "1987 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 24,
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 13,
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)",
+     "note": "Thirteen elected in 2001: the twelve regular seats and the remainder of the vacated term of Teofisto Guingona."
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "res_senate",
+     "quote": "2004 National and Local Elections - Senators"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "res_senate",
+     "quote": "2007 National and Local Elections - Senatorial"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "res_senate",
+     "quote": "2010 National and Local Elections - Senatorial"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "res_senate",
+     "quote": "2013 National and Local Elections - Senatorial"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 12,
+     "source": "res11050",
+     "quote": "Senators 12 (number of seats, Resolution No. 11050)"
+    }
+   ]
+  },
+  {
+   "key": "senate_1916",
+   "tier": "national",
+   "name": "Senado ng Pilipinas (1916-1935), senatorial districts",
+   "name_en": "Senate elections by senatorial district (1916-1935)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.senatorial_district_1916"
+    ]
+   },
+   "finest_note": "Results by senatorial district and province appear only in the Executive Bureau's printed reports; nothing is published online by the government.",
+   "note": "Under the Jones Law, 22 senators from eleven two-member senatorial districts (two more appointed for the non-Christian 12th district), half renewed every three years. Abolished by the 1935 Constitution's unicameral National Assembly.",
+   "source": "almanac",
+   "valid_from": "1916-10-03",
+   "valid_to": "1935-11-15",
+   "first_held": "1916-10-03",
+   "earliest_record": "1916-10-03",
+   "est_votes": 6000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No government body publishes district returns for 1916-1934 online; the figures survive only in the Executive Bureau's printed election reports.",
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 6,
+     "term_years": 6,
+     "classes": 2,
+     "valid_from": "1916-10-03",
+     "valid_to": "1935-11-15",
+     "administered_by": "Executive Bureau, Department of the Interior",
+     "source": "almanac"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "PH",
+     "valid_to": "1941-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1916-10-03",
+     "election_kind": "general",
+     "contests": 11,
+     "seats": 22,
+     "source": "almanac",
+     "quote": "1916 First Senate and House Elections (table of contents)"
+    },
+    {
+     "date": "1922-06-06",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1922 Legislative Elections (table of contents)",
+     "note": "Half renewal of the Senate."
+    },
+    {
+     "date": "1925-06-02",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1925 Legislative Elections (table of contents)",
+     "note": "Half renewal of the Senate."
+    },
+    {
+     "date": "1928-06-05",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1928 Legislative Elections (table of contents)",
+     "note": "Half renewal of the Senate."
+    },
+    {
+     "date": "1931-06-02",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1931 Legislative Elections (table of contents)",
+     "note": "Half renewal of the Senate."
+    },
+    {
+     "date": "1919-06-03",
+     "election_kind": "general"
+    },
+    {
+     "date": "1934-06-05",
+     "election_kind": "general"
+    }
+   ]
+  },
+  {
+   "key": "house",
+   "tier": "legislative_district",
+   "name": "Halalan sa Kapulungan ng mga Kinatawan (distritong pambatas)",
+   "name_en": "House of Representatives elections (legislative districts)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.legislative_district"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "District canvasses and precinct returns on the transparency sites since 2016; before automation only the proclaimed winners are on record with COMELEC.",
+   "note": "Single-member legislative districts apportioned among provinces, cities, and Metro Manila, first past the post, three-year terms, three consecutive at most (Art. VI, Sec. 5 and 7). Continues the Philippine Assembly (1907-1916) and the House of Representatives of 1916-1935 and 1946-1972; the unicameral National Assembly (1935-1941), the 1943 KALIBAPI assembly, and the Batasang Pambansa (1978-1986) are separate classes. Vacancies are filled by special elections (listed by COMELEC); the 1941 election chose the House of the restored bicameral Congress, which first met in 1945.",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article6 (Section 5: elected from legislative districts apportioned among the provinces, cities, and the Metropolitan Manila area)",
+   "valid_from": "1907-07-30",
+   "first_held": "1907-07-30",
+   "earliest_record": "1907-07-30",
+   "est_votes": 700000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 6,
+     "term_years": 3,
+     "valid_from": "1907-07-30",
+     "valid_to": "1935-11-15",
+     "administered_by": "Executive Bureau, Department of the Interior",
+     "source": "almanac"
+    },
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1941-11-11",
+     "valid_to": "1972-09-21",
+     "called": true,
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "vacancy_rule": "A special election fills the vacancy for the unexpired term (Art. VI, Sec. 9; Republic Act No. 6645)",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article6 (Sections 5 and 7)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, special elections",
+     "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/SpecialElections",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1995-05-14",
+     "evidence": "Resolutions and calendars for special elections to the House and local offices since 1995 (e.g. Cavite 7th district 2023, Negros Oriental 3rd district 2023, Antipolo 2nd district 2026); results are not published on the page.",
+     "source": "special"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1907-07-30",
+     "election_kind": "general",
+     "contests": 80,
+     "seats": 80,
+     "source": "almanac",
+     "quote": "1907 First Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1909-11-02",
+     "election_kind": "general"
+    },
+    {
+     "date": "1912-06-04",
+     "election_kind": "general"
+    },
+    {
+     "date": "1916-10-03",
+     "election_kind": "general",
+     "contests": 90,
+     "seats": 90,
+     "source": "almanac",
+     "quote": "1916 First Senate and House Elections (table of contents)"
+    },
+    {
+     "date": "1919-06-03",
+     "election_kind": "general"
+    },
+    {
+     "date": "1922-06-06",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1922 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1925-06-02",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1925 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1928-06-05",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1928 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1931-06-02",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1931 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1934-06-05",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1934 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1941-11-11",
+     "election_kind": "general",
+     "contests": 98,
+     "seats": 98,
+     "source": "almanac",
+     "quote": "1941 Elections (table of contents)"
+    },
+    {
+     "date": "1946-04-23",
+     "election_kind": "general",
+     "contests": 98,
+     "seats": 98,
+     "source": "almanac",
+     "quote": "1946 Elections (table of contents)"
+    },
+    {
+     "date": "1949-11-08",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1949 Elections (table of contents)"
+    },
+    {
+     "date": "1953-11-10",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1953 Elections (table of contents)"
+    },
+    {
+     "date": "1957-11-12",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1957 Elections (table of contents)"
+    },
+    {
+     "date": "1961-11-14",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1961 Elections (table of contents)"
+    },
+    {
+     "date": "1965-11-09",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1965 Elections (table of contents)"
+    },
+    {
+     "date": "1969-11-11",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1969 Elections (table of contents)"
+    },
+    {
+     "date": "1987-05-11",
+     "election_kind": "general",
+     "contests": 200,
+     "seats": 200,
+     "source": "almanac",
+     "quote": "1987 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "general",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "general",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "general",
+     "contests": 254,
+     "seats": 254,
+     "source": "res11050",
+     "quote": "Member, House of Representatives of Legislative Districts 254"
+    }
+   ]
+  },
+  {
+   "key": "party_list",
+   "tier": "national",
+   "name": "Halalan ng mga kinatawan ng party-list",
+   "name_en": "House of Representatives party-list elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns on the transparency sites since 2016; national party-list canvass on the COMELEC website for 2004-2013.",
+   "note": "One nationwide vote for a registered national, regional, or sectoral party or organization; party-list members make up 20% of the House (Art. VI, Sec. 5). Seats go first to every list with 2% of the vote, the rest in rank order by the formula of BANAT v. COMELEC (2009), with at most three seats per list (RA 7941). A non-territorial representation in substance.",
+   "source": "ra7941",
+   "valid_from": "1998-05-11",
+   "first_held": "1998-05-11",
+   "earliest_record": "1998-05-11",
+   "est_votes": 330000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1998-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "vacancy_rule": "The next nominee on the party's list fills the seat (RA 7941, Sec. 16)",
+     "source": "ra7941"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, election results",
+     "url": "https://www.comelec.gov.ph/?r=Results/2013NLE/Partylist",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2004-05-10",
+     "last_date": "2013-05-13",
+     "finest": "world.country",
+     "evidence": "National party-list canvass with votes and percentages for 2004, 2007, 2010, and 2013.",
+     "source": "res_partylist"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1998-05-11",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "res_partylist",
+     "quote": "2004 National and Local Elections - Party-list"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "res_partylist",
+     "quote": "2007 National and Local Elections - Party-list"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "res_partylist",
+     "quote": "2010 National and Local Elections - Party-list"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "res_partylist",
+     "quote": "2013 National and Local Elections - Party-list"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 63,
+     "source": "res11050",
+     "quote": "Member, House of Representatives for Party-Lists 63"
+    }
+   ]
+  },
+  {
+   "key": "national_assembly_1935",
+   "tier": "legislative_district",
+   "name": "Pambansang Asamblea (1935-1941)",
+   "name_en": "National Assembly of the Commonwealth (1935-1941)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.legislative_district"
+    ]
+   },
+   "note": "Unicameral National Assembly of the Commonwealth, 98 members from single-member districts, elected in 1935 and 1938; replaced by the bicameral Congress after the 1940 amendments.",
+   "source": "almanac",
+   "valid_from": "1935-09-16",
+   "valid_to": "1941-12-30",
+   "first_held": "1935-09-16",
+   "earliest_record": "1935-09-16",
+   "est_votes": 3000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "District returns for 1935 and 1938 survive only in printed reports of the Department of the Interior; no government body publishes them online.",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PH",
+     "valid_from": "1935-01-01",
+     "valid_to": "1942-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1935-09-16",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1935 Elections (table of contents)"
+    },
+    {
+     "date": "1938-11-08",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1938 Legislative Elections (table of contents)"
+    }
+   ]
+  },
+  {
+   "key": "kalibapi_assembly_1943",
+   "tier": "national",
+   "name": "Pambansang Asamblea ng KALIBAPI (1943)",
+   "name_en": "National Assembly of the Second Republic (1943)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under Japanese occupation, provincial governors and city mayors chose 54 assemblymen on 20 September 1943 from KALIBAPI nominees; the other 54 seats were held ex officio by governors and mayors.",
+   "source": "almanac",
+   "valid_from": "1943-09-20",
+   "valid_to": "1945-02-02",
+   "first_held": "1943-09-20",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect choice by appointed governors and mayors under occupation, with no popular vote.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PH",
+     "valid_from": "1943-01-01",
+     "valid_to": "1945-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1943-09-20",
+     "election_kind": "indirect",
+     "source": "almanac",
+     "quote": "1943 KALIBAPI Assembly Election (table of contents)"
+    }
+   ]
+  },
+  {
+   "key": "president_1943",
+   "tier": "national",
+   "name": "Halalan ng Pangulo ng Asamblea (1943)",
+   "name_en": "Presidential election by the National Assembly (1943)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "José P. Laurel was elected president of the Second Republic by the KALIBAPI National Assembly on 25 September 1943.",
+   "source": "almanac",
+   "valid_from": "1943-09-25",
+   "valid_to": "1945-08-17",
+   "first_held": "1943-09-25",
+   "est_votes": 108,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1943-09-25",
+     "election_kind": "indirect",
+     "contests": 1,
+     "seats": 1,
+     "source": "almanac",
+     "quote": "1943 KALIBAPI Assembly Presidential Election (table of contents)"
+    }
+   ]
+  },
+  {
+   "key": "batasang_pambansa",
+   "tier": "national",
+   "name": "Batasang Pambansa",
+   "name_en": "Batasang Pambansa (1978 and 1984)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.region",
+     "ph.province"
+    ]
+   },
+   "note": "Unicameral parliament under the 1973 Constitution: the Interim Batasang Pambansa elected 7 April 1978 by regional multi-member block vote (165 seats), and the regular Batasang Pambansa elected 14 May 1984 from provinces and cities (183 elective seats); sectoral and appointed members besides. Abolished by Proclamation No. 3 in 1986.",
+   "source": "almanac",
+   "valid_from": "1978-04-07",
+   "valid_to": "1986-03-25",
+   "first_held": "1978-04-07",
+   "earliest_record": "1978-04-07",
+   "est_votes": 600000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "COMELEC publishes no 1978 or 1984 returns online; the official canvass survives only in print.",
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "PH",
+     "valid_from": "1978-01-01",
+     "valid_to": "1986-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1978-04-07",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1978 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1984-05-14",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1984 Elections (table of contents)"
+    }
+   ]
+  },
+  {
+   "key": "constitutional_convention",
+   "tier": "legislative_district",
+   "name": "Halalan ng mga delegado sa Kumbensiyong Konstitusyonal",
+   "name_en": "Constitutional Convention delegate elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.legislative_district"
+    ]
+   },
+   "note": "Delegates elected by district to the 1934 Constitutional Convention (202 delegates, 10 July 1934) and the 1971 Constitutional Convention (320 delegates, 10 November 1970). The 1986 Constitutional Commission was appointed. The 1987 Constitution lets Congress call a convention by law (Art. XVII).",
+   "source": "almanac",
+   "valid_from": "1934-07-10",
+   "first_held": "1934-07-10",
+   "earliest_record": "1934-07-10",
+   "est_votes": 12000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Delegate returns for 1934 and 1970 are not published online by any government body.",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1934-07-10",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "1934 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1970-11-10",
+     "election_kind": "general",
+     "note": "Delegates to the 1971 Constitutional Convention."
+    }
+   ]
+  },
+  {
+   "key": "malolos_congress",
+   "tier": "national",
+   "name": "Kongreso ng Malolos (1898)",
+   "name_en": "Malolos Congress (1898)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Delegates to the Revolutionary Congress of the First Republic were partly elected by town notables in provinces under revolutionary control in mid-1898 and partly appointed.",
+   "source": "almanac",
+   "valid_from": "1898-09-15",
+   "valid_to": "1899-11-13",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Restricted elections by town principales in some provinces, mixed with appointments, with no surviving official returns.",
+   "match": []
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "Pambansang plebisito at reperendum",
+   "name_en": "National plebiscites and referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "schemes": [
+     "world.country"
+    ],
+    "fine": [
+     "ph.province"
+    ]
+   },
+   "finest_note": "Provincial tallies appear only in printed proclamations; nothing after 1987 has been held.",
+   "note": "A constitutional amendment or revision is valid only when ratified by a majority of votes in a plebiscite (1987 Constitution, Art. XVII, Sec. 4); RA 6735 provides national initiative and referendum on laws, though the Supreme Court held it inadequate for constitutional initiatives (Santiago v. COMELEC, 1997). No national vote since 1987.",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article17 (Section 4)",
+   "valid_from": "1935-05-14",
+   "first_held": "1935-05-14",
+   "earliest_record": "1935-05-14",
+   "est_votes": 190000000,
+   "effort": 5,
+   "cadence": [
+    {
+     "called": true,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC)",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article17 (Section 4)"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "sovereign_state"
+     ],
+     "iso_pattern": "PH"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1935-05-14",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1935 Plebiscite (table of contents)",
+     "note": "Ratification of the 1935 Constitution."
+    },
+    {
+     "date": "1937-04-30",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1937 Plebiscite (table of contents)",
+     "note": "Women's suffrage (only women voted)."
+    },
+    {
+     "date": "1939-08-24",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1939 Plebiscite (table of contents)",
+     "note": "Amendment of the economic provisions of the Tydings-McDuffie Act."
+    },
+    {
+     "date": "1940-06-18",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1940 Plebiscite (table of contents)",
+     "note": "Bicameral Congress, presidential re-election, and the Commission on Elections."
+    },
+    {
+     "date": "1947-03-11",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1947 Plebiscite (table of contents)",
+     "note": "Parity rights amendment."
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1967 Plebiscite (table of contents)",
+     "note": "Two proposed amendments (a larger House; legislators as Constitutional Convention delegates), both rejected."
+    },
+    {
+     "date": "1973-01-10",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1973 Plebiscite (table of contents)",
+     "note": "Citizens' assemblies (barangays) voted by show of hands on ratifying the 1973 Constitution, 10-15 January 1973."
+    },
+    {
+     "date": "1973-07-27",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1973 Plebiscite (table of contents)",
+     "note": "Referendum on President Marcos continuing in office beyond 1973."
+    },
+    {
+     "date": "1975-02-27",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1975 Plebiscite (table of contents)",
+     "note": "Referendum on martial law and local government reorganization."
+    },
+    {
+     "date": "1976-10-16",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1976 Plebiscite (table of contents)",
+     "note": "Referendum-plebiscite on martial law and the 1976 amendments."
+    },
+    {
+     "date": "1977-12-17",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1977 Plebiscite (table of contents)",
+     "note": "Referendum on President Marcos continuing as president and prime minister."
+    },
+    {
+     "date": "1981-04-07",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1981 Plebiscite (table of contents)",
+     "note": "1981 amendments to the 1973 Constitution."
+    },
+    {
+     "date": "1984-01-27",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1984 Plebiscite (table of contents)",
+     "note": "1984 amendments, among them the restored vice presidency."
+    },
+    {
+     "date": "1987-02-02",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1987 Plebiscite (table of contents)",
+     "note": "Ratification of the 1987 Constitution."
+    }
+   ]
+  },
+  {
+   "key": "party_nominations",
+   "tier": "national",
+   "name": "Nominasyon ng mga partido",
+   "name_en": "Party nominations",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "omnibus",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties nominate by internal convention or executive committee and file certificates of nomination; the state runs no primary.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ],
+     "iso_pattern": "PH"
+    }
+   ]
+  },
+  {
+   "key": "judiciary",
+   "tier": "national",
+   "name": "Hudikatura",
+   "name_en": "Judiciary",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution (Article VIII, Section 9: appointed by the President from nominees of the Judicial and Bar Council)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Justices and judges are appointed by the President from lists of the Judicial and Bar Council; none are elected.",
+   "match": []
+  },
+  {
+   "key": "special_bodies",
+   "tier": "national",
+   "name": "Mga espesyal na lupon",
+   "name_en": "Special-purpose and law-enforcement bodies",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "ra7160",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Water districts, school boards, development councils, and police bodies are appointed or ex officio; no special district or sheriff is popularly elected.",
+   "match": []
+  },
+  {
+   "key": "barmm_district",
+   "tier": "autonomous_region",
+   "name": "Halalan ng Parlamento ng Bangsamoro (distritong parlamentaryo)",
+   "name_en": "Bangsamoro Parliament elections (parliamentary districts)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.barmm_district"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns are transmitted to COMELEC's transparency server; no public results archive for 2026 was reachable.",
+   "note": "Up to 40% of the 80-member Parliament from single-member parliamentary districts by plurality (RA 11054, Art. VII, Sec. 7); 32 districts were allocated for the planned 2025 vote (Resolution No. 11050). The first regular election, reset from May 2025 and October 2025, was held on 14 September 2026 under RA 12317; from 2031 it is synchronized with the national and local elections every three years.",
+   "source": "ra11054",
+   "valid_from": "2019-02-26",
+   "first_held": "2026-09-14",
+   "est_votes": 2000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "valid_from": "2026-03-25",
+     "valid_to": "2031-01-01",
+     "term_years": 3,
+     "administered_by": "Commission on Elections (COMELEC)",
+     "called": true,
+     "source": "bpe2026"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "2031-01-01",
+     "administered_by": "Commission on Elections (COMELEC)",
+     "source": "bpe2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "name_pattern": "(?i)bangsamoro|barmm",
+     "valid_from": "2019-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-09-14",
+     "election_kind": "general",
+     "source": "bpe2026",
+     "quote": "The first regular election for the Bangsamoro Government under this Organic Law shall be held on the second Monday of September 2026."
+    }
+   ]
+  },
+  {
+   "key": "barmm_party",
+   "tier": "autonomous_region",
+   "name": "Halalan ng Parlamento ng Bangsamoro (mga kinatawan ng partido)",
+   "name_en": "Bangsamoro Parliament elections (party representatives)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.region"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "As for the district seats.",
+   "note": "Half of Parliament (40 seats) elected by closed-list proportional representation among registered regional political parties with at least 4% of the valid votes (RA 11054, Art. VII, Sec. 7; Resolution No. 11050).",
+   "source": "ra11054",
+   "valid_from": "2019-02-26",
+   "first_held": "2026-09-14",
+   "est_votes": 2000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "valid_from": "2026-03-25",
+     "valid_to": "2031-01-01",
+     "term_years": 3,
+     "called": true,
+     "source": "bpe2026"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "2031-01-01",
+     "source": "bpe2026"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "name_pattern": "(?i)bangsamoro|barmm",
+     "valid_from": "2019-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-09-14",
+     "election_kind": "general",
+     "contests": 1,
+     "source": "res11050",
+     "quote": "BARMM Members, Registered Regional Political Parties 40",
+     "note": "Seat number from the allocation for the planned 2025 vote."
+    }
+   ]
+  },
+  {
+   "key": "barmm_sectoral",
+   "tier": "autonomous_region",
+   "name": "Halalan ng mga kinatawang sektoral ng Parlamento ng Bangsamoro",
+   "name_en": "Bangsamoro Parliament sectoral representatives",
+   "category": "non_territorial",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "10% of Parliament (at least 8 seats) are reserved seats and sectoral representatives: two each for non-Moro indigenous peoples and settler communities, one each for women, youth, traditional leaders, and the Ulama. Women, youth, and settler seats are to be filled by direct plurality vote of registered sectoral voters from 2028; the others are chosen by sectoral assemblies.",
+   "source": "res11050",
+   "valid_from": "2019-02-26",
+   "est_votes": 200000,
+   "effort": 4,
+   "match": [
+    {
+     "name_pattern": "(?i)sectoral|reserved seat",
+     "polity_kinds": [
+      "region"
+     ],
+     "precedence": 2,
+     "valid_from": "2019-01-01"
+    }
+   ]
+  },
+  {
+   "key": "armm_governor",
+   "tier": "autonomous_region",
+   "name": "Halalan sa Gobernador ng ARMM",
+   "name_en": "ARMM regional governor elections (1990-2016)",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.region"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns exist for the automated 2008 (Shari'a pilot), 2013, and 2016 votes; COMELEC publishes none online.",
+   "note": "Regional governor elected regionwide by plurality for a three-year term (RA 6734, as amended by RA 9054). Abolished when the Bangsamoro Transition Authority took office on 26 February 2019.",
+   "source": "ra6734",
+   "valid_from": "1990-02-17",
+   "valid_to": "2019-02-26",
+   "first_held": "1990-02-17",
+   "earliest_record": "1990-02-17",
+   "est_votes": 10000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "valid_from": "1990-02-17",
+     "valid_to": "2013-01-01",
+     "term_years": 3,
+     "called": true,
+     "administered_by": "Commission on Elections (COMELEC)",
+     "source": "armm_laws"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "2013-01-01",
+     "valid_to": "2019-02-26",
+     "source": "armm_laws"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_from": "1989-01-01",
+     "valid_to": "2019-03-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-02-17",
+     "election_kind": "general",
+     "note": "First regional election after the 1989 plebiscite."
+    },
+    {
+     "date": "1993-03-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1996-09-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "2001-11-26",
+     "election_kind": "general",
+     "note": "Held under RA 9054 after resets by RA 8746, 8753, 8953, and 9012."
+    },
+    {
+     "date": "2005-08-08",
+     "election_kind": "general"
+    },
+    {
+     "date": "2008-08-11",
+     "election_kind": "general"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    }
+   ]
+  },
+  {
+   "key": "armm_vice_governor",
+   "tier": "autonomous_region",
+   "name": "Halalan sa Bise Gobernador ng ARMM",
+   "name_en": "ARMM regional vice governor elections (1990-2016)",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.region"
+    ],
+    "fine": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.precinct"
+    ]
+   },
+   "note": "Elected separately from the regional governor on the same dates.",
+   "source": "ra6734",
+   "valid_from": "1990-02-17",
+   "valid_to": "2019-02-26",
+   "first_held": "1990-02-17",
+   "earliest_record": "1990-02-17",
+   "est_votes": 9000000,
+   "effort": 4,
+   "match": [
+    {
+     "name_pattern": "(?i)vice[- ]?governor",
+     "polity_kinds": [
+      "region"
+     ],
+     "precedence": 1,
+     "valid_from": "1989-01-01",
+     "valid_to": "2019-03-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-02-17",
+     "election_kind": "general",
+     "note": "First regional election after the 1989 plebiscite."
+    },
+    {
+     "date": "1993-03-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1996-09-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "2001-11-26",
+     "election_kind": "general",
+     "note": "Held under RA 9054 after resets by RA 8746, 8753, 8953, and 9012."
+    },
+    {
+     "date": "2005-08-08",
+     "election_kind": "general"
+    },
+    {
+     "date": "2008-08-11",
+     "election_kind": "general"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    }
+   ]
+  },
+  {
+   "key": "armm_assembly",
+   "tier": "autonomous_region",
+   "name": "Halalan ng Regional Legislative Assembly ng ARMM",
+   "name_en": "ARMM Regional Legislative Assembly elections (1990-2016)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.legislative_district"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.precinct"
+    ]
+   },
+   "note": "Three members per congressional district of the region by plurality block vote (24 members by 2016), three-year terms (RA 6734 and RA 9054).",
+   "source": "ra9054",
+   "valid_from": "1990-02-17",
+   "valid_to": "2019-02-26",
+   "first_held": "1990-02-17",
+   "earliest_record": "1990-02-17",
+   "est_votes": 25000000,
+   "effort": 4,
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_from": "1989-01-01",
+     "valid_to": "2019-03-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-02-17",
+     "election_kind": "general",
+     "note": "First regional election after the 1989 plebiscite."
+    },
+    {
+     "date": "1993-03-25",
+     "election_kind": "general"
+    },
+    {
+     "date": "1996-09-09",
+     "election_kind": "general"
+    },
+    {
+     "date": "2001-11-26",
+     "election_kind": "general",
+     "note": "Held under RA 9054 after resets by RA 8746, 8753, 8953, and 9012."
+    },
+    {
+     "date": "2005-08-08",
+     "election_kind": "general"
+    },
+    {
+     "date": "2008-08-11",
+     "election_kind": "general"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "general",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "general",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016",
+     "note": "Synchronized with the national and local elections by RA 10153 (the 2011 vote was not held)."
+    }
+   ]
+  },
+  {
+   "key": "sangguniang_pampook",
+   "tier": "region",
+   "name": "Sangguniang Pampook (Rehiyon IX at XII)",
+   "name_en": "Regional assemblies of Regions IX and XII (1979-1986)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under Presidential Decree No. 1618, the autonomous regional governments of Western Mindanao (IX) and Central Mindanao (XII) had elected assemblies (Sangguniang Pampook), first chosen on 7 May 1979 and again in 1982.",
+   "source": "almanac",
+   "valid_from": "1979-05-07",
+   "valid_to": "1987-02-02",
+   "first_held": "1979-05-07",
+   "est_votes": 3000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No returns are published online by COMELEC or any other government body.",
+   "match": [
+    {
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "valid_from": "1979-01-01",
+     "valid_to": "1987-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-05-07",
+     "election_kind": "general"
+    }
+   ]
+  },
+  {
+   "key": "cordillera_assembly",
+   "tier": "autonomous_region",
+   "name": "Cordillera Autonomous Region",
+   "name_en": "Cordillera autonomous government (never constituted)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Organic acts for a Cordillera autonomous region were rejected in the plebiscites of 30 January 1990 (RA 6766) and 7 March 1998 (RA 8438); the regional governor and assembly elections set by RA 6766 were postponed (RA 6827, RA 6861) and never held. The plebiscites belong to autonomy_plebiscite.",
+   "source": "armm_laws",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedNationalandLocal (RA 6827 and RA 6861 postponing the first regular election for the Autonomous Region of the Cordilleras)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No election was ever held for the Cordillera autonomous government.",
+   "match": []
+  },
+  {
+   "key": "autonomy_plebiscite",
+   "tier": "autonomous_region",
+   "name": "Plebisito sa awtonomiya",
+   "name_en": "Autonomy plebiscites",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "ph.province",
+     "ph.city_municipality"
+    ],
+    "fine": [
+     "ph.barangay"
+    ]
+   },
+   "finest_note": "Results by province and by city or municipality in COMELEC's proclamations; the 2019 plebiscite also by barangay for the contiguous areas.",
+   "note": "Plebiscites on the organic acts: ARMM (19 November 1989), Cordillera (30 January 1990 and 7 March 1998), the expanded ARMM (14 August 2001), and the Bangsamoro Organic Law (21 January and 6 February 2019). An autonomous region comprises only the units that vote in favor (Art. X, Sec. 18).",
+   "source": "constitution",
+   "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article10 (Section 18: effective when approved by majority of the votes cast by the constituent units in a plebiscite)",
+   "valid_from": "1989-11-19",
+   "first_held": "1989-11-19",
+   "est_votes": 9000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "name_pattern": "(?i)autonom|organic|bangsamoro|cordillera",
+     "polity_kinds": [
+      "region",
+      "county",
+      "municipality",
+      "submunicipal"
+     ],
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-11-19",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1989 1989-1990 Autonomous Region Plebiscites (table of contents)"
+    },
+    {
+     "date": "1990-01-30",
+     "election_kind": "referendum",
+     "source": "almanac",
+     "quote": "1990 1989-1990 Autonomous Region Plebiscites (table of contents)"
+    },
+    {
+     "date": "1998-03-07",
+     "election_kind": "referendum"
+    },
+    {
+     "date": "2001-08-14",
+     "election_kind": "referendum"
+    },
+    {
+     "date": "2019-01-21",
+     "election_kind": "referendum",
+     "note": "First part: the core ARMM, Cotabato City, and Isabela City."
+    },
+    {
+     "date": "2019-02-06",
+     "election_kind": "referendum",
+     "note": "Second part: Lanao del Norte municipalities and the Cotabato barangays."
+    }
+   ]
+  },
+  {
+   "key": "governor",
+   "tier": "province",
+   "name": "Halalan sa Gobernador",
+   "name_en": "Provincial governor elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.province"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns on the transparency sites since 2016; provincial certificates of canvass are not published for earlier years.",
+   "note": "One governor per province by plurality, three-year term, three consecutive terms at most (Art. X, Sec. 8; RA 7160). Voters of highly urbanized and independent component cities do not vote for provincial officials unless their charter allows. Provincial governors were first elected in 1902 by municipal councillors and later by direct vote.",
+   "source": "ra7160",
+   "valid_from": "1902-02-03",
+   "first_held": "1902-02-03",
+   "est_votes": 600000000,
+   "effort": 4,
+   "contests_per_unit": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1947-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "governor"
+     ],
+     "polity_kinds": [
+      "county"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1902-02-03",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1902 First Gubernatorial Elections (table of contents)"
+    },
+    {
+     "date": "1937-12-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1940-12-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1947-11-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1947 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1951-11-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1951 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1955-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1980-01-30",
+     "election_kind": "local",
+     "note": "First local elections under martial law."
+    },
+    {
+     "date": "1988-01-18",
+     "election_kind": "local",
+     "note": "First local elections under the 1987 Constitution."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "contests": 82,
+     "seats": 82,
+     "source": "res11050",
+     "quote": "Governors 82"
+    }
+   ]
+  },
+  {
+   "key": "vice_governor",
+   "tier": "province",
+   "name": "Halalan sa Bise Gobernador",
+   "name_en": "Provincial vice governor elections",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.province"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "note": "Elected separately by plurality; presides over the Sangguniang Panlalawigan (RA 7160, Sec. 49).",
+   "source": "ra7160",
+   "valid_from": "1955-11-08",
+   "est_votes": 500000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1947-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    }
+   ],
+   "match": [
+    {
+     "name_pattern": "(?i)vice[- ]?governor|bise gobernador",
+     "polity_kinds": [
+      "county"
+     ],
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1955-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1980-01-30",
+     "election_kind": "local",
+     "note": "First local elections under martial law."
+    },
+    {
+     "date": "1988-01-18",
+     "election_kind": "local",
+     "note": "First local elections under the 1987 Constitution."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "contests": 82,
+     "seats": 82,
+     "source": "res11050",
+     "quote": "Vice Governors 82"
+    }
+   ]
+  },
+  {
+   "key": "sangguniang_panlalawigan",
+   "tier": "province",
+   "name": "Halalan sa Sangguniang Panlalawigan",
+   "name_en": "Provincial board elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.provincial_district"
+    ],
+    "fine": [
+     "ph.city_municipality",
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns on the transparency sites since 2016.",
+   "note": "Regular members elected by plurality block vote in provincial board districts (usually the congressional districts), 8 to 10 per province by income class (800 seats in 2025); ex officio and sectoral members besides (RA 7160, Sec. 41; RA 7166, Sec. 3).",
+   "source": "ra7166",
+   "valid_from": "1988-01-18",
+   "first_held": "1988-01-18",
+   "est_votes": 1200000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1988-01-18",
+     "election_kind": "local"
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "seats": 800,
+     "source": "res11050",
+     "quote": "Members, Sangguniang Panlalawigan 800"
+    }
+   ]
+  },
+  {
+   "key": "mayor",
+   "tier": "city_municipality",
+   "name": "Halalan sa Alkalde",
+   "name_en": "City and municipal mayor elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.city_municipality"
+    ],
+    "fine": [
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns on the transparency sites since 2016; winners with votes for 2010 on the COMELEC website.",
+   "note": "One mayor per city or municipality by plurality, three-year term, three consecutive at most (RA 7160). 149 city and 1,493 municipal mayors in 2025.",
+   "source": "ra7160",
+   "valid_from": "1901-01-31",
+   "est_votes": 650000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1947-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, 2010 certified lists of elected city and municipal candidates",
+     "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/CityMun",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-05-10",
+     "last_date": "2010-05-10",
+     "finest": "ph.city_municipality",
+     "evidence": "One PDF per city or municipality listing the elected mayor, vice mayor, and councilors with their votes and proclamation dates; losing candidates are not listed.",
+     "source": "res2010_citymun"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1937-12-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1940-12-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1947-11-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1947 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1951-11-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1951 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1955-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1980-01-30",
+     "election_kind": "local",
+     "note": "First local elections under martial law."
+    },
+    {
+     "date": "1988-01-18",
+     "election_kind": "local",
+     "note": "First local elections under the 1987 Constitution."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "contests": 1642,
+     "seats": 1642,
+     "source": "res11050",
+     "quote": "City Mayors 149; Municipal Mayors 1,493"
+    }
+   ]
+  },
+  {
+   "key": "vice_mayor",
+   "tier": "city_municipality",
+   "name": "Halalan sa Bise Alkalde",
+   "name_en": "City and municipal vice mayor elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.city_municipality"
+    ],
+    "fine": [
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "note": "Elected separately by plurality; presides over the city or municipal council (RA 7160).",
+   "source": "ra7160",
+   "valid_from": "1947-11-11",
+   "est_votes": 600000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1947-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, 2010 certified lists of elected city and municipal candidates",
+     "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/CityMun",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-05-10",
+     "last_date": "2010-05-10",
+     "finest": "ph.city_municipality",
+     "evidence": "One PDF per city or municipality listing the elected mayor, vice mayor, and councilors with their votes and proclamation dates; losing candidates are not listed.",
+     "source": "res2010_citymun"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "deputy_mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    },
+    {
+     "name_pattern": "(?i)vice[- ]?mayor|bise alkalde",
+     "polity_kinds": [
+      "municipality"
+     ],
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-11-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1947 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1951-11-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1951 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1955-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1980-01-30",
+     "election_kind": "local",
+     "note": "First local elections under martial law."
+    },
+    {
+     "date": "1988-01-18",
+     "election_kind": "local",
+     "note": "First local elections under the 1987 Constitution."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "contests": 1642,
+     "seats": 1642,
+     "source": "res11050",
+     "quote": "City Vice Mayors 149; Municipal Vice Mayors 1,493"
+    }
+   ]
+  },
+  {
+   "key": "municipal_council",
+   "tier": "city_municipality",
+   "name": "Halalan sa Sangguniang Panlungsod at Sangguniang Bayan",
+   "name_en": "City and municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ph.councilor_district"
+    ],
+    "fine": [
+     "ph.barangay",
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Precinct returns on the transparency sites since 2016; winners with votes for 2010 on the COMELEC website.",
+   "note": "Councilors elected by plurality block vote, citywide or municipality-wide or by councilor district (8 to 16 per council by class; 1,682 city and 11,948 municipal seats in 2025), plus ex officio and sectoral members (RA 7160, Sec. 457 and 446).",
+   "source": "ra7160",
+   "valid_from": "1901-01-31",
+   "est_votes": 6000000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 11,
+     "term_years": 4,
+     "valid_from": "1947-11-11",
+     "valid_to": "1972-09-21",
+     "source": "almanac"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "month": 5,
+     "day_rule": "may_second_monday",
+     "term_years": 3,
+     "valid_from": "1992-05-11",
+     "administered_by": "Commission on Elections (COMELEC), through precinct electoral boards and municipal, city, provincial, and national boards of canvassers",
+     "source": "ra7166"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC 2025 results transparency site",
+     "url": "https://2025electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2025-05-12",
+     "last_date": "2025-05-12",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for every position on the 2025 ballot (national and local), plus overseas and local absentee returns; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2025"
+    },
+    {
+     "platform": "COMELEC 2022 results transparency site",
+     "url": "https://2022electionresults.comelec.gov.ph/",
+     "format": "json, html",
+     "access": "blocked",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2022-05-09",
+     "last_date": "2022-05-09",
+     "finest": "ph.precinct",
+     "evidence": "Election returns per clustered precinct for the 2022 national and local elections; the host answers with a Cloudflare challenge from a cloud session.",
+     "source": "results2022"
+    },
+    {
+     "platform": "COMELEC website, 2010 certified lists of elected city and municipal candidates",
+     "url": "https://www.comelec.gov.ph/?r=Results/2010NLE/CityMun",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2010-05-10",
+     "last_date": "2010-05-10",
+     "finest": "ph.city_municipality",
+     "evidence": "One PDF per city or municipality listing the elected mayor, vice mayor, and councilors with their votes and proclamation dates; losing candidates are not listed.",
+     "source": "res2010_citymun"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1937-12-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "1940-12-10",
+     "election_kind": "local"
+    },
+    {
+     "date": "1947-11-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1947 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1951-11-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1951 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1955-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1955 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1959-11-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1959 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1963-11-12",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1963 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1967-11-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1967 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1971-11-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1971 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1980-01-30",
+     "election_kind": "local",
+     "note": "First local elections under martial law."
+    },
+    {
+     "date": "1988-01-18",
+     "election_kind": "local",
+     "note": "First local elections under the 1987 Constitution."
+    },
+    {
+     "date": "1992-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1992 Elections (table of contents)"
+    },
+    {
+     "date": "1995-05-08",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1995 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "1998-05-11",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "1998 Elections (table of contents)"
+    },
+    {
+     "date": "2001-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2001 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2004-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2004 Elections (table of contents)"
+    },
+    {
+     "date": "2007-05-14",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2007 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2010-05-10",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2010 Elections (table of contents)"
+    },
+    {
+     "date": "2013-05-13",
+     "election_kind": "local",
+     "source": "almanac",
+     "quote": "2013 Legislative Elections (table of contents)"
+    },
+    {
+     "date": "2016-05-09",
+     "election_kind": "local",
+     "source": "nle2016",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2016"
+    },
+    {
+     "date": "2019-05-13",
+     "election_kind": "local",
+     "source": "nle2019",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 13th, in the year 2019"
+    },
+    {
+     "date": "2022-05-09",
+     "election_kind": "local",
+     "source": "nle2022",
+     "quote": "the next synchronized National and Local Elections (NLE) will happen on the second Monday of May, the 9th, in the year 2022"
+    },
+    {
+     "date": "2025-05-12",
+     "election_kind": "local",
+     "seats": 13630,
+     "source": "res11050",
+     "quote": "Members, Sangguniang Panlungsod 1,682; Members, Sangguniang Bayan 11,948"
+    }
+   ]
+  },
+  {
+   "key": "recall",
+   "tier": "city_municipality",
+   "name": "Halalan sa pagpapabalik (recall)",
+   "name_en": "Recall elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A recall petition signed by a share of the voters leads to a recall election in which the official runs against challengers (RA 7160, Sec. 69-75, as amended by RA 9244). COMELEC lists recall elections for mayor in Puerto Princesa (8 May 2015) and Cabadbaran City (5 May 2018); earlier ones include Puerto Princesa in 2002.",
+   "source": "recall",
+   "valid_from": "1992-01-01",
+   "est_votes": 300000,
+   "effort": 4,
+   "cadence": [
+    {
+     "called": true,
+     "valid_from": "1992-01-01",
+     "administered_by": "Commission on Elections (COMELEC)",
+     "source": "ra7160"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "local_plebiscite",
+   "tier": "city_municipality",
+   "name": "Lokal na plebisito",
+   "name_en": "Local plebiscites (creation, division, merger, and conversion of local units)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "schemes": [
+     "ph.province",
+     "ph.city_municipality",
+     "ph.barangay"
+    ],
+    "fine": [
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "COMELEC posts the calendar resolution for each plebiscite; results appear only in the board of canvassers' certificates.",
+   "note": "No province, city, municipality, or barangay may be created, divided, merged, abolished, or substantially altered without approval in a plebiscite in the units directly affected (Art. X, Sec. 10; RA 7160, Sec. 10), e.g. the division of Maguindanao (17 September 2022), the rejected division of Palawan (13 March 2021), and city conversions. Local initiatives and referendums on ordinances under RA 6735 and RA 7160 belong here too.",
+   "source": "plebiscites",
+   "valid_from": "1973-01-17",
+   "est_votes": 15000000,
+   "effort": 4,
+   "cadence": [
+    {
+     "called": true,
+     "valid_from": "1987-02-02",
+     "administered_by": "Commission on Elections (COMELEC)",
+     "source": "constitution",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/Constitution/1987Constitution/Article10 (Section 10)"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "region",
+      "county",
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "2021-03-13",
+     "election_kind": "referendum",
+     "source": "plebiscites",
+     "quote": "PLEBISCITE TO RATIFY THE DIVISION OF THE PROVINCE OF PALAWAN INTO THREE (3) PROVINCES"
+    },
+    {
+     "date": "2022-09-17",
+     "election_kind": "referendum",
+     "source": "plebiscites",
+     "quote": "THE PLEBISCITE TO RATIFY THE DIVISION OF THE PROVINCE OF MAGUINDANAO INTO TWO (2) PROVINCES"
+    },
+    {
+     "date": "2023-10-30",
+     "election_kind": "referendum",
+     "source": "plebiscites",
+     "quote": "PLEBISCITE TO RATIFY THE CONVERSION OF THE CITY OF SAN JOSE DEL MONTE BULACAN INTO A HIGHLY URBANIZED CITY"
+    },
+    {
+     "date": "2024-04-13",
+     "election_kind": "referendum",
+     "source": "plebiscites",
+     "quote": "PLEBISCITES TO RATIFY THE CREATION OF THE EIGHT (8) MUNICIPALITIES COMPOSED OF SIXTY-THREE (63) BARANGAYS KNOWN AS THE “SPECIAL GEOGRAPHIC AREA”"
+    },
+    {
+     "date": "2026-11-21",
+     "election_kind": "referendum",
+     "source": "plebiscites",
+     "quote": "THE NOVEMBER 21, 2026 PLEBISCITE TO RATIFY PRESIDENTIAL PROCLAMATION NO. 1267 ENTITLED \"CONVERSION OF THE CITY OF NAGA, CAMARINES SUR INTO A HIGHLY URBANIZED CITY\""
+    }
+   ]
+  },
+  {
+   "key": "league_federations",
+   "tier": "city_municipality",
+   "name": "Liga ng mga Barangay at pederasyon ng SK",
+   "name_en": "Leagues of barangays and SK federations",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Presidents of the municipal and city chapters of the Liga ng mga Barangay and of the Pederasyon ng mga Sangguniang Kabataan are elected by and from the punong barangays and SK chairpersons and sit ex officio in the city, municipal, and provincial councils (RA 7160, Sec. 491-507; RA 10742).",
+   "source": "ra7160",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Indirect elections among elected barangay and SK officials, run by the leagues rather than COMELEC, with no public returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "county",
+      "submunicipal"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "punong_barangay",
+   "tier": "barangay",
+   "name": "Halalan sa Punong Barangay",
+   "name_en": "Barangay captain elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.barangay"
+    ],
+    "fine": [
+     "ph.precinct"
+    ]
+   },
+   "finest_note": "Manual count by precinct, canvassed by the barangay board of canvassers; COMELEC publishes no returns.",
+   "note": "One punong barangay per barangay by plurality, nonpartisan by law (RA 7160, RA 9164). The 1 December 2025 and 2 November 2026 votes were postponed by RA 12232 and RA 12326, which fixed five-year terms; the next synchronized election is in November 2028.",
+   "source": "ra9164",
+   "valid_from": "1982-05-17",
+   "first_held": "1982-05-17",
+   "est_votes": 1600000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Counts are manual and canvassed in each of 42,000 barangays; COMELEC publishes no vote counts, only proclaimed winners.",
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 10,
+     "day_rule": "oct_last_monday",
+     "term_years": 3,
+     "valid_from": "2007-10-29",
+     "valid_to": "2018-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra9164"
+    },
+    {
+     "term_years": 5,
+     "called": true,
+     "valid_from": "2018-01-01",
+     "valid_to": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "bske_laws",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK (RA 10952, 11462, 11935, 12232, and 12326 postponed the 2017, 2020, 2022, 2025, and 2026 votes)"
+    },
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 11,
+     "day_rule": "nov_second_monday",
+     "term_years": 5,
+     "valid_from": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra12326"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC website, BSKE resolutions",
+     "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/BSKE",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-10-29",
+     "evidence": "Calendars, rules, and postponement laws for each barangay and SK election; no barangay vote counts are published.",
+     "source": "bske_res"
+    }
+   ],
+   "match": [
+    {
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "other"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1982-05-17",
+     "election_kind": "local",
+     "note": "Barangay elections under Batas Pambansa Blg. 222."
+    },
+    {
+     "date": "1989-03-28",
+     "election_kind": "local"
+    },
+    {
+     "date": "1994-05-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "1997-05-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2002-07-15",
+     "election_kind": "local",
+     "source": "ra9164",
+     "quote": "There shall be synchronized barangay and sangguniang kabataan elections, which shall be held on July 15, 2002."
+    },
+    {
+     "date": "2007-10-29",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-25",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-28",
+     "election_kind": "local",
+     "note": "Barangay only; the SK election was postponed by RA 10632."
+    },
+    {
+     "date": "2018-05-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "2023-10-30",
+     "election_kind": "local",
+     "source": "bske2023",
+     "quote": "the October 30, 2023 Synchronized Barangay and Sangguniang Kabataan Elections (BSKE)"
+    }
+   ]
+  },
+  {
+   "key": "sangguniang_barangay",
+   "tier": "barangay",
+   "name": "Halalan sa Sangguniang Barangay",
+   "name_en": "Barangay council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.barangay"
+    ],
+    "fine": [
+     "ph.precinct"
+    ]
+   },
+   "note": "Seven kagawad per barangay by plurality block vote, on the same ballot as the punong barangay. The 1 December 2025 and 2 November 2026 votes were postponed by RA 12232 and RA 12326, which fixed five-year terms; the next synchronized election is in November 2028.",
+   "source": "ra9164",
+   "valid_from": "1982-05-17",
+   "first_held": "1982-05-17",
+   "est_votes": 9000000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "As for the punong barangay: manual barangay canvasses with no published vote counts.",
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 10,
+     "day_rule": "oct_last_monday",
+     "term_years": 3,
+     "valid_from": "2007-10-29",
+     "valid_to": "2018-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra9164"
+    },
+    {
+     "term_years": 5,
+     "called": true,
+     "valid_from": "2018-01-01",
+     "valid_to": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "bske_laws",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK (RA 10952, 11462, 11935, 12232, and 12326 postponed the 2017, 2020, 2022, 2025, and 2026 votes)"
+    },
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 11,
+     "day_rule": "nov_second_monday",
+     "term_years": 5,
+     "valid_from": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra12326"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC website, BSKE resolutions",
+     "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/BSKE",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-10-29",
+     "evidence": "Calendars, rules, and postponement laws for each barangay and SK election; no barangay vote counts are published.",
+     "source": "bske_res"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1982-05-17",
+     "election_kind": "local",
+     "note": "Barangay elections under Batas Pambansa Blg. 222."
+    },
+    {
+     "date": "1989-03-28",
+     "election_kind": "local"
+    },
+    {
+     "date": "1994-05-09",
+     "election_kind": "local"
+    },
+    {
+     "date": "1997-05-12",
+     "election_kind": "local"
+    },
+    {
+     "date": "2002-07-15",
+     "election_kind": "local",
+     "source": "ra9164",
+     "quote": "There shall be synchronized barangay and sangguniang kabataan elections, which shall be held on July 15, 2002."
+    },
+    {
+     "date": "2007-10-29",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-25",
+     "election_kind": "local"
+    },
+    {
+     "date": "2013-10-28",
+     "election_kind": "local",
+     "note": "Barangay only; the SK election was postponed by RA 10632."
+    },
+    {
+     "date": "2018-05-14",
+     "election_kind": "local"
+    },
+    {
+     "date": "2023-10-30",
+     "election_kind": "local",
+     "source": "bske2023",
+     "quote": "the October 30, 2023 Synchronized Barangay and Sangguniang Kabataan Elections (BSKE)"
+    }
+   ]
+  },
+  {
+   "key": "sk_chairperson",
+   "tier": "barangay",
+   "name": "Halalan sa Tagapangulo ng Sangguniang Kabataan",
+   "name_en": "Sangguniang Kabataan chairperson elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.barangay"
+    ],
+    "fine": [
+     "ph.precinct"
+    ]
+   },
+   "note": "Youth council chair elected by the Katipunan ng Kabataan (registered voters aged 15-30 since RA 10742), plurality; sits ex officio in the barangay council. No SK election was held between 2010 and 2018. The 1 December 2025 and 2 November 2026 votes were postponed by RA 12232 and RA 12326, which fixed five-year terms; the next synchronized election is in November 2028.",
+   "source": "ra10742",
+   "valid_from": "1992-12-04",
+   "first_held": "1992-12-04",
+   "est_votes": 200000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Manual barangay canvasses with no published vote counts.",
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 10,
+     "day_rule": "oct_last_monday",
+     "term_years": 3,
+     "valid_from": "2007-10-29",
+     "valid_to": "2018-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra9164"
+    },
+    {
+     "term_years": 5,
+     "called": true,
+     "valid_from": "2018-01-01",
+     "valid_to": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "bske_laws",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK (RA 10952, 11462, 11935, 12232, and 12326 postponed the 2017, 2020, 2022, 2025, and 2026 votes)"
+    },
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 11,
+     "day_rule": "nov_second_monday",
+     "term_years": 5,
+     "valid_from": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra12326"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC website, BSKE resolutions",
+     "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/BSKE",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-10-29",
+     "evidence": "Calendars, rules, and postponement laws for each barangay and SK election; no barangay vote counts are published.",
+     "source": "bske_res"
+    }
+   ],
+   "match": [
+    {
+     "name_pattern": "(?i)kabataan|\\bSK\\b",
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "other"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "precedence": 2
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-04",
+     "election_kind": "local",
+     "note": "First Sangguniang Kabataan election under RA 7160 (members aged 15-21)."
+    },
+    {
+     "date": "1996-05-06",
+     "election_kind": "local"
+    },
+    {
+     "date": "2002-07-15",
+     "election_kind": "local",
+     "source": "ra9164",
+     "quote": "There shall be synchronized barangay and sangguniang kabataan elections, which shall be held on July 15, 2002."
+    },
+    {
+     "date": "2007-10-29",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-25",
+     "election_kind": "local"
+    },
+    {
+     "date": "2018-05-14",
+     "election_kind": "local",
+     "note": "First under the SK Reform Act (RA 10742), voters aged 15-30 and candidates aged 18-24."
+    },
+    {
+     "date": "2023-10-30",
+     "election_kind": "local",
+     "source": "bske2023",
+     "quote": "the October 30, 2023 Synchronized Barangay and Sangguniang Kabataan Elections (BSKE)"
+    }
+   ]
+  },
+  {
+   "key": "sk_council",
+   "tier": "barangay",
+   "name": "Halalan sa Sangguniang Kabataan",
+   "name_en": "Sangguniang Kabataan council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ph.barangay"
+    ],
+    "fine": [
+     "ph.precinct"
+    ]
+   },
+   "note": "Seven SK kagawad per barangay by plurality block vote of the Katipunan ng Kabataan. The 1 December 2025 and 2 November 2026 votes were postponed by RA 12232 and RA 12326, which fixed five-year terms; the next synchronized election is in November 2028.",
+   "source": "ra10742",
+   "valid_from": "1992-12-04",
+   "first_held": "1992-12-04",
+   "est_votes": 1200000000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "Manual barangay canvasses with no published vote counts.",
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "month": 10,
+     "day_rule": "oct_last_monday",
+     "term_years": 3,
+     "valid_from": "2007-10-29",
+     "valid_to": "2018-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra9164"
+    },
+    {
+     "term_years": 5,
+     "called": true,
+     "valid_from": "2018-01-01",
+     "valid_to": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "bske_laws",
+     "locator": "https://www.comelec.gov.ph/?r=References/RelatedLaws/ElectionLaws/SynchronizedBarangayandSK (RA 10952, 11462, 11935, 12232, and 12326 postponed the 2017, 2020, 2022, 2025, and 2026 votes)"
+    },
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 11,
+     "day_rule": "nov_second_monday",
+     "term_years": 5,
+     "valid_from": "2028-01-01",
+     "administered_by": "Commission on Elections (COMELEC), with barangay boards of canvassers",
+     "source": "ra12326"
+    }
+   ],
+   "access": [
+    {
+     "platform": "COMELEC website, BSKE resolutions",
+     "url": "https://www.comelec.gov.ph/?r=References/ComelecResolutions/BSKE",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-10-29",
+     "evidence": "Calendars, rules, and postponement laws for each barangay and SK election; no barangay vote counts are published.",
+     "source": "bske_res"
+    }
+   ],
+   "match": [
+    {
+     "name_pattern": "(?i)kabataan|\\bSK\\b",
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "precedence": 2
+    }
+   ],
+   "dates": [
+    {
+     "date": "1992-12-04",
+     "election_kind": "local",
+     "note": "First Sangguniang Kabataan election under RA 7160 (members aged 15-21)."
+    },
+    {
+     "date": "1996-05-06",
+     "election_kind": "local"
+    },
+    {
+     "date": "2002-07-15",
+     "election_kind": "local",
+     "source": "ra9164",
+     "quote": "There shall be synchronized barangay and sangguniang kabataan elections, which shall be held on July 15, 2002."
+    },
+    {
+     "date": "2007-10-29",
+     "election_kind": "local"
+    },
+    {
+     "date": "2010-10-25",
+     "election_kind": "local"
+    },
+    {
+     "date": "2018-05-14",
+     "election_kind": "local",
+     "note": "First under the SK Reform Act (RA 10742), voters aged 15-30 and candidates aged 18-24."
+    },
+    {
+     "date": "2023-10-30",
+     "election_kind": "local",
+     "source": "bske2023",
+     "quote": "the October 30, 2023 Synchronized Barangay and Sangguniang Kabataan Elections (BSKE)"
+    }
+   ]
+  }
+ ]
+}
