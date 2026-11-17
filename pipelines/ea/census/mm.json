@@ -1,0 +1,1225 @@
+{
+  "polity": "MM",
+  "name": "Myanmar (Burma)",
+  "sources": {
+    "constitution": {
+      "title": "Constitution of the Republic of the Union of Myanmar (2008)",
+      "publisher": "Ministry of Information, Printing and Publishing Enterprise",
+      "url": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en",
+      "kind": "official_body",
+      "note": "Official English text printed by the Ministry of Information in September 2008, read in the 2015 revision as the Comparative Constitutions Project reproduces it, since the Union Election Commission and Hluttaw hosts refused this session. Art. 49: seven Regions, seven States, and the Union territories; art. 56: the five Self-Administered Zones and one Self-Administered Division; art. 60: the President is elected by the Presidential Electoral College of the Pyidaungsu Hluttaw's three groups; art. 109: the Pyithu Hluttaw has at most 330 representatives elected on the basis of townships and 110 Defence Services personnel nominated by the Commander-in-Chief; arts. 119, 151, and 168: five-year terms; art. 141: 168 elected Amyotha Hluttaw representatives, 12 from each Region or State, and 56 nominated Defence Services personnel; art. 161: two Region or State Hluttaw representatives from each township, one for each national race of at least 0.1 percent of the Union's population that has no Region, State, or Self-Administered Area of its own, and one third nominated Defence Services personnel; art. 276: Leading Bodies of Self-Administered Areas formed from Region or State Hluttaw representatives and nominees; art. 289: ward and village-tract administration assigned by law to a person respected by the community; art. 399: the Union Election Commission; art. 436: amendments to entrenched sections need a nation-wide referendum; art. 441: the Constitution was adopted by nation-wide referendum."
+    },
+    "cso_units": {
+      "title": "Myanmar Statistical Yearbook 2024, Table 1.11: Administrative Units, as of 24-5-2024",
+      "publisher": "Central Statistical Organization, Ministry of Planning and Finance",
+      "url": "https://www.csostat.gov.mm/Content/PublicationAndRelease/2024/excelfile/P0111.xlsx",
+      "kind": "official_body",
+      "note": "Union row: 121 districts, 330 townships, 471 towns, 3,489 wards, 13,590 village tracts, 63,217 villages, with one row for each of the 14 States and Regions and Nay Pyi Taw. Source line: General Administration Department. Index page: https://www.csostat.gov.mm/Content/PublicationAndRelease/2024/1.htm"
+    },
+    "uec_constituencies": {
+      "title": "UEC announces constituencies for 2025 general election",
+      "publisher": "The Global New Light of Myanmar (Ministry of Information)",
+      "url": "https://www.gnlm.com.mm/uec-announces-constituencies-for-2025-general-election/",
+      "kind": "official_body",
+      "note": "Reports the Union Election Commission's Notifications 50/2025 (Pyithu Hluttaw), 51/2025 (Amyotha Hluttaw), 52/2025 (Region and State Hluttaws), and 53/2025 (Region and State Hluttaw ethnic constituencies) of 15 August 2025: 330 FPTP Pyithu Hluttaw constituencies; 84 FPTP and 26 PR Amyotha Hluttaw constituencies; 322 FPTP and 42 PR Region and State Hluttaw constituencies; 29 ethnic constituencies."
+    },
+    "uec_votes_2026": {
+      "title": "UEC announces secured votes of political parties",
+      "publisher": "The Global New Light of Myanmar (Ministry of Information)",
+      "url": "https://www.gnlm.com.mm/uec-announces-secured-votes-of-political-parties/",
+      "kind": "official_body",
+      "note": "Reports Union Election Commission announcement 34/2026 of 9 February 2026: the election held in phases from 28 December 2025 in 263 Pyithu Hluttaw, 99 Amyotha Hluttaw, 297 Region or State Hluttaw, and 29 ethnic constituencies; the Commission announced each candidate's votes and percentage and each party's seats."
+    },
+    "ndsc_briefing": {
+      "title": "NDSC Information Team Leader briefs public on upcoming multiparty democratic election",
+      "publisher": "The Global New Light of Myanmar (Ministry of Information)",
+      "url": "https://www.gnlm.com.mm/ndsc-information-team-leader-briefs-public-on-upcoming-multiparty-democratic-election/",
+      "kind": "official_body",
+      "note": "Official briefing of November 2025 with the government's count of Myanmar's elections: Legislative Council elections under dyarchy on 11 November 1922, the first; six elections from 1922 to 1947, three in the parliamentary period (1948-1962), four under the Burma Socialist Programme Party (1962-1988), one under the SLORC and SPDC (1988-2010), and six since 2010 (general elections on 7 November 2010, 8 November 2015, and 8 November 2020, and three by-elections); FPTP for the Pyithu Hluttaw and a mixed-member proportional system for the Amyotha Hluttaw and the State and Region Hluttaws in 2025."
+    },
+    "president_2026": {
+      "title": "Misinformation vs. Reality: The Truth Behind the 2026 General Election and Presidential Appointment",
+      "publisher": "The Global New Light of Myanmar (Ministry of Information)",
+      "url": "https://www.gnlm.com.mm/misinformation-vs-reality-the-truth-behind-the-2026-general-election-and-presidential-appointment/",
+      "kind": "official_body",
+      "note": "The President was elected by the Pyidaungsu Hluttaw by secret ballot on the morning of 3 April 2026 from the nominees of the Pyithu Hluttaw, Amyotha Hluttaw, and Defence Services representatives' groups (584 of 586 representatives attending); turnout in the 2025 general election was 13.14 million of 24.22 million eligible voters (54.22 percent)."
+    },
+    "uec_2017": {
+      "title": "Myanmar by-election 2017 results",
+      "publisher": "Union Election Commission of Myanmar",
+      "url": "https://openelectiondata.uec.gov.mm/results2017/",
+      "kind": "official_body",
+      "license": "Official publication; reuse terms are not stated",
+      "note": "Results of the 1 April 2017 by-elections by constituency for the Pyithu Hluttaw, the Amyotha Hluttaw, and the Kayah and Shan State Hluttaws, with a CSV per constituency."
+    },
+    "uec_site": {
+      "title": "Union Election Commission website",
+      "publisher": "Union Election Commission of Myanmar",
+      "url": "https://www.uec.gov.mm/",
+      "kind": "official_body",
+      "note": "The Commission's site, which carries its notifications, the Hluttaw election laws, and the lists of elected representatives; it reset this session's connections on 17 November 2026."
+    },
+    "gnlm_announcements": {
+      "title": "Announcements",
+      "publisher": "The Global New Light of Myanmar (Ministry of Information)",
+      "url": "https://www.gnlm.com.mm/category/announcement/",
+      "kind": "official_body",
+      "note": "The state daily's announcement pages, which reprint the Union Election Commission's notifications, its lists of elected Pyithu, Amyotha, and Region or State Hluttaw representatives by constituency (for example the 2020 lists), and its 2026 announcements of each candidate's votes; each day's paper is also a PDF on moi.gov.mm."
+    },
+    "ycdc": {
+      "title": "Yangon City Development Committee: Laws and Regulations",
+      "publisher": "Yangon City Development Committee",
+      "url": "https://www.ycdc.gov.mm/",
+      "kind": "official_body",
+      "note": "The committee's site, which lists the Yangon City Development Law and the election law for the committee's elected members."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "ပြည်ထောင်စုသမ္မတမြန်မာနိုင်ငံတော်",
+      "name_en": "Republic of the Union of Myanmar",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "mm.nation",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 1,
+          "source": "cso_units",
+          "locator": "Table 1.11, row Union"
+        }
+      ]
+    },
+    {
+      "key": "state_region",
+      "name": "တိုင်းဒေသကြီးများ၊ ပြည်နယ်များနှင့် ပြည်ထောင်စုနယ်မြေ",
+      "name_en": "Regions and States (7 each) and the Nay Pyi Taw Union Territory; each Region and State elects a Hluttaw, Nay Pyi Taw none",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "mm.state_region",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 15,
+          "source": "cso_units",
+          "locator": "Table 1.11: rows Kachin, Kayah, Kayin, Chin, Mon, Rakhine, and Shan States; Sagaing, Taninthayi, Bago, Magway, Mandalay, Yangon, and Ayeyawady Regions; and Nay Pyi Taw"
+        }
+      ]
+    },
+    {
+      "key": "self_administered",
+      "name": "ကိုယ်ပိုင်အုပ်ချုပ်ခွင့်ရ တိုင်းနှင့် ဒေသများ",
+      "name_en": "Self-Administered Zones (5) and Division (1), each grouping townships inside a Region or State",
+      "parent": "state_region",
+      "scheme": "mm.self_administered",
+      "elects": false,
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "value": 6,
+          "source": "constitution",
+          "locator": "Art. 56(a)-(f): Naga, Danu, Pa-O, Pa Laung, and Kokang Self-Administered Zones and the Wa Self-Administered Division"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "ခရိုင်များ",
+      "name_en": "Districts",
+      "parent": "state_region",
+      "polity_kind": "county",
+      "scheme": "mm.district",
+      "elects": false,
+      "source": "cso_units",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 121,
+          "source": "cso_units",
+          "locator": "Table 1.11, row Union, column District"
+        }
+      ]
+    },
+    {
+      "key": "township",
+      "name": "မြို့နယ်များ",
+      "name_en": "Townships, the base of the Pyithu Hluttaw constituencies (one each) and of the Region or State Hluttaw constituencies (two each)",
+      "parent": "district",
+      "polity_kind": "municipality",
+      "scheme": "mm.township",
+      "elects": false,
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 330,
+          "source": "cso_units",
+          "locator": "Table 1.11, row Union, column Township"
+        }
+      ]
+    },
+    {
+      "key": "town",
+      "name": "မြို့များ",
+      "name_en": "Towns, whose development committees (Yangon, Mandalay, Nay Pyi Taw) and municipal development affairs committees may include elected members",
+      "parent": "township",
+      "scheme": "mm.town",
+      "source": "cso_units",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 471,
+          "source": "cso_units",
+          "locator": "Table 1.11, row Union, column Town"
+        }
+      ]
+    },
+    {
+      "key": "ward_village_tract",
+      "name": "ရပ်ကွက်များနှင့် ကျေးရွာအုပ်စုများ",
+      "name_en": "Wards (urban) and village tracts (rural), the smallest units that choose anyone: their administrators",
+      "parent": "township",
+      "polity_kind": "submunicipal",
+      "scheme": "mm.ward_village_tract",
+      "source": "cso_units",
+      "counts": [
+        {
+          "date": "2024-05-24",
+          "value": 17079,
+          "source": "cso_units",
+          "locator": "Table 1.11, row Union: 3,489 wards and 13,590 village tracts"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "pyithu_hluttaw",
+      "tier": "national",
+      "name": "ပြည်သူ့လွှတ်တော် ရွေးကောက်ပွဲ",
+      "name_en": "Pyithu Hluttaw (House of Representatives) general elections and by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2010-01-01",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "finest_note": "Candidates' votes by constituency (one per township) in the Commission's announcements; the 2017 by-elections also by constituency on the open results portal",
+      "note": "At most 330 representatives elected on the basis of townships, plus 110 Defence Services personnel nominated by the Commander-in-Chief (Constitution art. 109); five-year term from the first session (art. 119). Single-member constituencies by first past the post in 2010, 2015, 2020, and 2025. The Commission annulled the 2020 results in July 2021. The 2025 election was held in three phases (28 December 2025, 11 January 2026, and 25 January 2026) in 263 of the 330 constituencies. By-elections fill vacated seats: 1 April 2012, 1 April 2017 (loaded by mm.uec), and 3 November 2018.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 109 and 119)",
+      "est_votes": 22000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election", "special"],
+          "body_kinds": ["lower_house"],
+          "iso_pattern": "MM",
+          "valid_from": "2010-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 119: \"The term of the Pyithu Hluttaw is five years from the day of its first session.\")",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Union Election Commission",
+          "vacancy_rule": "A vacated seat is filled by a by-election called by the Union Election Commission.",
+          "valid_from": "2011-01-31"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Union Election Commission website",
+          "url": "https://www.uec.gov.mm/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2010-11-07",
+          "source": "uec_site",
+          "evidence": "Connections from this session were reset on 17 November 2026; the site carries the Commission's notifications and lists of elected representatives."
+        },
+        {
+          "platform": "The Global New Light of Myanmar, Union Election Commission announcements",
+          "url": "https://www.gnlm.com.mm/category/announcement/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-11-08",
+          "last_date": "2026-01-25",
+          "finest": "mm.constituency",
+          "source": "gnlm_announcements",
+          "evidence": "Reprints of the Commission's lists of elected representatives by constituency (2020) and of its 2026 announcements of each candidate's votes; the pages answered on 17 November 2026."
+        },
+        {
+          "platform": "Union Election Commission open results portal, 2017 by-elections",
+          "url": "https://openelectiondata.uec.gov.mm/results2017/",
+          "format": "html, csv",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2017-04-01",
+          "last_date": "2017-04-01",
+          "finest": "mm.constituency",
+          "source": "uec_2017",
+          "evidence": "The gateway could not connect from this session on 17 November 2026; the mm.uec pipeline loaded the portal's constituency pages and CSVs."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The first multiparty democratic election was held on 7 November 2010, and the first Hluttaw session convened on 31 January 2011."
+        },
+        {
+          "date": "2012-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to seats vacated by representatives appointed to the government; one of the three by-elections the official briefing counts since 2010."
+        },
+        {
+          "date": "2015-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The second general election under the multiparty democratic system took place on 8 November 2015, with the second Hluttaw session convening on 1 February 2016."
+        },
+        {
+          "date": "2017-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated Pyithu, Amyotha, and Kayah and Shan State Hluttaw seats; results by constituency on the Commission's 2017 portal, loaded by mm.uec."
+        },
+        {
+          "date": "2018-11-03",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats; the third by-election the official briefing counts since 2010."
+        },
+        {
+          "date": "2020-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The third general election was held on 8 November 2020",
+          "note": "The Union Election Commission annulled the 2020 results in July 2021."
+        },
+        {
+          "date": "2025-12-28",
+          "election_kind": "general",
+          "contests": 263,
+          "seats": 263,
+          "source": "uec_votes_2026",
+          "quote": "The Union Election Commission conducted the multiparty democratic general election in phases starting from 28 December 2025. These elections were held in 263 constituencies for the Pyithu Hluttaw",
+          "note": "Total over the three phases of 28 December 2025, 11 January 2026, and 25 January 2026; no vote in the other 67 of the 330 constituencies."
+        }
+      ]
+    },
+    {
+      "key": "amyotha_hluttaw",
+      "tier": "national",
+      "name": "အမျိုးသားလွှတ်တော် ရွေးကောက်ပွဲ",
+      "name_en": "Amyotha Hluttaw (House of Nationalities) general elections and by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2010-01-01",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "finest_note": "Candidates' votes by constituency (12 per Region or State to 2020); party votes in the 26 PR constituencies of 2025",
+      "note": "168 elected representatives, 12 from each Region or State including one from each Self-Administered Division or Zone, plus 56 Defence Services personnel nominated by the Commander-in-Chief (Constitution art. 141); same term as the Pyithu Hluttaw (art. 151). Single-member constituencies by first past the post from 2010 to 2020; in 2025 a mixed-member proportional system of 84 FPTP and 26 PR constituencies (Notification 51/2025), with a vote in 99 of them.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 141 and 151)",
+      "est_votes": 22000000,
+      "effort": 3,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election", "special"],
+          "body_kinds": ["upper_house"],
+          "iso_pattern": "MM",
+          "valid_from": "2010-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 151: \"The term of the Amyotha Hluttaw is the same as the term of the Pyithu Hluttaw.\")",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Union Election Commission",
+          "vacancy_rule": "A vacated seat is filled by a by-election called by the Union Election Commission.",
+          "valid_from": "2011-01-31"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Union Election Commission website",
+          "url": "https://www.uec.gov.mm/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2010-11-07",
+          "source": "uec_site",
+          "evidence": "Connections from this session were reset on 17 November 2026."
+        },
+        {
+          "platform": "The Global New Light of Myanmar, Union Election Commission announcements",
+          "url": "https://www.gnlm.com.mm/category/announcement/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-11-08",
+          "last_date": "2026-01-25",
+          "finest": "mm.constituency",
+          "source": "gnlm_announcements",
+          "evidence": "Announcement of elected Amyotha Hluttaw representatives by Region or State and constituency (2020) and the 2026 vote announcements."
+        },
+        {
+          "platform": "Union Election Commission open results portal, 2017 by-elections",
+          "url": "https://openelectiondata.uec.gov.mm/results2017/amyotha-mm/index.html",
+          "format": "html, csv",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2017-04-01",
+          "last_date": "2017-04-01",
+          "finest": "mm.constituency",
+          "source": "uec_2017",
+          "evidence": "The gateway could not connect from this session on 17 November 2026; the mm.uec pipeline loaded the portal's Amyotha Hluttaw page."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The first multiparty democratic election was held on 7 November 2010"
+        },
+        {
+          "date": "2012-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats."
+        },
+        {
+          "date": "2015-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The second general election under the multiparty democratic system took place on 8 November 2015"
+        },
+        {
+          "date": "2017-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats, loaded by mm.uec."
+        },
+        {
+          "date": "2018-11-03",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats."
+        },
+        {
+          "date": "2020-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The third general election was held on 8 November 2020",
+          "note": "Annulled by the Union Election Commission in July 2021."
+        },
+        {
+          "date": "2025-12-28",
+          "election_kind": "general",
+          "contests": 99,
+          "source": "uec_votes_2026",
+          "quote": "These elections were held in 263 constituencies for the Pyithu Hluttaw, 99 constituencies for the Amyotha Hluttaw",
+          "note": "Total over the three phases of 28 December 2025, 11 January 2026, and 25 January 2026, of the 110 constituencies (84 FPTP, 26 PR) of Notification 51/2025."
+        }
+      ]
+    },
+    {
+      "key": "state_region_hluttaw",
+      "tier": "state_region",
+      "name": "တိုင်းဒေသကြီး သို့မဟုတ် ပြည်နယ်လွှတ်တော် ရွေးကောက်ပွဲ",
+      "name_en": "Region and State Hluttaw general elections and by-elections (township constituencies)",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "2010-01-01",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "contests_per_unit": 2,
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "finest_note": "Candidates' votes by constituency, two per township; party votes in the 42 PR constituencies of 2025",
+      "note": "Two representatives elected from each township of the 14 Regions and States, plus one third nominated Defence Services personnel (Constitution art. 161); same term as the Pyithu Hluttaw (art. 168). Nay Pyi Taw has no Hluttaw. Single-member constituencies by first past the post from 2010 to 2020; in 2025 a mixed-member proportional system of 322 FPTP and 42 PR constituencies (Notification 52/2025), with a vote in 297. Matches every Region or State Hluttaw contest that does not carry the ethnic constituency scheme.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 161 and 168)",
+      "est_votes": 22000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election", "special"],
+          "body_kinds": ["unicameral"],
+          "iso_pattern": "MM",
+          "valid_from": "2010-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 168: \"The term of the Region or State Hluttaw is the same as the term of the Pyithu Hluttaw.\")",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Union Election Commission",
+          "vacancy_rule": "A vacated seat is filled by a by-election called by the Union Election Commission.",
+          "valid_from": "2011-01-31"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Union Election Commission website",
+          "url": "https://www.uec.gov.mm/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2010-11-07",
+          "source": "uec_site",
+          "evidence": "Connections from this session were reset on 17 November 2026."
+        },
+        {
+          "platform": "The Global New Light of Myanmar, Union Election Commission announcements",
+          "url": "https://www.gnlm.com.mm/category/announcement/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-11-08",
+          "last_date": "2026-01-25",
+          "finest": "mm.constituency",
+          "source": "gnlm_announcements",
+          "evidence": "Region and State Hluttaw results are announced first by the Region and State election sub-commissions and reprinted in the daily."
+        },
+        {
+          "platform": "Union Election Commission open results portal, 2017 by-elections",
+          "url": "https://openelectiondata.uec.gov.mm/results2017/region-mm/index.html",
+          "format": "html, csv",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2017-04-01",
+          "last_date": "2017-04-01",
+          "finest": "mm.constituency",
+          "source": "uec_2017",
+          "evidence": "The gateway could not connect from this session on 17 November 2026; the mm.uec pipeline loaded the Kayah and Shan State Hluttaw page."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The first multiparty democratic election was held on 7 November 2010"
+        },
+        {
+          "date": "2012-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats."
+        },
+        {
+          "date": "2015-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The second general election under the multiparty democratic system took place on 8 November 2015"
+        },
+        {
+          "date": "2017-04-01",
+          "election_kind": "by_election",
+          "note": "By-elections to Kayah and Shan State Hluttaw seats, loaded by mm.uec."
+        },
+        {
+          "date": "2018-11-03",
+          "election_kind": "by_election",
+          "note": "By-elections to vacated seats."
+        },
+        {
+          "date": "2020-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The third general election was held on 8 November 2020",
+          "note": "Annulled by the Union Election Commission in July 2021."
+        },
+        {
+          "date": "2025-12-28",
+          "election_kind": "general",
+          "contests": 297,
+          "source": "uec_votes_2026",
+          "quote": "297 constituencies for regional or state Hluttaws",
+          "note": "Total over the three phases, of the 364 constituencies (322 FPTP, 42 PR) of Notification 52/2025."
+        }
+      ]
+    },
+    {
+      "key": "state_region_ethnic",
+      "tier": "state_region",
+      "name": "တိုင်းရင်းသားလူမျိုးဆိုင်ရာ ကိုယ်စားလှယ် ရွေးကောက်ပွဲ",
+      "name_en": "Region and State Hluttaw national race (ethnic) representatives",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "valid_from": "2010-01-01",
+      "first_held": "2010-11-07",
+      "earliest_record": "2010-11-07",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.ethnic_constituency"]
+      },
+      "finest_note": "Candidates' votes per national race constituency, which spans every township of its Region or State where the race's voters are listed",
+      "note": "One representative in a Region or State Hluttaw for each national race of at least 0.1 percent of the Union's population that has no Region, State, or Self-Administered Area of its own there (Constitution art. 161(b)-(c)); only voters of that race vote. 29 such constituencies in 2015, 2020, and 2025 (Notification 53/2025). Pipelines must give these contests the mm.ethnic_constituency scheme so they leave the township class.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 161(b)-(c))",
+      "est_votes": 1000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election", "special"],
+          "body_kinds": ["unicameral"],
+          "schemes": ["mm.ethnic_constituency"],
+          "iso_pattern": "MM",
+          "valid_from": "2010-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 161(b)-(c) and 168)",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Union Election Commission",
+          "valid_from": "2011-01-31"
+        }
+      ],
+      "access": [
+        {
+          "platform": "The Global New Light of Myanmar, Union Election Commission announcements",
+          "url": "https://www.gnlm.com.mm/category/announcement/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2020-11-08",
+          "last_date": "2026-01-25",
+          "finest": "mm.ethnic_constituency",
+          "source": "gnlm_announcements",
+          "evidence": "Ethnic representatives are announced with the Region and State Hluttaw results."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-07",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The first multiparty democratic election was held on 7 November 2010"
+        },
+        {
+          "date": "2015-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The second general election under the multiparty democratic system took place on 8 November 2015"
+        },
+        {
+          "date": "2020-11-08",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "The third general election was held on 8 November 2020",
+          "note": "Annulled by the Union Election Commission in July 2021."
+        },
+        {
+          "date": "2025-12-28",
+          "election_kind": "general",
+          "contests": 29,
+          "source": "uec_votes_2026",
+          "quote": "297 constituencies for regional or state Hluttaws, and 29 constituencies for ethnic groups",
+          "note": "Total over the three phases."
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "ပြည်လုံးကျွတ်ဆန္ဒခံယူပွဲ",
+      "name_en": "Nation-wide referendums (constitutions and amendments to entrenched sections)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1973-12-15",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.state_region"],
+        "fine": ["mm.township"]
+      },
+      "finest_note": "The 2008 results were announced nationally and by Region and State in the state press; no township table has been found",
+      "note": "The 2008 Constitution was adopted by a nation-wide referendum (art. 441), held on 10 May 2008 and on 24 May 2008 in the townships hit by Cyclone Nargis; the 1974 Constitution was adopted by the referendum of December 1973. An amendment to the entrenched sections listed in art. 436(a) needs more than 75 percent of the Pyidaungsu Hluttaw and then a referendum carried by more than half of those eligible to vote; none has been held.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 436 and 441)",
+      "est_votes": 22000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": ["referendum"],
+          "contest_kinds": ["ballot_question"],
+          "iso_pattern": "MM"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "constitution",
+          "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 436(a): \"in a nation-wide referendum only with the votes of more than half of those who are eligible to vote\")",
+          "called": true,
+          "administered_by": "Union Election Commission",
+          "valid_from": "2011-01-31"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1973-12-15",
+          "election_kind": "referendum",
+          "note": "Referendum on the Constitution of the Socialist Republic of the Union of Burma, held from 15 to 31 December 1973."
+        },
+        {
+          "date": "2008-05-10",
+          "election_kind": "referendum",
+          "deferred": ["2008-05-24"],
+          "note": "Referendum on the 2008 Constitution; the cyclone-hit townships of Yangon and Ayeyawady voted on 24 May 2008."
+        }
+      ]
+    },
+    {
+      "key": "city_development",
+      "tier": "town",
+      "name": "စည်ပင်သာယာရေးကော်မတီ ရွေးကောက်ပွဲ",
+      "name_en": "City development committee elections (Yangon City Development Committee and its township committees)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "2013-01-01",
+      "first_held": "2014-12-27",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.township"]
+      },
+      "finest_note": "Winners by township and seat; no official vote table has been found",
+      "note": "The Yangon City Development Law, a Yangon Region Hluttaw law of 2013 replaced in 2018, provides for some members of the city committee and of the district and township development affairs committees to be elected, one voter per household; the first such election was held on 27 December 2014. Mandalay, Nay Pyi Taw, and the municipal development affairs committees of the other Regions and States are formed under their own Region or State laws.",
+      "source": "ycdc",
+      "est_votes": 300000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": ["local", "by_election", "general"],
+          "body_kinds": ["council"],
+          "name_pattern": "(development|စည်ပင်)",
+          "iso_pattern": "MM*",
+          "within": null,
+          "valid_from": "2013-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yangon City Development Committee website",
+          "url": "https://www.ycdc.gov.mm/",
+          "format": "html",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "source": "ycdc",
+          "evidence": "The site answers and lists the committee's laws, but carries no results of the 2014 election."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2014-12-27",
+          "election_kind": "local",
+          "note": "First election of members of the Yangon City Development Committee and its district and township committees, one voter per household."
+        }
+      ]
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "ဥပဒေပြုကောင်စီ ရွေးကောက်ပွဲ",
+      "name_en": "Burma Legislative Council (dyarchy, 1922-1936), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1922-01-01",
+      "valid_to": "1937-04-01",
+      "first_held": "1922-11-11",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Elected under the dyarchy of the Government of India Act as applied to Burma; the official count of six elections from 1922 to 1947 covers the Council elections of 1922, 1925, 1928, and 1932, the 1936 House of Representatives, and the 1947 Constituent Assembly. Results were printed in the colonial government's gazette and reports.",
+      "source": "ndsc_briefing",
+      "est_votes": 500000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["unicameral"],
+          "iso_pattern": "MM",
+          "valid_to": "1936-06-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-11-11",
+          "election_kind": "general",
+          "source": "ndsc_briefing",
+          "quote": "Under the Diarchy system, elections for the Legislative Council were held on 11 November 1922. Historical records show that this was the first election in the history of Myanmar."
+        },
+        {
+          "date": "1925-01-01",
+          "precision": "year",
+          "through": "1932-12-31",
+          "note": "Council elections of 1925, 1928, and 1932, the second to fourth of the six the official briefing counts from 1922 to 1947."
+        }
+      ]
+    },
+    {
+      "key": "house_of_representatives_1936",
+      "tier": "national",
+      "name": "ပြည်သူ့လွှတ်တော် (၁၉၃၆) ရွေးကောက်ပွဲ",
+      "name_en": "House of Representatives of British Burma (1936 election), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1936-06-01",
+      "valid_to": "1947-01-01",
+      "first_held": "1936-11-01",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Lower house under the Government of Burma Act 1935, which separated Burma from India from 1 April 1937; elected in 1936 and sitting until the Japanese occupation. The Senate was half elected by the House and half nominated. The fifth of the six elections the official briefing counts from 1922 to 1947.",
+      "source": "ndsc_briefing",
+      "est_votes": 1000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["lower_house", "upper_house"],
+          "iso_pattern": "MM",
+          "valid_from": "1936-06-01",
+          "valid_to": "1947-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1936-11-01",
+          "precision": "month",
+          "election_kind": "general",
+          "note": "General election to the House of Representatives."
+        }
+      ]
+    },
+    {
+      "key": "constituent_assembly",
+      "tier": "national",
+      "name": "တိုင်းပြုပြည်ပြုလွှတ်တော် ရွေးကောက်ပွဲ",
+      "name_en": "Constituent Assembly (1947), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1947-01-01",
+      "valid_to": "1948-01-04",
+      "first_held": "1947-04-09",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Elected on 9 April 1947 to draft the 1947 Constitution of the Union of Burma, then served as the provisional parliament until 1951-52; the last of the six elections the official briefing counts from 1922 to 1947.",
+      "source": "ndsc_briefing",
+      "est_votes": 1500000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["constituent_assembly"],
+          "iso_pattern": "MM"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-04-09",
+          "election_kind": "general",
+          "note": "Constituent Assembly election."
+        }
+      ]
+    },
+    {
+      "key": "chamber_of_deputies",
+      "tier": "national",
+      "name": "ပြည်သူ့လွှတ်တော် (၁၉၄၇ ဖွဲ့စည်းပုံ) ရွေးကောက်ပွဲ",
+      "name_en": "Chamber of Deputies of the Union of Burma (1951-1962), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1948-01-04",
+      "valid_to": "1962-03-02",
+      "first_held": "1951-06-01",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Lower house under the 1947 Constitution, elected by first past the post; the official briefing counts three elections in the parliamentary period (1951-52, held in phases from June 1951 to April 1952; 1956; and 1960). Dissolved by the coup of 2 March 1962.",
+      "source": "ndsc_briefing",
+      "est_votes": 5000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["lower_house"],
+          "iso_pattern": "MM",
+          "valid_from": "1948-01-04",
+          "valid_to": "1962-03-02"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1951-06-01",
+          "precision": "month",
+          "election_kind": "general",
+          "note": "First parliamentary general election, held in phases from June 1951 to April 1952."
+        },
+        {
+          "date": "1956-04-01",
+          "precision": "month",
+          "election_kind": "general",
+          "note": "Second parliamentary general election."
+        },
+        {
+          "date": "1960-02-01",
+          "precision": "month",
+          "election_kind": "general",
+          "note": "Third parliamentary general election."
+        }
+      ]
+    },
+    {
+      "key": "chamber_of_nationalities",
+      "tier": "national",
+      "name": "လူမျိုးစုလွှတ်တော် ရွေးကောက်ပွဲ",
+      "name_en": "Chamber of Nationalities of the Union of Burma (1951-1962), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1948-01-04",
+      "valid_to": "1962-03-02",
+      "first_held": "1951-06-01",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Upper house under the 1947 Constitution with seats reserved for the states and nationalities; elected with the Chamber of Deputies in 1951-52, 1956, and 1960, some members chosen by state councils.",
+      "source": "ndsc_briefing",
+      "est_votes": 3000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["upper_house"],
+          "iso_pattern": "MM",
+          "valid_from": "1948-01-04",
+          "valid_to": "1962-03-02"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1951-06-01",
+          "precision": "month",
+          "through": "1960-12-31",
+          "note": "Elected with the Chamber of Deputies in 1951-52, 1956, and 1960."
+        }
+      ]
+    },
+    {
+      "key": "pyithu_hluttaw_1974",
+      "tier": "national",
+      "name": "ပြည်သူ့လွှတ်တော် (၁၉၇၄ ဖွဲ့စည်းပုံ) ရွေးကောက်ပွဲ",
+      "name_en": "Pyithu Hluttaw (People's Assembly) of the Socialist Republic (1974-1988), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1974-01-01",
+      "valid_to": "1988-09-18",
+      "first_held": "1974-01-27",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Unicameral legislature under the 1974 Constitution, elected from single-party lists of the Burma Socialist Programme Party; the official briefing counts four elections in the BSPP period (1974, 1978, 1981, and 1985). Ended by the military takeover of 18 September 1988.",
+      "source": "ndsc_briefing",
+      "est_votes": 15000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["unicameral"],
+          "iso_pattern": "MM",
+          "valid_from": "1974-01-01",
+          "valid_to": "1988-09-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "First People's Assembly election."
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "Second People's Assembly election."
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "Third People's Assembly election."
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "Fourth People's Assembly election."
+        }
+      ]
+    },
+    {
+      "key": "peoples_councils",
+      "tier": "ward_village_tract",
+      "name": "ပြည်သူ့ကောင်စီ ရွေးကောက်ပွဲ",
+      "name_en": "People's Councils of states and divisions, townships, and wards and village tracts (1974-1988), abolished",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1974-01-01",
+      "valid_to": "1988-09-18",
+      "first_held": "1974-01-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Under the 1974 Constitution, People's Councils at the state or division, township, and ward or village-tract levels were elected with the People's Assembly from single-party lists; abolished in 1988.",
+      "source": "ndsc_briefing",
+      "est_votes": 15000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general", "local"],
+          "body_kinds": ["council"],
+          "iso_pattern": "MM*",
+          "within": null,
+          "valid_from": "1974-01-01",
+          "valid_to": "1988-09-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "through": "1985-12-31",
+          "note": "Elected with the People's Assembly in 1974, 1978, 1981, and 1985."
+        }
+      ]
+    },
+    {
+      "key": "pyithu_hluttaw_1990",
+      "tier": "national",
+      "name": "ပါတီစုံဒီမိုကရေစီ အထွေထွေရွေးကောက်ပွဲ (၁၉၉၀)",
+      "name_en": "Multiparty general election of 1990 (Pyithu Hluttaw), abolished",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1990-01-01",
+      "valid_to": "1991-01-01",
+      "first_held": "1990-05-27",
+      "measure": {
+        "unit": "contest",
+        "grain": ["mm.constituency"]
+      },
+      "note": "Held on 27 May 1990 under the State Law and Order Restoration Council in single-member constituencies by first past the post; the assembly was never convened. The one election the official briefing counts for 1988-2010.",
+      "source": "ndsc_briefing",
+      "est_votes": 15000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": ["general"],
+          "body_kinds": ["unicameral", "lower_house"],
+          "iso_pattern": "MM",
+          "valid_from": "1990-01-01",
+          "valid_to": "1991-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-05-27",
+          "election_kind": "general",
+          "note": "Multiparty general election; results by constituency were announced by the election commission of the time in the state press."
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "နိုင်ငံတော်သမ္မတ ရွေးချယ်ခြင်း",
+      "name_en": "President and Vice-Presidents, elected by the Presidential Electoral College",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2011-01-31",
+      "first_held": "2011-02-04",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The President is elected by the Presidential Electoral College, whose three groups (the elected Pyithu Hluttaw members, the elected Amyotha Hluttaw members, and the Defence Services representatives) each nominate a Vice-President; the Pyidaungsu Hluttaw then votes among the three (Constitution art. 60). Last held on 3 April 2026.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 60)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the members of the Pyidaungsu Hluttaw, not by a popular vote.",
+      "match": [
+        {
+          "election_kinds": ["indirect"],
+          "office_kinds": ["head_of_state", "head_of_government"],
+          "iso_pattern": "MM"
+        }
+      ]
+    },
+    {
+      "key": "chief_ministers",
+      "tier": "state_region",
+      "name": "တိုင်းဒေသကြီး သို့မဟုတ် ပြည်နယ် ဝန်ကြီးချုပ်",
+      "name_en": "Chief Ministers of the Regions and States",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The President selects a Region or State Hluttaw representative as Chief Minister and submits the name to the Hluttaw for approval (Constitution art. 261).",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 261)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the President with the Hluttaw's approval; there is no popular vote.",
+      "match": [
+        {
+          "election_kinds": ["indirect"],
+          "office_kinds": ["governor"],
+          "iso_pattern": "MM*",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "self_administered_leading_bodies",
+      "tier": "self_administered",
+      "name": "ကိုယ်ပိုင်အုပ်ချုပ်ခွင့်ရ တိုင်း သို့မဟုတ် ဒေသ ဦးစီးအဖွဲ့",
+      "name_en": "Leading Bodies of the Self-Administered Division and Zones",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each Leading Body is formed from the Region or State Hluttaw representatives elected from its townships, Defence Services representatives, and members they select, and chooses its Chairperson from among the elected representatives (Constitution art. 276).",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 276)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Formed from members already elected to the Region or State Hluttaw, nominees, and co-opted members; no separate vote.",
+      "match": [
+        {
+          "election_kinds": ["indirect"],
+          "body_kinds": ["council", "appointed_assembly"],
+          "iso_pattern": "MM*",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "ward_village_tract_administrators",
+      "tier": "ward_village_tract",
+      "name": "ရပ်ကွက် သို့မဟုတ် ကျေးရွာအုပ်စု အုပ်ချုပ်ရေးမှူး",
+      "name_en": "Ward and village-tract administrators",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Ward and village-tract administration is assigned by law to a person respected by the community (Constitution art. 289); under the Ward or Village Tract Administration Law the administrator is chosen by the heads of ten-household groups, who are themselves chosen by the households, and confirmed by the township administrator.",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (art. 289)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An indirect selection by household representatives run by the General Administration Department, with no published votes.",
+      "match": [
+        {
+          "election_kinds": ["indirect"],
+          "office_kinds": ["other", "muhtar"],
+          "iso_pattern": "MM*",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "defence_services_representatives",
+      "tier": "national",
+      "name": "တပ်မတော်သား လွှတ်တော်ကိုယ်စားလှယ်",
+      "name_en": "Defence Services representatives in the Pyithu, Amyotha, and Region or State Hluttaws",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "A quarter of the Union Hluttaw seats and a third of each Region or State Hluttaw's seats are held by Defence Services personnel nominated by the Commander-in-Chief (Constitution arts. 109(b), 141(b), and 161(d)).",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 109(b), 141(b), and 161(d))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Nominated by the Commander-in-Chief of the Defence Services; there is no vote."
+    },
+    {
+      "key": "judiciary",
+      "tier": "national",
+      "name": "တရားသူကြီးများ",
+      "name_en": "Judges of the Supreme Court of the Union and the High Courts",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The Chief Justice and judges of the Supreme Court are nominated by the President and approved by the Pyidaungsu Hluttaw; High Court judges by the Chief Minister with the Region or State Hluttaw (Constitution arts. 299 and 308).",
+      "source": "constitution",
+      "locator": "https://www.constituteproject.org/constitution/Myanmar_2015.pdf?lang=en (arts. 299 and 308)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are nominated and approved, never elected."
+    },
+    {
+      "key": "candidate_selection",
+      "tier": "national",
+      "name": "ပါတီ ကိုယ်စားလှယ်လောင်း ရွေးချယ်ခြင်း",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Parties registered under the Political Parties Registration Law nominate their own candidates; the Union Election Commission runs no primary or nominating contest.",
+      "source": "uec_site",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No state-run nominating contest exists; parties pick candidates internally."
+    }
+  ]
+}
