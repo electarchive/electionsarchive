@@ -349,6 +349,7 @@ def fetch() -> None:
         for name in results:
             raw.fetch(SOURCE, vtr_url(election, "szavossz", name), suffix=".json")
         _crawl(election)
+    _fetch_winner_pages()
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -2755,6 +2756,84 @@ ASSEMBLIES_2019 = PAGES_2019 + "mkiv.jsp?EA=40&URL=9"
 SETTLEMENTS_2014 = "https://static.valasztas.hu/dyn/onk14/szavossz/hu/M<county>/T<settlement>/tjk.html"
 ASSEMBLIES_2014 = "https://static.valasztas.hu/dyn/onk14/szavossz/hu/"
 PAGE_START = re.compile(r"<!-- (https://\S+) \(([^)]*)\) -->")
+PAGE_TIMEOUT = 60
+
+
+def _page(url: str) -> str | None:
+    """One results page decoded by the charset it declares, or None when the office has no such page."""
+    for _ in range(5):
+        try:
+            response = httpx.get(url, headers={"User-Agent": raw.USER_AGENT}, timeout=PAGE_TIMEOUT)
+        except httpx.TransportError:
+            continue
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        declared = re.search(rb"charset=([\w-]+)", response.content[:2000], re.IGNORECASE)
+        return response.content.decode(declared[1].decode() if declared else "utf-8", errors="replace")
+    raise RuntimeError(f"{url} failed five times")
+
+
+def _save_pages(key_url: str, found: list[tuple[str, str, str | None]]) -> None:
+    """Store fetched pages as one file of saved pages: each page under a line with its address and place name."""
+    parts = [f"<!-- {url} ({html.escape(place)}) -->\n{page}\n" for url, place, page in found if page is not None]
+    print(f"{key_url}: {len(parts):,} pages, {len(found) - len(parts)} missing")
+    raw.store(
+        SOURCE,
+        key_url,
+        "".join(parts).encode("utf-8"),
+        suffix=".html",
+        retrieved_at=datetime.now(UTC),
+        media_type="text/html; charset=utf-8",
+    )
+
+
+def _crawl_pages(targets: list[tuple[str, str]]) -> list[tuple[str, str, str | None]]:
+    with ThreadPoolExecutor(8) as pool:
+        fetched = list(pool.map(lambda target: _page(target[0]), targets))
+    return [(url, place, page) for (url, place), page in zip(targets, fetched, strict=True)]
+
+
+def _settlements_2014() -> dict[tuple[str, str], str]:
+    """The county and settlement numbers of every settlement in the 2014 local election files, with its name."""
+    out: dict[tuple[str, str], str] = {}
+    for path in sorted(bundle("2014_onkormanyzati")):
+        if FILES_2014.get(path.split("/")[-1]) not in ("mayor", "council", "ward"):
+            continue
+        for row in delimited("2014_onkormanyzati", path):
+            if row.get("TELEPÜLÉS_SORSZÁM", "000") != "000" and row.get("MEGYEKÓD"):
+                out.setdefault((row["MEGYEKÓD"].zfill(2), row["TELEPÜLÉS_SORSZÁM"].zfill(3)), row["TELEPÜLÉS"])
+    return out
+
+
+def _fetch_winner_pages() -> None:
+    """Fetch the office's 2014 settlement result pages and 2019 winner pages, each kind stored as one file."""
+    names = places().names
+    if SETTLEMENTS_2014 not in raw.keys(SOURCE):
+        targets = [
+            (SETTLEMENTS_2014.replace("<county>", maz).replace("<settlement>", taz), names.get(maz + taz, name))
+            for (maz, taz), name in sorted(_settlements_2014().items())
+        ]
+        _save_pages(SETTLEMENTS_2014, _crawl_pages(targets))
+    codes = sorted((code, name) for code, name in names.items() if not code.startswith(ABROAD))
+
+    def address(template: str, code: str) -> str:
+        return template.replace("<county>", code[:2]).replace("<settlement>", code[2:])
+
+    for template in (MAYORS_2019, COUNCILS_2019):
+        if template not in raw.keys(SOURCE):
+            _save_pages(template, _crawl_pages([(address(template, c), n) for c, n in codes]))
+    if WARDS_2019 not in raw.keys(SOURCE):
+        lists = _crawl_pages([(address(WARDS_2019, c), n) for c, n in codes])
+        wards = [
+            (PAGES_2019 + html.unescape(link), place)
+            for _, place, page in lists
+            if page
+            for link in dict.fromkeys(
+                re.findall(r'href="(teljkv\.jsp\?[^"]*W=5&(?:amp;)?TEVK=\d+)"', page, re.IGNORECASE)
+            )
+        ]
+        _save_pages(WARDS_2019, [*lists, *_crawl_pages(wards)])
 
 
 def pages(name: str) -> Iterator[tuple[str, str, str]]:
@@ -2945,6 +3024,12 @@ def nationality_body(level: str, place: str, nation: str) -> str:
     id = key("body", "nationality", level, place, nation)
     LOCAL_BODIES[id] = ("body", f"nationality-{level}", f"{place}|{nation}")
     return id
+
+
+def legacy_nationality_body(place: str, nation: str) -> None:
+    """Keep a 1994-2010 settlement self-government under the key earlier builds gave it, before the nationality names
+    were brought in line with the later years, since results loaded from those builds still refer to it."""
+    nationality_body("settlement", place, nation)
 
 
 def county_unit(d: Day, maz: str, suffix: str = "") -> str:
@@ -3651,6 +3736,18 @@ def mid_local(d: Day) -> None:
         else:
             # No polling-station protocols for it: the settlement's own figure is the only count.
             d.value(tag, d.settlement_unit(area), None, 4, number(row[valid_at]))
+    # Earlier builds keyed these self-governments by the nationality cell of the polling-station file as printed
+    # (a name, or a bare code where the cell held one); loaded results still name those bodies, so they are kept.
+    legacy: dict[str, str] = {}
+    for row in _txt(name, "kisersf"):
+        code, nation = (row[4], row[6]) if year == 2002 else (row[5], row[6])
+        legacy[code] = nation.strip().capitalize()
+    for row in _txt(name, "kisersj"):
+        maz, taz, code = (row[0], row[1], row[2]) if year == 2002 else (row[0], row[1], row[3])
+        legacy_nationality_body(areas.get((maz, taz)) or area_of(maz, taz, ""), legacy.get(code, code))
+    for row in _txt(name, "kiserej"):
+        if area := areas.get((row[0], row[1])):
+            legacy_nationality_body(area, legacy.get(row[2], row[2]))
 
 
 for _year, (_, _day) in MID_LOCAL.items():
@@ -3776,6 +3873,8 @@ def old_local(d: Day) -> None:
             d.settlement_unit(area_of(row)),
         ),
     )
+    for row in stem("kiseretj"):
+        legacy_nationality_body(area_of(row), row[5].capitalize())
 
 
 for _year, (_, _day) in OLD_LOCAL.items():
