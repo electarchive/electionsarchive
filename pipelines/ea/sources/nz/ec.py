@@ -1428,6 +1428,11 @@ def lists() -> Package:
     stray = sorted(set(held) - set(labels))
     if stray:
         raise ValueError(f"the lists name parties that stood no list in the party vote: {stray}")
+    # The registry is built from the summaries the cache holds; a list's party must be among them.
+    registered = {row["id"] for row in registry().rows["party"]}
+    unregistered = sorted(label for label in held if party_for(LISTS_YEAR, label) not in registered)
+    if unregistered:
+        raise ValueError(f"the registry built from this cache lacks the listed parties {unregistered}")
     printed_names = 0
     allocated: list[int] = []
     for label, members in held.items():
