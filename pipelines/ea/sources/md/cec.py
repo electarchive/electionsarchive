@@ -6,6 +6,7 @@ import fastexcel
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.md import decisions
 
 SOURCE = "md.cec"
 BASE = "https://a.cec.md/index.php/ro/upload"
@@ -168,6 +169,7 @@ CEC_SOURCE = key("source", "cec")
 PARLIAMENT = key("body", "parliament")
 PRESIDENCY = key("office", "president")
 SYSTEM_LIST = key("electoral_system", "parliament", "list")
+SYSTEM_LIST_2014 = key("electoral_system", "parliament", "list", "2014")
 SYSTEM_LIST_MIXED = key("electoral_system", "parliament", "list", "mixed")
 SYSTEM_DISTRICT = key("electoral_system", "parliament", "single_member")
 SYSTEM_PRESIDENT = key("electoral_system", "president", "two_round")
@@ -464,6 +466,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=SUFFIX.get(name, ".xlsx"))
     for url in [*PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
         raw.fetch(SOURCE, url, suffix=".xlsx")
+    decisions.fetch()
 
 
 def parse() -> None:
@@ -537,7 +540,7 @@ def registry() -> Package:
         license="Official publication; reuse terms are not stated",
         attribution="Comisia Electorală Centrală a Republicii Moldova",
     )
-    for url in [*URLS.values(), *PS2019_LIST.values(), *PS2019_DISTRICT.values()]:
+    for url in [*URLS.values(), *PS2019_LIST.values(), *PS2019_DISTRICT.values(), *decisions.URLS]:
         p.artifact(raw.cached(SOURCE, url), CEC_SOURCE)
     p.add(
         "scheme",
@@ -559,8 +562,32 @@ def registry() -> Package:
             SYSTEM_LIST,
             {"formula": "dhondt"},
             (
+                "A single national constituency elects 101 deputies by party-list proportional representation. Each "
+                "list that passes the minimum threshold of representation receives deputies by the successive "
+                "division of its votes by 1 up to 101 (D'Hondt), as the Commission's seat decisions describe. Its "
+                "exclusion decisions cite the threshold (art. 94(2) of Electoral Code No. 1381/1997 in 2021, art. "
+                "122(2) of Code No. 325/2022 in 2025) without printing the percentages, so none is stored here."
+            ),
+        ),
+        (
+            SYSTEM_LIST_2014,
+            {
+                "formula": "dhondt",
+                "threshold": [
+                    {"level": "party", "scope": "national", "percent": 6},
+                    {"level": "coalition", "scope": "national", "percent": 9},
+                ],
+            },
+            (
                 "A single national constituency elects 101 deputies by party-list proportional representation. The "
-                "electoral thresholds are not stored here."
+                "Commission's decision of 5 December 2014 excludes lists below the thresholds of valid votes "
+                "nationwide: 6% for a party or other social-political organization, 9% for an electoral bloc of two "
+                "parties, and 2% for an independent candidate. The independent threshold and the thresholds for "
+                "larger blocs are not stored in the rules. Seats are then allocated by an electoral quotient (valid "
+                "votes divided by 101), each list receiving its votes divided by the quotient rounded to the nearest "
+                "whole number; the seats left over go one at a time to each list, starting with the one that holds "
+                "the most. The stored formula is the nearest the engine offers and does not reproduce that "
+                "procedure."
             ),
         ),
         (
@@ -573,10 +600,14 @@ def registry() -> Package:
         ),
         (
             SYSTEM_LIST_MIXED,
-            {"formula": "dhondt"},
+            {"formula": "dhondt", "threshold": {"level": "party", "scope": "national", "percent": 6}},
             (
                 "Under the mixed system used in 2019, a single national constituency elects 50 of the 101 deputies by "
-                "party-list proportional representation. The electoral thresholds are not stored here."
+                "party-list proportional representation. The Commission's exclusion decision of 3 March 2019 removes "
+                "the parties and other social-political organizations with under 6% of the valid votes in the "
+                "national constituency; the thresholds for electoral blocs are not printed there and are not stored. "
+                "Seats are allocated by an electoral quotient (valid votes divided by 50) with rounding and a "
+                "distribution of leftover seats, which the stored formula does not reproduce."
             ),
         ),
         (
@@ -759,7 +790,7 @@ def _parliament(p: Package, day: str, first: date) -> None:
         f"md/{day}-general/parliament",
         body_id=PARLIAMENT,
         magnitude=101,
-        electoral_system_id=SYSTEM_LIST,
+        electoral_system_id=SYSTEM_LIST_2014 if year == 2014 else SYSTEM_LIST,
     )
     t = table(day)
     result_set = _result_set(p, election, contest, f"ps{day}")
@@ -784,6 +815,7 @@ def _parliament(p: Package, day: str, first: date) -> None:
             _put(p, result_set, units[station.code], option, VOTES, value)
     _declared(p, result_set, options, t)
     _caveats(p, result_set, t)
+    _list_outcomes(p, day, result_set, t.labels, options, 101)
     if day == "2025-09-28":
         p.accept(
             "accounting.declared",
@@ -837,6 +869,7 @@ def _parliament_2019(p: Package, day: str, first: date) -> None:
         )
     units = _units(p, day, [t])
     _votes(p, result_set, units, options, t)
+    _list_outcomes(p, day, result_set, t.labels, options, 50)
     p.add(
         "note",
         id=key("note", result_set, "national"),
@@ -847,6 +880,7 @@ def _parliament_2019(p: Package, day: str, first: date) -> None:
         "of those 51 totals, which equals the Commission's protocol on the national totalization of 3 March 2019.",
         lang="en",
     )
+    winning = decisions.winners(day)
     for district in PS2019_DISTRICT:
         name = f"ps{day}-{district}"
         seat = _contest(
@@ -865,6 +899,119 @@ def _parliament_2019(p: Package, day: str, first: date) -> None:
         result_set = _result_set(p, election, seat, name)
         options = _candidates(p, name, 2019, 1, seat, t, True, f"ps2019:{district}")
         _votes(p, result_set, _units(p, day, [t]), options, t)
+        found = _by_name(t.labels, options)
+        winner = _named(found, winning[district])
+        for option in options:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if option == winner else "lost")
+        _declared_in(p, result_set, day, decisions.DISTRICTS)
+
+
+def _by_name(labels: list[str], options: list[str]) -> dict[tuple[str, ...], str]:
+    """The options by the words of their ballot label, so a decision's wording finds its option."""
+    found: dict[tuple[str, ...], str] = {}
+    for label, option in zip(labels, options, strict=True):
+        words = decisions.tokens(label)
+        if words:
+            if words in found:
+                raise ValueError(f"two ballot labels read alike: {label}")
+            found[words] = option
+    return found
+
+
+# Names the decisions print differently from the ballot.
+ALIASES = {"Uniunea Centristă din Moldova": "Uniunea Centristă"}
+
+
+def _named(found: dict[tuple[str, ...], str], name: str) -> str:
+    option = found.get(decisions.tokens(next((v for k, v in ALIASES.items() if k in name), name)))
+    if option is None:
+        raise ValueError(f"the decision names {name}, which is on no ballot")
+    return option
+
+
+def _declared_in(p: Package, result_set: str, day: str, *kinds: str) -> None:
+    """Cite the decisions that declare a result set's outcomes, and keep their pages among the package's sources."""
+    cited = []
+    for kind in kinds:
+        number = decisions.DECISIONS[day][kind][0]
+        url = decisions.PRINT.format(number)
+        p.uses(raw.cached(SOURCE, url))
+        cited.append(f"decision {decisions.reference(day, kind)} ({url})")
+    p.add(
+        "note",
+        id=key("note", result_set, "outcomes"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md="The outcomes are as the Central Electoral Commission declared them in its "
+        + " and its ".join(cited)
+        + ".",
+        lang="en",
+    )
+
+
+def _list_outcomes(
+    p: Package, day: str, result_set: str, labels: list[str], options: list[str], magnitude: int
+) -> None:
+    """Seats won by the lists that passed the threshold, and the others excluded from the allocation."""
+    found = _by_name(labels, options)
+    seen: set[str] = set()
+    total = 0
+    for name, count in decisions.seats(day):
+        option = _named(found, name)
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=count)
+        seen.add(option)
+        total += count
+    if total != magnitude:
+        raise ValueError(f"the decision gives {total} seats of {magnitude}")
+    for name in decisions.excluded(day):
+        option = _named(found, name)
+        if option in seen:
+            raise ValueError(f"{name} is both seated and excluded")
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="lost")
+        seen.add(option)
+    for label, option in zip(labels, options, strict=True):
+        if option not in seen and label.strip().endswith("Retras"):
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="withdrew")
+            seen.add(option)
+    missing = [label for label, option in zip(labels, options, strict=True) if label and option not in seen]
+    if missing:
+        p.add(
+            "note",
+            id=key("note", result_set, "unlisted"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md="The decisions name no outcome for "
+            + "; ".join(missing)
+            + ", which the Commission's results workbook lists with no votes.",
+            lang="en",
+        )
+    _declared_in(p, result_set, day, decisions.SEATS, decisions.EXCLUDED)
+
+
+def _round_outcomes(p: Package, day: str, result_set: str, round_number: int, t: Table, options: list[str]) -> None:
+    """The candidates a first-round decision advances, or the president-elect a second-round decision declares."""
+    found = _by_name(t.labels, options)
+    votes = dict(zip(options, t.total[t.first : t.end], strict=True))
+    if round_number == 1:
+        advancing: set[str] = set()
+        for name, count in decisions.advanced(day):
+            option = _named(found, name)
+            if votes[option] != count:
+                raise ValueError(f"the decision prints {count} votes for {name}, the workbook {votes[option]}")
+            advancing.add(option)
+        if len(advancing) != 2:
+            raise ValueError("a first-round decision advances two candidates")
+        for option in options:
+            if option in advancing:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="advanced")
+            elif votes[option]:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="eliminated")
+        _declared_in(p, result_set, day, decisions.ADVANCED)
+        return
+    winner = _named(found, decisions.elected(day))
+    for option in options:
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if option == winner else "lost")
+    _declared_in(p, result_set, day, decisions.ELECTED)
 
 
 def _votes(p: Package, result_set: str, units: dict[str, str], options: list[str], t: Table) -> None:
@@ -981,6 +1128,7 @@ def _presidential(p: Package, day: str, first: date, round_number: int) -> None:
             _put(p, result_set, units[station.code], option, VOTES, value)
     _declared(p, result_set, options, t)
     _caveats(p, result_set, t)
+    _round_outcomes(p, day, result_set, round_number, t, options)
     if year == 2016:
         p.accept(
             "accounting.declared",
