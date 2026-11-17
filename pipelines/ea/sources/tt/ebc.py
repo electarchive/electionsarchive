@@ -1,4 +1,5 @@
 import csv
+import difflib
 import functools
 import re
 import subprocess
@@ -16,6 +17,7 @@ import httpx
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
+from ea.sources.tt import report2020
 
 SOURCE = "tt.ebc"
 SITE = "https://ebctt.com"
@@ -28,12 +30,19 @@ HISTORY = f"{SITE}/wp-content/plugins/charts/data/parliamentary-results.tsv"
 RESULTS_2015 = f"{UPLOADS}/2015-Parliamentary-Elections-Final-Results-and-CandiatesVote-Count.pdf"
 PARTY_2015 = f"{UPLOADS}/Results-of-the-Parliamentary-Election-Held-on-Monday-7th-September-2015-Political-Party.xlsx"
 SUMMARY_2020 = f"{UPLOADS}/The-Preliminary-Results-for-the-2020-Parliamentary-Elections.pdf"
+REPORT_2020 = (
+    f"{UPLOADS}/Report-of-the-Elections-Boundaries-Commission-on-the-Parliamentary-Elections-held-on-Monday-10th-"
+    "August-2020.pdf"
+)
+# The report's station tables of Appendix I lie on these pages.
+REPORT_2020_PAGES = range(19, 403)
 REPORT_2025 = f"{UPLOADS}/Parliamentary_Elections_Report_2025_20260713_secured.pdf"
 FILES = {
     HISTORY: ".tsv",
     RESULTS_2015: ".pdf",
     PARTY_2015: ".xlsx",
     SUMMARY_2020: ".pdf",
+    REPORT_2020: ".pdf",
     REPORT_2025: ".pdf",
 }
 DAYS = {
@@ -58,6 +67,7 @@ DAYS = {
 }
 COUNCIL = {1946, 1956}
 FULL = {2015, 2020, 2025}
+STATIONS = {2020, 2025}
 # Party abbreviations that mean a different party in different decades.
 SPLIT = {("P.D.P.", 1956): "PDP56"}
 PARTIES = {
@@ -147,6 +157,8 @@ class Station:
     valid: int
     rejected: int
     registered: int
+    page: int | None = None
+    boxes: list[tuple[float, float, float, float]] = field(default_factory=list)
 
 
 @dataclass
@@ -160,6 +172,8 @@ class District:
     winner: int
     stations: list[Station] = field(default_factory=list)
     declared: dict[str, int] = field(default_factory=dict)
+    # For each candidate, the index of its column in the preliminary summary the district supersedes.
+    columns: list[int] = field(default_factory=list)
 
 
 class Event(NamedTuple):
@@ -189,6 +203,8 @@ class Election:
     totals: dict[str, int] = field(default_factory=dict)
     sources: list[str] = field(default_factory=list)
     stage: str = "official"
+    supersedes: Election | None = None
+    pages: dict[int, tuple[int, int]] = field(default_factory=dict)
 
 
 def _text(url: str) -> str:
@@ -395,7 +411,7 @@ def s_figures(station: Station, width: int) -> list[int]:
     return [*station.votes, station.valid, station.rejected, station.registered]
 
 
-def election_2020() -> Election:
+def preliminary_2020() -> Election:
     lines = _text(SUMMARY_2020).splitlines()
     header: list[tuple[str, float]] | None = None
     districts: list[District] = []
@@ -465,6 +481,189 @@ def election_2020() -> Election:
         [SUMMARY_2020],
         "preliminary",
     )
+
+
+def _header(text: str) -> tuple[str, str]:
+    """A candidate's column heading in the report: the name, surname first, and the party abbreviation below it."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if len(lines) < 2:
+        raise ValueError(f"unreadable candidate heading {text!r}")
+    return " ".join(lines[:-1]), lines[-1]
+
+
+def election_2020() -> Election:
+    """The 2020 election by polling station, from Appendix I of the commission's report, superseding the summary."""
+    preliminary = preliminary_2020()
+    earlier = {norm(district.name): district for district in preliminary.districts}
+    pdf = raw.cached(SOURCE, REPORT_2020).path
+    fixes = report2020.overrides()
+    headings = report2020.headings()
+    groups: dict[str, list[report2020.Draft]] = {}
+    sizes: dict[int, tuple[int, int]] = {}
+    for reading in report2020.readings(pdf, REPORT_2020_PAGES).values():
+        page = report2020.draft(reading, fixes)
+        code = _district_code(page.district, list(earlier))
+        if code is None:
+            raise ValueError(f"report page {page.number}: no district {page.district!r} in the summary")
+        groups.setdefault(code, []).append(page)
+        sizes[page.number] = (page.width, page.height)
+    if set(groups) != set(earlier):
+        raise ValueError(f"districts missing from the report: {sorted(set(earlier) - set(groups))}")
+    districts = [_district_2020(earlier[code], pages, headings.get(code)) for code, pages in groups.items()]
+    order = {norm(district.name): index for index, district in enumerate(preliminary.districts)}
+    districts.sort(key=lambda district: order[norm(district.name)])
+    parties: Counter[str] = Counter()
+    for district in districts:
+        for candidate in district.candidates:
+            parties[candidate.party if candidate.party in NATIONAL_2020 else ""] += candidate.votes or 0
+    if dict(parties) != NATIONAL_2020:
+        raise ValueError(f"2020 party totals {dict(parties)} disagree with the report's {NATIONAL_2020}")
+    return Election(
+        2020,
+        districts,
+        {
+            "registered": sum(d.registered or 0 for d in districts),
+            "valid": sum(d.valid or 0 for d in districts),
+            "rejected": sum(d.rejected or 0 for d in districts),
+            "ballots": sum(d.ballots or 0 for d in districts),
+        },
+        [REPORT_2020],
+        supersedes=preliminary,
+        pages=sizes,
+    )
+
+
+def _venue(text: str) -> str:
+    """A polling station's venue as read from the scan, with the commas it misreads for abbreviation stops."""
+    text = re.sub(r"\b(ST|NO|[A-Z]),(?=\s|$)", r"\1.", re.sub(r"[|_~]", " ", text.upper()))
+    return title(re.sub(r"\s+", " ", text).strip(" ,"))
+
+
+def _district_code(title: str, codes: list[str]) -> str | None:
+    """The summary's district a page heading names, allowing for a misread letter or two."""
+    found = difflib.get_close_matches(norm(title), codes, n=1, cutoff=0.8)
+    return found[0] if found else None
+
+
+def _district_2020(earlier: District, pages: list[report2020.Draft], heading: list[list[str]] | None) -> District:
+    name = earlier.name
+    labels = heading or _headings(pages, earlier)
+    width = len(labels) + 3
+    for page in pages:
+        if any(len(row) != width for row in page.grid):
+            raise ValueError(f"{name}: page {page.number} does not have {width} columns")
+    settled = report2020.settle(pages)
+    if settled.problems:
+        raise ValueError(f"{name}: {'; '.join(settled.problems)}")
+    stations = [
+        Station(
+            row.code,
+            row.special,
+            _venue(row.venue),
+            row.values[: len(labels)],
+            row.values[-3],
+            row.values[-2],
+            row.values[-1],
+            number,
+            row.boxes,
+        )
+        for number, row in settled.rows
+    ]
+    total = settled.total
+    codes = [station.code for station in stations]
+    if len(codes) != len(set(codes)):
+        raise ValueError(f"{name}: a polling station appears twice")
+    candidates = []
+    for (label, code), votes in zip(labels, total, strict=False):
+        surname, _, given = label.partition(",")
+        candidates.append(
+            Candidate(
+                f"{given.strip()} {surname.strip()}".strip(),
+                None if code == "IND." else code,
+                votes,
+                independent=code == "IND.",
+                label=label,
+            )
+        )
+    valid, rejected, registered = total[-3:]
+    if sum(total[: len(labels)]) != valid:
+        raise ValueError(f"{name}: candidate totals do not add up to the valid votes")
+    return District(
+        name,
+        registered,
+        valid,
+        rejected,
+        valid + rejected,
+        candidates,
+        _winner(candidates),
+        stations,
+        {"ballots": valid + rejected},
+        _columns(earlier, candidates),
+    )
+
+
+# The national votes the report's account of the results gives the two main parties and all others together.
+NATIONAL_2020 = {"P.N.M.": 322_180, "U.N.C.": 309_654, "": 25_058}
+# Party labels the report spells out instead of abbreviating.
+SPELLED = {"ONETOBAGOVOICE": "OTV", "TTDEMFRONT": "TDF", "PROGRESSIVEPARTY": "PP", "UNITYOFTHEPEOPLE": "UTP"}
+
+
+def _headings(pages: list[report2020.Draft], earlier: District) -> list[list[str]]:
+    """Each candidate's name and party as most of a district's pages read them.
+
+    The party is matched to the closest party abbreviation in the preliminary summary for the same district,
+    because the scan often reads a dot as a letter (U.L.N.C. for U.N.C.).
+    """
+    codes = {re.sub(r"[^A-Z0-9]", "", c.party or "IND") for c in earlier.candidates}
+    found: list[list[str]] = []
+    for column in range(len(pages[0].names)):
+        votes: Counter[str] = Counter()
+        parties: Counter[str] = Counter()
+        for page in pages:
+            if column >= len(page.names):
+                continue
+            name, party = _header(page.names[column])
+            name = re.sub(r"\s+", " ", re.sub(r"[^A-Za-z,.'\- ]", " ", name)).strip(" ,-").upper()
+            # Join a name the heading breaks after a hyphen, and read a trailing initial's comma as its stop.
+            name = re.sub(r"- ", "-", re.sub(r"\s+,", ",", re.sub(r",(?=\S)", ", ", name)))
+            name = re.sub(r"(?<=\b[A-Z])[,]?$", ".", name) if re.search(r"\b[A-Z][.,]?$", name) else name
+            votes[name] += 1
+            letters = re.sub(r"[^A-Z0-9]", "", party.upper()).replace("0", "O")
+            letters = SPELLED.get(letters, letters)
+            match = difflib.get_close_matches(letters, sorted(codes), n=1, cutoff=0.5)
+            if match:
+                parties[match[0]] += 1
+        if not parties:
+            raise ValueError(f"{earlier.name}: no party read for candidate {column + 1}")
+        code = parties.most_common(1)[0][0]
+        found.append([votes.most_common(1)[0][0], "IND." if code == "IND" else "".join(f"{c}." for c in code)])
+    return found
+
+
+def _columns(earlier: District, candidates: list[Candidate]) -> list[int]:
+    """Matches each candidate in the report to the column for the same option in the preliminary summary."""
+    found: list[int] = []
+    for candidate in candidates:
+        party = re.sub(r"[^A-Z0-9]", "", candidate.party or "")
+        matches = [
+            index
+            for index, option in enumerate(earlier.candidates)
+            if index not in found
+            and (
+                (candidate.independent and option.independent)
+                or (party and re.sub(r"[^A-Z0-9]", "", option.party or "") == party)
+            )
+        ]
+        if not matches:
+            raise ValueError(f"{earlier.name}: {candidate.label} ({candidate.party}) is not in the summary")
+        found.append(
+            min(matches, key=lambda index: abs((earlier.candidates[index].votes or 0) - (candidate.votes or 0)))
+        )
+    if len(found) != len(earlier.candidates):
+        raise ValueError(
+            f"{earlier.name}: {len(found)} candidates in the report, {len(earlier.candidates)} in the summary"
+        )
+    return found
 
 
 def election_2015() -> Election:
@@ -570,13 +769,22 @@ METHODS = {
         "voters are the electorate, ballots cast are valid plus rejected ballots, and the winner is the candidate "
         "with most votes."
     ),
-    2020: (
+    "2020-summary": (
         "From the commission's published preliminary results summary of the 10 August 2020 election, which gives "
         "each electoral district's votes for each party, with independent candidates as IN1 to IN4, and rejected "
-        "ballots. It does not name the candidates, so options are labelled by party, and the winner is the "
-        "option with most votes. Its district electorate and rejected ballots are stored; ballots cast is the "
-        "summary's grand total. The commission's final report for the election is a scanned document that is not "
-        "yet digitized."
+        "ballots. Its district electorate and rejected ballots are stored; ballots cast is the summary's grand "
+        "total. The polling station figures of the commission's report on the election supersede this set."
+    ),
+    2020: (
+        "From the commission's report on the 10 August 2020 election, Appendix I, which gives each candidate's votes "
+        "at each polling station with its valid votes, rejected ballots, and electorate, and names the candidates. "
+        "The report is a scan, so its figures were read by optical character recognition in three passes: each "
+        "column as a strip, each cell on its own, and a tight crop around short figures. Every station's candidate "
+        "votes add up to its valid votes, every page's stations carry the totals brought forward to the totals "
+        "carried forward, and each district's stations add up to the totals the returning officer certified. Four "
+        "electorate figures the passes could not settle were read from the page by hand. The parties' national "
+        "totals match those in the report's own account of the results. Each figure records the page and the box "
+        "it was read from. Ballots cast are valid votes plus rejected ballots."
     ),
     2025: (
         "From the commission's report on the 28 April 2025 election, Appendix II, which gives each candidate's votes "
@@ -682,12 +890,14 @@ def general(year: int) -> Package:
         SOURCE,
         f"The {year} Trinidad and Tobago "
         f"{'Legislative Council' if year in COUNCIL else 'parliamentary'} election by "
-        f"{'polling station' if year == 2025 else 'constituency'}, from the Elections and Boundaries Commission",
+        f"{'polling station' if year in STATIONS else 'constituency'}, from the Elections and Boundaries Commission",
         depends=["tt.ebc/geo", "tt.ebc/registry"],
     )
     p.external.add(TRINIDAD)
-    for url in election.sources:
+    for url in election.sources + (election.supersedes.sources if election.supersedes else []):
         p.uses(raw.cached(SOURCE, url))
+    pages = _pages(p, election)
+    earlier = {norm(d.name): d for d in election.supersedes.districts} if election.supersedes else {}
     body = COUNCIL_BODY if year in COUNCIL else BODY
     method = METHODS[year] if year in METHODS else METHODS["history"]
     if year not in FULL:
@@ -720,6 +930,32 @@ def general(year: int) -> Package:
         p.name(contest, district.name, "en", "official")
         p.add("slug", path=f"{path}/{slug(district.name)}", entity_id=contest, is_current=True)
         result_set = key("result_set", day, code)
+        previous = earlier.get(code)
+        if previous is not None and election.supersedes is not None:
+            # The set built from the preliminary summary stays, superseded by the report's polling station set.
+            p.add(
+                "result_set",
+                id=result_set,
+                election_id=first,
+                contest_id=contest,
+                stage=election.supersedes.stage,
+                kind="counted",
+                source_id=SOURCE_ID,
+                status="superseded",
+                is_default=False,
+                completeness=1.0,
+            )
+            p.add(
+                "note",
+                id=key("note", result_set),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHODS["2020-summary"],
+                lang="en",
+            )
+            superseded, result_set = result_set, key("result_set", day, code, "report")
+        else:
+            superseded = None
         p.add(
             "result_set",
             id=result_set,
@@ -731,6 +967,7 @@ def general(year: int) -> Package:
             status="active",
             is_default=True,
             completeness=1.0,
+            supersedes_id=superseded,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
         unit = key("unit", day, code)
@@ -747,8 +984,11 @@ def general(year: int) -> Package:
         )
         p.name(unit, district.name, "en", "official")
         options: list[str] = []
+        named = previous.candidates if previous is not None else district.candidates
+        tags = [f"{index}:{norm(c.name or c.label or c.party or '')}" for index, c in enumerate(named)]
         for index, candidate in enumerate(district.candidates):
-            tag = f"{index}:{norm(candidate.name or candidate.label or candidate.party or '')}"
+            # A candidate keeps the option the preliminary summary's column for it already had.
+            tag = tags[district.columns[index]] if previous is not None else tags[index]
             option = key("option", day, code, tag)
             options.append(option)
             label = candidate.label if candidate.name is None else (candidate.name)
@@ -783,6 +1023,10 @@ def general(year: int) -> Package:
             option_id=options[winner],
             kind="elected",
         )
+        if superseded is not None and previous is not None:
+            old = [key("option", day, code, tag) for tag in tags]
+            p.add("outcome", result_set_id=superseded, option_id=old[previous.winner], kind="elected")
+            _values(p, superseded, [unit], old, previous)
         stations = district.stations
         units = [unit]
         if stations:
@@ -803,7 +1047,56 @@ def general(year: int) -> Package:
                 p.name(child, f"{station.code} {station.venue}", "en", "official")
                 units.append(child)
         _values(p, result_set, units, options, district)
+        if stations and stations[0].page is not None:
+            _locate(p, result_set, units, options, district, pages)
     return p
+
+
+def _pages(p: Package, election: Election) -> dict[int, str]:
+    """A source page for each scanned page the election's figures are read from."""
+    if not election.pages:
+        return {}
+    artifact = raw.cached(SOURCE, election.sources[0])
+    artifact_id = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{SOURCE_ID}\x1f{artifact.storage_key}"))
+    found: dict[int, str] = {}
+    for number, (width, height) in sorted(election.pages.items()):
+        found[number] = key("page", election.year, number)
+        p.add(
+            "source_page",
+            id=found[number],
+            artifact_id=artifact_id,
+            page_number=number,
+            image_key=f"pages/{SOURCE}/{artifact.sha256}-{number}.png",
+            width=width,
+            height=height,
+        )
+    return found
+
+
+def _locate(
+    p: Package, result_set: str, units: list[str], options: list[str], district: District, pages: dict[int, str]
+) -> None:
+    """Where on the scanned page each polling station figure was read, in pixels of the page at 200 dpi."""
+    for unit, station in zip(units, district.stations, strict=True):
+        if station.page is None:
+            continue
+        cells = [*((option, VOTES) for option in options), (None, VALID), (None, INVALID), (None, REGISTERED)]
+        for (option, measure), box in zip(cells, station.boxes, strict=True):
+            p.add(
+                "value_locator",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                page_id=pages[station.page],
+                source_id=SOURCE_ID,
+                x0=round(box[0], 1),
+                y0=round(box[1], 1),
+                x1=round(box[2], 1),
+                y1=round(box[3], 1),
+            )
 
 
 def _value(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
