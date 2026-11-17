@@ -1,0 +1,1079 @@
+{
+ "polity": "LI",
+ "name": "Liechtenstein",
+ "sources": {
+  "verfassung": {
+   "title": "Verfassung des Fürstentums Liechtenstein vom 5. Oktober 1921 (LGBl. 1921 Nr. 15, LR 101)",
+   "publisher": "Regierung des Fürstentums Liechtenstein (Lilex)",
+   "url": "https://www.gesetze.li/konso/1921015000",
+   "kind": "official_body"
+  },
+  "vrg": {
+   "title": "Gesetz vom 17. Juli 1973 über die Ausübung der politischen Volksrechte in Landesangelegenheiten (Volksrechtegesetz, VRG; LGBl. 1973 Nr. 50, LR 161)",
+   "publisher": "Regierung des Fürstentums Liechtenstein (Lilex)",
+   "url": "https://www.gesetze.li/konso/1973050000",
+   "kind": "official_body"
+  },
+  "gemg": {
+   "title": "Gemeindegesetz (GemG) vom 20. März 1996 (LGBl. 1996 Nr. 76, LR 141.0)",
+   "publisher": "Regierung des Fürstentums Liechtenstein (Lilex)",
+   "url": "https://www.gesetze.li/konso/1996076000",
+   "kind": "official_body"
+  },
+  "lt_site": {
+   "title": "Landtagswahlen: Ergebnisse und Archiv seit 2001",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/",
+   "kind": "official_body"
+  },
+  "va_site": {
+   "title": "Abstimmungen: Ergebnisse und Archiv seit 2002",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.abstimmungen.li/",
+   "kind": "official_body",
+   "note": "The archive list on every page names each national vote since March 2002 with its voting days; /resultat/<n> has the results by municipality and the protocol."
+  },
+  "gw_site": {
+   "title": "Gemeindewahlen: Ergebnisse und Archiv seit 2003",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/",
+   "kind": "official_body"
+  },
+  "lt2001": {
+   "title": "Landtagswahlen 2001: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/5/14",
+   "kind": "official_body"
+  },
+  "lt2005": {
+   "title": "Landtagswahlen 2005: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/6/14",
+   "kind": "official_body"
+  },
+  "lt2009": {
+   "title": "Landtagswahlen 2009: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/7/14",
+   "kind": "official_body"
+  },
+  "lt2013": {
+   "title": "Landtagswahlen 2013: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/8/14",
+   "kind": "official_body"
+  },
+  "lt2017": {
+   "title": "Landtagswahlen 2017: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/10/14",
+   "kind": "official_body"
+  },
+  "lt2021": {
+   "title": "Landtagswahlen 2021: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/12/14",
+   "kind": "official_body"
+  },
+  "lt2025": {
+   "title": "Landtagswahlen 2025: Ergebnisse Liechtenstein",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.landtagswahlen.li/resultat/16/14",
+   "kind": "official_body"
+  },
+  "gw2003": {
+   "title": "Gemeindewahlen 2003: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/3",
+   "kind": "official_body"
+  },
+  "gw2007": {
+   "title": "Gemeindewahlen 2007: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/2",
+   "kind": "official_body"
+  },
+  "gw2011": {
+   "title": "Gemeindewahlen 2011: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/1",
+   "kind": "official_body"
+  },
+  "gw2015": {
+   "title": "Gemeindewahlen 2015: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/9",
+   "kind": "official_body"
+  },
+  "gw2019": {
+   "title": "Gemeindewahlen 2019: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/11",
+   "kind": "official_body"
+  },
+  "gw2023": {
+   "title": "Gemeindewahlen 2023: Ergebnisse",
+   "publisher": "Regierung des Fürstentums Liechtenstein",
+   "url": "https://www.gemeindewahlen.li/resultate/14",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Fürstentum Liechtenstein",
+   "name_en": "Principality of Liechtenstein",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "li.land",
+   "source": "verfassung"
+  },
+  {
+   "key": "landschaft",
+   "name": "Landschaften (Wahlkreise Oberland und Unterland)",
+   "name_en": "Landschaften (the Oberland and Unterland electoral districts)",
+   "parent": "national",
+   "elects": false,
+   "scheme": "li.wahlkreis",
+   "source": "verfassung",
+   "counts": [
+    {
+     "date": "2026-11-17",
+     "value": 2,
+     "source": "verfassung",
+     "locator": "https://www.gesetze.li/konso/1921015000 (Art. 1 Abs. 1: \"ein Staatsverband von zwei Landschaften mit elf Gemeinden\"; Art. 46 Abs. 1: each Landschaft is one electoral district; consolidated text as read 2026-11-17)"
+    }
+   ]
+  },
+  {
+   "key": "gemeinde",
+   "name": "Gemeinden",
+   "name_en": "Municipalities",
+   "parent": "landschaft",
+   "polity_kind": "municipality",
+   "scheme": "li.gemeinde",
+   "source": "gemg",
+   "counts": [
+    {
+     "date": "2026-11-17",
+     "value": 11,
+     "source": "verfassung",
+     "locator": "https://www.gesetze.li/konso/1921015000 (Art. 1 Abs. 1: Vaduz, Balzers, Planken, Schaan, Triesen and Triesenberg in the Oberland; Eschen, Gamprin, Mauren, Ruggell and Schellenberg in the Unterland; consolidated text as read 2026-11-17)"
+    },
+    {
+     "date": "2023-03-05",
+     "value": 11,
+     "source": "gw2023",
+     "locator": "https://www.gemeindewahlen.li/resultate/14 (results for all 11 municipalities)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "landtag",
+   "tier": "national",
+   "name": "Landtagswahlen",
+   "name_en": "Landtag elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "li.wahlkreis"
+    ],
+    "fine": [
+     "li.gemeinde"
+    ]
+   },
+   "finest_note": "Counted by municipality; the Oberland and Unterland districts are the contests. Postal and in-person votes are split in the protocol, not by station.",
+   "note": "25 members since 1989 (15 for the Oberland, 10 for the Unterland) and 15 before, elected by list PR in the two districts with a national 8% threshold; each voter has as many votes as the district has seats, unused ones count for the list as Zusatzstimmen (Verfassung Art. 46; VRG Art. 55-56). Each list also elects deputy members (stellvertretende Abgeordnete). Majority vote until PR was introduced in 1939; women vote since 1984.",
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 46-50)",
+   "valid_from": "1918-01-01",
+   "earliest_record": "2001-02-11",
+   "contests_per_unit": 2,
+   "est_votes": 330000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1958-01-01",
+     "valid_to": "1989-01-01",
+     "administered_by": "Regierung des Fürstentums Liechtenstein",
+     "source": "verfassung",
+     "locator": "https://www.gesetze.li/konso/1921015000 (Art. 47 Abs. 1 as amended by LGBl. 1958 Nr. 1; Art. 48 lets the Prince dissolve the Landtag)"
+    },
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 2,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1989-01-01",
+     "administered_by": "Regierung des Fürstentums Liechtenstein",
+     "source": "verfassung",
+     "locator": "https://www.gesetze.li/konso/1921015000 (Art. 47 Abs. 1: four-year term, regular elections in February or March of the year the fourth year ends; Art. 48 and 50: dissolution and a new election within six weeks)",
+     "vacancy_rule": "The next unelected candidate of the same list takes the seat; a by-election (Ergänzungswahl) only when the list is exhausted (Verfassung Art. 53)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Landtagswahlen (landtagswahlen.li)",
+     "url": "https://www.landtagswahlen.li/resultat/{id}/{unit}",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2001-02-11",
+     "finest": "li.gemeinde",
+     "role": "administers",
+     "evidence": "Result, protocol, and elected-member pages for the 2001-2025 Landtag elections, by municipality (units 1-11), electoral district (12-13), and country (14).",
+     "source": "lt_site"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LI",
+     "valid_from": "1918-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1918-01-01",
+     "precision": "year",
+     "through": "1997-12-31",
+     "election_kind": "general",
+     "note": "Direct Landtag elections from 1918 through 1997, including the silent election of 1939 (no ballot held) and the repeat elections of 1953, 1958, 1989, and 1993 after dissolutions; not yet counted from the government's official returns, which the government's results site does not carry before 2001."
+    },
+    {
+     "date": "2001-02-11",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2001",
+     "quote": "Landtagswahlen 2001 Ergebnisse (11.02.2001)"
+    },
+    {
+     "date": "2005-03-13",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2005",
+     "quote": "Landtagswahlen 2005 Ergebnisse (13.03.2005)"
+    },
+    {
+     "date": "2009-02-08",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2009",
+     "quote": "Landtagswahlen 2009 Ergebnisse (08.02.2009)"
+    },
+    {
+     "date": "2013-02-03",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2013",
+     "quote": "Landtagswahlen 2013 Ergebnisse (03.02.2013)"
+    },
+    {
+     "date": "2017-02-05",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2017",
+     "quote": "Landtagswahlen 2017 Ergebnisse (05.02.2017)"
+    },
+    {
+     "date": "2021-02-07",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2021",
+     "quote": "Landtagswahlen 2021 Ergebnisse (07.02.2021)"
+    },
+    {
+     "date": "2025-02-09",
+     "contests": 2,
+     "seats": 25,
+     "source": "lt2025",
+     "quote": "Landtagswahlen 2025 ... Resultat vom 09.02.2025 ... Oberland 15 ... Unterland 10"
+    }
+   ]
+  },
+  {
+   "key": "landtag_1862",
+   "tier": "national",
+   "name": "Landtagswahlen nach der Konstitutionellen Verfassung von 1862",
+   "name_en": "Landtag elections under the 1862 constitution (indirect, through electors)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the constitution of 26 September 1862, which the 1921 constitution replaced, voters in each municipality chose electors (Wahlmänner) who elected 12 of the Landtag's 15 members; the Prince appointed the other three.",
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (preamble: \"die Verfassung vom 26. September 1862 ... geändert\")",
+   "valid_from": "1862-09-26",
+   "valid_to": "1918-01-01",
+   "est_votes": 40000,
+   "effort": 5,
+   "disposition": "blocked",
+   "disposition_reason": "No official publisher of the returns answers online: the government's results sites begin in 2001, the Landesarchiv's e-archiv.li offers document editions without result tables, and the statistics portal (statistikportal.li) and the national administration's site (llv.li) refuse automated requests.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LI",
+     "valid_to": "1918-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1862-01-01",
+     "precision": "year",
+     "through": "1917-12-31",
+     "election_kind": "indirect",
+     "note": "Indirect Landtag elections from 1862 to 1914; not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "volksabstimmung",
+   "tier": "national",
+   "name": "Volksabstimmungen",
+   "name_en": "National referendums and initiatives",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "li.land"
+    ],
+    "fine": [
+     "li.wahlkreis",
+     "li.gemeinde"
+    ]
+   },
+   "finest_note": "Counted by municipality.",
+   "note": "Optional referendums on laws, spending decisions and treaties (1,000 or 1,500 signatures or three or four municipalities), initiatives for laws and constitutional amendments, votes ordered by the Landtag, votes on dissolving the Landtag (Art. 48 Abs. 3), on a motion of no confidence in the Prince (Art. 13ter), and on abolishing the monarchy in two rounds (Art. 113). A counter-proposal or rival initiative is a separate ballot question. The Prince's sanction is still needed for a law passed by the people (Art. 65).",
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 64, 66, 66bis, 13ter, 48 Abs. 3, 112, 113)",
+   "valid_from": "1921-10-05",
+   "earliest_record": "2002-03-10",
+   "est_votes": 1200000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Abstimmungen (abstimmungen.li)",
+     "url": "https://www.abstimmungen.li/resultat/{id}/{unit}",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2002-03-10",
+     "last_date": "2024-12-01",
+     "finest": "li.gemeinde",
+     "role": "administers",
+     "evidence": "Results pages 1-35 for every national vote from March 2002 to December 2024, by municipality, district, and country, with the voting protocol; pages above 35 are empty.",
+     "source": "va_site"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LI"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1921-10-05",
+     "through": "2001-12-31",
+     "election_kind": "referendum",
+     "note": "National votes under the 1921 constitution before March 2002 (among them the women's suffrage votes of 1971, 1973, and 1984 and the EEA votes of 1992 and 1995); not yet counted, as abstimmungen.li begins in 2002."
+    },
+    {
+     "date": "2002-03-10",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "LBO-Referendum 8. / 10. März 2002 ... Verkehrsinitiative 8. / 10. März 2002",
+     "note": "Voting ran from 8 to 10 March; the archive dates each two- or three-day vote by its Sunday."
+    },
+    {
+     "date": "2002-09-29",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Raumplanungsreferendum 27. / 29. September 2002"
+    },
+    {
+     "date": "2003-03-16",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "Verfassungsinitiativen 14. / 16. März 2003 (Inititative des Fürsten und Erbprinzen; Initiative \"Verfassungsfrieden\")"
+    },
+    {
+     "date": "2004-04-04",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "Polizeigebäude 2. / 4. April 2004 ... NBU-Beitrag 2. / 4. April 2004"
+    },
+    {
+     "date": "2005-11-27",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "Für das Leben 25. / 27. November 2005 (Initiative \"Für das Leben\"; Gegenvorschlag Landtag)",
+     "note": "One ballot with the initiative and the Landtag's counter-proposal, each answered yes or no."
+    },
+    {
+     "date": "2006-11-05",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Hundegesetz 3. / 5. November 2006"
+    },
+    {
+     "date": "2009-03-29",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "SPES I 27./29. März 2009 ... Nichtraucherschutz 27./29. März 2009"
+    },
+    {
+     "date": "2009-12-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Mobilfunkanlagen 4./6. Dezember 2009"
+    },
+    {
+     "date": "2010-03-14",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Industriezubringer Schaan 12./14. März 2010"
+    },
+    {
+     "date": "2011-06-19",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Partnerschaftsgesetz 17. / 19. Juni 2011"
+    },
+    {
+     "date": "2011-09-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Hilfe statt Strafe 18. September 2011"
+    },
+    {
+     "date": "2011-10-30",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Neubau Landesspital 2011 30. Oktober 2011"
+    },
+    {
+     "date": "2012-07-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Ja - damit deine Stimme zählt 29. Juni / 01. Juli 2012",
+     "note": "Initiative to strip the Prince's veto over successful popular votes (Art. 65), rejected."
+    },
+    {
+     "date": "2014-06-15",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "va_site",
+     "quote": "Pensionskasse 15. Juni 2014 (Pensionskasse win-win; WinWin50)"
+    },
+    {
+     "date": "2015-12-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Krankenversicherungsgesetz 13.12.2015"
+    },
+    {
+     "date": "2016-09-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Familienzulagengesetz 18. September 2016"
+    },
+    {
+     "date": "2018-11-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "«Tour de Ski» Sonntag, 25. November 2018"
+    },
+    {
+     "date": "2019-11-24",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Neubau Landesspital 24. November 2019"
+    },
+    {
+     "date": "2020-08-30",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "va_site",
+     "quote": "HalbeHalbe 30. August 2020 ... Doppelte Staatsbürgerschaft 30. August 2020 ... S-Bahn 30. August 2020"
+    },
+    {
+     "date": "2022-06-26",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Franchisebefreiung im Rentenalter 26. Juni 2022"
+    },
+    {
+     "date": "2022-09-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Gesetzliche Grundlage für 2G-Regelung 18. September 2022"
+    },
+    {
+     "date": "2023-01-29",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Initiativbegehren \"Casino-Verbot\" ... Resultat vom 29.01.2023",
+     "note": "The archive list gives no date; the result page reports the result of 29.01.2023."
+    },
+    {
+     "date": "2024-01-21",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "va_site",
+     "quote": "Photovoltaik-Pflicht 21. Januar 2024 ... Anpassung der Gebäudevorschriften 21. Januar 2024 ... Elektronisches Gesundheitsdossier 21. Januar 2024"
+    },
+    {
+     "date": "2024-02-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Einbezug des Volkes bei der Bestellung der Regierung 25. Februar 2024"
+    },
+    {
+     "date": "2024-06-16",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Ergänzungskredit Neubau Landesspital 16. Juni 2024"
+    },
+    {
+     "date": "2024-09-22",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Beitritt zum Internationalen Währungsfonds (IWF) 22. September 2024"
+    },
+    {
+     "date": "2024-10-27",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Aufhebung des Gesetzes über den „Liechtensteinischen Rundfunk“ 27. Oktober 2024"
+    },
+    {
+     "date": "2024-12-01",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "va_site",
+     "quote": "Ergebnisse der Abstimmung vom 01. Dezember 2024 - Personalvorsorge des Staates (SBPVG)"
+    }
+   ]
+  },
+  {
+   "key": "richter_volkswahl",
+   "tier": "national",
+   "name": "Volksabstimmung über Richterkandidaten",
+   "name_en": "Popular vote on a judicial candidate",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Judges are chosen by a panel the Prince chairs, elected by the Landtag, and appointed by the Prince. Only if the Landtag rejects the panel's candidate and no agreement follows within four weeks do voters choose between the panel's candidate, the Landtag's, and any nominated by initiative, in two rounds when there are more than two (Art. 96 Abs. 2, since the 2003 revision). No such vote has been held.",
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 96)",
+   "est_votes": 0,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "special",
+      "runoff"
+     ],
+     "office_kinds": [
+      "other"
+     ],
+     "iso_pattern": "LI",
+     "name_pattern": "[Rr]ichter"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "landesfuerst",
+   "tier": "national",
+   "name": "Landesfürst",
+   "name_en": "Reigning Prince",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 2-3)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The office is hereditary in the princely house under its house law (Art. 3); no one votes on it. A motion of no confidence in the Prince goes to a national vote, which the volksabstimmung class holds.",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "LI"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "regierung",
+   "tier": "national",
+   "name": "Bestellung der Regierung",
+   "name_en": "Appointment of the government",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 79-80)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Prince appoints the head of government and four ministers in agreement with the Landtag on its proposal (Art. 79 Abs. 2); there is no ballot by voters, and the 25 February 2024 initiative to involve the people in choosing the government was rejected.",
+   "match": [
+    {
+     "office_kinds": [
+      "head_of_government"
+     ],
+     "iso_pattern": "LI"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "landtag_intern",
+   "tier": "national",
+   "name": "Wahlen im Landtag",
+   "name_en": "Elections inside the Landtag",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "verfassung",
+   "locator": "https://www.gesetze.li/konso/1921015000 (Art. 52, 72, 96)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Landtag's elections of its president and vice-president, the Landesausschuss, and judges are votes of 25 members in session, recorded in the Landtag's minutes, not elections by voters.",
+   "dates": []
+  },
+  {
+   "key": "unterschriften",
+   "tier": "national",
+   "name": "Unterschriftensammlungen für Initiativen und Referenden",
+   "name_en": "Signature collections for initiatives and referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {},
+   "source": "vrg",
+   "locator": "https://www.gesetze.li/konso/1973050000 (Art. 67-71: Gemeinde- and Sammelbegehren, signature checks and publication)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Voters sign in support and there is no choice between options, so a signature count is not an election result; abstimmungen.li lists the counts beside each vote. The archive keeps the votes that a successful collection triggers.",
+   "dates": []
+  },
+  {
+   "key": "nominierung",
+   "tier": "national",
+   "name": "Nominierung der Kandidaten",
+   "name_en": "Candidate nomination",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "vrg",
+   "locator": "https://www.gesetze.li/konso/1973050000 (Art. 37: a nomination needs 30 voters' signatures in the district)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No nominating contest is run by the state: voter groups file lists with voters' signatures (VRG Art. 37; GemG Art. 73), and the parties choose their candidates at their own meetings.",
+   "dates": []
+  },
+  {
+   "key": "gemeinderat",
+   "tier": "gemeinde",
+   "name": "Gemeinderatswahlen",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "li.gemeinde"
+    ]
+   },
+   "finest_note": "Each of the 11 municipalities is one contest.",
+   "note": "Councils of 6 to 12 members besides the Vorsteher, set by each municipality's ordinance by population (GemG Art. 38), elected by list PR with candidate and additional votes and no threshold (GemG Art. 78-80). The 2003-2011 sites count 117 council seats with the 11 Vorsteher, 2015-2023 115.",
+   "source": "gemg",
+   "locator": "https://www.gesetze.li/konso/1996076000 (Art. 38, 44-47, 72-80)",
+   "earliest_record": "2003-02-02",
+   "est_votes": 450000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2003-01-01",
+     "valid_to": "2015-01-01",
+     "administered_by": "The municipal electoral commissions, on the date the government sets",
+     "source": "gw_site",
+     "locator": "https://www.gemeindewahlen.li/ (archive: 2003, 2007, 2011)"
+    },
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2015-01-01",
+     "administered_by": "The municipal electoral commissions, on the date the government sets",
+     "source": "gemg",
+     "locator": "https://www.gesetze.li/konso/1996076000 (Art. 44: the government sets the election day in March before the term ends; Art. 45: four-year term from 1 May)",
+     "vacancy_rule": "The next unelected candidate of the same list takes the seat; a by-election only when the list is exhausted (GemG Art. 46)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Gemeindewahlen (gemeindewahlen.li)",
+     "url": "https://www.gemeindewahlen.li/resultate/{id}",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2003-02-02",
+     "finest": "li.gemeinde",
+     "evidence": "Council seats by party, the elected Vorsteher, candidates, and turnout per municipality for 2003, 2007, 2011, 2015, 2019, and 2023 (resultate/3, 2, 1, 9, 11, 14).",
+     "source": "gw_site"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1864-01-01",
+     "precision": "year",
+     "through": "2002-12-31",
+     "election_kind": "local",
+     "note": "Municipal council elections before 2003, under the municipal laws of 1864, 1959, and 1996; not yet counted, as gemeindewahlen.li begins in 2003."
+    },
+    {
+     "date": "2003-02-02",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 106,
+     "source": "gw2003",
+     "quote": "Wahlen 2003 Ergebnis vom 02.02.2003 Parteimandate"
+    },
+    {
+     "date": "2007-01-28",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 106,
+     "source": "gw2007",
+     "quote": "Wahlen 2007 Ergebnis vom 28.01.2007 Parteimandate"
+    },
+    {
+     "date": "2011-02-20",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 106,
+     "source": "gw2011",
+     "quote": "Wahlen 2011 Ergebnis vom 20.02.2011 Parteimandate"
+    },
+    {
+     "date": "2015-03-15",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 104,
+     "source": "gw2015",
+     "quote": "Wahlen 2015 Ergebnis vom 15.03.2015 Parteimandate"
+    },
+    {
+     "date": "2019-03-24",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 104,
+     "source": "gw2019",
+     "quote": "Wahlen 2019 Ergebnis vom 24.03.2019 Parteimandate"
+    },
+    {
+     "date": "2023-03-05",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 104,
+     "source": "gw2023",
+     "quote": "Wahlen 2023 Ergebnis vom 05.03.2023 Parteimandate"
+    }
+   ]
+  },
+  {
+   "key": "vorsteher",
+   "tier": "gemeinde",
+   "name": "Gemeindevorsteherwahlen",
+   "name_en": "Mayoral (Gemeindevorsteher) elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "li.gemeinde"
+    ]
+   },
+   "finest_note": "Each of the 11 municipalities is one contest.",
+   "note": "The Vorsteher heads the council and the municipality; elected by absolute majority, with a second round among the same candidates within four weeks decided by plurality (GemG Art. 71). The Vaduz Vorsteher is styled Bürgermeister.",
+   "source": "gemg",
+   "locator": "https://www.gesetze.li/konso/1996076000 (Art. 35, 71)",
+   "earliest_record": "2003-02-02",
+   "est_votes": 450000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2015-01-01",
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Absolute majority of valid votes; otherwise a new round within four weeks among the same candidates, decided by plurality (GemG Art. 71 Abs. 2-3).",
+     "administered_by": "The municipal electoral commissions, on the date the government sets",
+     "source": "gemg",
+     "locator": "https://www.gesetze.li/konso/1996076000 (Art. 44-45, 71)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Gemeindewahlen (gemeindewahlen.li)",
+     "url": "https://www.gemeindewahlen.li/resultate/{id}",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2003-02-02",
+     "finest": "li.gemeinde",
+     "evidence": "Council seats by party, the elected Vorsteher, candidates, and turnout per municipality for 2003, 2007, 2011, 2015, 2019, and 2023 (resultate/3, 2, 1, 9, 11, 14).",
+     "source": "gw_site"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "runoff",
+      "by_election"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1864-01-01",
+     "precision": "year",
+     "through": "2002-12-31",
+     "election_kind": "local",
+     "note": "Vorsteher elections before 2003; not yet counted."
+    },
+    {
+     "date": "2003-02-02",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2003",
+     "quote": "Wahlen 2003 Ergebnis vom 02.02.2003"
+    },
+    {
+     "date": "2007-01-28",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2007",
+     "quote": "Wahlen 2007 Ergebnis vom 28.01.2007"
+    },
+    {
+     "date": "2011-02-20",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2011",
+     "quote": "Wahlen 2011 Ergebnis vom 20.02.2011"
+    },
+    {
+     "date": "2015-03-15",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2015",
+     "quote": "Wahlen 2015 Ergebnis vom 15.03.2015"
+    },
+    {
+     "date": "2019-03-24",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2019",
+     "quote": "Wahlen 2019 Ergebnis vom 24.03.2019"
+    },
+    {
+     "date": "2023-03-05",
+     "election_kind": "local",
+     "contests": 11,
+     "seats": 11,
+     "source": "gw2023",
+     "quote": "Wahlen 2023 Ergebnis vom 05.03.2023",
+     "note": "The Schellenberg Vorsteher led with 46.4% in the first round, so a second round followed; second rounds are not on the site and are not yet counted."
+    }
+   ]
+  },
+  {
+   "key": "gpk",
+   "tier": "gemeinde",
+   "name": "Wahl der Geschäftsprüfungskommission",
+   "name_en": "Municipal audit committee elections",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "li.gemeinde"
+    ]
+   },
+   "note": "Each municipality's voters elect a three-member audit committee by ballot within six months of the council election (GemG Art. 35, 56). The government's results sites do not carry these elections; each municipality announces its own.",
+   "source": "gemg",
+   "locator": "https://www.gesetze.li/konso/1996076000 (Art. 35, 56)",
+   "est_votes": 150000,
+   "effort": 4,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1996-01-01",
+     "administered_by": "The municipal electoral commissions",
+     "source": "gemg",
+     "locator": "https://www.gesetze.li/konso/1996076000 (Art. 56: elected within six months after the council election; three members)"
+    }
+   ],
+   "match": [
+    {
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Geschäftsprüfungskommission|GPK"
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "gemeindeabstimmung",
+   "tier": "gemeinde",
+   "name": "Gemeindeabstimmungen",
+   "name_en": "Municipal votes",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "li.gemeinde"
+    ]
+   },
+   "note": "Ballot votes (Urnenabstimmungen) that a council orders in place of a municipal assembly, on spending, plans, ordinances, a sixth of voters' referendums and initiatives (GemG Art. 35-42), and a municipality's vote to start leaving the state (Verfassung Art. 4 Abs. 2). Each municipality runs and announces its own.",
+   "source": "gemg",
+   "locator": "https://www.gesetze.li/konso/1996076000 (Art. 35-43)",
+   "est_votes": 150000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "precedence": 1
+    }
+   ],
+   "dates": []
+  },
+  {
+   "key": "vizevorsteher",
+   "tier": "gemeinde",
+   "name": "Wahl des Vizevorstehers",
+   "name_en": "Election of the deputy mayor",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "gemg",
+   "locator": "https://www.gesetze.li/konso/1996076000 (Art. 82)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The council elects the Vizevorsteher from its own members within four days of taking office (GemG Art. 82); there is no ballot by voters.",
+   "match": [
+    {
+     "office_kinds": [
+      "deputy_mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": []
+  }
+ ]
+}
