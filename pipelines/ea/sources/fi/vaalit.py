@@ -543,8 +543,9 @@ def _units(p: Package, vote: Vote, units: dict[tuple[str, str], str]) -> None:
 METHOD = (
     "Counted per voting district (äänestysalue) in the Ministry of Justice's election information system and published "
     "in its results service. Registered voters are the persons entitled to vote in the election, ballots cast are the "
-    "persons who voted, and valid and invalid ballots are as counted. The totals are stored for all channels; the "
-    "source also splits them into advance votes and election-day votes. A district that the municipality counted "
+    "persons who voted, and valid and invalid ballots are as counted. The "
+    "totals are stored as advance votes and election-day votes; a district that the service marks as counted "
+    "the two together has one total for all channels. A district that the municipality counted "
     "together with another has no count of its own, and only its registered voters are stored. The figures are "
     "those of the checked count."
 )
@@ -755,17 +756,24 @@ def _candidates(
     return found
 
 
-def _total(frame: pl.DataFrame, total: str, measure: int) -> pl.DataFrame:
-    return frame.select(
-        "result_set_id",
-        "unit_id",
-        "option_id",
-        channel=pl.lit(0),
-        measure=pl.lit(measure),
-        count_round=pl.lit(0),
-        flags=pl.lit(0),
-        value=count(total),
-    )
+def _total(frame: pl.DataFrame, total: str, measure: int, early: str, day: str) -> pl.DataFrame:
+    """A measure by channel: early (2) and election day (1) for a district counted on its own, and one total on all
+    channels (0) for a district whose area-file flag says the two were counted together."""
+
+    def rows(select: pl.DataFrame, channel: int, column: str) -> pl.DataFrame:
+        return select.select(
+            "result_set_id",
+            "unit_id",
+            "option_id",
+            channel=pl.lit(channel),
+            measure=pl.lit(measure),
+            count_round=pl.lit(0),
+            flags=pl.lit(0),
+            value=count(column),
+        )
+
+    apart = frame.filter(~pl.col("together"))
+    return pl.concat([rows(apart, 2, early), rows(apart, 1, day), rows(frame.filter(pl.col("together")), 0, total)])
 
 
 def _values(
@@ -780,12 +788,14 @@ def _values(
     kind = vote.kind
     ck = contest_column(kind).alias("ck")
     merged = {units[(c3, c5)] for c3, c5 in alu.filter(pl.col("c8") != "").select("c3", "c5").iter_rows()}
+    together = {units[(c3, c5)] for c3, c5 in alu.filter(pl.col("c9") == "1").select("c3", "c5").iter_rows()} | merged
     unit_frame = pl.DataFrame(
         {
             "c3": [code[0] for code in units],
             "c5": [code[1] for code in units],
             "unit_id": list(units.values()),
             "merged": [id in merged for id in units.values()],
+            "together": [id in together for id in units.values()],
         }
     )
     set_frame = pl.DataFrame({"ck": list(sets), "result_set_id": list(sets.values())})
@@ -812,18 +822,18 @@ def _values(
             flags=pl.lit(0),
             value=count("c14"),
         ),
-        _total(base, "c41", CAST),
-        _total(counted, "c66", VALID),
-        _total(counted, "c69", INVALID),
+        _total(base, "c41", CAST, "c37", "c39"),
+        _total(counted, "c66", VALID, "c64", "c65"),
+        _total(counted, "c69", INVALID, "c67", "c68"),
     ]
     mismatch = _mismatch(p, counted)
     if vote.parties:
         names = {"ck": [k[0] for k in lists], "c10": [k[1] for k in lists], "option_id": list(lists.values())}
         votes = attach(read(vote, "puo")).filter(~pl.col("merged")).join(pl.DataFrame(names), on=["ck", "c10"])
-        frames.append(_total(votes, "c41", VOTES_MEASURE))
+        frames.append(_total(votes, "c41", VOTES_MEASURE, "c39", "c40"))
     names = {"ck": [k[0] for k in options], "c15": [k[1] for k in options], "option_id": list(options.values())}
     people = attach(read(vote, "ehd")).filter(~pl.col("merged")).join(pl.DataFrame(names), on=["ck", "c15"])
-    frames.append(_total(people, "c35", PREFERENCE if vote.parties else VOTES_MEASURE))
+    frames.append(_total(people, "c35", PREFERENCE if vote.parties else VOTES_MEASURE, "c33", "c34"))
     p.frame("result_value", pl.concat(frames))
     return mismatch
 
