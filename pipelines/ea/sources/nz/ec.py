@@ -749,7 +749,8 @@ def general(day: str) -> Package:
     elif how == "electorate":
         labels = party_columns(year)[0]
     else:
-        labels = list(summ.votes)
+        # Only the parties that stood a list or won a seat are options; the others stood electorate candidates only.
+        labels = [name for name, votes in summ.votes.items() if votes or name in summ.seats]
     options: dict[str, str] = {}
     for position, label in enumerate(labels, 1):
         option = options[label] = key("option", f"party-{day}", label)
@@ -822,9 +823,11 @@ def general(day: str) -> Package:
             kind="aggregate",
         )
         p.name(unit, "New Zealand", "en", "official")
-        for label, value in summ.votes.items():
-            _put(p, party_set, unit, 0, options[label], VOTES, value)
+        for label in labels:
+            _put(p, party_set, unit, 0, options[label], VOTES, summ.votes[label])
         _put(p, party_set, unit, 0, None, VALID, summ.valid)
+        if summ.informal is not None:
+            _put(p, party_set, unit, 0, None, INVALID, summ.informal)
         p.add(
             "note",
             id=key("note", party_set, "nation"),
