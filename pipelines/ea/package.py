@@ -10,6 +10,7 @@ import time
 from collections.abc import Iterable, Iterator
 from contextlib import suppress
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from itertools import batched
 from pathlib import Path
@@ -35,6 +36,7 @@ SERVER_LIMIT = 3072
 ROLLUP_VALUES = 500_000
 LOAD_CHUNK = 20
 ROLLED = {"election", "contest", "reporting_unit", "result_set"}
+SCALE = 9
 
 U = pl.String()
 D = pl.Date()
@@ -309,6 +311,80 @@ def folder(key: str) -> Path:
     return ROOT / key
 
 
+def _schema(table: str, file: Path | None = None) -> dict[str, pl.DataType]:
+    schema = TABLES[table][1] if table in TABLES else FACTS[table]
+    if table in FACTS and "value" in schema and file is not None and file.exists():
+        kind = pl.read_parquet_schema(file)["value"]
+        if isinstance(kind, pl.Decimal):
+            return {**schema, "value": kind}
+    return schema
+
+
+def _exact(value: object) -> int | Decimal | None:
+    if value is None or (isinstance(value, int) and not isinstance(value, bool)):
+        return value
+    if isinstance(value, Decimal):
+        number = value
+    elif isinstance(value, float):
+        number = Decimal(repr(value))
+    elif isinstance(value, str):
+        try:
+            number = Decimal(value.strip())
+        except InvalidOperation:
+            raise ValueError(f"value {value!r} is not a number") from None
+    else:
+        raise TypeError(f"value {value!r} is not a number; give an int, a Decimal, or a decimal string")
+    if not number.is_finite():
+        raise ValueError(f"value {value!r} is not a finite number")
+    return int(number) if number == number.to_integral_value() else number
+
+
+def _series(name: str, values: Iterable[object]) -> pl.Series:
+    exact = [_exact(value) for value in values]
+    places = [-int(number.as_tuple().exponent) for number in exact if isinstance(number, Decimal)]
+    if not places:
+        return pl.Series(name, exact, dtype=I64)
+    return pl.Series(name, [None if n is None else Decimal(n) for n in exact], dtype=pl.Decimal(38, max(places)))
+
+
+def _numbers(series: pl.Series) -> pl.Series:
+    if series.dtype.is_integer() or isinstance(series.dtype, pl.Decimal):
+        return series
+    return _series(series.name, series.to_list())
+
+
+def _settle(pieces: list[pl.LazyFrame], table: str) -> pl.DataType:
+    kinds = [piece.collect_schema()["value"] for piece in pieces]
+    odd = [kind for kind in kinds if not (kind.is_integer() or kind == pl.Null or isinstance(kind, pl.Decimal))]
+    if odd:
+        raise ValueError(f"{table}.value is {odd[0]}; counts must be integers or exact decimals, never floats or text")
+    top = max((kind.scale for kind in kinds if isinstance(kind, pl.Decimal)), default=0)
+    if not top:
+        return I64
+    wide = pl.concat([piece.select(pl.col("value").cast(pl.Decimal(38, top))) for piece in pieces])
+    fits = wide.select(
+        (pl.col("value").cast(pl.Decimal(38, places)) == pl.col("value")).all().alias(str(places))
+        for places in range(top + 1)
+    ).collect()
+    places = next(places for places, fit in enumerate(fits.row(0)) if fit)
+    if places > SCALE:
+        raise ValueError(
+            f"{table}.value needs {places} decimal places, more than the {SCALE} the package format holds; "
+            "round to the precision the source publishes"
+        )
+    return I64 if places == 0 else pl.Decimal(38, places)
+
+
+def _conform(frame: pl.LazyFrame, schema: dict[str, pl.DataType], exact: bool) -> pl.LazyFrame:
+    present = set(frame.collect_schema().names())
+    return frame.select(
+        (pl.col(column) if exact and column == "value" else pl.col(column).cast(kind))
+        if column in present
+        else pl.lit(None, kind).alias(column)
+        for column, kind in schema.items()
+    )
+
+
 def canonical(value: object) -> str:
     parsed = json.loads(value) if isinstance(value, str) else value
     return json.dumps(parsed, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -382,55 +458,48 @@ class Package:
         counts: dict[str, int] = {}
         for table in sorted({*self.rows, *self.frames, *self.parts}):
             rows = self.rows.get(table, [])
-            schema = TABLES[table][1] if table in TABLES else FACTS[table]
-            if table in self.parts:
-                if rows or table in self.frames:
-                    raise ValueError(f"{table} cannot mix staged files with rows")
-                pl.concat(
-                    [
-                        pl.scan_parquet(path).select(
-                            pl.col(c).cast(kind)
-                            if c in pl.scan_parquet(path).collect_schema()
-                            else pl.lit(None, kind).alias(c)
-                            for c, kind in schema.items()
-                        )
-                        for path in self.parts[table]
-                    ]
-                ).sink_parquet(out / f"{table}.parquet", statistics=False)
-                counts[table] = int(pl.scan_parquet(out / f"{table}.parquet").select(pl.len()).collect().item())
-                continue
+            schema = _schema(table)
+            exact = table in FACTS and "value" in schema
             staged = self.frames.get(table, [])
             unknown = {column for row in rows for column in row} | {c for f in staged for c in f.columns}
             if unknown - set(schema):
                 raise ValueError(f"{table} has columns outside the package format: {sorted(unknown - set(schema))}")
-            frame = pl.DataFrame(
-                [
-                    {
-                        column: canonical(row[column])
-                        if column in JSON_COLUMNS and row.get(column) is not None
-                        else row.get(column)
-                        for column in schema
-                    }
-                    for row in rows
-                ],
-                schema=schema,
-                orient="row",
-            )
-            if staged:
-                frame = pl.concat(
+            pieces: list[pl.LazyFrame] = []
+            if rows:
+                plain = {column: kind for column, kind in schema.items() if not (exact and column == "value")}
+                frame = pl.DataFrame(
                     [
-                        frame,
-                        *(
-                            f.select(
-                                pl.col(c).cast(kind) if c in f.columns else pl.lit(None, kind).alias(c)
-                                for c, kind in schema.items()
-                            )
-                            for f in staged
-                        ),
-                    ]
+                        {
+                            column: canonical(row[column])
+                            if column in JSON_COLUMNS and row.get(column) is not None
+                            else row.get(column)
+                            for column in plain
+                        }
+                        for row in rows
+                    ],
+                    schema=plain,
+                    orient="row",
                 )
-            frame.write_parquet(out / f"{table}.parquet", statistics=False)
-            counts[table] = frame.height
+                if exact:
+                    frame = frame.with_columns(_series("value", [row.get("value") for row in rows]))
+                pieces.append(frame.lazy())
+            for f in staged:
+                if exact and "value" in f.columns:
+                    f = f.with_columns(_numbers(f["value"]))
+                pieces.append(_conform(f.lazy(), schema, exact))
+            pieces += [_conform(pl.scan_parquet(path), schema, exact) for path in self.parts.get(table, [])]
+            if exact:
+                kind = _settle(pieces, table)
+                pieces = [piece.with_columns(pl.col("value").cast(kind)) for piece in pieces]
+            combined = pl.concat(pieces).select(list(schema))
+            file = out / f"{table}.parquet"
+            if table in self.parts:
+                combined.sink_parquet(file, statistics=False)
+                counts[table] = int(pl.scan_parquet(file).select(pl.len()).collect().item())
+            else:
+                written = combined.collect()
+                written.write_parquet(file, statistics=False)
+                counts[table] = written.height
         commit = store.checkout()
         manifest = {
             "key": self.key,
@@ -499,6 +568,8 @@ def _views(con: duckdb.DuckDBPyConnection, path: Path) -> list[str]:
 
 
 def _duck(kind: pl.DataType) -> str:
+    if isinstance(kind, pl.Decimal):
+        return f"decimal({kind.precision},{kind.scale})"
     text = str(kind)
     if text.startswith("Datetime"):
         return "timestamptz"
@@ -510,7 +581,7 @@ def _digest(out: Path, tables: Iterable[str], con: duckdb.DuckDBPyConnection | N
     con = con or duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4})
     digest = hashlib.sha256()
     for table in sorted(tables):
-        schema = TABLES[table][1] if table in TABLES else FACTS[table]
+        schema = _schema(table, out / f"{table}.parquet")
         columns = ", ".join(f'"{c}"::{_duck(kind)} as "{c}"' for c, kind in schema.items())
         found = con.execute(
             f"select sum(hash(t))::varchar from (select {columns} from read_parquet('{out / table}.parquet')) t"
@@ -763,7 +834,11 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
 def _chunks(file: Path, columns: list[str]) -> Iterator[bytes]:
     rows = int(pl.scan_parquet(file).select(pl.len()).collect().item())
     size = max(1, rows * CHUNK_BYTES // max(1, file.stat().st_size))
-    for frame in pl.scan_parquet(file).select(columns).collect_batches(chunk_size=max(1_000, min(200_000, size))):
+    decimals = [c for c, kind in pl.read_parquet_schema(file).items() if c in columns and isinstance(kind, pl.Decimal)]
+    scan = pl.scan_parquet(file).select(columns)
+    if decimals:
+        scan = scan.with_columns(pl.col(c).cast(pl.String).str.replace(r"\.?0+$", "") for c in decimals)
+    for frame in scan.collect_batches(chunk_size=max(1_000, min(200_000, size))):
         buffer = BytesIO()
         frame.write_csv(buffer, include_header=False, null_value="", quote_style="non_numeric")
         yield buffer.getvalue()
@@ -1170,7 +1245,7 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
             ),
         ):
             file = item.path / f"{table}.parquet"
-            expected: dict[str, tuple[int, int]] = {}
+            expected: dict[str, tuple[int, Decimal]] = {}
             if file.exists():
                 grouped = (
                     pl.scan_parquet(file)
@@ -1178,14 +1253,16 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
                     .agg(pl.len(), pl.col(measure).fill_null(0).sum())
                     .collect()
                 )
-                expected = {str(rs): (int(n), int(total)) for rs, n, total in grouped.iter_rows()}
+                expected = {str(rs): (int(n), Decimal(total)) for rs, n, total in grouped.iter_rows()}
             ids = sorted(sets | set(expected))
-            actual = {str(rs): (int(n), int(total)) for rs, n, total in conn.execute(query, [ids]).fetchall()}
+            actual = {str(rs): (int(n), Decimal(total)) for rs, n, total in conn.execute(query, [ids]).fetchall()}
+            none = (0, Decimal(0))
             for rs in ids:
-                if actual.get(rs, (0, 0)) != expected.get(rs, (0, 0)):
+                got, built = actual.get(rs, none), expected.get(rs, none)
+                if got != built:
                     problems.append(
-                        f"{item.key}: {table} for result set {rs} holds (rows, {measure}) {actual.get(rs, (0, 0))},"
-                        f" the package {expected.get(rs, (0, 0))}"
+                        f"{item.key}: {table} for result set {rs} holds (rows, {measure}) ({got[0]}, {got[1]}),"
+                        f" the package ({built[0]}, {built[1]})"
                     )
     if problems:
         raise ValueError(f"load verification failed, rolled back ({len(problems):,}): " + "; ".join(problems[:10]))
@@ -1559,18 +1636,25 @@ def export(pipeline: str) -> Path:
             query = sql.SQL("select {} from {} t where {}").format(_select(schema), sql.Identifier(table), mine)
             counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
         sets = sql.SQL("r.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
-        fractional = conn.execute(
+        found = conn.execute(
             sql.SQL(
-                """select count(*) from result_set r
+                """select coalesce(max(min_scale(v.value)), 0) from result_set r
                    cross join lateral (select v.value from result_value v where v.result_set_k = r.k offset 0) v
-                   where {} and v.value <> trunc(v.value)"""
+                   where {}"""
             ).format(sets)
         ).fetchone()
-        if fractional is not None and fractional[0]:
-            raise ValueError(f"{pipeline}: {fractional[0]:,} fractional values do not fit the package format")
-        for table, rest in (
-            ("result_value", "v.flags, v.value::int8"),
-            ("value_locator", "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1"),
+        places = 0 if found is None else int(found[0])
+        if places > SCALE:
+            raise ValueError(
+                f"{pipeline}: values need {places} decimal places, more than the {SCALE} the package format holds"
+            )
+        for table, rest, schema in (
+            (
+                "result_value",
+                "v.flags, v.value" if places else "v.flags, v.value::int8",
+                {**FACTS["result_value"], "value": pl.Decimal(38, places) if places else I64},
+            ),
+            ("value_locator", "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1", FACTS["value_locator"]),
         ):
             query = sql.SQL(
                 """select r.id::text, (select u.id::text from reporting_unit u where u.k = v.unit_k),
@@ -1579,7 +1663,7 @@ def export(pipeline: str) -> Path:
                    from result_set r cross join lateral (select * from {t} v where v.result_set_k = r.k offset 0) v
                    where {sets}"""
             ).format(rest=sql.SQL(rest), t=sql.Identifier(table), sets=sets)
-            counts[table] = _dump(conn, con, query, FACTS[table], out / f"{table}.parquet")
+            counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
         outside = conn.execute(
             """select c.relname from pg_attribute a join pg_class c on c.oid = a.attrelid
                where c.relnamespace = 'public'::regnamespace and a.attname = 'changeset_id' and not a.attisdropped
@@ -1674,8 +1758,9 @@ class Draft(Changeset):
                 raise ValueError(f"{pipeline} writes {table} columns outside the package format: {unknown}")
             if frame.height == 0:
                 continue
-            if "value" in frame.columns and (frame["value"].cast(pl.Float64) % 1 != 0).any():
-                raise ValueError(f"{pipeline}: {table} has fractional values, which do not fit the package format")
+            if table in FACTS and "value" in frame.columns:
+                frame = frame.with_columns(_numbers(frame["value"]))
+                schema = {**schema, "value": _settle([frame.lazy()], table)}
             defaults = self.defaults.get(table, {})
             frame.select(
                 _column(frame, column, kind, defaults.get(column)) for column, kind in schema.items()
