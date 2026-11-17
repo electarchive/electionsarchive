@@ -1,0 +1,1553 @@
+{
+  "polity": "PY",
+  "name": "Paraguay",
+  "sources": {
+    "constitucion": {
+      "title": "Constitución Nacional de la República del Paraguay (20 de junio de 1992), con la enmienda N.° 1 de 2011, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Official text with errata, pp. 7-111 of the compendium. Art. 118: universal, direct, secret suffrage and proportional representation; arts. 121-122: the legislative referendum; art. 156: departments, municipalities, and districts; art. 157: Asunción a municipality independent of every department; art. 161: a governor and a junta departamental elected in each department with the general elections for five years; art. 167: an intendente and a junta municipal elected directly; art. 187: senators and deputies elected with the President for five years from 1 July; art. 221: at least 80 deputies in departmental colleges, Asunción its own college; art. 223: at least 45 senators in one national constituency; arts. 229-230: President and Vice President on one ticket by simple majority for five years from 15 August, elections 90 to 120 days before the term ends; arts. 251, 262-264: judges named by the Supreme Court from the Consejo de la Magistratura's ternas, two of whose members are lawyers elected by their peers for three years; arts. 289-291: reform by an elected Convención Nacional Constituyente; art. 290: amendments put to a referendum; transitional arts. 3-4: the first general elections under it between 15 April and May 1993. Footnote 46 records enmienda N.° 1 of 17 October 2011 (voters abroad).",
+      "kind": "official_body"
+    },
+    "codigo": {
+      "title": "Ley N.° 834/96 Que establece el Código Electoral Paraguayo, con sus modificaciones, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Pp. 167-267 of the compendium, with the amending laws. Art. 106 (Ley 3166/2007): one roll per electoral district for President, Senate, Chamber, Parlamentarios del Mercosur, governor, junta departamental, intendente, junta municipal, constituent conventioneers, and referendum; art. 107: each municipality an electoral district; art. 154 (Leyes 1830/2001, 1890/2002, 1975/2002): national elections in April or May, municipal elections in October or November thirty months after the general elections, party candidate selection 90-135 days (national) or 90-120 days (municipal) before, an election to fill a vacant vice presidency in the first three years, and elections after a governor or intendente is removed; art. 253: intendentes by simple majority for five years on a separate ballot; arts. 259-265: the legislative referendum (one national constituency, simple majority) and the constitutional referendum within 180 days of an amendment.",
+      "kind": "official_body"
+    },
+    "ley6318": {
+      "title": "Ley N.° 6318/19 Que modifica la Ley N.° 834/96 e incorpora el sistema de listas cerradas, desbloqueadas y de representación proporcional para cargos pluripersonales, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Pp. 396-400 of the compendium. Rewrites arts. 241, 247, 249, 250, and 258 of the Code: constituent conventioneers, senators, deputies (in departmental colleges with Asunción its own), Parlamentarios del Mercosur, and members of the departmental and municipal juntas are elected from closed, unblocked lists by proportional representation, each voter marking one preferred candidate who reorders the list; governors by simple majority.",
+      "kind": "official_body"
+    },
+    "ley426": {
+      "title": "Ley N.° 426/94 Que establece la Carta Orgánica del Gobierno Departamental, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Pp. 112-134 of the compendium. Art. 10: a governor and a junta departamental in each department, elected directly for five years with the general elections, the governor not re-eligible; art. 11 (as amended by art. 343 of Ley 834/96): 7 to 21 junta members by the department's roll, one more per 15,000 registered voters above 35,000.",
+      "kind": "official_body"
+    },
+    "ley3966": {
+      "title": "Ley N.° 3966/10 Orgánica Municipal, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Pp. 272-377 of the compendium. Art. 22: juntas municipales elected directly; art. 24: 24 councillors in Asunción, 12 in departmental capitals and municipalities of the first and second groups, 9 in the third and fourth, with as many substitutes; arts. 57-60: Juntas Comunales de Vecinos in compañías, colonias, and barrios, created by the intendencia, whose authorities are elected under the intendencia's oversight; art. 65: Comisiones Vecinales recognised by the intendencia under municipal ordinances.",
+      "kind": "official_body"
+    },
+    "ley635": {
+      "title": "Ley N.° 635/95 Que reglamenta la Justicia Electoral, en Normativa Electoral Paraguaya, edición 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE), Dirección de Legislación y Compilación",
+      "url": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf",
+      "note": "Pp. 135-161 of the compendium. The Justicia Electoral calls, runs, counts, and judges general, departmental, and municipal elections and popular consultations; it replaced the Junta Electoral Central.",
+      "kind": "official_body"
+    },
+    "resena": {
+      "title": "Reseña informativa: Elecciones Municipales 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE)",
+      "url": "https://www.tsje.gov.py/pdf/resena-informativa-elecciones-municipales-2026.pdf",
+      "note": "The Tribunal's briefing for the municipal elections of 4 October 2026. P. 19: 17 departments and 263 districts including Asunción, a Senate of 45 and a Chamber of 80; p. 26: 263 intendentes and 2,832 junta members (Asunción 24, 150 districts of 12, 112 of 9); p. 71: districts by department (total 263); p. 94: the parties' simultaneous internal elections of 7 June 2026, run by each party's own electoral tribunal with the Tribunal's machines and logistics; Cuadros 16 and 18 (pp. 153-154): intendentes and junta members elected at each municipal election from 1996.",
+      "kind": "official_body"
+    },
+    "numeros": {
+      "title": "Números relevantes: Elecciones Municipales 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE)",
+      "url": "https://www.tsje.gov.py/pdf/numeros-relevantes-municipales-2026.pdf",
+      "note": "Cuadro 1: on 4 October 2026, 263 intendentes, 2,832 junta members, and 2,832 substitutes (5,927 offices), a roll of 5,043,154, and 14,711 polling tables; Gráfico 3: municipal turnout 1996-2021.",
+      "kind": "official_body"
+    },
+    "resultados": {
+      "title": "Resultados de las Elecciones Municipales 2026",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE)",
+      "url": "https://www.tsje.gov.py/resultados-2026",
+      "note": "The Tribunal's 2026 results page with per-table workbooks for intendentes and juntas municipales under https://www.tsje.gov.py/resultados/. The 2026 site serves only this election; the Tribunal's open data portal (datos.tsje.gov.py) and the national portal (datos.gov.py) refused automated connections on 17 November 2026.",
+      "kind": "official_body"
+    },
+    "magistratura": {
+      "title": "Elección de abogados para integrar el Consejo de la Magistratura, período 2026-2029: cronograma electoral",
+      "publisher": "Tribunal Superior de Justicia Electoral (TSJE)",
+      "url": "https://www.tsje.gov.py/consejo-magistratura",
+      "note": "The Tribunal runs the election in which registered lawyers choose their two members of the Consejo de la Magistratura; the 2026 election is on Saturday 28 November 2026, with the roll at padroncm.tsje.gov.py.",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "República del Paraguay",
+      "name_en": "Republic of Paraguay",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "world.country",
+      "source": "constitucion"
+    },
+    {
+      "key": "departamento",
+      "name": "Departamentos",
+      "name_en": "Departments, each with an elected governor and junta departamental (Asunción, the capital, belongs to none and is its own deputies' college)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "py.departamento",
+      "source": "ley426",
+      "counts": [
+        {
+          "date": "2026-10-04",
+          "value": 17,
+          "source": "resena",
+          "locator": "P. 19: \"El territorio nacional está organizado en 17 departamentos, cuya creación, fusión o modificación debe realizarse mediante una ley.\""
+        }
+      ]
+    },
+    {
+      "key": "distrito",
+      "name": "Municipios (distritos)",
+      "name_en": "Municipalities (districts), each with an elected intendente and junta municipal and each an electoral district",
+      "parent": "departamento",
+      "polity_kind": "municipality",
+      "scheme": "py.distrito",
+      "source": "ley3966",
+      "counts": [
+        {
+          "date": "2026-10-04",
+          "value": 263,
+          "source": "resena",
+          "locator": "P. 19: \"Actualmente, el país cuenta con 263 distritos, incluida la ciudad de Asunción.\" P. 71, Cuadro 1 (Oficinas del Registro Electoral) totals 263 districts by department."
+        },
+        {
+          "date": "2026-10-04",
+          "value": 263,
+          "source": "numeros",
+          "locator": "Cuadro 1 (Numeralia electoral): \"El 04 de octubre de 2026 se elige: 263 Intendentes\"."
+        }
+      ]
+    },
+    {
+      "key": "compania_barrio",
+      "name": "Compañías, colonias y barrios",
+      "name_en": "Rural companies, settlements, and urban neighborhoods, where Juntas Comunales de Vecinos and Comisiones Vecinales sit",
+      "parent": "distrito",
+      "polity_kind": "submunicipal",
+      "elects": true,
+      "source": "ley3966"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presidente",
+      "tier": "national",
+      "name": "Presidente y Vicepresidente de la República",
+      "name_en": "President and Vice President of the Republic, elected on one ticket",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "py.departamento",
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "finest_note": "The Tribunal has published general-election results by department, district, and polling table; no file for a general election was reachable from this check.",
+      "source": "constitucion",
+      "valid_from": "1992-06-20",
+      "first_held": "1993-05-09",
+      "earliest_record": "1993-05-09",
+      "est_votes": 15000000,
+      "effort": 3,
+      "note": "Elected on one ticket by simple majority with no runoff for a single five-year term from 15 August (Constitution arts. 229-230). Paraguayans abroad vote since the 2011 amendment. Elections under the 1870, 1940, and 1967 constitutions are in presidente_historico.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "PY",
+          "valid_from": "1992-06-20"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "1992-06-20",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Constitution arts. 161, 187, 229-230; Código Electoral art. 154)",
+          "runoff": "none",
+          "runoff_rule": "Simple majority of votes; no runoff (Constitution art. 230)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1993-05-09",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Presidential results by department, district, and polling table. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-09",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Transitional art. 4: \"La próxima elección para designar Presidente de la República, Vicepresidente, senadores y diputados, gobernadores y miembros de las juntas departamentales se realizará simultáneamente [...] en el lapso comprendido entre el 15 de abril y mayo de 1993.\""
+        },
+        {
+          "date": "1998-05-10",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2008-04-20",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Constitution art. 230: \"El Presidente de la República y el Vicepresidente serán elegidos conjunta y directamente por el pueblo, por mayoría simple de votos, en comicios generales que se realizarán entre noventa y ciento veinte días antes de expirar el periodo constitucional vigente.\""
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "vicepresidente",
+      "tier": "national",
+      "name": "Elección para cubrir la vacancia de la Vicepresidencia de la República",
+      "name_en": "Election to fill a vacant vice presidency",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "py.departamento",
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "codigo",
+      "valid_from": "1992-06-20",
+      "first_held": "2000-08-13",
+      "earliest_record": "2000-08-13",
+      "est_votes": 1300000,
+      "effort": 3,
+      "note": "When the vice presidency falls vacant in the first three years of the term, an election fills it within 120 days of being called (Código Electoral art. 154). Held once, on 13 August 2000, after Vice President Luis María Argaña was killed in 1999.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "iso_pattern": "PY",
+          "name_pattern": "Vicepresiden|Vice President"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2000-08-13",
+          "last_date": "2000-08-13",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "The 2000 vice-presidential election. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-08-13",
+          "contests": 1,
+          "source": "codigo",
+          "quote": "Art. 154: \"Si se produjera la vacancia definitiva de la Vicepresidencia de la República durante los tres primeros años del período constitucional, se convocará a elecciones para cubrirla dentro de los treinta días de producida y la elección se realizará dentro de los ciento veinte días posteriores a la convocatoria.\""
+        }
+      ]
+    },
+    {
+      "key": "senado",
+      "tier": "national",
+      "name": "Cámara de Senadores",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "py.departamento",
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "constitucion",
+      "valid_from": "1992-06-20",
+      "first_held": "1993-05-09",
+      "earliest_record": "1993-05-09",
+      "est_votes": 14000000,
+      "effort": 3,
+      "note": "45 senators and 30 substitutes in one national constituency, by D'Hondt from closed lists; from the 2023 election the lists are unblocked, each voter marking one preferred candidate (Ley 6318/19). Elected with the President for five years from 1 July (Constitution arts. 187, 223). Former presidents sit for life without a vote (art. 189) and are not elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "PY",
+          "valid_from": "1992-06-20"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "1992-06-20",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Constitution arts. 161, 187, 229-230; Código Electoral art. 154)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1993-05-09",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Senate list and preference votes. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-09",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Transitional art. 4: \"La próxima elección para designar Presidente de la República, Vicepresidente, senadores y diputados, gobernadores y miembros de las juntas departamentales se realizará simultáneamente [...] en el lapso comprendido entre el 15 de abril y mayo de 1993.\""
+        },
+        {
+          "date": "1998-05-10",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2008-04-20",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 1,
+          "seats": 45,
+          "source": "constitucion",
+          "quote": "Constitution art. 223: \"La Cámara de Senadores se compondrá de cuarenta y cinco miembros titulares como mínimo, y de treinta suplentes, elegidos directamente por el pueblo en una sola circunscripción nacional.\""
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "diputados",
+      "tier": "national",
+      "name": "Cámara de Diputados",
+      "name_en": "Chamber of Deputies",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "py.departamento"
+        ],
+        "fine": [
+          "py.distrito",
+          "py.mesa"
+        ]
+      },
+      "source": "constitucion",
+      "valid_from": "1992-06-20",
+      "first_held": "1993-05-09",
+      "earliest_record": "1993-05-09",
+      "est_votes": 14000000,
+      "effort": 3,
+      "note": "80 deputies and as many substitutes in 18 colleges (the 17 departments and Asunción), seats set by the Tribunal before each election from each college's roll, at least one per department; D'Hondt from closed lists, unblocked from 2023 (Constitution art. 221; Código art. 247 as rewritten by Ley 6318/19).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "PY",
+          "valid_from": "1992-06-20"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "1992-06-20",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Constitution arts. 161, 187, 229-230; Código Electoral art. 154)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1993-05-09",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Chamber list and preference votes by college. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-09",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Transitional art. 4: \"La próxima elección para designar Presidente de la República, Vicepresidente, senadores y diputados, gobernadores y miembros de las juntas departamentales se realizará simultáneamente [...] en el lapso comprendido entre el 15 de abril y mayo de 1993.\""
+        },
+        {
+          "date": "1998-05-10",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2008-04-20",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 18,
+          "seats": 80,
+          "source": "constitucion",
+          "quote": "Constitution art. 221: \"Se compondrá de ochenta miembros titulares como mínimo [...] elegidos directamente por el pueblo en colegios electorales departamentales. La ciudad de la Asunción constituirá un Colegio Electoral con representación en dicha Cámara.\" Seventeen departments and Asunción make 18 colleges."
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "parlasur",
+      "tier": "national",
+      "name": "Parlamentarios del Mercosur",
+      "name_en": "Members of the Mercosur Parliament (Parlasur)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "py.departamento",
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "codigo",
+      "valid_from": "2007-01-01",
+      "first_held": "2008-04-20",
+      "earliest_record": "2008-04-20",
+      "est_votes": 9000000,
+      "effort": 3,
+      "note": "Paraguay's 18 members and their substitutes are elected directly in one national constituency with the general elections, from 2008, by D'Hondt from closed lists, unblocked from 2023 (Código arts. 106 and 247 as amended by Leyes 3166/2007 and 6318/19).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "PY",
+          "name_pattern": "Mercosur|Parlasur"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "2007-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral arts. 106, 154, 247)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2008-04-20",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Parlasur list votes. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-04-20",
+          "contests": 1,
+          "seats": 18,
+          "source": "ley6318",
+          "quote": "Código art. 247 as rewritten: \"Los parlamentarios del Mercosur serán electos por el sistema de listas cerradas, desbloqueadas y de representación proporcional\"."
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 1,
+          "seats": 18,
+          "source": "ley6318",
+          "quote": "Código art. 247 as rewritten: \"Los parlamentarios del Mercosur serán electos por el sistema de listas cerradas, desbloqueadas y de representación proporcional\"."
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 1,
+          "seats": 18,
+          "source": "ley6318",
+          "quote": "Código art. 247 as rewritten: \"Los parlamentarios del Mercosur serán electos por el sistema de listas cerradas, desbloqueadas y de representación proporcional\"."
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 1,
+          "seats": 18,
+          "source": "ley6318",
+          "quote": "Código art. 247 as rewritten: \"Los parlamentarios del Mercosur serán electos por el sistema de listas cerradas, desbloqueadas y de representación proporcional\"."
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "gobernador",
+      "tier": "departamento",
+      "name": "Gobernadores departamentales",
+      "name_en": "Departmental governors",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "py.departamento"
+        ],
+        "fine": [
+          "py.distrito",
+          "py.mesa"
+        ]
+      },
+      "source": "constitucion",
+      "valid_from": "1992-06-20",
+      "first_held": "1993-05-09",
+      "earliest_record": "1993-05-09",
+      "est_votes": 13000000,
+      "effort": 3,
+      "note": "One governor per department (17), by simple majority, with the general elections, for five years, not re-eligible (Constitution art. 161; Ley 426/94 art. 10; Código art. 249). When a governor leaves office the junta departamental elects a replacement from its members; a removed governor is replaced by election (Código art. 154).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "PY*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "1992-06-20",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Constitution arts. 161, 187, 229-230; Código Electoral art. 154)",
+          "runoff": "none",
+          "runoff_rule": "Simple majority (Código art. 249)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1993-05-09",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Governor results by department and district. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-09",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Transitional art. 4: \"La próxima elección para designar Presidente de la República, Vicepresidente, senadores y diputados, gobernadores y miembros de las juntas departamentales se realizará simultáneamente [...] en el lapso comprendido entre el 15 de abril y mayo de 1993.\""
+        },
+        {
+          "date": "1998-05-10",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2008-04-20",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 17,
+          "seats": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "junta_departamental",
+      "tier": "departamento",
+      "name": "Juntas departamentales",
+      "name_en": "Departmental councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "py.departamento"
+        ],
+        "fine": [
+          "py.distrito",
+          "py.mesa"
+        ]
+      },
+      "source": "ley426",
+      "valid_from": "1992-06-20",
+      "first_held": "1993-05-09",
+      "earliest_record": "1993-05-09",
+      "est_votes": 13000000,
+      "effort": 3,
+      "note": "7 to 21 members and as many substitutes per department by its roll (Ley 426/94 art. 11), on a separate ballot by D'Hondt from closed lists, unblocked from 2023 (Código art. 249 as rewritten by Ley 6318/19), with the general elections for five years.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "PY*",
+          "schemes": [
+            "py.departamento"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 3,
+          "day_rule": "apr_or_may_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral (the Junta Electoral Central in 1993)",
+          "valid_from": "1992-06-20",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Constitution arts. 161, 187, 229-230; Código Electoral art. 154)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1993-05-09",
+          "last_date": "2023-04-30",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Junta departamental list votes by department. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-05-09",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Transitional art. 4: \"La próxima elección para designar Presidente de la República, Vicepresidente, senadores y diputados, gobernadores y miembros de las juntas departamentales se realizará simultáneamente [...] en el lapso comprendido entre el 15 de abril y mayo de 1993.\""
+        },
+        {
+          "date": "1998-05-10",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2003-04-27",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2008-04-20",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2013-04-21",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2018-04-22",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2023-04-30",
+          "contests": 17,
+          "source": "constitucion",
+          "quote": "Constitution art. 161: \"El gobierno de cada departamento será ejercido por un gobernador y por una junta departamental. Serán electos por voto directo de los ciudadanos radicados en los respectivos departamentos, en comicios coincidentes con las elecciones generales, y durarán cinco años en sus funciones.\""
+        },
+        {
+          "date": "2028-04-01",
+          "precision": "month",
+          "note": "Next due in April or May 2028 (Código Electoral art. 154)."
+        }
+      ]
+    },
+    {
+      "key": "intendente",
+      "tier": "distrito",
+      "name": "Intendentes municipales",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "codigo",
+      "valid_from": "1990-01-01",
+      "first_held": "1991-05-26",
+      "earliest_record": "1996-11-17",
+      "est_votes": 14000000,
+      "effort": 2,
+      "note": "One per municipality, by simple majority on a separate ballot, for five years, re-eligible once (Constitution art. 167; Código art. 253). Appointed by the executive under the 1967 Constitution; first elected on 26 May 1991 under the 1990 electoral code. A removed intendente is replaced by election (Código art. 154). Counts are the Tribunal's intendentes elected at each election.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "PY*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 1,
+          "day_rule": "oct_or_nov_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "1996-01-01",
+          "valid_to": "2010-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154; Ley 834/96 transitional art. 13: municipal elections in 1996)",
+          "runoff": "none",
+          "runoff_rule": "Simple majority (Código art. 253)."
+        },
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 0,
+          "day_rule": "oct_or_nov_sunday_30_months_after_general",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "2010-01-01",
+          "valid_to": "2021-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154 as amended by Leyes 1830/2001, 1890/2002, and 1975/2002)",
+          "runoff": "none",
+          "runoff_rule": "Simple majority (Código art. 253)."
+        },
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 1,
+          "day_rule": "oct_or_nov_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "2021-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154; the 2020 elections were held on 10 October 2021 and the next on 4 October 2026)",
+          "runoff": "none",
+          "runoff_rule": "Simple majority (Código art. 253)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE results page and per-table workbooks (www.tsje.gov.py/resultados-2026)",
+          "url": "https://www.tsje.gov.py/resultados/resultado-muni-2026-{intendentes,junta-municipal}.xlsx",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2026-10-04",
+          "last_date": "2026-10-04",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Per-table votes for every list and candidate, and files of the elected, for the 4 October 2026 municipal elections; the archive holds them (py.tsje)"
+        },
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1996-11-17",
+          "last_date": "2021-10-10",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Municipal results 1996-2021. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-05-26",
+          "note": "First direct election of intendentes, under the Junta Electoral Central; not yet counted."
+        },
+        {
+          "date": "1996-11-17",
+          "precision": "day",
+          "contests": 221,
+          "seats": 221,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 1996: 221 intendentes electos"
+        },
+        {
+          "date": "2001-11-18",
+          "precision": "day",
+          "contests": 220,
+          "seats": 220,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 2001: 220 intendentes electos"
+        },
+        {
+          "date": "2006-11-01",
+          "precision": "month",
+          "contests": 230,
+          "seats": 230,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 2006: 230 intendentes electos"
+        },
+        {
+          "date": "2010-11-07",
+          "precision": "day",
+          "contests": 238,
+          "seats": 238,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 2010: 238 intendentes electos"
+        },
+        {
+          "date": "2015-11-15",
+          "precision": "day",
+          "contests": 250,
+          "seats": 250,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 2015: 250 intendentes electos"
+        },
+        {
+          "date": "2021-10-10",
+          "precision": "day",
+          "contests": 261,
+          "seats": 261,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 2021: 261 intendentes electos"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 263,
+          "seats": 263,
+          "source": "numeros",
+          "quote": "Cuadro 1: \"El 04 de octubre de 2026 se elige: 263 Intendentes\"."
+        },
+        {
+          "date": "2031-10-01",
+          "precision": "month",
+          "note": "Next due in October or November 2031."
+        }
+      ]
+    },
+    {
+      "key": "junta_municipal",
+      "tier": "distrito",
+      "name": "Juntas municipales",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "ley3966",
+      "valid_from": "1990-01-01",
+      "first_held": "1991-05-26",
+      "earliest_record": "1996-11-17",
+      "est_votes": 14000000,
+      "effort": 3,
+      "note": "24 councillors in Asunción, 12 in departmental capitals and first- and second-group municipalities, 9 elsewhere, with as many substitutes (Ley 3966/10 art. 24), by D'Hondt from closed lists, unblocked with one preference vote from 2021 (Ley 6318/19), for five years. Juntas also sat under the 1967 Constitution; those elections are in the span row. Contests are one per municipality; seats are the Tribunal's councillors elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "PY*",
+          "schemes": [
+            "py.distrito"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 1,
+          "day_rule": "oct_or_nov_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "1996-01-01",
+          "valid_to": "2010-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154; Ley 834/96 transitional art. 13: municipal elections in 1996)"
+        },
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 0,
+          "day_rule": "oct_or_nov_sunday_30_months_after_general",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "2010-01-01",
+          "valid_to": "2021-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154 as amended by Leyes 1830/2001, 1890/2002, and 1975/2002)"
+        },
+        {
+          "source": "codigo",
+          "period_years": 5,
+          "phase": 1,
+          "day_rule": "oct_or_nov_sunday_set_by_tsje",
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Tribunal Superior de Justicia Electoral",
+          "valid_from": "2021-01-01",
+          "locator": "https://www.tsje.gov.py/pdf/Normativa_Electoral_Paraguaya_2026.pdf (Código Electoral art. 154; the 2020 elections were held on 10 October 2021 and the next on 4 October 2026)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE results page and per-table workbooks (www.tsje.gov.py/resultados-2026)",
+          "url": "https://www.tsje.gov.py/resultados/resultado-muni-2026-{intendentes,junta-municipal}.xlsx",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-17",
+          "license": "none stated",
+          "first_date": "2026-10-04",
+          "last_date": "2026-10-04",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Per-table votes for every list and candidate, and files of the elected, for the 4 October 2026 municipal elections; the archive holds them (py.tsje)"
+        },
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "1996-11-17",
+          "last_date": "2021-10-10",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "Municipal results 1996-2021. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "through": "1990-12-31",
+          "note": "Junta elections under the 1967 Constitution and before are not yet listed; this class starts with the 1990 electoral code."
+        },
+        {
+          "date": "1991-05-26",
+          "note": "Municipal elections under the Junta Electoral Central; not yet counted."
+        },
+        {
+          "date": "1996-11-17",
+          "precision": "day",
+          "contests": 221,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 16 (Histórico de candidaturas y electos a intendente): 1996: 221 intendentes electos"
+        },
+        {
+          "date": "2001-11-18",
+          "precision": "day",
+          "contests": 220,
+          "seats": 2238,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 18 (Histórico de candidaturas y electos a miembros de Junta Municipal): 2.238 miembros de junta electos"
+        },
+        {
+          "date": "2006-11-01",
+          "precision": "month",
+          "contests": 230,
+          "seats": 2475,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 18 (Histórico de candidaturas y electos a miembros de Junta Municipal): 2.475 miembros de junta electos"
+        },
+        {
+          "date": "2010-11-07",
+          "precision": "day",
+          "contests": 238,
+          "seats": 2529,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 18 (Histórico de candidaturas y electos a miembros de Junta Municipal): 2.529 miembros de junta electos"
+        },
+        {
+          "date": "2015-11-15",
+          "precision": "day",
+          "contests": 250,
+          "seats": 2640,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 18 (Histórico de candidaturas y electos a miembros de Junta Municipal): 2.640 miembros de junta electos"
+        },
+        {
+          "date": "2021-10-10",
+          "precision": "day",
+          "contests": 261,
+          "seats": 2781,
+          "source": "resena",
+          "quote": "Reseña 2026, Cuadro 18 (Histórico de candidaturas y electos a miembros de Junta Municipal): 2.781 miembros de junta electos"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 263,
+          "seats": 2832,
+          "source": "numeros",
+          "quote": "Cuadro 1: \"El 04 de octubre de 2026 se elige: 263 Intendentes, 2.832 Miembros Titulares de Junta Municipal, 2.832 Miembros Suplentes de Junta Municipal\"."
+        },
+        {
+          "date": "2031-10-01",
+          "precision": "month",
+          "note": "Next due in October or November 2031."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referéndum",
+      "name_en": "Referendums: constitutional (on amendments) and legislative (called by law)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "py.departamento",
+          "py.distrito"
+        ],
+        "fine": [
+          "py.mesa"
+        ]
+      },
+      "source": "codigo",
+      "valid_from": "1992-06-20",
+      "first_held": "2011-10-09",
+      "earliest_record": "2011-10-09",
+      "est_votes": 500000,
+      "effort": 2,
+      "note": "A constitutional referendum follows every amendment the Congress passes (Constitution art. 290; Código art. 265); a legislative referendum, binding or consultative, is called by law at the request of the executive, five senators, or ten deputies, in one national constituency (arts. 121-122; Código arts. 259-262). The only one held is the referendum of 9 October 2011 on enmienda N.° 1 (voting by Paraguayans abroad), approved and promulgated on 17 October 2011.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "PY"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE open data portal (datos.tsje.gov.py)",
+          "url": "https://datos.tsje.gov.py/",
+          "format": "csv, xlsx (per the portal's former listings; not reachable to confirm)",
+          "access": "blocked",
+          "checked_at": "2026-11-17",
+          "first_date": "2011-10-09",
+          "last_date": "2011-10-09",
+          "finest": "py.mesa",
+          "source": "resultados",
+          "evidence": "The 2011 referendum. The Tribunal's 2026 site serves only the 2026 municipal results, and its open data portal (datos.tsje.gov.py) refused this check."
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-10-09",
+          "contests": 1,
+          "source": "constitucion",
+          "quote": "Footnote 46 to art. 120: \"Modificado por enmienda constitucional N.° 1, del 17/10/2011.\" Art. 290: the amendment is sent to the Tribunal \"para que, dentro del plazo de ciento ochenta días, se convoque a un referéndum.\""
+        }
+      ]
+    },
+    {
+      "key": "convencion_constituyente",
+      "tier": "national",
+      "name": "Convención Nacional Constituyente",
+      "name_en": "National Constituent Convention",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "valid_from": "1870-01-01",
+      "first_held": "1991-12-01",
+      "earliest_record": "1991-12-01",
+      "est_votes": 1200000,
+      "effort": 4,
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of the 1991 or earlier conventions' results is online: the Tribunal's site begins with 2026 and its open data portal refused this check; the 1991 election was run by the Junta Electoral Central before the Tribunal existed.",
+      "note": "Elected only to reform the Constitution, with no more members than the Congress, by proportional representation (Constitution arts. 289-291; Código art. 241). The convention elected on 1 December 1991 wrote the 1992 Constitution; earlier conventions wrote or amended the charters of 1870, 1967, and 1977. None has been elected since.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "PY"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1870-01-01",
+          "precision": "year",
+          "through": "1977-12-31",
+          "note": "Constituent conventions of 1870, 1967, and 1977; not yet listed."
+        },
+        {
+          "date": "1991-12-01",
+          "note": "The convention that wrote the 1992 Constitution; not yet counted."
+        }
+      ]
+    },
+    {
+      "key": "consejo_magistratura_abogados",
+      "tier": "national",
+      "name": "Elección de abogados para el Consejo de la Magistratura",
+      "name_en": "Lawyers' election of their two members of the Council of the Magistracy",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "valid_from": "1992-06-20",
+      "est_votes": 60000,
+      "effort": 3,
+      "disposition": "blocked",
+      "disposition_reason": "The Tribunal runs it and posts the 2026 calendar and roll, but no results of past lawyers' elections were found on its site, and its open data portal refused this check.",
+      "note": "Registered lawyers elect two of the Consejo's eight members by direct vote for three years (Constitution arts. 262-263); the Tribunal runs the election. The 2026-2029 election is on Saturday 28 November 2026. The two law professors on the Consejo are elected by their peers in the faculties (consejo_magistratura_profesores).",
+      "match": [
+        {
+          "iso_pattern": "PY",
+          "name_pattern": "Consejo de la Magistratura|Council of the Magistracy"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TSJE Consejo de la Magistratura page",
+          "url": "https://www.tsje.gov.py/consejo-magistratura",
+          "format": "html, pdf (calendar); roll lookup at padroncm.tsje.gov.py",
+          "access": "none",
+          "checked_at": "2026-11-17",
+          "source": "magistratura",
+          "evidence": "The page lists the 2026 calendar and links the roll; it publishes no results"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "through": "2023-12-31",
+          "note": "Lawyers' elections every three years since the Consejo was set up; not yet listed."
+        },
+        {
+          "date": "2026-11-28",
+          "contests": 1,
+          "seats": 2,
+          "source": "magistratura",
+          "quote": "\"El sábado 28 de noviembre de 2026, desde las 07:00 horas hasta las 17:00 horas, los abogados habilitados elegirán a sus representantes para integrar el Consejo de la Magistratura\"."
+        }
+      ]
+    },
+    {
+      "key": "consejo_magistratura_profesores",
+      "tier": "national",
+      "name": "Profesores de Derecho en el Consejo de la Magistratura",
+      "name_en": "Law professors elected by their peers to the Council of the Magistracy",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {},
+      "source": "constitucion",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the law faculty professors of the Universidad Nacional and of the private universities (Constitution art. 262), within the universities and not on the Tribunal's rolls; the Tribunal's 2026 calendar covers only the lawyers' election."
+    },
+    {
+      "key": "internas_partidarias",
+      "tier": "national",
+      "name": "Elecciones internas simultáneas de partidos, movimientos y concertaciones",
+      "name_en": "Parties' simultaneous internal elections choosing candidates and party authorities",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {},
+      "source": "resena",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run, counted, and proclaimed by each party's own electoral tribunal (Reseña 2026, p. 94; Código art. 154); the Tribunal only lends machines, materials, delegates, and preliminary transmission, so it does not declare the results."
+    },
+    {
+      "key": "junta_comunal_vecinos",
+      "tier": "compania_barrio",
+      "name": "Juntas Comunales de Vecinos y Comisiones Vecinales",
+      "name_en": "Neighborhood boards in compañías, colonias, and barrios",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {},
+      "source": "ley3966",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Auxiliary bodies the intendencia creates or recognises, whose authorities residents elect under the intendencia's oversight or under municipal ordinances (Ley 3966/10 arts. 57-60, 65); not run by the Tribunal and published by no official body."
+    },
+    {
+      "key": "magistrados",
+      "tier": "national",
+      "name": "Ministros de la Corte Suprema, jueces y ministros del Tribunal Superior de Justicia Electoral",
+      "name_en": "Supreme Court and electoral court justices and judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {},
+      "source": "constitucion",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed, not elected by voters: judges by the Supreme Court from the Consejo de la Magistratura's ternas (Constitution art. 251), and Supreme Court and electoral justices by the Senate with the executive's agreement from such ternas (arts. 264, 275)."
+    },
+    {
+      "key": "segundo_grado",
+      "tier": "national",
+      "name": "Designaciones del Congreso y de las juntas",
+      "name_en": "Officers chosen by other organs (Fiscal General, Defensor del Pueblo, Contralor, and the junta member who completes a governor's term)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "constitucion",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the executive with the Senate's agreement (Fiscal General, art. 269), by the Chamber of Deputies (Defensor del Pueblo, art. 277; Contralor, art. 281), or by the junta departamental from its members (a governor's vacancy, Código art. 154), not by voters."
+    },
+    {
+      "key": "intendente_designado",
+      "tier": "distrito",
+      "name": "Intendentes designados por el Poder Ejecutivo",
+      "name_en": "Mayors appointed by the executive before 1991",
+      "category": "executive",
+      "goal": "local",
+      "measure": {},
+      "source": "codigo",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the executive under the 1967 Constitution and earlier, not elected; abolished by the 1990 electoral code and the 1992 Constitution (art. 167).",
+      "valid_to": "1991-05-26"
+    },
+    {
+      "key": "presidente_historico",
+      "tier": "national",
+      "name": "Presidente de la República (constituciones de 1870, 1940 y 1967)",
+      "name_en": "President of the Republic under the 1870, 1940, and 1967 constitutions",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "valid_from": "1870-11-25",
+      "valid_to": "1992-06-20",
+      "est_votes": 6000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of these results is online: the Tribunal, created in 1995, publishes none of the Junta Electoral Central's results on its site, and its open data portal refused this check.",
+      "note": "Chosen by electors under the 1870 Constitution and directly under those of 1940 and 1967, for five years; the last such election, on 1 May 1989, followed the 1989 coup.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "PY",
+          "valid_to": "1992-06-20"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1870-01-01",
+          "precision": "year",
+          "through": "1988-12-31",
+          "note": "Presidential elections under the constitutions of 1870, 1940, and 1967; not yet listed."
+        },
+        {
+          "date": "1989-05-01",
+          "note": "General election of 1 May 1989 under the 1967 Constitution; not yet counted."
+        }
+      ]
+    },
+    {
+      "key": "congreso_historico",
+      "tier": "national",
+      "name": "Congreso, Cámara de Representantes y Cámaras de Senadores y Diputados (1870-1992)",
+      "name_en": "The legislature under the 1870, 1940, and 1967 constitutions",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitucion",
+      "valid_from": "1870-11-25",
+      "valid_to": "1992-06-20",
+      "est_votes": 6000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No official publication of these results is online: the Tribunal, created in 1995, publishes none of the Junta Electoral Central's results on its site, and its open data portal refused this check.",
+      "note": "A bicameral Congress under the 1870 Constitution, a single Cámara de Representantes under the 1940 charter, and a Senate and Chamber under the 1967 Constitution, whose winning party took two thirds of the seats; transitional art. 3 of the 1992 Constitution kept the Congress elected in 1989 until 1993.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house",
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "PY",
+          "valid_to": "1992-06-20"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1870-01-01",
+          "precision": "year",
+          "through": "1988-12-31",
+          "note": "Legislative elections under the constitutions of 1870, 1940, and 1967; not yet listed."
+        },
+        {
+          "date": "1989-05-01",
+          "note": "Senate and Chamber elected on 1 May 1989 under the 1967 Constitution; not yet counted."
+        }
+      ]
+    }
+  ]
+}
