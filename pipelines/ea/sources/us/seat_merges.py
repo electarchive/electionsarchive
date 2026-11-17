@@ -11,11 +11,13 @@ from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import connect
 
 SOURCE = "us.seat_merges"
-VERSION = "3"
+VERSION = "4"
 NEAR = 12 * 366
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 STRONG = ("bioguide", "wikidata", "fec.candidate")
-LOCAL = r"^[0-9-]+:(alged:|[A-Z]{2}:[0-9]{4,}:)"
+# Local tails, plus every state legislative, congressional, and statewide tail (the seat key without its date). President
+# is left out: a father and son can share a ballot name there (George Bush, George W. Bush) within the window.
+LOCAL = r"^[0-9-]+:(alged:|[A-Z]{2}:[0-9]{4,}:|[A-Z]{2}:(?!(president|question)(:|$))[a-z])"
 PLACEHOLDERS = re.compile(
     r"write|scatter|blank|\bover|\bunder|vacan|none of|no candidate|total|^yes$|^no$|uncommitted|^other"
 )
@@ -170,7 +172,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "People that two or more pipelines recorded apart on the same local seat (the same contest key "
+                "People that two or more pipelines recorded apart on the same local or state seat (the same contest key "
                 "without its date) joined into one person where their names share a surname and suffix, their "
                 "first and middle names agree (ignoring case, accents, punctuation, and spaces, a common nickname such as "
                 "Bill for William, a name printed as its initial, or a short form three or more letters shorter), they ran within 12 "
