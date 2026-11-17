@@ -148,10 +148,10 @@ def emit() -> Path:
             if hit:
                 for pf in ids:
                     candidates[pf][hit[0]].add(("parlgov", value))
-        pf_of: dict[UUID, set[str]] = defaultdict(set)
+        items_of: dict[UUID, set[str]] = defaultdict(set)
         for pf, entities in candidates.items():
             if len(entities) == 1:
-                pf_of[next(iter(entities))].add(pf)
+                items_of[next(iter(entities))].update(item for _, item, _ in routes.get(pf, ()))
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -196,9 +196,6 @@ def emit() -> Path:
                 skipped.append((pf, "several parties", ",".join(str(e) for e in entities)))
                 continue
             entity, how = next(iter(entities.items()))
-            if len(pf_of[entity]) != 1:
-                skipped.append((pf, "party has several Party Facts IDs", str(entity)))
-                continue
             if pf in known:
                 continue
             cs.add("external_id", entity_id=entity, scheme="partyfacts", value=pf)
@@ -211,8 +208,9 @@ def emit() -> Path:
                 )
             report.append((pf, str(entity), "+".join(sorted({r for r, _ in how}))))
             if entity not in linked and "wikidata" not in {r for r, _ in how}:
-                items = {item for _, item, _ in routes.get(pf, ())}
+                items = items_of[entity]
                 if len(items) == 1 and (item := next(iter(items))) not in by_item:
+                    linked.add(entity)
                     cs.add("external_id", entity_id=entity, scheme="wikidata", value=item)
                     cs.add(
                         "citation",
