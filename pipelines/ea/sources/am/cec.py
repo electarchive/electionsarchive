@@ -49,6 +49,8 @@ class Election:
     info: str  # the information table, relative to DOCS
     names: tuple[str, str]  # English, Armenian
     options: tuple[tuple[int, str], ...] = ()  # column in the information table and label, where the export has none
+    protocol: str = ""  # the protocol registering the elected deputies, relative to DOCS
+    seats: tuple[tuple[str, int], ...] = ()  # list seats each ballot label won, as the protocol registers them
 
 
 ELECTIONS = [
@@ -73,6 +75,15 @@ ELECTIONS = [
         24104,
         "doc/resultarm06.05.12.xls",
         ("2012 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2012"),
+        protocol="doc/290512v.pdf",
+        seats=(
+            ("ՀԱՅԱՍՏԱՆԻ ՀԱՆՐԱՊԵՏԱԿԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 40),
+            ("ԲԱՐԳԱՎԱՃ ՀԱՅԱՍՏԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 28),
+            ("ՀԱՅ ԱԶԳԱՅԻՆ ԿՈՆԳՐԵՍ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆՆԵՐԻ ԴԱՇԻՆՔ", 7),
+            ("ՀԱՅ ՅԵՂԱՓՈԽԱԿԱՆ ԴԱՇՆԱԿՑՈՒԹՅՈՒՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 5),
+            ("ԺԱՌԱՆԳՈՒԹՅՈՒՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 5),
+            ("ՕՐԻՆԱՑ ԵՐԿԻՐ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 5),
+        ),
     ),
     Election(
         date(2013, 2, 18),
@@ -96,6 +107,13 @@ ELECTIONS = [
         27339,
         "doc/resultarm02.04.17v.xlsx",
         ("2017 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2017"),
+        protocol="doc/030517v.pdf",
+        seats=(
+            ("ՀԱՅԱՍՏԱՆԻ ՀԱՆՐԱՊԵՏԱԿԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 58),
+            ("«ԾԱՌՈՒԿՅԱՆ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆՆԵՐԻ ԴԱՇԻՆՔ", 31),
+            ("«ԵԼՔ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆՆԵՐԻ ԴԱՇԻՆՔ", 9),
+            ("«ՀԱՅ ՅԵՂԱՓՈԽԱԿԱՆ ԴԱՇՆԱԿՑՈՒԹՅՈՒՆ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 7),
+        ),
     ),
     Election(
         date(2018, 12, 9),
@@ -103,6 +121,12 @@ ELECTIONS = [
         27576,
         "doc/resultarm09.12.18v.xlsx",
         ("2018 Armenian early parliamentary election", "Ազգային ժողովի արտահերթ ընտրություններ, 2018"),
+        protocol="doc/04.01.19v.pdf",
+        seats=(
+            ("ԻՄ ՔԱՅԼԸ ԴԱՇԻՆՔ", 88),
+            ("«ԲԱՐԳԱՎԱՃ ՀԱՅԱՍՏԱՆ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 26),
+            ("«ԼՈՒՍԱՎՈՐ ՀԱՅԱՍՏԱՆ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 18),
+        ),
     ),
     Election(
         date(2021, 6, 20),
@@ -110,6 +134,12 @@ ELECTIONS = [
         27697,
         "doc/resultsarm20.06.21v.xlsx",
         ("2021 Armenian early parliamentary election", "Ազգային ժողովի արտահերթ ընտրություններ, 2021"),
+        protocol="doc/protocol22.07.21.pdf",
+        seats=(
+            ("«ՔԱՂԱՔԱՑԻԱԿԱՆ ՊԱՅՄԱՆԱԳԻՐ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 71),
+            ("ՀԱՅԱՍՏԱՆ ԴԱՇԻՆՔ", 29),
+            ("«ՊԱՏԻՎ ՈՒՆԵՄ» ԴԱՇԻՆՔ", 7),
+        ),
     ),
     Election(
         date(2026, 6, 7),
@@ -117,6 +147,12 @@ ELECTIONS = [
         28826,
         "forGenerals/NA2026/resultsarm07.06.26v_14-06-2026.xlsx",
         ("2026 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2026"),
+        protocol="Decisions/0-2026/21.07.26/protocol1_21-07-2026.pdf",
+        seats=(
+            ("«ՔԱՂԱՔԱՑԻԱԿԱՆ ՊԱՅՄԱՆԱԳԻՐ» ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 64),
+            ("ՈՒԺԵՂ ՀԱՅԱՍՏԱՆ ԴԱՇԻՆՔ", 29),
+            ("ՀԱՅԱՍՏԱՆ ԴԱՇԻՆՔ", 12),
+        ),
     ),
 ]
 
@@ -159,6 +195,10 @@ def info_url(e: Election) -> str:
     return f"{DOCS}/{e.info}"
 
 
+def protocol_url(e: Election) -> str:
+    return f"{DOCS}/{e.protocol}"
+
+
 def page_url(e: Election) -> str:
     section = {
         "parliament": "Elections/ParliamentaryProportional",
@@ -173,7 +213,13 @@ def package_key(e: Election) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e) for e in ELECTIONS), *(old_key(o) for o in OLD)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(package_key(e) for e in ELECTIONS),
+        *(early_key(d) for d in EARLY),
+        *(old_key(o) for o in OLD),
+    ]
 
 
 def fetch() -> None:
@@ -181,9 +227,11 @@ def fetch() -> None:
         raw.fetch(SOURCE, export_url(e), suffix=".xlsx")
         raw.fetch(SOURCE, stations_url(e), suffix=".xlsx")
         raw.fetch(SOURCE, info_url(e), suffix="." + e.info.rsplit(".", 1)[1])
+        if e.protocol:
+            raw.fetch(SOURCE, protocol_url(e), suffix=".pdf")
+    raw.fetch(SOURCE, ARCHIVE, suffix=".html")
     for e in ELECTIONS:
         page(e)
-    raw.fetch(SOURCE, ARCHIVE, suffix=".html")
 
 
 def page(e: Election) -> raw.Artifact:
@@ -247,6 +295,8 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         election(e).write()
+    for d in EARLY:
+        early(d).write()
     for o in OLD:
         old_referendum(o).write()
 
@@ -510,6 +560,9 @@ def registry() -> Package:
             continue
         for name in list_names(e):
             names.setdefault(party(name), name)
+    for d in EARLY:
+        for name, _ in tally(d).parties:
+            names.setdefault(party(name), name)
     for id, name in sorted(names.items()):
         p.add("party", id=id, kind=party_kind(name), polity_id=ARMENIA)
         p.add("external_id", entity_id=id, scheme="am.cec.party", value=fold(name))
@@ -562,6 +615,8 @@ def election(e: Election) -> Package:
     p.artifact(raw.cached(SOURCE, export_url(e)), SOURCE_ID)
     p.artifact(raw.cached(SOURCE, info_url(e)), SOURCE_ID)
     p.uses(raw.cached(SOURCE, stations_url(e)))
+    if e.protocol:
+        p.artifact(raw.cached(SOURCE, protocol_url(e)), SOURCE_ID)
     table = export(e)
     data = info(e)
     found = matched(table, data)
@@ -598,7 +653,7 @@ def election(e: Election) -> Package:
         office_id=PRESIDENCY if e.family == "president" else None,
         body_id=NATIONAL_ASSEMBLY if e.family == "parliament" else None,
         district_area_id=COUNTRY,
-        magnitude=1 if e.family == "president" else None,
+        magnitude=1 if e.family == "president" else sum(n for _, n in e.seats) or None,
         round_number=1,
         electoral_system_id={"president": PRESIDENT_SYSTEM, "referendum": REFERENDUM_SYSTEM}.get(e.family),
         default_result_kind="counted",
@@ -796,8 +851,29 @@ def totals(e: Election, data: Info, found: dict[str, int], columns: dict[str, in
 
 
 def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str], declared: dict[str, int]) -> None:
-    """The winner of a presidential election and the answer a referendum carried, from the Commission's totals."""
+    """The seats each list won, from the Commission's protocol; the winner of a presidential election and the answer
+    a referendum carried, from its totals."""
     if e.family == "parliament":
+        if not e.seats:
+            return
+        seats = {fold(name): n for name, n in e.seats}
+        missing = seats.keys() - {fold(name) for name in options}
+        if missing:
+            raise LookupError(f"{e.day}: no ballot line for {sorted(missing)}")
+        for name, option in options.items():
+            n = seats.get(fold(name))
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="lost" if n is None else "won", seats=n)
+        p.add(
+            "note",
+            id=key("note", result_set, "seats"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=(
+                "Seats are the deputies the Commission's protocol registering the elected deputies assigns to each "
+                "list, counted from the names the protocol registers under it."
+            ),
+            lang="en",
+        )
         return
     votes = {name: declared.get(f"option:{name}", 0) for name in options}
     winner = max(votes, key=lambda name: votes[name])
@@ -806,9 +882,187 @@ def _outcomes(p: Package, e: Election, result_set: str, options: dict[str, str],
         p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
 
 
-# The referendums of 2003 and 2005, whose only published results are the national totals on the Commission's page.
+# The 1999 and 2003 elections: the national totals the Commission prints on its page for those years.
 
 ARCHIVE = f"{SITE}/PageFor/Elections%201999-2005"
+
+
+@dataclass(frozen=True)
+class Early:
+    day: date
+    tab: str  # the id of the page's section for the election
+    names: tuple[str, str]  # English, Armenian
+    invalid: str  # the label that starts the invalid ballots row
+    total: str  # the label that starts the row that sums the votes for the lists
+
+
+EARLY = [
+    Early(
+        date(1999, 5, 30),
+        "Tab6",
+        ("1999 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 1999"),
+        "Քվեատուփում առկա անվավեր",
+        "Կուսակցությունների կամ կուսակցությունների դաշինքի օգտին",
+    ),
+    Early(
+        date(2003, 5, 25),
+        "Tab3",
+        ("2003 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2003"),
+        "Անվավեր քվեաթերթիկների",
+        "Կողմ քվեարկված քվեաթերթիկների ընդհանուր",
+    ),
+]
+
+
+def early_key(d: Early) -> str:
+    return f"{SOURCE}/parliament-{d.day}"
+
+
+@dataclass
+class Tally:
+    registered: int
+    voters: int
+    invalid: int
+    against: int | None  # votes against every list
+    total: int  # the votes for the lists, as the Commission sums them
+    parties: list[tuple[str, int]]
+
+
+@functools.cache
+def tally(d: Early) -> Tally:
+    """The national totals in the page's section for the election."""
+    text = raw.cached(SOURCE, ARCHIVE).path.read_text(encoding="utf-8")
+    start = text.index(f'id="{d.tab}"')
+    end = text.find('id="Tab', start + 1)
+    section = text[start : end if end > 0 else len(text)]
+    table = section[section.index('class="election-result"') :]
+    table = table[: table.index("</table>")]
+    lines: dict[str, int] = {}
+    parties: list[tuple[str, int]] = []
+    listed = False
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL):
+        cells = [
+            clean(html.unescape(re.sub(r"<[^>]+>", " ", cell)))
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)
+        ]
+        if len(cells) == 1 and cells[0].startswith("Յուրաքանչյուր"):
+            listed = True
+        elif len(cells) == 2 and (figure := number(cells[1])) is not None:
+            if listed and not cells[0].startswith(d.total):
+                parties.append((cells[0], figure))
+            else:
+                listed = False
+                lines[cells[0]] = figure
+
+    def line(prefix: str) -> int | None:
+        found = [v for label, v in lines.items() if label.startswith(prefix)]
+        return found[0] if len(found) == 1 else None
+
+    registered = line("Ընտրողների ընդհանուր թիվը")
+    voters = line("Գրանցված և քվեաթերթիկ ստացած")
+    invalid = line(d.invalid)
+    total = line(d.total)
+    if registered is None or voters is None or invalid is None or total is None:
+        raise LookupError(f"{d.day}: the page's totals are not as expected: {lines}")
+    if sum(v for _, v in parties) != total:
+        raise ValueError(f"{d.day}: the lists' votes sum to {sum(v for _, v in parties)}, not the printed {total}")
+    return Tally(registered, voters, invalid, line("Բոլոր կուսակցություններին"), total, parties)
+
+
+def early(d: Early) -> Package:
+    p = Package(
+        early_key(d),
+        SOURCE,
+        f"The {d.names[0]}, national totals from the Central Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {ARMENIA, COUNTRY}
+    p.artifact(raw.cached(SOURCE, ARCHIVE), SOURCE_ID)
+    data = tally(d)
+    day = d.day
+    election_id = key("election", day, "parliament")
+    p.add("election", id=election_id, polity_id=ARMENIA, kind="general", date_from=day, date_to=day, status="held")
+    p.name(election_id, d.names[0], "en", "official")
+    p.name(election_id, d.names[1], "hy", "native", False)
+    path = f"am/{day}-parliamentary"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    contest = key("contest", day, "parliament")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election_id,
+        kind="list_allocation",
+        body_id=NATIONAL_ASSEMBLY,
+        district_area_id=COUNTRY,
+        round_number=1,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{d.names[0]}, national list", "en", "official")
+    p.name(contest, f"{d.names[1]}, համամասնական ընտրակարգ", "hy", "native", False)
+    p.add("slug", path=f"{path}/national-list", entity_id=contest, is_current=True)
+    result_set = key("result_set", day, "parliament")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "The Commission's page for this election prints only national totals: the registered voters, the voters "
+            "registered by signature, the invalid ballots, and the votes for each list. They are held here as one "
+            "unit that covers the whole country, and the same figures are stored as declared. The Commission's "
+            "other printed figures, such as the ballots issued, are not stored."
+        ),
+        lang="en",
+    )
+    values = Facts()
+    unit = key("unit", f"{day}:total")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=ARMENIA,
+        scheme_code="am.precinct",
+        code=f"{day}:total",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
+    for measure, value in ((REGISTERED, data.registered), (VOTERS, data.voters), (INVALID, data.invalid)):
+        values.add(result_set, unit, None, measure, value)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    lines: list[tuple[str, int, bool]] = [(name, votes, True) for name, votes in data.parties]
+    if data.against is not None:
+        lines.append(("Against all lists", data.against, False))
+    for position, (name, votes, listed) in enumerate(lines, 1):
+        option = key("option", day, "parliament", name)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list" if listed else "none_of_the_above",
+            party_id=party(name) if listed else None,
+            ballot_position=position,
+            ballot_label=name,
+        )
+        values.add(result_set, unit, option, VOTES, votes)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+    p.frame("result_value", values.frame())
+    print(f"{early_key(d)}: {len(data.parties)} lists, total {data.total}", flush=True)
+    return p
+
+
+# The referendums of 2003 and 2005, whose only published results are the national totals on the Commission's page.
 
 
 @dataclass(frozen=True)
