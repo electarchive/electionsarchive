@@ -74,9 +74,52 @@ STATE_DAYS = {
     "PILIHAN RAYA UMUM DEWAN NEGERI JOHOR KE-16": date(2026, 7, 11),
     "PILIHAN RAYA UMUM DEWAN NEGERI, NEGERI SEMBILAN KE-16": date(2026, 8, 1),
 }
-# Polling days of by-elections, keyed by the contest's seat code and year, from the Commission's media statements
-# ("Menjelang hari mengundi" and "Keputusan"). A by-election not listed here is dated to its year.
-BY_DAYS: dict[tuple[str, int], date] = {}
+# Polling days of by-elections, keyed by the contest's seat code and year, each with the Commission's media statement
+# that gives it: the statement on the eve of polling, or the one that fixed the election's dates. A by-election not
+# listed here is dated to its year; the Commission's statement archive does not reach back before 2022.
+STATEMENTS = "https://spr.gov.my/wp-content/uploads"
+PULAI = (
+    f"{STATEMENTS}/2025/10/KM-BIL-31-2023-MENJELANG-PROSES-PENGUNDIAN-PRK-PARLIMEN-P161-PULAI-DAN-DEWAN-NEGERI-"
+    "N13-SIMPANG-JERAM-JOHOR.pdf"
+)
+BY_DAYS: dict[tuple[str, int], tuple[date, str]] = {
+    ("P.161", 2023): (
+        date(2023, 9, 9),
+        PULAI,
+    ),
+    ("N.13", 2023): (
+        date(2023, 9, 9),
+        PULAI,
+    ),
+    ("N.36", 2023): (
+        date(2023, 10, 7),
+        f"{STATEMENTS}/2025/10/KM-BIL-42-2023-MENJELANG-PROSES-PENGUNDIAN-PRK-DEWAN-NEGERI-N36-PELANGAI-PAHANG.pdf",
+    ),
+    ("N.67", 2023): (
+        date(2023, 11, 4),
+        f"{STATEMENTS}/2025/10/KM-BIL-38-2023-URUSAN-PRK-DEWAN-UNDANGAN-NEGERI-N67-JEPAK-SARAWAK-1.pdf",
+    ),
+    ("N.06", 2024): (
+        date(2024, 5, 11),
+        f"{STATEMENTS}/2025/02/KM-BIL-12-2024-MENJELANG-PROSES-PENGUNDIAN-PRK-DN-N06-KUALA-KUBU-BAHARU-SELANGOR-1.pdf",
+    ),
+    ("N.43", 2024): (
+        date(2024, 8, 17),
+        f"{STATEMENTS}/2024/12/KM-BIL-31-2024-MENJELANG-HARI-MENGUNDI-PRK-DEWAN-NEGERI-N.43-NENGGIRI-KELANTAN.pdf",
+    ),
+    ("N.29", 2024): (
+        date(2024, 9, 28),
+        f"{STATEMENTS}/2024/12/KM-BIL-39-2024-MENJELANG-HARI-MENGUNDI-PRK-N29-MAHKOTA-JOHOR.pdf",
+    ),
+    ("P.187", 2026): (
+        date(2026, 1, 24),
+        f"{STATEMENTS}/2025/12/KM-BIL-42-2025-MESYUARAT-KHAS-PRK-P.187-KINABATANGAN-DAN-N.58-LAMAG-SABAH-final.pdf",
+    ),
+    ("N.58", 2026): (
+        date(2026, 1, 24),
+        f"{STATEMENTS}/2025/12/KM-BIL-42-2025-MESYUARAT-KHAS-PRK-P.187-KINABATANGAN-DAN-N.58-LAMAG-SABAH-final.pdf",
+    ),
+}
 # Contests the source classes as by-elections that are postponed polls of the 2022 general election.
 POSTPONED = ("PILIHAN RAYA UMUM KE-15",)
 
@@ -90,6 +133,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+STATEMENTS_ID = key("source", "kenyataan-media")
 DEWAN_RAKYAT = key("body", "dewan-rakyat")
 SYSTEM = key("electoral_system", "fptp")
 
@@ -98,6 +142,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, CATALOG, suffix=".json")
     for slug in FILES.values():
         raw.fetch(SOURCE, data_url(slug), suffix=".json")
+    for _, url in BY_DAYS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def clean(text: str | None) -> str:
@@ -285,11 +331,19 @@ class Event:
     native: list[str]
     note: str | None = None
     contests: list[Contest] = field(default_factory=list)
+    # The year-dated name a by-election was first loaded under. Its entities keep the ids derived from that name, so
+    # dating it updates those rows in place rather than adding a second election, and its old address redirects.
+    first: str | None = None
+    statement: str | None = None  # the media statement that gives the polling day
+
+    @property
+    def anchor(self) -> str:
+        return self.first or self.id
 
 
 def _contest(event: Event, row: Row) -> Contest:
     parts = (row.state, row.parliament, row.assembly)
-    id = key("contest", event.id, *parts)
+    id = key("contest", event.anchor, *parts)
     for found in event.contests:
         if found.id == id:
             return found
@@ -342,10 +396,12 @@ def events() -> list[Event]:
             assert seat is not None
             postponed = any(row.event.startswith(prefix) for prefix in POSTPONED)
             slug = f"{'postponed' if postponed else 'by'}-{changeset.slug(seat[0] + ' ' + seat[1])}"
-            day = BY_DAYS.get((seat[0], row.year))
-            id = f"{row.year}-{slug}"
-            if day is not None:
-                same = sum(d == day for d in BY_DAYS.values()) > 1
+            dated = BY_DAYS.get((seat[0], row.year))
+            first = f"{row.year}-{slug}"
+            id, day, statement = first, None, None
+            if dated is not None:
+                day, statement = dated
+                same = sum(d == day for d, _ in BY_DAYS.values()) > 1
                 id = f"{day}-{slug}" if same else str(day)
             body = "state seat" if row.assembly else "parliamentary seat"
             label = (
@@ -369,6 +425,8 @@ def events() -> list[Event]:
                         if postponed
                         else ""
                     ),
+                    first=first if day is not None else None,
+                    statement=statement,
                 ),
             )
         if row.event not in event.native:
@@ -480,6 +538,18 @@ def registry() -> Package:
     )
     for url in [CATALOG, *(data_url(slug) for slug in FILES.values())]:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    p.add(
+        "source",
+        id=STATEMENTS_ID,
+        kind="official_body",
+        publisher="Suruhanjaya Pilihan Raya Malaysia",
+        title="Kenyataan Media SPR (media statements of the Election Commission)",
+        url="https://spr.gov.my/arkib-kenyataan-media/",
+        license="No license stated; published on the Election Commission's website",
+        attribution="Suruhanjaya Pilihan Raya Malaysia (SPR)",
+    )
+    for url in sorted({url for _, url in BY_DAYS.values()}):
+        p.artifact(raw.cached(SOURCE, url), STATEMENTS_ID)
     p.add("body", id=DEWAN_RAKYAT, polity_id=MALAYSIA, kind="lower_house")
     p.name(DEWAN_RAKYAT, "House of Representatives", "en", "english")
     p.name(DEWAN_RAKYAT, "Dewan Rakyat", "ms", "native", False)
@@ -582,13 +652,17 @@ def election(event: Event, checked: Audit) -> Package:
     p.external.add(MALAYSIA)
     for url in [data_url(slug) for slug in FILES.values()]:
         p.uses(raw.cached(SOURCE, url))
-    id = key("election", event.id)
+    if event.statement is not None:
+        p.uses(raw.cached(SOURCE, event.statement))
+    id = key("election", event.anchor)
     if event.day is not None:
         first = last = event.day
         precision = "day"
         path = f"my/{event.day}-" + ("general" if event.kind == "general" else event.kind.replace("_", "-"))
         if event.name.endswith("state election") or "state elections" in event.name:
             path = f"my/{event.day}-state"
+        if event.kind == "by_election" and event.id != str(event.day):
+            path = f"my/{event.id}"
     else:
         first, last = date(event.year, 1, 1), date(event.year, 12, 31)
         precision = "year"
@@ -604,12 +678,25 @@ def election(event: Event, checked: Audit) -> Package:
         original_text=" / ".join(event.native),
         status="held",
     )
+    if event.first is not None:
+        # The year-dated address comes first, so it stops being current before the new one becomes current.
+        p.add("slug", path=f"my/{event.first}", entity_id=id, is_current=False)
     p.add("slug", path=path, entity_id=id, is_current=True)
     p.name(id, event.name, "en", "official")
     for native in event.native:
         p.name(id, native, "ms", "native", False)
     if event.note:
         p.add("note", id=p.id("note", id), entity_id=id, kind="context", body_md=event.note, lang="en")
+    if event.statement is not None:
+        p.add(
+            "note",
+            id=p.id("note", id, "date"),
+            entity_id=id,
+            kind="context",
+            body_md="The Election Commission's results files give this election's year but not its polling day. The "
+            f"day is from the Commission's [media statement]({event.statement}) on the election.",
+            lang="en",
+        )
     if precision == "year":
         p.add(
             "note",
@@ -653,6 +740,9 @@ def election(event: Event, checked: Audit) -> Package:
         if slug in seen:
             raise ValueError(f"duplicate contest slug {slug}")
         seen.add(slug)
+        if event.first is not None:
+            old = f"my/{event.first}/{slug.removeprefix(path + '/')}"
+            p.add("slug", path=old, entity_id=contest_id, is_current=False)
         p.add("slug", path=slug, entity_id=contest_id, is_current=True)
         result_set = key("result_set", contest_id)
         p.add(
@@ -684,14 +774,14 @@ def election(event: Event, checked: Audit) -> Package:
                 body_md=caveat,
                 lang="en",
             )
-        unit = key("unit", event.id, contest.state, seat[0])
+        unit = key("unit", event.anchor, contest.state, seat[0])
         if not contest.tacit:
             p.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=MALAYSIA,
                 scheme_code="my.keputusan",
-                code=f"{event.id}:{changeset.slug(contest.state)}:{seat[0]}",
+                code=f"{event.anchor}:{changeset.slug(contest.state)}:{seat[0]}",
                 area_relation="equals",
                 area_id=seat_area(contest),
                 kind="standard",
