@@ -84,7 +84,6 @@ ICU = {
     "be": "Belarusian-Latin/BGN",
     "mk": "Macedonian-Latin/BGN",
     "tg": "Russian-Latin/BGN",
-    "hy": "Armenian-Latin/BGN",
     "ka": "Georgian-Latin/BGN",
     "am": "Amharic-Latin/BGN",
     "ti": "Amharic-Latin/BGN",
@@ -114,6 +113,55 @@ GREEK = {
     "ου": "ou", "γγ": "ng", "γκ": "gk", "γξ": "nx", "γχ": "nch", "μπ": "mp", "ντ": "nt",
 }  # fmt: skip
 VOICED = set("αεηιοωυϊϋβγδζλμνρ")
+ARMENIAN = {
+    **dict(
+        zip(
+            "աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցփքօֆ",
+            [
+                "a",
+                "b",
+                "g",
+                "d",
+                "e",
+                "z",
+                "e",
+                "y",
+                "t",
+                "zh",
+                "i",
+                "l",
+                "kh",
+                "ts",
+                "k",
+                "h",
+                "dz",
+                "gh",
+                "ch",
+                "m",
+                "y",
+                "n",
+                "sh",
+                "o",
+                "ch",
+                "p",
+                "j",
+                "r",
+                "s",
+                "v",
+                "t",
+                "r",
+                "ts",
+                "p",
+                "k",
+                "o",
+                "f",
+            ],
+        )
+    ),
+    "ու": "u",
+    "և": "ev",
+}
+ARMENIAN_INITIAL = {"ե": "ye", "ո": "vo", "և": "yev"}
 UKRAINIAN_INITIAL = {"є": "ye", "ї": "yi", "й": "y", "ю": "yu", "я": "ya"}
 INITIALS = ("g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "", "j", "jj", "ch", "k", "t", "p", "h")
 MEDIALS = (
@@ -356,9 +404,11 @@ def romanizer(lang: str, script: str, group: str, country: str) -> Callable[[str
             return lambda text: table(text, MONGOLIAN)
         bgn = transform(ICU.get(lang, "Russian-Latin/BGN"))
         return lambda text: unicodedata.normalize("NFC", bgn(text)).replace("·", "").replace("ĭ", "y").replace("Ĭ", "Y")
-    if script in ("Armn", "Geor", "Ethi"):
+    if script == "Armn":
+        return lambda text: table(text, ARMENIAN, ARMENIAN_INITIAL)
+    if script in ("Geor", "Ethi"):
         bgn = transform(ICU.get(lang, ICU[SCRIPT_LANGS[script]]))
-        return bgn if script == "Armn" else lambda text: capitalized(strip(bgn(text)))
+        return lambda text: capitalized(strip(bgn(text)))
     if group == "person" or script in LOSSY:
         return None
     if script == "Hang":
