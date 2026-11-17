@@ -34,7 +34,9 @@ MONTHS = {
         1,
     )
 }
-DIVISION = re.compile(r"^ELECTORAL DIVISION(?::\s*|\s+)(?!TOTALS)(.+?)\s*\((\d+)\)\s*$", re.IGNORECASE)
+DIVISION = re.compile(
+    r"^ELECTORAL DIVISION(?::\s*|\s+)(?!TOTALS)(.+?)\s*\((\d+)\)(?:\s+\d+\s+#DIV/0!)?\s*$", re.IGNORECASE
+)
 
 
 @dataclass
@@ -78,6 +80,12 @@ class Row:
     division: str = ""
     head: list[Word] = field(default_factory=list)
     emergency: bool = False
+
+    @property
+    def first(self) -> int:
+        """Where the cells may start: a number right after the station is the start of its location, unless it has none."""
+        bare = all(NUMBER.match(w.text) or PERCENT.match(w.text) for w in self.head[2:])
+        return 2 if bare else 3
 
 
 @dataclass
@@ -183,7 +191,12 @@ def _header(
     head = [
         w
         for w in page
-        if w.y0 >= top and w.y1 <= end + 1 and w.x1 <= cut + 2 and w.xc >= columns[0][1] - 60 and w.text not in LABELS
+        if w.y0 >= top
+        and w.y1 <= end + 1
+        and w.x1 <= cut + 2
+        and w.xc >= columns[0][1] - 60
+        and w.text not in LABELS
+        and not re.fullmatch(r"\(\d+\)", w.text)
     ]
     rotated = sum(1 for w in head if w.y1 - w.y0 > 1.5 * (w.x1 - w.x0)) > len(head) / 2
     if rotated:
@@ -326,10 +339,10 @@ def read(path: Path, by: str = "constituency", name: str = "") -> Document:
             joined = " ".join(w.text for w in line)
             if "Report Printed" in joined or re.search(r"\bPage \d+ of \d+", joined):
                 continue
-            if DIVISION.match(joined):
-                division = re.sub(r"^ELECTORAL DIVISION:?\s*", "", joined, flags=re.IGNORECASE)
+            if shown := DIVISION.match(joined):
+                division = f"{shown.group(1)} ({shown.group(2)})"
                 continue
-            if "TOTALS" in joined:
+            if re.search(r"\bTOTALS?\b", joined) and not re.match(r"^\d", joined):
                 items.append(Row(line, True))
                 continue
             head = [w for w in line if w.text != "EPM"]
@@ -345,7 +358,7 @@ def read(path: Path, by: str = "constituency", name: str = "") -> Document:
             (w, item.head[i - 1])
             for item in stations
             for i, w in enumerate(item.head[2:], 2)
-            if i > 2 and NUMBER.match(w.text)  # a number right after the station is the start of the location
+            if i >= item.first and NUMBER.match(w.text)
         ]
         rows = len(stations)
         if rows and not numbers:
@@ -403,7 +416,7 @@ def read(path: Path, by: str = "constituency", name: str = "") -> Document:
                     current.divisions.append(totals)
                 continue
             station_division, head, emergency = item.division, item.head, item.emergency
-            cells = aligned([w for w in head[3:] if NUMBER.match(w.text)])
+            cells = aligned([w for w in head[item.first :] if NUMBER.match(w.text)])
             electors = value(cells[-1])
             if electors is None and re.search(r"\bNO ELECTORS?\b", " ".join(w.text for w in line)):
                 electors = 0
