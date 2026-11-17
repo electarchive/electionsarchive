@@ -1,4 +1,5 @@
 import functools
+import json
 import re
 import subprocess
 import unicodedata
@@ -9,6 +10,7 @@ from uuid import uuid5
 
 import fastexcel
 import polars as pl
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -27,6 +29,40 @@ LICENSE = (
 
 VOTES, REGISTERED, CAST, VALID, INVALID, OBJECTED = 1, 2, 3, 4, 5, 15
 MEASURES = {"registered": REGISTERED, "cast": CAST, "valid": VALID, "null": INVALID, "observed": OBJECTED}
+GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/DOM"
+GB_PROVINCES = f"{GEOBOUNDARIES}/ADM1/geoBoundaries-DOM-ADM1.geojson"
+GB_MUNICIPALITIES = f"{GEOBOUNDARIES}/ADM2/geoBoundaries-DOM-ADM2.geojson"
+SHAPES_FROM = date(2020, 1, 1)
+PROVINCE_SHAPES = {"LA ESTRELLETA": "ELIAS PINA", "EL SEYBO": "EL SEIBO", "HERMANAS": "HERMANAS MIRABAL"}
+"""Province names the geoBoundaries extract spells otherwise than the Board does."""
+MUNICIPALITY_SHAPES = {
+    "AZUA DE COMPOSTELA": "AZUA",
+    "VILLA TABARA ARRIBA": "TABARA ARRIBA",
+    "SANTA CRUZ DE BARAHONA": "BARAHONA",
+    "HOSTOS": "EUGENIO MARIA DE HOSTOS",
+    "VILLA RIVAS": "VILLA RIVA",
+    "SANTA CRUZ DEL SEYBO": "EL SEIBO",
+    "HATO MAYOR DEL REY": "HATO MAYOR",
+    "SALVALEON DE HIGUEY": "HIGUEY",
+    "CONCEPCION DE LA VEGA": "LA VEGA",
+    "CASTANUELA": "CASTANUELAS",
+    "SAN FERNANDO DE MONTE CRISTI": "MONTECRISTI",
+    "VILLA VAZQUEZ": "VILLA VASQUEZ",
+    "ESPERALVILLO": "PERALVILLO",
+    "LA ISABELA": "VILLA ISABELA",
+    "MONTELLANO": "VILLA MONTELLANO",
+    "SAN FELIPE DE PUERTO PLATA": "PUERTO PLATA",
+    "LA MATA": "VILLA LA MATA",
+    "SANTA BARBARA DE SAMANA": "SAMANA",
+    "CAMBITA GARABITO": "CAMBITA GARABITOS",
+    "NIGUA": "SAN GREGORIO DE NIGUA",
+    "SAN GREGORIO DE YAGUATE": "YAGUATE",
+    "QUISQUELLA": "QUISQUEYA",
+    "LOS ALMACIGOS": "VILLA LOS ALMACIGOS",
+    "VILLA BISONO": "VILLA BISONO NAVARRETE",
+    "GUERRA": "SAN ANTONIO DE GUERRA",
+}
+"""Municipality names the geoBoundaries extract spells otherwise than the Board does."""
 LOCAL_2024 = "2024-02-18"
 LOCAL_SUMMARIES = frozenset({"local", "mayors", "directors"})
 """The kinds of printed municipal summaries, which are not presidential summaries and are read apart."""
@@ -446,6 +482,8 @@ def sigla(column: str) -> str:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, GB_PROVINCES, suffix=".geojson")
+    raw.fetch(SOURCE, GB_MUNICIPALITIES, suffix=".geojson")
     for d in DAYS:
         for s in d.sheets:
             raw.fetch(SOURCE, s.url, suffix=s.suffix)
@@ -887,6 +925,53 @@ def _sources(p: Package) -> None:
     )
 
 
+def _shape(feature: dict[str, object]) -> shapely.Geometry:
+    found = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))  # type: ignore[arg-type]
+    polygons = [
+        polygon
+        for part in shapely.get_parts(found)
+        if shapely.get_type_id(part) in (3, 6)
+        for polygon in shapely.get_parts(part)
+    ]
+    return shapely.set_srid(shapely.MultiPolygon(polygons), 4326)
+
+
+@functools.cache
+def shapes() -> tuple[dict[int, shapely.Geometry], dict[int, shapely.Geometry]]:
+    """The shapes of provinces by province code and of municipalities by municipality code, as geoBoundaries draws them."""
+    found = places()
+    by_province = {fold(text): code for code, text in found.provinces.items()}
+    by_municipality = {fold(text): code for code, (_, text) in found.municipalities.items()}
+    provinces: dict[int, shapely.Geometry] = {}
+    for feature in json.loads(raw.cached(SOURCE, GB_PROVINCES).path.read_bytes())["features"]:
+        name = fold(feature["properties"]["shapeName"])
+        code = by_province.get(PROVINCE_SHAPES.get(name, name))
+        if code is None or code in provinces:
+            raise ValueError(f"province shape {name} matches no province or a second time")
+        provinces[code] = _shape(feature)
+    municipalities: dict[int, shapely.Geometry] = {}
+    for feature in json.loads(raw.cached(SOURCE, GB_MUNICIPALITIES).path.read_bytes())["features"]:
+        name = fold(feature["properties"]["shapeName"])
+        code = by_municipality.get(MUNICIPALITY_SHAPES.get(name, name))
+        if code is None:
+            continue  # La Laguna de Nisibon, which the Board's files do not code as a municipality
+        if code in municipalities:
+            raise ValueError(f"municipality shape {name} matches a second time")
+        municipalities[code] = _shape(feature)
+    return provinces, municipalities
+
+
+def unshaped() -> list[str]:
+    """The municipalities, each with its province, that geoBoundaries does not draw."""
+    found = places()
+    _, drawn = shapes()
+    return [
+        f"{text} ({found.provinces[prov]})"
+        for mun, (prov, text) in sorted(found.municipalities.items())
+        if mun not in drawn
+    ]
+
+
 def geo() -> Package:
     found = places()
     p = Package(
@@ -897,6 +982,40 @@ def geo() -> Package:
     )
     p.external |= {DOMINICAN, COUNTRY}
     _sources(p)
+    province_source, municipality_source = key("source", "geoboundaries-adm1"), key("source", "geoboundaries-adm2")
+    for id, title_, license_, license_url, notes in (
+        (
+            province_source,
+            "geoBoundaries gbOpen: Dominican Republic ADM1 (provinces)",
+            "Public domain (Natural Earth)",
+            "https://www.naturalearthdata.com/about/terms-of-use/",
+            "Boundary year 2022, built December 2023.",
+        ),
+        (
+            municipality_source,
+            "geoBoundaries gbOpen: Dominican Republic ADM2 (municipalities)",
+            "Creative Commons Attribution 4.0 International",
+            "https://creativecommons.org/licenses/by/4.0/",
+            (
+                "Boundary year 2020 from the Caribbean GeoPortal, built December 2023. It draws 154 of the Board's 158 "
+                "municipalities; the other four, and the municipal districts, are left without a shape."
+            ),
+        ),
+    ):
+        p.add(
+            "source",
+            id=id,
+            kind="academic",
+            publisher="geoBoundaries (William & Mary geoLab)",
+            title=title_,
+            url="https://www.geoboundaries.org/",
+            license=license_,
+            license_url=license_url,
+            attribution="geoBoundaries (William & Mary geoLab)",
+            notes=notes,
+        )
+    p.artifact(raw.cached(SOURCE, GB_PROVINCES), province_source)
+    p.artifact(raw.cached(SOURCE, GB_MUNICIPALITIES), municipality_source)
     for code, rank, kind, noun in (
         ("do.provincia", 1, "administrative", "province"),
         ("do.municipio", 2, "administrative", "municipality"),
@@ -927,6 +1046,32 @@ def geo() -> Package:
     for mun, circ in sorted(found.city_circs):
         text = f"Circunscripción {circ}, {found.municipalities[mun][1]}"
         place("do.circunscripcion_municipal", f"{mun}:{circ}", text, area("do.municipio", str(mun)))
+    drawn_provinces, drawn_municipalities = shapes()
+    for scheme, vintage in (("do.provincia", "2022"), ("do.municipio", "2020")):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", scheme, vintage),
+            scheme_code=scheme,
+            vintage=vintage,
+            valid_from=SHAPES_FROM,
+            as_of=SHAPES_FROM,
+        )
+    for scheme, drawn, source_id, quality in (
+        ("do.provincia", {f"{c:02d}": g for c, g in drawn_provinces.items()}, province_source, "academic"),
+        ("do.municipio", {str(c): g for c, g in drawn_municipalities.items()}, municipality_source, "academic"),
+    ):
+        for code, shape in sorted(drawn.items()):
+            p.add(
+                "area_geometry",
+                area_id=area(scheme, code),
+                valid_from=SHAPES_FROM,
+                geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+                ),
+                quality=quality,
+                source_id=source_id,
+            )
     return p
 
 
