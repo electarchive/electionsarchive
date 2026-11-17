@@ -32,7 +32,8 @@ FILES = {
     "territoriales-2023": "comprimidos/MMV_TERRITORIALES2023_COLOMBIA.zip",
     "territoriales-2019": "comprimidosTwo/MMV_TERRITORIALES2019_COLOMBIA.zip",
 }
-# The statistics CDs of 1997 to 2015: installers (CAB, MSI, and EXE) around per-year databases, not parsed yet.
+# The statistics CDs of 1997 to 2015: installers (CAB, MSI, and EXE) around per-year databases. The territorial
+# elections among them are parsed by co.registraduria_history; the congressional and presidential ones are not yet.
 HISTORIC = {
     1997: "comprimidoThree/1997-1998_ELECCIONES_TERRITORIALES_CONGREGRESO_DE_LA_REPUBLICA_Y_PRESIDENTE.zip",
     2000: "comprimidoThree/2000_ELECCIONES_TERRITORIALES.zip",
