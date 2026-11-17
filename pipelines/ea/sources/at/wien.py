@@ -56,7 +56,12 @@ POSTAL = {
     "Gelbe Wahlkuverts EU": ("gk-eu", "Gelbe Wahlkuverts, Unionsbürger"),
 }
 
-PERSISTENT = {"SPÖ", "ÖVP", "FPÖ", "GRÜNE", "NEOS", "LIF", "KPÖ", "BZÖ", "SLP"}
+# the lists keyed once across elections; every other list is keyed per Gemeinderat election
+PERSISTENT = {"SPÖ", "ÖVP", "FPÖ", "GRÜNE", "NEOS", "LIF"}
+# parties kept per election that are still parties rather than one-off lists
+PARTIES = PERSISTENT | {"KPÖ", "BZÖ", "SLP"}
+# the codes the older files print for these lists, which their per-election keys keep
+CODES = {"KPÖ": "KPOE", "BZÖ": "BZOE", "SÖZ": "SOEZ"}
 DISPLAY = {
     "SPOE": "SPÖ",
     "OEVP": "ÖVP",
@@ -546,8 +551,14 @@ def geo() -> Package:
 # ---------------------------------------------------------------- registry
 
 
+def party_key(year: int, label: str) -> str:
+    if label in PERSISTENT:
+        return label
+    return f"{CODES.get(label, label) if year < 2025 else label}@{gr(year)}"
+
+
 def party(year: int, label: str) -> str:
-    return key("party", label) if label in PERSISTENT else key("party", f"{label}@{gr(year)}")
+    return key("party", party_key(year, label))
 
 
 def registry() -> Package:
@@ -590,13 +601,8 @@ def registry() -> Package:
                 if id in seen:
                     continue
                 seen.add(id)
-                p.add("party", id=id, kind="party" if label in PERSISTENT else "list_vehicle", polity_id=AUSTRIA)
-                p.add(
-                    "external_id",
-                    entity_id=id,
-                    scheme="at.wien.party",
-                    value=label if label in PERSISTENT else f"{label}@{gr(year)}",
-                )
+                p.add("party", id=id, kind="party" if label in PARTIES else "list_vehicle", polity_id=AUSTRIA)
+                p.add("external_id", entity_id=id, scheme="at.wien.party", value=party_key(year, label))
                 p.name(id, FULL_NAMES.get(label, label), "de", "official")
                 if label in FULL_NAMES:
                     p.name(id, label, "de", "abbreviation", False)
