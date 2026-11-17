@@ -10,7 +10,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.fi import early, pages
+from ea.sources.fi import early, pages, tilastokeskus
 
 SOURCE = "fi.vaalit"
 BASE = "https://tulospalvelu.vaalit.fi"
@@ -69,6 +69,7 @@ def files(vote: Vote) -> list[str]:
 
 
 def fetch() -> None:
+    tilastokeskus.fetch()
     for vote in VOTES:
         for address in files(vote):
             raw.fetch(SOURCE, address, suffix=".pdf" if address.endswith(".pdf") else ".zip")
@@ -81,6 +82,7 @@ def key(kind: str, *parts: object) -> str:
 
 VOLBY = key("source", "results-service")
 STATFIN = key("source", "statfin")
+BOUNDARIES = key("source", "statistics-finland-boundaries")
 LEVEL = {"E": "V", "EP": "M", "P": "M", "K": "K", "A": "R"}
 NATIONAL = {"EP", "P"}
 WIDTH = {"alu": 74, "ehd": 45, "puo": 53}
@@ -296,8 +298,9 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Finland's constituencies, wellbeing services counties, and municipalities as the Ministry of Justice's "
-        "results service names them, and the voting district scheme",
+        "results service names them, with Statistics Finland's boundaries, and the voting district scheme",
     )
+    tilastokeskus.add_source(p, BOUNDARIES)
     p.external.add(FINLAND)
     for code, kind, rank, noun in SCHEMES:
         p.add("scheme", code=code, polity_id=FINLAND, kind=kind, rank=rank, noun=noun, code_system=None)
@@ -318,7 +321,25 @@ def geo() -> Package:
             if scheme == "fi.kunta":
                 for name in former_names().get(code, []):
                     p.name(id, name, "fi", "historical", False)
+        if scheme in tilastokeskus.SCHEMES:
+            _outlines(p, scheme, places()[scheme])
     return p
+
+
+def _outlines(p: Package, scheme: str, found: dict[str, tuple[str, str]]) -> None:
+    """Statistics Finland's shapes for the areas the results service names, matched by code. A code Statistics Finland
+    maps that no election here names gets no area. Statistics Finland numbers the constituencies where the results
+    service gives them letters, so those match by their Finnish names."""
+    codes = {code: code for code in found}
+    if scheme == "fi.vaalipiiri":
+        by_name = {fi: code for code, (fi, _) in found.items()}
+        codes = {number: by_name[name] for number, name in tilastokeskus.names(scheme).items()}
+    for number, runs in sorted(tilastokeskus.spans(scheme).items()):
+        if number not in codes:
+            continue
+        code = codes[number]
+        for since, until, shape in runs:
+            tilastokeskus.outline(p, area(scheme, code), BOUNDARIES, since, until, shape)
 
 
 @functools.cache
