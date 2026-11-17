@@ -35,6 +35,7 @@ FILES = {
     "pres2023-r2-mun": f"{MEDIA}/predsjednicki/2023/preliminarni_rezultati_po_opstinama-1.pdf",
     "par2023": f"{MEDIA}/parlamentarni/2023/Konacni-rezultati-po-birackim-mjestima.pdf",
     "par2023-final": f"{MEDIA}/parlamentarni/2023/KONACNI-REZULTATI-2023.pdf",
+    "par2023-prelim": f"{MEDIA}/parlamentarni/2023/Preliminarni_rezultati_po_svim_birackim_mjestima.pdf",
     "ref2006-mun": f"{SITE}/images/DIK/Izbori_arhiva/Referendum_2006/Rezultati-konacni-po-opstinama.pdf",
     "par2006-final": f"{MEDIA}/parlamentarni/2006/20.09.06.-KONA.pdf",
     "par2009-final": f"{MEDIA}/parlamentarni/2009/Konacni-rezultati-izbora-za-poslanike-u-Skupstinu-CG-2009.pdf",
@@ -574,6 +575,121 @@ def decision(name: str, start: str | None = None, stop: str | None = None) -> De
     return Decision(acc, labels, votes, seats)
 
 
+PRELIM_TOKEN = re.compile(r"^(?:\d+|\d+(?:\.\d+)?%)$")
+PRELIM_HEADER = {"Ukupno", "upisano", "glasalo", "Glasali", "na", "biračkom", "mjestu", "putem", "pisma", "Izborna"}
+PRELIM_HEADER |= {"Upotrijebljeno", "Neupotrijebljeno", "Broj", "odrezaka/potvrda", "odvojenih", "kupona", "vizuelnih"}
+PRELIM_HEADER |= {"identifikacija", "Važeći", "Nevažeći", "lista"}  # the rotated column headings, printed once
+PRELIM_FIGURES = 26  # eleven accounting figures and fifteen lists, each followed by its share
+DISAGREE: list[tuple[str, str, int, int]] = []  # place, station, preliminary valid, final list votes
+
+
+@dataclass
+class Prelim:
+    place: str
+    name: str
+    acc: dict[str, int]
+    votes: list[int]
+
+
+def read_2023_prelim() -> list[Prelim]:
+    """The preliminary per-station accounting: each station prints its name, then a figure and a share per column."""
+    lines = pdf("par2023-prelim")
+    start = lines.index("BIRAČKO MJESTO")
+    records: list[Prelim] = []
+    place: str | None = None
+    name: list[str] = []
+    tokens: list[str] = []
+    carry: list[str] = []  # the figures of the next station, printed before its name
+
+    def flush() -> None:
+        nonlocal name, tokens, carry
+        if not tokens:
+            return
+        if len(tokens) == 3 * PRELIM_FIGURES and all(t.isdigit() for t in tokens[2 * PRELIM_FIGURES :]):
+            tokens, carry = tokens[: 2 * PRELIM_FIGURES], tokens[2 * PRELIM_FIGURES :]
+        if place is None or not name or len(tokens) != 2 * PRELIM_FIGURES:
+            raise ValueError(f"unreadable preliminary station {name!r} in {place!r}: {len(tokens)} tokens")
+        half = PRELIM_FIGURES
+        if all(t.isdigit() for t in tokens[:half]) and all(t.endswith("%") for t in tokens[half:]):
+            figures = [int(token) for token in tokens[:half]]  # figures first, then every share
+        elif all(t.isdigit() for t in tokens[::2]) and all(t.endswith("%") for t in tokens[1::2]):
+            figures = [int(token) for token in tokens[::2]]
+        else:
+            raise ValueError(f"misaligned preliminary station {name!r} in {place!r}: {tokens}")
+        acc = {"registered": figures[0], "voters": figures[1], "valid": figures[9], "invalid": figures[10]}
+        records.append(Prelim(place, "".join(name) if len(name) == 1 else " ".join(name), acc, figures[11:]))
+        name, tokens = [], []
+
+    skip_number = False
+    body = lines[start + 1 :]
+    for at, line in enumerate(body):
+        if line.startswith(("Ukupno:", "Izborna lista")):
+            break
+        if skip_number:  # the list number printed after `lista` in the column heading
+            skip_number = False
+            if PRELIM_TOKEN.match(line):
+                continue
+        if line in PRELIM_HEADER:
+            skip_number = line == "lista"
+            continue
+        parts = line.split()
+        if all(PRELIM_TOKEN.match(part) for part in parts):  # a line may hold several figures
+            tokens.extend(parts)
+            continue
+        flush()
+        found = place_of(line)
+        if found is not None and (line != line.upper() or found == PRISON):
+            place = found
+            name = []
+            continue
+        following = body[at + 1].split() if at + 1 < len(body) else []
+        if "100%" in parts[1:] and carry and not parts[parts.index("100%") - 1].isdigit():
+            at100 = parts.index("100%")  # `NAME 100% 57.33% ...`, the figures having come first
+            name.append(" ".join(parts[:at100]))
+            tokens, carry = carry + parts[at100:], []
+            continue
+        for index, part in enumerate(parts):  # the registered figure can share a line with the name
+            after = parts[index + 1] if index + 1 < len(parts) else (following[0] if following else "")
+            if index and part.isdigit() and after == "100%":
+                name.append(" ".join(parts[:index]))
+                tokens.append(part)
+                tokens.extend(parts[index + 1 :])
+                break
+        else:
+            name.append(line)
+    flush()
+    return records
+
+
+def _glued(text: str) -> str:
+    """A station name with spacing ignored, because the PDF splits some names across lines mid-word."""
+    return fold(text).replace(" ", "")
+
+
+def attach_prelim(table: Table) -> None:
+    """Give each final station its preliminary registered, voters, valid, and invalid, matched by name within the
+    municipality, in listed order when a name repeats. A station whose final list votes do not add up to its preliminary
+    valid ballots is noted in `DISAGREE`."""
+    pool: dict[tuple[str, str], list[Prelim]] = {}
+    for record in read_2023_prelim():
+        pool.setdefault((record.place, _glued(record.name)), []).append(record)
+    DISAGREE.clear()
+    for row in table.rows:
+        queue = pool.get((row.place, _glued(row.name)))
+        if not queue:
+            raise ValueError(f"no preliminary figures for {row.place}: {row.name}")
+        record = queue.pop(0)
+        if not any(record.acc.values()) and any(row.votes):
+            continue  # the preliminary table prints zeros for a station it had not yet received
+        row.acc = dict(record.acc)
+        total = sum(v or 0 for v in row.votes)
+        if record.acc["valid"] != total:
+            DISAGREE.append((row.place, row.name, record.acc["valid"], total))
+    left = [record for queue in pool.values() for record in queue]
+    if left:
+        raise ValueError(f"{len(left)} preliminary stations match no final station, such as {left[0]}")
+
+
 def read_2023() -> Table:
     """The final per-station list votes. The table gives no station numbers, so each station is numbered in table order."""
     final = decision("par2023-final")
@@ -603,6 +719,7 @@ def read_2023() -> Table:
         where = _place(place)
         code = str(1 + sum(1 for r in table.rows if r.place == where))
         table.rows.append(Row(where, code, name, {}, list(votes), "prison" if where == PRISON else "standard"))
+    attach_prelim(table)
     return _finish(table)
 
 
@@ -803,6 +920,16 @@ METHOD = (
     "voters are the voters on the roll. Voters are the voters who took part, at the polling station or by letter, "
     "ballots cast are the ballots used, and valid and invalid are the valid and invalid ballots. Polling stations "
     "inside the prisons are listed as units of their own."
+)
+METHOD_2023 = (
+    "The list votes are the final count at each polling station, from the State Election Commission's final table "
+    "by polling station. Registered voters, voters, and valid and invalid ballots are the commission's preliminary "
+    "table by polling station, matched to the final stations by name within each municipality, so they are the "
+    "preliminary counts and can differ slightly from the final ones. Registered voters are the voters on the roll, "
+    "voters are the voters who took part, at the polling station or by letter, and valid and invalid are the valid "
+    'and invalid ballots. One station, JU OŠ "Jedinstvo" Skorać in Tuzi, prints zeros in the preliminary table '
+    "because it had not been received yet, so it carries list votes only. Polling stations inside the prisons are "
+    "listed as units of their own."
 )
 NATIONAL_METHOD = (
     "The national figures the State Election Commission declared in its decision on the results. Registered voters "
@@ -1241,6 +1368,8 @@ def build_parliament(day: str) -> Package:
     )
     p.external.add(MONTENEGRO)
     _uses(p, name, *([f"{name}-final"] if name in ("par2006", "par2009", "par2016", "par2020", "par2023") else []))
+    if name == "par2023":
+        _uses(p, "par2023-prelim")
     election = _election(
         p,
         name,
@@ -1270,7 +1399,7 @@ def build_parliament(day: str) -> Package:
     if name == "par2023":
         coarse = _result_set(p, election, contest, f"{name}-national", "official", True, NATIONAL_METHOD, 1.0)
         _fill(p, units, coarse, national_table(t.labels, official), options, official)
-        result_set = _result_set(p, election, contest, name, "official", False, METHOD, 1.0)
+        result_set = _result_set(p, election, contest, name, "official", False, METHOD_2023, 1.0)
         _fill(p, units, result_set, t, options, Official({}, official.votes))
         outcomes = coarse
     else:
@@ -1279,6 +1408,18 @@ def build_parliament(day: str) -> Package:
         outcomes = result_set
     for index, count in sorted(seats.items()):
         p.add("outcome", result_set_id=outcomes, option_id=options[index], kind="won", seats=count)
+    if name == "par2023" and DISAGREE:
+        listed = "; ".join(
+            f"{where}, {station} ({valid} valid ballots against {votes} list votes)"
+            for where, station, valid, votes in DISAGREE
+        )
+        _caveat(
+            p,
+            "accounting.votes_valid",
+            result_set,
+            "at these polling stations the preliminary table's valid ballots differ from the list votes in the final "
+            f"table: {listed}",
+        )
     if name == "par2006":
         _caveat(
             p,
