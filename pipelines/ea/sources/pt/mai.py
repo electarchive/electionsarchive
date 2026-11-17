@@ -24,7 +24,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.pt import cne_local, legacy
+from ea.sources.pt import cne_local, cnetables, legacy
 from ea.sources.pt.crawl import CANDIDATE_SITES, HOST, Site, bundle_url, store
 from ea.sources.pt.legacy import Old
 
@@ -162,6 +162,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 MAI_SOURCE = key("source", "mai")
+CNE_SOURCE = key("source", "cne")
 ASSEMBLY = key("body", "assembleia-da-republica")
 MADEIRA_ASSEMBLY = key("body", "alram")
 AZORES_ASSEMBLY = key("body", "alraa")
@@ -194,6 +195,7 @@ def _ps_election(site: Site) -> int:
 
 
 def fetch() -> None:
+    cnetables.fetch()
     for site in SITES:
         if site.family == "legacy":
             legacy.store(OLD[site.name])
@@ -958,6 +960,30 @@ def registry() -> Package:
     return p
 
 
+def commission() -> Package:
+    """The National Elections Commission as a source, with the results tables of the elections whose circles abroad
+    the Ministry's sites leave out."""
+    p = Package(
+        f"{SOURCE}/cne",
+        SOURCE,
+        "The National Elections Commission's results tables for the 1999, 2002, and 2005 legislative elections",
+    )
+    p.external.add(PORTUGAL)
+    p.add(
+        "source",
+        id=CNE_SOURCE,
+        kind="official_body",
+        publisher="Comissão Nacional de Eleições",
+        title="Results tables of the elections for the Assembly of the Republic (www.cne.pt)",
+        url="https://www.cne.pt/",
+        license="Official publication; reuse terms are not stated",
+        attribution="Comissão Nacional de Eleições",
+    )
+    for year in cnetables.DAYS:
+        p.artifact(cnetables.artifact(year), CNE_SOURCE)
+    return p
+
+
 def candidates(site: Site) -> dict[str, str]:
     """A presidential site's candidates: the full name for each ballot label."""
     names: dict[str, str] = {}
@@ -1067,12 +1093,13 @@ def _ps_slates(site: Site, archive: zipfile.ZipFile) -> dict[tuple[str, str], di
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{DAYS[site.name]}" for site in SITES)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/cne", *(f"{SOURCE}/{DAYS[site.name]}" for site in SITES)]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
+    commission().write()
     for site in SITES:
         election(site).write()
 
@@ -1191,7 +1218,12 @@ def election(site: Site) -> Package:
         SOURCE,
         f"The Portuguese election of {day} by parish and consular post, from the Ministry of Internal "
         "Administration's results site",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{SOURCE}/{DAYS[first.name]}"] if first else [])],
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            *([f"{SOURCE}/cne"] if site.name in CNE_SITES else []),
+            *([f"{SOURCE}/{DAYS[first.name]}"] if first else []),
+        ],
     )
     p.external.add(PORTUGAL)
     p.uses(bundle(site))
@@ -1248,6 +1280,8 @@ def election(site: Site) -> Package:
                 contests.append((compensation, units_of(t, organ)))
         for node, leaves in sorted(contests, key=lambda item: (t.nodes[item[0]].name, item[0])):
             _contest(p, t, site, organ, node, leaves, election_id, path, slugs, built, towns, known, people, first)
+    if site.name in CNE_SITES:
+        _abroad(p, t, site, election_id, path, slugs, built)
     _values(p, built)
     _turnout(p, site, built)
     if built.short:
@@ -1614,6 +1648,104 @@ def _slates(
             )
             if role != "substitute" and name in elected:
                 p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+
+
+CNE_SITES = {f"legislativas{year}": year for year in cnetables.DAYS}
+CNE_METHOD = (
+    "Counted by electoral circle, as printed in the results table of the National Elections Commission (Comissão "
+    "Nacional de Eleições) for the election. The Ministry of Internal Administration's results site for this "
+    "election prints only the counts at home, so the circle's figures are stored on one unit that stands for the whole "
+    "circle. "
+    "Valid votes are not printed and are not stored."
+)
+
+
+def _abroad(
+    p: Package,
+    t: Tree,
+    site: Site,
+    election_id: str,
+    path: str,
+    slugs: set[str],
+    built: Built,
+) -> None:
+    """The Europe and Outside Europe circles, which the Ministry's site for the election leaves out."""
+    if any(fold(node.name) in ABROAD_CIRCLES for node in t.nodes.values()):
+        raise LookupError(f"{site.name}: the site already prints the circles abroad")
+    year = CNE_SITES[site.name]
+    p.uses(cnetables.artifact(year))
+    top = t.count(t.top, "AR")
+    printed = {re.sub(r"[^a-z]", "", line.label.lower()): line.label for line in top.lines} if top else {}
+    names = {"europa": "Europa", "fora-da-europa": "Fora da Europa"}
+    for slug, circle in sorted(cnetables.abroad(year).items()):
+        node = f"CIRCLE-{slug}"
+        contest = key("contest", site.name, "AR", node)
+        name = names[slug]
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="list_allocation",
+            round_number=1,
+            default_result_kind="counted",
+            magnitude=circle.seats,
+            electoral_system_id=SYSTEM_LIST,
+            body_id=ASSEMBLY,
+            district_area_id=circle_area(slug),
+        )
+        p.name(contest, name, "en", "official")
+        p.add("slug", path=_slug(path, name, slugs), entity_id=contest, is_current=True)
+        result_set = key("result_set", site.name, "AR", node)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CNE_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=CNE_METHOD, lang="en"
+        )
+        unit = key("unit", DAYS[site.name], node)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=PORTUGAL,
+            scheme_code="pt.circulo",
+            code=f"{DAYS[site.name]}:{node}",
+            area_relation="equals",
+            area_id=circle_area(slug),
+            kind="aggregate",
+        )
+        p.name(unit, name, "pt", "official")
+        for measure, value in (
+            (REGISTERED, circle.registered),
+            (CAST, circle.cast),
+            (BLANK, circle.blank),
+            (INVALID, circle.invalid),
+        ):
+            built.values.append((result_set, unit, None, measure, value))
+        for position, (cne_label, votes, seats) in enumerate(circle.lines, 1):
+            # The lists keep the labels the Ministry's site prints for them, so that they are the same parties.
+            label = printed.get(re.sub(r"[^a-z]", "", cne_label.lower()), cne_label)
+            option = key("option", site.name, "AR", node, label, 0)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(label),
+                ballot_position=position,
+                ballot_label=label,
+            )
+            built.values.append((result_set, unit, option, VOTES, votes))
+            if seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
 
 
 def _outcomes(p: Package, organ: str, result_set: str, declared: Count, options: dict[tuple[str, int], str]) -> None:
