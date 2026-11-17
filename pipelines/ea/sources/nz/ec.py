@@ -53,6 +53,16 @@ SUMMARIES = (
     "voting-place-coordinates.csv",
 )
 REFERENDUM_URL = f"{SITE}/electionresults_2011/referendum_ppresults.csv"
+# The 2020 general election's lists of candidates, and its two referendums held on the same day.
+LISTS_DAY = "2020-10-17"
+LISTS_YEAR = 2020
+LISTS_FILES = ("party-lists-of-successful-registered-parties.csv", "party-lists-of-unsuccessful-registered-parties.csv")
+REFERENDUMS_PAGE = f"{SITE}/electionresults_2020/referendums-results.html"
+REFERENDUMS_SHEET = f"{SITE}/electionresults_2020/referendums-statistics/ElectorateReferendumResults.xlsx"
+# The voting-place files of the 2020 general election that a person saved from the results site in a browser are one
+# file for all the electorates: each electorate's file in turn, after a line giving the address of the file it is.
+SAVED_BUNDLE = re.compile(r"/nz-(\d{4})-(?:candidate|party)-votes-by-voting-place-all-electorates\.csv$")
+SAVED_MARK = "# SOURCE: "
 
 METHOD = (
     "Counted per voting place and published by the Electoral Commission. A place open for advance voting and again on "
@@ -92,7 +102,7 @@ def _held() -> dict[str, str]:
     saved from a browser."""
     found: dict[str, str] = {}
     for stored in raw.keys(SOURCE):
-        if bundle_year(stored):
+        if bundle_year(stored) or SAVED_BUNDLE.search(stored):
             continue
         if stored.startswith("browser://"):
             original = csv_url(SAVED_YEAR, stored.rsplit("/", 1)[1])
@@ -165,6 +175,36 @@ def fetch() -> None:
             for number in range(1, 80):
                 _try(page_url(year, vote, number), ".html")
     _try(REFERENDUM_URL, ".csv")
+    for name in LISTS_FILES:
+        _try(csv_url(LISTS_YEAR, name), ".csv")
+    _try(REFERENDUMS_PAGE, ".html")
+    _try(REFERENDUMS_SHEET, ".xlsx")
+
+
+def split_saved() -> None:
+    """Store each electorate's file from a saved all-electorates bundle under the address it says it is, as if fetched
+    from there, so that the electorate pages are read as they are for any other year."""
+    for stored in sorted(raw.keys(SOURCE)):
+        if not SAVED_BUNDLE.search(stored):
+            continue
+        whole = raw.cached(SOURCE, stored)
+        data = whole.path.read_bytes().decode("utf-8-sig")
+        for chunk in re.split(rf"^(?={SAVED_MARK})", data, flags=re.MULTILINE):
+            if not chunk.startswith(SAVED_MARK):
+                continue
+            head, _, body = chunk.partition("\n")
+            url = head[len(SAVED_MARK) :].strip()
+            if has(url):
+                continue
+            raw.store(
+                SOURCE,
+                url,
+                body.encode("utf-8"),
+                suffix=".csv",
+                retrieved_at=whole.retrieved_at,
+                media_type=whole.media_type or "text/csv",
+            )
+    _held.cache_clear()
 
 
 def _try(url: str, suffix: str) -> None:
@@ -455,6 +495,8 @@ def electorates(year: int) -> dict[int, str]:
     """The electorate names by number, as the index of the voting-place pages lists them."""
     if bundled(year):
         return {n: page.electorate for n, page in sorted(bundle_pages(year)["party"].items())}
+    if not has(index_url(year)):
+        return {n: page.electorate for n, page in sorted(pages(year, "party").items())}
     text = art(index_url(year)).path.read_text("utf-8")
     cells = Cells()
     cells.feed(text)
@@ -659,7 +701,7 @@ def level(year: int) -> str | None:
         return "voting_place"
     if summary_url(year) is None:
         return None
-    if has(index_url(year)) and pages(year, "candidate") and len(pages(year, "candidate")) == len(electorates(year)):
+    if pages(year, "candidate") and len(pages(year, "candidate")) == len(electorates(year)):
         return "voting_place"
     if all(has(e9_url(year, name)) for name in ("e9_part1.csv", "e9_part4.csv")):
         return "electorate"
@@ -674,17 +716,35 @@ def package_key(day: str) -> str:
     return f"nz.ec/{day}-general" if day == REFERENDUM_DAY else f"nz.ec/{day}"
 
 
+LISTS_KEY = f"nz.ec/{LISTS_DAY}-lists"
+REFERENDUMS_KEY = f"nz.ec/{LISTS_DAY}-referendums"
+
+
+def has_lists() -> bool:
+    return all(has(csv_url(LISTS_YEAR, name)) for name in LISTS_FILES) and LISTS_DAY in days()
+
+
+def has_referendums() -> bool:
+    return has(REFERENDUMS_PAGE) and has(REFERENDUMS_SHEET)
+
+
 def packages() -> list[str]:
     held = [f"nz.ec/{REFERENDUM_DAY}"] if has(REFERENDUM_URL) else []
-    return ["nz.ec/registry", *held, *(package_key(day) for day in days())]
+    more = [*([LISTS_KEY] if has_lists() else []), *([REFERENDUMS_KEY] if has_referendums() else [])]
+    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *more]
 
 
 def parse() -> None:
+    split_saved()
     registry().write()
     if has(REFERENDUM_URL):
         referendum().write()
     for day in days():
         general(day).write()
+    if has_lists():
+        lists().write()
+    if has_referendums():
+        referendums().write()
 
 
 def emit() -> None:
@@ -831,7 +891,7 @@ def _put(
     )
 
 
-def _result_set(p: Package, election: str, contest: str, name: str) -> str:
+def _result_set(p: Package, election: str, contest: str, name: str, method: str = METHOD) -> str:
     result_set = key("result_set", name)
     p.add(
         "result_set",
@@ -845,7 +905,7 @@ def _result_set(p: Package, election: str, contest: str, name: str) -> str:
         is_default=True,
         completeness=1.0,
     )
-    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     return result_set
 
 
@@ -1104,7 +1164,7 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
             [
                 *(page_source(year, "candidate", n) for n in candidate_pages),
                 *(page_source(year, "party", n) for n in party_pages),
-                index_url(year),
+                *([index_url(year)] if has(index_url(year)) else []),
                 *([csv_url(year, "winning-electorate-candidates.csv")] if won else []),
                 *(
                     [csv_url(year, "votes-for-registered-parties-by-electorate.csv")]
@@ -1306,4 +1366,289 @@ def referendum() -> Package:
         p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=total[0])
         p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=sum(valid))
         p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=total[informal - 2])
+    return p
+
+
+LIST_SECTIONS = {"successful": LISTS_FILES[0], "unsuccessful": LISTS_FILES[1]}
+
+
+@dataclass
+class Listed:
+    party: str
+    position: int
+    printed: str
+    seat: str
+
+
+def party_lists() -> dict[str, list[Listed]]:
+    """Each party's list in order, as the two list files print them. A party's name stands alone on a line above its
+    list; a successful party's list gives, for each name that won a seat, the electorate it won or the number of the
+    list seat allocated."""
+    found: dict[str, list[Listed]] = {}
+    for name in LISTS_FILES:
+        party = ""
+        for row in rows_of(csv_url(LISTS_YEAR, name))[1:]:
+            if not any(row):
+                continue
+            if len(row) == 1:
+                party = row[0]
+                if party in found:
+                    raise ValueError(f"{name}: {party} is listed twice")
+                found[party] = []
+            elif row[0].isdigit() and party:
+                position = int(row[0])
+                if position != len(found[party]) + 1:
+                    raise ValueError(f"{name}: {party} list is out of order at {position}")
+                found[party].append(Listed(party, position, clean(row[1]), clean(row[2]) if len(row) > 2 else ""))
+            else:
+                raise ValueError(f"{name}: unexpected row {row}")
+    return found
+
+
+def lists() -> Package:
+    """The party lists of the 2020 general election, as list candidacies on the party vote's options, with the members
+    each party's list returned. The party vote and its options are the general election's own package."""
+    general_key = package_key(LISTS_DAY)
+    p = Package(
+        LISTS_KEY,
+        SOURCE,
+        "The 2020 New Zealand general election's party lists and the members they returned, from the Electoral "
+        "Commission's statistics",
+        depends=["nz.ec/registry", general_key],
+    )
+    p.external.add(NEW_ZEALAND)
+    for name in LISTS_FILES:
+        p.uses(art(csv_url(LISTS_YEAR, name)))
+    summ = summary(LISTS_YEAR)
+    p.uses(art(summ.url))
+    p.uses(art(csv_url(LISTS_YEAR, "winning-electorate-candidates.csv")))
+    labels = next(iter(pages(LISTS_YEAR, "party").values())).labels
+    party_set = key("result_set", f"party-{LISTS_DAY}")
+    held = party_lists()
+    stray = sorted(set(held) - set(labels))
+    if stray:
+        raise ValueError(f"the lists name parties that stood no list in the party vote: {stray}")
+    printed_names = 0
+    allocated: list[int] = []
+    for label, members in held.items():
+        option = key("option", f"party-{LISTS_DAY}", label)
+        won = [m for m in members if m.seat]
+        for m in won:
+            if not re.fullmatch(r"Seat Allocation \d+|.+ Electorate", m.seat):
+                raise ValueError(f"{label}: {m.printed} is marked {m.seat!r}")
+        if len(won) > summ.seats.get(label, 0):
+            raise ValueError(
+                f"{label}: the list marks {len(won)} seats won, but the summary gives {summ.seats.get(label, 0)}"
+            )
+        printed_names += len(members)
+        for m in members:
+            tag = f"{LISTS_DAY}:{label}:{m.position}"
+            person = p.id("person", tag)
+            p.add("person", id=person)
+            p.name(person, person_name(m.printed), "en", "official")
+            candidacy = p.id("candidacy", tag)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role="list_member",
+                list_position=m.position,
+                ballot_name=m.printed,
+                member_of_party_id=party_for(LISTS_YEAR, label),
+                is_independent=False,
+            )
+            if m.seat.startswith("Seat Allocation "):
+                allocated.append(int(m.seat.rsplit(" ", 1)[1]))
+                text = (
+                    f"Took a list seat, number {m.seat.rsplit(' ', 1)[1]} in the allocation of the House's 120 seats."
+                )
+            elif m.seat:
+                text = f"Won the {m.seat.removesuffix(' Electorate')} electorate seat."
+            else:
+                continue
+            p.add("note", id=p.id("note", candidacy), entity_id=candidacy, kind="context", body_md=text, lang="en")
+    if printed_names != 548:
+        raise ValueError(f"the lists hold {printed_names} names, but the summary prints 548")
+    if len(allocated) != len(set(allocated)) or len(allocated) != (summ.magnitude or 0) - len(winners(LISTS_YEAR)):
+        raise ValueError(f"the lists mark {len(allocated)} list seats; the House has {summ.magnitude} seats")
+    p.add(
+        "note",
+        id=key("note", party_set, "lists"),
+        entity_id=party_set,
+        kind="context",
+        body_md="Each registered party's list is given in the order the party ranked it. A name marked with an "
+        "electorate won that electorate's seat, and a name marked with a seat allocation number took a list seat; "
+        "the number is the place of that seat in the order the Sainte-Laguë method allocated the House's 120 seats. "
+        "The lists give only the members who were also on a list; an electorate winner a party did not list is "
+        "not named here.",
+        lang="en",
+    )
+    return p
+
+
+QUESTIONS = (
+    (
+        "eol",
+        "End of Life Choice",
+        "Do you support the End of Life Choice Act 2019 coming into force?",
+        (2, 3, 4),
+        "End of Life Choice Referendum",
+    ),
+    (
+        "cannabis",
+        "Cannabis Legalisation and Control Bill",
+        "Do you support the proposed Cannabis Legalisation and Control Bill?",
+        (5, 6, 7),
+        "Cannabis Referendum",
+    ),
+)
+REFERENDUM_METHOD = (
+    "Counted by electorate and published by the Electoral Commission. Votes taken at voting places are reported for "
+    "the general electorate they were taken in, and special declaration votes for the electorate of the voter. "
+    "Votes cast overseas are included in the special votes."
+)
+
+
+def _sheet(name: str) -> list[list[str]]:
+    import fastexcel
+
+    book = fastexcel.read_excel(str(art(REFERENDUMS_SHEET).path))
+    frame = book.load_sheet_by_name(name, header_row=None).to_polars()
+    return [[clean(str(cell)) if cell is not None else "" for cell in row] for row in frame.iter_rows()]
+
+
+def _referendum_rows(name: str, total_label: str) -> tuple[list[tuple[str, str, list[int]]], list[int]]:
+    """The electorate rows of one sheet as (numbers, name, [yes, no, informal for each question]), and the sheet's
+    printed totals row."""
+    rows: list[tuple[str, str, list[int]]] = []
+    total: list[int] | None = None
+    for row in _sheet(name):
+        if len(row) != 9:
+            raise ValueError(f"{name}: unexpected width {len(row)}")
+        if row[1].startswith(total_label):
+            total = [int(cell) for cell in row[2:8]]
+            if int(row[8]) != total[0] + total[1] + total[2]:
+                raise ValueError(f"{name}: the total row's own total is wrong")
+        elif re.fullmatch(r"\d+(/\d+)*", row[0]) and row[2].isdigit():
+            values = [int(cell) for cell in row[2:8]]
+            if int(row[8]) != sum(values[:3]) or int(row[8]) != sum(values[3:]):
+                raise ValueError(f"{name}: {row[1]} does not add up to its total")
+            rows.append((row[0], row[1], values))
+    if total is None:
+        raise ValueError(f"{name}: no total row")
+    sums = [sum(values[i] for _, _, values in rows) for i in range(6)]
+    if sums != total:
+        raise ValueError(f"{name}: the electorates sum to {sums}, but the total row prints {total}")
+    return rows, total
+
+
+def _referendum_page() -> list[list[int]]:
+    """The national count of each question, in the order the results page gives them: yes, no, informal, and all
+    votes."""
+    cells = Cells()
+    cells.feed(text(REFERENDUMS_PAGE))
+    found: list[list[int]] = []
+    for row in cells.rows:
+        row = [clean(cell) for cell in row]
+        if row[:1] == ["VOTES"]:
+            found.append([])
+        elif found and len(row) == 3 and row[0] in ("Yes", "No", "Informal votes*", "TOTAL VOTES"):
+            found[-1].append(number(row[1]))
+    if len(found) != len(QUESTIONS) or any(len(counts) != 4 for counts in found):
+        raise ValueError(f"{REFERENDUMS_PAGE}: expected {len(QUESTIONS)} tables of four rows, found {found}")
+    return found
+
+
+def referendums() -> Package:
+    first = date.fromisoformat(LISTS_DAY)
+    p = Package(
+        REFERENDUMS_KEY,
+        SOURCE,
+        "The two 2020 New Zealand referendums, on end of life choice and on cannabis, by electorate from the Electoral "
+        "Commission's results",
+        depends=["nz.ec/registry"],
+    )
+    p.external.add(NEW_ZEALAND)
+    p.uses(art(REFERENDUMS_PAGE))
+    p.uses(art(REFERENDUMS_SHEET))
+    national = _referendum_page()
+    election = _election(
+        p,
+        f"referendums-{LISTS_DAY}",
+        first,
+        "referendum",
+        "2020 New Zealand referendums",
+        f"nz/{LISTS_DAY}-referendums",
+    )
+    ordinary, ordinary_total = _referendum_rows("Ordinary Votes", "Ordinary Votes Referendum")
+    special, special_total = _referendum_rows("Special Votes", "Special Votes Referendums")
+    units: list[tuple[str, str, str, str, list[int]]] = []
+    for numbers, name, values in ordinary:
+        units.append((f"ordinary:{numbers}", f"{name}, ordinary votes", "standard", numbers, values))
+    for numbers, name, values in special:
+        units.append((f"special:{numbers}", f"{name}, special votes", "aggregate", numbers, values))
+    made: dict[str, str] = {}
+    for code, name, kind, _, _ in units:
+        unit = made[code] = key("unit", f"{LISTS_DAY}-referendums", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=NEW_ZEALAND,
+            scheme_code=ELECTORATE_SCHEME,
+            code=f"{LISTS_DAY}-referendums:{code}",
+            area_relation="unlocated",
+            area_id=None,
+            kind=kind,
+        )
+        p.name(unit, name, "en", "official")
+    for index, (letter, english, question, _, heading) in enumerate(QUESTIONS):
+        contest = _contest(
+            p,
+            f"referendum-{LISTS_DAY}-{letter}",
+            election,
+            "ballot_question",
+            f"2020 New Zealand referendum, {english}",
+            f"nz/{LISTS_DAY}-referendums/{letter.replace('eol', 'end-of-life-choice')}",
+            electoral_system_id=SYSTEM_REFERENDUM,
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.add(
+            "note",
+            id=key("note", contest, "question"),
+            entity_id=contest,
+            kind="context",
+            body_md=f"The referendum asked the question: \u201c{question}\u201d Voters answered Yes or No.",
+            lang="en",
+        )
+        result_set = _result_set(p, election, contest, f"referendum-{LISTS_DAY}-{letter}", REFERENDUM_METHOD)
+        options = []
+        for position, label in enumerate(("Yes", "No"), 1):
+            option = key("option", f"referendum-{LISTS_DAY}-{letter}", label)
+            options.append(option)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        for code, _, _, _, values in units:
+            yes, no, informal = values[3 * index : 3 * index + 3]
+            unit = made[code]
+            _put(p, result_set, unit, 0, options[0], VOTES, yes)
+            _put(p, result_set, unit, 0, options[1], VOTES, no)
+            _put(p, result_set, unit, 0, None, CAST, yes + no + informal)
+            _put(p, result_set, unit, 0, None, VALID, yes + no)
+            _put(p, result_set, unit, 0, None, INVALID, informal)
+        yes, no, informal, everything = national[index]
+        got = [ordinary_total[3 * index + i] + special_total[3 * index + i] for i in range(3)]
+        if got != [yes, no, informal] or yes + no + informal != everything:
+            raise ValueError(f"{heading}: the sheets total {got}, but the results page prints {national[index]}")
+        for option, value in zip(options, (yes, no), strict=True):
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=everything)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=yes + no)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=informal)
     return p
