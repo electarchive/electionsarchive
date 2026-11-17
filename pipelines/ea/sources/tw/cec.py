@@ -78,7 +78,7 @@ def json_url(kind: str, day: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.tw import cec_township, cec_village
+    from ea.sources.tw import cec_recall, cec_referendum, cec_township, cec_village
 
     for day in PRESIDENT:
         for url, suffix in (
@@ -91,6 +91,8 @@ def fetch() -> None:
     local_fetch()
     cec_township.fetch()
     cec_village.fetch()
+    cec_referendum.fetch()
+    cec_recall.fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -113,7 +115,7 @@ def office(county: str) -> str:
 
 
 def packages() -> list[str]:
-    from ea.sources.tw import cec_township, cec_village
+    from ea.sources.tw import cec_recall, cec_referendum, cec_township, cec_village
 
     return [
         "tw.cec/geo",
@@ -123,11 +125,13 @@ def packages() -> list[str]:
         *(f"tw.cec/local-{day}" for day in LOCAL_DAYS),
         *cec_township.packages(),
         *cec_village.packages(),
+        *cec_referendum.packages(),
+        *cec_recall.packages(),
     ]
 
 
 def parse() -> None:
-    from ea.sources.tw import cec_township, cec_village
+    from ea.sources.tw import cec_recall, cec_referendum, cec_township, cec_village
 
     geo().write()
     registry().write()
@@ -139,6 +143,8 @@ def parse() -> None:
         local(day).write()
     cec_township.parse()
     cec_village.parse()
+    cec_referendum.parse()
+    cec_recall.parse()
 
 
 def emit() -> None:
@@ -321,7 +327,7 @@ def profile(day: str) -> dict[str, object]:
 
 
 def geo() -> Package:
-    from ea.sources.tw import cec_township, cec_village
+    from ea.sources.tw import cec_recall, cec_referendum, cec_township, cec_village
 
     p = Package(
         "tw.cec/geo",
@@ -372,6 +378,9 @@ def geo() -> Package:
                     villages.add((contest.county, str(row["district"]), str(row["village"])))
     cec_township.extend_geo(counties, townships, villages)
     cec_village.extend_geo(counties, townships, villages)
+    cec_referendum.extend_geo(counties, townships, villages)
+    cec_recall.extend_geo(counties, townships, villages)
+    cec_recall.extend_districts(districts)
     for county in sorted(counties):
         id = area("tw.county", county)
         p.add("area", id=id, scheme_code="tw.county")
@@ -399,11 +408,12 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=area("tw.county", county))
         p.name(id, f"{county}第{district}選舉區", "zh", "official")
     cec_township.geo(p)
+    cec_recall.geo(p)
     return p
 
 
 def registry() -> Package:
-    from ea.sources.tw import cec_township, cec_village
+    from ea.sources.tw import cec_recall, cec_referendum, cec_township, cec_village
 
     p = Package(
         "tw.cec/registry",
@@ -498,6 +508,8 @@ def registry() -> Package:
     used |= {c.party for theme in THEMES for contest in contests(theme.day, theme.subject) for c in contest.cands}
     cec_township.registry(p)
     cec_village.registry(p)
+    cec_referendum.registry(p)
+    cec_recall.registry(p)
     used |= cec_township.parties() | cec_village.parties()
     for name in sorted(used - INDEPENDENT):
         id = key("party", name)
