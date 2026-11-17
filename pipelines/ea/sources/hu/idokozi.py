@@ -149,6 +149,9 @@ def fetch() -> None:
             crawl(service, vl_id, group)
             print(f"{service} {vl_id}: {len(group)} elections")
     fetch_archive()
+    from ea.sources.hu import idokozi_archive
+
+    idokozi_archive.fetch()
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -1245,7 +1248,14 @@ def registry() -> Package:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in sorted(built()))]
+    from ea.sources.hu import idokozi_old
+
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{day}" for day in sorted(built())),
+        *idokozi_old.packages(),
+    ]
 
 
 @functools.cache
@@ -1262,6 +1272,9 @@ def parse(only: str | None = None) -> None:
         d.write()
     geo().write()
     registry().write()
+    from ea.sources.hu import idokozi_old
+
+    idokozi_old.parse(only)
 
 
 def emit() -> None:
