@@ -21,7 +21,6 @@ from ea.sources.cy import crawl
 from ea.sources.cy import moi as national
 
 PIPELINE = "cy.moi_local"
-PREFIX = f"{PIPELINE}/councils"
 RAW = crawl.SOURCE
 CYPRUS = national.CYPRUS
 COUNTRY = national.COUNTRY
@@ -65,11 +64,28 @@ ELECTIONS = [
 ]
 
 
-# The municipal council elections of the three municipal election days; each package set is built from these only.
+# The municipal council elections of the three municipal election days. They are their own package set, loaded
+# earlier; the set built here holds the other elections of those days and borrows that set's schemes, areas, and
+# party lines.
 COUNCIL_SITES = {74, 97, 164}
+COUNCIL_PREFIX = f"{PIPELINE}/councils"
+# School boards, deputy mayors, and the presidents of the district self-government organisations.
+OFFICE_SITES = {73, 99, 172, 165, 197, 174}
+
+
+# The package set being built: "offices" (the default) or "councils".
+MODE = ["offices"]
+
+
+def prefix() -> str:
+    return COUNCIL_PREFIX if MODE[0] == "councils" else f"{PIPELINE}/offices"
 
 
 def active() -> list[Election]:
+    return [e for e in ELECTIONS if e.site in (COUNCIL_SITES if MODE[0] == "councils" else OFFICE_SITES)]
+
+
+def councils() -> list[Election]:
     return [e for e in ELECTIONS if e.site in COUNCIL_SITES]
 
 
@@ -178,7 +194,7 @@ SOURCE_ID = key("source", "moi-local")
 
 
 def election_package(day: date) -> str:
-    return f"{PREFIX}/{day}"
+    return f"{prefix()}/{day}"
 
 
 def days() -> list[date]:
@@ -186,12 +202,18 @@ def days() -> list[date]:
 
 
 def packages() -> list[str]:
-    return [f"{PREFIX}/geo", f"{PREFIX}/registry", *(election_package(day) for day in days())]
+    out = []
+    for mode in ("councils", "offices"):
+        MODE[0] = mode
+        out += [f"{prefix()}/geo", f"{prefix()}/registry", *(election_package(day) for day in days())]
+    MODE[0] = "offices"
+    return out
 
 
 def fetch() -> None:
-    for e in active():
-        crawl.fetch_election(e.site)
+    for e in ELECTIONS:
+        if e.site in COUNCIL_SITES | OFFICE_SITES:
+            crawl.fetch_election(e.site)
 
 
 def emit() -> None:
@@ -199,10 +221,15 @@ def emit() -> None:
 
 
 def parse() -> None:
-    geo().write()
-    registry().write()
-    for day in days():
-        build(day).write()
+    for mode in ("councils", "offices"):
+        MODE[0] = mode
+        geo().write()
+        registry().write()
+        for day in days():
+            build(day).write()
+        for cache in (places, council_places, lines):
+            cache.cache_clear()
+    MODE[0] = "offices"
 
 
 def artifact(site: int) -> raw.Artifact:
@@ -234,9 +261,21 @@ def district_area(code: object) -> str:
 @functools.cache
 def places() -> tuple[dict[int, tuple[str, str | None]], dict[int, tuple[str, str | None, int]]]:
     """Districts and the municipalities and communities with Greek and English names, from the newest election."""
+    return _places(tuple(sorted({*active(), *councils()}, key=lambda e: e.site)))
+
+
+@functools.cache
+def council_places() -> tuple[dict[int, tuple[str, str | None]], dict[int, tuple[str, str | None, int]]]:
+    """The districts and areas the council package set holds."""
+    return _places(tuple(councils())) if MODE[0] == "offices" else ({}, {})
+
+
+def _places(
+    elections: tuple[Election, ...],
+) -> tuple[dict[int, tuple[str, str | None]], dict[int, tuple[str, str | None, int]]]:
     districts: dict[int, tuple[str, str | None]] = {}
     areas: dict[int, tuple[str, str | None, int]] = {}
-    for e in sorted(active(), key=lambda e: e.day):
+    for e in sorted(elections, key=lambda e: e.day):
         document = national.load(e.site)
         english = document["english"]["districts"]
         for district in document["districts"]:
@@ -256,22 +295,31 @@ def label(code: int) -> tuple[str, str]:
 
 
 def geo() -> Package:
+    first = MODE[0] == "councils"
     p = Package(
-        f"{PREFIX}/geo",
+        f"{prefix()}/geo",
         PIPELINE,
-        "Cyprus's districts, municipalities, and communities that voted in the Ministry of Interior's local results",
+        "Cyprus's districts, municipalities, and communities that voted in the Ministry of Interior's local results"
+        + ("" if first else ", beyond those in the council package set"),
+        depends=[] if first else [f"{COUNCIL_PREFIX}/geo"],
     )
     p.external |= {CYPRUS, COUNTRY}
-    add_source(p)
+    if first:
+        add_source(p)
+        for scheme, rank, noun in (
+            ("cy.local_district", 1, "district"),
+            ("cy.local_area", 2, "municipality or community"),
+        ):
+            p.add(
+                "scheme", code=scheme, polity_id=CYPRUS, kind="administrative", rank=rank, noun=noun, code_system=None
+            )
     for e in active():
         p.artifact(artifact(e.site), SOURCE_ID)
-    for scheme, rank, noun in (
-        ("cy.local_district", 1, "district"),
-        ("cy.local_area", 2, "municipality or community"),
-    ):
-        p.add("scheme", code=scheme, polity_id=CYPRUS, kind="administrative", rank=rank, noun=noun, code_system=None)
-    districts, areas = places()
+    districts, areas = _places(tuple(active()))
+    held_districts, held_areas = council_places()
     for code, (greek, english) in sorted(districts.items()):
+        if code in held_districts:
+            continue
         id = district_area(code)
         p.add("area", id=id, scheme_code="cy.local_district")
         p.add("area_code", area_id=id, code=str(code))
@@ -280,6 +328,8 @@ def geo() -> Package:
         if english:
             p.name(id, english, "en", "english", False)
     for code, (greek, english, district) in sorted(areas.items()):
+        if code in held_areas:
+            continue
         id = area(code)
         p.add("area", id=id, scheme_code="cy.local_area")
         p.add("area_code", area_id=id, code=str(code))
@@ -328,10 +378,10 @@ def party_name(name: str) -> str:
 
 
 @functools.cache
-def lines() -> dict[str, dict[str, str | None]]:
+def lines(elections: tuple[Election, ...] = ()) -> dict[str, dict[str, str | None]]:
     """Every list ballot line, by Greek name, with an English name when the site gives one."""
     out: dict[str, dict[str, str | None]] = {}
-    for e in active():
+    for e in elections or tuple(active()):
         if KINDS[e.kind].seats != "list":
             continue
         document = national.load(e.site)
@@ -354,10 +404,10 @@ def seen() -> dict[str, set[int]]:
 
 def registry() -> Package:
     p = Package(
-        f"{PREFIX}/registry",
+        f"{prefix()}/registry",
         PIPELINE,
         "Cyprus's local councils, offices, and party ballot lines",
-        depends=[f"{PREFIX}/geo"],
+        depends=[f"{prefix()}/geo"],
     )
     p.external |= {CYPRUS, COUNTRY}
     for e in active():
@@ -377,7 +427,10 @@ def registry() -> Package:
                 )
             p.name(id, english, "en", "official")
             p.name(id, greek, "el", "native", False)
+    held = lines(tuple(councils())) if MODE[0] == "offices" else {}
     for name, row in sorted(lines().items()):
+        if name in held:
+            continue
         id = key("party", name)
         p.add("party", id=id, kind="party", polity_id=CYPRUS)
         p.name(id, name, "el", "official")
@@ -433,7 +486,8 @@ def build(day: date) -> Package:
         election_package(day),
         PIPELINE,
         f"The {day} local elections in Cyprus by ballot box from the Ministry of Interior",
-        depends=[f"{PREFIX}/geo", f"{PREFIX}/registry"],
+        depends=([f"{COUNCIL_PREFIX}/geo", f"{COUNCIL_PREFIX}/registry"] if MODE[0] == "offices" else [])
+        + [f"{prefix()}/geo", f"{prefix()}/registry"],
     )
     p.external |= {CYPRUS, COUNTRY, "cy.ballot_box"}
     over = [0, 0]
