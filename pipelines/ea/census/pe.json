@@ -150,7 +150,7 @@
    "name_en": "Regional governments",
    "parent": "nacional",
    "polity_kind": "region",
-   "scheme": "pe.ubigeo.departamento",
+   "scheme": "pe.ubigeo_departamento",
    "valid_from": "2002-11-17",
    "source": "const1993",
    "counts": [
@@ -178,7 +178,7 @@
    "name_en": "Provincial municipalities",
    "parent": "departamento",
    "polity_kind": "county",
-   "scheme": "pe.ubigeo.provincia",
+   "scheme": "pe.ubigeo_provincia",
    "source": "const1993",
    "counts": [
     {
@@ -195,7 +195,7 @@
    "name_en": "District municipalities",
    "parent": "provincia",
    "polity_kind": "municipality",
-   "scheme": "pe.ubigeo.distrito",
+   "scheme": "pe.ubigeo_distrito",
    "source": "const1993",
    "counts": [
     {
@@ -240,9 +240,9 @@
    "measure": {
     "unit": "contest",
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -516,9 +516,9 @@
      "pe.circunscripcion"
     ],
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -661,9 +661,9 @@
      "pe.circunscripcion"
     ],
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -830,9 +830,9 @@
      "pe.provincia"
     ],
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1073,9 +1073,9 @@
    "measure": {
     "unit": "contest",
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1188,9 +1188,9 @@
    "measure": {
     "unit": "question",
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1280,12 +1280,12 @@
    "measure": {
     "unit": "question",
     "grain": [
-     "pe.ubigeo.departamento"
+     "pe.ubigeo_departamento"
     ],
     "fine": [
-     "pe.ubigeo.departamento",
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_departamento",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1365,7 +1365,7 @@
    "measure": {
     "unit": "question",
     "fine": [
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1572,8 +1572,8 @@
    "measure": {
     "unit": "contest",
     "fine": [
-     "pe.ubigeo.provincia",
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_provincia",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1735,10 +1735,10 @@
    "measure": {
     "unit": "constituency",
     "grain": [
-     "pe.ubigeo.provincia"
+     "pe.ubigeo_provincia"
     ],
     "fine": [
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
@@ -1784,7 +1784,7 @@
      "source": "infogob",
      "license": "Official public record, no license stated",
      "evidence": "Totals per provincial constituency and the elected councillors, 2010-2022.",
-     "finest": "pe.ubigeo.provincia"
+     "finest": "pe.ubigeo_provincia"
     },
     {
      "platform": "ONPE, Plataforma Nacional de Datos Abiertos",
@@ -1934,7 +1934,7 @@
    "measure": {
     "unit": "contest",
     "fine": [
-     "pe.ubigeo.distrito",
+     "pe.ubigeo_distrito",
      "pe.mesa"
     ]
    },
