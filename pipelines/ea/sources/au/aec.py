@@ -192,9 +192,10 @@ def _suffix(url: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.au import aec_cd
+    from ea.sources.au import aec_cd, aec_pages
 
     aec_cd.fetch()
+    aec_pages.fetch()
     fetch_html()
     for event in EVENTS:
         if event.id in HTML_ONLY:
@@ -1105,9 +1106,9 @@ def referendum(p: Package, event: Event, election: str, path: str, units: Units,
 
 
 def days() -> list[date]:
-    from ea.sources.au import aec_cd
+    from ea.sources.au import aec_cd, aec_pages
 
-    return sorted({V2001.day, *(event.day for event in EVENTS), *aec_cd.DAYS})
+    return sorted({V2001.day, *(event.day for event in EVENTS), *aec_cd.DAYS, *aec_pages.DAYS})
 
 
 def packages() -> list[str]:
@@ -1184,8 +1185,10 @@ def election(day: date) -> Package:
 
 
 def build(day: date) -> Package:
-    from ea.sources.au import aec_cd
+    from ea.sources.au import aec_cd, aec_pages
 
+    if day in aec_pages.DAYS:
+        return aec_pages.election(day)
     for year in aec_cd.YEARS:
         if day == year.day:
             return aec_cd.election(year)
