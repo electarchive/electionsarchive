@@ -1139,10 +1139,13 @@ def registry() -> Package:
     systems = (
         (
             SYSTEM_LIST,
-            {"formula": "dhondt"},
+            {"formula": "dhondt", "threshold": {"level": "list", "scope": "contest", "percent": 3}},
             (
-                "One national constituency elects 81 members by party-list proportional representation. The electoral "
-                "thresholds and the rules for minority lists are not stored here."
+                "One national constituency elects 81 members by party-list proportional representation. Only lists "
+                "with at least 3 percent of the valid votes in the constituency share in the allocation, as the "
+                "commission's decisions on the 2020 and 2023 results cite under article 94 of the Law on the Election "
+                "of Councilors and Members of Parliament. The rules for minority lists are not stored here, because "
+                "those decisions do not set them out."
             ),
         ),
         (
@@ -1155,7 +1158,7 @@ def registry() -> Package:
         ),
         (
             SYSTEM_REFERENDUM,
-            {"formula": "referendum"},
+            {"formula": "referendum", "majority": {"share": 0.55}},
             "A yes or no question put to all voters. The 2006 referendum on statehood required 55 percent in favor.",
         ),
     )
