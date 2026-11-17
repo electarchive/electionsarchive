@@ -1,0 +1,2768 @@
+{
+ "polity": "NO",
+ "name": "Norway",
+ "sources": {
+  "grunnloven": {
+   "title": "Kongeriket Noregs grunnlov (LOV-1814-05-17)",
+   "publisher": "Lovdata (Stortinget)",
+   "url": "https://lovdata.no/dokument/NL/lov/1814-05-17",
+   "kind": "official_body"
+  },
+  "valgloven": {
+   "title": "Lov om valg til Stortinget, fylkesting og kommunestyrer (valgloven), LOV-2023-06-16-62",
+   "publisher": "Lovdata (Kommunal- og distriktsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/2023-06-16-62",
+   "kind": "official_body"
+  },
+  "valgloven_2002": {
+   "title": "Lov om valg til Stortinget, fylkesting og kommunestyrer (valgloven), LOV-2002-06-28-57 (repealed 2025)",
+   "publisher": "Lovdata (Kommunal- og distriktsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/2002-06-28-57",
+   "kind": "official_body"
+  },
+  "kommuneloven": {
+   "title": "Lov om kommuner og fylkeskommuner (kommuneloven), LOV-2018-06-22-83",
+   "publisher": "Lovdata (Kommunal- og distriktsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/2018-06-22-83",
+   "kind": "official_body"
+  },
+  "sameloven": {
+   "title": "Lov om Sametinget og andre samiske rettsforhold (sameloven), LOV-1987-06-12-56",
+   "publisher": "Lovdata (Kommunal- og distriktsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/1987-06-12-56",
+   "kind": "official_body"
+  },
+  "svalbardloven": {
+   "title": "Lov om Svalbard (svalbardloven), LOV-1925-07-17-11, kapittel 5 (Longyearbyen lokalstyre)",
+   "publisher": "Lovdata (Justis- og beredskapsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/1925-07-17-11",
+   "kind": "official_body"
+  },
+  "innst_lyb": {
+   "title": "Innst. O. nr. 126 (2000-2001) om lov om endringer i svalbardloven (lokaldemokrati i Longyearbyen)",
+   "publisher": "Stortinget",
+   "url": "https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Innstillinger/Odelstinget/2000-2001/inno-200001-126/?lvl=0",
+   "kind": "official_body"
+  },
+  "lokalstyre": {
+   "title": "Longyearbyen lokalstyre",
+   "publisher": "Longyearbyen lokalstyre",
+   "url": "https://www.lokalstyre.no/",
+   "kind": "official_body"
+  },
+  "valg_om": {
+   "title": "Valga i Noreg",
+   "publisher": "Valdirektoratet (valg.no)",
+   "url": "https://www.valg.no/om-valg/valgene-i-norge/",
+   "kind": "official_body"
+  },
+  "valg_st": {
+   "title": "Stortingsval",
+   "publisher": "Valdirektoratet (valg.no)",
+   "url": "https://www.valg.no/om-valg/valgene-i-norge/stortingsvalg/",
+   "kind": "official_body"
+  },
+  "valg_sa": {
+   "title": "Sametingsval",
+   "publisher": "Valdirektoratet (valg.no)",
+   "url": "https://www.valg.no/om-valg/valgene-i-norge/sametingsvalg/",
+   "kind": "official_body"
+  },
+  "valgresultat": {
+   "title": "Valgresultat",
+   "publisher": "Valgdirektoratet",
+   "url": "https://valgresultat.no",
+   "kind": "official_body",
+   "note": "Results service and JSON API (valgresultat.no/api) for every election from 2009, down to the polling circuit."
+  },
+  "klass_kommune": {
+   "title": "Standard for kommuneinndeling (KLASS 131), versions from 1838",
+   "publisher": "Statistisk sentralbyrå (KLASS)",
+   "url": "https://data.ssb.no/api/klass/v1/classifications/131",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "klass_fylke": {
+   "title": "Standard for fylkesinndeling (KLASS 104), versions from 1842",
+   "publisher": "Statistisk sentralbyrå (KLASS)",
+   "url": "https://data.ssb.no/api/klass/v1/classifications/104",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_25_2": {
+   "title": "Historisk statistikk, tabell 25.2: Stortingsvalg. Personer med stemmerett, avgitte stemmer og valgte representanter",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/a/histstat/tabeller/25-2.html",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_25_5": {
+   "title": "Historisk statistikk, tabell 25.5: Kommunestyrevalg. Personer med stemmerett, avgitte stemmer og representanter",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/a/histstat/tabeller/25-5.html",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_25_8": {
+   "title": "Historisk statistikk, tabell 25.8: Folkeavstemninger",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/a/histstat/tabeller/25-8.html",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_11589": {
+   "title": "Statistikkbanken 11589: Stortingsvalget. Personer med stemmerett, etter kjønn 1815-2025",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/11589",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_13151": {
+   "title": "Statistikkbanken 13151: Valgdeltakelse, etter valgtype og kjønn 1829-2025",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/13151",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_09475": {
+   "title": "Statistikkbanken 09475: Kommunestyrevalget. Stemmer og valgdeltakelse (K) 1955-2023",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/09475",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_01180": {
+   "title": "Statistikkbanken 01180: Kommunestyrevalget. Godkjente stemmer, etter parti/valgliste (K) 1945-2023",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/01180",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_09476": {
+   "title": "Statistikkbanken 09476: Fylkestingsvalget. Stemmer og valgdeltakelse (K) 1975-2023",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/09476",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_05922": {
+   "title": "Statistikkbanken 05922: Sametingsvalget. Representanter og godkjente stemmer per representant, etter valgdistrikt 2005-2025",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/05922",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_07552": {
+   "title": "Statistikkbanken 07552: Lokale folkeavstemninger, etter tema 1970-2025",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/statbank/table/07552",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "ssb_valg": {
+   "title": "Valg: statistikk over stortingsvalg, kommunestyre- og fylkestingsvalg og sametingsvalg",
+   "publisher": "Statistisk sentralbyrå",
+   "url": "https://www.ssb.no/valg",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "oslo_valg2007": {
+   "title": "Valgresultater fra kommunestyrevalg og valg til bydelsutvalg 2007",
+   "publisher": "Oslo kommune",
+   "url": "https://www.oslo.kommune.no/politikk/valg/valgresultater-og-statistikk/valgresultater-2007/",
+   "kind": "official_body"
+  },
+  "oslo_bydel_reglement": {
+   "title": "Reglement for bydelene",
+   "publisher": "Oslo kommune",
+   "url": "https://www.oslo.kommune.no/politikk/reglement-for-folkevalgte/reglement-for-bydelene/",
+   "kind": "official_body"
+  },
+  "krd_ordforer": {
+   "title": "Ordførerforsøket i valgperioden 2003-2007: forsøkskommuner",
+   "publisher": "Kommunal- og regionaldepartementet (regjeringen.no)",
+   "url": "https://www.regjeringen.no/no/tema/kommuner-og-regioner/kommunalrett-og-kommunal-inndeling/forsok-i-kommunesektoren/avsluttede-forsok/ordforerforsoket-i-valgperioden-2003-200/id414675/",
+   "kind": "official_body"
+  },
+  "innst_ordforer": {
+   "title": "Innst. O. nr. 9 (2006-2007) om endringer i kommuneloven mv. (direkte valg av ordfører)",
+   "publisher": "Stortinget",
+   "url": "https://www.stortinget.no/globalassets/pdf/innstillinger/odelstinget/2006-2007/inno-200607-009.pdf",
+   "kind": "official_body"
+  },
+  "stortinget_hist": {
+   "title": "Stortingets historie",
+   "publisher": "Stortinget",
+   "url": "https://www.stortinget.no/no/Stortinget-og-demokratiet/Historikk/",
+   "kind": "official_body"
+  },
+  "sametinget_valg": {
+   "title": "Sametingsvalg",
+   "publisher": "Sametinget",
+   "url": "https://sametinget.no/politikk/valg/",
+   "kind": "official_body"
+  },
+  "kirkeloven": {
+   "title": "Lov om tros- og livssynssamfunn (trossamfunnsloven), LOV-2020-04-24-31",
+   "publisher": "Lovdata (Barne- og familiedepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/2020-04-24-31",
+   "kind": "official_body"
+  },
+  "domstolloven": {
+   "title": "Lov om domstolene (domstolloven), LOV-1915-08-13-5",
+   "publisher": "Lovdata (Justis- og beredskapsdepartementet)",
+   "url": "https://lovdata.no/dokument/NL/lov/1915-08-13-5",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Kongeriket Norge",
+   "name_en": "Kingdom of Norway",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "grunnloven"
+  },
+  {
+   "key": "valgdistrikt",
+   "name": "Valgdistrikter ved stortingsvalg",
+   "name_en": "Storting constituencies",
+   "parent": "national",
+   "elects": false,
+   "scheme": "no.fylke",
+   "source": "valgloven",
+   "counts": [
+    {
+     "date": "1973-09-10",
+     "value": 19,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=1973-09-01 (19 counties after Bergen joined Hordaland in 1972; each county one constituency from 1953)"
+    },
+    {
+     "date": "2025-09-08",
+     "value": 19,
+     "source": "valgresultat",
+     "locator": "https://valgresultat.no/api/2025/st (19 constituencies, 169 seats; the constituencies kept the 2019 counties when the counties merged in 2020)"
+    }
+   ]
+  },
+  {
+   "key": "fylke",
+   "name": "Fylkeskommuner",
+   "name_en": "Counties",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "no.fylke",
+   "source": "kommuneloven",
+   "counts": [
+    {
+     "date": "1906-09-01",
+     "value": 20,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=1906-09-01 (20 counties (amter, fylker from 1919), with Kristiania and Bergen, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "1973-09-01",
+     "value": 19,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=1973-09-01 (19 counties, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2018-01-01",
+     "value": 18,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=2018-01-01 (18 counties after Trøndelag was formed, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2020-01-01",
+     "value": 11,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=2020-01-01 (11 counties, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2024-01-01",
+     "value": 15,
+     "source": "klass_fylke",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/104/codesAt?date=2024-01-01 (15 counties, excluding the 99 'uoppgitt' code)"
+    }
+   ]
+  },
+  {
+   "key": "kommune",
+   "name": "Kommuner",
+   "name_en": "Municipalities",
+   "parent": "fylke",
+   "polity_kind": "municipality",
+   "scheme": "no.kommune",
+   "source": "kommuneloven",
+   "counts": [
+    {
+     "date": "1955-10-01",
+     "value": 744,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=1955-10-01 (744 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "1964-01-01",
+     "value": 525,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=1964-01-01 (525 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "1975-09-01",
+     "value": 443,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=1975-09-01 (443 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "1987-09-01",
+     "value": 454,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=1987-09-01 (454 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "1995-09-01",
+     "value": 435,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=1995-09-01 (435 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2007-09-01",
+     "value": 431,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=2007-09-01 (431 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2015-09-01",
+     "value": 428,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=2015-09-01 (428 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2019-01-01",
+     "value": 422,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=2019-01-01 (422 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2020-01-01",
+     "value": 356,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=2020-01-01 (356 municipalities, excluding the 99 'uoppgitt' code)"
+    },
+    {
+     "date": "2024-01-01",
+     "value": 357,
+     "source": "klass_kommune",
+     "locator": "https://data.ssb.no/api/klass/v1/classifications/131/codesAt?date=2024-01-01 (357 municipalities, excluding the 99 'uoppgitt' code)"
+    }
+   ]
+  },
+  {
+   "key": "bydel",
+   "name": "Bydeler i Oslo",
+   "name_en": "Oslo city districts",
+   "parent": "kommune",
+   "polity_kind": "submunicipal",
+   "source": "oslo_bydel_reglement",
+   "valid_from": "1995-09-11",
+   "counts": [
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "value": 15,
+     "source": "oslo_bydel_reglement",
+     "locator": "https://www.oslo.kommune.no/politikk/reglement-for-folkevalgte/reglement-for-bydelene/ (15 bydeler, each with a directly elected bydelsutvalg)"
+    }
+   ]
+  },
+  {
+   "key": "longyearbyen",
+   "name": "Longyearbyen lokalstyre",
+   "name_en": "Longyearbyen local council area (Svalbard)",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "source": "svalbardloven",
+   "valid_from": "2002-01-01",
+   "counts": [
+    {
+     "date": "2002-01-01",
+     "value": 1,
+     "source": "svalbardloven",
+     "locator": "Svalbard Act ch. 5 (Longyearbyen lokalstyre, the only elected local government on Svalbard; Svalbard is outside the municipal division)"
+    }
+   ]
+  },
+  {
+   "key": "sami",
+   "name": "Sametingets valgkretser",
+   "name_en": "Sámi Parliament (the Sámi electoral roll, nationwide constituencies)",
+   "parent": "national",
+   "scheme": "no.samevalgkrets",
+   "source": "sameloven",
+   "valid_from": "1989-09-11",
+   "counts": [
+    {
+     "date": "2005-09-12",
+     "value": 13,
+     "source": "ssb_05922",
+     "locator": "13 constituency rows (Varanger to Sør-Norge) with representatives in 2005"
+    },
+    {
+     "date": "2009-09-14",
+     "value": 7,
+     "source": "ssb_05922",
+     "locator": "7 constituency rows (VAL1 Østre to VAL7 Sør-Norge) with representatives in 2009"
+    },
+    {
+     "date": "2025-09-08",
+     "value": 7,
+     "source": "valg_sa",
+     "locator": "https://www.valg.no/om-valg/valgene-i-norge/sametingsvalg/ (Det er 7 valkrinsar som dekkjer heile landet ... Til saman blir det valt 39 representantar)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "storting",
+   "tier": "national",
+   "name": "Stortingsvalg",
+   "name_en": "Storting elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "no.fylke"
+    ],
+    "fine": [
+     "no.kommune",
+     "no.stemmekrets"
+    ]
+   },
+   "finest_note": "Each constituency is one contest; valgresultat.no publishes counts by polling circuit from 2009, SSB by municipality from 1906 (NOS volumes) and in Statistikkbanken for recent elections.",
+   "note": "169 members (since 2005) in 19 constituencies, the counties of 2019: 150 district seats by modified Sainte-Laguë (first divisor 1.4) among closed lists, and one leveling seat per constituency for parties above 4% nationally. Direct elections since 1906: single-member constituencies with a second ballot until 1918, list PR since 1921. The Storting cannot be dissolved (Grunnloven § 71), so elections fall every fourth September. Before 1906 see storting_indirekte.",
+   "source": "grunnloven",
+   "locator": "https://lovdata.no/dokument/NL/lov/1814-05-17 (§§ 54, 57-59, 71)",
+   "valid_from": "1906-01-01",
+   "first_held": "1906-01-01",
+   "earliest_record": "1906-01-01",
+   "contests_per_unit": 1,
+   "est_votes": 80000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 9,
+     "day_rule": "a Monday in September set by the King (valgloven § 9-2); municipalities may also poll on the Sunday before",
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "valid_from": "1936-01-01",
+     "administered_by": "Valgdirektoratet with the county electoral boards (fylkesvalgstyrer) and municipal electoral boards",
+     "source": "valg_st",
+     "locator": "https://www.valg.no/om-valg/valgene-i-norge/stortingsvalg/ (I september kvart fjerde år blir det valt representantar til Stortinget)",
+     "vacancy_rule": "A vacancy is filled by the next deputy (vararepresentant) of the same list; there are no by-elections."
+    },
+    {
+     "period_years": 3,
+     "phase": 1,
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1906-01-01",
+     "valid_to": "1936-01-01",
+     "administered_by": "Municipal electoral boards and county electoral assemblies",
+     "source": "ssb_25_2",
+     "locator": "https://www.ssb.no/a/histstat/tabeller/25-2.html (elections every third year from 1906 to 1936)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Valgresultat (Valgdirektoratet)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.stemmekrets",
+     "source": "valgresultat",
+     "url": "https://valgresultat.no/api/{year}/st",
+     "first_date": "2009-09-14",
+     "last_date": "2025-09-08",
+     "evidence": "JSON results for every Storting election from 2009, by constituency, municipality, and polling circuit."
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Statistikkbanken",
+     "url": "https://www.ssb.no/statbank/table/11589",
+     "format": "px, csv, json-stat",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "world.country",
+     "license": "CC BY 4.0",
+     "first_date": "1815-01-01",
+     "last_date": "2025-09-08",
+     "evidence": "Electorate and turnout by election from 1815; party votes by municipality in the stortingsvalg tables for recent elections.",
+     "source": "ssb_11589"
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Norges offisielle statistikk (digitized volumes)",
+     "url": "https://www.ssb.no/a/histstat/nos/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1906-01-01",
+     "last_date": "2005-09-12",
+     "evidence": "Norges offisielle statistikk: Stortingsvalget volumes, votes by party and municipality for each election.",
+     "source": "ssb_valg"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "^Storting",
+     "valid_from": "1906-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "election_kind": "general",
+     "date": "1906-01-01",
+     "precision": "year",
+     "seats": 123,
+     "contests": 123,
+     "note": "Single-member constituencies with a second ballot where no candidate won a majority; polling spread over several weeks.",
+     "source": "ssb_25_2",
+     "quote": "1906 | ... | Valgte representanter 123"
+    },
+    {
+     "election_kind": "general",
+     "date": "1909-01-01",
+     "precision": "year",
+     "seats": 123,
+     "contests": 123,
+     "note": "Single-member constituencies with a second ballot where no candidate won a majority; polling spread over several weeks.",
+     "source": "ssb_25_2",
+     "quote": "1909 | ... | Valgte representanter 123"
+    },
+    {
+     "election_kind": "general",
+     "date": "1912-01-01",
+     "precision": "year",
+     "seats": 123,
+     "contests": 123,
+     "note": "Single-member constituencies with a second ballot where no candidate won a majority; polling spread over several weeks.",
+     "source": "ssb_25_2",
+     "quote": "1912 | ... | Valgte representanter 123"
+    },
+    {
+     "election_kind": "general",
+     "date": "1915-01-01",
+     "precision": "year",
+     "seats": 123,
+     "contests": 123,
+     "note": "Single-member constituencies with a second ballot where no candidate won a majority; polling spread over several weeks.",
+     "source": "ssb_25_2",
+     "quote": "1915 | ... | Valgte representanter 123"
+    },
+    {
+     "election_kind": "general",
+     "date": "1918-01-01",
+     "precision": "year",
+     "seats": 126,
+     "contests": 126,
+     "note": "Single-member constituencies with a second ballot where no candidate won a majority; polling spread over several weeks.",
+     "source": "ssb_25_2",
+     "quote": "1918 | ... | Valgte representanter 126"
+    },
+    {
+     "election_kind": "general",
+     "date": "1921-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1921 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1924-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1924 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1927-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1927 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1930-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1930 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1933-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1933 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1936-01-01",
+     "precision": "year",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule.",
+     "source": "ssb_25_2",
+     "quote": "1936 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1945-10-08",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule. The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source.",
+     "source": "ssb_25_2",
+     "quote": "1945 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1949-10-10",
+     "seats": 150,
+     "note": "Party-list PR with separate rural and town constituencies; the constituency count is not yet taken from an official schedule. The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source.",
+     "source": "ssb_25_2",
+     "quote": "1949 | ... | Valgte representanter 150"
+    },
+    {
+     "election_kind": "general",
+     "date": "1953-10-12",
+     "seats": 150,
+     "contests": 20,
+     "source": "ssb_25_2",
+     "quote": "1953 | ... | Valgte representanter 150",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1957-10-07",
+     "seats": 150,
+     "contests": 20,
+     "source": "ssb_25_2",
+     "quote": "1957 | ... | Valgte representanter 150",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1961-09-11",
+     "seats": 150,
+     "contests": 20,
+     "source": "ssb_25_2",
+     "quote": "1961 | ... | Valgte representanter 150",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1965-09-13",
+     "seats": 150,
+     "contests": 20,
+     "source": "ssb_25_2",
+     "quote": "1965 | ... | Valgte representanter 150",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1969-09-08",
+     "seats": 150,
+     "contests": 20,
+     "source": "ssb_25_2",
+     "quote": "1969 | ... | Valgte representanter 150",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1973-09-10",
+     "seats": 155,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1973 | ... | Valgte representanter 155",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1977-09-12",
+     "seats": 155,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1977 | ... | Valgte representanter 155",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1981-09-14",
+     "seats": 155,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1981 | ... | Valgte representanter 155",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1985-09-09",
+     "seats": 157,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1985 | ... | Valgte representanter 157",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1989-09-11",
+     "seats": 165,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1989 | ... | Valgte representanter 165",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1993-09-13",
+     "seats": 165,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1993 | ... | Valgte representanter 165",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "1997-09-15",
+     "seats": 165,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "1997 | ... | Valgte representanter 165",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "2001-09-10",
+     "seats": 165,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "2001 | ... | Valgte representanter 165",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "2005-09-12",
+     "seats": 169,
+     "contests": 19,
+     "source": "ssb_25_2",
+     "quote": "2005 | ... | Valgte representanter 169",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "general",
+     "date": "2009-09-14",
+     "seats": 169,
+     "contests": 19,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2009/st: 19 fylker, mandater antall 169"
+    },
+    {
+     "election_kind": "general",
+     "date": "2013-09-09",
+     "seats": 169,
+     "contests": 19,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2013/st: 19 fylker, mandater antall 169"
+    },
+    {
+     "election_kind": "general",
+     "date": "2017-09-11",
+     "seats": 169,
+     "contests": 19,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2017/st: 19 fylker, mandater antall 169"
+    },
+    {
+     "election_kind": "general",
+     "date": "2021-09-13",
+     "seats": 169,
+     "contests": 19,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2021/st: 19 fylker, mandater antall 169"
+    },
+    {
+     "election_kind": "general",
+     "date": "2025-09-08",
+     "seats": 169,
+     "contests": 19,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2025/st: 19 fylker, mandater antall 169"
+    }
+   ]
+  },
+  {
+   "key": "storting_indirekte",
+   "tier": "national",
+   "name": "Indirekte stortingsvalg (1814-1903)",
+   "name_en": "Indirect Storting elections (1814-1903)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "SSB gives national electorate and turnout (from 1829); returns by electoral assembly survive in the Storting's and counties' archives.",
+   "note": "Two-stage elections under the Constitution of 1814: the enfranchised men chose electors at parish and town polls, and the electors chose the representatives. Every third year, with the 1814 extraordinary Storting.",
+   "source": "grunnloven",
+   "valid_from": "1814-08-01",
+   "valid_to": "1906-01-01",
+   "first_held": "1814-01-01",
+   "earliest_record": "1815-01-01",
+   "est_votes": 2000000,
+   "effort": 5,
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "^Storting",
+     "valid_to": "1906-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1814-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "note": "Election of the extraordinary Storting of autumn 1814 (after the Moss Convention); not in SSB's series."
+    },
+    {
+     "date": "1815-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 87,
+     "source": "ssb_25_2",
+     "quote": "1815 | ... | Valgte representanter 87",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1817-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 78,
+     "source": "ssb_25_2",
+     "quote": "1817 | ... | Valgte representanter 78",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1820-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 77,
+     "source": "ssb_25_2",
+     "quote": "1820 | ... | Valgte representanter 77",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1823-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 77,
+     "source": "ssb_25_2",
+     "quote": "1823 | ... | Valgte representanter 77",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1826-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 79,
+     "source": "ssb_25_2",
+     "quote": "1826 | ... | Valgte representanter 79",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1829-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 81,
+     "source": "ssb_25_2",
+     "quote": "1829 | ... | Valgte representanter 81",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1832-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 95,
+     "source": "ssb_25_2",
+     "quote": "1832 | ... | Valgte representanter 95",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1835-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 96,
+     "source": "ssb_25_2",
+     "quote": "1835 | ... | Valgte representanter 96",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1838-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 99,
+     "source": "ssb_25_2",
+     "quote": "1838 | ... | Valgte representanter 99",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1841-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 100,
+     "source": "ssb_25_2",
+     "quote": "1841 | ... | Valgte representanter 100",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1844-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 102,
+     "source": "ssb_25_2",
+     "quote": "1844 | ... | Valgte representanter 102",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1847-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 105,
+     "source": "ssb_25_2",
+     "quote": "1847 | ... | Valgte representanter 105",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1850-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 106,
+     "source": "ssb_25_2",
+     "quote": "1850 | ... | Valgte representanter 106",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1853-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 107,
+     "source": "ssb_25_2",
+     "quote": "1853 | ... | Valgte representanter 107",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1856-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1856 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1859-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 117,
+     "source": "ssb_25_2",
+     "quote": "1859 | ... | Valgte representanter 117",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1862-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1862 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1865-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1865 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1868-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1868 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1870-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1870 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1873-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1873 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1876-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 111,
+     "source": "ssb_25_2",
+     "quote": "1876 | ... | Valgte representanter 111",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1879-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1879 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1882-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1882 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1885-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1885 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1888-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1888 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1891-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1891 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1894-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1894 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1897-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1897 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1900-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 114,
+     "source": "ssb_25_2",
+     "quote": "1900 | ... | Valgte representanter 114",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    },
+    {
+     "date": "1903-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 117,
+     "source": "ssb_25_2",
+     "quote": "1903 | ... | Valgte representanter 117",
+     "note": "Indirect: the voters chose electors (valgmenn) at the parish and town elections, and the electors chose the representatives at county and town electoral assemblies."
+    }
+   ]
+  },
+  {
+   "key": "riksforsamling",
+   "tier": "national",
+   "name": "Riksforsamlingen på Eidsvoll (1814)",
+   "name_en": "Constituent Assembly at Eidsvoll (1814)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "112 representatives chosen in February and March 1814 by electors elected at church meetings and by army and navy units; the Assembly adopted the Constitution on 17 May 1814.",
+   "source": "stortinget_hist",
+   "valid_from": "1814-01-01",
+   "valid_to": "1814-05-21",
+   "first_held": "1814-01-01",
+   "est_votes": 30000,
+   "effort": 5,
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "NO",
+     "valid_to": "1814-12-31"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1814-01-01",
+     "precision": "year",
+     "election_kind": "indirect",
+     "seats": 112,
+     "source": "stortinget_hist",
+     "quote": "Riksforsamlingen på Eidsvoll 1814",
+     "note": "Election meetings in February and March 1814."
+    }
+   ]
+  },
+  {
+   "key": "folkeavstemning",
+   "tier": "national",
+   "name": "Folkeavstemninger",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "no.fylke",
+     "no.kommune"
+    ]
+   },
+   "finest_note": "SSB's historical tables give results by county; the NOS volumes by municipality.",
+   "note": "Six national referendums, each called by a special decision of the Storting; the Constitution provides no referendum, so all since 1905 have been advisory in law.",
+   "source": "ssb_25_8",
+   "first_held": "1905-08-13",
+   "earliest_record": "1905-08-13",
+   "est_votes": 7400000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Statistisk sentralbyrå, Historisk statistikk",
+     "url": "https://www.ssb.no/a/histstat/tabeller/25-8.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.fylke",
+     "license": "CC BY 4.0",
+     "first_date": "1905-08-13",
+     "last_date": "1994-11-28",
+     "evidence": "Electorate, turnout, and yes and no votes by county (with Bergen) for all six referendums.",
+     "source": "ssb_25_8"
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Norges offisielle statistikk (digitized volumes)",
+     "url": "https://www.ssb.no/a/histstat/nos/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1905-08-13",
+     "last_date": "1994-11-28",
+     "evidence": "Norges offisielle statistikk: Folkeavstemningen volumes, results by municipality.",
+     "source": "ssb_valg"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NO"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1905-08-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1905: Oppløsning av unionen med Sverige",
+     "note": "Dissolution of the union with Sweden. The polling day is not quoted from a fetched source."
+    },
+    {
+     "date": "1905-11-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1905: Prins Carl av Danmark til norsk konge",
+     "note": "Prince Carl of Denmark as King (12-13 November). The polling day is not quoted from a fetched source."
+    },
+    {
+     "date": "1919-10-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1919: Innføring av brennevinsforbud",
+     "note": "Prohibition of spirits (5-6 October). The polling day is not quoted from a fetched source."
+    },
+    {
+     "date": "1926-10-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1926: Fortsatt brennevinsforbud",
+     "note": "Continued prohibition of spirits. The polling day is not quoted from a fetched source."
+    },
+    {
+     "date": "1972-09-25",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1972: Rådgivende avstemning om Norges tilslutning til EF",
+     "note": "Advisory: membership of the European Communities (24-25 September). The polling day is not quoted from a fetched source."
+    },
+    {
+     "date": "1994-11-28",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_25_8",
+     "quote": "1994: Rådgivende avstemning om Norges tilslutning til EU",
+     "note": "Advisory: membership of the European Union (27-28 November). The polling day is not quoted from a fetched source."
+    }
+   ]
+  },
+  {
+   "key": "sameting",
+   "tier": "sami",
+   "name": "Sametingsvalg",
+   "name_en": "Sámi Parliament elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "no.samevalgkrets"
+    ],
+    "fine": [
+     "no.kommune",
+     "no.stemmekrets"
+    ]
+   },
+   "finest_note": "Each constituency is one contest; counts by municipality and polling circuit on valgresultat.no from 2013.",
+   "note": "39 representatives elected by the Sámi on the Sámi Parliament's electoral roll, on the day of the Storting election: three in each of 13 constituencies from 1989 (with four leveling seats in 2005), and from 2009 in 7 constituencies apportioned by the roll. The Sámi Parliament is the highest electoral authority for its own election.",
+   "source": "sameloven",
+   "valid_from": "1989-09-11",
+   "first_held": "1989-09-11",
+   "earliest_record": "1989-09-11",
+   "contests_per_unit": 1,
+   "est_votes": 120000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 9,
+     "day_rule": "the day of the Storting election",
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "administered_by": "Sametinget (the highest electoral body) and the municipal electoral boards",
+     "source": "valg_sa",
+     "locator": "https://www.valg.no/om-valg/valgene-i-norge/sametingsvalg/ (Sametingsvalet blir halde kvart fjerde år på same dagen som stortingsvalet)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Valgresultat (Valgdirektoratet)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.stemmekrets",
+     "source": "valgresultat",
+     "url": "https://valgresultat.no/api/{year}/sa",
+     "first_date": "2013-09-09",
+     "last_date": "2025-09-08",
+     "evidence": "JSON results for the Sámi Parliament elections from 2013, by constituency, municipality, and polling circuit."
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Statistikkbanken",
+     "url": "https://www.ssb.no/statbank/table/05922",
+     "format": "px, csv, json-stat",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.samevalgkrets",
+     "license": "CC BY 4.0",
+     "first_date": "2005-09-12",
+     "last_date": "2025-09-08",
+     "evidence": "Representatives and votes by constituency from 2005 (05921-05925).",
+     "source": "ssb_05922"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "Sámi Parliament|Sametinget|Sámediggi"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-09-11",
+     "election_kind": "general",
+     "contests": 13,
+     "seats": 39,
+     "source": "sameloven",
+     "quote": "Sametinget velges ved valg samtidig med stortingsvalget (sameloven § 2-3)",
+     "note": "The first Sámi Parliament election. 39 seats, three in each of 13 constituencies (sameloven as first enacted); the count is not quoted from a results volume."
+    },
+    {
+     "date": "1993-09-13",
+     "election_kind": "general",
+     "contests": 13,
+     "seats": 39,
+     "source": "sameloven",
+     "quote": "Sametinget velges ved valg samtidig med stortingsvalget (sameloven § 2-3)",
+     "note": "39 seats, three in each of 13 constituencies (sameloven as first enacted); the count is not quoted from a results volume."
+    },
+    {
+     "date": "1997-09-15",
+     "election_kind": "general",
+     "contests": 13,
+     "seats": 39,
+     "source": "sameloven",
+     "quote": "Sametinget velges ved valg samtidig med stortingsvalget (sameloven § 2-3)",
+     "note": "39 seats, three in each of 13 constituencies (sameloven as first enacted); the count is not quoted from a results volume."
+    },
+    {
+     "date": "2001-09-10",
+     "election_kind": "general",
+     "contests": 13,
+     "seats": 39,
+     "source": "sameloven",
+     "quote": "Sametinget velges ved valg samtidig med stortingsvalget (sameloven § 2-3)",
+     "note": "39 seats, three in each of 13 constituencies (sameloven as first enacted); the count is not quoted from a results volume."
+    },
+    {
+     "date": "2005-09-12",
+     "election_kind": "general",
+     "contests": 13,
+     "seats": 43,
+     "source": "ssb_05922",
+     "quote": "13 constituencies with 43 representatives in 2005",
+     "note": "Four leveling seats added to the 39 constituency seats; the last election with 13 constituencies."
+    },
+    {
+     "date": "2009-09-14",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 39,
+     "source": "ssb_05922",
+     "quote": "7 constituencies with 39 representatives in 2009"
+    },
+    {
+     "date": "2013-09-09",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 39,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2013/sa: 7 valgdistrikter, mandater antall 39"
+    },
+    {
+     "date": "2017-09-11",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 39,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2017/sa: 7 valgdistrikter, mandater antall 39"
+    },
+    {
+     "date": "2021-09-13",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 39,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2021/sa: 7 valgdistrikter, mandater antall 39"
+    },
+    {
+     "date": "2025-09-08",
+     "election_kind": "general",
+     "contests": 7,
+     "seats": 39,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2025/sa: 7 valgdistrikter, mandater antall 39"
+    }
+   ]
+  },
+  {
+   "key": "fylkesting",
+   "tier": "fylke",
+   "name": "Fylkestingsvalg",
+   "name_en": "County council elections",
+   "category": "council",
+   "goal": "subnational",
+   "measure": {
+    "schemes": [
+     "no.fylke"
+    ],
+    "fine": [
+     "no.kommune",
+     "no.stemmekrets"
+    ]
+   },
+   "finest_note": "Each county is one contest; valgresultat.no by polling circuit from 2011, SSB by municipality from 1975.",
+   "note": "Direct elections since 1975, held with the municipal elections; Oslo is a county with no county council of its own (its city council serves). Lists, modified Sainte-Laguë (first divisor 1.4 since 2019); the council sets its size within the Local Government Act's minimums. Before 1975 county councils were chosen by the municipal councils (class fylkesting_indirekte).",
+   "source": "valgloven",
+   "valid_from": "1975-01-01",
+   "first_held": "1975-09-15",
+   "earliest_record": "1975-09-15",
+   "contests_per_unit": 1,
+   "est_votes": 26000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 9,
+     "day_rule": "a Monday in September set by the King, the same day as the municipal elections",
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "administered_by": "County electoral boards (fylkesvalgstyrer) and the municipal electoral boards, under Valgdirektoratet",
+     "source": "valgloven",
+     "vacancy_rule": "Filled by the next deputy of the same list; no by-elections."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Valgresultat (Valgdirektoratet)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.stemmekrets",
+     "source": "valgresultat",
+     "url": "https://valgresultat.no/api/{year}/fy",
+     "first_date": "2011-09-12",
+     "last_date": "2023-09-11",
+     "evidence": "JSON results for the county council elections from 2011, by county, municipality, and polling circuit."
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Statistikkbanken",
+     "url": "https://www.ssb.no/statbank/table/09476",
+     "format": "px, csv, json-stat",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1975-09-15",
+     "last_date": "2023-09-11",
+     "evidence": "Votes and turnout (09476) and party votes (01181) by municipality, 1975-2023.",
+     "source": "ssb_09476"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "^Fylkesting"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1975-09-15",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1975, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1979-09-17",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1979, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1983-09-12",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1983, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1987-09-14",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1987, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1991-09-09",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1991, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1995-09-11",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1995, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "1999-09-13",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 1999, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "2003-09-15",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 2003, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "2007-09-10",
+     "election_kind": "local",
+     "contests": 18,
+     "source": "ssb_09476",
+     "quote": "19 county rows with votes in 2007, Oslo's among them; Oslo elects no county council",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "date": "2011-09-12",
+     "election_kind": "local",
+     "contests": 18,
+     "seats": 728,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2011/fy: 18 fylker, mandater antall 728"
+    },
+    {
+     "date": "2015-09-14",
+     "election_kind": "local",
+     "contests": 18,
+     "seats": 718,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2015/fy: 18 fylker, mandater antall 718"
+    },
+    {
+     "date": "2019-09-09",
+     "election_kind": "local",
+     "contests": 10,
+     "seats": 574,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2019/fy: 10 fylker, mandater antall 574"
+    },
+    {
+     "date": "2023-09-11",
+     "election_kind": "local",
+     "contests": 14,
+     "seats": 664,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2023/fy: 14 fylker, mandater antall 664"
+    }
+   ]
+  },
+  {
+   "key": "kommunestyre",
+   "tier": "kommune",
+   "name": "Kommunestyrevalg",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "no.kommune"
+    ],
+    "fine": [
+     "no.stemmekrets"
+    ]
+   },
+   "finest_note": "Each municipality is one contest; valgresultat.no by polling circuit from 2011, SSB by municipality from 1945 (votes) and 1901 (national totals).",
+   "note": "Every municipal council (kommunestyre; bystyre in towns) is elected for four years on the same September Monday as the county councils, by open lists with personal votes and modified Sainte-Laguë; where only one list or none is filed, by majority vote. Municipal elections go back to the formannskapslover of 1837; universal suffrage from 1910. Councils elected in 2019 and 2023 served the merged municipalities of 2020 and 2024. Extraordinary elections are held only for new merged municipalities (Færder, 2017).",
+   "source": "valgloven",
+   "valid_from": "1837-01-14",
+   "first_held": "1837-01-01",
+   "earliest_record": "1901-01-01",
+   "contests_per_unit": 1,
+   "est_votes": 75000000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 9,
+     "day_rule": "a Monday in September set by the King (valgloven § 9-2); municipalities may also poll on the Sunday before",
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "valid_from": "1947-01-01",
+     "administered_by": "Municipal electoral boards (valgstyrer), under Valgdirektoratet",
+     "source": "valgloven",
+     "vacancy_rule": "Filled by the next deputy of the same list; no by-elections."
+    },
+    {
+     "period_years": 3,
+     "phase": 2,
+     "term_years": 3,
+     "called": false,
+     "valid_from": "1901-01-01",
+     "valid_to": "1945-01-01",
+     "administered_by": "Municipal electoral boards",
+     "source": "ssb_25_5",
+     "locator": "https://www.ssb.no/a/histstat/tabeller/25-5.html (elections every third year from 1901 to 1937)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Valgresultat (Valgdirektoratet)",
+     "format": "json",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.stemmekrets",
+     "source": "valgresultat",
+     "url": "https://valgresultat.no/api/{year}/ko",
+     "first_date": "2011-09-12",
+     "last_date": "2023-09-11",
+     "evidence": "JSON results for the municipal elections from 2011 (and Færder 2017), by municipality and polling circuit."
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Statistikkbanken",
+     "url": "https://www.ssb.no/statbank/table/01180",
+     "format": "px, csv, json-stat",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1945-01-01",
+     "last_date": "2023-09-11",
+     "evidence": "Party votes by municipality, 1945-2023 (01180), with votes and turnout from 1955 (09475) and representatives from 1979 (01182).",
+     "source": "ssb_01180"
+    },
+    {
+     "platform": "Statistisk sentralbyrå, Norges offisielle statistikk (digitized volumes)",
+     "url": "https://www.ssb.no/a/histstat/nos/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1901-01-01",
+     "last_date": "2007-09-10",
+     "evidence": "Norges offisielle statistikk: Kommunevalgene volumes, by municipality.",
+     "source": "ssb_valg"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "^(Kommunestyre|Bystyre)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1837-01-01",
+     "precision": "year",
+     "through": "1900-12-31",
+     "election_kind": "local",
+     "note": "Municipal elections under the formannskapslover of 1837, every few years by the enfranchised men; not yet counted from the municipal archives."
+    },
+    {
+     "election_kind": "local",
+     "seats": 12428,
+     "date": "1901-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1901 | ... | Representanter I alt 12,428"
+    },
+    {
+     "election_kind": "local",
+     "seats": 12856,
+     "date": "1907-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1907 | ... | Representanter I alt 12,856",
+     "note": "SSB's series has no figures for the municipal elections of 1904."
+    },
+    {
+     "election_kind": "local",
+     "seats": 13116,
+     "date": "1910-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1910 | ... | Representanter I alt 13,116"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13457,
+     "date": "1913-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1913 | ... | Representanter I alt 13,457"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13747,
+     "date": "1916-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1916 | ... | Representanter I alt 13,747"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13992,
+     "date": "1919-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1919 | ... | Representanter I alt 13,992"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14444,
+     "date": "1922-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1922 | ... | Representanter I alt 14,444"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14654,
+     "date": "1925-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1925 | ... | Representanter I alt 14,654"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14799,
+     "date": "1928-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1928 | ... | Representanter I alt 14,799"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14932,
+     "date": "1931-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1931 | ... | Representanter I alt 14,932"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14975,
+     "date": "1934-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1934 | ... | Representanter I alt 14,975"
+    },
+    {
+     "election_kind": "local",
+     "seats": 15056,
+     "date": "1937-01-01",
+     "precision": "year",
+     "source": "ssb_25_5",
+     "quote": "1937 | ... | Representanter I alt 15,056"
+    },
+    {
+     "election_kind": "local",
+     "seats": 15078,
+     "date": "1945-01-01",
+     "precision": "year",
+     "contests": 744,
+     "source": "klass_kommune",
+     "quote": "744 municipalities in the 1945 division; representatives 15,078 (Historisk statistikk 25.5)",
+     "note": "SSB 01180 has party votes for only about 710 of them: the rest elected by majority vote without lists. Held in December 1945, the first after the occupation."
+    },
+    {
+     "election_kind": "local",
+     "seats": 15102,
+     "date": "1947-01-01",
+     "precision": "year",
+     "contests": 744,
+     "source": "klass_kommune",
+     "quote": "744 municipalities in the 1947 division; representatives 15,102 (Historisk statistikk 25.5)",
+     "note": "SSB 01180 has party votes for only about 710 of them: the rest elected by majority vote without lists."
+    },
+    {
+     "election_kind": "local",
+     "seats": 15232,
+     "date": "1951-01-01",
+     "precision": "year",
+     "contests": 744,
+     "source": "klass_kommune",
+     "quote": "744 municipalities in the 1951 division; representatives 15,232 (Historisk statistikk 25.5)",
+     "note": "SSB 01180 has party votes for only about 710 of them: the rest elected by majority vote without lists."
+    },
+    {
+     "election_kind": "local",
+     "seats": 16418,
+     "date": "1955-01-01",
+     "precision": "year",
+     "contests": 741,
+     "source": "ssb_09475",
+     "quote": "741 municipalities with votes in 1955; representatives 16,418 (Historisk statistikk 25.5)"
+    },
+    {
+     "election_kind": "local",
+     "seats": 16348,
+     "date": "1959-01-01",
+     "precision": "year",
+     "contests": 729,
+     "source": "ssb_09475",
+     "quote": "729 municipalities with votes in 1959; representatives 16,348 (Historisk statistikk 25.5)"
+    },
+    {
+     "election_kind": "local",
+     "seats": 14343,
+     "date": "1963-01-01",
+     "precision": "year",
+     "contests": 525,
+     "source": "ssb_09475",
+     "quote": "525 municipalities with votes in 1963; representatives 14,343 (Historisk statistikk 25.5)"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13523,
+     "date": "1967-01-01",
+     "precision": "year",
+     "contests": 451,
+     "source": "ssb_09475",
+     "quote": "451 municipalities with votes in 1967; representatives 13,523 (Historisk statistikk 25.5)"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13392,
+     "date": "1971-01-01",
+     "precision": "year",
+     "contests": 444,
+     "source": "ssb_09475",
+     "quote": "444 municipalities with votes in 1971; representatives 13,392 (Historisk statistikk 25.5)"
+    },
+    {
+     "election_kind": "local",
+     "seats": 13545,
+     "date": "1975-09-15",
+     "contests": 445,
+     "source": "ssb_09475",
+     "quote": "445 municipalities with votes in 1975; representatives 13,545 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 13772,
+     "date": "1979-09-17",
+     "contests": 454,
+     "source": "ssb_09475",
+     "quote": "454 municipalities with votes in 1979; representatives 13,772 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 13806,
+     "date": "1983-09-12",
+     "contests": 454,
+     "source": "ssb_09475",
+     "quote": "454 municipalities with votes in 1983; representatives 13,806 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 13648,
+     "date": "1987-09-14",
+     "contests": 448,
+     "source": "ssb_09475",
+     "quote": "448 municipalities with votes in 1987; representatives 13,648 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 13073,
+     "date": "1991-09-09",
+     "contests": 439,
+     "source": "ssb_09475",
+     "quote": "439 municipalities with votes in 1991; representatives 13,073 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 12663,
+     "date": "1995-09-11",
+     "contests": 435,
+     "source": "ssb_09475",
+     "quote": "435 municipalities with votes in 1995; representatives 12,663 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 12253,
+     "date": "1999-09-13",
+     "contests": 435,
+     "source": "ssb_09475",
+     "quote": "435 municipalities with votes in 1999; representatives 12,253 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 11138,
+     "date": "2003-09-15",
+     "contests": 434,
+     "source": "ssb_09475",
+     "quote": "434 municipalities with votes in 2003; representatives 11,138 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 10946,
+     "date": "2007-09-10",
+     "contests": 430,
+     "source": "ssb_09475",
+     "quote": "430 municipalities with votes in 2007; representatives 10,946 (Historisk statistikk 25.5)",
+     "note": "The polling day (the Monday; Sunday polling optional) is not quoted from a fetched source."
+    },
+    {
+     "election_kind": "local",
+     "seats": 10785,
+     "date": "2011-09-12",
+     "contests": 429,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2011/ko: 429 kommuner, mandater antall 10785"
+    },
+    {
+     "election_kind": "local",
+     "seats": 10620,
+     "date": "2015-09-14",
+     "contests": 428,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2015/ko: 428 kommuner, mandater antall 10620"
+    },
+    {
+     "election_kind": "local",
+     "seats": 9336,
+     "date": "2019-09-09",
+     "contests": 356,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2019/ko: 356 kommuner, mandater antall 9336"
+    },
+    {
+     "election_kind": "local",
+     "seats": 9125,
+     "date": "2023-09-11",
+     "contests": 357,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2023/ko: 357 kommuner, mandater antall 9125"
+    },
+    {
+     "date": "2017-09-11",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 47,
+     "source": "valgresultat",
+     "quote": "https://valgresultat.no/api/2017/ko: one kommune, /2017/ko/07/0729 (Færder), mandater antall 47",
+     "note": "Extraordinary election of the council of Færder (Nøtterøy and Tjøme, merged 2018), held with the Storting election."
+    }
+   ]
+  },
+  {
+   "key": "bydelsutvalg",
+   "tier": "bydel",
+   "name": "Valg til bydelsutvalg i Oslo",
+   "name_en": "Oslo district council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "Oslo kommune publishes each district council's result by party; counts by polling circuit are not known to be published.",
+   "note": "Oslo's 15 district councils (bydelsutvalg) are elected directly from party lists on the day of the municipal election, under the regulation on direct elections to submunicipal councils (kommuneloven § 5-8). A trial with four directly elected district councils ran in 1995; all have been directly elected since 2007.",
+   "source": "oslo_bydel_reglement",
+   "valid_from": "1995-09-11",
+   "first_held": "1995-09-11",
+   "earliest_record": "2007-09-10",
+   "contests_per_unit": 1,
+   "est_votes": 1500000,
+   "effort": 3,
+   "access": [
+    {
+     "platform": "Oslo kommune",
+     "url": "https://www.oslo.kommune.no/politikk/valg/valgresultater-og-statistikk/",
+     "format": "html, pdf",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2007-09-10",
+     "evidence": "Results of the bystyre and bydelsutvalg elections for 2007 and later, with each district council's settlement (valgoppgjør).",
+     "source": "oslo_valg2007"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "Bydelsutvalg"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "through": "2023-12-31",
+     "election_kind": "local",
+     "note": "A trial with four directly elected district councils in 1995, and direct elections in every district by 2007 (Oslo kommune publishes district council results from 2007); not yet counted from Oslo kommune's result pages."
+    }
+   ]
+  },
+  {
+   "key": "longyearbyen",
+   "tier": "longyearbyen",
+   "name": "Valg til Longyearbyen lokalstyre",
+   "name_en": "Longyearbyen local council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "One contest per election; results by party only.",
+   "note": "The local council of Longyearbyen on Svalbard, created by the 2001 amendment of the Svalbard Act and in office from 1 January 2002, is elected by list PR under a regulation of 14 May 2007 (no. 506) in October of the municipal election year. Since 2023 non-Nordic foreign residents need three years of residence in a Norwegian municipality to vote.",
+   "source": "svalbardloven",
+   "valid_from": "2001-06-05",
+   "first_held": "2001-01-01",
+   "contests_per_unit": 1,
+   "est_votes": 12000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "month": 10,
+     "term_years": 4,
+     "called": false,
+     "partisan": true,
+     "valid_from": "2003-01-01",
+     "administered_by": "Longyearbyen lokalstyre's electoral board",
+     "source": "innst_lyb",
+     "locator": "https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Innstillinger/Odelstinget/2000-2001/inno-200001-126/?lvl=0 (first election autumn 2001, the next autumn 2003, then the four-year municipal cycle)"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "name_pattern": "Longyearbyen"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2001-01-01",
+     "precision": "year",
+     "through": "2023-12-31",
+     "election_kind": "local",
+     "note": "Elections planned for autumn 2001 and 2003 and then every four years with the municipal cycle; not yet counted from the council's records."
+    }
+   ]
+  },
+  {
+   "key": "direkte_ordforer",
+   "tier": "kommune",
+   "name": "Forsøk med direkte valg av ordfører",
+   "name_en": "Direct mayoral elections (trials, 1999 and 2003)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "One contest per trial municipality, two rounds where no candidate won a majority; results are in the trial municipalities' records and the ministry's evaluations.",
+   "note": "Under the Local Government Act's trial provision, the ministry let 20 municipalities in 1999 and 36 in 2003 elect the mayor directly on the municipal election day, with a second round. The Storting declined in 2006-2007 to make it permanent, and the trials ended.",
+   "source": "krd_ordforer",
+   "valid_from": "1999-01-01",
+   "valid_to": "2007-01-01",
+   "first_held": "1999-09-13",
+   "est_votes": 500000,
+   "effort": 4,
+   "match": [
+    {
+     "contest_kinds": [
+      "office"
+     ],
+     "iso_pattern": "NO",
+     "name_pattern": "[Oo]rdfører|[Mm]ayor"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-09-13",
+     "election_kind": "local",
+     "contests": 20,
+     "source": "innst_ordforer",
+     "quote": "Ved lokalvalgene i september 1999 fikk 20 kommuner etter søknad anledning til å la innbyggerne velge sin ordfører gjennom direkte valg"
+    },
+    {
+     "date": "2003-09-15",
+     "election_kind": "local",
+     "contests": 36,
+     "source": "krd_ordforer",
+     "quote": "de 36 forsøkskommunene som ved lokalvalget i 2003 gjennomførte direkte valg",
+     "note": "The Odelsting committee's report gives 37."
+    }
+   ]
+  },
+  {
+   "key": "lokal_folkeavstemning",
+   "tier": "kommune",
+   "name": "Lokale folkeavstemninger",
+   "name_en": "Local referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "finest_note": "One contest per vote (a few span a county); SSB counts them by topic and gives electorate and turnout, not the yes and no votes.",
+   "note": "Consultative votes held by a municipal or county council under kommuneloven § 12-1 on any matter, most often alcohol sales, the written standard of Norwegian for schools, and boundary changes. SSB counts 992 from 1970 to 2025, 204 of them in 2016 on the municipal reform.",
+   "source": "kommuneloven",
+   "first_held": "1970-01-01",
+   "earliest_record": "1970-01-01",
+   "est_votes": 3000000,
+   "effort": 5,
+   "access": [
+    {
+     "platform": "Statistisk sentralbyrå, Statistikkbanken",
+     "url": "https://www.ssb.no/statbank/table/07552",
+     "format": "px, csv, json-stat",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "finest": "no.kommune",
+     "license": "CC BY 4.0",
+     "first_date": "1970-01-01",
+     "last_date": "2025-12-31",
+     "evidence": "Counts of local referendums by topic and year (07552), and electorate and turnout by municipality (07548); no vote counts by option.",
+     "source": "ssb_07552"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "NO",
+     "schemes": [
+      "no.kommune",
+      "no.fylke"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1970-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 24,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1970: 24 folkeavstemninger"
+    },
+    {
+     "date": "1971-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 29,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1971: 29 folkeavstemninger"
+    },
+    {
+     "date": "1972-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 36,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1972: 36 folkeavstemninger"
+    },
+    {
+     "date": "1973-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 28,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1973: 28 folkeavstemninger"
+    },
+    {
+     "date": "1974-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 15,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1974: 15 folkeavstemninger"
+    },
+    {
+     "date": "1975-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 10,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1975: 10 folkeavstemninger"
+    },
+    {
+     "date": "1976-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 20,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1976: 20 folkeavstemninger"
+    },
+    {
+     "date": "1977-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 28,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1977: 28 folkeavstemninger"
+    },
+    {
+     "date": "1978-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 26,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1978: 26 folkeavstemninger"
+    },
+    {
+     "date": "1979-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 8,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1979: 8 folkeavstemninger"
+    },
+    {
+     "date": "1980-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 23,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1980: 23 folkeavstemninger"
+    },
+    {
+     "date": "1981-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 25,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1981: 25 folkeavstemninger"
+    },
+    {
+     "date": "1982-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1982: 5 folkeavstemninger"
+    },
+    {
+     "date": "1983-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 21,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1983: 21 folkeavstemninger"
+    },
+    {
+     "date": "1984-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 21,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1984: 21 folkeavstemninger"
+    },
+    {
+     "date": "1985-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 45,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1985: 45 folkeavstemninger"
+    },
+    {
+     "date": "1986-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 31,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1986: 31 folkeavstemninger"
+    },
+    {
+     "date": "1987-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 22,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1987: 22 folkeavstemninger"
+    },
+    {
+     "date": "1988-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 24,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1988: 24 folkeavstemninger"
+    },
+    {
+     "date": "1989-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 13,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1989: 13 folkeavstemninger"
+    },
+    {
+     "date": "1990-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 24,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1990: 24 folkeavstemninger"
+    },
+    {
+     "date": "1991-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 10,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1991: 10 folkeavstemninger"
+    },
+    {
+     "date": "1992-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 7,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1992: 7 folkeavstemninger"
+    },
+    {
+     "date": "1993-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 7,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1993: 7 folkeavstemninger"
+    },
+    {
+     "date": "1994-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 6,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1994: 6 folkeavstemninger"
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 8,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1995: 8 folkeavstemninger"
+    },
+    {
+     "date": "1996-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 11,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1996: 11 folkeavstemninger"
+    },
+    {
+     "date": "1997-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 15,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1997: 15 folkeavstemninger"
+    },
+    {
+     "date": "1998-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 17,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1998: 17 folkeavstemninger"
+    },
+    {
+     "date": "1999-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 11,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 1999: 11 folkeavstemninger"
+    },
+    {
+     "date": "2000-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 17,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2000: 17 folkeavstemninger"
+    },
+    {
+     "date": "2001-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 6,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2001: 6 folkeavstemninger"
+    },
+    {
+     "date": "2002-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2002: 5 folkeavstemninger"
+    },
+    {
+     "date": "2003-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 26,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2003: 26 folkeavstemninger"
+    },
+    {
+     "date": "2004-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 21,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2004: 21 folkeavstemninger"
+    },
+    {
+     "date": "2005-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 12,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2005: 12 folkeavstemninger"
+    },
+    {
+     "date": "2006-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 9,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2006: 9 folkeavstemninger"
+    },
+    {
+     "date": "2007-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 6,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2007: 6 folkeavstemninger"
+    },
+    {
+     "date": "2008-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2008: 3 folkeavstemninger"
+    },
+    {
+     "date": "2009-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 4,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2009: 4 folkeavstemninger"
+    },
+    {
+     "date": "2010-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 16,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2010: 16 folkeavstemninger"
+    },
+    {
+     "date": "2011-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 13,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2011: 13 folkeavstemninger"
+    },
+    {
+     "date": "2012-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 8,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2012: 8 folkeavstemninger"
+    },
+    {
+     "date": "2013-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2013: 5 folkeavstemninger"
+    },
+    {
+     "date": "2014-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 6,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2014: 6 folkeavstemninger"
+    },
+    {
+     "date": "2015-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 17,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2015: 17 folkeavstemninger"
+    },
+    {
+     "date": "2016-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 204,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2016: 204 folkeavstemninger",
+     "note": "Most were consultative votes on the municipal mergers of the 2014-2020 reform."
+    },
+    {
+     "date": "2017-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 8,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2017: 8 folkeavstemninger"
+    },
+    {
+     "date": "2018-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2018: 5 folkeavstemninger"
+    },
+    {
+     "date": "2019-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 7,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2019: 7 folkeavstemninger"
+    },
+    {
+     "date": "2020-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2020: 1 folkeavstemninger"
+    },
+    {
+     "date": "2021-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 8,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2021: 8 folkeavstemninger"
+    },
+    {
+     "date": "2022-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 7,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2022: 7 folkeavstemninger"
+    },
+    {
+     "date": "2023-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2023: 1 folkeavstemninger"
+    },
+    {
+     "date": "2024-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2024: 2 folkeavstemninger"
+    },
+    {
+     "date": "2025-01-01",
+     "precision": "year",
+     "election_kind": "referendum",
+     "contests": 5,
+     "source": "ssb_07552",
+     "quote": "Tema Totalt, 2025: 5 folkeavstemninger"
+    }
+   ]
+  },
+  {
+   "key": "kirkevalg",
+   "tier": "national",
+   "name": "Kirkevalg i Den norske kirke",
+   "name_en": "Church of Norway elections",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parish councils (menighetsråd) and diocesan councils are elected by the members of the Church of Norway under the church's own election rules (trossamfunnsloven § 10, the General Synod's regulations), held on the same days as public elections but run by the church; the electorate is church membership, not a public electorate.",
+   "source": "kirkeloven"
+  },
+  {
+   "key": "kongen",
+   "tier": "national",
+   "name": "Kongen og regjeringen",
+   "name_en": "Head of state and government",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "The King is hereditary (Grunnloven § 6), and the Prime Minister and government are appointed by the King and depend on the Storting's confidence; there is no popular vote for an executive.",
+   "source": "grunnloven"
+  },
+  {
+   "key": "ordforer",
+   "tier": "kommune",
+   "name": "Valg av ordfører og fylkesordfører",
+   "name_en": "Mayors and county mayors",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Mayors and county mayors are elected by and from the municipal and county councils (kommuneloven § 6-1); only the 1999 and 2003 trials (direkte_ordforer) were popular votes.",
+   "source": "kommuneloven"
+  },
+  {
+   "key": "fylkesting_indirekte",
+   "tier": "fylke",
+   "name": "Amtsting og fylkesting valgt av kommunestyrene (1837-1975)",
+   "name_en": "County councils chosen by the municipal councils (1837-1975)",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Until 1963 the amtsting/fylkesting was made up of the mayors of the rural municipalities, and from 1964 to 1975 its members were chosen by the municipal councils; there was no popular vote.",
+   "source": "ssb_09476",
+   "valid_from": "1837-01-14",
+   "valid_to": "1975-01-01"
+  },
+  {
+   "key": "lagting_odelsting",
+   "tier": "national",
+   "name": "Lagtinget og Odelstinget (1814-2009)",
+   "name_en": "Lagting and Odelsting divisions (1814-2009)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Storting chose a quarter of its own members as the Lagting, the rest forming the Odelsting; the divisions were abolished from the 2009 Storting. Not a popular vote.",
+   "source": "stortinget_hist",
+   "valid_from": "1814-10-07",
+   "valid_to": "2009-10-01"
+  },
+  {
+   "key": "dommere",
+   "tier": "national",
+   "name": "Dommere og meddommere",
+   "name_en": "Judges and lay judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Professional judges are appointed by the King in Council on the Judicial Appointments Board's recommendation; lay judges and conciliation board members are chosen by the municipal and county councils (domstolloven §§ 64-66, 27). No popular vote.",
+   "source": "domstolloven"
+  },
+  {
+   "key": "nominasjon",
+   "tier": "national",
+   "name": "Nominasjon av kandidater",
+   "name_en": "Candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties nominate their lists at their own nomination meetings (valgloven ch. 6 sets only the filing rules); the state runs no primaries and publishes no nomination results.",
+   "source": "valgloven"
+  }
+ ]
+}
