@@ -36,7 +36,7 @@ FILES = "https://www.datosabiertos.gob.pe/sites/default/files/"
 PORTAL = "https://www.datosabiertos.gob.pe/dataset/"
 PERU = jne.PERU_POLITY
 MESA = "pe.mesa"
-DEPARTMENT, PROVINCE, DISTRICT = "pe.ubigeo.departamento", "pe.ubigeo.provincia", "pe.ubigeo.distrito"
+DEPARTMENT, PROVINCE, DISTRICT = "pe.ubigeo_departamento", "pe.ubigeo_provincia", "pe.ubigeo_distrito"
 ABROAD = {"91", "92", "93", "94", "95"}
 
 
