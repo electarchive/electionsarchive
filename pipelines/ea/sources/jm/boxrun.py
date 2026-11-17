@@ -458,6 +458,9 @@ def assemble(day: str, pdf: Path, out: Path, fix: bool = True) -> dict:
     )
     grouped: dict[str, list[tuple[dict, dict]]] = {}
     for page_ in pages:
+        flagged = [r for r in page_.get("rows") or [] if r["total"]]
+        for r in flagged[:-1]:
+            r["total"] = False  # only the last line at the totals label is the totals line
         if page_.get("name") and page_.get("rows"):
             for row in page_["rows"]:
                 grouped.setdefault(page_["name"], []).append((page_, row))
@@ -510,10 +513,11 @@ def assemble(day: str, pdf: Path, out: Path, fix: bool = True) -> dict:
                     edge.add(id(r))
         stations = [(p, r) for p, r in stations if id(r) not in edge]
         rows: list[dict] = []
+        last = {p["page"]: r for p, r in stations}
         for r in (r for _, r in stations):
             total = r["values"][n + 1]
             before = sum(x["values"][n + 1] or 0 for x in rows)
-            if len(rows) >= 5 and total is not None and total >= 0.8 * before:
+            if last[r["page"]] is r and len(rows) >= 5 and total is not None and total >= 0.8 * before:
                 printed.append(({}, r))  # a totals line whose label the reading missed
                 continue
             rows.append(r)

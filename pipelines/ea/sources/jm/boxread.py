@@ -459,7 +459,7 @@ def _rows(
             cells.append(_join(inside) if inside else None)
         if sum(c is not None for c in cells) < max(2, len(cells) - 3):
             continue
-        is_total = label is not None and y > label - height
+        is_total = label is not None and y > label - height * 0.3
         codes = [pair for pair in keys if previous - 2 < pair[0].yc <= y + height * 0.6]
         if codes:
             pd, ps = codes[0]
