@@ -78,12 +78,12 @@ KRAJE = {
 WORKERS = 12
 
 
-def link(year: int, name: str, **query: object) -> str:
+def link(year: int | str, name: str, **query: object) -> str:
     tail = "&".join(f"{k}={v}" for k, v in query.items())
-    return f"{BASE}/pls/{PAGES[year]}/{name}" + (f"?{tail}" if tail else "")
+    return f"{BASE}/pls/{PAGES[year] if isinstance(year, int) else year}/{name}" + (f"?{tail}" if tail else "")
 
 
-def read(year: int, name: str, **query: object) -> str:
+def read(year: int | str, name: str, **query: object) -> str:
     return raw.cached(SOURCE, link(year, name, **query)).path.read_text(encoding="utf-8")
 
 
@@ -106,7 +106,7 @@ def fetch() -> None:
         fetch_year(year)
 
 
-def fetch_year(year: int) -> None:
+def fetch_year(year: int | str) -> None:
     """Every results page of one election, which the packages cite."""
     for name in STATIC:
         raw.fetch(SOURCE, link(year, name), suffix=".html")
@@ -141,19 +141,19 @@ def fetch_year(year: int) -> None:
     )
 
 
-def okres_list(year: int) -> list[tuple[str, str]]:
+def okres_list(year: int | str) -> list[tuple[str, str]]:
     tree = read(year, "u53")
     return sorted(set(re.findall(r"u5312\?xkraj=(\d+)&xokres=(\d+)", tree)), key=lambda p: (int(p[0]), int(p[1])))
 
 
-def obec_list(year: int) -> list[tuple[str, str, str]]:
+def obec_list(year: int | str) -> list[tuple[str, str, str]]:
     found: list[tuple[str, str, str]] = []
     for k, o in okres_list(year):
         found += re.findall(r"u53111\?xkraj=(\d+)&xokres=(\d+)&xobec=(\d+)", read(year, "u5311", xkraj=k, xokres=o))
     return found
 
 
-def okrsek_list(year: int) -> list[tuple[str, str, str, str]]:
+def okrsek_list(year: int | str) -> list[tuple[str, str, str, str]]:
     found: list[tuple[str, str, str, str]] = []
     for k, o, c in obec_list(year):
         text = read(year, "u53111", xkraj=k, xokres=o, xobec=c)
@@ -161,7 +161,7 @@ def okrsek_list(year: int) -> list[tuple[str, str, str, str]]:
     return found
 
 
-def list_pages(year: int) -> list[tuple[str, str]]:
+def list_pages(year: int | str) -> list[tuple[str, str]]:
     text = read(year, "u32", xpl=0, xtr=2)
     return [
         (v, k)
@@ -187,7 +187,7 @@ def numbers(cells: list[str]) -> bool:
     return bool(cells) and all(re.fullmatch(r"[\d. ]+", cell) for cell in cells)
 
 
-def tally(year: int, k: str, o: str, c: str, n: str) -> tuple[dict[int, int], dict[str, int], dict[str, str]]:
+def tally(year: int | str, k: str, o: str, c: str, n: str) -> tuple[dict[int, int], dict[str, int], dict[str, str]]:
     """One polling district's accounting by measure, valid votes by list number, and the list names it prints."""
     accounting: dict[int, int] = {}
     votes: dict[str, int] = {}
@@ -206,7 +206,7 @@ def tally(year: int, k: str, o: str, c: str, n: str) -> tuple[dict[int, int], di
     return accounting, votes, names
 
 
-def regional(year: int) -> dict[str, dict[str, int]]:
+def regional(year: int | str) -> dict[str, dict[str, int]]:
     """Valid votes per list per region, as the regional results page prints them."""
     out: dict[str, dict[str, int]] = {k: {} for k in KRAJE}
     for cells in rows(read(year, "u5")):
@@ -218,7 +218,7 @@ def regional(year: int) -> dict[str, dict[str, int]]:
     return out
 
 
-def regions(year: int) -> dict[str, dict[int, int]]:
+def regions(year: int | str) -> dict[str, dict[int, int]]:
     """Accounting per region from the territorial overview."""
     out: dict[str, dict[int, int]] = {}
     for cells in rows(read(year, "u52")):
@@ -227,7 +227,7 @@ def regions(year: int) -> dict[str, dict[int, int]]:
     return out
 
 
-def national(year: int) -> tuple[dict[int, int], dict[str, tuple[str, int]]]:
+def national(year: int | str) -> tuple[dict[int, int], dict[str, tuple[str, int]]]:
     accounting: dict[int, int] = {}
     lists: dict[str, tuple[str, int]] = {}
     for cells in rows(read(year, "u4")):
@@ -240,7 +240,7 @@ def national(year: int) -> tuple[dict[int, int], dict[str, tuple[str, int]]]:
     return accounting, lists
 
 
-def full_names(year: int) -> dict[str, str]:
+def full_names(year: int | str) -> dict[str, str]:
     """The full names of the lists that passed the first threshold, and the short forms of all lists."""
     out: dict[str, str] = {}
     for cells in rows(read(year, "u65")):
@@ -249,7 +249,7 @@ def full_names(year: int) -> dict[str, str]:
     return out
 
 
-def short_names(year: int) -> dict[str, str]:
+def short_names(year: int | str) -> dict[str, str]:
     out: dict[str, str] = {}
     for cells in rows(read(year, "u64")):
         if len(cells) >= 3 and re.fullmatch(r"\d\d", cells[0]) and not numbers(cells[1:2]):
@@ -257,7 +257,7 @@ def short_names(year: int) -> dict[str, str]:
     return out
 
 
-def seats(year: int) -> tuple[dict[str, int], dict[str, int]]:
+def seats(year: int | str) -> tuple[dict[str, int], dict[str, int]]:
     """The seats of each region and of each list as the allocation tables print them."""
     by_region: dict[str, int] = {}
     for cells in rows(read(year, "u67")):
@@ -270,7 +270,7 @@ def seats(year: int) -> tuple[dict[str, int], dict[str, int]]:
     return by_region, by_list
 
 
-def candidates(year: int, list_number: str, k: str) -> list[dict[str, object]]:
+def candidates(year: int | str, list_number: str, k: str) -> list[dict[str, object]]:
     out: list[dict[str, object]] = []
     for cells in rows(read(year, "u321", xpl=0, xtr=2, xvstrana=list_number, xkraj=k)):
         if len(cells) == 7 and cells[0].isdigit() and numbers(cells[2:5]):
@@ -286,7 +286,7 @@ def candidates(year: int, list_number: str, k: str) -> list[dict[str, object]]:
     return out
 
 
-def names_of(year: int) -> tuple[dict[tuple[str, str], str], dict[str, str]]:
+def names_of(year: int | str) -> tuple[dict[tuple[str, str], str], dict[str, str]]:
     """The names of the places the pages print: obec by (region, code) and okres by (region, number)."""
     obce: dict[tuple[str, str], str] = {}
     for k, o in okres_list(year):
@@ -347,7 +347,7 @@ def old_regions(p: Package, groups: dict[str, list[str]]) -> None:
 RUIAN_SOURCE = key("source", "cz.cuzk")
 
 
-def placement(year: int) -> tuple[dict[str, str], dict[tuple[str, str], str], dict[str, set[str]]]:
+def placement(year: int | str) -> tuple[dict[str, str], dict[tuple[str, str], str], dict[str, set[str]]]:
     """Where each municipality that voted sits today.
 
     Returns each municipality's area where the geo package holds it, the current district that most of each
