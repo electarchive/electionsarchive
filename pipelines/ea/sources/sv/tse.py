@@ -65,6 +65,9 @@ def _crawl(round_number: int, name: str) -> list[str]:
 
 
 def fetch() -> None:
+    from ea.sources.sv import assembly
+
+    assembly.fetch()
     for round_number in ROUNDS:
         _crawl(round_number, "pais")
         level = ["dep%02d" % n for n in range(1, 16)]
@@ -75,12 +78,27 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    return ["sv.tse/geo", "sv.tse/registry", *(f"sv.tse/pres-{day}" for _, day in ROUNDS.values())]
+    from ea.sources.sv import assembly
+
+    return [
+        "sv.tse/geo",
+        "sv.tse/registry",
+        *(f"sv.tse/pres-{day}" for _, day in ROUNDS.values()),
+        *assembly.packages(),
+    ]
+
+
+def build(name: str) -> Package:
+    from ea.sources.sv import assembly
+
+    if name in assembly.packages():
+        return assembly.build(name)
+    return {"sv.tse/geo": geo, "sv.tse/registry": registry}.get(name, lambda n=name: president(n))()
 
 
 def parse() -> None:
     for name in packages():
-        {"sv.tse/geo": geo, "sv.tse/registry": registry}.get(name, lambda n=name: president(n))().write()
+        build(name).write()
 
 
 def emit() -> None:
@@ -122,7 +140,9 @@ def columns(content: str) -> list[str]:
     return heads[heads.index("TOTALES PROCESADAS NO PROCESADAS") + 1 : heads.index("IMPUGNADOS")]
 
 
-def tree(round_number: int) -> tuple[dict[str, str], dict[str, tuple[str, str]], dict[str, tuple[str, str]]]:
+def tree(
+    round_number: int, with_centers: bool = True
+) -> tuple[dict[str, str], dict[str, tuple[str, str]], dict[str, tuple[str, str]]]:
     """Departments, municipalities, and voting centers as {code: (name, parent code)}."""
     departments: dict[str, str] = {}
     municipalities: dict[str, tuple[str, str]] = {}
@@ -134,7 +154,7 @@ def tree(round_number: int) -> tuple[dict[str, str], dict[str, tuple[str, str]],
             for label, child, _ in rows(text(round_number, code)):
                 if child and child.startswith("mun"):
                     municipalities[child.removesuffix(".html")] = (label, code)
-    for code in municipalities:
+    for code in municipalities if with_centers else ():
         for label, child, _ in rows(text(round_number, code)):
             if child and child.startswith("cen"):
                 centers[child.removesuffix(".html")] = (label, code)
@@ -153,7 +173,7 @@ def geo() -> Package:
         "results, without boundaries",
     )
     p.external |= {EL_SALVADOR, TERRITORY}
-    departments, municipalities, _ = tree(1)
+    departments, municipalities, _ = tree(1, with_centers=False)
     for code, rank, kind, noun in (
         ("sv.departamento", 1, "administrative", "department"),
         ("sv.municipio", 2, "administrative", "municipality"),
