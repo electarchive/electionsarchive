@@ -1,5 +1,6 @@
-"""Taiwan's presidential and legislative elections by polling station, from the Central Election Commission's election
-database. The 2008 and 2012 legislative archives are .rar files; parsing them needs the `unar` command."""
+"""Taiwan's presidential and legislative elections, special municipality mayors, and county magistrates and city mayors,
+from the Central Election Commission's election database. The 2008 and 2012 legislative archives are .rar files; parsing
+them needs the `unar` command."""
 
 import functools
 import json
@@ -8,6 +9,7 @@ import shutil
 import subprocess
 import tempfile
 import zipfile
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import cast
@@ -15,6 +17,7 @@ from urllib.parse import quote
 from uuid import uuid5
 
 import fastexcel
+import libarchive
 import polars as pl
 import xlrd
 
@@ -83,6 +86,7 @@ def fetch() -> None:
         ):
             raw.fetch(SOURCE, url, suffix=suffix)
     fetch_legislative()
+    local_fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -97,6 +101,11 @@ NATION = key("area", "tw.nation", "TW")
 CEC = key("source", SOURCE)
 PRESIDENCY = key("office", "president")
 SYSTEM = key("electoral_system", "president", 1996)
+LOCAL_SYSTEM = key("electoral_system", "local executive", 1994)
+
+
+def office(county: str) -> str:
+    return key("office", "local executive", county)
 
 
 def packages() -> list[str]:
@@ -105,6 +114,7 @@ def packages() -> list[str]:
         "tw.cec/registry",
         *(f"tw.cec/prez-{day}" for day in PRESIDENT),
         *(f"tw.cec/leg-{day}" for day in leg_days()),
+        *(f"tw.cec/local-{day}" for day in LOCAL_DAYS),
     ]
 
 
@@ -115,6 +125,8 @@ def parse() -> None:
         president(day).write()
     for day in leg_days():
         legislative(day).write()
+    for day in LOCAL_DAYS:
+        local(day).write()
 
 
 def emit() -> None:
@@ -301,7 +313,7 @@ def geo() -> Package:
         "tw.cec/geo",
         SOURCE,
         "Taiwan's counties and cities, townships and districts, villages, and the polling stations that the Central "
-        "Election Commission reports presidential votes for",
+        "Election Commission reports votes for",
     )
     p.external.add(TAIWAN)
     for code, rank, kind, noun in (
@@ -337,12 +349,21 @@ def geo() -> Package:
             for (type_, county, district) in leg_tables(day)
             if type_ == "L1" and county is not None and district is not None
         )
+    for theme in THEMES:
+        for contest in contests(theme.day, theme.subject):
+            counties.add(contest.county)
+            for row in contest.rows:
+                townships.add((contest.county, str(row["district"])))
+                if row["village"]:
+                    villages.add((contest.county, str(row["district"]), str(row["village"])))
     for county in sorted(counties):
         id = area("tw.county", county)
         p.add("area", id=id, scheme_code="tw.county")
         p.add("area_code", area_id=id, code=county)
         p.add("area_parent", area_id=id, parent_id=NATION)
         p.name(id, county, "zh", "official")
+        if county in PLACES:
+            p.name(id, PLACES[county], "en", "official", False)
     for county, district in sorted(townships):
         id = area("tw.township", county, district)
         p.add("area", id=id, scheme_code="tw.township")
@@ -383,9 +404,19 @@ def registry() -> Package:
         license_url=LICENSE_URL,
         attribution="Central Election Commission, Taiwan (中央選舉委員會)",
     )
-    for day in PRESIDENT:
-        for url in (bulk_url(day), json_url("tickets", day), json_url("profiles", day)):
-            p.artifact(raw.cached(SOURCE, url), CEC)
+    cited: set[str] = set()
+    urls = [url for day in PRESIDENT for url in (bulk_url(day), json_url("tickets", day), json_url("profiles", day))]
+    urls += [url for theme in THEMES for url in local_artifacts(theme)]
+    for url in urls:
+        artifact = raw.cached(SOURCE, url)
+        if artifact.storage_key not in cited:
+            cited.add(artifact.storage_key)
+            p.artifact(artifact, CEC)
+    for county in sorted({c.county for theme in THEMES for c in contests(theme.day, theme.subject)}):
+        id = office(county)
+        p.add("office", id=id, polity_id=TAIWAN, kind="mayor" if county in CITIES else "other")
+        p.name(id, office_name(county), "en", "official")
+        p.name(id, f"{county}{'市長' if county in CITIES else '縣長'}", "zh", "native", False)
     p.add("office", id=PRESIDENCY, polity_id=TAIWAN, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Republic of China (Taiwan)", "en", "official")
     p.name(PRESIDENCY, "總統", "zh", "native", False)
@@ -427,7 +458,25 @@ def registry() -> Package:
             rules_version=1,
         )
         p.add("note", id=key("note", system), entity_id=system, kind="methodology", body_md=method, lang="en")
+    p.add(
+        "electoral_system",
+        id=LOCAL_SYSTEM,
+        polity_id=TAIWAN,
+        valid_from=LOCAL_SYSTEM_START,
+        valid_to=None,
+        rules={"formula": "fptp"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", LOCAL_SYSTEM),
+        entity_id=LOCAL_SYSTEM,
+        kind="methodology",
+        body_md=LOCAL_METHOD,
+        lang="en",
+    )
     used = {str(t["party"]) for day in PRESIDENT for t in tickets(day)} | leg_parties()
+    used |= {c.party for theme in THEMES for contest in contests(theme.day, theme.subject) for c in contest.cands}
     for name in sorted(used - INDEPENDENT):
         id = key("party", name)
         p.add("party", id=id, kind="party", polity_id=TAIWAN)
@@ -1425,3 +1474,728 @@ def leg_contest(
             )
         )
     return out
+
+
+# --- local executives: special municipality mayors and county magistrates and city mayors
+
+
+@dataclass(frozen=True)
+class Theme:
+    day: str
+    subject: str  # C1 for special municipality mayors, C2 for county magistrates and city mayors
+    theme: str
+    layout: str  # std, y2005, text2006, village, or township
+    files: tuple[str, ...]  # bulk workbooks or archives under attachments/
+    special: bool = False
+
+
+THEMES: tuple[Theme, ...] = (
+    Theme("2022-11-26", "C1", "05cc7b904c7a30cc7c88d5b10898c98e", "std", ("直轄市長.zip",)),
+    Theme("2022-11-26", "C2", "63615098f5afa8ec53159c4a86fc01d3", "std", ("縣市長.zip",)),
+    Theme(
+        "2022-12-18",
+        "C2",
+        "1275d73551f2c0caf202e803b1766057",
+        "std",
+        ("表8-嘉義市第11屆市長重行選舉各投開票所得票數一覽表 .xls",),
+        True,
+    ),
+    Theme("2018-11-24", "C1", "a0222f6529a3ff2192a1a04f209eaac3", "std", ("直轄市長.zip",)),
+    Theme("2018-11-24", "C2", "f75e94cad2958f8764f9d090e72b5567", "std", ("縣市長.zip",)),
+    Theme("2014-11-29", "C1", "45ca615ee3ff7b12238c79783524bd8f", "std", ("直轄市長.zip",)),
+    Theme("2014-11-29", "C2", "4d5371ae79267a6fd9bb78199c636cfb", "std", ("縣市長.zip",)),
+    Theme("2010-11-27", "C1", "e613c42ee1eddb1fc8c7a75a420ef033", "std", ("2010直轄市長選舉得票概況.rar",)),
+    Theme("2009-12-05", "C2", "ca9356e2d1cdde43ef4f7115f4898bf5", "std", ("2009縣市長選舉得票概況.rar",)),
+    Theme(
+        "2006-12-09",
+        "C1",
+        "d2ce132760640611c410338a3136e810",
+        "text2006",
+        ("第04屆台北市長選舉得票概況.rar", "第04屆高雄市長選舉得票概況.rar"),
+    ),
+    Theme("2005-12-03", "C2", "0da76d11a1f55dded2bbc358b26cd293", "y2005", ("2005縣市長選舉得票概況.rar",)),
+    Theme("2002-12-07", "C1", "a31daef43bd42a9613254e2d3d18fdbd", "village", ()),
+    Theme("2001-12-01", "C2", "333346bf02c9949349a6735cebaddf4f", "township", ()),
+    Theme("1998-12-05", "C1", "1cc537ea416941769d8e715a4c37ee6b", "village", ()),
+    Theme("1997-11-29", "C2", "8a062c6eb5089dceb912a02713b136d8", "township", ()),
+    Theme("1994-12-03", "C1", "81714e9f8f0072a65451bac5810796fa", "village", ()),
+)
+LOCAL_DAYS = sorted({theme.day for theme in THEMES}, reverse=True)
+CITIES = {
+    "臺北市": "Taipei City",
+    "新北市": "New Taipei City",
+    "桃園市": "Taoyuan City",
+    "臺中市": "Taichung City",
+    "臺南市": "Tainan City",
+    "高雄市": "Kaohsiung City",
+    "基隆市": "Keelung City",
+    "新竹市": "Hsinchu City",
+    "嘉義市": "Chiayi City",
+}
+COUNTIES = {
+    "臺北縣": "Taipei County",
+    "桃園縣": "Taoyuan County",
+    "新竹縣": "Hsinchu County",
+    "苗栗縣": "Miaoli County",
+    "臺中縣": "Taichung County",
+    "彰化縣": "Changhua County",
+    "南投縣": "Nantou County",
+    "雲林縣": "Yunlin County",
+    "嘉義縣": "Chiayi County",
+    "臺南縣": "Tainan County",
+    "高雄縣": "Kaohsiung County",
+    "屏東縣": "Pingtung County",
+    "宜蘭縣": "Yilan County",
+    "花蓮縣": "Hualien County",
+    "臺東縣": "Taitung County",
+    "澎湖縣": "Penghu County",
+    "金門縣": "Kinmen County",
+    "連江縣": "Lienchiang County",
+}
+PLACES = CITIES | COUNTIES
+PARTIES |= {
+    "台灣團結聯盟": "Taiwan Solidarity Union",
+    "建國黨": "Taiwan Independence Party",
+    "無黨團結聯盟": "Non-Partisan Solidarity Union",
+    "綠黨": "Green Party Taiwan",
+    "中華統一促進黨": "Chinese Unification Promotion Party",
+    "時代力量": "New Power Party",
+    "社會民主黨": "Social Democratic Party",
+}
+LOCAL_SYSTEM_START = date(1994, 1, 1)
+LOCAL_METHOD = (
+    "Voters choose one candidate for the chief executive of the municipality, county, or city. The candidate with the "
+    "most votes in the one count is elected, with no runoff."
+)
+LOCAL_NOTE = (
+    "Valid votes for each candidate, valid and invalid ballots, ballots cast, and registered voters at each {unit}, "
+    "as published by the Central Election Commission. Voters registered is the number of voters on the roll. The "
+    "totals for the contest are the Commission's own."
+)
+GRAIN = {
+    "std": "polling station",
+    "y2005": "polling station",
+    "text2006": "polling station",
+    "village": "village",
+    "township": "township or district",
+}
+
+
+def attachment_url(theme: Theme, name: str) -> str:
+    return f"{BASE}attachments/ELC/{theme.subject}/{theme.theme}/{quote(name)}"
+
+
+def table_url(kind: str, theme: Theme, level: str, name: str) -> str:
+    return f"{BASE}{kind}/ELC/{theme.subject}/00/{theme.theme}/{level}/{name}.json"
+
+
+def old_cities(theme: Theme) -> list[tuple[str, str]]:
+    """The (province code, city code, name) areas of a theme with no workbooks, read from its area list."""
+    data = json.loads(raw.cached(SOURCE, table_url("areas", theme, "C", "00_000_00_000_0000")).path.read_text("utf-8"))
+    return [(f"{row['prv_code']}_{row['city_code']}", str(row["area_name"])) for row in next(iter(data.values()))]
+
+
+def local_urls(theme: Theme) -> list[str]:
+    urls = [attachment_url(theme, name) for name in theme.files]
+    if theme.layout in ("village", "township"):
+        urls.append(table_url("areas", theme, "C", "00_000_00_000_0000"))
+    if theme.layout != "village":
+        urls += [table_url(kind, theme, "C", "00_000_00_000_0000") for kind in ("tickets", "profiles")]
+    return urls
+
+
+def local_urls_after_areas(theme: Theme) -> list[str]:
+    urls: list[str] = []
+    if theme.layout in ("village", "township"):
+        for prefix, _ in old_cities(theme):
+            for kind in ("tickets", "profiles"):
+                urls.append(table_url(kind, theme, "D", f"{prefix}_00_000_0000"))
+                if theme.layout == "village":
+                    urls.append(table_url(kind, theme, "L", f"{prefix}_00_000_0000"))
+    return urls
+
+
+def local_fetch() -> None:
+    for theme in THEMES:
+        for url in local_urls(theme):
+            suffix = ".json" if url.endswith(".json") else url[url.rindex(".") :]
+            raw.fetch(SOURCE, url, suffix=suffix)
+        for url in local_urls_after_areas(theme):
+            raw.fetch(SOURCE, url, suffix=".json")
+
+
+def local_artifacts(theme: Theme) -> list[str]:
+    return [*local_urls(theme), *local_urls_after_areas(theme)]
+
+
+# --- reading the local executive files
+
+
+def decoded(name: str | bytes) -> str:
+    return name.decode("cp950", errors="replace") if isinstance(name, bytes) else name
+
+
+def local_members(url: str) -> list[tuple[str, bytes]]:
+    """The files in one downloaded workbook, zip, or rar, with their names decoded."""
+    path = raw.cached(SOURCE, url).path
+    if url.lower().endswith(".xls"):
+        return [(url.rsplit("/", 1)[-1], path.read_bytes())]
+    found: list[tuple[str, bytes]] = []
+    if url.lower().endswith(".zip"):
+        archive = zipfile.ZipFile(path)
+        for info in archive.infolist():
+            if not info.is_dir():
+                name = info.filename if info.flag_bits & 0x800 else info.filename.encode("cp437").decode("cp950")
+                found.append((name.rsplit("/", 1)[-1], archive.read(info)))
+        return found
+    with libarchive.file_reader(str(path)) as entries:
+        for entry in entries:
+            if not entry.isdir:
+                found.append((decoded(entry.pathname).rsplit("/", 1)[-1], b"".join(entry.get_blocks())))
+    return found
+
+
+def serial(value: object) -> str:
+    """A station or village number as a string without leading zeros or a decimal point."""
+    if isinstance(value, float):
+        return str(int(value))
+    digits = text(value)
+    return str(int(digits)) if digits.isdigit() else digits
+
+
+def header_names(cells: list[object]) -> list[str]:
+    """The candidate names in a header row, whether a cell holds a number, a name, and a party, or only a name."""
+    names: list[str] = []
+    for cell in cells:
+        parts = [part for part in str(cell).split("\n") if part.strip()]
+        names.append(text(parts[1] if len(parts) >= 2 else parts[0]))
+    return names
+
+
+@dataclass
+class LocalTable:
+    county: str
+    names: list[str]
+    rows: list[dict[str, object]]
+
+
+def std_table(name: str, data: bytes) -> LocalTable:
+    _, grid_rows = grid(name, data)
+    head = next(index for index, row in enumerate(grid_rows) if any("有效票數" in str(cell) for cell in row))
+    end = next(index for index, cell in enumerate(grid_rows[head]) if "有效票數" in str(cell))
+    labels = grid_rows[head + 1][3:end]
+    if all("\n" in str(cell) for cell in labels if str(cell).strip()):
+        names, first = header_names(labels), head + 2
+    else:
+        names, first = header_names(grid_rows[head + 2][3:end]), head + 3
+    found = re.search(r"\((.+?)\)", name)
+    if found:
+        county = found.group(1)
+    else:
+        title = next(text(row[0]) for row in grid_rows if re.search(r"[縣市]", text(row[0])) and len(text(row[0])) > 6)
+        matched = re.match(r"(?:\d+年)?(.+?[縣市])", title)
+        if matched is None:
+            raise ValueError(f"{name}: no county in the title {title}")
+        county = matched.group(1)
+    rows: list[dict[str, object]] = []
+    district = ""
+    for row in grid_rows[first:]:
+        label, village, station = text(row[0]), text(row[1]), serial(row[2])
+        if station:
+            if not district:
+                raise ValueError(f"{name}: a station row comes before any district")
+            rows.append(
+                {
+                    "district": district,
+                    "village": village,
+                    "unit": station,
+                    "votes": [number(row[3 + index]) for index in range(len(names))],
+                    "valid": number(row[end]),
+                    "invalid": number(row[end + 1]),
+                    "cast": number(row[end + 2]),
+                    "registered": number(row[end + 6]),
+                }
+            )
+        elif label and not village and "總" not in label and number(row[3]) is not None:
+            district = label
+    return LocalTable(county, names, rows)
+
+
+def y2005_table(name: str, data: bytes) -> LocalTable:
+    _, grid_rows = grid(name, data)
+    end = next(index for index, cell in enumerate(grid_rows[1]) if "有效票數" in str(cell))
+    names = [text(str(cell).replace("得票數", "")) for cell in grid_rows[1][4:end:2]]
+    rows: list[dict[str, object]] = []
+    county = ""
+    for row in grid_rows[2:]:
+        if not (text(row[1]) and number(row[3]) is not None):
+            continue
+        county = county or text(row[0])
+        rows.append(
+            {
+                "district": text(row[1]),
+                "village": text(row[2]),
+                "unit": serial(row[3]),
+                "votes": [number(row[4 + 2 * index]) for index in range(len(names))],
+                "valid": number(row[end]),
+                "invalid": number(row[end + 1]),
+                "cast": number(row[end + 2]),
+                "registered": number(row[end + 6]),
+            }
+        )
+    return LocalTable(county, names, rows)
+
+
+def text2006_table(county: str, name: str, data: bytes) -> LocalTable:
+    lines = [line.split("\t") for line in data.decode("cp950", errors="replace").splitlines() if line.strip()]
+    head = next(index for index, cells in enumerate(lines) if any("有效票數" in cell for cell in cells))
+    end = next(index for index, cell in enumerate(lines[head]) if "有效票數" in cell)
+    names = [text(cell) for cell in lines[head][3:end]]
+    rows: list[dict[str, object]] = []
+    district = ""
+    for cells in lines[head + 1 :]:
+        cells = [*cells, *([""] * (end + 7 - len(cells)))]
+        if text(cells[0]) and "總" not in text(cells[0]):
+            district = text(cells[0])
+        if "總" in text(cells[0]) or not text(cells[2]).isdigit():
+            continue
+        rows.append(
+            {
+                "district": district,
+                "village": text(cells[1]),
+                "unit": serial(cells[2]),
+                "votes": [number(cells[3 + index]) for index in range(len(names))],
+                "valid": number(cells[end]),
+                "invalid": number(cells[end + 1]),
+                "cast": number(cells[end + 2]),
+                "registered": number(cells[end + 6]),
+            }
+        )
+    return LocalTable(county, names, rows)
+
+
+@functools.cache
+def workbook_tables(day: str, subject: str) -> dict[str, LocalTable]:
+    (theme,) = [t for t in THEMES if (t.day, t.subject) == (day, subject)]
+    tables: dict[str, LocalTable] = {}
+    for file in theme.files:
+        url = attachment_url(theme, file)
+        for name, data in local_members(url):
+            if theme.layout == "text2006":
+                if "台北" in file and re.fullmatch(r"\w+區\.xls", name):
+                    table = text2006_table("臺北市", name, data)
+                elif "高雄" in file and "各投開票所開票結果表" in name:
+                    table = text2006_table("高雄市", name, data)
+                else:
+                    continue
+                if table.county in tables:
+                    holder = tables[table.county]
+                    if holder.names != table.names:
+                        raise ValueError(f"{name}: the candidates differ between districts")
+                    holder.rows.extend(table.rows)
+                else:
+                    tables[table.county] = table
+                continue
+            if not name.lower().endswith(".xls"):
+                continue
+            if theme.layout == "std":
+                table = std_table(name, data)
+            else:
+                table = y2005_table(name, data)
+            if table.county in tables:
+                raise ValueError(f"{theme.day} {subject}: two files for {table.county}")
+            tables[table.county] = table
+    return tables
+
+
+@dataclass
+class Cand:
+    no: int
+    name: str
+    sex: str | None
+    birth: str | None
+    party: str
+    votes: int
+    won: bool
+    incumbent: bool | None
+
+
+@dataclass
+class Contest:
+    county: str
+    cands: list[Cand]
+    totals: dict[int, int]  # measure -> the Commission's total
+    rows: list[dict[str, object]]
+
+
+def load(url: str) -> dict[str, list[dict[str, object]]]:
+    return json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))
+
+
+def cand(row: dict[str, object]) -> Cand:
+    sex, birth = str(row.get("cand_sex") or "").strip(), str(row.get("cand_birthyear") or "").strip()
+    return Cand(
+        no=int(str(row["cand_no"])),
+        name=text(row["cand_name"]),
+        sex={"1": "male", "2": "female"}.get(sex),
+        birth=birth if birth.isdigit() else None,
+        party=str(row["party_name"]).strip(),
+        votes=int(str(row["ticket_num"])),
+        won=row["is_victor"] == "*",
+        incumbent={"Y": True, "N": False}.get(str(row.get("is_current"))),
+    )
+
+
+def totals(row: dict[str, object]) -> dict[int, int]:
+    return {
+        2: int(str(row["votable_population"])),
+        3: int(str(row["vote_ticket"])),
+        4: int(str(row["valid_ticket"])),
+        5: int(str(row["invalid_ticket"])),
+    }
+
+
+def plain(name: str) -> str:
+    """A name with a character the Commission could not encode (a private-use glyph or an @code@ placeholder) as ?."""
+    return re.sub(r"@[0-9A-F]+@|[\ue000-\uf8ff]", "?", name)
+
+
+def same_name(left: str, right: str) -> bool:
+    a, b = plain(left), plain(right)
+    return len(a) == len(b) and all(x == y or "?" in (x, y) for x, y in zip(a, b, strict=True))
+
+
+def check_names(county: str, table: list[str], cands: list[Cand]) -> None:
+    if len(table) != len(cands) or not all(same_name(x, c.name) for x, c in zip(table, cands, strict=True)):
+        raise ValueError(f"{county}: the workbook lists {table} but the candidate list has {[c.name for c in cands]}")
+
+
+def stations_contests(theme: Theme) -> list[Contest]:
+    tickets = load(table_url("tickets", theme, "C", "00_000_00_000_0000"))
+    profiles = load(table_url("profiles", theme, "C", "00_000_00_000_0000"))
+    by_county: dict[str, list[Cand]] = {}
+    for row in next(iter(tickets.values())):
+        by_county.setdefault(text(row["area_name"]), []).append(cand(row))
+    sums = {text(row["area_name"]): totals(row) for row in next(iter(profiles.values()))}
+    out: list[Contest] = []
+    for county, table in workbook_tables(theme.day, theme.subject).items():
+        cands = sorted(by_county.pop(county), key=lambda c: c.no)
+        check_names(county, table.names, cands)
+        out.append(Contest(county, cands, sums.pop(county), table.rows))
+    if by_county:
+        raise ValueError(f"{theme.day} {theme.subject}: no workbook for {sorted(by_county)}")
+    return out
+
+
+def rows_of(url: str) -> list[dict[str, object]]:
+    return [row for group in load(url).values() for row in group]
+
+
+def old_contests(theme: Theme) -> list[Contest]:
+    """Village rows for the early special municipality mayors and township rows for the early county magistrates."""
+    villages = theme.layout == "village"
+    if not villages:
+        whole = {
+            text(row["area_name"]): row for row in rows_of(table_url("profiles", theme, "C", "00_000_00_000_0000"))
+        }
+        whole_cands: dict[str, list[Cand]] = {}
+        for row in rows_of(table_url("tickets", theme, "C", "00_000_00_000_0000")):
+            whole_cands.setdefault(text(row["area_name"]), []).append(cand(row))
+    out: list[Contest] = []
+    for prefix, county in old_cities(theme):
+        district_cands = rows_of(table_url("tickets", theme, "D", f"{prefix}_00_000_0000"))
+        district_profiles = rows_of(table_url("profiles", theme, "D", f"{prefix}_00_000_0000"))
+        names = {str(row["dept_code"]): text(row["area_name"]) for row in district_cands}
+        listed = {c.no: c for c in map(cand, district_cands)}
+        if villages:
+            sums: dict[int, int] = {}
+            for row in district_cands:
+                sums[int(str(row["cand_no"]))] = sums.get(int(str(row["cand_no"])), 0) + int(str(row["ticket_num"]))
+            top = max(sums.values())
+            cands = [
+                Cand(c.no, c.name, c.sex, c.birth, c.party, sums[c.no], sums[c.no] == top, c.incumbent)
+                for c in sorted(listed.values(), key=lambda c: c.no)
+            ]
+            total = {measure: sum(totals(row)[measure] for row in district_profiles) for measure in (2, 3, 4, 5)}
+        else:
+            cands = sorted(whole_cands[county], key=lambda c: c.no)
+            total = totals(whole[county])
+        profile_at = {(str(r["dept_code"]), str(r["li_code"])): r for r in district_profiles}
+        rows: list[dict[str, object]] = []
+        if villages:
+            grouped: dict[tuple[str, str], list[dict[str, object]]] = {}
+            for row in rows_of(table_url("tickets", theme, "L", f"{prefix}_00_000_0000")):
+                grouped.setdefault((str(row["dept_code"]), str(row["li_code"])), []).append(row)
+            have_at = {
+                (str(r["dept_code"]), str(r["li_code"])): r
+                for r in rows_of(table_url("profiles", theme, "L", f"{prefix}_00_000_0000"))
+            }
+            for (dept, li), group in grouped.items():
+                votes = {int(str(r["cand_no"])): int(str(r["ticket_num"])) for r in group}
+                have = have_at[(dept, li)]
+                rows.append(
+                    {
+                        "district": names[dept],
+                        "village": text(group[0]["area_name"]),
+                        "unit": serial(li),
+                        "votes": [votes.get(c.no) for c in cands],
+                        "valid": int(str(have["valid_ticket"])),
+                        "invalid": int(str(have["invalid_ticket"])),
+                        "cast": int(str(have["vote_ticket"])),
+                        "registered": int(str(have["votable_population"])),
+                    }
+                )
+        else:
+            grouped = {}
+            for row in district_cands:
+                grouped.setdefault((str(row["dept_code"]), "0000"), []).append(row)
+            for (dept, li), group in grouped.items():
+                votes = {int(str(r["cand_no"])): int(str(r["ticket_num"])) for r in group}
+                have = profile_at[(dept, li)]
+                rows.append(
+                    {
+                        "district": names[dept],
+                        "village": "",
+                        "unit": "",
+                        "votes": [votes.get(c.no) for c in cands],
+                        "valid": int(str(have["valid_ticket"])),
+                        "invalid": int(str(have["invalid_ticket"])),
+                        "cast": int(str(have["vote_ticket"])),
+                        "registered": int(str(have["votable_population"])),
+                    }
+                )
+        out.append(Contest(county, cands, total, rows))
+    return out
+
+
+@functools.cache
+def contests(day: str, subject: str) -> list[Contest]:
+    (theme,) = [t for t in THEMES if (t.day, t.subject) == (day, subject)]
+    return old_contests(theme) if theme.layout in ("village", "township") else stations_contests(theme)
+
+
+# --- the local executive packages
+
+
+def ballots(row: dict[str, object]) -> list[int | None]:
+    votes = row["votes"]
+    if not isinstance(votes, list):
+        raise TypeError("a row's votes are not a list")
+    return votes
+
+
+def slug_of(county: str) -> str:
+    return re.sub(r"[^a-z]+", "-", PLACES[county].lower()).strip("-")
+
+
+def office_name(county: str) -> str:
+    return f"Mayor of {PLACES[county]}" if county in CITIES else f"Magistrate of {PLACES[county]}"
+
+
+def contest_name(year: str, county: str) -> str:
+    return f"{year} {PLACES[county]} " + ("mayoral election" if county in CITIES else "magistrate election")
+
+
+def contest_name_zh(year: str, county: str) -> str:
+    return f"{int(year) - 1911}年{county}{'市長' if county in CITIES else '縣長'}選舉"
+
+
+def election_names(day: str, subjects: set[str], special: bool) -> tuple[str, str]:
+    year = day[:4]
+    roc = int(year) - 1911
+    if special:
+        return f"{year} Chiayi City mayoral re-run election", "嘉義市第11屆市長重行選舉"
+    if subjects == {"C1", "C2"}:
+        return f"{year} Taiwanese local elections", f"{roc}年地方公職人員選舉"
+    if subjects == {"C1"}:
+        return f"{year} Taiwanese special municipality mayoral elections", f"{roc}年直轄市長選舉"
+    return f"{year} Taiwanese county magistrate and city mayor elections", f"{roc}年縣市長選舉"
+
+
+def local(day: str) -> Package:
+    themes = [theme for theme in THEMES if theme.day == day]
+    year = day[:4]
+    special = any(theme.special for theme in themes)
+    p = Package(
+        f"tw.cec/local-{day}",
+        SOURCE,
+        f"The {year} Taiwanese "
+        + ("Chiayi City mayoral re-run" if special else "county magistrate and mayor elections")
+        + " by the finest unit the Central Election Commission reports",
+        depends=["tw.cec/geo", "tw.cec/registry"],
+    )
+    p.external.add(TAIWAN)
+    for theme in themes:
+        for url in local_artifacts(theme):
+            p.uses(raw.cached(SOURCE, url))
+    election = key("election", day, "local")
+    path = f"tw/{day}-chiayi-city-mayoral" if special else f"tw/{day}-local"
+    when = date.fromisoformat(day)
+    p.add(
+        "election",
+        id=election,
+        polity_id=TAIWAN,
+        kind="special" if special else "local",
+        date_from=when,
+        date_to=when,
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    english, native = election_names(day, {theme.subject for theme in themes}, special)
+    p.name(election, english, "en", "official")
+    p.name(election, native, "zh", "native", False)
+    unit_frames: list[pl.DataFrame] = []
+    value_frames: list[pl.DataFrame] = []
+    for theme in themes:
+        note = LOCAL_NOTE.format(unit=GRAIN[theme.layout])
+        for found in contests(theme.day, theme.subject):
+            county = found.county
+            contest = key("contest", day, county)
+            p.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="office",
+                office_id=office(county),
+                district_area_id=area("tw.county", county),
+                magnitude=1,
+                round_number=1,
+                electoral_system_id=LOCAL_SYSTEM,
+                default_result_kind="counted",
+            )
+            p.name(contest, contest_name(year, county), "en", "official")
+            p.name(contest, contest_name_zh(year, county), "zh", "native", False)
+            head = "mayor" if county in CITIES else "magistrate"
+            p.add("slug", path=f"{path}/{slug_of(county)}-{head}", entity_id=contest, is_current=True)
+            result_set = key("result_set", day, county)
+            p.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                source_id=CEC,
+                status="active",
+                is_default=True,
+                completeness=1.0,
+            )
+            p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=note, lang="en")
+            options: dict[int, str] = {}
+            for c in found.cands:
+                independent = c.party in INDEPENDENT
+                party_id = None if independent else key("party", c.party)
+                option = key("option", day, county, c.no)
+                options[c.no] = option
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party_id,
+                    ballot_position=c.no,
+                    ballot_label=c.name,
+                )
+                person = key("person", day, county, c.no)
+                p.add(
+                    "person",
+                    id=person,
+                    birth_date=date(int(c.birth), 1, 1) if c.birth else None,
+                    birth_precision="year" if c.birth else None,
+                    gender=c.sex,
+                )
+                p.name(person, c.name, "zh", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", day, county, c.no),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=c.name,
+                    member_of_party_id=party_id,
+                    is_independent=independent,
+                    is_incumbent=c.incumbent,
+                )
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if c.won else "lost")
+                p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=c.votes)
+            for measure, value in found.totals.items():
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+            if sum(1 for c in found.cands if c.won) != 1:
+                raise ValueError(f"{day} {county}: the Commission does not name exactly one winner")
+            frame = pl.DataFrame(
+                {
+                    "district": [str(row["district"]) for row in found.rows],
+                    "village": [str(row["village"]) for row in found.rows],
+                    "unit": [str(row["unit"]) for row in found.rows],
+                    "valid": [row["valid"] for row in found.rows],
+                    "invalid": [row["invalid"] for row in found.rows],
+                    "cast": [row["cast"] for row in found.rows],
+                    "registered": [row["registered"] for row in found.rows],
+                    **{f"v{c.no}": [ballots(row)[index] for row in found.rows] for index, c in enumerate(found.cands)},
+                },
+                schema_overrides={"valid": pl.Int64, "invalid": pl.Int64, "cast": pl.Int64, "registered": pl.Int64},
+            )
+            codes = [
+                ":".join((day, theme.subject, county, str(row["district"]), str(row["village"]), str(row["unit"])))
+                for row in found.rows
+            ]
+            if len(set(codes)) != len(codes):
+                raise ValueError(f"{day} {county}: reporting unit codes repeat")
+            if theme.layout == "township":
+                scheme, relation = "tw.township", "equals"
+            elif theme.layout == "village":
+                scheme, relation = "tw.village", "equals"
+            else:
+                scheme, relation = "tw.station", "within"
+            unit_ids = [key("unit", code) for code in codes]
+            areas = [
+                area("tw.village", county, str(row["district"]), str(row["village"]))
+                if row["village"]
+                else area("tw.township", county, str(row["district"]))
+                for row in found.rows
+            ]
+            unit_frames.append(
+                pl.DataFrame(
+                    {
+                        "id": unit_ids,
+                        "polity_id": [TAIWAN] * len(codes),
+                        "scheme_code": [scheme] * len(codes),
+                        "code": codes,
+                        "area_relation": [relation] * len(codes),
+                        "area_id": areas,
+                        "kind": ["standard"] * len(codes),
+                    }
+                )
+            )
+            base = frame.with_columns(unit_id=pl.Series(unit_ids))
+            parts = [
+                base.select(
+                    unit_id="unit_id",
+                    option_id=pl.lit(options[c.no]),
+                    measure=pl.lit(1),
+                    value=pl.col(f"v{c.no}"),
+                )
+                for c in found.cands
+            ]
+            for measure, column in ((2, "registered"), (3, "cast"), (4, "valid"), (5, "invalid")):
+                parts.append(
+                    base.select(
+                        unit_id="unit_id", option_id=pl.lit(None, pl.String), measure=pl.lit(measure), value=column
+                    )
+                )
+            facts = pl.concat(parts).filter(pl.col("value").is_not_null() & (pl.col("value") >= 0))
+            value_frames.append(
+                facts.select(
+                    result_set_id=pl.lit(result_set),
+                    unit_id="unit_id",
+                    option_id="option_id",
+                    channel=pl.lit(0),
+                    measure="measure",
+                    count_round=pl.lit(0),
+                    flags=pl.lit(0),
+                    value="value",
+                )
+            )
+    p.frame("reporting_unit", pl.concat(unit_frames))
+    p.frame("result_value", pl.concat(value_frames))
+    return p
