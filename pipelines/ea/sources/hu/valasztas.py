@@ -2741,6 +2741,181 @@ def local_2019(d: Day) -> None:
         found = re.search(r"szavazóköri_eredmények_(\d\d)_", path)
         if found:
             local_workbook(d, local, sheets("2019_onkormanyzati", path.split("/")[-1]), found[1], SHEETS_2019)
+    winners_2019(d, local)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Declared winners of the 2014 and 2019 local elections: mayors, ward members, and block-vote councils
+
+PAGES_2019 = "https://valtor.valasztas.hu/valtort/jsp/"
+MAYORS_2019 = PAGES_2019 + "teljkv.jsp?EA=40&MAZ=<county>&TAZ=<settlement>&W=4"
+WARDS_2019 = PAGES_2019 + "tevkjkvkiv.jsp?EA=40&MAZ=<county>&TAZ=<settlement>&W=5"
+COUNCILS_2019 = PAGES_2019 + "teltag.jsp?EA=40&MAZ=<county>&TAZ=<settlement>"
+ASSEMBLIES_2019 = PAGES_2019 + "mkiv.jsp?EA=40&URL=9"
+SETTLEMENTS_2014 = "https://static.valasztas.hu/dyn/onk14/szavossz/hu/M<county>/T<settlement>/tjk.html"
+ASSEMBLIES_2014 = "https://static.valasztas.hu/dyn/onk14/szavossz/hu/"
+PAGE_START = re.compile(r"<!-- (https://\S+) \(([^)]*)\) -->")
+
+
+def pages(name: str) -> Iterator[tuple[str, str, str]]:
+    """The settlement pages of one combined file of saved pages: each page's address, place name, and HTML."""
+    content = raw.cached(SOURCE, name).path.read_bytes().decode("utf-8", errors="replace")
+    marks = list(PAGE_START.finditer(content))
+    for mark, following in zip(marks, [*marks[1:], None], strict=False):
+        yield mark[1], html.unescape(mark[2]), content[mark.end() : following.start() if following else None]
+
+
+def table_cells(page: str) -> list[list[str]]:
+    rows = []
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.DOTALL | re.IGNORECASE):
+        cells = re.findall(r"<t[dh][^>]*>(.*?)(?=<t[dh]|</tr>|$)", row, re.DOTALL | re.IGNORECASE)
+        rows.append(
+            [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]*>", " ", c)).replace("\xa0", " ")).strip() for c in cells]
+        )
+    return rows
+
+
+def name_words(name: str) -> tuple[str, ...]:
+    """The words of a printed name without titles, so a name that leaves out a given name still lines up."""
+    words = re.sub(r"[^\w\s-]", " ", unicodedata.normalize("NFC", name).upper()).split()
+    words = [word for word in words if word not in ("DR", "ID", "IFJ", "ÖZV", "PROF")]
+    # A married name ends in -né on the last given name, which a shortened line may attach to an earlier one.
+    return tuple(
+        word[:-2].removesuffix("Á").removesuffix("É")
+        + ("A" if word[:-2].endswith("Á") else "E" if word[:-2].endswith("É") else "")
+        if word.endswith("NÉ") and len(word) > 4
+        else word
+        for word in words
+    )
+
+
+def is_subsequence(short: tuple[str, ...], long: tuple[str, ...]) -> bool:
+    rest = iter(long)
+    return bool(short) and all(word in rest for word in short)
+
+
+class Winners:
+    """Marks declared winners on the options of a built day, found by position or by the name printed on the ballot."""
+
+    def __init__(self, d: Day, year: int) -> None:
+        self.d = d
+        self.year = year
+        self.marked: Counter[str] = Counter()
+        self.taken: set[tuple[str, str]] = set()
+        self.totals: dict[str, Counter[str]] = {}
+        self.missed: list[str] = []
+        self.index: dict[str, dict[str, list[tuple[str, str | None]]]] = defaultdict(lambda: defaultdict(list))
+        self.labels: dict[str, dict[tuple[str, ...], list[tuple[str, str | None]]]] = defaultdict(
+            lambda: defaultdict(list)
+        )
+        for row in d.p.rows.get("contest_option", []):
+            if row["kind"] == "candidate":
+                pair = (cast(str, row["id"]), cast(str | None, row["party_id"]))
+                self.index[cast(str, row["contest_id"])][same_name(cast(str, row["ballot_label"]))].append(pair)
+                self.labels[cast(str, row["contest_id"])][name_words(cast(str, row["ballot_label"]))].append(pair)
+
+    def tag(self, kind: str, area: str, ward: str | None = None) -> str | None:
+        for spelling in dict.fromkeys([ward, ward and ward.lstrip("0"), ward and ward.zfill(2)]):
+            tag = f"onk:{self.year}:{kind}:{area}" + (f":{spelling}" if spelling else "")
+            if tag in self.d.sets:
+                return tag
+        return None
+
+    def by_position(self, kind: str, tag: str, position: int) -> None:
+        option = self.d.options.get((tag, str(position)))
+        if option is None:
+            self.missed.append(f"{tag}: no option at position {position}")
+            return
+        self.d.outcome(tag, option, "elected")
+        self.marked[kind] += 1
+
+    def by_name(self, kind: str, tag: str, name: str, nominator: str | None = None) -> None:
+        """Mark the candidate whose ballot name is `name`, or, when the line also carries the organization, starts it."""
+        names = self.index[self.d.contest_id(tag)]
+        wanted = same_name(name)
+        found = names.get(wanted) or next((v for k, v in names.items() if k and wanted.startswith(k)), [])
+        if not found:
+            words = name_words(name)
+            found = [
+                pair
+                for label, pairs in self.labels[self.d.contest_id(tag)].items()
+                if is_subsequence(words, label) or is_subsequence(label, words)
+                for pair in pairs
+            ]
+        if len(found) > 1 and nominator:
+            found = [pair for pair in found if pair[1] == party(nominator)] or found
+        found = [pair for pair in found if (tag, pair[0]) not in self.taken] or found
+        if len(found) > 1:
+            # Namesakes the line cannot tell apart: the one with the most votes in the contest is the one elected.
+            votes = self.votes(tag)
+            top = max(votes.get(pair[0], 0) for pair in found)
+            found = [pair for pair in found if votes.get(pair[0], 0) == top]
+        if len(found) != 1:
+            self.missed.append(f"{tag}: {name!r} matches {len(found)} candidates")
+            return
+        self.taken.add((tag, found[0][0]))
+        self.d.outcome(tag, found[0][0], "elected")
+        self.marked[kind] += 1
+
+    def votes(self, tag: str) -> dict[str, int]:
+        if tag not in self.totals:
+            totals: Counter[str] = Counter()
+            result_set = self.d.sets[tag]
+            for (rs, _unit, option, measure), amount in self.d.values.items():
+                if rs == result_set and option is not None and measure == 1:
+                    totals[option] += amount
+            self.totals[tag] = totals
+        return self.totals[tag]
+
+
+def winners_2019(d: Day, local: Local) -> None:
+    found = places()
+    winners = Winners(d, 2019)
+    for name in (MAYORS_2019, WARDS_2019, COUNCILS_2019):
+        d.cite(name)
+    for address, place, page in pages(MAYORS_2019):
+        match = re.search(r"MAZ=(\d+)&TAZ=(\d+)", address)
+        assert match
+        area = found.resolve(match[1], match[2], place, trust_code=True)
+        tag = winners.tag("mayor", area)
+        for row in table_cells(page):
+            if len(row) == 6 and row[5] == "Igen" and tag:
+                winners.by_position("mayor", tag, cast(int, number(row[0])))
+    for address, place, page in pages(WARDS_2019):
+        match = re.search(r"MAZ=(\d+)&TAZ=(\d+)&W=5&TEVK=(\d+)", address)
+        if not match:
+            continue
+        area = found.resolve(match[1], match[2], place, trust_code=True)
+        tag = winners.tag("ward", area, match[3])
+        for row in table_cells(page):
+            if len(row) == 6 and row[5] == "Igen":
+                if tag:
+                    winners.by_position("ward", tag, cast(int, number(row[0])))
+                else:
+                    winners.missed.append(f"{area} ward {match[3]}: no contest")
+    for address, place, page in pages(COUNCILS_2019):
+        match = re.search(r"MAZ=(\d+)&TAZ=(\d+)", address)
+        assert match
+        area = found.resolve(match[1], match[2], place, trust_code=True)
+        if tag := winners.tag("council", area):
+            for row in table_cells(page):
+                if (
+                    len(row) == 2
+                    and row[0]
+                    and row[0] != "Képviselő neve"
+                    and not row[1].isdigit()
+                    and row[0] != "Szervezet"
+                ):
+                    winners.by_name("council", tag, row[0], row[1])
+    report("2019", winners)
+
+
+def report(year: str, winners: Winners) -> None:
+    print(f"{year} winners marked: {dict(winners.marked)}; unmatched: {len(winners.missed)}")
+    for line in winners.missed[:15]:
+        print("  ", line)
+    if winners.missed:
+        raise ValueError(f"{year}: {len(winners.missed)} declared winners did not match a candidate")
 
 
 OTHER.append((date(2019, 10, 13), "2019 local elections", local_2019))
@@ -2912,6 +3087,45 @@ def local_2014(d: Day) -> None:
                     if d.first(tag, str(position)):
                         d.candidate(tag, option, f"{tag}:{position}", label, nominator=nominator)
                 d.value(tag, unit, option, 1, number(item["SZAVAZAT"]))
+    winners_2014(d, local)
+
+
+def winners_2014(d: Day, local: Local) -> None:
+    found = places()
+    winners = Winners(d, 2014)
+    d.cite(SETTLEMENTS_2014)
+    for address, place, page in pages(SETTLEMENTS_2014):
+        match = re.search(r"/M(\d+)/T(\d+)/", address)
+        assert match
+        area = found.resolve(match[1], match[2], place, trust_code=True)
+        mayor = re.search(r"A polgármester</p>\s*<p[^>]*><strong>(.*?)</strong>", page, re.DOTALL)
+        if mayor and (tag := winners.tag("mayor", area)):
+            line = [
+                re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]*>", "", part))).strip()
+                for part in re.split(r"<br\s*/?>", mayor[1])
+            ]
+            if line[0]:
+                winners.by_name("mayor", tag, line[0], line[1] if len(line) > 1 else None)
+            else:
+                winners.marked["no mayor declared"] += 1
+        start = page.find("Az önkormányzat összetétele")
+        if start < 0:
+            continue
+        block = page[start : page.find("</table>", start)]
+        block_tag = winners.tag("council", area)
+        for row in table_cells(block):
+            if len(row) < 3 or not row[0] or row[0] == "A jelölt neve":
+                continue
+            ward = row[2].split()[0] if row[2].split() else None
+            if ward:
+                tag = winners.tag("ward", area, ward)
+                if tag:
+                    winners.by_name("ward", tag, row[0], row[1])
+                else:
+                    winners.missed.append(f"{area} ward {ward}: no contest")
+            elif block_tag:
+                winners.by_name("council", block_tag, row[0], row[1])
+    report("2014", winners)
 
 
 OTHER.append((date(2014, 10, 12), "2014 local and nationality elections", local_2014))
