@@ -36,6 +36,7 @@ def key(kind: str, *parts: object) -> str:
 WAEC = key("source", "waec")
 ASSEMBLY = key("body", "legislative-assembly")
 SYSTEM = key("electoral_system", "legislative-assembly", "irv")
+REFERENDUM_SYSTEM = key("electoral_system", "referendum")
 COUNCIL = key("body", "legislative-council")
 COUNCIL_SYSTEM = key("electoral_system", "legislative-council", "stv")
 
@@ -763,6 +764,271 @@ def council(day: str) -> list[Region]:
     return out
 
 
+# Referendums ------------------------------------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Referendum:
+    day: str
+    report: str
+    title: str
+    questions: list[str]  # each question's short name, in the report's order
+    state: list[tuple[int, int, int, int]]  # the report's statewide yes, no, informal, and total votes per question
+
+
+REFERENDUMS = [
+    Referendum(
+        "2005-02-26",
+        url(f"{DOCS}/2005_Retail_Trading_Ref_Report.pdf"),
+        "2005 Western Australian retail trading hours referendum",
+        ["Question 1: weeknight trading", "Question 2: Sunday trading"],
+        [(457_183, 648_860, 23_158, 1_129_201), (422_942, 672_478, 33_644, 1_129_064)],
+    ),
+    Referendum(
+        "2009-05-16",
+        url(f"{DOCS}/2009_DSR_ Report.pdf"),
+        "2009 Western Australian daylight saving referendum",
+        ["Daylight saving"],
+        [(519_899, 624_304, 4_650, 1_148_853)],
+    ),
+]
+# The boundary determination each referendum's districts follow.
+REFERENDUM_PLANS = {"2005-02-26": "2003", "2009-05-16": "2007"}
+
+
+@dataclass
+class Question:
+    text: str
+    places: list[Place]  # votes are yes and no
+    declared: Place
+    fixes: list[str]
+
+
+DISTRICT_HEAD = re.compile(r"^\s*([A-Z][A-Za-z' -]+?)(?: District)?\s*$")
+# Rows the referendum reports misprint, each proven by the district's printed totals: (day, district, place) to
+# (printed yes, no, valid, informal, and total votes; corrected ones; note).
+REFERENDUM_FIXES = {
+    ("2009-05-16", "Albany", "Albany Primary School"): (
+        (198, 435, 633, 13, 646),
+        (372, 484, 856, 1, 857),
+        (
+            "The report prints Albany Primary School with 198 yes, 435 no, 13 informal, and 646 total votes, the "
+            "figures of the same polling place at the 2005 referendum's first question. With them the district's polling "
+            "places fall short of its printed total of polling place votes by 174 yes, 49 no, and 211 total votes and "
+            "exceed it by 12 informal votes. The archive stores the polling place as the printed total less the other "
+            "polling places: 372 yes, 484 no, 1 informal, and 857 total votes."
+        ),
+    ),
+}
+
+
+@functools.cache
+def referendum(day: str) -> dict[tuple[int, str], Question]:
+    """Each question's table by district, keyed by the question's position and the district's name."""
+    spec = next(r for r in REFERENDUMS if r.day == day)
+    lines = layout(spec.report).splitlines()
+    plan = REFERENDUM_PLANS[day]
+    known = {fold(d.name) for g in GENERALS if PLANS[g.day] == plan for d in checked(g.day)}
+    heads = [i for i, line in enumerate(lines) if (m := DISTRICT_HEAD.match(line)) and fold(m[1]) in known]
+    texts: list[str] = []
+    out: dict[tuple[int, str], Question] = {}
+    for n, head in enumerate(heads):
+        found = DISTRICT_HEAD.match(lines[head])
+        assert found
+        name = found[1].strip()
+        end = heads[n + 1] if n + 1 < len(heads) else len(lines)
+        block = lines[head:end]
+        question = next((i for i, line in enumerate(block) if re.match(r"^\s*Question\b", line)), None)
+        if question is None:
+            continue
+        words = []
+        for line in block[question:]:
+            if not line.strip() or "%" in line or "Yes" in line:
+                break
+            words.append(line.strip())
+        text = re.sub(r"^Question( \d)?:\s*", "", " ".join(words))
+        if text not in texts:
+            texts.append(text)
+        places: list[Place] = []
+        declared = None
+        fixes: list[str] = []
+        for row in rows(block, 7):
+            label = row.label
+            cells = tuple(integer(c) for c in row.numbers[:5])
+            fix = REFERENDUM_FIXES.get((day, name, label))
+            if fix is not None:
+                if cells != fix[0]:
+                    raise ValueError(f"{day} {name}, {label}: the correction no longer fits the report")
+                cells = fix[1]
+                fixes.append(fix[2])
+            yes, no, valid, informal, total = cells
+            place = Place(label, [yes, no], valid, informal, total)
+            if label == "Total Votes":
+                declared = place
+                break
+            if label in ("Total Polling Places Votes", "Total Count Centre Votes", "Polling Place Totals"):
+                continue
+            if label in DECLARATION or label.startswith("Special Institutions"):
+                place.kind = "aggregate"
+            places.append(place)
+        if declared is None:
+            raise ValueError(f"{day} {name}: no total row")
+        check(f"{day} {name}", places, declared, 2, {})
+        key_ = (texts.index(text), name)
+        if key_ in out:
+            raise ValueError(f"{day} {name}: question {key_[0] + 1} printed twice")
+        out[key_] = Question(text, places, declared, fixes)
+    if len(texts) != len(spec.questions):
+        raise ValueError(f"{day}: {len(texts)} questions for {len(spec.questions)}")
+    for index, (yes, no, informal, total) in enumerate(spec.state):
+        found = [q.declared for (i, _), q in out.items() if i == index]
+        sums = (
+            sum(d.votes[0] for d in found),
+            sum(d.votes[1] for d in found),
+            sum(d.informal for d in found),
+            sum(d.total for d in found),
+        )
+        if sums != (yes, no, informal, total):
+            raise ValueError(
+                f"{day} question {index + 1}: districts add up to {sums}, not {(yes, no, informal, total)}"
+            )
+    return out
+
+
+REFERENDUM_METHOD = (
+    "Yes and no votes at each polling place, from the district results of the Western Australian Electoral "
+    "Commission's report on the referendum. Absent, early (postal and in person), provisional, and special "
+    "institution, hospital, and remote votes are reported once per district and stored as one unit each. The "
+    "districts add up to the report's statewide totals."
+)
+
+
+def referendum_package(day: str) -> Package:
+    spec = next(r for r in REFERENDUMS if r.day == day)
+    when = date.fromisoformat(day)
+    found = referendum(day)
+    p = Package(
+        f"{SOURCE}/{day}-referendum",
+        SOURCE,
+        f"The {spec.title} by polling place, from the Western Australian Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external.add(AUSTRALIA)
+    p.uses(raw.cached(SOURCE, spec.report))
+    election_id = key("election", day, "referendum")
+    path = f"au/wa/{day}-referendum"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=AUSTRALIA,
+        kind="referendum",
+        date_from=when,
+        date_to=when,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, spec.title[0].upper() + spec.title[1:], "en", "official")
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units: dict[str, str] = {}
+    for index, short in enumerate(spec.questions):
+        contest = key("contest", day, "referendum", index)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="ballot_question",
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=REFERENDUM_SYSTEM,
+            default_result_kind="counted",
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        texts = {q.text for (i, _), q in found.items() if i == index}
+        p.name(contest, short, "en", "official")
+        p.add("note", id=key("note", contest), entity_id=contest, kind="context", body_md=texts.pop(), lang="en")
+        p.add("slug", path=f"{path}/question-{index + 1}", entity_id=contest, is_current=True)
+        result_set = key("result_set", contest)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=WAEC,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=REFERENDUM_METHOD,
+            lang="en",
+        )
+        options = [key("option", contest, answer) for answer in ("yes", "no")]
+        for position, (option, label) in enumerate(zip(options, ("Yes", "No"), strict=True), 1):
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        yes, no, informal, total = spec.state[index]
+        for option, value in zip(options, (yes, no), strict=True):
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+        for measure, value in ((VALID, yes + no), (INVALID, informal), (CAST, total)):
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for option, value in zip(options, (yes, no), strict=True):
+            won = value == max(yes, no)
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if won else "lost")
+        for (i, name), q in sorted(found.items()):
+            if i != index:
+                continue
+            for n, fix in enumerate(q.fixes):
+                p.add(
+                    "note",
+                    id=key("note", result_set, "fix", name, n),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=fix,
+                    lang="en",
+                )
+            slug = changeset.slug(name)
+            district = area("au-wa.district", f"{REFERENDUM_PLANS[day]}:{slug}")
+            seen: Counter[str] = Counter()
+            for place in q.places:
+                seen[place.name] += 1
+                code = f"{day}:referendum:{slug}:{changeset.slug(place.name)}"
+                if seen[place.name] > 1:
+                    code += f"-{seen[place.name]}"
+                if code not in units:
+                    unit = units[code] = key("unit", code)
+                    p.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=AUSTRALIA,
+                        scheme_code="au-wa.polling_place",
+                        code=code,
+                        area_relation="within",
+                        area_id=district,
+                        kind=place.kind,
+                    )
+                    label = place.name if place.kind == "standard" else f"{name}: {place.name}"
+                    p.name(unit, label, "en", "official")
+                unit = units[code]
+                for option, value in zip(options, place.votes, strict=True):
+                    put(p, result_set, unit, option, VOTES, value)
+                put(p, result_set, unit, None, VALID, place.formal)
+                put(p, result_set, unit, None, INVALID, place.informal)
+                put(p, result_set, unit, None, CAST, place.total)
+    return p
+
+
 # Totals the reports print for the whole state, which the districts must add up to: formal and informal votes.
 STATE = {
     "2001-02-10": (1_026_720, 48_836),
@@ -951,6 +1217,17 @@ def registry() -> Package:
     p.external.add(AUSTRALIA)
     for link in files():
         p.artifact(raw.cached(SOURCE, link), WAEC)
+    p.add(
+        "electoral_system", id=REFERENDUM_SYSTEM, polity_id=AUSTRALIA, rules={"formula": "referendum"}, rules_version=1
+    )
+    p.add(
+        "note",
+        id=key("note", REFERENDUM_SYSTEM),
+        entity_id=REFERENDUM_SYSTEM,
+        kind="methodology",
+        body_md="A question put to the state's electors, decided by a majority of the valid votes.",
+        lang="en",
+    )
     p.add("body", id=COUNCIL, polity_id=AUSTRALIA, kind="upper_house")
     p.name(COUNCIL, "Western Australian Legislative Council", "en", "official")
     p.add(
@@ -1288,11 +1565,17 @@ def council_contests(p: Package, day: str, election_id: str, path: str) -> None:
 def files() -> list[str]:
     links = [link for g in GENERALS for link in (g.districts, g.candidates, g.enrolment) if link]
     links += [link for c in COUNCILS for link in (c.candidates, c.counts, c.elected) if link]
+    links += [r.report for r in REFERENDUMS]
     return list(dict.fromkeys(links))
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{g.day}" for g in GENERALS)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{g.day}" for g in GENERALS),
+        *(f"{SOURCE}/{r.day}-referendum" for r in REFERENDUMS),
+    ]
 
 
 def fetch() -> None:
@@ -1305,6 +1588,8 @@ def parse() -> None:
     registry().write()
     for g in GENERALS:
         election(g.day).write()
+    for r in REFERENDUMS:
+        referendum_package(r.day).write()
 
 
 def emit() -> None:
