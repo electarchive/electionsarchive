@@ -796,27 +796,44 @@ def party_id(label: str) -> str:
     return key("party", party_key(label))
 
 
+# Parties that packages already loaded refer to, under keys that today's readings of the same declarations no longer
+# produce; they stay in the registry so that those packages' contest options keep their party.
+LEGACY_PARTIES = {"AGNSP": "GNS Party", "UNITEDREPUBLICANPARTYURP": "United Republican Party - Urp"}
+
+
+def legacy_party_key(label: str) -> str:
+    """The key the first loaded packages gave a label, before a printed abbreviation decided it."""
+    upper = label.upper()
+    if re.search(r"AFC|ALLIANCE FOR CHANGE", upper) and re.search(r"APNU|PARTNERSHIP", upper):
+        return "APNU+AFC"
+    if re.search(r"APNU|A\.P\.N\.U|PARTNERSHIP|PARTNERS|PARTHNER|PARETNER|PARTERS", upper):
+        return "APNU"
+    if re.search(r"PPP|P\.P\.P|PROGRESSIVE", upper):
+        return "PPP/C"
+    if re.search(r"\bAFC\b|ALLIANCE FOR CHANGE", upper):
+        return "AFC"
+    found = re.findall(r"\(([^)]+)\)", upper)
+    key_ = re.sub(r"[^A-Z/+]", "", found[-1] if found else upper)
+    return ALIASES.get(key_, key_)
+
+
 def party_names() -> dict[str, str]:
-    """The key and the name printed for each party that a declaration lists or a candidate stands for."""
-    found: dict[str, str] = {}
+    """The key and the name printed for each party that any declaration lists or any candidate stands for.
+
+    Every parsed form counts, including the lists and constituencies that are left out of a contest, and a key
+    that an earlier load gave a label stays, so that no party a loaded package refers to leaves the registry."""
+    found: dict[str, str] = dict(LEGACY_PARTIES)
     for area in kinds():
-        labels = [name for name, _ in area.form.lists] if area.list_ok else []
-        for n in area.ok:
-            labels += [c.party for c in area.form.constituencies[n] if c.party and c.party != "INDEPENDENT"]
+        labels = [name for name, _ in area.form.lists]
+        for cands in area.form.constituencies.values():
+            labels += [c.party for c in cands if c.party and c.party != "INDEPENDENT"]
         for label in labels:
-            k = party_key(label)
-            if k in FULL:
-                found[k] = FULL[k]
-            elif k not in found or (len(found[k]) <= len(k) and re.search(r"[A-Za-z]{4}", label)):
-                found[k] = (
-                    (
-                        re.sub(r"\s*\([^)]*\)\s*$", "", label).strip().title()
-                        if label.isupper()
-                        else re.sub(r"\s*\([^)]*\)\s*$", "", label).strip()
-                    )
-                    if re.search(r"[A-Za-z]{4}", label)
-                    else k
-                )
+            for k in {party_key(label), legacy_party_key(label)}:
+                if k in FULL:
+                    found[k] = FULL[k]
+                elif k not in found or (len(found[k]) <= len(k) and re.search(r"[A-Za-z]{4}", label)):
+                    clean = re.sub(r"\s*\([^)]*\)\s*$", "", label).strip()
+                    found[k] = (clean.title() if label.isupper() else clean) if re.search(r"[A-Za-z]{4}", label) else k
     return found
 
 
