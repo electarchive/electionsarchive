@@ -2311,9 +2311,17 @@ def parse() -> None:
     for line in compare():
         print(line, flush=True)
     geo().write()
-    registry().write()
-    for d in DAYS:
-        election(d).write()
+    parties = registry()
+    held = {str(row["id"]) for row in parties.rows["party"]}
+    built = [election(d) for d in DAYS]
+    for p in built:
+        for table, column in (("contest_option", "party_id"), ("candidacy", "member_of_party_id")):
+            missing = {str(row[column]) for row in p.rows.get(table, []) if row.get(column)} - held
+            if missing:
+                raise ValueError(f"{p.key}: {table} names parties the registry lacks: {sorted(missing)}")
+    parties.write()
+    for p in built:
+        p.write()
 
 
 def emit() -> None:
