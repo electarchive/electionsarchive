@@ -522,7 +522,7 @@ def unopposed_mayor(summary: str) -> str | None:
     if "Elected Unopposed" in plain(summary):
         for r in table:
             label = one_line(r[0].replace("[tick]", "")) if r else ""
-            if re.match(r"^[A-Z][A-Z'\-]+(?: [A-Z'\-]+)*, ", label):
+            if re.match(r"^[A-Z][A-Za-z'\-]+(?: [A-Za-z'\-]+)*, ", label):
                 return label
     return None
 
@@ -591,6 +591,27 @@ def local_contests(base: Base, names: dict[str, str]) -> list[Contest]:
         else:
             scopes.append(totals)
             cands, ticked = cs, tick
+    if base.kind == "councillor" and not found and not district_links(base.summary):
+        for r in rows(base.summary):
+            for cell in r:
+                lines = [one_line(x) for x in cell.split("\n") if x.strip()]
+                if len(lines) >= 2 and lines[-1] == "elected unopposed":
+                    who = [Cand(w, i) for i, w in enumerate(lines[:-1], 1)]
+                    scope = Scope(base.council, 1, None, "", "")
+                    found.append(
+                        Contest(
+                            "councillor",
+                            base.council,
+                            council=council,
+                            council_type="Council - Undivided",
+                            elect=len(who),
+                            system="First Past the Post",
+                            cands=who,
+                            declared={c.order for c in who},
+                            scopes=[scope],
+                            totals=scope,
+                        )
+                    )
     if base.kind == "mayor" and scopes:
         total = contest_totals(base.summary, cands)
         total.name, total.enrolment = council, sum(s.enrolment or 0 for s in scopes) or None
