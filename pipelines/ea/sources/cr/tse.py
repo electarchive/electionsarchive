@@ -17,7 +17,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.cr import declared
+from ea.sources.cr import declared, municipal_declared
 
 SOURCE = "cr.tse"
 BASE = "https://www.tse.go.cr"
@@ -81,6 +81,7 @@ def fetch() -> None:
     for name in (*ARCHIVES, *MUNICIPAL_ARCHIVES):
         raw.fetch(SOURCE, zip_url(name), suffix=".zip")
     declared.fetch()
+    municipal_declared.fetch()
     fetch_report()
 
 
@@ -2301,6 +2302,180 @@ def inconsistent(p: Package, values: pl.DataFrame) -> None:
             )
 
 
+INITIALS = {
+    "PAEC": "ECOLOGICO COMUNAL COSTARRICENSE",
+    "PAREVA": "RECUPERANDO VALORES",
+    "PASC": "AUTENTICO SANTACRUCENO",
+    "PGS": "PROGRESER",
+    "PABIRA": "BIENESTAR RAFAELENO",
+    "PNI": "NANDAYURE PROGRESA",
+    "PSA": "SOMOS SARCHI",
+    "APS": "ALIANZA POR SARCHI",
+}
+"""Party initials in the municipal declaratorias that do not spell the party's name, with the name the workbooks
+print. Each is checked against the parties on the ballot of the canton and against the national tables of chapter 1."""
+
+
+@dataclass(frozen=True)
+class Declared:
+    """The people a municipal declaratoria declares elected in one contest, each with the party's label."""
+
+    resolution: municipal_declared.Resolution
+    people: list[tuple[municipal_declared.Named, str]]
+
+
+@functools.cache
+def municipal_declared_people(day: date) -> dict[tuple[str, str], Declared]:
+    """The people declared elected in each municipal contest of a day, by family and the folded name of the canton
+    (mayors and councils) or the district (intendants)."""
+    _, cantons, districts_ = places()
+    labels: dict[tuple[str, str], list[str]] = {}
+    for piece in all_pieces()[day]:
+        columns = [c for c in piece.table.columns if measure_of(c) is None]
+        code = f"{piece.province}{piece.canton:02d}"
+        if piece.family in (MAYOR, COUNCIL):
+            labels[(piece.family, fold(cantons[code]))] = columns
+        elif piece.family == INTENDANT:
+            for district, _, _ in piece.leaves:
+                labels[(piece.family, fold(districts_[f"{code}{district:02d}"]))] = columns
+    names = {fold(n) for n in cantons.values()} | {fold(n) for n in districts_.values()}
+    found: list[tuple[municipal_declared.Resolution, municipal_declared.Named]] = []
+    for resolution in municipal_declared.available(day):
+        found += [(resolution, named) for named in municipal_declared.named(resolution, names)]
+    learned: dict[str, set[str]] = {}
+    for resolution, named in found:
+        options = labels.get((resolution.family, named.place), [])
+        label = municipal_declared.resolve(named.initials, options)
+        if label is not None:
+            learned.setdefault(named.initials, set()).add(label)
+    out: dict[tuple[str, str], Declared] = {}
+    squashed = {(family, place.replace(" ", "")): (family, place) for family, place in labels}
+    for resolution, named in found:
+        where = (resolution.family, named.place)
+        where = where if where in labels else squashed.get((where[0], where[1].replace(" ", "")), where)
+        if where not in labels:
+            UNDECLARED.append(f"{day} {resolution.number}: no contest for {where}")
+            continue
+        options = labels[where]
+        label = INITIALS.get(named.initials)
+        if label not in options:
+            label = municipal_declared.resolve(named.initials, options)
+        if label is None:
+            seen = [x for x in learned.get(named.initials, set()) if x in options]
+            label = seen[0] if len(seen) == 1 else None
+        if label is None:
+            raise LookupError(f"{day} {resolution.number} {named.place}: no party for {named.initials}")
+        held = out.setdefault(where, Declared(resolution, []))
+        if held.resolution != resolution:
+            raise ValueError(f"{day} {where}: named by {held.resolution.number} and {resolution.number}")
+        held.people.append((named, label))
+    return out
+
+
+UNDECLARED: list[str] = []
+
+
+def declared_table(m: Municipal, sheet: str) -> dict[str, int]:
+    """The national table of chapter 1 that counts the posts each party won: each party row's count of the posts held
+    in their own right (en propiedad), or its first count when the table does not split them."""
+    frame = sheet_of(book(m.book.zip, m.book.member)[sheet])
+    column = next(
+        (
+            c
+            for r in range(min(frame.height, 8))
+            for c in range(frame.width)
+            if fold(cell(frame, r, c)) == "EN PROPIEDAD"
+        ),
+        1,
+    )
+    found: dict[str, int] = {}
+    for r in range(frame.height):
+        label = fold(cell(frame, r, 0))
+        value = number(cell(frame, r, column))
+        if label and value is not None and not label.startswith(("FUENTE", "NOTA", "TOTAL")):
+            found[label] = round(value)
+    return found
+
+
+POST_TABLES = {MAYOR: "1.9", COUNCIL: "1.10", INTENDANT: "1.13"}
+"""The tables of chapter 1 that count the mayors, councilors, and intendants each party won, nationally."""
+
+
+def declare_municipal(
+    p: Package, day: date, family: str, seat_code: str, result_set: str, options: dict[str, str], held: Declared
+) -> Counter[str]:
+    """Store the outcome the Tribunal declares for a mayor's, council's, or intendant's contest, with the candidacies
+    of the people it declares elected; return the posts won by each party label."""
+    won: Counter[str] = Counter()
+    for named, label in held.people:
+        if label not in options:
+            raise KeyError(f"{day} {family} {seat_code}: {label} is not on the ballot")
+        if named.role in ("head", "list_member"):
+            won[label] += 1
+    if family in (MAYOR, INTENDANT):
+        if len(won) != 1 or sum(won.values()) != 1:
+            raise ValueError(f"{day} {family} {seat_code}: heads {won}")
+        winner = next(iter(won))
+        for column, option in options.items():
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if column == winner else "lost")
+    else:
+        for label, seats in sorted(won.items()):
+            p.add("outcome", result_set_id=result_set, option_id=options[label], kind="won", seats=seats)
+    seen: set[str] = set()
+    for named, label in held.people:
+        tag = (day, family, seat_code, label, named.role, named.position)
+        candidacy = key("candidacy", *tag, fold(named.name))
+        if candidacy in seen:
+            raise ValueError(f"{day} {family} {seat_code}: {named.name} named twice")
+        seen.add(candidacy)
+        person = key("person", *tag, fold(named.name))
+        p.add("person", id=person)
+        p.name(person, title(named.name), "es", "official")
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[label],
+            role=named.role,
+            list_position=named.position if named.role == "running_mate" else None,
+            ballot_name=named.name,
+            member_of_party_id=party(label),
+        )
+        if family == COUNCIL and named.role == "list_member":
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[label],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+    resolution = held.resolution
+    p.add(
+        "citation",
+        id=key("citation", result_set, resolution.number),
+        entity_id=result_set,
+        source_id=DECLARATORIAS,
+        locator=json.dumps({"resolution": resolution.number}),
+    )
+    what = {
+        MAYOR: "the mayor and the first and second vice mayors",
+        INTENDANT: "the intendant and the vice intendant",
+        COUNCIL: "the councilors (regidores) and their substitutes (suplentes); the seats each party won are the "
+        "councilors it declares elected for the party",
+    }[family]
+    p.add(
+        "note",
+        id=key("note", result_set, "declared"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=f"The outcome and the people named are those the Tribunal declares elected in resolution n.º "
+        f"{resolution.number}: {what}. The declaratoria prints each party's initials, matched to the parties on the "
+        "ballot.",
+        lang="en",
+    )
+    return won
+
+
 def municipal(m: Municipal) -> Package:
     day = m.day
     p = Package(
@@ -2313,6 +2488,11 @@ def municipal(m: Municipal) -> Package:
     p.external |= {COSTA_RICA, COUNTRY}
     p.uses(raw.cached(SOURCE, zip_url(m.book.zip)))
     p.uses(raw.cached(SOURCE, LIST_URL))
+    people = municipal_declared_people(day)
+    for resolution in sorted({held.resolution for held in people.values()}, key=lambda r: r.number):
+        p.artifact(raw.cached(SOURCE, municipal_declared.url(resolution)), DECLARATORIAS)
+    posts: dict[str, Counter[str]] = {MAYOR: Counter(), COUNCIL: Counter(), INTENDANT: Counter()}
+    _, cantons_, districts_all = places()
     election_id = key("election", day, "municipal")
     path = f"cr/{day}-municipal"
     p.add("election", id=election_id, polity_id=COSTA_RICA, kind="local", date_from=day, date_to=day, status="held")
@@ -2350,6 +2530,9 @@ def municipal(m: Municipal) -> Package:
             contest = key("contest", day, family, seat_code)
             result_set = key("result_set", day, family, seat_code)
             is_office = family in (MAYOR, INTENDANT)
+            place = fold(cantons_[code] if family in (MAYOR, COUNCIL) else districts_all.get(seat_code, ""))
+            held = people.get((family, place)) if family in posts else None
+            seats = sum(1 for named, _ in held.people if named.role == "list_member") if held else None
             area_id = area("cr.canton", code) if family in (MAYOR, COUNCIL) else area("cr.distrito", seat_code)
             p.add(
                 "contest",
@@ -2359,6 +2542,7 @@ def municipal(m: Municipal) -> Package:
                 office_id=seat(family, seat_code or code) if is_office else None,
                 body_id=None if is_office else seat(family, seat_code or code),
                 district_area_id=area_id,
+                magnitude=1 if is_office else seats,
                 round_number=1,
                 default_result_kind="counted",
             )
@@ -2406,6 +2590,11 @@ def municipal(m: Municipal) -> Package:
                     ballot_position=len(options),
                     ballot_label=text,
                 )
+            if held is not None:
+                default_set = (
+                    key("result_set", day, family, seat_code, "centro") if (family, seat_code) in finer else result_set
+                )
+                posts[family] += declare_municipal(p, day, family, seat_code or code, default_set, options, held)
             mine: Counter[tuple[str | None, int]] = Counter()
             repeats: Counter[str] = Counter()
             for district, _, leaf in leaves:
@@ -2580,6 +2769,19 @@ def municipal(m: Municipal) -> Package:
         family: compare(m, chapter, national_sums[family]) for chapter, family in {**TABLES_OF, 5: INTENDANT}.items()
     }
     comparison["units"] = len(unit_rows)
+    comparison["declared"] = {
+        family: {
+            "contests": sum(1 for where in people if where[0] == family),
+            "differ": {
+                label: (mine, printed)
+                for label in {*won, *printed_posts}
+                if (mine := won[label]) != (printed := printed_posts.get(label, 0))
+            },
+        }
+        for family, won, printed_posts in (
+            (family, posts[family], declared_table(m, sheet)) for family, sheet in POST_TABLES.items()
+        )
+    }
     if centro_rows:
         if overlap := {str(row["id"]) for row in centro_rows} & {str(row["id"]) for row in unit_rows}:
             raise ValueError(f"{day}: voting centers and electoral districts share {len(overlap)} unit ids")
