@@ -465,9 +465,10 @@ def contests_of(day: date) -> list[Contest]:
 
 
 def national_ids() -> tuple[set[str], set[str]]:
-    """The ids of the parties and areas the national registry and geo packages already hold."""
-    registry, geo = tse.registry(), tse.geo()
-    return {str(r["id"]) for r in registry.rows["party"]}, {str(r["id"]) for r in geo.rows["area"]}
+    """The ids of the parties the national and municipal registries hold, and of the areas the geo package holds."""
+    held = [tse.registry(), tse.municipal_registry()]
+    parties = {str(r["id"]) for p in held for r in p.rows.get("party", [])}
+    return parties, {str(r["id"]) for r in tse.geo().rows["area"]}
 
 
 def names() -> tuple[dict[str, str], dict[str, str]]:
@@ -497,7 +498,7 @@ def municipal() -> Package:
         SOURCE,
         "The offices, councils, parties, and places that Costa Rica's municipal elections of 2002, 2006, and 2010 add "
         "to the Tribunal Supremo de Elecciones' national records",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", tse.MUNICIPAL_REGISTRY],
     )
     p.external |= {COSTA_RICA, COUNTRY}
     sources(p)
@@ -585,7 +586,7 @@ def election(day: date) -> Package:
         f"Costa Rica's municipal elections of {day:%-d %B %Y} by "
         f"{'administrative' if day.year == 2010 else 'electoral'} district from the Tribunal Supremo de Elecciones' "
         "vote count",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/municipal"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", tse.MUNICIPAL_REGISTRY, f"{SOURCE}/municipal"],
     )
     p.external |= {COSTA_RICA, COUNTRY}
     sources(p)
@@ -830,6 +831,7 @@ def packages() -> list[str]:
 def parse() -> None:
     tse.geo().write()
     tse.registry().write()
+    tse.municipal_registry().write()
     municipal().write()
     for day in DAYS:
         election(day.day).write()
