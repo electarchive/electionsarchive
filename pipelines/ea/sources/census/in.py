@@ -1,4 +1,3 @@
-# ruff: noqa: N999
 from ea.sources import census
 
 
