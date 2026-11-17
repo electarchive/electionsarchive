@@ -289,6 +289,9 @@ def read(url: str) -> pl.DataFrame:
             )
     for member, data in workbooks(url):
         for sheet, grid in _frame(data, member):
+            if _header(grid.row(0)[0]) == "eleccion" and "codmesa" in [_header(cell) for cell in grid.row(0)]:
+                frames.append(_listed_mesas(grid, member, sheet))
+                continue
             frame = _sheet(grid)
             if frame is None:
                 continue
@@ -299,6 +302,47 @@ def read(url: str) -> pl.DataFrame:
     if not frames:
         raise ValueError(f"{url} holds no results sheet")
     return pl.concat(frames, how="diagonal_relaxed")
+
+
+def _listed_mesas(grid: pl.DataFrame, member: str, sheet: str) -> pl.DataFrame:
+    """The 2024 primaries file: one row per table and option, with the election named on every row, and with the
+    table's blank, null, emitted, and calculated totals as options numbered from 900. The totals are checked against
+    the options and left out."""
+    names = [_header(cell) for cell in grid.row(0)]
+    long = pl.DataFrame(
+        {name: grid.to_series(i).slice(1).str.strip_chars() for i, name in enumerate(names) if name}
+    ).with_columns(
+        pl.col("canorden").cast(pl.Float64).cast(pl.Int32),
+        votos=pl.col("votosprovisorio").cast(pl.Float64).cast(pl.Int64),
+        mesa_code=pl.col("codmesa").cast(pl.Float64).cast(pl.Int64).cast(pl.String),
+    )
+    tables = long.filter(pl.col("canorden") < 900).group_by("eleccion", "mesa_code").agg(pl.col("votos").sum())
+    for number, label in ((904, "total-emitted"), (905, "calculated-sum")):
+        printed = long.filter(pl.col("canorden") == number).select("eleccion", "mesa_code", printed=pl.col("votos"))
+        sums = long.filter(pl.col("canorden") < 904).group_by("eleccion", "mesa_code").agg(pl.col("votos").sum())
+        bad = sums.join(printed, on=["eleccion", "mesa_code"]).filter(pl.col("votos") != pl.col("printed"))
+        print(
+            f"{member}: {bad.height:,} of {printed.height:,} tables print a {label} figure unlike the sum of their options"
+        )
+    print(f"{member}: {tables.height:,} election-and-table pairs, {tables['votos'].sum():,} votes for candidates")
+    frame = long.filter(pl.col("canorden") < 904).select(
+        region=pl.col("region").map_elements(region_number, return_dtype=pl.String, skip_nulls=True),
+        comuna="comuna",
+        circ="circunscripcion",
+        mesa="mesa",
+        electores=pl.col("mesaelectores").cast(pl.Float64).cast(pl.Int64).cast(pl.String),
+        voto=pl.col("canorden").cast(pl.String),
+        candidato="candidato",
+        votos="votos",
+        mesa_code="mesa_code",
+        total=pl.lit(False),
+        file="eleccion",
+        sheet=pl.lit(sheet),
+    )
+    for column in COLUMNS:
+        if column not in frame.columns:
+            frame = frame.with_columns(pl.lit(None, pl.String).alias(column))
+    return frame.select(*COLUMNS, "total", "file", "sheet")
 
 
 def _sheet(grid: pl.DataFrame) -> pl.DataFrame | None:
@@ -556,6 +600,7 @@ FILES = (
     "2023/06/14_Resultados_Mesa_Concejales_Ter.xlsx",
     "2023/06/15_Resultados_Mesa_Concejales_TERARICA.xlsx",
     "2023/06/15_Resultados_Mesa_Concejales_Ter.xlsx",
+    "2024/06/Primarias2024_Resultados_Provisorios.zip",
     "2025/07/Resultados_Preliminares_Primarias_Presidencial_CL_20250701.xlsx",
     "2025/07/Resultados_Preliminares_Primarias_Presidencial_EXT_20250701.xlsx",
     "2025/11/PRELIMINARES_DIPUTADOS.zip",
@@ -712,6 +757,16 @@ ELECTIONS = (
         "Primarias de gobernadores regionales y alcaldes 2020",
         Group("governor_primary", r"2022/12/Primarias_2020_Alcalde-GORE\.zip", "GORE"),
         Group("mayor_primary", r"2022/12/Primarias_2020_Alcalde-GORE\.zip", "Alcaldes"),
+    ),
+    _election(
+        date(2024, 6, 9),
+        "primary",
+        "primaries",
+        "2024 Chilean regional governor and mayoral primaries",
+        "Primarias de gobernadores regionales y alcaldes 2024",
+        Group("governor_primary", r"2024/06/Primarias2024_Resultados_Provisorios\.zip", "Gobernadores"),
+        Group("mayor_primary", r"2024/06/Primarias2024_Resultados_Provisorios\.zip", "Alcaldes"),
+        stage="official",
     ),
     _election(
         date(2021, 5, 15),
@@ -1214,6 +1269,11 @@ def _comunas(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def _headed(head: pl.Expr, pact: pl.Expr) -> pl.Expr:
+    """A primary's contest code, the place and the pact; a file that names no pact gives the place alone."""
+    return pl.when(pact == "").then(head).otherwise(pl.concat_str(head, pact, separator=":"))
+
+
 def _contest_code(kind: str) -> pl.Expr:
     pact = pl.coalesce(pl.col("lista"), pl.col("pacto_fold"), pl.lit(""))
     district = pl.col("distrito").cast(pl.Int32, strict=False).cast(pl.String)
@@ -1224,9 +1284,9 @@ def _contest_code(kind: str) -> pl.Expr:
         case "president_primary":
             return pact
         case "governor_primary":
-            return pl.concat_str(pl.col("region"), pact, separator=":")
+            return _headed(pl.col("region"), pact)
         case "mayor_primary":
-            return pl.concat_str(pl.col("comuna_code"), pact, separator=":")
+            return _headed(pl.col("comuna_code"), pact)
         case "deputies_primary":
             return pl.concat_str(district, pact, separator=":")
         case "deputies" | "convention":
@@ -1420,11 +1480,11 @@ def _title(kind: str, day: date, code: str, pact: str | None) -> str:
         case "council":
             return f"Concejo Municipal de {places[code][0]}"
         case "mayor_primary":
-            return f"Primaria de alcalde de {places[head][0]}, {pact}"
+            return f"Primaria de alcalde de {places[head][0]}" + (f", {pact}" if pact else "")
         case "governor":
             return f"Gobernador regional de {REGIONS[int(code)]}"
         case "governor_primary":
-            return f"Primaria de gobernador regional de {REGIONS[int(head)]}, {pact}"
+            return f"Primaria de gobernador regional de {REGIONS[int(head)]}" + (f", {pact}" if pact else "")
         case "convention_indigenous":
             return f"Escaño reservado, pueblo {code.title()}"
     return QUESTIONS[kind]
@@ -1521,7 +1581,8 @@ def build(election: Election) -> Package:
         contest = key("contest", day, kind, code)
         result_set = key("result_set", day, kind, code)
         contest_kind, _ = KINDS[kind]
-        pact = next((str(v) for v in part["pacto"].drop_nulls().head(1)), None) or (code.split(":")[-1] or None)
+        tail = code.partition(":")[2] if kind in ("mayor_primary", "governor_primary") else code.split(":")[-1]
+        pact = next((str(v) for v in part["pacto"].drop_nulls().head(1)), None) or (tail or None)
         title = _title(kind, day, code, pact)
         office_id, body_id = _seat(kind, code)
         previous = _previous(election, kind)
@@ -1563,6 +1624,17 @@ def build(election: Election) -> Package:
             completeness=1.0,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        if pact is None and kind in ("mayor_primary", "governor_primary"):
+            p.add(
+                "note",
+                id=key("note", result_set, "pact"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md="The source does not name the pact of each primary. Every candidate listed for the place is "
+                "shown in this one contest, so a commune where more than one pact held a primary appears as a single "
+                "contest. The source's own per-table totals disagree with the sum of its options at some tables.",
+                lang="en",
+            )
         values.append(_options(p, election, kind, code, contest, result_set, part, unit_ids))
     facts = pl.concat(values)
     duplicated = facts.filter(pl.struct("result_set_id", "unit_id", "option_id", "measure").is_duplicated())
