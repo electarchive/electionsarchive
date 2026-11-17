@@ -1,0 +1,1214 @@
+{
+ "polity": "LU",
+ "name": "Luxembourg",
+ "sources": {
+  "constitution": {
+   "title": "Constitution du Grand-Duché de Luxembourg (texte consolidé en vigueur au 1er juillet 2023)",
+   "publisher": "Service central de législation (Legilux)",
+   "url": "https://legilux.public.lu/eli/etat/leg/constitution/1868/10/17/n1/consolide/20230701",
+   "kind": "official_body"
+  },
+  "loi_electorale": {
+   "title": "Loi électorale modifiée du 18 février 2003",
+   "publisher": "Service central de législation (Legilux)",
+   "url": "https://legilux.public.lu/eli/etat/leg/loi/2003/02/18/n1/jo",
+   "kind": "official_body"
+  },
+  "loi_communale": {
+   "title": "Loi communale modifiée du 13 décembre 1988",
+   "publisher": "Service central de législation (Legilux)",
+   "url": "https://legilux.public.lu/eli/etat/leg/loi/1988/12/13/n1/jo",
+   "kind": "official_body"
+  },
+  "loi_referendum": {
+   "title": "Loi du 4 février 2005 relative au référendum au niveau national",
+   "publisher": "Service central de législation (Legilux)",
+   "url": "https://legilux.public.lu/eli/etat/leg/loi/2005/02/04/n1/jo",
+   "kind": "official_body"
+  },
+  "epl_legislation": {
+   "title": "Élections au Luxembourg: législation",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/legislation.html",
+   "kind": "official_body"
+  },
+  "epl_leg": {
+   "title": "Élections législatives: archive des résultats depuis 1994",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-legislatives.html",
+   "kind": "official_body"
+  },
+  "epl_leg_principes": {
+   "title": "Élections législatives: principes",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/systeme-electoral/legislatives-mode-emploi/principes.html",
+   "kind": "official_body"
+  },
+  "epl_eur": {
+   "title": "Élections européennes: archive des résultats depuis 1994",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-europeennes.html",
+   "kind": "official_body"
+  },
+  "epl_eur_principes": {
+   "title": "Élections européennes: principes",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/systeme-electoral/europeennes-mode-emploi/principes.html",
+   "kind": "official_body"
+  },
+  "epl_com": {
+   "title": "Élections communales: archive des résultats depuis 2005",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-communales.html",
+   "kind": "official_body"
+  },
+  "epl_com_principes": {
+   "title": "Élections communales: principes",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/systeme-electoral/communales-mode-emploi/principes.html",
+   "kind": "official_body"
+  },
+  "epl_com2005": {
+   "title": "Élections communales 2005: résultats par commune",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-communales/2005/resultats/communes.html",
+   "kind": "official_body"
+  },
+  "epl_com2011": {
+   "title": "Élections communales 2011: résultats par commune",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-communales/2011/resultats/communes.html",
+   "kind": "official_body"
+  },
+  "epl_com2017": {
+   "title": "Élections communales 2017: résultats par commune",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-communales/2017/resultats/communes.html",
+   "kind": "official_body"
+  },
+  "epl_com2023": {
+   "title": "Élections communales 2023: résultats par commune",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/elections-communales/2023/resultats/communes.html",
+   "kind": "official_body"
+  },
+  "epl_fusion": {
+   "title": "Fusion des communes",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/fusion-communes.html",
+   "kind": "official_body"
+  },
+  "epl_ref": {
+   "title": "Référendums: principes",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/systeme-electoral/referendum-mode-emploi/principes.html",
+   "kind": "official_body"
+  },
+  "epl_ref2015": {
+   "title": "Référendum 2015",
+   "publisher": "Ministère d'État, elections.public.lu",
+   "url": "https://elections.public.lu/fr/referendum/2015.html",
+   "kind": "official_body"
+  },
+  "opendata": {
+   "title": "Élections: données ouvertes du Ministère d'État",
+   "publisher": "Portail Open Data du Luxembourg (data.public.lu)",
+   "url": "https://data.public.lu/fr/datasets/?q=elections",
+   "kind": "official_body",
+   "license": "CC0 1.0"
+  },
+  "chd_elections": {
+   "title": "The history of elections",
+   "publisher": "Chambre des Députés",
+   "url": "https://chd.lu/en/elections",
+   "kind": "official_body"
+  },
+  "chd_history": {
+   "title": "The history of the parliament",
+   "publisher": "Chambre des Députés",
+   "url": "https://chd.lu/en/parliamentary-history",
+   "kind": "official_body"
+  },
+  "chd_5443": {
+   "title": "Dossier parlementaire 5443: référendum national sur le Traité établissant une Constitution pour l'Europe",
+   "publisher": "Chambre des Députés",
+   "url": "https://www.chd.lu/fr/dossier/5443",
+   "kind": "official_body"
+  },
+  "sip_gouv": {
+   "title": "Les gouvernements du Grand-Duché de Luxembourg depuis 1848 (édition 2011)",
+   "publisher": "Service information et presse du gouvernement (data.public.lu)",
+   "url": "https://download.data.public.lu/resources/gouvernements-depuis-1848/20170620-094133/Gouvernements_depuis_1848-version_2011.pdf",
+   "kind": "official_body"
+  },
+  "csl": {
+   "title": "Chambre des salariés: élections sociales",
+   "publisher": "Chambre des salariés",
+   "url": "https://www.csl.lu/fr/elections-sociales/",
+   "kind": "official_body"
+  },
+  "chfep": {
+   "title": "Chambre des fonctionnaires et employés publics",
+   "publisher": "Chambre des fonctionnaires et employés publics",
+   "url": "https://www.chfep.lu",
+   "kind": "official_body"
+  },
+  "cc": {
+   "title": "Chambre de commerce",
+   "publisher": "Chambre de commerce du Grand-Duché de Luxembourg",
+   "url": "https://www.cc.lu",
+   "kind": "official_body"
+  },
+  "cdm": {
+   "title": "Chambre des métiers",
+   "publisher": "Chambre des métiers du Grand-Duché de Luxembourg",
+   "url": "https://www.cdm.lu",
+   "kind": "official_body"
+  },
+  "lwk": {
+   "title": "Chambre d'agriculture",
+   "publisher": "Chambre d'agriculture (Landwirtschaftskammer)",
+   "url": "https://www.lwk.lu",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Grand-Duché de Luxembourg",
+   "name_en": "Grand Duchy of Luxembourg",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "world.country",
+   "source": "constitution"
+  },
+  {
+   "key": "canton",
+   "name": "Cantons",
+   "name_en": "Cantons",
+   "parent": "national",
+   "polity_kind": "county",
+   "scheme": "lu.canton",
+   "elects": false,
+   "source": "epl_leg_principes",
+   "counts": [
+    {
+     "date": "2023-10-08",
+     "value": 12,
+     "source": "epl_leg_principes",
+     "locator": "https://elections.public.lu/fr/systeme-electoral/legislatives-mode-emploi/principes.html (the four constituencies listed as the cantons of Esch-sur-Alzette and Capellen; Luxembourg and Mersch; Diekirch, Redange, Wiltz, Clervaux, and Vianden; Grevenmacher, Remich, and Echternach)"
+    }
+   ]
+  },
+  {
+   "key": "commune",
+   "name": "Communes",
+   "name_en": "Communes",
+   "parent": "canton",
+   "polity_kind": "municipality",
+   "scheme": "lu.commune",
+   "source": "loi_communale",
+   "counts": [
+    {
+     "date": "2023-09-01",
+     "value": 100,
+     "source": "epl_fusion",
+     "locator": "https://elections.public.lu/fr/fusion-communes.html (le nombre des communes luxembourgeoises sera réduit à 100; fusions du 1er septembre 2023)"
+    },
+    {
+     "date": "2018-01-01",
+     "value": 102,
+     "source": "epl_fusion",
+     "locator": "https://elections.public.lu/fr/fusion-communes.html (Le 1er janvier 2018 déjà, le nombre de communes luxembourgeoises est passé de 105 à 102)"
+    },
+    {
+     "date": "2011-10-09",
+     "value": 106,
+     "source": "epl_com2011",
+     "locator": "https://elections.public.lu/fr/elections-communales/2011/resultats/communes.html (106 communes; Käerjeng voted in two electoral sections)"
+    },
+    {
+     "date": "2005-10-09",
+     "value": 116,
+     "source": "epl_com2005",
+     "locator": "https://elections.public.lu/fr/elections-communales/2005/resultats/communes.html (116 communes)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "chambre",
+   "tier": "national",
+   "name": "Élections législatives (Chambre des Députés)",
+   "name_en": "Chamber of Deputies elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "lu.circonscription"
+    ],
+    "fine": [
+     "lu.commune",
+     "lu.count"
+    ]
+   },
+   "finest_note": "Published by commune (with a separate postal count per constituency since 2018); polling-station counts are not published.",
+   "note": "60 deputies in four constituencies (Sud 23, Centre 21, Nord 9, Est 7), open-list PR with panachage and the Hagenbach-Bischoff quota; voting compulsory. From 1919 to 1954 half the Chamber was renewed every three years, alternately in Sud and Est and in Centre and Nord.",
+   "source": "constitution",
+   "valid_from": "1919-10-26",
+   "first_held": "1919-10-26",
+   "earliest_record": "1919-10-26",
+   "contests_per_unit": 4,
+   "est_votes": 4500000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 1,
+     "term_years": 6,
+     "called": true,
+     "valid_from": "1919-10-26",
+     "valid_to": "1956-11-02",
+     "administered_by": "Gouvernement (Ministère d'État) and the principal bureaus of the constituencies",
+     "source": "chd_elections",
+     "locator": "https://chd.lu/en/elections (term of six years; every three years half of the Chamber is re-elected, alternately in the South and East and the Centre and North)"
+    },
+    {
+     "period_years": 5,
+     "phase": 3,
+     "month": 10,
+     "term_years": 5,
+     "called": true,
+     "valid_from": "1956-11-02",
+     "administered_by": "Ministère d'État (bureau centralisateur gouvernemental) and the principal bureaus of the constituencies",
+     "source": "epl_leg_principes",
+     "locator": "https://elections.public.lu/fr/systeme-electoral/legislatives-mode-emploi/principes.html (60 députés, mandat de 5 ans; quatre circonscriptions, Art. 51 de la Constitution)",
+     "vacancy_rule": "A vacant seat passes to the first runner-up on the same list (loi électorale)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Élections au Luxembourg (elections.public.lu)",
+     "url": "https://elections.public.lu/fr/elections-legislatives.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-06-12",
+     "finest": "lu.commune",
+     "evidence": "Official (officiels) and unofficial (officieux) results for every legislative election since 1994, by constituency and commune, with candidates' personal votes; the bureaux-de-vote pages give only the number of polling stations per commune.",
+     "source": "epl_leg"
+    },
+    {
+     "platform": "data.public.lu (Ministère d'État)",
+     "url": "https://data.public.lu/fr/datasets/?q=elections",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2013-10-20",
+     "finest": "lu.commune",
+     "license": "CC0 1.0",
+     "evidence": "XML result trees (country, constituency, canton, commune) for the 2013, 2018, and 2023 legislative, 2014-2024 European, and 2017 and 2023 communal elections.",
+     "source": "opendata"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LU",
+     "valid_from": "1919-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-10-26",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 48,
+     "source": "sip_gouv",
+     "quote": "premières élections organisées d'après le nouveau régime électoral le 26 octobre 1919 ... la nouvelle Chambre composée de 48 députés"
+    },
+    {
+     "date": "1922-05-28",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Les élections partielles qui ont lieu dans les circonscriptions du centre et du nord le 28 mai 1922",
+     "note": "Partial renewal of half the Chamber: Centre and Nord."
+    },
+    {
+     "date": "1925-03-01",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 47,
+     "source": "sip_gouv",
+     "quote": "la Chambre est dissoute et des élections législatives sont organisées le 1er mars 1925 ... 22 sièges sur un total de 47",
+     "note": "General election after a dissolution."
+    },
+    {
+     "date": "1928-06-03",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Les élections partielles du 3 juin 1928",
+     "note": "Partial renewal: Sud and Est (the halves alternate, chd.lu)."
+    },
+    {
+     "date": "1931-06-07",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Les élections partielles ... du 7 juin 1931",
+     "note": "Partial renewal: Centre and Nord."
+    },
+    {
+     "date": "1934-06-03",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Les élections partielles ... du 3 juin 1934",
+     "note": "Partial renewal: Sud and Est."
+    },
+    {
+     "date": "1937-06-06",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "les élections législatives qui ont lieu le 6 juin 1937 dans les circonscriptions du Nord et du Centre",
+     "note": "Held with the referendum on the law of order."
+    },
+    {
+     "date": "1945-10-21",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 51,
+     "source": "sip_gouv",
+     "quote": "Les élections du 21 octobre 1945 marquent le retour à une vie politique normale",
+     "note": "General election after the occupation; 51 seats (34 députés sur un total de 51)."
+    },
+    {
+     "date": "1948-06-06",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Lors des élections partielles du 6 juin 1948",
+     "note": "Partial renewal: Sud and Est."
+    },
+    {
+     "date": "1951-06-03",
+     "election_kind": "general",
+     "contests": 2,
+     "source": "sip_gouv",
+     "quote": "Lors des élections partielles du 3 juin 1951, dans les circonscriptions du Centre et du Nord"
+    },
+    {
+     "date": "1954-05-30",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 52,
+     "source": "sip_gouv",
+     "quote": "Le 30 mai 1954 ont lieu des élections générales dans les quatre circonscriptions ... 26 sièges sur un total de 52",
+     "note": "Last election under the half-renewal system; the 1956 revision set a five-year term for the whole Chamber."
+    },
+    {
+     "date": "1959-02-01",
+     "election_kind": "general",
+     "contests": 4,
+     "source": "sip_gouv",
+     "quote": "Les élections anticipées du 1er février 1959",
+     "note": "Early election."
+    },
+    {
+     "date": "1964-06-07",
+     "election_kind": "general",
+     "contests": 4,
+     "source": "sip_gouv",
+     "quote": "Lors des élections du 7 juin 1964"
+    },
+    {
+     "date": "1968-12-15",
+     "election_kind": "general",
+     "contests": 4,
+     "source": "sip_gouv",
+     "quote": "l'issue des élections anticipées du 15 décembre 1968",
+     "note": "Early election."
+    },
+    {
+     "date": "1974-05-26",
+     "election_kind": "general",
+     "contests": 4,
+     "source": "sip_gouv",
+     "quote": "Les élections du 26 mai 1974"
+    },
+    {
+     "date": "1979-06-10",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 59,
+     "source": "sip_gouv",
+     "quote": "Le Parti chrétien-social sort vainqueur du scrutin du 10 juin 1979",
+     "note": "Held with the first European Parliament election."
+    },
+    {
+     "date": "1984-06-17",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 64,
+     "source": "sip_gouv",
+     "quote": "Lors des élections législatives du 17 juin 1984, le nombre des députés à élire passe de 59 à 64"
+    },
+    {
+     "date": "1989-06-18",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "sip_gouv",
+     "quote": "Les élections législatives qui ont lieu le 18 juin 1989",
+     "note": "The 1988 constitutional revision fixed the Chamber at 60 seats (chd.lu)."
+    },
+    {
+     "date": "1994-06-12",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 1994"
+    },
+    {
+     "date": "1999-06-13",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 1999"
+    },
+    {
+     "date": "2004-06-13",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 2004"
+    },
+    {
+     "date": "2009-06-07",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 2009"
+    },
+    {
+     "date": "2013-10-20",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 2013",
+     "note": "Early election."
+    },
+    {
+     "date": "2018-10-14",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 2018"
+    },
+    {
+     "date": "2023-10-08",
+     "election_kind": "general",
+     "contests": 4,
+     "seats": 60,
+     "source": "epl_leg",
+     "quote": "Élections législatives 2023"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Élections européennes",
+   "name_en": "European Parliament elections in Luxembourg",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "lu.circonscription",
+     "lu.commune",
+     "lu.count"
+    ]
+   },
+   "finest_note": "One national constituency; results published by constituency and commune.",
+   "note": "Six members elected in one national constituency by open-list PR (Hagenbach-Bischoff), six votes per voter with panachage; held with the legislative elections until 2009.",
+   "source": "epl_eur_principes",
+   "valid_from": "1979-06-10",
+   "first_held": "1979-06-10",
+   "earliest_record": "1979-06-10",
+   "est_votes": 2000000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": false,
+     "administered_by": "Ministère d'État",
+     "source": "epl_eur_principes",
+     "locator": "https://elections.public.lu/fr/systeme-electoral/europeennes-mode-emploi/principes.html (6 députés, mandat de 5 ans, circonscription unique)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Élections au Luxembourg (elections.public.lu)",
+     "url": "https://elections.public.lu/fr/elections-europeennes.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "1994-06-12",
+     "finest": "lu.commune",
+     "evidence": "Official and unofficial results for every European election since 1994, by constituency and commune.",
+     "source": "epl_eur"
+    },
+    {
+     "platform": "data.public.lu (Ministère d'État)",
+     "url": "https://data.public.lu/fr/datasets/?q=elections",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2013-10-20",
+     "finest": "lu.commune",
+     "license": "CC0 1.0",
+     "evidence": "XML result trees (country, constituency, canton, commune) for the 2013, 2018, and 2023 legislative, 2014-2024 European, and 2017 and 2023 communal elections.",
+     "source": "opendata"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "world.country"
+     ],
+     "iso_pattern": "LU",
+     "valid_from": "1979-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-06-10",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "chd_history",
+     "quote": "The first elections at the European Parliament. These elections are organised in parallel with the national legislative elections"
+    },
+    {
+     "date": "1984-06-17",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "chd_history",
+     "quote": "These elections are organised in parallel with the national legislative elections",
+     "note": "Held with the legislative election of the same day (sip_gouv dates it)."
+    },
+    {
+     "date": "1989-06-18",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "chd_history",
+     "quote": "These elections are organised in parallel with the national legislative elections",
+     "note": "Held with the legislative election of the same day."
+    },
+    {
+     "date": "1994-06-12",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 1994"
+    },
+    {
+     "date": "1999-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 1999"
+    },
+    {
+     "date": "2004-06-13",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 2004"
+    },
+    {
+     "date": "2009-06-07",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 2009"
+    },
+    {
+     "date": "2014-05-25",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 2014"
+    },
+    {
+     "date": "2019-05-26",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 2019"
+    },
+    {
+     "date": "2024-06-09",
+     "election_kind": "general",
+     "contests": 1,
+     "seats": 6,
+     "source": "epl_eur",
+     "quote": "Élections européennes 2024"
+    }
+   ]
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "Référendums nationaux",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "lu.circonscription",
+     "lu.commune",
+     "lu.count"
+    ]
+   },
+   "finest_note": "One national constituency; the 2015 results are published by constituency and commune.",
+   "note": "Referendums under the law of 4 February 2005 (constitutional and consultative referendums, old Constitution arts. 51 and 114); earlier ones in 1919 and 1937 were called by special laws. Voting compulsory.",
+   "source": "loi_referendum",
+   "first_held": "1919-09-28",
+   "earliest_record": "1919-09-28",
+   "est_votes": 1000000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Élections au Luxembourg (elections.public.lu)",
+     "url": "https://elections.public.lu/fr/referendum.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2015-06-07",
+     "last_date": "2015-06-07",
+     "finest": "lu.commune",
+     "evidence": "Official and unofficial results of the 2015 referendum, by constituency and commune; the site holds no other referendum.",
+     "source": "epl_ref2015"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LU"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-09-28",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "chd_elections",
+     "quote": "Le 28 septembre 1919, le suffrage universel s'applique pour la première fois lors du référendum sur la monarchie et l'union économique future",
+     "note": "Two questions: the form of state and the economic union."
+    },
+    {
+     "date": "1937-06-06",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "sip_gouv",
+     "quote": "Bech consent à soumettre l'application de la loi à un référendum, en même temps que les élections législatives ... 50,67 % des électeurs votent non",
+     "note": "Referendum on the law of order (loi muselière)."
+    },
+    {
+     "date": "2005-07-10",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "chd_5443",
+     "quote": "référendum national sur le Traité établissant une Constitution pour l'Europe",
+     "note": "Consultative referendum on the European Constitution treaty under the law of 4 February 2005."
+    },
+    {
+     "date": "2015-06-07",
+     "election_kind": "referendum",
+     "contests": 3,
+     "source": "epl_ref2015",
+     "quote": "Le référendum du 7 juin 2015",
+     "note": "Three consultative questions on the new Constitution (voting at 16, foreign residents' vote, ministers' term limit)."
+    }
+   ]
+  },
+  {
+   "key": "chambre_censitaire",
+   "tier": "national",
+   "name": "Élections censitaires à la Chambre des Députés (1848-1918)",
+   "name_en": "Chamber of Deputies elections under property suffrage (1848-1918)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Direct census suffrage by canton with majority voting and partial renewals (indirect again briefly from 1856, direct from 1860); 51 deputies in 1848, 31 from 1857, 40 from 1868, 53 by 1916. Includes the Chamber with constituent powers elected on 28 July and 4 August 1918.",
+   "source": "chd_elections",
+   "valid_from": "1848-09-28",
+   "valid_to": "1919-10-26",
+   "first_held": "1848-09-28",
+   "est_votes": 300000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LU",
+     "valid_from": "1848-08-01",
+     "valid_to": "1856-11-27"
+    },
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LU",
+     "valid_from": "1868-10-17",
+     "valid_to": "1919-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1848-09-28",
+     "election_kind": "general",
+     "seats": 51,
+     "source": "sip_gouv",
+     "quote": "C'est le 28 septembre qu'ont lieu les premières élections pour la Chambre des députés",
+     "note": "First Chamber under the Constitution of 1848."
+    },
+    {
+     "date": "1851-01-01",
+     "through": "1918-07-27",
+     "election_kind": "general",
+     "note": "Partial renewals and by-elections by canton under property suffrage; not yet counted from the Mémorial and the Chamber's compte rendu."
+    },
+    {
+     "date": "1918-07-28",
+     "election_kind": "general",
+     "seats": 53,
+     "source": "sip_gouv",
+     "quote": "Le 28 juillet et le 4 août 1918 ont lieu les élections pour une nouvelle Chambre chargée de procéder à la révision de la Constitution",
+     "note": "Two rounds (28 July and 4 August 1918); 53 deputies."
+    }
+   ]
+  },
+  {
+   "key": "assemblee_etats",
+   "tier": "national",
+   "name": "Assemblée des États (1841-1848, 1856-1868)",
+   "name_en": "Assembly of Estates (1841-1848 and 1856-1868)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "34-member consultative assembly under the 1841 charter, elected by two-stage census suffrage with half renewed every three years; restored as the legislature under the 1856 charter until the 1868 Constitution.",
+   "source": "chd_history",
+   "valid_from": "1841-10-12",
+   "valid_to": "1868-10-17",
+   "est_votes": 20000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LU",
+     "valid_to": "1848-08-01"
+    },
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LU",
+     "valid_from": "1856-11-27",
+     "valid_to": "1868-10-17"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1841-01-01",
+     "through": "1868-10-16",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "Elections to the Assembly of Estates; not yet counted from the Mémorial."
+    }
+   ]
+  },
+  {
+   "key": "constituante_1848",
+   "tier": "national",
+   "name": "Assemblée constituante (1848)",
+   "name_en": "Constituent Assembly (1848)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected by two-stage census suffrage in spring 1848; it adopted the Constitution of 1848, which introduced direct census suffrage.",
+   "source": "chd_elections",
+   "valid_from": "1848-01-01",
+   "valid_to": "1848-08-01",
+   "est_votes": 5000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "LU"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1848-01-01",
+     "precision": "year",
+     "election_kind": "general",
+     "note": "Two-stage election; date and constituency count not yet read from an official text."
+    }
+   ]
+  },
+  {
+   "key": "conseil_communal",
+   "tier": "commune",
+   "name": "Élections communales",
+   "name_en": "Communal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "lu.commune"
+    ],
+    "fine": [
+     "lu.count"
+    ]
+   },
+   "finest_note": "Each commune is one constituency (a few merged communes vote in electoral sections); published by commune only.",
+   "note": "Councils of 7 to 19 members (27 in Luxembourg City) by population, every six years; plurality block vote in communes under 3,000 inhabitants and open-list PR (Hagenbach-Bischoff) above. EU and other foreign residents may register. The mayor and aldermen are appointed, not elected.",
+   "source": "loi_communale",
+   "earliest_record": "2005-10-09",
+   "est_votes": 3000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 1,
+     "month": 6,
+     "term_years": 6,
+     "called": false,
+     "valid_from": "2023-01-01",
+     "administered_by": "Communes, under the Ministère des Affaires intérieures and the Ministère d'État",
+     "source": "epl_com_principes",
+     "locator": "https://elections.public.lu/fr/systeme-electoral/communales-mode-emploi/principes.html (Les élections communales ont lieu tous les 6 ans)",
+     "vacancy_rule": "Proportional communes fill a vacancy from the same list; plurality communes hold a by-election (loi électorale)"
+    },
+    {
+     "period_years": 6,
+     "phase": 1,
+     "month": 10,
+     "term_years": 6,
+     "called": false,
+     "valid_to": "2023-01-01",
+     "administered_by": "Communes, under the Ministère de l'Intérieur",
+     "source": "epl_com",
+     "locator": "https://elections.public.lu/fr/elections-communales.html (2005, 2011, 2017 in October)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Élections au Luxembourg (elections.public.lu)",
+     "url": "https://elections.public.lu/fr/elections-communales.html",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2005-10-09",
+     "finest": "lu.commune",
+     "evidence": "Unofficial results by commune and party for 2005, 2011, 2017, and 2023, with candidates' votes.",
+     "source": "epl_com"
+    },
+    {
+     "platform": "data.public.lu (Ministère d'État)",
+     "url": "https://data.public.lu/fr/datasets/?q=elections",
+     "format": "xml",
+     "access": "open",
+     "checked_at": "2026-11-17T00:00:00Z",
+     "first_date": "2013-10-20",
+     "finest": "lu.commune",
+     "license": "CC0 1.0",
+     "evidence": "XML result trees (country, constituency, canton, commune) for the 2013, 2018, and 2023 legislative, 2014-2024 European, and 2017 and 2023 communal elections.",
+     "source": "opendata"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "LU"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-01-01",
+     "through": "1999-12-31",
+     "election_kind": "local",
+     "note": "Communal elections under universal suffrage before 2005 (every six years after 1946, last on 10 October 1999); not yet counted from the Mémorial or the communes' own returns."
+    },
+    {
+     "date": "2005-10-09",
+     "election_kind": "local",
+     "contests": 116,
+     "source": "epl_com2005",
+     "quote": "Élections communales 2005 - résultats par commune",
+     "note": "116 communes."
+    },
+    {
+     "date": "2011-10-09",
+     "election_kind": "local",
+     "contests": 107,
+     "source": "epl_com2011",
+     "quote": "Élections communales 2011 - résultats par commune",
+     "note": "106 communes; Käerjeng elected its council in two electoral sections (Bascharage, Clemency)."
+    },
+    {
+     "date": "2017-10-08",
+     "election_kind": "local",
+     "contests": 103,
+     "source": "epl_com2017",
+     "quote": "Élections communales 2017 - résultats par commune",
+     "note": "102 communes after the 2018 mergers took effect for this election; Habscht voted in two sections (Hobscheid, Septfontaines)."
+    },
+    {
+     "date": "2023-06-11",
+     "election_kind": "local",
+     "contests": 100,
+     "source": "epl_com2023",
+     "quote": "Élections communales 2023 - Résultats officieux",
+     "note": "100 communes, the Grosbus-Wal and Bous-Waldbredimus mergers counted."
+    }
+   ]
+  },
+  {
+   "key": "consultation_communale",
+   "tier": "commune",
+   "name": "Référendums communaux",
+   "name_en": "Communal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {},
+   "source": "loi_communale",
+   "disposition": "blocked",
+   "disposition_reason": "Communal councils may consult their voters (loi communale), including on mergers, but no national register lists these votes; results sit only in individual communes' minutes."
+  },
+  {
+   "key": "chambre_salaries",
+   "tier": "national",
+   "name": "Élections à la Chambre des salariés",
+   "name_en": "Chamber of Employees elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Statutory postal election of the 60 members of the Chamber of Employees by all employees and pensioners, by occupational group, every five years (2008, 2013, 2019, 2024); list PR.",
+   "source": "csl",
+   "valid_from": "2008-01-01",
+   "est_votes": 600000,
+   "effort": 4,
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "LU",
+     "name_pattern": "Chambre des salariés|Chamber of Employees"
+    }
+   ]
+  },
+  {
+   "key": "chambres_professionnelles",
+   "tier": "national",
+   "name": "Élections aux autres chambres professionnelles",
+   "name_en": "Other professional chamber elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Statutory elections of the Chamber of Civil Servants and Public Employees, the Chamber of Commerce, the Chamber of Skilled Trades, and the Chamber of Agriculture by their members, by group; results are published by each chamber.",
+   "source": "chfep",
+   "est_votes": 150000,
+   "effort": 4,
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "LU",
+     "name_pattern": "Chambre (des fonctionnaires|de commerce|des métiers|d'agriculture)|Chamber of (Civil Servants|Commerce|Skilled Trades|Agriculture)"
+    }
+   ]
+  },
+  {
+   "key": "grand_duc",
+   "tier": "national",
+   "name": "Grand-Duc",
+   "name_en": "Grand Duke",
+   "category": "executive",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The head of state is hereditary in the House of Nassau; the government is appointed by the Grand Duke, so no executive is elected."
+  },
+  {
+   "key": "bourgmestre",
+   "tier": "commune",
+   "name": "Bourgmestre et échevins",
+   "name_en": "Mayors and aldermen",
+   "category": "executive",
+   "goal": "local",
+   "measure": {},
+   "source": "epl_com_principes",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The mayor is appointed by the Grand Duke and the aldermen by the Minister of the Interior on the proposal of the council majority; voters do not elect them."
+  },
+  {
+   "key": "conseil_etat",
+   "tier": "national",
+   "name": "Conseil d'État",
+   "name_en": "Council of State",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "chd_history",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Its members are appointed by the Grand Duke on the proposal of the government, the Chamber, or the Council itself; there is no public election."
+  },
+  {
+   "key": "syndicats_intercommunaux",
+   "tier": "commune",
+   "name": "Syndicats intercommunaux",
+   "name_en": "Intercommunal syndicates",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "loi_communale",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Delegates are designated by the member communes' councils, not chosen at a public election."
+  },
+  {
+   "key": "juges",
+   "tier": "national",
+   "name": "Magistrats",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Judges are appointed by the Grand Duke (on the proposal of the National Council of Justice since 2023); none is elected by voters."
+  },
+  {
+   "key": "selection_candidats",
+   "tier": "national",
+   "name": "Désignation des candidats",
+   "name_en": "Party candidate selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {},
+   "source": "loi_electorale",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties draw up their lists under their own statutes; the state runs no primary and publishes no nominating vote."
+  },
+  {
+   "key": "elections_sociales",
+   "tier": "national",
+   "name": "Élections sociales (délégations du personnel)",
+   "name_en": "Staff delegation elections",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {},
+   "source": "csl",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held inside each enterprise under labour law, with candidates presented by the unions; they elect workplace delegations, not a public body."
+  },
+  {
+   "key": "assemblee_consultative_1945",
+   "tier": "national",
+   "name": "Assemblée consultative (1945)",
+   "name_en": "Consultative Assembly (1945)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "source": "chd_history",
+   "valid_from": "1945-03-01",
+   "valid_to": "1945-10-21",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Appointed after the liberation, from March to August 1945, pending the October 1945 election; no vote was held."
+  }
+ ]
+}
