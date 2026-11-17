@@ -15,10 +15,11 @@ from xml.etree import ElementTree
 
 import httpx
 import polars as pl
+import shapely
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.lu import pages
+from ea.sources.lu import pages, shapes
 from ea.sources.lu.model import Candidate, Entry, Place, Race, Stats, clean, fold, number, slug
 
 SOURCE = "lu.elections"
@@ -155,6 +156,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+BOUNDARIES = key("source", "boundaries")
 CHAMBER = key("body", "chamber")
 SYSTEM_LEGISLATIVE = key("electoral_system", "legislative")
 SYSTEM_EUROPEAN = key("electoral_system", "european")
@@ -650,8 +652,8 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         (
-            "Luxembourg's four legislative constituencies, its cantons, and the communes named in the elections site's "
-            "result files"
+            "Luxembourg's four legislative constituencies, its cantons, and its communes with their shapes since before "
+            "1920 and the mergers between them, with the communes named in the elections site's result files"
         ),
     )
     p.external |= {LUXEMBOURG, COUNTRY}
@@ -672,6 +674,8 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=slug(text))
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, text, "fr", "official")
+    atlas = shapes.load()
+    _boundaries(p, atlas)
     cantons: dict[str, str] = {}
     communes: dict[str, tuple[str, str]] = {}
     for name in NAMES_ALL:
@@ -681,6 +685,10 @@ def geo() -> Package:
             if canton:
                 communes[slug(commune)] = (communes[slug(commune)][0], canton)
                 cantons.setdefault(slug(canton), canton)
+    for code, found in atlas.cantons.items():
+        cantons.setdefault(code, found.name)
+    for code, found in atlas.communes.items():
+        communes.setdefault(code, (found.name, ""))
     for code, text in sorted(cantons.items()):
         id = key("area", "lu.canton", code)
         p.add("area", id=id, scheme_code="lu.canton")
@@ -691,9 +699,100 @@ def geo() -> Package:
         id = area("lu.commune", text)
         p.add("area", id=id, scheme_code="lu.commune")
         p.add("area_code", area_id=id, code=slug(text))
-        p.add("area_parent", area_id=id, parent_id=key("area", "lu.canton", slug(canton)) if canton else COUNTRY)
         p.name(id, text, "fr", "official")
+        if slug(text) not in atlas.communes:
+            p.add("area_parent", area_id=id, parent_id=key("area", "lu.canton", slug(canton)) if canton else COUNTRY)
+    _shapes(p, atlas)
     return p
+
+
+def _boundaries(p: Package, atlas: shapes.Atlas) -> None:
+    p.add(
+        "source",
+        id=BOUNDARIES,
+        kind="official_body",
+        publisher="Administration du cadastre et de la topographie",
+        title="Limites communales historiques and Limites administratives du Grand-Duché de Luxembourg",
+        url=shapes.DATASET,
+        license="Open data of the Luxembourg government, published on data.public.lu under the Creative Commons "
+        "Zero licence",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="Administration du cadastre et de la topographie, data.public.lu",
+    )
+    for artifact in atlas.artifacts:
+        p.artifact(artifact, BOUNDARIES)
+
+
+def _shapes(p: Package, atlas: shapes.Atlas) -> None:
+    """The shapes and cantons of the communes in each period, and a note of each merger on the communes it joined."""
+    for scheme, found in (("lu.canton", atlas.cantons), ("lu.commune", atlas.communes)):
+        for code, commune in found.items():
+            id = key("area", scheme, code)
+            for version in commune.versions:
+                shape = shapes.wgs(version.shape)
+                p.add(
+                    "area_geometry",
+                    area_id=id,
+                    valid_from=version.start,
+                    valid_to=version.end,
+                    geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                    label_point=shapely.to_wkb(
+                        shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+                    ),
+                    quality="official",
+                    source_id=BOUNDARIES,
+                )
+            if scheme == "lu.commune":
+                for canton, start, end in commune.parents():
+                    p.add(
+                        "area_parent",
+                        area_id=id,
+                        parent_id=key("area", "lu.canton", canton),
+                        valid_from=start,
+                        valid_to=end,
+                    )
+        for period in shapes.PERIODS:
+            p.add(
+                "boundary_set",
+                id=p.id("boundary_set", scheme, period.vintage),
+                scheme_code=scheme,
+                vintage=period.vintage,
+                valid_from=period.start,
+                valid_to=period.end,
+                as_of=period.start or date(1919, 12, 31),
+            )
+    for merger in shapes.MERGERS:
+        into = area("lu.commune", merger.target)
+        names = [name for name in merger.sources if slug(name) != slug(merger.target)]
+        joined = f"{', '.join(names[:-1])} and {names[-1]}" if len(names) > 1 else names[0]
+        verb = "merged into" if slug(merger.target) in {slug(s) for s in merger.sources} else "merged to form"
+        text = f"On {_day(merger.day)}, {joined} {verb} {merger.target}."
+        _note(p, into, merger.day, text)
+        for name in names:
+            _note(p, area("lu.commune", name), merger.day, f"On {_day(merger.day)}, merged into {merger.target}.")
+    for day, old, new in shapes.RENAMES:
+        _note(
+            p,
+            area("lu.commune", old),
+            day,
+            f"On {_day(day)}, renamed {new}; the file of the later period draws it under that name.",
+        )
+        _note(p, area("lu.commune", new), day, f"Formerly {old}, renamed on {_day(day)}.")
+
+
+def _day(day: date) -> str:
+    return f"{day.day} {day.strftime('%B %Y')}"
+
+
+def _note(p: Package, entity: str, day: date, text: str) -> None:
+    p.add("note", id=p.id("note", entity, day, text), entity_id=entity, kind="context", body_md=text, lang="en")
+    p.add(
+        "citation",
+        id=p.id("citation", entity, day, text),
+        entity_id=entity,
+        source_id=BOUNDARIES,
+        locator={"file": "fusions-communales.pdf"},
+    )
 
 
 def _source(p: Package) -> None:
