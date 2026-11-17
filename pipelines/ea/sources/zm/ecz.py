@@ -3,6 +3,10 @@
 The Commission publishes its results as PDF public notices: presidential and National Assembly results by
 constituency, mayoral and council chairperson results by district, councillor results by ward, and one notice for each
 by-election date. Each notice's text layer is read in `ea.sources.zm.text`.
+
+The `geo` package, built in `ea.sources.zm.shapes`, holds the shapes of the 156 constituencies contested from 2016 to
+2021 and of the wards of 2021. Each unit of those plans is linked to its area; the 150 constituencies before 2016,
+the 226 of 2026, and the wards before 2021 have no open shapes yet, so their units stay unlocated.
 """
 
 import re
@@ -15,7 +19,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.zm import text
+from ea.sources.zm import shapes, text
 from ea.sources.zm.text import National, Unit
 
 SOURCE = "zm.ecz"
@@ -188,6 +192,7 @@ def by_days() -> dict[date, str]:
 def packages() -> list[str]:
     return [
         f"{SOURCE}/registry",
+        f"{SOURCE}/geo",
         *(f"{SOURCE}/{day}" for day in sorted([*DAYS, *by_days()])),
     ]
 
@@ -195,10 +200,12 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in urls():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, shapes.COD, suffix=".zip")
 
 
 def parse() -> None:
     registry().write()
+    geo().write()
     for day in sorted([*DAYS, *by_days()]):
         build(day).write()
 
@@ -319,6 +326,58 @@ def parts(day: date) -> list[tuple[Part, list[Unit]]]:
     tables = text.read_by_election(path(by_days()[day]))
     pairs = (("chair", "mayor"), ("assembly", "assembly"), ("ward", "ward"))
     return [(Part(kind, by_days()[day], table), tables[table]) for table, kind in pairs if tables[table]]
+
+
+@cache
+def seats() -> dict[int, str]:
+    """The 156 constituencies of the 2016 plan by number, named as the 2021 presidential notice prints them."""
+    return {int(number(u, "president")): display(u.name) for u in units("2021-president", "", "president")}
+
+
+def _ward_district(part: Part, u: Unit) -> str | None:
+    """The dataset's p-code of the district a ward lies in: a general notice's ward code carries it, and a
+    by-election notice names the district."""
+    if part.name in GENERAL:
+        return f"ZM{u.code[3:9]}"
+    if u.district:
+        return shapes.district_code(u.district)
+    # the North-Western rows run the district into the province, as in "North-Western Mushindamo"
+    words = u.province.split()
+    return next((code for i in range(1, len(words)) if (code := shapes.district_code(" ".join(words[i:])))), None)
+
+
+@cache
+def ward_names() -> dict[str, str]:
+    """The 2021 councillor notice's name for each ward it matches in the boundary dataset, by p-code."""
+    found: dict[str, str] = {}
+    part = Part("ward", "2021-councillor")
+    for u in units(part.name, "", part.kind):
+        district = _ward_district(part, u)
+        place = shapes.ward(district, u.name, u.parent_name)
+        if place is not None:
+            found[place.pcode] = display(u.name)
+    return found
+
+
+def geo() -> Package:
+    return shapes.geo(seats(), ward_names())
+
+
+def area(day: date, part: Part, u: Unit, code: str) -> str | None:
+    """The area of the 2016 constituency plan or the 2021 ward plan that a unit reports, if its plan has shapes."""
+    if part.kind in ("president", "assembly") and shapes.PLAN_2016 <= day < shapes.PLAN_2026:
+        found = shapes.constituency(u.name)
+        expected = shapes.constituency(seats()[int(code)])
+        if found is None or found != expected:
+            raise ValueError(
+                f"{day}: constituency {code} {u.name!r} does not match the 2016 plan's {seats()[int(code)]}"
+            )
+        return shapes.constituency_area(int(code))
+    if part.kind == "ward" and shapes.WARDS_2021 <= day < shapes.PLAN_2026:
+        district = _ward_district(part, u)
+        place = shapes.ward(district, u.name, u.parent_name)
+        return shapes.ward_area(place.pcode) if place else None
+    return None
 
 
 def registry() -> Package:
@@ -464,7 +523,7 @@ def build(day: date) -> Package:
         SOURCE,
         f"The Zambian {'by-elections' if held_by else 'election'} of {day.day} {day:%B %Y}, by constituency, district, "
         "and ward, from the Electoral Commission of Zambia's public notices",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", *([f"{SOURCE}/geo"] if shapes.PLAN_2016 <= day < shapes.PLAN_2026 else [])],
     )
     p.external.add(ZAMBIA)
     id = key("election", day)
@@ -496,6 +555,9 @@ def build(day: date) -> Package:
         p.uses(raw.cached(SOURCE, GENERAL.get(part.name, part.name)))
         _part(p, day, id, part, notice, placed, counter)
     counter.accept(p)
+    located = [row["area_id"] for row in p.rows.get("reporting_unit", []) if row["area_id"]]
+    if len(located) != len(set(located)):
+        raise ValueError(f"{day}: two units report the same area")
     if day == date(1996, 11, 18):
         p.accept(
             "accounting.declared",
@@ -524,17 +586,27 @@ def _unit(p: Package, day: date, part: Part, u: Unit, placed: dict[str, str]) ->
     unit = key("unit", day, scheme, code)
     if unit not in placed:
         placed[unit] = name
+        located = area(day, part, u, code)
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=ZAMBIA,
             scheme_code=scheme,
             code=f"{day}:{code}",
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="equals" if located else "unlocated",
+            area_id=located,
             kind="standard",
         )
         p.name(unit, name, "en", "official")
+        if located:
+            p.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=located,
+                method="source_code",
+                approximate=False,
+                partial=False,
+            )
     return unit
 
 
