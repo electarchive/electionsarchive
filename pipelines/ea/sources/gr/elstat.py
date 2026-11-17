@@ -96,6 +96,8 @@ class Row:
     code: str
     band: tuple[float, float] | None
     values: list[int | None]
+    misprinted: set[str] = field(default_factory=set)
+    """Columns of a printed subtotal that a misprint note above it owns."""
 
 
 @dataclass
@@ -148,9 +150,13 @@ def read(name: str) -> Election:
     blocks: list[Block] = []
     notes: list[str] = []
     tiers: dict[str, tuple[str, str, str]] = {}
+    pending: set[str] = set()
     for number, line in enumerate((TABLES / f"{name}.txt").read_text().splitlines(), 1):
         if line.startswith("# misprint:"):
             notes.append(line.removeprefix("# misprint:").strip())
+            match = MISPRINT.match(notes[-1])
+            if match is not None and match.group(2) == "=":
+                pending.add(match.group(3) or "")
         text = line.split("#")[0].strip()
         if not text:
             continue
@@ -189,13 +195,14 @@ def read(name: str) -> Election:
             values = [None if value == "-" else int(value) for value in fields[1:]]
             if len(values) != len(blocks[-1].columns):
                 raise ValueError(f"{name}.txt:{number}: {len(values)} values for {len(blocks[-1].columns)} columns")
-            blocks[-1].rows.append(Row(fields[0], band, values))
+            blocks[-1].rows.append(Row(fields[0], band, values, pending if fields[0] == "=" else set()))
+            pending = set()
     election = Election(name, family, day, parties, districts, blocks, notes, tiers)
     _verify(election)
     return election
 
 
-MISPRINT = re.compile(r"^(\w+) ([A-Z]?\d+|[A-Z])(?: \([^)]*\))?(?: (\w+))?:")
+MISPRINT = re.compile(r"^(\w+) ([A-Z]?\d+|[A-Z]|=)(?: \([^)]*\))?(?: (\w+))?:")
 
 
 def misprints(e: Election) -> set[tuple[str, str, str | None]]:
@@ -244,11 +251,15 @@ def _verify(e: Election) -> None:
                         ]
                         summed = sum(found)
                         codes = [r.code for _, r in earlier.get(block.name, [])] + codes
-                    if summed != (row.values[j] or 0) and not excused(block.name, codes, column):
+                    if (
+                        summed != (row.values[j] or 0)
+                        and not excused(block.name, codes, column)
+                        and column not in row.misprinted
+                    ):
                         problems.append(f"{block.name} p{block.page} {row.code} {column}: {summed} <> {row.values[j]}")
                     if row.code == "==" and subtotals and block.name not in earlier:
                         summed = sum(r.values[j] or 0 for r in subtotals)
-                        if summed != (row.values[j] or 0):
+                        if summed != (row.values[j] or 0) and not any(column in r.misprinted for r in subtotals):
                             problems.append(f"{block.name} p{block.page} == {column}: subtotals {summed}")
                 if row.code == "=":
                     subtotals.append(row)
@@ -317,6 +328,9 @@ ALIASES = {
     "νομοσ ρεθυμνου": "νομοσ ρεθυμνησ",
     "νομοσ καβαλλασ": "νομοσ καβαλασ",
     "εκλογικοσ συλλογοσ ισραηλιτων του δημου θεσσαλονικησ": "εκλογικοσ συλλογοσ ισραηλιτων θεσσαλονικησ",
+    "πρωην δημοσ πειραιωσ μετα των επαρχιων αιγινησ, τροιζηνιασ, κυθηρων, του δημου σπετσων και τησ κοινοτητοσ υδρασ": (
+        "πρωην δημοσ πειραιωσ μετα των επαρχιων αιγινησ, τροιζηνιασ και κυθηρων και των δημων σπετσων και υδρασ"
+    ),
 }
 FRENCH = (
     (re.compile(r"^Provinces? (?:de la |de |d'|des )(.+)$"), "{} Province"),

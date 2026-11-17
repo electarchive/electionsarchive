@@ -1,0 +1,229 @@
+# Fifth National Assembly, 9 June 1935. Volume GRESYE_02_2101_00006 (ELSTAT, Statistics of the elections of the National Assembly of 9 June 1935).
+# General tables, pages 18-23: Table I (population, voters and invalid ballots, p18), Table IV a (votes by party, absolute figures, p21),
+# Table V (members elected by party, p23). Tables II and III (seats, lists and candidates; candidates by party) and Table IV b
+# (proportions, p22, used only to settle readings) are not transcribed. The volume prints no registered electors.
+election assembly 1935-06-09
+# Parties as the column headers of Tables IV and V and the party list (page 17) print them.
+party EB list | Ένωσις Βασιλοφρόνων | Union de Royalistes
+# Table IV prints the votes of the coalition of the People's Party and the National Radical Party as one column;
+# Table V prints the seats of the two parties apart.
+party SKK list | Συμπράττοντα Κυβερνητικά κόμματα | Partis Gouvernementaux coalisés
+party LK list | Λαϊκόν κόμμα | Parti Populaire
+party ERK list | Εθνικόν Ριζοσπαστικόν κόμμα | Parti National-Radical
+party ME list | Μακεδονική Ένωσις | Union Macédonienne
+party EE list | Εθνική Ένωσις | Union Nationale
+party EK list | Εθνικόν κόμμα | Parti National
+party KS list | Κομμουνισταί και συμπράττοντες | Communistes et leurs alliés
+party AA independents | Ανεξάρτητοι και ακαθόριστοι | Indépendants et indéterminés
+# Constituencies by the volume's order numbers; subtotals (=) are the ten regions: Central Greece and Euboea 1-5, Thessaly 6-7,
+# Ionian Islands 8-10, Cyclades 11, Peloponnese 12-17, Macedonia 18-26, Epirus 27-29, Aegean Islands 30-32, Crete 33-36,
+# Western Thrace 37-38.
+district 1 | Νομός Αττικής και Βοιωτίας | Département d'Attique et Béotie
+district 2 | Πρώην δήμος Πειραιώς μετά των Επαρχιών Αιγίνης, Τροιζηνίας, Κυθήρων, του δήμου Σπετσών και της κοινότητος Ύδρας | Municipalité du Pirée avec les Provinces d'Égine, Trézène, Cythères, la municipalité de Spétzia et la commune d'Hydra
+district 3 | Νομός Αιτωλίας και Ακαρνανίας | Département d'Aetolie et Acarnanie
+district 4 | Νομός Ευβοίας | Département d'Eubée
+district 5 | Νομός Φθιώτιδος και Φωκίδος | Département de Phthiotide et Phocide
+district 6 | Νομός Λαρίσης | Département de Larissa
+district 7 | Νομός Τρικκάλων | Département de Trikkala
+district 8 | Νομός Ζακύνθου | Département de Zante
+district 9 | Νομός Κερκύρας | Département de Corfou
+district 10 | Νομός Κεφαλληνίας | Département de Céphalonie
+district 11 | Νομός Κυκλάδων | Département de Cyclades
+district 12 | Νομός Αργολίδος και Κορινθίας | Département d'Argolide et Corinthie
+district 13 | Νομός Αρκαδίας | Département d'Arcadie
+district 14 | Νομός Αχαΐας | Département d'Achaïe
+district 15 | Νομός Ηλείας | Département d'Élie
+district 16 | Νομός Λακωνίας | Département de Laconie
+district 17 | Νομός Μεσσηνίας | Département de Messénie
+district 18 | Νομός Δράμας | Département de Drama
+district 19 | Νομός Θεσσαλονίκης | Département de Salonique
+district 20 | Νομός Καβάλλας | Département de Cavalla
+district 21 | Νομός Κιλκίς | Département de Kilkis
+district 22 | Νομός Κοζάνης | Département de Cozane
+district 23 | Νομός Πέλλης | Département de Pella
+district 24 | Νομός Σερρών | Département de Serrès
+# Table I prints "Flopina"; Tables II-V print Florina.
+district 25 | Νομός Φλωρίνης | Département de Florina
+district 26 | Νομός Χαλκιδικής | Département de Chalcidique
+district 27 | Νομός Άρτης | Département d'Arta
+district 28 | Νομός Ιωαννίνων | Département de Jannina
+district 29 | Νομός Πρεβέζης | Département de Prévéza
+district 30 | Νομός Λέσβου | Département de Lesbos
+district 31 | Νομός Σάμου | Département de Samos
+district 32 | Νομός Χίου | Département de Chios
+district 33 | Νομός Ηρακλείου | Département d'Héraclion
+district 34 | Νομός Λασηθίου | Département de Lassithi
+district 35 | Νομός Ρεθύμνης | Département de Réthymne
+district 36 | Νομός Χανίων | Département de la Canée
+district 37 | Νομός Έβρου | Département d'Hevros
+district 38 | Νομός Ροδόπης | Département de Rhodope
+# Table I (page 18): electors who voted and invalid ballots (absolute figures). Population and percentages skipped.
+# Valid ballots are not printed here; the votes table's valid column (Table IV) equals cast - invalid on every row.
+table turnout volume=6 page=18
+columns cast invalid
+y .35 .95
+x .431 .536 .582
+1 @0.3603:0.3660 124078 5939
+2 @0.3834:0.3888 37913 2195
+3 @0.3911:0.3968 41264 1280
+4 @0.3988:0.4042 30860 1451
+5 @0.4068:0.4125 37155 1517
+= @0.4213:0.4279 271270 12382
+6 @0.4401:0.4458 51415 1411
+7 @0.4478:0.4532 36922 792
+= @0.4627:0.4689 88337 2203
+8 @0.4812:0.4869 8861 112
+9 @0.4889:0.4946 21347 1002
+10 @0.4969:0.5023 13414 111
+= @0.5114:0.5177 43622 1225
+11 @0.5302:0.5356 27133 1342
+= @0.5448:0.5510 27133 1342
+12 @0.5633:0.5690 35748 932
+13 @0.5713:0.5770 30420 3524
+14 @0.5790:0.5847 35157 942
+15 @0.5867:0.5921 25865 400
+16 @0.5946:0.6001 26142 972
+17 @0.6023:0.6078 53502 578
+= @0.6169:0.6231 206834 7348
+18 @0.6357:0.6411 22801 885
+19 @0.6431:0.6488 80763 5885
+20 @0.6514:0.6565 21429 2224
+21 @0.6588:0.6645 12379 1993
+22 @0.6665:0.6722 29403 1888
+23 @0.6745:0.6802 18580 2154
+24 @0.6822:0.6879 32201 3984
+25 @0.6901:0.6953 22524 1475
+26 @0.6978:0.7030 12224 985
+= @0.7124:0.7184 252304 21473
+27 @0.7309:0.7366 10688 88
+28 @0.7389:0.7443 27363 2419
+29 @0.7469:0.7523 15779 783
+= @0.7611:0.7674 53830 3290
+30 @0.7802:0.7856 30664 1234
+31 @0.7879:0.7933 12663 421
+32 @0.7959:0.8013 10129 604
+= @0.8101:0.8164 53456 2259
+33 @0.8292:0.8347 17402 341
+34 @0.8367:0.8424 7159 207
+35 @0.8446:0.8498 6390 276
+36 @0.8523:0.8578 7963 308
+= @0.8669:0.8731 38914 1132
+37 @0.8857:0.8911 25046 5163
+38 @0.8934:0.8988 29616 3349
+= @0.9079:0.9145 54662 8512
+== @0.9364:0.9458 1090362 61166
+# Table IV a (page 21): valid ballots and votes by party. In several rows the party columns are set one line lower than the
+# row's name (row 2's KS and AA, rows 3-5, 7, 18-26); each value is assigned to the row whose valid total it balances.
+# Footnotes: Arcadia's independent list (25,956 votes) was made up of 5 Populists, 3 of the Free Opinion party and 1 National
+# Radical; Messenia's Union de Royalistes list (20,288) of 11 royalists and 2 agrarians.
+table votes volume=6 page=21
+columns valid EB SKK ME EE EK KS AA
+y .305 .84
+x .344 .401 .449 .496 .533 .567 .596 .651 .695
+# misprint: votes 1 KS: printed 11373, but the row needs 16373 (118139 valid - 28711 - 71961 - 1094), the Central Greece subtotal prints 26401 (the rows give 21401 with 11373), and Table I gives 124078 - 5939 = 118139 valid
+1 @0.3255:0.3310 118139 28711 71961 - - - 11373 1094
+2 @0.3563:0.3620 35718 7503 21138 - - - 6745 332
+3 @0.3643:0.3712 39984 11295 27448 - - - 1157 84
+4 @0.3720:0.3774 29409 9413 18914 - - - 1082 -
+5 @0.3797:0.3854 35638 4499 30054 - - - 1044 41
+= @0.3914:0.3982 258888 61421 169515 - - - 26401 1551
+6 @0.4051:0.4108 50004 8100 28540 - - - 13283 81
+7 @0.4131:0.4188 36130 - 33411 - - - 2719 -
+= @0.4250:0.4313 86134 8100 61951 - - - 16002 81
+8 @0.4390:0.4444 8749 3809 4940 - - - - -
+9 @0.4464:0.4521 20345 - 20345 - - - - -
+10 @0.4544:0.4601 13303 9412 3751 - - - 140 -
+= @0.4664:0.4726 42397 13221 29036 - - - 140 -
+11 @0.4798:0.4855 25791 - 25791 - - - - -
+= @0.4920:0.4986 25791 - 25791 - - - - -
+12 @0.5054:0.5114 34816 1859 31988 - - - 476 493
+13 @0.5131:0.5191 26896 - - - - - 940 25956
+14 @0.5211:0.5271 34215 3791 28188 - - - 1233 1003
+15 @0.5285:0.5345 25465 6824 18338 - - - 303 -
+16 @0.5368:0.5422 25170 7142 18028 - - - - -
+17 @0.5442:0.5502 52924 20288 31865 - - - 771 -
+= @0.5564:0.5630 199486 39904 128407 - - - 3723 27452
+18 @0.5698:0.5755 21916 - 8648 - - 5635 5041 2592
+19 @0.5778:0.5835 74878 5115 39882 20059 - - 9821 1
+20 @0.5858:0.5912 19205 1633 11129 - - - 6443 -
+21 @0.5935:0.5992 10386 783 5656 2184 - - 1762 1
+22 @0.6012:0.6069 27515 - 20077 - - - 972 6466
+23 @0.6089:0.6143 16426 - 8256 7421 - - 749 -
+24 @0.6166:0.6223 28217 - 16789 - - - 5552 5876
+25 @0.6246:0.6300 21049 - 9634 - - - 896 10519
+26 @0.6323:0.6377 11239 1916 8973 - - - 350 -
+= @0.6440:0.6505 230831 9447 129044 29664 - 5635 31586 25455
+27 @0.6582:0.6636 10600 - 5782 - - - - 4818
+28 @0.6659:0.6713 24944 4485 19034 - - - 1425 -
+29 @0.6733:0.6790 14996 3211 9919 - - - 226 1640
+= @0.6853:0.6921 50540 7696 34735 - - - 1651 6458
+30 @0.6990:0.7050 29430 - 19746 - - - 9503 181
+31 @0.7072:0.7127 12242 2301 9088 - - - 853 -
+32 @0.7149:0.7204 9525 1418 7789 - - - 318 -
+= @0.7269:0.7332 51197 3719 36623 - - - 10674 181
+33 @0.7409:0.7463 17061 - 9696 - - - 531 6834
+34 @0.7486:0.7540 6952 - 6814 - - - 85 53
+35 @0.7563:0.7620 6114 - 4416 - - - - 1698
+36 @0.7643:0.7697 7655 - 3639 - 2590 1 301 1124
+= @0.7759:0.7825 37782 - 24565 - 2590 1 917 9709
+37 @0.7899:0.7956 19883 5063 11711 - - - 3109 -
+38 @0.7973:0.8033 26267 3714 18056 - - - 4496 1
+= @0.8099:0.8161 46150 8777 29767 - - - 7605 1
+== @0.8304:0.8372 1029196 152285 669434 29664 2590 5636 98699 70888
+# Table V (page 23): members elected by party. Seats were allocated in the constituency only (no higher tier).
+# Arcadia's 9 members came from the independent list but are counted here by party (3 EB, 5 LK, 1 ERK).
+table seats volume=6 page=23
+columns seats EB LK ERK AA
+y .285 .885
+x .308 .365 .420 .486 .535 .595
+1 @0.2948:0.3002 31 - 28 3 -
+2 @0.3176:0.3230 14 - 13 1 -
+3 @0.3258:0.3307 11 - 11 - -
+4 @0.3332:0.3384 8 - 8 - -
+5 @0.3412:0.3461 10 - 10 - -
+= @0.3555:0.3615 74 - 70 4 -
+6 @0.3743:0.3794 13 - 11 2 -
+7 @0.3823:0.3874 11 - 6 5 -
+= @0.3965:0.4025 24 - 17 7 -
+8 @0.4156:0.4205 2 - 2 - -
+9 @0.4233:0.4284 5 - 5 - -
+10 @0.4310:0.4359 4 4 - - -
+= @0.4456:0.4515 11 4 7 - -
+11 @0.4644:0.4692 8 - 8 - -
+= @0.4789:0.4846 8 - 8 - -
+12 @0.4974:0.5023 8 - 8 - -
+13 @0.5054:0.5103 9 3 5 1 -
+14 @0.5134:0.5180 9 - 8 1 -
+15 @0.5208:0.5259 6 - 6 - -
+16 @0.5285:0.5336 7 - 7 - -
+17 @0.5365:0.5416 13 - 13 - -
+# misprint: seats = seats: printed 60, but the Peloponnese rows sum to 52 (8+9+9+6+7+13), Table II prints 52, and the national total 300 needs 52
+# misprint: seats = LK: printed 55, but the Peloponnese rows sum to 47, and the national LK total 254 needs 47
+= @0.5507:0.5567 60 3 55 2 -
+18 @0.5696:0.5744 5 - 4 1 -
+19 @0.5775:0.5827 22 - 16 6 -
+20 @0.5850:0.5901 5 - 4 1 -
+21 @0.5932:0.5981 3 - 2 1 -
+22 @0.6006:0.6058 9 - 8 1 -
+23 @0.6086:0.6132 4 - 3 1 -
+24 @0.6163:0.6206 8 - 6 2 -
+25 @0.6240:0.6288 6 - - - 6
+26 @0.6317:0.6368 3 - 3 - -
+= @0.6462:0.6522 65 - 46 13 6
+27 @0.6653:0.6699 3 - 3 - -
+28 @0.6733:0.6784 10 - 9 1 -
+29 @0.6810:0.6859 4 - 4 - -
+= @0.6958:0.7015 17 - 16 1 -
+30 @0.7144:0.7189 8 - 8 - -
+31 @0.7226:0.7275 4 - 4 - -
+32 @0.7300:0.7349 5 - 2 3 -
+= @0.7449:0.7506 17 - 14 3 -
+33 @0.7660:0.7688 7 - 7 - -
+34 @0.7714:0.7765 3 - 3 - -
+35 @0.7791:0.7836 3 - 3 - -
+36 @0.7868:0.7916 5 - 5 - -
+= @0.8013:0.8076 18 - 18 - -
+37 @0.8201:0.8253 6 - 4 2 -
+38 @0.8281:0.8330 8 - 7 1 -
+= @0.8426:0.8486 14 - 11 3 -
+== @0.8731:0.8800 300 7 254 33 6
