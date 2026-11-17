@@ -42,6 +42,27 @@
       "url": "https://matsne.gov.ge/en/document/view/30346?publication=32",
       "kind": "official_body",
       "note": "The consolidated English text in force between the constitutional laws of 27 December 2011 and 2017; read on 2026-11-17."
+    },
+    "ajara_law": {
+      "title": "Law of the Autonomous Republic of Ajara on the elections of the Supreme Council of the Autonomous Republic of Ajara (consolidated version)",
+      "publisher": "Supreme Council of the Autonomous Republic of Ajara",
+      "url": "https://matsne.gov.ge/ka/document/view/1687543",
+      "kind": "official_body",
+      "note": "Read on 2026-11-17. Art. 8 and the district article of the current text: 21 deputies elected by proportional representation, with Ajara as one multi-member district; the elections of 2012 to 2020 also elected single-member districts, as the Commission's reports state."
+    },
+    "ajara_status": {
+      "title": "Constitutional Law of Georgia on the Status of the Autonomous Republic of Ajara (consolidated version of 27 December 2011 to 13 October 2017)",
+      "publisher": "Parliament of Georgia",
+      "url": "https://matsne.gov.ge/ka/document/view/30442",
+      "kind": "official_body",
+      "note": "Read on 2026-11-17. Repealed on 13 October 2017. Art. 7(2): the Supreme Council has no more than 21 deputies, elected for four years; their number and election rules are set by the Ajara constitution and laws."
+    },
+    "usko": {
+      "title": "Reports and results sites of the Supreme Election Commission of Ajara (USKO)",
+      "publisher": "Supreme Election Commission of the Autonomous Republic of Ajara",
+      "url": "https://sec.ge/",
+      "kind": "official_body",
+      "note": "Read on 2026-11-17: the report on each election (angarishi) and its results site."
     }
   },
   "tiers": [
@@ -866,8 +887,8 @@
       "valid_from": "1991-01-01",
       "source": "ec2011",
       "locator": "https://matsne.gov.ge/en/document/view/1557168?publication=101 (art. 7(4): \"If general elections and the elections of the Supreme Council of Ajara are held simultaneously, DECs and PECs formed for general elections shall perform the duties of DECs and PECs.\")",
-      "finest_note": "Precinct protocols are expected with the parliamentary ones when both are held on one day; not confirmed.",
-      "note": "Elected under the Constitutional Law on the status of Ajara and the Autonomous Republic's own election law, administered by the Supreme Election Commission of Ajara, which is part of the Electoral Administration of Georgia (Election Code 2025 art. 2(q)); since 2008 held with the parliamentary elections. Its members sit in the presidential Electoral College (Constitution Art. 50(3)). Dates not quoted from a fetched source.",
+      "finest_note": "Precinct results for 2012 to 2024 are on the Commission's results sites (sec.ge); 2004 and 2008 are published only as national totals.",
+      "note": "Elected under the Constitutional Law on the status of Ajara and the Autonomous Republic's own election law, administered by the Supreme Election Commission of Ajara, which is part of the Electoral Administration of Georgia (Election Code 2025 art. 2(q)); since 2008 held with the parliamentary elections. Its members sit in the presidential Electoral College (Constitution Art. 50(3)). Seats and contests read from the Commission's reports of 2012 to 2024 (21 in every election: 15 + 6 in 2012 and 2016, 18 + 3 in 2020, 21 by lists alone in 2024); a contest is the list contest plus each single-member district. 2004 and 2008 dates and seats are not quoted from a fetched source.",
       "match": [
         {
           "election_kinds": [
@@ -878,7 +899,9 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "GE-AJ"
+          "iso_pattern": "GE",
+          "name_pattern": "(Ajara|აჭარ)",
+          "precedence": 1
         }
       ],
       "dates": [
@@ -895,16 +918,42 @@
           "date": "2008-11-03"
         },
         {
-          "date": "2012-10-01"
+          "date": "2012-10-01",
+          "contests": 7,
+          "seats": 21,
+          "source": "usko",
+          "locator": "angarishi 18.12.2012, p. 3",
+          "quote": "პროპორციული საარჩევნო სისტემით არჩეული 15 და მაჟორიტარული საარჩევნო სისტემით არჩეული 6 დეპუტატისაგან"
         },
         {
-          "date": "2016-10-08"
+          "date": "2016-10-08",
+          "contests": 7,
+          "seats": 21,
+          "source": "usko",
+          "locator": "angariSi_2016, p. 3",
+          "quote": "პროპორციული საარჩევნო სისტემით არჩეული 15 და მაჟორიტარული საარჩევნო სისტემით არჩეული 6 დეპუტატისაგან",
+          "deferred": [
+            "2016-10-30"
+          ]
         },
         {
-          "date": "2020-10-31"
+          "date": "2020-10-31",
+          "contests": 4,
+          "seats": 21,
+          "source": "usko",
+          "locator": "angarishi_2020, p. 4",
+          "quote": "პროპორციული საარჩევნო სისტემით არჩეული 18 და მაჟორიტარული საარჩევნო სისტემით არჩეული 3 დეპუტატისაგან",
+          "deferred": [
+            "2020-11-21"
+          ]
         },
         {
-          "date": "2024-10-26"
+          "date": "2024-10-26",
+          "contests": 1,
+          "seats": 21,
+          "source": "usko",
+          "locator": "angarishi_2024, p. 4",
+          "quote": "პროპორციული საარჩევნო სისტემით არჩეული 21 დეპუტატისაგან"
         }
       ],
       "access": [
