@@ -21,6 +21,7 @@ URLS = {
     "pres2020": f"{UP}/2024/12/Presidential_2020-Result-Detail-2.pdf",
     "pres2020-summary": f"{UP}/2024/12/RESULTS-2020-PRESIDENTIAL-1.pdf",
     "na2020": f"{UP}/2024/12/ELECTION-2020_-National_Assembly-detail-.pdf",
+    "na2020-seats": f"{UP}/2024/12/National_Assembly_2020_Results.pdf",
     "report2025-1": f"{UP}/2025/12/2025-First-Ballot-Election-Report.pdf",
     "report2025-2": f"{UP}/2026/02/2025-Second-Ballot-Election-Report.pdf",
     "pres2025-1": f"{UP}/2025/09/PRESIDENTIAL-NATIONAL-ASSEMBLY-ELECTION-RESULTS-BY-POLITICAL-PARTY-AND-ELECTORAL-AREA-1-1-scaled.jpg",
@@ -371,6 +372,30 @@ def read_2020_assembly() -> tuple[
     return rows, total
 
 
+# --- National Assembly seats by party -------------------------------------------------------------------------
+
+SEAT_ROW = re.compile(r"([A-Z][A-Z ]+?)\s+(\d+)\s+(\d+)(?:\s+(\d+))?(?=\s+[A-Z]|\s*$)")
+
+
+def read_seats(name: str) -> dict[str, tuple[int, int]]:
+    """Party code -> (directly elected seats, proportional seats) from the commission's closing results slide."""
+    page = next(p for p in text(name).split("\f") if "Nominated" in p)
+    body = clean(page.split("Nominated", 1)[1])
+    found: dict[str, tuple[int, int]] = {}
+    for match in SEAT_ROW.finditer(body):
+        code = PARTY_TEXT[match.group(1).strip()]
+        direct, nominated = int(match.group(2)), int(match.group(3))
+        if match.group(4) is not None and int(match.group(4)) != direct + nominated:
+            raise ValueError(f"{name}: {match.group(0)}")
+        found[code] = (direct, nominated)
+    return found
+
+
+# Table 43 of the 2025 first ballot report, read from the page image: party -> (directly elected, proportional seats).
+SEATS_2025 = {"lds": (11, 4), "spnm": (0, 0), "us": (15, 4), "mls": (0, 0), "sum": (0, 0), "ibt": (0, 0), "lns": (0, 0)}
+# The table prints total seats of 15 and 19 for the two parties that won, and 26, 8, and 34 in its total row.
+SEATS_2025_TOTAL = (26, 8, 34)
+
 # --- 2025 tables transcribed from the commission's published images --------------------------------------------
 
 # September 2025 presidential election, first ballot: votes by area for LNS, US, IC2, IC1, SPNM, IC3, LDS, SUM.
@@ -557,7 +582,7 @@ def registry() -> Package:
             {"formula": "fptp"},
             (
                 "Each electoral area elects one member by plurality. The Assembly's proportional seats, which go to "
-                "parties by their share of the national vote, are not stored here."
+                "parties for each 10% of the votes they polled, are stored as a national contest of their own."
             ),
         ),
         (
@@ -625,7 +650,9 @@ class Build:
         self.p.name(election, english, "en", "official")
         return election
 
-    def contest(self, name: str, election: str, english: str, path: str, **fields: object) -> tuple[str, str]:
+    def contest(
+        self, name: str, election: str, english: str, path: str, completeness: float = 1.0, **fields: object
+    ) -> tuple[str, str]:
         contest = key("contest", name)
         self.p.add(
             "contest",
@@ -646,7 +673,7 @@ class Build:
             source_id=ECS_SOURCE,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=completeness,
         )
         self.p.add(
             "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en"
@@ -866,8 +893,65 @@ def _district(b: Build, name: str, election: str, year: int, code: str, path: st
     )
 
 
+def proportional(
+    b: Build, name: str, election: str, year: int, seats: dict[str, tuple[int, int]], wins: dict[str, int]
+) -> None:
+    """The national contest for the proportionally elected members, with the commission's declared seats by party."""
+    for code, (direct, _) in seats.items():
+        if wins.get(code, 0) != direct:
+            raise ValueError(f"{year}: {code} printed {direct} directly elected seats, areas give {wins.get(code, 0)}")
+    if sum(wins.values()) != sum(direct for direct, _ in seats.values()):
+        raise ValueError(f"{year}: directly elected seats {wins} against {seats}")
+    magnitude = sum(proportional for _, proportional in seats.values())
+    contest, result_set = b.contest(
+        f"{name}-pr",
+        election,
+        f"{year} Seychelles National Assembly election, proportional seats",
+        f"sc/{b.day}-national-assembly/proportional",
+        kind="list_allocation",
+        body_id=ASSEMBLY,
+        magnitude=magnitude,
+        completeness=0.0,
+    )
+    for position, (code, (direct, nominated)) in enumerate(seats.items(), 1):
+        option = key("option", f"{name}-pr", position)
+        b.p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=party(code),
+            ballot_position=position,
+            ballot_label=PARTIES[code],
+        )
+        b.p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=option,
+            kind="won" if nominated else "lost",
+            seats=nominated,
+        )
+    b.p.add(
+        "note",
+        id=key("note", f"{name}-pr", "seats"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=f"The commission declares {magnitude} proportional seats in {year}, which parties nominate for each "
+        "10% of the votes they polled. This contest holds those seats by party. Each party's directly elected seats "
+        "are in the electoral areas' contests; the commission prints "
+        + ", ".join(
+            f"{PARTIES[code]} {direct} directly elected and {nominated} proportional, {direct + nominated} in all"
+            for code, (direct, nominated) in seats.items()
+            if direct + nominated
+        )
+        + ". The commission publishes no votes with these seats.",
+        lang="en",
+    )
+
+
 def assembly_2016(b: Build) -> None:
     _uses(b.p, "na2016")
+    wins: dict[str, int] = {}
     election = b.election(
         "na2016", DAYS[b.day], "general", "2016 Seychelles National Assembly election", f"sc/{b.day}-national-assembly"
     )
@@ -886,6 +970,9 @@ def assembly_2016(b: Build) -> None:
         _put(b.p, result_set, unit, None, VALID, total)
         b.declare(result_set, options, list(votes), (None, None, total, None))
         b.outcomes(result_set, options, votes, True, False)
+        top = candidates[max(range(len(votes)), key=votes.__getitem__)][1]
+        wins[top or "ic"] = wins.get(top or "ic", 0) + 1
+    proportional(b, "na2016", election, 2016, read_seats("na2016"), wins)
     for code, (counted, printed) in MISMATCH_2016.items():
         b.p.accept(
             "accounting.votes_valid",
@@ -914,7 +1001,8 @@ def assembly_2016(b: Build) -> None:
 
 
 def assembly_2020(b: Build) -> None:
-    _uses(b.p, "na2020")
+    _uses(b.p, "na2020", "na2020-seats")
+    wins: dict[str, int] = {}
     election = b.election(
         "na2020", DAYS[b.day], "general", "2020 Seychelles National Assembly election", f"sc/{b.day}-national-assembly"
     )
@@ -935,6 +1023,9 @@ def assembly_2020(b: Build) -> None:
             _put(b.p, result_set, unit, option, VOTES, value)
         b.declare(result_set, options, votes, accounting)
         b.outcomes(result_set, options, votes, True, False)
+        top = candidates[max(range(len(votes)), key=votes.__getitem__)][1]
+        wins[top or "ic"] = wins.get(top or "ic", 0) + 1
+    proportional(b, "na2020", election, 2020, read_seats("na2020-seats"), wins)
     print(f"NOTE na2020 sums {sums} printed {total}")
 
 
@@ -1003,12 +1094,13 @@ def read_eligible_2025() -> dict[str, int]:
 
 
 def assembly_2025(b: Build) -> None:
-    _uses(b.p, "na2025", *(f"na2025-slide{n}" for n in range(5, 31)))
+    _uses(b.p, "na2025", "report2025-1", *(f"na2025-slide{n}" for n in range(5, 31)))
     election = b.election(
         "na2025", DAYS[b.day], "general", "2025 Seychelles National Assembly election", f"sc/{b.day}-national-assembly"
     )
     sums = [0] * 8
     totals = [0, 0, 0, 0]
+    wins: dict[str, int] = {}
     for code, _ in AREAS:
         accounting = NA_2025_ACCOUNTING[code]
         cells = NA_2025[code]
@@ -1036,10 +1128,16 @@ def assembly_2025(b: Build) -> None:
             _put(b.p, result_set, unit, option, VOTES, value)
         b.declare(result_set, options, votes, accounting)
         b.outcomes(result_set, options, votes, True, False)
+        index = max((i for i, v in enumerate(cells) if v is not None), key=lambda i: cells[i] or 0)
+        top = NA_2025_COLUMNS[index] or "ic"
+        wins[top] = wins.get(top, 0) + 1
         for i in range(4):
             totals[i] += accounting[i]
     if sums != NA_2025_TOTAL:
         raise ValueError(f"2025 assembly column sums {sums} != {NA_2025_TOTAL}")
+    if tuple(map(sum, zip(*SEATS_2025.values(), strict=True))) != SEATS_2025_TOTAL[:2]:
+        raise ValueError("2025 seats do not add up to the printed total row")
+    proportional(b, "na2025", election, 2025, SEATS_2025, wins)
     print(f"NOTE na2025 accounting sums {totals} printed {NA_2025_PRINTED}")
 
 
