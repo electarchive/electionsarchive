@@ -15,7 +15,7 @@ import os
 import re
 import unicodedata
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import uuid5
@@ -30,9 +30,11 @@ TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fGRC"))
 DERIVED = 1
 INDEPENDENTS = 998
 BLANK_MEASURES = (2, 3, 4, 5, 6)
+ABROAD = 57
 
 A = "browser://20261116-222821-308b6c/"
 B = "browser://20261116-224930-393d08/"
+C = "browser://20261117-133413-6c56bf/"
 OLD = "http://ekloges-prev.singularlogic.eu/"
 GEO = f"{SOURCE}/national-geo"  # `ypes` builds the local elections' geo and registry
 REGISTRY = f"{SOURCE}/national-registry"
@@ -57,10 +59,6 @@ class Election:
         return f"gr/{self.day.isoformat()}-{suffix}"
 
 
-def _june(n: int) -> str:
-    return f"{OLD}2023/june/dyn/v/ep_{n}.js"
-
-
 ELECTIONS = [
     Election("ps-2012-05", date(2012, 5, 6), "parliament", (B + "gr-2012-may-national-district-municipality.txt",)),
     Election("ps-2012-06", date(2012, 6, 17), "parliament", (B + "gr-2012-june-national-district-municipality.txt",)),
@@ -74,25 +72,19 @@ ELECTIONS = [
         "ps-2019",
         date(2019, 7, 7),
         "parliament",
-        (A + "gr-2019-national-results-dyn.txt", A + "gr-2019-national-static-metadata.txt"),
+        (C + "gr-vouli-2019-07-ep-dhm-den-bundle.json",),
     ),
     Election(
         "ps-2023-05",
         date(2023, 5, 21),
         "parliament",
-        (A + "gr-2023-may-national-results-dyn.txt", A + "gr-2023-may-national-static-metadata.txt"),
-        extra=(f"{OLD}2023/may/dyn/v/ep_57.js",),
+        (C + "gr-vouli-2023-05-ep-dhm-den-abroad-bundle.json",),
     ),
     Election(
         "ps-2023-06",
         date(2023, 6, 25),
         "parliament",
-        (
-            B + "gr-2023-june-ep_districts.txt",
-            B + "gr-2023-june-national-and-stat.txt",
-            A + "gr-2023-june-national-static-metadata.txt",
-        ),
-        extra=tuple(_june(n) for n in (40, 48, 49, 57)),
+        (C + "gr-vouli-2023-06-ep-dhm-den-abroad-bundle.json",),
     ),
 ]
 LEGACY = "https://eklogesapps.ypes.gr/{0}/eklogesapps.ypes.gr/ekloges/content/gr/elec_data/{1}_epi_res.html"
@@ -115,7 +107,17 @@ STATICS = {  # elections whose district, municipality, and unit tables are in a 
     "ps-2023-05",
     "ps-2023-06",
 }
-UNITS = {"ps-2012-05", "ps-2012-06", "eu-2014", "ps-2015-01", "ref-2015", "ps-2015-09"}  # municipal-unit results
+UNITS = {  # municipal-unit results
+    "ps-2012-05",
+    "ps-2012-06",
+    "eu-2014",
+    "ps-2015-01",
+    "ref-2015",
+    "ps-2015-09",
+    "ps-2019",
+    "ps-2023-05",
+    "ps-2023-06",
+}
 
 
 def fetch() -> None:
@@ -154,6 +156,13 @@ def decode(data: bytes) -> str:
 
 
 def split(text: str, url: str) -> dict[str, str]:
+    if text.lstrip().startswith("{"):
+        try:
+            bundle = json.loads(text)
+        except ValueError:
+            bundle = None
+        if isinstance(bundle, dict) and bundle and all(str(k).startswith("http") for k in bundle):
+            return {str(k): str(v) for k, v in bundle.items()}  # a bundle of files, keyed by their addresses
     parts = re.split(r"<!-- (\S+) -->\n?", text)
     if len(parts) == 1:
         return {url: text}
@@ -252,6 +261,8 @@ class Data:
     unit_names: dict[int, tuple[str, int]]  # name and municipality
     updated: str
     official: bool
+    cities: dict[int, Figures] = field(default_factory=dict)  # votes abroad, by city
+    city_names: dict[int, tuple[str, str]] = field(default_factory=dict)  # city and country
 
 
 def number(text: str) -> int:
@@ -309,6 +320,7 @@ def load(election: Election) -> Data:
     ep: dict[int, object] = {}
     dhm: dict[int, object] = {}
     den: dict[int, object] = {}
+    city: dict[int, object] = {}
     epik: object | None = None
     statics = ""
     parties: dict[int, str] = {}
@@ -318,7 +330,7 @@ def load(election: Election) -> Data:
     for name, text in segments.items():
         if name.endswith(("ep_party.js", "model.el.js")):
             continue
-        found = re.search(r"/(ep|dhm|den|epik)_(\d+)\.js$", name) or re.search(r"/(epik)\.js$", name)
+        found = re.search(r"/(ep|dhm|den|city|epik)_(\d+)\.js$", name) or re.search(r"/(epik)\.js$", name)
         if name.endswith("/statics.js"):
             statics = text
         elif found is None:
@@ -330,6 +342,8 @@ def load(election: Election) -> Data:
                 if kind == "ep":
                     stat_ep[index] = mapping(json.JSONDecoder().raw_decode(text.strip())[0])
                 continue
+            if not text.strip():
+                continue
             value = json.JSONDecoder().raw_decode(text.strip())[0]
             if isinstance(value, list) and not value:
                 continue  # a district the election did not have
@@ -339,6 +353,8 @@ def load(election: Election) -> Data:
                 dhm[index] = value
             elif kind == "den":
                 den[index] = value
+            elif kind == "city":
+                city[index] = value
             elif kind == "epik" and (epik is None or "/dyn1/" in name):
                 epik = value
     if epik is None:
@@ -348,7 +364,11 @@ def load(election: Election) -> Data:
             parties.update(model_parties(text))
     municipality_names: dict[int, tuple[str, int]] = {}
     unit_names: dict[int, tuple[str, int]] = {}
+    city_names: dict[int, tuple[str, str]] = {}
     if statics:
+        countries = {int(str(row[0])): str(row[1]) for row in bracket(statics, "country")}
+        for row in bracket(statics, "city"):
+            city_names[int(str(row[0]))] = (str(row[1]), countries.get(int(str(row[2])), ""))
         for row in bracket(statics, "party"):
             parties[int(str(row[0]))] = str(row[2])
         for row in bracket(statics, "ep"):
@@ -380,6 +400,8 @@ def load(election: Election) -> Data:
         unit_names=unit_names,
         updated=str(mapping(epik).get("Updated") or ""),
         official=bool(mapping(epik).get("official")),
+        cities={n: figures(row, mapping(row)["party"], None) for n, row in city.items()},
+        city_names=city_names,
     )
 
 
@@ -788,7 +810,18 @@ class Build:
                 leaf = Leaf(self.unit("gr.unit", str(code), area("gr.unit", code), "equals", "standard"), figures_)
                 self.leaves[n].append(leaf)
             for n, whole in sorted(d.districts.items()):
-                if n == 57:
+                if n == ABROAD and d.cities:
+                    for code, figures_ in sorted(d.cities.items()):
+                        name, country = d.city_names[code]
+                        tag = f"abroad:{code}:{latin(country)}:{latin(name)}"
+                        abroad = self.unit("gr.district", tag, None, "unlocated", "abroad_mission")
+                        self.leaves[n].append(Leaf(abroad, figures_))
+                    rest = subtract(whole, [x.figures for x in self.leaves[n]])
+                    if rest.valid or rest.registered or rest.invalid or rest.blank:
+                        residual = self.unit("gr.district", "abroad:residual", None, "unlocated", "aggregate")
+                        self.leaves[n].append(Leaf(residual, rest, DERIVED))
+                    continue
+                if n == ABROAD:
                     abroad = self.unit("gr.district", str(n), None, "unlocated", "abroad_mission")
                     self.leaves[n].append(Leaf(abroad, whole))
                     continue
@@ -953,6 +986,18 @@ class Build:
         options = self.options(contest, suffix, pids)
         for leaf in self.everything:
             self.emit(rs, leaf, options, rest=bool(leaf.flags))
+        if d.cities:
+            self.p.add(
+                "note",
+                id=key("note", rs, "abroad"),
+                entity_id=rs,
+                kind="methodology",
+                body_md=(
+                    "Votes cast at polling stations abroad are stored for each city the Ministry lists, one unit "
+                    "for each, with no mapped area. The cities add up to the abroad district's own figures."
+                ),
+                lang="en",
+            )
         rest = self.rest
         if rest.valid > 0 or rest.invalid > 0 or rest.blank > 0 or any(v > 0 for v in rest.votes.values()):
             unit = self.unit("gr.country", "residual", TERRITORY, "within", "aggregate")
