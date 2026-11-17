@@ -57,6 +57,8 @@ def fetch() -> None:
         for stage in STAGES:
             urls += [fragment_url(year, stage, code) for code in (*known[stage[:7]], *LISTS)]
     raw.fetch_many(SOURCE, urls, suffix=".html", workers=4)
+    senate_fetch()
+    raw.fetch(GEOBOUNDARIES, ADM1, suffix=".geojson")
 
 
 import functools
@@ -138,6 +140,11 @@ def page(year: int, stage: str, code: str) -> Page | None:
         text = raw.cached(SOURCE, fragment_url(year, stage, code)).path.read_text("utf-8")
     except LookupError:
         return None
+    return parse_fragment(text, f"{year} {stage} {code}")
+
+
+def parse_fragment(text: str, label: str) -> Page:
+    year, stage, code = label.split(" ")
     heading = re.search(r"<h2[^>]*>(.*?)</h2>", text, re.DOTALL)
     if heading is None:
         raise ValueError(f"{year} {stage} {code}: no heading")
@@ -178,7 +185,13 @@ def stage_codes(year: int) -> list[tuple[str, str]]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/hor-{year}" for year in YEARS)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/hor-{year}" for year in YEARS),
+        f"{SOURCE}/senate-registry",
+        *(f"{SOURCE}/sen-{year}" for year in YEARS),
+    ]
 
 
 def parse() -> None:
@@ -186,6 +199,9 @@ def parse() -> None:
     registry().write()
     for year in YEARS:
         house(year).write()
+    senate_registry().write()
+    for year in YEARS:
+        senate(year).write()
 
 
 def emit() -> None:
@@ -671,4 +687,399 @@ def house(year: int) -> Package:
         if row["id"] not in counted:
             row["completeness"] = None
     print(f"{p.key}: {dict(tally)}", flush=True)
+    return p
+
+
+SENATE_ROUNDS = ("stage_1_round_1", "stage_1_round_2")
+
+
+def senate_archive_url(year: int, stage: str) -> str:
+    return f"{BASE}/senate_{year}/results/{stage}_results/"
+
+
+def senate_fragment_url(year: int, stage: str, code: str) -> str:
+    return f"{BASE}/senate_{year}/results/{stage}_results/html/{code}.html"
+
+
+def senate_codes() -> list[str]:
+    """The 27 individual districts, one per governorate, in the order the archive pages list them."""
+    return sorted(GOVERNORATES, key=int)
+
+
+def senate_fetch() -> None:
+    for year in YEARS:
+        for stage in SENATE_ROUNDS:
+            try:
+                raw.fetch(SOURCE, senate_archive_url(year, stage), suffix=".html")
+            except Exception as failure:
+                print(f"{senate_archive_url(year, stage)}: {failure}", file=sys.stderr, flush=True)
+    urls = [
+        senate_fragment_url(year, stage, code)
+        for year in YEARS
+        for stage in SENATE_ROUNDS
+        for code in (*senate_codes(), *LISTS)
+    ]
+    raw.fetch_many(SOURCE, urls, suffix=".html", workers=4)
+
+
+SENATE_FIRST_DAY = {2020: date(2020, 8, 9), 2025: date(2025, 8, 1)}
+SENATE_BODY = key("body", "senate")
+SENATE_METHOD = (
+    "Published by the National Elections Authority as a results page for each district: one individual district for "
+    "each governorate and four list districts. The pages name the winners and the candidates sent to a runoff, and a "
+    "list district's winning list with its candidates. They do not name candidates who lost in the first round. The "
+    "2020 pages carry each district's registered voters, ballots cast, valid, and invalid ballots but no candidate "
+    "votes; the 2025 first-round pages carry the votes of the individual-seat winners and the votes for and against "
+    "the winning list but no turnout. Runoff candidates carry no votes. The seats the President appoints are not "
+    "part of this election."
+)
+SENATE_STATS = {"registered": 2, "cast": 3, "valid": 4, "invalid": 5}
+
+
+def senate_page(year: int, stage: str, code: str) -> Page | None:
+    try:
+        text = raw.cached(SOURCE, senate_fragment_url(year, stage, code)).path.read_text("utf-8")
+    except LookupError:
+        return None
+    return parse_fragment(text, f"{year} {stage} {code}")
+
+
+def senate_stats(year: int, code: str) -> tuple[int | None, dict[int, int]]:
+    """The seat count and the accounting figures printed above the winners on a first-round page, when it has them."""
+    text = raw.cached(SOURCE, senate_fragment_url(year, "stage_1_round_1", code)).path.read_text("utf-8")
+    head = re.split(r'<h3 class="winner_header red">', text)[0]
+    labels = [clean(m) for m in re.findall(r'<p class="enteries">(.*?)</p>', head, re.DOTALL)]
+    seats: int | None = None
+    figures: dict[int, int] = {}
+    for line in labels:
+        match = re.search(r"([\d,]+)", line.split(":")[-1] if "عدد المقاعد" in line else line)
+        if match is None:
+            continue
+        if "عدد المقاعد" in line:
+            seats = number(match.group(1))
+        elif "المقيدين" in line:
+            figures[2] = number(match.group(1))
+        elif "الحضور" in line:
+            figures[3] = number(match.group(1))
+        elif "الصحيحة" in line:
+            figures[4] = number(match.group(1))
+        elif "الباطله" in line:
+            figures[5] = number(match.group(1))
+    return seats, figures
+
+
+def senate_party_names() -> dict[str, str]:
+    found: dict[str, str] = {}
+    for year in YEARS:
+        for stage in SENATE_ROUNDS:
+            for code in (*senate_codes(), *LISTS):
+                found_page = senate_page(year, stage, code)
+                if found_page is None:
+                    continue
+                for row in found_page.members:
+                    found.setdefault(party_name(row[2]), clean(row[2]))
+                if stage.endswith("round_2"):
+                    for row in found_page.winners:
+                        found.setdefault(party_name(row[2]), clean(row[2]))
+    for name in (INDEPENDENT, "", "-"):
+        found.pop(name, None)
+    return found
+
+
+def senate_registry() -> Package:
+    p = Package(
+        f"{SOURCE}/senate-registry",
+        SOURCE,
+        "Egypt's Senate and the parties that appear only in its results",
+        depends=[f"{SOURCE}/registry"],
+    )
+    p.external.add(EGYPT)
+    for year in YEARS:
+        for stage in SENATE_ROUNDS:
+            try:
+                p.artifact(raw.cached(SOURCE, senate_archive_url(year, stage)), SOURCE_ID)
+            except LookupError:
+                pass
+    p.add("body", id=SENATE_BODY, polity_id=EGYPT, kind="upper_house")
+    p.name(SENATE_BODY, "Senate", "en", "official")
+    p.name(SENATE_BODY, "مجلس الشيوخ", "ar", "native", False)
+    existing = set(party_names())
+    for name in sorted(set(senate_party_names()) - existing):
+        id = key("party", name)
+        p.add("party", id=id, kind="party", polity_id=EGYPT)
+        p.add("external_id", entity_id=id, scheme="eg.nea.party", value=name)
+        p.name(id, name, "ar", "official")
+    return p
+
+
+def senate(year: int) -> Package:
+    first = SENATE_FIRST_DAY[year]
+    p = Package(
+        f"{SOURCE}/sen-{year}",
+        SOURCE,
+        f"The {year} Egyptian Senate election by district, with its runoffs",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/senate-registry"],
+    )
+    p.external |= {EGYPT, COUNTRY}
+    election = key("election", "senate", year)
+    p.add(
+        "election",
+        id=election,
+        polity_id=EGYPT,
+        kind="general",
+        date_from=first,
+        date_to=None,
+        date_precision="month",
+        status="held",
+    )
+    p.name(election, f"{year} Egyptian Senate election", "en", "official")
+    p.name(election, f"انتخابات مجلس الشيوخ {year}", "ar", "native", False)
+    path = f"eg/{first}-senate"
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    known = {key("party", name) for name in (*party_names(), *senate_party_names())}
+    people: set[str] = set()
+
+    def person(scope: str, name: str, nickname: str = "") -> str:
+        id = key("person", "senate", year, scope, person_key(name))
+        if id not in people:
+            people.add(id)
+            p.add("person", id=id)
+            p.name(id, clean(name), "ar", "official")
+            if nickname and nickname != "-" and nickname != clean(name):
+                p.name(id, nickname, "ar", "ballot", False)
+        return id
+
+    def party_of(text: str) -> str | None:
+        id = party_id(text)
+        return id if id in known else None
+
+    counted: set[str] = set()
+
+    def value(rs: str, unit_id: str, option: str | None, measure: int, amount: int) -> None:
+        counted.add(rs)
+        p.add(
+            "result_value",
+            result_set_id=rs,
+            unit_id=unit_id,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=0,
+            value=amount,
+        )
+
+    def result_set(contest: str, tag: str) -> str:
+        id = key("result_set", "senate", year, tag)
+        p.add(
+            "result_set",
+            id=id,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=SOURCE_ID,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=SENATE_METHOD, lang="en")
+        return id
+
+    def unit(tag: str, title: str, area: str, scheme: str) -> str:
+        id = key("unit", "senate", year, tag)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=EGYPT,
+            scheme_code=scheme,
+            code=f"senate-{year}:{tag}",
+            area_relation="equals",
+            area_id=area,
+            kind="standard",
+        )
+        p.name(id, title, "ar", "official")
+        return id
+
+    tally: Counter[str] = Counter()
+    for code in senate_codes():
+        one = senate_page(year, "stage_1_round_1", code)
+        two = senate_page(year, "stage_1_round_2", code)
+        if one is None:
+            raise LookupError(f"{year} {code}: no first-round page")
+        area = governorate_area(code)
+        final = {clean(row[0]): row for row in two.winners} if two else {}
+        round_one = {clean(row[1]): row for row in one.winners}
+        runoff = {clean(row[1]): row for row in one.runoff}
+        stated, figures = senate_stats(year, code)
+        seats = len(final) if two else stated
+        if seats is None:
+            raise ValueError(f"{year} {code}: no seat count")
+        if two:
+            elected_later = set(final) - set(round_one)
+            if not set(round_one) <= set(final) or elected_later - set(runoff):
+                raise ValueError(f"{year} {code}: round 1 and final winners disagree")
+        else:
+            elected_later = set()
+        if stated is not None and stated != seats:
+            raise ValueError(f"{year} {code}: {stated} seats stated, {seats} found")
+        if len(round_one) + (one.remaining or 0) != seats:
+            raise ValueError(f"{year} {code}: {len(round_one)} winners and {one.remaining} left, not {seats}")
+        previous: str | None = None
+        for round_number in (1, 2):
+            if round_number == 2 and not (runoff and two):
+                break
+            contest = key("contest", "senate", year, code, round_number)
+            suffix = "" if round_number == 1 else ", runoff"
+            p.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=SENATE_BODY,
+                district_area_id=area,
+                magnitude=seats if round_number == 1 else len(elected_later),
+                round_number=round_number,
+                previous_round_id=previous,
+                electoral_system_id=SYSTEM_INDIVIDUAL,
+                default_result_kind="counted",
+            )
+            previous = contest
+            p.name(contest, f"{year} Egyptian Senate election, {one.title}{suffix}", "en", "official")
+            p.name(contest, f"{one.title}{' (الإعادة)' if round_number == 2 else ''}", "ar", "native", False)
+            p.add(
+                "slug",
+                path=f"{path}/{code}" + ("" if round_number == 1 else "-runoff"),
+                entity_id=contest,
+                is_current=True,
+            )
+            rs = result_set(contest, f"{code}:{round_number}")
+            unit_id = unit(f"{code}:{round_number}", one.title, area, "eg.governorate")
+            if round_number == 1:
+                for measure, amount in figures.items():
+                    value(rs, unit_id, None, measure, amount)
+                entries = [(n, "elected", r) for n, r in round_one.items()] + [
+                    (n, "advanced", r) for n, r in runoff.items()
+                ]
+            else:
+                entries = [(n, "elected" if n in elected_later else "lost", r) for n, r in runoff.items()]
+            for position, (name, outcome, row) in enumerate(entries, 1):
+                option = key("option", "senate", year, code, round_number, name)
+                member = final.get(name)
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=position,
+                    ballot_label=name,
+                )
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", "senate", year, code, round_number, name),
+                    person_id=person(code, name, member[1] if member else ""),
+                    option_id=option,
+                    role="head",
+                    ballot_name=name,
+                    member_of_party_id=party_of(member[2]) if member else None,
+                    is_independent=member is not None and party_name(member[2]) == INDEPENDENT,
+                )
+                p.add("outcome", result_set_id=rs, option_id=option, kind=outcome)
+                if round_number == 1 and name in round_one and len(row) == 3:
+                    value(rs, unit_id, option, 1, number(row[2]))
+                    tally[f"votes{year}"] += number(row[2])
+            if round_number == 1:
+                tally["individual_seats"] += seats
+                for measure, amount in figures.items():
+                    tally[f"measure{measure}"] += amount
+    for code, title in SECTORS.items():
+        one = senate_page(year, "stage_1_round_1", code)
+        two = senate_page(year, "stage_1_round_2", code)
+        if one is None:
+            raise LookupError(f"{year} {code}: no list page")
+        if two is not None and (two.list_name != one.list_name or len(two.members) != len(one.members)):
+            raise ValueError(f"{year} {code}: list winners differ between rounds")
+        house_sector = page(year, _sector_stage(year, code), code)
+        if house_sector is None or one.title != house_sector.title:
+            raise ValueError(f"{year} {code}: title differs from the House list district")
+        area = sector_area(year, code)
+        contest = key("contest", "senate", year, code)
+        seats = len(one.members)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=SENATE_BODY,
+            district_area_id=area,
+            magnitude=seats,
+            round_number=1,
+            electoral_system_id=SYSTEM_LIST,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{year} Egyptian Senate election, {title}", "en", "official")
+        p.name(contest, one.title, "ar", "native", False)
+        p.add("slug", path=f"{path}/{code}", entity_id=contest, is_current=True)
+        rs = result_set(contest, code)
+        unit_id = unit(code, one.title, area, "eg.sector")
+        _, figures = senate_stats(year, code)
+        for measure, amount in figures.items():
+            value(rs, unit_id, None, measure, amount)
+            tally[f"list_measure{measure}"] += amount
+        option = key("option", "senate", year, code, "list")
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            ballot_position=1,
+            ballot_label=one.list_name,
+        )
+        p.add("outcome", result_set_id=rs, option_id=option, kind="won", seats=seats)
+        if one.list_votes is not None:
+            against = key("option", "senate", year, code, "against")
+            p.add(
+                "contest_option",
+                id=against,
+                contest_id=contest,
+                kind="none_of_the_above",
+                ballot_position=2,
+                ballot_label="الأصوات التي لم تنتخب القائمة",
+            )
+            p.add("outcome", result_set_id=rs, option_id=against, kind="lost")
+            value(rs, unit_id, option, 1, one.list_votes[0])
+            value(rs, unit_id, against, 1, one.list_votes[1])
+            tally["list_for"] += one.list_votes[0]
+            tally["list_against"] += one.list_votes[1]
+        for member in one.members:
+            candidacy = key("candidacy", "senate", year, code, "list", member[0])
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person(f"list{code}", member[1]),
+                option_id=option,
+                role="list_member",
+                list_position=int(member[0]),
+                ballot_name=member[1],
+                member_of_party_id=party_of(member[2]),
+                is_independent=party_name(member[2]) == INDEPENDENT,
+            )
+            p.add("outcome", result_set_id=rs, option_id=option, candidacy_id=candidacy, kind="elected")
+        tally["list_seats"] += seats
+    for stage in SENATE_ROUNDS:
+        for code in (*senate_codes(), *LISTS):
+            try:
+                p.uses(raw.cached(SOURCE, senate_fragment_url(year, stage, code)))
+            except LookupError:
+                pass
+    for row in p.rows["result_set"]:
+        if row["id"] not in counted:
+            row["completeness"] = None
+    print(f"{p.key}: {dict(tally)}", flush=True)
+    if year == 2020:
+        p.accept(
+            "accounting.votes_valid",
+            "The 2020 pages print each single-seat district's valid ballots but not the winner's votes, "
+            "so no candidate votes exist to match them.",
+        )
     return p
