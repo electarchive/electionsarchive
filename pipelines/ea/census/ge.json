@@ -899,7 +899,9 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "GE-AJ"
+          "iso_pattern": "GE",
+          "name_pattern": "(Ajara|აჭარ)",
+          "precedence": 1
         }
       ],
       "dates": [

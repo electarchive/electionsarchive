@@ -1,15 +1,18 @@
 """Georgia's Supreme Council of the Autonomous Republic of Ajara, 2012-2024, from the Supreme Election Commission of Ajara.
 
 The Commission (USKO, sec.ge) publishes each election's results on a results site of its own: the front page carries
-the district totals, and a table for every district lists each precinct's proportional (party list) and majoritarian
-(single-member district) votes, loaded by script after the page opens. The cache holds copies of those pages as a
-browser saved them with the tables in place (results2012.sec.ge, results.sec.ge for 2016, results2020.sec.ge,
-results20202.sec.ge for the 2020 runoff, and results2024.sec.ge), which are the only way to read the tables. The
+the district totals and links to a page for every district, whose table lists each precinct's proportional (party
+list) and majoritarian (single-member district) votes. The cache holds, under each site's address, its front page
+followed by every district page it links to (results2012.sec.ge, results.sec.ge for 2016, results2020.sec.ge,
+results20202.sec.ge for the 2020 runoff, and results2024.sec.ge). The
 Commission's reports on each election (angarishi) carry the national totals, the seats each list won, and the 2016
 runoff by district; they are the declared record that the precinct sums are compared with.
 
 The 2004 and 2008 elections are not built: the Commission's site publishes only their national turnout and invalid
 ballot counts, and its decisions that approve their results carry no numbers.
+
+The body, its elections, schemes, and lists belong to Georgia's polity: the archive holds no polity for the Autonomous
+Republic, and a package cannot create one. The census class finds the elections by the body's name.
 """
 
 import functools
@@ -20,7 +23,7 @@ import subprocess
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from datetime import date
+from datetime import UTC, date, datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from uuid import uuid5
@@ -33,7 +36,7 @@ from ea import package, raw
 from ea.package import Package
 
 SOURCE = "ge.ajara"
-AJARA = str(uuid5(package.NAMESPACE, "polity\x1fGE-AJ"))
+GEORGIA = str(uuid5(package.NAMESPACE, "polity\x1fGE"))
 VOTES = 1
 _IDS = Package(SOURCE, SOURCE, "ids")
 
@@ -124,13 +127,49 @@ def packages() -> list[str]:
 def _data(path: Path) -> None:
     if not path.stat().st_size:
         raise ValueError(f"{path.name} is empty")
+    if b"<title>Access Denied</title>" in path.read_bytes()[:2000]:
+        raise ValueError(f"{path.name} is a refusal page")
 
 
 def fetch() -> None:
     for url in FETCHED:
         raw.fetch(SOURCE, url, suffix=".pdf" if url.endswith(".pdf") else ".html", check=_data)
-    for url in RESULTS.values():
-        raw.cached(SOURCE, url)  # the saved copies of the results sites, stored with `raw.store`
+    for day in RESULTS:
+        site(day)
+
+
+# The district pages each site's menu links to; the menus are written by script, so they are listed here as the
+# rendered menus show them. The 2024 links are those of the protocol (trad) view, which the site opens on.
+DISTRICT_PAGES = {
+    date(2012, 10, 1): [f"?action=res_{d}_{kind}" for kind in ("partia", "maj") for d in range(79, 85)],
+    date(2016, 10, 8): [f"?action=res_{kind}_olqi&olqi={d}" for kind in ("partia", "maj") for d in range(68, 74)],
+    date(2020, 10, 31): [f"?action=res_{kind}_olqi&olqi={d}" for kind in ("partia", "maj") for d in (28, 29, 30)],
+    date(2020, 11, 21): [f"?action=res_maj_olqi&olqi={d}" for d in (28, 30)],
+    date(2024, 10, 26): [f"?action=res_olqi&olqi={d}&type=trad" for d in range(79, 85)],
+}
+
+
+def site(day: date) -> None:
+    """Store one copy of a results site under its address: the front page followed by every district page, each
+    fetched into the cache on its own first."""
+    url = RESULTS[day]
+    try:
+        raw.cached(SOURCE, url)
+        return
+    except LookupError:
+        pass
+    text = raw.fetch(SOURCE, url + "index.php", suffix=".html", check=_data).path.read_text(encoding="utf-8")
+    parts = [text]
+    for link in DISTRICT_PAGES[day]:
+        parts.append(raw.fetch(SOURCE, url + link, suffix=".html", check=_data).path.read_text(encoding="utf-8"))
+    raw.store(
+        SOURCE,
+        url,
+        "\n".join(parts).encode("utf-8"),
+        suffix=".html",
+        retrieved_at=datetime.now(UTC),
+        media_type="text/html",
+    )
 
 
 def parse() -> None:
@@ -506,7 +545,7 @@ def geo() -> Package:
         "Ajara's six municipalities and the majoritarian districts of the Supreme Council elections of 2012, 2016, and "
         "2020, with the precinct scheme",
     )
-    p.external |= {AJARA}
+    p.external |= {GEORGIA}
     sources(p)
     p.add(
         "source",
@@ -529,7 +568,7 @@ def geo() -> Package:
         ("ge-aj.precinct", "precinct", 4, "precinct"),
     )
     for code, kind, rank, noun in schemes:
-        p.add("scheme", code=code, polity_id=AJARA, kind=kind, rank=rank, noun=noun)
+        p.add("scheme", code=code, polity_id=GEORGIA, kind=kind, rank=rank, noun=noun)
     shape = shapes()
     ajara = region()
     p.add("area", id=ajara, scheme_code="ge-aj.region")
@@ -590,7 +629,7 @@ def registry() -> Package:
         "The Supreme Council of Ajara, its electoral systems, and the party lists on the ballots of 2012 to 2024",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {AJARA}
+    p.external |= {GEORGIA}
     p.add(
         "source",
         id=LAW_ID,
@@ -606,7 +645,7 @@ def registry() -> Package:
     p.artifact(raw.cached(SOURCE, STATUS_LAW), LAW_ID)
     for day in DAYS:
         p.uses(raw.cached(SOURCE, RESULTS[day]))
-    p.add("body", id=BODY, polity_id=AJARA, kind="unicameral")
+    p.add("body", id=BODY, polity_id=GEORGIA, kind="unicameral")
     p.name(BODY, "Supreme Council of the Autonomous Republic of Ajara", "en", "official")
     p.name(BODY, "აჭარის ავტონომიური რესპუბლიკის უმაღლესი საბჭო", "ka", "native", False)
     systems = (
@@ -616,7 +655,9 @@ def registry() -> Package:
         (ROUND_SYSTEM, DAYS[1], None, {"formula": "two_round", "majority": 0.5, "advance": 2}, TWO_ROUND_NOTE),
     )
     for id, start, end, rules, note in systems:
-        p.add("electoral_system", id=id, polity_id=AJARA, valid_from=start, valid_to=end, rules=rules, rules_version=1)
+        p.add(
+            "electoral_system", id=id, polity_id=GEORGIA, valid_from=start, valid_to=end, rules=rules, rules_version=1
+        )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
     made: set[str] = set()
     for day in DAYS:
@@ -625,7 +666,7 @@ def registry() -> Package:
             if id in made:
                 continue
             made.add(id)
-            p.add("party", id=id, kind=party_kind(name), polity_id=AJARA)
+            p.add("party", id=id, kind=party_kind(name), polity_id=GEORGIA)
             p.name(id, name.strip('„“" '), "ka", "official")
     return p
 
@@ -669,7 +710,7 @@ def election_row(p: Package, day: date, runoff: bool) -> tuple[str, str]:
     p.add(
         "election",
         id=id,
-        polity_id=AJARA,
+        polity_id=GEORGIA,
         kind="runoff" if runoff else "general",
         date_from=day,
         date_to=day,
@@ -721,7 +762,7 @@ def precinct_units(p: Package, day: date, rows: dict[str, str | None]) -> dict[s
         p.add(
             "reporting_unit",
             id=id,
-            polity_id=AJARA,
+            polity_id=GEORGIA,
             scheme_code="ge-aj.precinct",
             code=f"{day}:{code}",
             area_relation="within",
@@ -770,7 +811,7 @@ def election(day: date) -> Package:
         "the Supreme Election Commission of Ajara",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {AJARA}
+    p.external |= {GEORGIA}
     p.artifact(raw.cached(SOURCE, RESULTS[day]), SOURCE_ID)
     p.artifact(raw.cached(SOURCE, REPORTS[day]), SOURCE_ID)
     all_sections = sections(day)
@@ -953,7 +994,7 @@ def runoff(day: date) -> Package:
         f"The runoffs of the {first.year} Ajara Supreme Council election in its single-member districts",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{first}"],
     )
-    p.external |= {AJARA}
+    p.external |= {GEORGIA}
     p.uses(raw.cached(SOURCE, REPORTS[first]))  # the first round's package holds its source artifact
     election_id, path = election_row(p, day, runoff=True)
     names = candidates(first)
@@ -966,7 +1007,7 @@ def runoff(day: date) -> Package:
             p.add(
                 "reporting_unit",
                 id=id,
-                polity_id=AJARA,
+                polity_id=GEORGIA,
                 scheme_code="ge-aj.precinct",
                 code=f"{day}:{d}",
                 area_relation="equals",
@@ -992,7 +1033,7 @@ def runoff(day: date) -> Package:
             p.add(
                 "reporting_unit",
                 id=id,
-                polity_id=AJARA,
+                polity_id=GEORGIA,
                 scheme_code="ge-aj.precinct",
                 code=f"{day}:{code}",
                 area_relation="within",
