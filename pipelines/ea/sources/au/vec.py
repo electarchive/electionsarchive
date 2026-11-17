@@ -1,0 +1,652 @@
+import difflib
+import re
+from collections import Counter, defaultdict
+from datetime import date
+from html import unescape
+from typing import NamedTuple
+from uuid import uuid5
+
+import fastexcel
+import polars as pl
+
+from ea import changeset, package, raw
+from ea.package import Package
+
+SOURCE = "au.vec"
+ROOT = "https://www.vec.vic.gov.au"
+RESULTS = f"{ROOT}/results/state-election-results"
+AUSTRALIA = str(uuid5(package.NAMESPACE, "polity\x1fAU"))
+COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fAUS"))
+NO_PARTY = {"", "Independent"}
+
+
+class Year(NamedTuple):
+    year: int
+    day: date
+    vintage: str
+    page: str
+    sheet: str | None
+
+
+BLOB = "https://itsitecoreblobvecprd01.blob.core.windows.net/public-files/historical-results"
+YEARS = {
+    2018: Year(2018, date(2018, 11, 24), "2013", f"{BLOB}/state2018/summary.html", None),
+    2022: Year(
+        2022,
+        date(2022, 11, 26),
+        "2021",
+        f"{RESULTS}/2022-state-election-results",
+        f"{ROOT}/-/media/c4665365795d431e811d0ce818e373d4.xlsx",
+    ),
+}
+
+
+def key(kind: str, *parts: object) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+def area(scheme: str, code: str) -> str:
+    return key("area", scheme, code)
+
+
+VEC = key("source", SOURCE)
+ASSEMBLY = key("body", "legislative-assembly")
+ASSEMBLY_SYSTEM = key("electoral_system", "legislative-assembly", "irv")
+VICTORIA = area("au-vic.state", "VIC")
+
+ASSEMBLY_METHOD = (
+    "First preference votes per voting centre, as the Victorian Electoral Commission publishes them in its results by "
+    "voting centre spreadsheet. Ordinary votes are reported per election-day voting centre and per early voting "
+    "centre; absent, postal, provisional, marked-as-voted, and other early votes are reported once per district and "
+    "are stored as one unit each. The elected member and the two candidates left after the distribution of "
+    "preferences come from each district's results page; the later counts of the distribution are not stored here. "
+    "Enrolment at the close of rolls is stored on a separate unit per district."
+)
+SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
+    (
+        ASSEMBLY_SYSTEM,
+        date(1911, 1, 1),
+        None,
+        {"formula": "irv"},
+        (
+            "Each district elects one member to the Legislative Assembly by full preferential voting: voters must "
+            "number every box, and the candidate with the fewest votes is excluded and their ballots passed on at "
+            "full value until one candidate holds an absolute majority."
+        ),
+    ),
+]
+
+
+# Fetching -------------------------------------------------------------------------------------------------------
+
+
+def district_slugs(year: int) -> list[str]:
+    config = YEARS[year]
+    text = raw.cached(SOURCE, config.page).path.read_text(encoding="utf-8")
+    if config.sheet is None:
+        return sorted(set(re.findall(r'href="([a-z-]+district)\.html"', text)))
+    return sorted(set(re.findall(r"/results-by-district/([a-z0-9-]+)-district-results", text)))
+
+
+def district_url(year: int, slug: str) -> str:
+    config = YEARS[year]
+    if config.sheet is None:
+        return f"{config.page.rsplit('/', 1)[0]}/{slug}.html"
+    return f"{config.page}/results-by-district/{slug}-district-results"
+
+
+def sheet_url(year: int, slug: str) -> str:
+    return f"{YEARS[year].page.rsplit('/', 1)[0]}/files/{slug}.xlsx"
+
+
+def urls(year: int) -> list[str]:
+    config = YEARS[year]
+    found = [config.page]
+    if config.sheet:
+        found.append(config.sheet)
+    else:
+        found += [sheet_url(year, slug) for slug in district_slugs(year)]
+    return found
+
+
+def fetch() -> None:
+    for year, config in YEARS.items():
+        raw.fetch(SOURCE, config.page, suffix=".html")
+        if config.sheet:
+            raw.fetch(SOURCE, config.sheet, suffix=".xlsx")
+        slugs = district_slugs(year)
+        raw.fetch_many(SOURCE, [district_url(year, slug) for slug in slugs], suffix=".html")
+        if not config.sheet:
+            raw.fetch_many(SOURCE, [sheet_url(year, slug) for slug in slugs], suffix=".xlsx")
+
+
+# Parsing --------------------------------------------------------------------------------------------------------
+
+
+class Row(NamedTuple):
+    district: str
+    place: str
+    vote_type: str
+    candidate: str
+    order: int
+    party: str
+    votes: int
+
+
+class Page(NamedTuple):
+    district: str
+    elected: str
+    enrolment: int
+    formal: int
+    informal: int
+    first: list[tuple[str, str, int]]
+    final: list[tuple[str, str, int]]
+
+
+def tokens(name: str) -> frozenset[str]:
+    return frozenset(re.sub(r"[^a-z ]", "", name.lower().replace(",", " ").replace("-", " ")).split())
+
+
+def match(name: str, options: dict[frozenset[str], str]) -> str:
+    """Match a name on a results page to a candidate name in the spreadsheet; the spreadsheet holds a few misspellings."""
+    exact = options.get(tokens(name))
+    if exact:
+        return exact
+    flat = "".join(sorted(tokens(name)))
+    scored = sorted(
+        ((difflib.SequenceMatcher(None, flat, "".join(sorted(t))).ratio(), c) for t, c in options.items()),
+        reverse=True,
+    )
+    if scored[0][0] < 0.85 or (len(scored) > 1 and scored[1][0] > scored[0][0] - 0.1):
+        raise ValueError(f"{name!r} matches no candidate in {sorted(options.values())}")
+    return scored[0][1]
+
+
+def person_name(page_name: str) -> str:
+    surname, _, given = page_name.partition(", ")
+    if surname.isupper():
+        surname = surname.title()
+    else:
+        surname = re.sub(r"^([A-Z][a-z]+)([A-Z]+)$", lambda m: m.group(1) + m.group(2).title(), surname)
+    return f"{given} {surname}".strip()
+
+
+def _number(text: str) -> int:
+    return int(text.replace(",", ""))
+
+
+def _text(cell: str) -> str:
+    return re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+
+
+def legacy_sheet(year: int, slug: str) -> tuple[str, int, int, int, list[tuple[str, str, int]], list[Row]]:
+    """One district's spreadsheet: its name, enrolment, formal and informal votes, candidate totals, and voting centre rows."""
+    path = raw.cached(SOURCE, sheet_url(year, slug)).path
+    grid = fastexcel.read_excel(str(path)).load_sheet(0, header_row=None, dtypes="string").to_polars().rows()
+    cells = [[(c or "").strip() for c in row] for row in grid]
+    name = re.sub(r"\s*District.*", "", cells[3][0]).strip()
+    head = {row[0].rstrip(":"): _number(row[2]) for row in cells[4:9] if row[0].endswith(":")}
+    labels = next(row for row in cells if row[1] == "" and any("\n" in c for c in row))
+    columns = [i for i, c in enumerate(labels) if i > 2 and c]
+    candidates: dict[int, tuple[str, str]] = {}
+    for i in columns:
+        text, _, party = labels[i].partition("\n")
+        candidates[i] = (text.strip(), party.strip())
+    out: list[Row] = []
+    totals: list[tuple[str, str, int]] = []
+    state = "ordinary"
+    for row in cells:
+        place = row[1]
+        if not place or place.startswith(("Percentage", "Total Declaration")) or place == "Total Ordinary Votes":
+            state = "declaration" if place == "Total Ordinary Votes" else state
+            continue
+        if place == "TOTAL ALL VOTE TYPES":
+            totals = [(candidates[i][0], candidates[i][1], _number(row[i])) for i in columns if i in candidates]
+            break
+        for order, i in enumerate(columns, 1):
+            votes = _number(row[i])
+            label, party = candidates[i]
+            who = label.split("\n")[0]
+            if who.startswith("Total Votes"):
+                who = "Total Votes"
+            out.append(Row(name, place, state, who, order, party, votes))
+    return name, head["ENROLMENT"], head["FORMAL VOTES"], head["INFORMAL VOTES"], totals, out
+
+
+def page(year: int, slug: str) -> Page:
+    if YEARS[year].sheet is None:
+        name, enrolment, formal, informal, totals, _ = legacy_sheet(year, slug)
+        html = raw.cached(SOURCE, district_url(year, slug)).path.read_text(encoding="utf-8")
+        elected = re.search(r'<span class="bold-text">([^<]+)</span>', html)
+        distribution = re.search(r"Results after distribution of preferences.*?</table>", html, flags=re.DOTALL)
+        if not elected:
+            raise ValueError(f"{year} {slug}: the district page has an unexpected layout")
+        final = (
+            [
+                (_text(cells[0]), "", _number(_text(cells[2])))
+                for cells in (
+                    re.findall(r"<td[^>]*>(.*?)</td>", tr, flags=re.DOTALL)
+                    for tr in re.findall(r"<tr>(.*?)</tr>", distribution.group(0), flags=re.DOTALL)
+                )
+                if len(cells) == 4
+            ]
+            if distribution
+            else []
+        )
+        first = [(n, p, v) for n, p, v in totals if not n.startswith(("Informal", "Total"))]
+        return Page(name, elected.group(1), enrolment, formal, informal, first, final)
+    html = raw.cached(SOURCE, district_url(year, slug)).path.read_text(encoding="utf-8")
+    body = html[html.index("<main") :]
+    text = _text(re.sub(r"<script.*?</script>|<style.*?</style>", "", body, flags=re.DOTALL))
+    elected = re.search(r"Elected member (.+?) (?:Votes counted|Total enrolment)", text)
+    enrolment = re.search(r"Total enrolment as at close of rolls: ([\d,]+)", text)
+    formal = re.search(r"Formal votes: ([\d,]+)", text)
+    informal = re.search(r"Informal votes: ([\d,]+)", text)
+    tables = re.findall(r"<table.*?</table>", body, flags=re.DOTALL)
+    if not (elected and enrolment and formal and informal) or len(tables) < 2:
+        raise ValueError(f"{year} {slug}: the district page has an unexpected layout")
+
+    def rows(table: str) -> list[tuple[str, str, int]]:
+        out = []
+        for tr in re.findall(r"<tr>(.*?)</tr>", table, flags=re.DOTALL):
+            cells = [_text(c) for c in re.findall(r"<td[^>]*>(.*?)</td>", tr, flags=re.DOTALL)]
+            if len(cells) == 4:
+                out.append((cells[0], cells[1], _number(cells[2])))
+        return out
+
+    name = elected.group(1)
+    return Page(
+        slug.replace("-", " "),
+        name,
+        _number(enrolment.group(1)),
+        _number(formal.group(1)),
+        _number(informal.group(1)),
+        rows(tables[0]),
+        rows(tables[1]),
+    )
+
+
+def sheet_rows(year: int) -> list[Row]:
+    config = YEARS[year]
+    path = raw.cached(SOURCE, str(config.sheet)).path
+    frame = fastexcel.read_excel(str(path)).load_sheet(0, header_row=0).to_polars()
+    out = []
+    for r in frame.iter_rows(named=True):
+        out.append(
+            Row(
+                str(r["Electorate"]),
+                str(r["Polling place"]),
+                str(r["Vote type new"]),
+                str(r["Candidate name"]),
+                int(r["Ballot order"]),
+                str(r["Party name"]),
+                int(r["Votes"]),
+            )
+        )
+    return out
+
+
+def rows(year: int) -> list[Row]:
+    if YEARS[year].sheet is None:
+        found: list[Row] = []
+        for slug in district_slugs(year):
+            found += legacy_sheet(year, slug)[5]
+        return found
+    return sheet_rows(year)
+
+
+def parties(years: list[int]) -> dict[str, str]:
+    names: dict[str, str] = {}
+    for year in years:
+        for r in rows(year):
+            if r.party not in NO_PARTY and r.candidate not in ("Total Votes", "Informal Votes"):
+                code = party_key(r.party)
+                if code not in names or names[code].isupper():
+                    names[code] = r.party
+    return names
+
+
+ALIASES = {"australian-labor-party": "australian-labor-party-victorian-branch", "australian-greens": "the-greens"}
+
+
+def party_key(name: str) -> str:
+    code = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return ALIASES.get(code, code)
+
+
+def party(name: str) -> str:
+    return key("party", party_key(name))
+
+
+# Geo ------------------------------------------------------------------------------------------------------------
+
+
+def source_row(p: Package) -> None:
+    p.add(
+        "source",
+        id=VEC,
+        kind="official_body",
+        publisher="Victorian Electoral Commission",
+        title="Victorian state and local council election results",
+        url=f"{ROOT}/results",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="© State of Victoria (Victorian Electoral Commission)",
+    )
+
+
+def districts(years: list[int]) -> dict[tuple[str, str], str]:
+    found: dict[tuple[str, str], str] = {}
+    for year in years:
+        for r in rows(year):
+            found[(YEARS[year].vintage, r.district)] = r.district
+    return found
+
+
+def geo(years: list[int]) -> Package:
+    found = districts(years)
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        f"Victoria and its {len(found)} Legislative Assembly districts, by boundary vintage, as the Victorian "
+        "Electoral Commission names them in its state election results",
+    )
+    p.external |= {AUSTRALIA, COUNTRY}
+    source_row(p)
+    for year in years:
+        for url in urls(year):
+            p.artifact(raw.cached(SOURCE, url), VEC)
+    for code, rank, kind, noun in (
+        ("au-vic.state", 1, "administrative", "state"),
+        ("au-vic.district", 2, "electoral_district", "district"),
+        ("au-vic.voting_centre", 3, "precinct", "voting centre"),
+    ):
+        p.add("scheme", code=code, polity_id=AUSTRALIA, kind=kind, rank=rank, noun=noun, code_system=None)
+    p.add("area", id=VICTORIA, scheme_code="au-vic.state")
+    p.add("area_code", area_id=VICTORIA, code="VIC")
+    p.add("area_parent", area_id=VICTORIA, parent_id=COUNTRY)
+    p.name(VICTORIA, "Victoria", "en", "official")
+    for vintage in sorted({v for v, _ in found}):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", "au-vic.district", vintage),
+            scheme_code="au-vic.district",
+            vintage=vintage,
+            as_of=min(YEARS[y].day for y in years if YEARS[y].vintage == vintage),
+        )
+    for (vintage, name), label in sorted(found.items()):
+        id = area("au-vic.district", f"{vintage}:{name}")
+        p.add("area", id=id, scheme_code="au-vic.district")
+        p.add("area_code", area_id=id, code=f"{vintage}:{name}")
+        p.add("area_parent", area_id=id, parent_id=VICTORIA)
+        p.name(id, label, "en", "official")
+    return p
+
+
+# Registry -------------------------------------------------------------------------------------------------------
+
+
+def registry(years: list[int]) -> Package:
+    names = parties(years)
+    p = Package(
+        f"{SOURCE}/registry",
+        SOURCE,
+        f"Victoria's Legislative Assembly, its electoral system, and the {len(names)} registered parties on the "
+        "Victorian Electoral Commission's results, with the source files every election package cites",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external |= {AUSTRALIA}
+    p.add("body", id=ASSEMBLY, polity_id=AUSTRALIA, kind="lower_house")
+    p.name(ASSEMBLY, "Victorian Legislative Assembly", "en", "official")
+    for id, since, until, rules, method in SYSTEMS:
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=AUSTRALIA,
+            valid_from=since,
+            valid_to=until,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for code, name in sorted(names.items()):
+        id = key("party", code)
+        p.add("party", id=id, kind="party", polity_id=AUSTRALIA)
+        p.name(id, name.title().replace("'S ", "'s ") if name.isupper() else name, "en", "official")
+    return p
+
+
+# Elections ------------------------------------------------------------------------------------------------------
+
+
+class Values:
+    def __init__(self) -> None:
+        self.columns: dict[str, list[object]] = {
+            c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "count_round", "value")
+        }
+
+    def add(self, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
+        for column, item in zip(self.columns, (result_set, unit, option, measure, 0, value), strict=True):
+            self.columns[column].append(item)
+
+    def frame(self) -> pl.DataFrame:
+        return pl.DataFrame(
+            self.columns,
+            schema={
+                "result_set_id": pl.String,
+                "unit_id": pl.String,
+                "option_id": pl.String,
+                "measure": pl.Int16,
+                "count_round": pl.Int16,
+                "value": pl.Int64,
+            },
+        ).with_columns(channel=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16))
+
+
+AGGREGATE = {"Absent", "Provisional", "Marked As Voted", "Marked as Voted", "Other Early Votes", "Early Vote"}
+
+
+def _known(p_key: str) -> str | None:
+    path = package.folder(f"{SOURCE}/registry") / "build" / "party.parquet"
+    return p_key if path.exists() and p_key in set(pl.read_parquet(path)["id"]) else None
+
+
+def election(year: int) -> Package:
+    config = YEARS[year]
+    day = config.day
+    slugs = district_slugs(year)
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"The {year} Victorian state election, Legislative Assembly first preferences by voting centre, from the "
+        "Victorian Electoral Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRALIA}
+    for url in urls(year):
+        p.uses(raw.cached(SOURCE, url))
+    for slug in slugs:
+        p.uses(raw.cached(SOURCE, district_url(year, slug)))
+    election_id = key("election", day)
+    path = f"au/vic/{day}-general"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=AUSTRALIA,
+        kind="general",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, f"{year} Victorian state election", "en", "official")
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    values = Values()
+    known = {id for id in (party(n) for n in parties([year]).values()) if _known(id)}
+    by_district: dict[str, list[Row]] = defaultdict(list)
+    for r in rows(year):
+        by_district[r.district].append(r)
+    pages = {tokens(detail.district): detail for detail in (page(year, slug) for slug in slugs)}
+    for name, district_rows in sorted(by_district.items()):
+        detail = pages[tokens(name)]
+        contest = key("contest", day, "assembly", name)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=ASSEMBLY,
+            district_area_id=area("au-vic.district", f"{config.vintage}:{name}"),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=ASSEMBLY_SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, name, "en", "official")
+        p.add("slug", path=f"{path}/assembly-{changeset.slug(name)}", entity_id=contest, is_current=True)
+        result_set = key("result_set", contest)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=VEC,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=ASSEMBLY_METHOD,
+            lang="en",
+        )
+        options: dict[str, str] = {}
+        parties_of: dict[str, str] = {}
+        order: dict[str, int] = {}
+        for r in district_rows:
+            if r.candidate in ("Total Votes", "Informal Votes"):
+                continue
+            parties_of[r.candidate] = r.party
+            order[r.candidate] = r.order
+        by_tokens = {tokens(c): c for c in order}
+        listed = {n: match(n, by_tokens) for n, _, _ in detail.first}
+        names = {c: person_name(n) for n, c in listed.items()}
+        for candidate in sorted(order, key=lambda c: order[c]):
+            id = options[candidate] = key("option", day, name, candidate)
+            label = candidate
+            pid = party(parties_of[candidate]) if parties_of[candidate] not in NO_PARTY else None
+            pid = pid if pid in known else None
+            p.add(
+                "contest_option",
+                id=id,
+                contest_id=contest,
+                kind="candidate",
+                party_id=pid,
+                ballot_position=order[candidate],
+                ballot_label=label,
+            )
+            person = key("person", day, name, candidate)
+            p.add("person", id=person)
+            p.name(person, names[candidate], "en", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", day, name, candidate),
+                person_id=person,
+                option_id=id,
+                role="head",
+                ballot_name=label,
+                member_of_party_id=pid,
+                is_independent=parties_of[candidate] in NO_PARTY,
+            )
+        named = [c for n, c in listed.items() if tokens(n) <= tokens(detail.elected)]
+        if len(named) != 1:
+            raise ValueError(f"{year} {name}: elected member {detail.elected!r} matches {named}")
+        winner = named[0]
+        final = {match(n, by_tokens) for n, _, _ in detail.final} or set(order)
+        if winner not in final:
+            raise ValueError(f"{year} {name}: elected member is not among the final candidates")
+        for candidate, id in options.items():
+            kind = "elected" if candidate == winner else "lost" if candidate in final else "eliminated"
+            p.add("outcome", result_set_id=result_set, option_id=id, kind=kind)
+        for n, _, votes in detail.first:
+            p.add("declared", result_set_id=result_set, option_id=options[listed[n]], measure=1, value=votes)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=detail.formal)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=detail.informal)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=3, value=detail.formal + detail.informal)
+        units: dict[str, str] = {}
+        valid: Counter[str] = Counter()
+        bad: dict[str, int] = {}
+        total: dict[str, int] = {}
+        for r in district_rows:
+            if r.place not in units:
+                id = units[r.place] = key("unit", day, name, r.place)
+                kind = (
+                    "postal_district"
+                    if r.place == "Postal Vote"
+                    else "aggregate"
+                    if r.place in AGGREGATE
+                    else "standard"
+                )
+                p.add(
+                    "reporting_unit",
+                    id=id,
+                    polity_id=AUSTRALIA,
+                    scheme_code="au-vic.voting_centre",
+                    code=f"{day}:{name}:{r.place}",
+                    area_relation="within",
+                    area_id=area("au-vic.district", f"{config.vintage}:{name}"),
+                    kind=kind,
+                )
+                p.name(id, f"{name}: {r.place}" if kind != "standard" else r.place, "en", "official")
+            unit = units[r.place]
+            if r.candidate == "Informal Votes":
+                bad[unit] = r.votes
+            elif r.candidate == "Total Votes":
+                total[unit] = r.votes
+            else:
+                values.add(result_set, unit, options[r.candidate], 1, r.votes)
+                valid[unit] += r.votes
+        for unit, n in valid.items():
+            values.add(result_set, unit, None, 4, n)
+            values.add(result_set, unit, None, 5, bad[unit])
+            values.add(result_set, unit, None, 3, total[unit])
+        roll = key("unit", day, name, "roll")
+        p.add(
+            "reporting_unit",
+            id=roll,
+            polity_id=AUSTRALIA,
+            scheme_code="au-vic.voting_centre",
+            code=f"{day}:{name}:ROLL",
+            area_relation="within",
+            area_id=area("au-vic.district", f"{config.vintage}:{name}"),
+            kind="aggregate",
+        )
+        p.name(roll, f"{name}: electoral roll", "en", "official")
+        values.add(result_set, roll, None, 2, detail.enrolment)
+    p.frame("result_value", values.frame())
+    return p
+
+
+def days() -> list[date]:
+    return [config.day for config in YEARS.values()]
+
+
+def packages() -> list[str]:
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days())]
+
+
+def parse() -> None:
+    years = sorted(YEARS)
+    geo(years).write()
+    registry(years).write()
+    for year in years:
+        election(year).write()
+
+
+def emit() -> None:
+    package.run("load", packages())
