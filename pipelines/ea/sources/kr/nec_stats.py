@@ -18,6 +18,7 @@ import polars as pl
 from ea import package, raw
 from ea.package import Package
 from ea.sources.kr import (
+    areas,
     local,
     local_dong,
     local_head,
@@ -284,7 +285,24 @@ SUB_OFFICES: dict[str, tuple[str, str, str, str]] = {}
 SUB_BODIES: dict[str, tuple[str, str, str]] = {}
 
 
-def _write_units(p: Package, day: str, recs: list[Rec], made: dict[tuple[str, ...], str]) -> None:
+AREAS_DAY = "20250603"
+"""The day whose counting offices name the areas: the 2025 presidential election."""
+
+
+def build_areas(every: list[Day]) -> areas.Areas:
+    found = next(day for day in every if day.day == AREAS_DAY)
+    towns = {
+        (rec.path[0], rec.path[1])
+        for contest in found.contests
+        for rec in contest.recs
+        if len(rec.path) >= 2 and rec.scheme is None
+    }
+    return areas.Areas({code: (full, english) for code, (_, full, english) in nec.SIDO.items()}, towns)
+
+
+def _write_units(
+    p: Package, day: str, recs: list[Rec], made: dict[tuple[str, ...], str], places: areas.Areas | None = None
+) -> None:
     for rec in recs:
         scheme = rec.scheme or (LEAF if len(rec.path) >= 3 else SCHEMES[len(rec.path)])
         for depth in range(1, len(rec.path) + 1):
@@ -297,6 +315,9 @@ def _write_units(p: Package, day: str, recs: list[Rec], made: dict[tuple[str, ..
             code = f"{day}:" + "/".join(path)
             unit = made[ident] = key("unit", day, leaf_scheme, *path)
             parent = made.get((SCHEMES.get(depth - 1, LEAF), *path[: depth - 1])) if depth > 1 else None
+            relation, area_id = "unlocated", None
+            if places and leaf_scheme == SCHEMES.get(depth) and (not last or rec.kind == "standard"):
+                relation, area_id = places.link(day, path)
             p.add(
                 "reporting_unit",
                 id=unit,
@@ -304,8 +325,8 @@ def _write_units(p: Package, day: str, recs: list[Rec], made: dict[tuple[str, ..
                 scheme_code=leaf_scheme,
                 code=code,
                 parent_id=parent,
-                area_relation="unlocated",
-                area_id=None,
+                area_relation=relation,
+                area_id=area_id,
                 kind=rec.kind if last else "standard",
             )
             p.name(unit, path[-1], "ko", "official")
@@ -316,14 +337,14 @@ def _unit(made: dict[tuple[str, ...], str], rec: Rec) -> str:
     return made[scheme, *rec.path]
 
 
-def build_day(day: Day, files: list[raw.Artifact]) -> Package:
+def build_day(day: Day, files: list[raw.Artifact], places: areas.Areas) -> Package:
     held = date(int(day.day[:4]), int(day.day[4:6]), int(day.day[6:]))
     p = Package(
         f"{SOURCE}/{held}",
         SOURCE,
         f"South Korea's {held} elections from the National Election Commission's statistics system, at the finest unit "
         "it prints",
-        depends=[REGISTRY],
+        depends=[REGISTRY, areas.GEO],
     )
     p.external.add(KOREA)
     for artifact in files:
@@ -351,7 +372,7 @@ def build_day(day: Day, files: list[raw.Artifact]) -> Package:
         _channels_split(contest.recs)
         _apart(contest.recs)
         _labels(contest.recs)
-    _write_units(p, day.day, all_recs, made)
+    _write_units(p, day.day, all_recs, made, places)
     overs: Counter[str] = Counter()
     for contest in day.contests:
         c = key("contest", day.day, contest.ref)
@@ -1124,6 +1145,7 @@ FETCHERS = (
 def fetch() -> None:
     for module in FETCHERS:
         module.fetch()
+    areas.fetch()
 
 
 def _table(source: str, name: str) -> pl.DataFrame:
@@ -1213,36 +1235,42 @@ def _local(add: Callable[[str, str, str, str], Day]) -> None:
 
 
 def packages() -> list[str]:
-    return [REGISTRY, *(f"{SOURCE}/{date(int(d.day[:4]), int(d.day[4:6]), int(d.day[6:]))}" for d in days())]
+    return [REGISTRY, areas.GEO, *(f"{SOURCE}/{date(int(d.day[:4]), int(d.day[4:6]), int(d.day[6:]))}" for d in days())]
 
 
 def parse() -> None:
-    every = days()
-    files = {day.day: _files(day.day) for day in every}
-    build_registry(every, [artifact for found in files.values() for artifact in found]).write()
-    for day in every:
-        p = build_day(day, files[day.day])
-        for code, count, _ in package.check(p.write()):
-            if code in REASONS:
-                p.accept(code, f"{count:,} {REASONS[code]}")
-        if p.accepted:
-            p.write()
+    build(days(), registry=True)
 
 
 def parse_local() -> None:
     """Rebuild the local election days alone. The registry this writes holds only what the local days use, so it
     serves `ea package check` here and is not a release of the registry, which `parse` builds from every day."""
-    every = days(local_only=True)
+    build(days(local_only=True), registry=True)
+    print(dict(DONG), flush=True)
+
+
+def build(every: list[Day], registry: bool) -> None:
+    """Write the geo package, the registry when asked, and each day's package."""
     files = {day.day: _files(day.day) for day in every}
-    build_registry(every, []).write()
+    if registry:
+        build_registry(every, [artifact for found in files.values() for artifact in found]).write()
+    places = build_areas(every) if any(day.day == AREAS_DAY for day in every) else _stored_areas()
+    geo, missing = areas.build(places)
+    geo.write()
+    if missing:
+        print(f"no outline for {', '.join(missing)}", flush=True)
     for day in every:
-        p = build_day(day, files[day.day])
+        p = build_day(day, files[day.day], places)
         for code, count, _ in package.check(p.write()):
             if code in REASONS:
                 p.accept(code, f"{count:,} {REASONS[code]}")
         if p.accepted:
             p.write()
-    print(dict(DONG), flush=True)
+
+
+def _stored_areas() -> areas.Areas:
+    """The areas of the 2025 presidential election, read from the parsed counts when that day is not being built."""
+    return build_areas([day for day in days() if day.day == AREAS_DAY])
 
 
 def emit() -> None:
