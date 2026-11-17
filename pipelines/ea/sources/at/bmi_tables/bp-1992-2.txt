@@ -1,0 +1,32 @@
+# bp-1992-2: bpw_1992.pdf, second round (24 May 1992), page 15 "Ergebnisse der Bundespräsidentenwahl am 26. April und 24. Mai 1992 - Österreich / Bundesländer" (bold lines = second round; "darunter im Ausland abgegeben" lines not transcribed)
+# Note: registered is printed once per Land (on the first-round line) and applies to both rounds (unchanged Wählerverzeichnisse), so it is its own table block with the first-round line bands.
+# Note: Land figures include the votes of Austrians abroad (printed as "darunter im Ausland abgegeben", AT 37.151 cast / 36.643 valid), counted in their Land of registration; cast includes Wahlkarten voters.
+# Note: bold 8/9 are hard to tell apart in this print; AT cast 4592932 and Kärnten STREICHER 159171 confirmed by the column sums and cast - invalid = valid.
+option STREICHER Dr. Rudolf Streicher
+option KLESTIL Dr. Thomas Klestil
+table page=15 rotate=0
+columns registered
+x 0.3023 0.3635
+total AT @0.1454:0.1543 5676903
+row 1 @0.2428:0.2514 207835
+row 2 @0.3083:0.3168 411862
+row 3 @0.3737:0.3831 1089930
+row 4 @0.4395:0.4472 952581
+row 5 @0.5045:0.5130 338378
+row 6 @0.5695:0.5780 890544
+row 7 @0.6349:0.6430 441894
+row 8 @0.6999:0.7080 214514
+row 9 @0.7649:0.7738 1129365
+table page=15 rotate=0
+columns cast invalid valid STREICHER KLESTIL
+x 0.3881 0.4493 0.4613 0.5105 0.5165 0.5771 0.5969 0.6581 0.7061 0.7678
+total AT @0.1608:0.1693 4592932 149546 4443386 1915380 2528006
+row 1 @0.2531:0.2612 196058 4191 191867 94482 97385
+row 2 @0.3185:0.3271 357415 14758 342657 159171 183486
+row 3 @0.3839:0.3920 967096 23153 943943 392855 551088
+row 4 @0.4489:0.4575 753476 19207 734269 317521 416748
+row 5 @0.5147:0.5229 246804 6273 240531 94542 145989
+row 6 @0.5797:0.5879 796747 36125 760622 337338 423284
+row 7 @0.6451:0.6533 373082 17793 355289 118515 236774
+row 8 @0.7097:0.7183 193630 13104 180526 57916 122610
+row 9 @0.7751:0.7832 708624 14942 693682 343040 350642

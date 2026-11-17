@@ -1,0 +1,56 @@
+# nr-1949: nationalratswahl-9101949.pdf, Nationalratswahl 9 Oct 1949
+# Tables: p10 Tabelle 5 (Fortsetzung; Wahlberechtigte / Abstimmende, Bundesländer rows), p10 Tabelle 7 ("Die Gültigkeit oder
+# Ungültigkeit der Stimmzettel in den Wahlkreisen, Wahlkreisverbänden und Bundesländern", Land rows),
+# p12 Tabelle 9 ("Die Parteisummen in den Wahlkreisen, Wahlkreisverbänden und Bundesländern", Land rows); seats p17 Tabelle 17.
+# Note: KPOE column is the combined list "Kommunistische Partei Österreichs und Linkssozialisten (Linksblock)".
+# OEPU printed 0 in Wien and in the Austria total (list without votes); '-' where nothing is printed.
+option OEVP Österreichische Volkspartei
+option SPOE Sozialistische Partei Österreichs
+option KPOE Kommunistische Partei Österreichs und Linkssozialisten (Linksblock)
+option WDU Wahlpartei der Unabhängigen
+option DU Demokratische Union
+option VIERTE Vierte Partei (Ergokraten)
+option DF Demokratična fronta delovnega ljudstva
+option DPOE Demokratische Partei Österreichs
+option WP Wirtschaftspartei der Haus- und Grundbesitzer
+option OEPU Österreichische Patriotische Union
+table page=10 rotate=0
+columns registered cast
+x 0.3174 0.3748 0.3936 0.4510
+row 9 @0.2912:0.2980 1195361 1158111
+row 3 @0.3014:0.3078 921069 895330
+row 4 @0.3117:0.3181 626805 602993
+row 5 @0.3219:0.3283 186665 175342
+row 7 @0.3326:0.3386 237912 231405
+row 8 @0.3425:0.3489 108567 105212
+row 6 @0.3527:0.3587 678328 664301
+row 2 @0.3625:0.3690 267272 252008
+row 1 @0.3728:0.3792 169836 165914
+total AT @0.3985:0.4049 4391815 4250616
+table page=10 rotate=0
+columns valid invalid
+x 0.7503 0.8156 0.8222 0.8634
+row 9 @0.8145:0.8209 1142160 15951
+row 3 @0.8247:0.8311 886095 9235
+row 4 @0.8350:0.8414 597523 5470
+row 5 @0.8448:0.8512 172060 3282
+row 7 @0.8551:0.8615 226497 4908
+row 8 @0.8653:0.8717 101837 3375
+row 6 @0.8756:0.8820 653755 10546
+row 2 @0.8854:0.8918 248834 3174
+row 1 @0.8957:0.9021 164972 942
+total AT @0.9209:0.9277 4193733 56883
+table page=12 rotate=0
+columns OEVP SPOE KPOE WDU DU VIERTE DF DPOE WP OEPU
+x 0.2769 0.3247 0.3301 0.3785 0.3881 0.4299 0.4395 0.4782 0.4861 0.5254 0.5302 0.5617 0.5671 0.5985 0.6209 0.6276 0.6572 0.6644 0.6941 0.7019
+row 9 @0.5447:0.5515 401854 565440 89710 79149 3305 2702 - - - 0
+row 3 @0.5549:0.5614 464784 330631 48459 39385 1288 1545 - - 3 -
+row 4 @0.5652:0.5716 268578 184042 18574 124520 897 912 - - - -
+row 5 @0.5755:0.5819 75215 57752 5759 31919 466 949 - - - -
+row 7 @0.5857:0.5921 127528 53820 3705 39377 1644 423 - - - -
+row 8 @0.5960:0.6020 57402 19262 2435 22287 451 - - - - -
+row 6 @0.6058:0.6122 280719 244482 29617 94991 3540 406 - - - -
+row 2 @0.6161:0.6221 83801 101356 10002 51247 335 - 2088 5 - -
+row 1 @0.6259:0.6323 86700 66739 4805 6398 133 197 - - - -
+total AT @0.6507:0.6580 1846581 1623524 213066 489273 12059 7134 2088 5 3 0
+seats page=17 OEVP 77 SPOE 67 KPOE 5 WDU 16 DU 0 VIERTE 0 DF 0 DPOE 0 WP 0 OEPU 0

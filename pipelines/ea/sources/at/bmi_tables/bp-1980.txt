@@ -1,0 +1,31 @@
+# bp-1980: bpw_1980.pdf, Tabelle 3 "Die Wahlbeteiligung sowie gültige und ungültige Stimmen in den Wahlkreisen" and Tabelle 4 "Die Verteilung der Stimmen auf die Wahlwerber in den Wahlkreisen", both page 9; Wahlkreise = Länder
+# Note: abgegebene Stimmen include Wahlkarten voters from other Wahlkreise (footnote to Tabelle 3), so cast can exceed registered (Burgenland).
+option BURGER Dipl.-Vw. Dr. Norbert Burger
+option GREDLER Dr. Willfried Gredler
+option KIRCHSCHLAEGER Dr. Rudolf Kirchschläger
+table page=9 rotate=0
+columns registered cast invalid valid
+x 0.4037 0.4601 0.4949 0.5489 0.5723 0.6173 0.6545 0.7091
+row 1 @0.4639:0.4724 193413 197176 19850 177326
+row 2 @0.4788:0.4878 367750 336465 20570 315895
+row 3 @0.4947:0.5032 990200 988409 88525 899884
+row 4 @0.5100:0.5186 841664 790913 61827 729086
+row 5 @0.5254:0.5340 288521 272498 18944 253554
+row 6 @0.5408:0.5494 817261 759261 52534 706727
+row 7 @0.5558:0.5643 370383 334182 25150 309032
+row 8 @0.5716:0.5802 176916 163550 12941 150609
+row 9 @0.5870:0.5964 1169767 936600 47824 888776
+total AT @0.6122:0.6216 5215875 4779054 348165 4430889
+table page=9 rotate=0
+columns valid BURGER GREDLER KIRCHSCHLAEGER
+x 0.2639 0.3191 0.3635 0.4085 0.4529 0.4979 0.5555 0.6089
+row 1 @0.8055:0.8140 177326 6214 25414 145698
+row 2 @0.8209:0.8294 315895 11976 69154 234765
+row 3 @0.8363:0.8448 899884 26277 135074 738533
+row 4 @0.8516:0.8602 729086 24018 119844 585224
+row 5 @0.8670:0.8756 253554 9677 50699 193178
+row 6 @0.8820:0.8910 706727 28692 107456 570579
+row 7 @0.8974:0.9064 309032 10262 57564 241206
+row 8 @0.9128:0.9218 150609 6059 41900 102650
+row 9 @0.9282:0.9372 888776 17566 144295 726915
+total AT @0.9534:0.9628 4430889 140741 751400 3538748

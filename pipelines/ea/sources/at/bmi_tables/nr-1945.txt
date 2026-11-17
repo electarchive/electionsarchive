@@ -1,0 +1,58 @@
+# nr-1945: nationalratswahl-25111945.pdf, Nationalratswahl 25 Nov 1945
+# Tables: p7 Tabelle 7 (Wahlbeteiligung nach Bundesländern: Wahlberechtigte), p9 Tabelle 12 (gültige / ungültige Stimmen,
+# Land rows), p10 Tabelle 15 (gültige Stimmen der Parteien, Land rows), p11 Tabelle 18 footnote (DPÖ, Kärnten only), seats p12 Tabelle 22/23.
+# Caveat: Tabelle 7 also prints "Zahl der abstimmenden Personen" (Wien 881861, NÖ 706358, OÖ 484169, Sbg 131002, T 159791, V 72469,
+# St 501460, K 184707, B 131517; AT 3253329) counted where the envelope was cast; Tabelle 12 counts votes for the Wahlkreis of
+# residence (34040 "fremde Wähler"), so per Land valid+invalid differs from it. Only the national figure agrees (3217354+35975=3253329).
+# Cast is therefore not transcribed per Land; registered from Tabelle 7.
+option OEVP Österreichische Volkspartei
+option SPOE Sozialistische Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option DPOE Demokratische Partei Österreichs
+table page=7 rotate=0
+columns registered
+x 0.7700 0.8392
+row 9 @0.4515:0.4592 925891
+row 3 @0.4617:0.4694 734788
+row 4 @0.4720:0.4793 516845
+row 5 @0.4818:0.4895 142707
+row 7 @0.4921:0.5002 178449
+row 8 @0.5024:0.5100 77824
+row 6 @0.5126:0.5203 531238
+row 2 @0.5229:0.5306 204641
+row 1 @0.5331:0.5408 137222
+total AT @0.5481:0.5579 3449605
+table page=9 rotate=0
+columns valid invalid
+x 0.2944 0.3543 0.3682 0.4075
+row 9 @0.8251:0.8328 889324 7967
+row 3 @0.8337:0.8427 704878 5791
+row 4 @0.8444:0.8525 469027 5449
+row 5 @0.8546:0.8632 126390 1982
+row 7 @0.8649:0.8730 153571 3381
+row 8 @0.8747:0.8829 69707 1887
+row 6 @0.8854:0.8931 493861 5449
+row 2 @0.8957:0.9029 179260 3362
+row 1 @0.9059:0.9130 131336 707
+total AT @0.9192:0.9286 3217354 35975
+table page=10 rotate=0
+columns OEVP SPOE KPOE
+x 0.2189 0.2781 0.2840 0.3398 0.3460 0.3942
+row 9 @0.5883:0.5956 310803 508214 70307
+row 3 @0.5985:0.6058 384214 284430 36234
+row 4 @0.6088:0.6161 276676 179975 12376
+row 5 @0.6186:0.6259 71631 49965 4794
+row 7 @0.6289:0.6362 109360 40857 3354
+row 8 @0.6392:0.6464 48812 19189 1706
+row 6 @0.6494:0.6567 261358 205779 26724
+row 2 @0.6593:0.6670 71265 87572 14451
+row 1 @0.6695:0.6772 68108 58917 4311
+total AT @0.6845:0.6930 1602227 1434898 174257
+# DPÖ ran only in Kärnten (Wahlkreis 24); its only by-area figure is the footnote to Tabelle 18 ("*) Demokratische Partei
+# Österreichs a) 5.972"); the national total 5972 is printed in Tabelle 14 (p9) and Tabelle 23 (p12). The row and total both point at the footnote.
+table page=11 rotate=0
+columns DPOE
+x 0.4359 0.4667
+row 2 @0.6114:0.6186 5972
+total AT @0.6114:0.6186 5972
+seats page=12 OEVP 85 SPOE 76 KPOE 4 DPOE 0

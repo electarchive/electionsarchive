@@ -1,0 +1,26 @@
+# nr-1990: nationalratswahl-7101990.pdf, Tabelle 12 Zusammenfassung "Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (page 51); Wahlkreise = Länder, Wahlkreisverband subtotal rows skipped; seats from b) Reststimmen und Mandate (page 51); party names from "Die Kreiswahlvorschläge" (page 9)
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option GRUENE Die Grüne Alternative/Grüne im Parlament
+option VGOE Vereinte Grüne Österreichs/Das Umwelt-Bürgerforum
+option KPOE Kommunistische Partei Österreichs
+option VDS Verband der Sozialversicherten
+option CWG Christliche-Wähler-Gemeinschaft
+option CDP Christdemokratische Partei
+option WGOE Wahlplattform der Grauen Österreichs
+option GEORG Fritz Georg
+table page=51 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE GRUENE VGOE KPOE VDS CWG CDP WGOE GEORG
+x 0.2080 0.2551 0.2999 0.3434 0.3476 0.3821 0.3857 0.4293 0.4686 0.5121 0.5163 0.5586 0.5629 0.5973 0.6058 0.6409 0.6518 0.6808 0.6947 0.7237 0.7376 0.7666 0.7836 0.8065 0.8265 0.8501 0.8700 0.8936 0.9135 0.9365
+row 1 @0.2014:0.2103 205541 185430 5096 180334 90005 63810 19971 4501 1570 477 - - - - -
+row 3 @0.2219:0.2296 1078506 958064 25670 932394 396159 364276 114201 30480 14798 4082 8398 - - - -
+row 9 @0.2420:0.2497 1132198 837617 17037 820580 416022 173086 129062 62560 17790 6777 12242 - 3041 - -
+row 2 @0.3142:0.3219 407925 363309 8923 354386 163428 65565 107322 10628 4600 1217 1626 - - - -
+row 4 @0.3343:0.3420 942375 819645 23796 795849 334481 264883 127689 32844 20630 3097 6457 5768 - - -
+row 5 @0.3549:0.3634 333516 269886 7680 262206 99193 84241 53878 19087 3325 991 - - - 1491 -
+row 6 @0.3749:0.3826 883795 823232 28137 795095 344525 263800 133797 31334 8818 5711 7110 - - - -
+row 7 @0.3955:0.4027 434154 394640 18935 375705 114641 152929 64393 23771 12165 2148 - - 3153 2505 -
+row 8 @0.4156:0.4241 210902 196918 8573 188345 54333 76010 32335 9879 8581 1182 - 3495 - - 2530
+total AT @0.4878:0.4959 5628912 4848741 143847 4704894 2012787 1508600 782648 225084 92277 25682 35833 9263 6194 3996 2530
+seats page=51 SPOE 80 OEVP 60 FPOE 33 GRUENE 10

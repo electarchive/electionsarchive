@@ -1,0 +1,35 @@
+# bp-1951-1: bpw_1951.pdf, Bundespräsidentenwahl 6 May 1951 (1. Wahlgang): page 8 Tabelle 2 'Die Wahlbeteiligung in den Wahlkreisen und Bundesländern' (Wahlberechtigte, abstimmende Personen) and page 9 (sideways) Tabelle 3 (Land subtotal rows and Österreich), Wahlkreis rows not transcribed
+# candidate names as printed in the list of Wahlwerber on page 7; page 9 is slightly skewed, so row bands on page 9 span the row's extent across the transcribed columns
+# 1. Wahlgang; no candidate reached the absolute majority
+option BREITNER Dr. Burghard Breitner
+option FIALA Gottlieb Fiala
+option GLEISSNER Dr. Heinrich Gleißner
+option HAINISCH Ludovica Hainisch
+option KOERNER Dr. h. c. General Theodor Körner
+option UDE Dr. Johannes Ude
+table page=8 rotate=0
+columns registered cast
+x 0.2440 0.3025 0.3050 0.3655
+row 9 @0.5240:0.5310 1224066 1186242
+row 3 @0.5329:0.5398 938201 920151
+row 4 @0.5432:0.5503 647363 627602
+row 5 @0.5534:0.5603 194802 188604
+row 7 @0.5637:0.5705 246735 235449
+row 8 @0.5740:0.5808 113577 108788
+row 6 @0.5836:0.5911 696380 672147
+row 2 @0.5939:0.6007 278283 265217
+row 1 @0.6042:0.6110 174190 166374
+total AT @0.6195:0.6264 4513597 4370574
+table page=9 rotate=270
+columns cast BREITNER FIALA GLEISSNER HAINISCH KOERNER UDE valid invalid
+x 0.2810 0.3265 0.3385 0.3750 0.3910 0.4240 0.4375 0.4725 0.4970 0.5215 0.5345 0.5700 0.5945 0.6190 0.6220 0.6670 0.6865 0.7160
+row 9 @0.6652:0.6848 1186242 127938 89697 354578 1070 595079 862 1169224 17018
+row 3 @0.6868:0.7048 920151 54058 51100 446279 265 355441 276 907419 12732
+row 4 @0.7084:0.7260 627602 118951 20344 283266 293 193379 1252 617485 10117
+row 5 @0.7300:0.7480 188604 67037 5311 64849 54 48424 61 185736 2868
+row 7 @0.7516:0.7696 235449 56484 4371 115322 94 53192 169 229632 5817
+row 8 @0.7728:0.7912 108788 26528 2577 52952 20 21271 2014 105362 3426
+row 6 @0.7940:0.8128 672147 140627 30924 251428 217 235806 704 659706 12441
+row 2 @0.8156:0.8336 265217 62545 10668 76182 98 109092 68 258653 6564
+row 1 @0.8368:0.8544 166374 8333 4977 80595 21 71197 7 165130 1244
+total AT @0.8684:0.8884 4370574 662501 219969 1725451 2132 1682881 5413 4298347 72227

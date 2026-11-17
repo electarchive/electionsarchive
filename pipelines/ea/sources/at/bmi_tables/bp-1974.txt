@@ -1,0 +1,30 @@
+# bp-1974: bpw_1974.pdf, Tabelle 3 "Die Wahlbeteiligung sowie gültige und ungültige Stimmen in den Wahlkreisen" and Tabelle 4 "Die Verteilung der Stimmen auf die Wahlwerber in den Wahlkreisen", both page 7; Wahlkreise = Länder
+# Note: abgegebene Stimmen include Wahlkarten voters in the Wahlkreis where they voted (footnote to Tabelle 3), so cast can exceed registered (Burgenland, Niederösterreich).
+option KIRCHSCHLAEGER Dr. Rudolf Kirchschläger
+option LUGGER Dr. Alois Lugger
+table page=7 rotate=0
+columns registered cast invalid valid
+x 0.4193 0.4745 0.5093 0.5633 0.6083 0.6515 0.6719 0.7259
+row 1 @0.4399:0.4515 183619 188169 2918 185251
+row 2 @0.4549:0.4669 342179 335380 9163 326217
+row 3 @0.4703:0.4823 951789 965036 14866 950170
+row 4 @0.4861:0.4976 786774 756194 15253 740941
+row 5 @0.5011:0.5130 266261 257832 6182 251650
+row 6 @0.5165:0.5284 784420 751450 17223 734227
+row 7 @0.5323:0.5438 339719 327543 5949 321594
+row 8 @0.5477:0.5592 160592 153891 3375 150516
+row 9 @0.5626:0.5759 1216419 997521 27250 970271
+total AT @0.5887:0.6015 5031772 4733016 102179 4630837
+table page=7 rotate=0
+columns valid KIRCHSCHLAEGER LUGGER
+x 0.4403 0.4949 0.5513 0.6053 0.6617 0.7163
+row 1 @0.7837:0.7939 185251 98065 87186
+row 2 @0.7991:0.8093 326217 183093 143124
+row 3 @0.8140:0.8243 950170 472754 477416
+row 4 @0.8294:0.8397 740941 373594 367347
+row 5 @0.8448:0.8551 251650 120840 130810
+row 6 @0.8602:0.8705 734227 378193 356034
+row 7 @0.8756:0.8858 321594 96301 225293
+row 8 @0.8910:0.9012 150516 50572 99944
+row 9 @0.9059:0.9166 970271 618955 351316
+total AT @0.9320:0.9431 4630837 2392367 2238470

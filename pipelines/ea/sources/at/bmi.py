@@ -124,6 +124,9 @@ def url(edition: Edition) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.at import bmi_history
+
+    bmi_history.fetch()
     for edition in EDITIONS:
         raw.fetch(
             SOURCE,
@@ -464,14 +467,24 @@ PRESIDENCY = key("office", "federal-president")
 
 
 def packages() -> list[str]:
-    return ["at.bmi/geo", "at.bmi/registry", *(f"at.bmi/{edition.key}" for edition in EDITIONS)]
+    from ea.sources.at import bmi_history
+
+    return [
+        "at.bmi/geo",
+        "at.bmi/registry",
+        *(f"at.bmi/{edition.key}" for edition in EDITIONS),
+        *bmi_history.packages(),
+    ]
 
 
 def parse() -> None:
+    from ea.sources.at import bmi_history
+
     geo().write()
     registry().write()
     for edition in EDITIONS:
         election(edition).write()
+    bmi_history.parse()
 
 
 def emit() -> None:

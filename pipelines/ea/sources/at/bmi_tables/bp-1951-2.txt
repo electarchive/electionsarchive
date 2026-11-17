@@ -1,0 +1,31 @@
+# bp-1951-2: bpw_1951.pdf, Bundespräsidentenwahl 27 May 1951 (2. Wahlgang): page 8 Tabelle 2 'Die Wahlbeteiligung in den Wahlkreisen und Bundesländern' (Wahlberechtigte, abstimmende Personen) and page 9 (sideways) Tabelle 3 (Land subtotal rows and Österreich), Wahlkreis rows not transcribed
+# candidate names as printed in the list of Wahlwerber on page 7; page 9 is slightly skewed, so row bands on page 9 span the row's extent across the transcribed columns
+# 2. Wahlgang (runoff between Gleißner and Körner)
+option GLEISSNER Dr. Heinrich Gleißner
+option KOERNER Dr. h. c. General Theodor Körner
+table page=8 rotate=0
+columns registered cast
+x 0.2440 0.3025 0.3700 0.4235
+row 9 @0.5240:0.5310 1224066 1177710
+row 3 @0.5329:0.5398 938201 926451
+row 4 @0.5432:0.5503 647363 628329
+row 5 @0.5534:0.5603 194802 189717
+row 7 @0.5637:0.5705 246735 235565
+row 8 @0.5740:0.5808 113577 108472
+row 6 @0.5836:0.5911 696380 675984
+row 2 @0.5939:0.6007 278283 265573
+row 1 @0.6042:0.6110 174190 165393
+total AT @0.6195:0.6264 4513597 4373194
+table page=9 rotate=270
+columns cast GLEISSNER KOERNER valid invalid
+x 0.7230 0.7655 0.7750 0.8140 0.8240 0.8630 0.8690 0.9115 0.9280 0.9615
+row 9 @0.6576:0.6744 1177710 416111 720845 1136956 40754
+row 3 @0.6788:0.6960 926451 466975 439150 906125 20326
+row 4 @0.7004:0.7176 628329 322681 273215 595896 32433
+row 5 @0.7220:0.7392 189717 91362 79045 170407 19310
+row 7 @0.7444:0.7608 235565 138588 82950 221538 14027
+row 8 @0.7660:0.7824 108472 64810 35225 100035 8437
+row 6 @0.7876:0.8032 675984 321762 321799 643561 32423
+row 2 @0.8092:0.8248 265573 101394 146032 247426 18147
+row 1 @0.8308:0.8456 165393 82639 80370 163009 2384
+total AT @0.8620:0.8796 4373194 2006322 2178631 4184953 188241

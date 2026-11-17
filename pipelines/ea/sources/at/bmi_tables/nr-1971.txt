@@ -1,0 +1,20 @@
+# nr-1971: nationalratswahl-10101971.pdf, Tabelle 12 "Zusammenfassung. Das Wahlergebnis nach Wahlkreisen und Wahlkreisverbänden, a) Wahlberechtigte, Wahlbeteiligung, Wahlzahlen, Parteisummen" (p. 41); from 1971 each of the 9 Wahlkreise is one Bundesland, so the Wahlkreis rows are the Land rows (Wahlkreisverband rows skipped). Party names and seats from "Die Hauptergebnisse der Nationalratswahlen vom 10. Oktober 1971" (p. 26).
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunistische Partei Österreichs
+option OL Offensiv links
+table page=41 rotate=0
+columns registered cast invalid valid SPOE OEVP FPOE KPOE OL
+x 0.2690 0.3253 0.3779 0.4341 0.4426 0.4813 0.4867 0.5435 0.6112 0.6675 0.6917 0.7479 0.7823 0.8277 0.8428 0.8815 0.8966 0.9287
+row 1 @0.2121:0.2193 180590 170879 1625 169254 85021 78586 4857 790 -
+row 3 @0.2326:0.2398 943546 896350 9247 887103 417135 431413 27594 10961 -
+row 9 @0.2531:0.2604 1243424 1086717 8246 1078471 641596 365266 46794 22941 1874
+row 2 @0.3249:0.3322 333231 303811 3258 300553 165167 101449 29177 4760 -
+row 4 @0.3454:0.3523 769942 722536 7233 715303 343226 319627 46536 5914 -
+row 5 @0.3655:0.3728 257019 229416 2217 227199 102668 96669 26103 1759 -
+row 6 @0.3861:0.3933 772901 740471 10822 729649 357198 324894 35594 11963 -
+row 7 @0.4066:0.4139 329134 309064 4964 304100 114892 171759 15736 1713 -
+row 8 @0.4267:0.4339 154661 148372 3014 145358 53265 75050 16082 961 -
+total AT @0.4981:0.5053 4984448 4607616 50626 4556990 2280168 1964713 248473 61762 1874
+seats page=26 SPOE 93 OEVP 80 FPOE 10 KPOE 0 OL 0

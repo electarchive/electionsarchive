@@ -1,0 +1,19 @@
+# bp-1992-1: bpw_1992.pdf, first round (26 Apr 1992), page 15 "Ergebnisse der Bundespräsidentenwahl am 26. April und 24. Mai 1992 - Österreich / Bundesländer" (regular-type lines = first round; bold lines = second round; "darunter im Ausland abgegeben" lines not transcribed)
+# Note: Land figures include the votes of Austrians abroad (printed as "darunter im Ausland abgegeben", AT 30.667 cast / 30.290 valid), counted in their Land of registration; cast includes Wahlkarten voters. Tabelle 3/4 (pages 12-13) hold the same figures in a poorer print.
+option STREICHER Dr. Rudolf Streicher
+option KLESTIL Dr. Thomas Klestil
+option SCHMIDT Dr. Heide Schmidt
+option JUNGK Robert Jungk
+table page=15 rotate=0
+columns registered cast invalid valid STREICHER KLESTIL SCHMIDT JUNGK
+x 0.3023 0.3635 0.3881 0.4493 0.4613 0.5105 0.5165 0.5771 0.5969 0.6581 0.7061 0.7678 0.8212 0.8710 0.8782 0.9286
+total AT @0.1454:0.1543 5676903 4788894 143717 4645177 1888599 1728234 761390 266954
+row 1 @0.2428:0.2514 207835 193240 4360 188880 90466 71890 21543 4981
+row 2 @0.3083:0.3168 411862 366368 12935 353433 150991 85702 103198 13542
+row 3 @0.3737:0.3831 1089930 980329 24472 955857 388662 410343 120197 36655
+row 4 @0.4395:0.4472 952581 785194 18378 766816 311752 293334 117748 43982
+row 5 @0.5045:0.5130 338378 268540 7162 261378 92711 98608 49364 20695
+row 6 @0.5695:0.5780 890544 814237 33296 780941 326977 278457 138728 36779
+row 7 @0.6349:0.6430 441894 391417 16957 374460 119560 166532 62281 26087
+row 8 @0.6999:0.7080 214514 199908 10829 189079 51146 81185 38008 18740
+row 9 @0.7649:0.7738 1129365 789661 15328 774333 356334 242183 110323 65493

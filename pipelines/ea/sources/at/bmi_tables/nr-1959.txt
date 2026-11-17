@@ -1,0 +1,51 @@
+# nr-1959: nationalratswahl-1051959.pdf, Nationalratswahl 10 May 1959
+# Tables: p13 Tabelle 7 ("Die Wahlbeteiligung in den Wahlkreisen, Wahlkreisverbänden und Bundesländern 1956 und 1959",
+# 1959 columns Wahlberechtigte / Abstimmende incl. Wahlkartenwähler, Land rows), p14 Tabelle 8 ("Die gültigen und ungültigen
+# Stimmen nach Wahlkreisen, Wahlkreisverbänden und Bundesländern", Land rows), p15 Tabelle 10 ("Die Parteisummen in den
+# Wahlkreisen, Wahlkreisverbänden und Bundesländern", printed sideways, Land rows); seats p21 Tabelle 16 (insgesamt 1959).
+# Note: KPOE column is the list "Kommunisten und Linkssozialisten" (KLS). BDS ran only in Kärnten.
+option OEVP Österreichische Volkspartei
+option SPOE Sozialistische Partei Österreichs
+option FPOE Freiheitliche Partei Österreichs
+option KPOE Kommunisten und Linkssozialisten
+option BDS Bund demokratischer Sozialisten
+table page=13 rotate=0
+columns registered cast
+x 0.6620 0.7207 0.8071 0.8658
+row 9 @0.5015:0.5092 1236149 1129909
+row 3 @0.5118:0.5182 929057 894535
+row 4 @0.5220:0.5280 704646 670261
+row 5 @0.5319:0.5383 214991 198824
+row 7 @0.5421:0.5485 279785 265620
+row 8 @0.5524:0.5588 131553 125323
+row 6 @0.5626:0.5690 726066 701489
+row 2 @0.5729:0.5789 298478 274638
+row 1 @0.5827:0.5891 175878 164059
+total AT @0.6156:0.6225 4696603 4424658
+table page=14 rotate=0
+columns valid invalid
+x 0.3845 0.4426 0.5157 0.5562
+row 9 @0.5147:0.5212 1115891 14018
+row 3 @0.5246:0.5310 880276 14259
+row 4 @0.5348:0.5413 663366 6895
+row 5 @0.5451:0.5515 196404 2420
+row 7 @0.5554:0.5618 260200 5420
+row 8 @0.5652:0.5720 122537 2786
+row 6 @0.5755:0.5819 690381 11108
+row 2 @0.5853:0.5921 271371 3267
+row 1 @0.5956:0.6024 162430 1629
+total AT @0.6285:0.6362 4362856 61802
+table page=15 rotate=270
+columns OEVP SPOE FPOE KPOE BDS
+x 0.2642 0.3035 0.3271 0.3668 0.3976 0.4301 0.4617 0.4934 0.5319 0.5566
+row 9 @0.7515:0.7612 383534 584486 83077 64794 -
+row 3 @0.7660:0.7757 445569 370743 38003 25961 -
+row 4 @0.7805:0.7902 313817 278538 57922 13089 -
+row 5 @0.7950:0.8047 86875 75966 29869 3694 -
+row 7 @0.8096:0.8192 154659 82038 20446 3057 -
+row 8 @0.8241:0.8343 69153 36834 14836 1714 -
+row 6 @0.8386:0.8489 308835 312776 47116 21654 -
+row 2 @0.8537:0.8634 88813 136967 36687 6714 2190
+row 1 @0.8682:0.8779 76788 75587 8154 1901 -
+total AT @0.9154:0.9262 1928043 1953935 336110 142578 2190
+seats page=21 OEVP 79 SPOE 78 FPOE 8 KPOE 0 BDS 0

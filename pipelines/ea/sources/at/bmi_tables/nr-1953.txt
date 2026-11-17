@@ -1,0 +1,57 @@
+# nr-1953: nationalratswahl-2221953.pdf, Nationalratswahl 22 Feb 1953
+# Tables: p15 Tabelle 10 ("Die Wahlbeteiligung in den Wahlkreisen, Wahlkreisverbänden und Bundesländern 1949 und 1953",
+# 1953 columns Wahlberechtigte / Abstimmende, Land rows), p17 Tabelle 12 ("Die gültigen und ungültigen Stimmen nach
+# Wahlkreisen, Wahlkreisverbänden und Bundesländern", Land rows), p18 Tabelle 14 ("Die Parteisummen in den Wahlkreisen,
+# Wahlkreisverbänden und Bundesländern", printed sideways, Land rows); seats p26 Tabelle 22 (insgesamt 1953).
+# Note: KPOE column is the list "Österreichische Volksopposition" (VO; KPÖ with Linkssozialisten).
+option SPOE Sozialistische Partei Österreichs
+option OEVP Österreichische Volkspartei
+option WDU Wahlpartei der Unabhängigen
+option KPOE Österreichische Volksopposition
+option EM Überparteiliche Einigung der Mitte
+option CDP_1953 Christlich-demokratische Partei
+option CSP Christlichsoziale Partei
+option FD Freie Demokraten
+option BOEM Bund der österreichischen Monarchisten
+option ONR Österreichische National-Republikaner
+option OEPU Österreichische Patriotische Union
+table page=15 rotate=0
+columns registered cast
+x 0.6765 0.7358 0.7908 0.8501
+row 9 @0.8311:0.8384 1233321 1192581
+row 3 @0.8414:0.8478 943997 914184
+row 4 @0.8516:0.8581 665402 626468
+row 5 @0.8615:0.8683 199405 189302
+row 7 @0.8717:0.8786 257656 247748
+row 8 @0.8824:0.8884 116767 112255
+row 6 @0.8923:0.8987 708311 682335
+row 2 @0.9025:0.9089 285615 260413
+row 1 @0.9124:0.9192 176396 170233
+total AT @0.9303:0.9367 4586870 4395519
+table page=17 rotate=0
+columns valid invalid
+x 0.3894 0.4486 0.5212 0.5605
+row 9 @0.4878:0.4942 1177610 14971
+row 3 @0.4981:0.5045 904384 9800
+row 4 @0.5083:0.5147 617312 9156
+row 5 @0.5186:0.5250 186020 3282
+row 7 @0.5284:0.5348 240944 6804
+row 8 @0.5387:0.5451 108269 3986
+row 6 @0.5490:0.5554 662518 19817
+row 2 @0.5592:0.5656 253175 7238
+row 1 @0.5690:0.5755 168456 1777
+total AT @0.6024:0.6088 4318688 76831
+table page=18 rotate=270
+columns SPOE OEVP WDU KPOE EM CDP_1953 CSP FD BOEM ONR OEPU
+x 0.2800 0.3215 0.3241 0.3630 0.3737 0.4079 0.4168 0.4493 0.4703 0.4921 0.5135 0.5348 0.5562 0.5806 0.5990 0.6216 0.6430 0.6644 0.6862 0.7097 0.7418 0.7507
+row 9 @0.7709:0.7799 590532 362148 124683 93938 2509 - 1496 2021 - 257 26
+row 3 @0.7854:0.7950 360791 438348 47706 56303 786 - - 193 - 257 -
+row 4 @0.8005:0.8096 236944 285308 75065 18780 850 - - - - 365 -
+row 5 @0.8150:0.8241 65871 79128 35269 5251 501 - - - - - -
+row 7 @0.8301:0.8386 70473 132655 31650 5716 450 - - - - - -
+row 8 @0.8440:0.8531 24531 60140 20340 3172 86 - - - - - -
+row 6 @0.8585:0.8676 272360 269662 89895 29177 439 - 985 - - - -
+row 2 @0.8730:0.8827 121775 73015 42053 10405 145 3668 370 359 1210 175 -
+row 1 @0.8881:0.8972 75240 81373 6205 5417 43 - 178 - - - -
+total AT @0.9281:0.9371 1818517 1781777 472866 228159 5809 3668 3029 2573 1210 1054 26
+seats page=26 OEVP 74 SPOE 73 WDU 14 KPOE 4 EM 0 CDP_1953 0 CSP 0 FD 0 BOEM 0 ONR 0 OEPU 0

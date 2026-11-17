@@ -1,0 +1,30 @@
+# bp-1971: bpw_1971.pdf, Bundespräsidentenwahl 25 April 1971, page 7: Tabelle 3 'Die Wahlbeteiligung sowie gültige und ungültige Stimmen in den Wahlkreisen' and Tabelle 4 'Die Verteilung der Stimmen auf die Wahlwerber in den Wahlkreisen' (the 9 Wahlkreise are the Länder); candidate names from page 6
+# Wahlkarten votes are included in the Wahlkreis figures where cast (Tabelle 3 footnote 1); page slightly skewed, bands span the row across the columns
+option JONAS Franz Jonas
+option WALDHEIM Dr. Kurt Waldheim
+table page=7 rotate=0
+columns registered cast invalid valid
+x 0.3970 0.4550 0.4865 0.5440 0.5710 0.6110 0.6435 0.7005
+row 1 @0.4583:0.4679 182283 179842 2044 177798
+row 2 @0.4736:0.4833 335920 314779 7030 307749
+row 3 @0.4890:0.4987 952644 946240 12136 934104
+row 4 @0.5044:0.5141 775521 751916 11848 740068
+row 5 @0.5198:0.5295 258385 248379 5159 243220
+row 6 @0.5352:0.5443 778186 748095 13125 734970
+row 7 @0.5506:0.5597 330784 316485 5322 311163
+row 8 @0.5660:0.5751 155758 149321 3332 145989
+row 9 @0.5814:0.5911 1254843 1132649 15662 1116987
+total AT @0.6070:0.6167 5024324 4787706 75658 4712048
+table page=7 rotate=0
+columns valid JONAS WALDHEIM
+x 0.4050 0.4630 0.5175 0.5725 0.6280 0.6840
+row 1 @0.8019:0.8113 177798 92403 85395
+row 2 @0.8173:0.8267 307749 179775 127974
+row 3 @0.8327:0.8421 934104 461337 472767
+row 4 @0.8481:0.8575 740068 378136 361932
+row 5 @0.8629:0.8729 243220 121322 121898
+row 6 @0.8789:0.8883 734970 381642 353328
+row 7 @0.8937:0.9031 311163 124198 186965
+row 8 @0.9091:0.9185 145989 59598 86391
+row 9 @0.9245:0.9339 1116987 688828 428159
+total AT @0.9473:0.9567 4712048 2487239 2224809
