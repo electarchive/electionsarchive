@@ -250,23 +250,23 @@ def registry() -> Package:
     )
     for config in ELECTIONS.values():
         p.artifact(raw.cached(SOURCE, str(config["url"])), INE_SOURCE)
-    p.add("scheme", code="mx.computos.entidad", polity_id=MEXICO, kind="administrative", rank=1, noun="state")
+    p.add("scheme", code="mx.computos_entidad", polity_id=MEXICO, kind="administrative", rank=1, noun="state")
     p.add(
         "scheme",
-        code="mx.computos.distrito",
+        code="mx.computos_distrito",
         polity_id=MEXICO,
         kind="electoral_district",
         rank=2,
         noun="federal electoral district",
     )
-    p.add("scheme", code="mx.computos.casilla", polity_id=MEXICO, kind="precinct", rank=3, noun="casilla")
+    p.add("scheme", code="mx.computos_casilla", polity_id=MEXICO, kind="precinct", rank=3, noun="casilla")
     for code, name in STATES.items():
         unit = STATE_UNIT[code]
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=MEXICO,
-            scheme_code="mx.computos.entidad",
+            scheme_code="mx.computos_entidad",
             code=f"{code:02d}",
             area_relation="unlocated",
             area_id=None,
@@ -540,7 +540,7 @@ def build(year: int) -> Package:
             {
                 "id": unit,
                 "polity_id": MEXICO,
-                "scheme_code": "mx.computos.distrito",
+                "scheme_code": "mx.computos_distrito",
                 "code": f"{year}:{state:02d}-{district:02d}",
                 "parent_id": STATE_UNIT[state],
                 "area_relation": "unlocated",
@@ -578,7 +578,7 @@ def build(year: int) -> Package:
     unit_frame = frame.select(
         id="unit_id",
         polity_id=pl.lit(MEXICO),
-        scheme_code=pl.lit("mx.computos.casilla"),
+        scheme_code=pl.lit("mx.computos_casilla"),
         code="full",
         parent_id=pl.struct("state", "district").map_elements(
             lambda row: district_units[(row["state"], row["district"])], return_dtype=pl.String
