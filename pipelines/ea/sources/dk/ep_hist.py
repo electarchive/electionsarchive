@@ -746,7 +746,7 @@ def build(year: int) -> Package:
         f"The {year} European Parliament election in Denmark by nomination district",
         depends=[f"{SOURCE}/registry"],
     )
-    p.external.add(DENMARK)
+    p.external.update({DENMARK, "dk.amt", "dk.opstillingskreds"})
     source = source_of(p, year)
     election = key("election", year)
     p.add("election", id=election, polity_id=DENMARK, kind="general", date_from=day, date_to=day, status="held")
@@ -934,7 +934,7 @@ def greenland_contest(p: Package, year: int, election: str, path: str, source: s
         1,
         SYSTEM_SEAT,
     )
-    p.external.add(GREENLAND)
+    p.external.update({GREENLAND, "gl.kommune"})
     p.add(
         "note",
         id=key("note", result_set),
