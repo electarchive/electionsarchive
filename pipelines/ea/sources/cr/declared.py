@@ -209,6 +209,10 @@ def advancing(resolution: Resolution) -> list[str]:
     text = squash(plain(resolution))
     match = re.search(r"entre\s+las\s+nóminas\s+de\s+los\s+partidos\s+políticos\s+(.+?)\s*,?\s+por\s+ser", text)
     if match is None:
+        match = re.search(
+            r"participar[aá]n\s+únicamente\s+las\s+nóminas\s+correspondientes\s+a\s+los\s+partidos\s+(.+?)\s*\.", text
+        )
+    if match is None:
         raise ValueError(f"{resolution.number}: no second round")
     return [fold(part) for part in re.split(r"\s+y\s+|,\s*", match.group(1))]
 
