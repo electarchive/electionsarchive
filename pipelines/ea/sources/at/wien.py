@@ -1,49 +1,167 @@
 import csv
 import functools
+import html
 import io
+import json
 import re
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
+
+import numpy
+import shapely
+import shapely.geometry
 
 from ea import changeset, package, raw
 from ea.package import Package
 
 SOURCE = "at.wien"
+SITE = "https://www.wien.gv.at"
+OLD = f"{SITE}/wahl/NET"
+NEW = f"{SITE}/wahlergebnis"
+WFS = (
+    "https://data.wien.gv.at/daten/geo?service=WFS&version=1.1.0&request=GetFeature&srsName=EPSG:4326&outputFormat=json"
+)
 AUSTRIA = str(uuid5(package.NAMESPACE, "polity\x1fAT"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fAUT"))
+TOLERANCE = 0.00003
+DERIVED = 1
+LICENSE = "CC BY 4.0"
+LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
+ATTRIBUTION = "Stadt Wien – data.wien.gv.at"
+LAND_SCHEME = "at-9.land"
+BEZIRK_SCHEME = "at-9.bezirk"
+SPRENGEL_SCHEME = "at-9.sprengel"
+
+# election year -> (election day, Gemeinderat file code, Bezirksvertretung file code)
+ELECTIONS = {
+    1996: (date(1996, 10, 13), "GR961", "BV961"),
+    2001: (date(2001, 3, 25), "GR011", "BV011"),
+    2005: (date(2005, 10, 23), "GR051", "BV051"),
+    2010: (date(2010, 10, 10), "GR101", "BV101"),
+    2015: (date(2015, 10, 11), "GR151", "BV161"),
+    2020: (date(2020, 10, 11), "GR201", "BV201"),
+    2025: (date(2025, 4, 27), "GR251", "BV251"),
+}
+SHAPE_YEARS = (2005, 2010, 2015, 2020, 2025)
+# the polling-district shapes of each plan, as the city publishes them
+SHAPE_LAYERS = {year: f"ogdwien:WAHLSPRGR{year}OGD" for year in SHAPE_YEARS}
+BEZIRKE = "ogdwien:BEZIRKSGRENZEOGD"
+# the 2025 files print the postal ballots of each district in rows of their own, one per kind of envelope
+POSTAL = {
+    "Wahlkartenstimmen OE": ("wk", "Wahlkarten"),
+    "Briefwahlstimmen OE": ("bw", "Briefwahl"),
+    "Briefwahlstimmen EU": ("bw-eu", "Briefwahl, Unionsbürger"),
+    "Gelbe Wahlkuverts EU": ("gk-eu", "Gelbe Wahlkuverts, Unionsbürger"),
+}
+
+PERSISTENT = {"SPÖ", "ÖVP", "FPÖ", "GRÜNE", "NEOS", "LIF", "KPÖ", "BZÖ", "SLP"}
+DISPLAY = {
+    "SPOE": "SPÖ",
+    "OEVP": "ÖVP",
+    "FPOE": "FPÖ",
+    "GRUE": "GRÜNE",
+    "SOEZ": "SÖZ",
+    "KPOE": "KPÖ",
+    "BZOE": "BZÖ",
+    "BGOE": "BGÖ",
+    "OENP": "ÖNP",
+    "OEABP": "ÖABP",
+}
+FULL_NAMES = {
+    "SPÖ": "Sozialdemokratische Partei Österreichs",
+    "ÖVP": "Österreichische Volkspartei",
+    "FPÖ": "Freiheitliche Partei Österreichs",
+    "GRÜNE": "Die Grünen – Die Grüne Alternative",
+    "LIF": "Liberales Forum",
+    "NEOS": "NEOS – Das Neue Österreich und Liberales Forum",
+    "KPÖ": "Kommunistische Partei Österreichs",
+    "BZÖ": "Bündnis Zukunft Österreich",
+    "SLP": "Sozialistische LinksPartei",
+}
+LONG_PREFIXES = (
+    ("Sozialdemokratische Partei", "SPÖ"),
+    ("SPÖ", "SPÖ"),
+    ("Wiener Volkspartei", "ÖVP"),
+    ("Österreichische Volkspartei", "ÖVP"),
+    ("Die Grünen", "GRÜNE"),
+    ("GRÜNE", "GRÜNE"),
+    ("NEOS", "NEOS"),
+    ("Freiheitliche Partei", "FPÖ"),
+    ("KPÖ und LINKS", None),
+)
+METHOD = (
+    "Counted by the Vienna election authorities per polling district (Sprengel), as published by the City of Vienna. "
+    "Registered voters are the electoral roll, ballots cast are the ballots counted, and valid votes are the ballots "
+    "cast less the invalid ones. Postal ballots and ballots cast with a voting card (Wahlkarte) are reported in "
+    "separate units of each district, so the units add up to the printed totals. Vienna's Gemeinderat is also its "
+    "Landtag, so one election elects both, and the 23 district councils (Bezirksvertretungen) are elected on the same "
+    "day, where citizens of other EU member states may also vote. The City prints a zero for a list that did not run "
+    "in a district, so a list is kept in a contest only when it has votes there."
+)
 
 
-@dataclass(frozen=True)
-class Edition:
-    """One Viennese Gemeinderat (and Landtag) election and the files that hold its results by polling district."""
-
-    key: str
-    day: date
-    files: tuple[str, ...]
+def gr(year: int) -> str:
+    return f"gr-{year}"
 
 
-OLD = "https://www.wien.gv.at/wahl/NET"
-NEW = "https://www.wien.gv.at/wahlergebnis"
+def bv(year: int) -> str:
+    return f"bv-{year}"
 
 
-def _old(code: str) -> tuple[str, ...]:
-    return tuple(f"{OLD}/{code}/{code}_99999999_9999_{kind}.xls" for kind in ("SPR", "WVB"))
+def legacy_url(code: str, kind: str) -> str:
+    if code.endswith("201"):
+        return f"{NEW}/downloads/{code}/{code}_99999999_9999_{kind}.xls"
+    return f"{OLD}/{code}/{code}_99999999_9999_{kind}.xls"
 
 
-EDITIONS = [
-    Edition("gr-1996", date(1996, 10, 13), _old("GR961")),
-    Edition("gr-2001", date(2001, 3, 25), _old("GR011")),
-    Edition("gr-2005", date(2005, 10, 23), _old("GR051")),
-    Edition("gr-2010", date(2010, 10, 10), _old("GR101")),
-    Edition("gr-2015", date(2015, 10, 11), _old("GR151")),
-    Edition(
-        "gr-2020",
-        date(2020, 10, 11),
-        tuple(f"{NEW}/downloads/GR201/GR201_99999999_9999_{kind}.xls" for kind in ("SPR", "WVB")),
-    ),
-    Edition("gr-2025", date(2025, 4, 27), (f"{NEW}/ogd/GR251.csv",)),
-]
+def csv_url(code: str) -> str:
+    return f"{NEW}/ogd/{code}.csv"
+
+
+def files(year: int, council: bool) -> list[str]:
+    _, gr_code, bv_code = ELECTIONS[year]
+    code = gr_code if council else bv_code
+    if year == 2025:
+        return [csv_url(code)]
+    return [legacy_url(code, kind) for kind in ("SPR", "WVB")]
+
+
+def pages(year: int, council: bool) -> list[str]:
+    """The result pages that print the seats: the city page for the Gemeinderat and one page per district council.
+    The 1996 pages print no seats."""
+    if year == 1996:
+        return []
+    _, gr_code, bv_code = ELECTIONS[year]
+    if year >= 2020:
+        if council:
+            return [f"{NEW}/de/{gr_code}/index.html"]
+        return [f"{NEW}/de/{bv_code}/9{n:02d}.html" for n in range(1, 24)]
+    if council:
+        return [f"{OLD}/{gr_code}/index.htm"]
+    return [f"{OLD}/{bv_code}/{bv_code}-3{n:02d}.htm" for n in range(1, 24)]
+
+
+def page_url(year: int, council: bool, bz: int | None) -> str:
+    found = pages(year, council)
+    return found[0] if council else found[(bz or 1) - 1]
+
+
+def wfs(layer: str) -> str:
+    return f"{WFS}&typeName={layer}"
+
+
+def fetch() -> None:
+    for year in ELECTIONS:
+        for council in (True, False):
+            for url in files(year, council):
+                raw.fetch(SOURCE, url, suffix=".csv" if url.endswith(".csv") else ".txt")
+    for layer in (BEZIRKE, *SHAPE_LAYERS.values()):
+        raw.fetch(SOURCE, wfs(layer), suffix=".json")
+    for year in ELECTIONS:
+        for council in (True, False):
+            raw.fetch_many(SOURCE, pages(year, council), suffix=".html")
 
 
 def key(kind: str, *parts: object) -> str:
@@ -51,197 +169,393 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+SHAPES_ID = key("source", "shapes")
 BODY = key("body", "landtag")
-LAND = key("area", "at-9.land", "9")
-DISTRICTS = [
-    "Innere Stadt",
-    "Leopoldstadt",
-    "Landstraße",
-    "Wieden",
-    "Margareten",
-    "Mariahilf",
-    "Neubau",
-    "Josefstadt",
-    "Alsergrund",
-    "Favoriten",
-    "Simmering",
-    "Meidling",
-    "Hietzing",
-    "Penzing",
-    "Rudolfsheim-Fünfhaus",
-    "Ottakring",
-    "Hernals",
-    "Währing",
-    "Döbling",
-    "Brigittenau",
-    "Floridsdorf",
-    "Donaustadt",
-    "Liesing",
-]
-MEASURES = ((2, "registered"), (3, "cast"), (4, "valid"), (5, "invalid"))
-SHORT = {"SPOE": "SPÖ", "OEVP": "ÖVP", "FPOE": "FPÖ", "GRUE": "GRÜNE", "OENP": "ÖNP", "BGOE": "BGÖ"}
-PERSISTENT = [
-    (re.compile(r"^(spö|spoe)", re.IGNORECASE), "SPÖ"),
-    (re.compile(r"^(övp|oevp|wiener volkspartei)", re.IGNORECASE), "ÖVP"),
-    (re.compile(r"^(fpö|fpoe|freiheitliche)", re.IGNORECASE), "FPÖ"),
-    (re.compile(r"^(grüne|grue)", re.IGNORECASE), "GRÜNE"),
-    (re.compile(r"^(neos)", re.IGNORECASE), "NEOS"),
-    (re.compile(r"^(lif)$", re.IGNORECASE), "LIF"),
-]
+LAND = key("area", LAND_SCHEME, "9")
+
+
+def district(number: int) -> str:
+    return key("area", BEZIRK_SCHEME, number)
+
+
+def precinct(year: int, code: str) -> str:
+    return key("area", SPRENGEL_SCHEME, f"{year}:{code}")
+
+
+def council_body(number: int) -> str:
+    return key("body", "bezirksvertretung", number)
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.key}" for e in EDITIONS)]
-
-
-def fetch() -> None:
-    for edition in EDITIONS:
-        for url in edition.files:
-            raw.fetch(SOURCE, url, suffix=url.rsplit(".", 1)[1])
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{gr(year)}" for year in ELECTIONS),
+        *(f"{SOURCE}/{bv(year)}" for year in ELECTIONS),
+    ]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
-    for edition in EDITIONS:
-        election(edition).write()
+    for year in ELECTIONS:
+        landtag(year).write()
+        councils(year).write()
 
 
 def emit() -> None:
     package.run("load", packages())
 
 
+# ---------------------------------------------------------------- reading the results
+
+
 @dataclass
-class Leaf:
-    district: int
-    polling: str
-    kind: str
+class Row:
+    bz: int
+    code: str  # the unit's code within its election day, such as 01-001 or 01-wk
+    label: str  # the unit's name before its district
+    kind: str  # standard or postal_district
+    shape: str | None  # the polling district's code in the city's shapes
     registered: int | None
     cast: int
     invalid: int
-    votes: list[int]
-
-    @property
-    def valid(self) -> int:
-        return self.cast - self.invalid
+    votes: dict[str, int | None]
 
 
 @dataclass
-class Table:
-    labels: list[str]
-    leaves: list[Leaf]
+class Figures:
     registered: int
     cast: int
     invalid: int
-    votes: list[int]
+    votes: dict[str, int | None]
 
 
-def _legacy(edition: Edition) -> Table:
-    """The older files are tab-separated text with fixed-width zero-padded numbers, one line per polling district."""
-    spr, wvb = (raw.cached(SOURCE, url).path.read_bytes().decode("cp1252").splitlines() for url in edition.files)
-    header = [c.strip() for c in spr[0].split("\t")]
-    width = len(header) - 1
-    labels = [SHORT.get(c, c) for c in header[8:width]]
-    leaves = []
-    for line in spr[1:]:
-        cells = line.split("\t")
-        if cells[0] != "4":
+@dataclass
+class Results:
+    labels: list[str]
+    rows: list[Row] = field(default_factory=list)
+    declared: dict[int | None, Figures] = field(default_factory=dict)
+
+
+def _int(text: str) -> int | None:
+    text = text.strip()
+    return int(text) if text else None
+
+
+def _table(code: str, kind: str) -> tuple[list[str], list[list[str]]]:
+    path = raw.cached(SOURCE, legacy_url(code, kind)).path
+    lines = path.read_text(encoding="latin-1").splitlines()
+    header = [cell.strip() for cell in lines[0].split("\t")]
+    body = [[cell.strip() for cell in line.split("\t")] for line in lines[1:] if line.strip()]
+    return header, body
+
+
+def _legacy(code: str) -> Results:
+    """The older files are tab-separated text with zero-padded numbers, one line per polling district and one line
+    per district for its postal ballots (polling district 000)."""
+    header, rows = _table(code, "SPR")
+    columns = {name: i for i, name in enumerate(header) if name}
+    parties = [(name, i) for name, i in columns.items() if i > columns["UNG."]]
+    result = Results([DISPLAY.get(name, name) for name, _ in parties])
+
+    def figures(row: list[str]) -> Figures:
+        return Figures(
+            int(row[columns["WBER"]]),
+            int(row[columns["ABG."]]),
+            int(row[columns["UNG."]]),
+            {DISPLAY.get(name, name): int(row[i]) for name, i in parties},
+        )
+
+    for row in rows:
+        if row[0] != "4":
             continue
-        figures = [int(c) for c in cells[5:width]]
-        number = cells[4]
-        leaves.append(
-            Leaf(
-                int(cells[3]),
-                number,
-                "postal" if number == "000" else "standard",
-                None if number == "000" else figures[0],
-                figures[1],
-                figures[2],
-                figures[3:],
+        found = figures(row)
+        spr = row[columns["SPR"]]
+        bz = int(row[columns["BZ"]])
+        postal = spr == "000" or (found.registered == 0 and found.cast > 0)
+        result.rows.append(
+            Row(
+                bz,
+                f"{bz:02d}-{spr}",
+                "Wahlkarten" if spr == "000" else f"Sprengel {int(spr)}",
+                "postal_district" if postal else "standard",
+                None if postal else f"{bz:02d}{spr}",
+                None if postal else found.registered,
+                found.cast,
+                found.invalid,
+                dict(found.votes),
             )
         )
-    total = next(line.split("\t") for line in wvb[1:] if line.startswith("1\t"))
-    figures = [int(c) for c in total[5:width]]
-    return Table(labels, leaves, figures[0], figures[1], figures[2], figures[3:])
+    _, totals = _table(code, "WVB")
+    for row in totals:
+        if row[0] == "1" and code.startswith("GR"):
+            result.declared[None] = figures(row)
+        elif row[0] == "3" and code.startswith("BV"):
+            result.declared[int(row[columns["BZ"]])] = figures(row)
+    return result
 
 
-def _current(edition: Edition) -> Table:
-    text = raw.cached(SOURCE, edition.files[0]).path.read_bytes().decode("cp1252")
-    rows = list(csv.reader(io.StringIO(text), delimiter=";"))
-    header = rows[0]
-    end = header.index("Status")
-    labels = [" ".join(c.split()) for c in header[16:end]]
-    leaves = []
-    for row in rows[1:]:
-        postal = row[6] == "Bezirk" and row[11] == "Parteistimmen"
-        if row[6] != "Sprengel" and not postal:
-            continue
-        figures = [int(c or 0) for c in row[13:end]]
-        district = int(row[9][1:3])
-        if postal:
-            number = "wk" if row[12].startswith("Wahlkarten") else "bw"
-        else:
-            number = row[10]
-        leaves.append(
-            Leaf(
-                district,
-                number,
-                "postal" if postal else "standard",
-                None if postal else figures[0],
-                figures[1],
-                figures[2],
-                figures[3:],
-            )
+def _name(text: str) -> str:
+    for prefix, code in LONG_PREFIXES:
+        if text.startswith(prefix):
+            return code or text
+    return text
+
+
+def _modern(code: str) -> Results:
+    path = raw.cached(SOURCE, csv_url(code)).path
+    table = list(csv.reader(io.StringIO(path.read_bytes().decode("cp1252")), delimiter=";"))
+    header = table[0]
+    status = header.index("Status")
+    names = {i: " ".join(header[i].split()) for i in range(16, status)}
+    index = {name: i for i, name in enumerate(header[:16])}
+    result = Results([_name(text) for text in names.values()])
+
+    def figures(row: list[str]) -> Figures:
+        return Figures(
+            int(row[index["Wahlberechtigte"]]),
+            int(row[index["Abgegebene Stimmen"]]),
+            int(row[index["Ungültige Stimmen"]]),
+            {_name(text): _int(row[i]) for i, text in names.items()},
         )
-    total = next(row for row in rows[1:] if row[6] == "Wien")
-    figures = [int(c) for c in total[13:end]]
-    return Table(labels, leaves, figures[0], figures[1], figures[2], figures[3:])
+
+    for row in table[1:]:
+        if not row or not row[0]:
+            continue
+        typ, kind = row[index["Typ"]], row[index["ErfassungseinheitTyp"]]
+        if typ == "Sprengel":
+            found = figures(row)
+            bz = int(row[index["DistrictCode"]][1:3])
+            number = row[index["Sprengelnummer"]]
+            result.rows.append(
+                Row(
+                    bz,
+                    f"{bz:02d}-{number}",
+                    f"Sprengel {int(number)}",
+                    "standard",
+                    f"{bz:02d}{int(number):03d}",
+                    found.registered,
+                    found.cast,
+                    found.invalid,
+                    found.votes,
+                )
+            )
+        elif typ == "Bezirk" and kind:
+            found = figures(row)
+            bz = int(row[index["DistrictCode"]][1:3])
+            suffix, label = POSTAL[kind]
+            result.rows.append(
+                Row(
+                    bz,
+                    f"{bz:02d}-{suffix}",
+                    label,
+                    "postal_district",
+                    None,
+                    None,
+                    found.cast,
+                    found.invalid,
+                    found.votes,
+                )
+            )
+        elif typ == "Wien" and code.startswith("GR"):
+            result.declared[None] = figures(row)
+        elif typ == "Bezirk" and code.startswith("BV") and not row[index["Stimmtyp"]]:
+            result.declared[int(row[index["DistrictCode"]][1:3])] = figures(row)
+    return result
 
 
 @functools.cache
-def table(edition: Edition) -> Table:
-    return _current(edition) if edition.files[0].endswith(".csv") else _legacy(edition)
+def results(year: int, council: bool) -> Results:
+    _, gr_code, bv_code = ELECTIONS[year]
+    code = gr_code if council else bv_code
+    return _modern(code) if year == 2025 else _legacy(code)
 
 
-def party_key(edition: Edition, label: str) -> str:
-    for pattern, name in PERSISTENT:
-        if pattern.search(label):
-            return name
-    return f"{label}@{edition.key}"
+def _text(year: int, council: bool, bz: int | None) -> str:
+    data = raw.cached(SOURCE, page_url(year, council, bz)).path.read_bytes()
+    try:
+        markup = data.decode("utf-8")
+    except UnicodeDecodeError:
+        markup = data.decode("cp1252")
+    markup = re.sub(r"<script.*?</script>|<style.*?</style>", "", markup, flags=re.DOTALL)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", markup)))
 
 
-def party(edition: Edition, label: str) -> str:
-    return key("party", party_key(edition, label))
+def seats(year: int, council: bool, bz: int | None) -> tuple[int, list[tuple[float, int]]] | None:
+    """The seats the city prints on a result page: the council's size and each list's vote share with its seats.
+    Lists are matched by share, because the pages abbreviate their names."""
+    if not pages(year, council):
+        return None
+    text = _text(year, council, bz)
+    heading = list(re.finditer(r"Mandatsverteilung \((\d+) Mandate zu vergeben\)", text))
+    if not heading:
+        return None
+    size = int(heading[0].group(1))
+    if "Stimmen in Prozent" in text:
+        shares = re.findall(r"(\d+,\d+)%", text.split("Stimmen in Prozent")[1].split("Änderung der Stimmen")[0])
+        counts = re.match(r"((?: \d+)+)", text[heading[-1].end() :])
+        assert counts is not None
+        given = counts.group(1).split()
+        if len(shares) != len(given):
+            raise ValueError(f"{page_url(year, council, bz)}: {len(shares)} shares and {len(given)} seat counts")
+        return size, [(float(a.replace(",", ".")), int(b)) for a, b in zip(shares, given, strict=True)]
+    tail = text[heading[0].end() :].split("Endergebnis der Stadtwahlbehörde - Tabelle")[0]
+    pairs = re.findall(r"(\d+) \([^)]*\) (.+?)(?= \d+ \([^)]*\) |$)", tail)
+    diagram = re.sub(r"^.*?Diagramm(?: \d+%)*", "", text[: heading[0].start()].split("Diagramm : -->")[-1])
+    share = {
+        a.strip(): float(b.replace(",", "."))
+        for a, b in re.findall(r"(.+?) (\d+,\d+)% (?:[+±-]\d+,\d+%|n\.t\.) ?", diagram)
+    }
+    return size, [(share[label.strip()], int(count)) for count, label in pairs if int(count) or label.strip() in share]
+
+
+# ---------------------------------------------------------------- geography
+
+
+@functools.cache
+def _features(layer: str) -> list[tuple[dict[str, str | int | None], shapely.Geometry]]:
+    data = json.loads(raw.cached(SOURCE, wfs(layer)).path.read_text(encoding="utf-8"))
+    return [(feature["properties"], shapely.geometry.shape(feature["geometry"])) for feature in data["features"]]
+
+
+def _multi(shape: shapely.Geometry) -> shapely.Geometry:
+    parts = [part for part in shapely.get_parts(shapely.make_valid(shape)) if shapely.get_type_id(part) in (3, 6)]
+    return shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
+
+
+def _outline(p: Package, id: str, shape: shapely.Geometry, since: date | None, until: date | None) -> None:
+    shape = _multi(shape)
+    p.add(
+        "area_geometry",
+        area_id=id,
+        valid_from=since,
+        valid_to=until,
+        geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+        ),
+        quality="official",
+        source_id=SHAPES_ID,
+    )
+
+
+@functools.cache
+def bezirke() -> dict[int, tuple[str, shapely.Geometry]]:
+    found = {}
+    for props, shape in _features(BEZIRKE):
+        found[int(str(props["BEZNR"]))] = (str(props["NAMEK"]), shape)
+    shapes = list(shapely.make_valid(shapely.coverage_simplify(numpy.array([s for _, s in found.values()]), TOLERANCE)))
+    return {number: (found[number][0], shape) for number, shape in zip(sorted(found), shapes, strict=True)}
+
+
+def districts() -> dict[int, str]:
+    return {number: name for number, (name, _) in bezirke().items()}
+
+
+@functools.cache
+def sprengel(year: int) -> dict[str, shapely.Geometry]:
+    """The published polling-district shapes of one plan, keyed by the five-digit code (district and number)."""
+    grouped: dict[str, list[shapely.Geometry]] = defaultdict(list)
+    for props, shape in _features(SHAPE_LAYERS[year]):
+        grouped[str(props["SPRENGEL"])].append(shape)
+    codes = sorted(grouped)
+    merged = [shapely.union_all(grouped[code]) for code in codes]
+    simple = shapely.coverage_simplify(numpy.array(merged), TOLERANCE)
+    return dict(zip(codes, shapely.make_valid(simple), strict=True))
+
+
+def window(year: int) -> tuple[date | None, date | None]:
+    """The days a plan's polling districts held for: from its election to the next one that has shapes."""
+    later = [y for y in SHAPE_YEARS if y > year]
+    return ELECTIONS[year][0], ELECTIONS[later[0]][0] if later else None
 
 
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Vienna and its 23 municipal districts as the city's election office codes them in its results",
+        "Vienna, its 23 municipal districts, and the polling districts of the 2005 to 2025 elections, with shapes from "
+        "the City of Vienna's open data",
     )
     p.external |= {AUSTRIA, COUNTRY}
-    for code, rank, noun in (("at-9.land", 1, "state"), ("at-9.bezirk", 2, "municipal district")):
-        p.add("scheme", code=code, polity_id=AUSTRIA, kind="administrative", rank=rank, noun=noun, code_system=None)
-    p.add("area", id=LAND, scheme_code="at-9.land")
+    p.add(
+        "source",
+        id=SHAPES_ID,
+        kind="official_body",
+        publisher="Stadt Wien",
+        title="Open government data of the City of Vienna: district boundaries and polling districts",
+        url="https://www.data.gv.at/katalog/organization/stadt-wien",
+        license=LICENSE,
+        license_url=LICENSE_URL,
+        attribution=ATTRIBUTION,
+    )
+    for layer in (BEZIRKE, *SHAPE_LAYERS.values()):
+        p.artifact(raw.cached(SOURCE, wfs(layer)), SHAPES_ID)
+    for code, rank, kind, noun in (
+        (LAND_SCHEME, 1, "administrative", "state"),
+        (BEZIRK_SCHEME, 2, "administrative", "municipal district"),
+        (SPRENGEL_SCHEME, 3, "precinct", "polling district"),
+    ):
+        p.add("scheme", code=code, polity_id=AUSTRIA, kind=kind, rank=rank, noun=noun, code_system=None)
+    found = bezirke()
+    p.add("area", id=LAND, scheme_code=LAND_SCHEME)
     p.add("area_code", area_id=LAND, code="9")
     p.add("area_parent", area_id=LAND, parent_id=COUNTRY)
     p.name(LAND, "Wien", "de", "official")
     p.name(LAND, "Vienna", "en", "official", False)
-    for number, text in enumerate(DISTRICTS, start=1):
-        id = key("area", "at-9.bezirk", number)
-        p.add("area", id=id, scheme_code="at-9.bezirk")
+    _outline(p, LAND, shapely.coverage_union_all([shape for _, shape in found.values()]), None, None)
+    taken = raw.cached(SOURCE, wfs(BEZIRKE)).retrieved_at
+    for scheme in (LAND_SCHEME, BEZIRK_SCHEME):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", scheme, taken.year),
+            scheme_code=scheme,
+            vintage=str(taken.year),
+            as_of=taken.date(),
+        )
+    for number, (name, shape) in sorted(found.items()):
+        id = district(number)
+        p.add("area", id=id, scheme_code=BEZIRK_SCHEME)
         p.add("area_code", area_id=id, code=f"{number:02d}")
         p.add("area_parent", area_id=id, parent_id=LAND)
-        p.name(id, text, "de", "official")
+        p.name(id, name, "de", "official")
+        _outline(p, id, shape, None, None)
+    for year in SHAPE_YEARS:
+        since, until = window(year)
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", SPRENGEL_SCHEME, year),
+            scheme_code=SPRENGEL_SCHEME,
+            vintage=str(year),
+            valid_from=since,
+            valid_to=until,
+            as_of=since,
+        )
+        for code, shape in sorted(sprengel(year).items()):
+            number, spr = int(code[:-3]), code[-3:]
+            id = precinct(year, code)
+            p.add("area", id=id, scheme_code=SPRENGEL_SCHEME)
+            p.add("area_code", area_id=id, code=f"{year}:{code}", valid_from=since, valid_to=until)
+            p.add("area_parent", area_id=id, parent_id=district(number), valid_from=since, valid_to=until)
+            p.name(id, f"{found[number][0]}, Sprengel {int(spr)} ({year})", "de", "official")
+            _outline(p, id, shape, since, until)
     return p
+
+
+# ---------------------------------------------------------------- registry
+
+
+def party(year: int, label: str) -> str:
+    return key("party", label) if label in PERSISTENT else key("party", f"{label}@{gr(year)}")
 
 
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "The Viennese Landtag and the lists on its ballots, as the city's election office prints them",
+        "Vienna's Gemeinderat and Landtag, its 23 district councils, and the lists on their ballots from the City of "
+        "Vienna's election results",
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {AUSTRIA, COUNTRY}
@@ -249,77 +563,111 @@ def registry() -> Package:
         "source",
         id=SOURCE_ID,
         kind="official_body",
-        publisher="Stadt Wien",
-        title="Wiener Wahlergebnisse: Gemeinderatswahlen",
-        url="https://www.wien.gv.at/politik/wahlergebnisse",
-        attribution="Stadt Wien",
+        publisher="Stadt Wien, Magistratsabteilung 62",
+        title="Wiener Wahlergebnisse: Gemeinderats- und Bezirksvertretungswahlen",
+        url=f"{SITE}/politik/wahlergebnisse",
+        license=LICENSE,
+        license_url=LICENSE_URL,
+        attribution=ATTRIBUTION,
     )
-    for edition in EDITIONS:
-        for url in edition.files:
-            p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    for year in ELECTIONS:
+        for council in (True, False):
+            for url in [*files(year, council), *pages(year, council)]:
+                p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     p.add("body", id=BODY, polity_id=AUSTRIA, kind="unicameral")
     p.name(BODY, "Viennese Landtag", "en", "official")
     p.name(BODY, "Wiener Landtag und Gemeinderat", "de", "native", False)
+    for number, name in sorted(districts().items()):
+        body = council_body(number)
+        p.add("body", id=body, polity_id=AUSTRIA, kind="council")
+        p.name(body, f"Bezirksvertretung {name}", "de", "official")
+        p.name(body, f"District Council of {name}", "en", "official", False)
     seen: set[str] = set()
-    for edition in EDITIONS:
-        for label in table(edition).labels:
-            id = party(edition, label)
-            if id in seen:
-                continue
-            seen.add(id)
-            p.add("party", id=id, kind="party", polity_id=AUSTRIA)
-            p.add("external_id", entity_id=id, scheme="at.wien.party", value=party_key(edition, label))
-            p.name(id, label, "de", "abbreviation" if len(label) < 12 else "official")
+    for year in ELECTIONS:
+        for council in (True, False):
+            for label in results(year, council).labels:
+                id = party(year, label)
+                if id in seen:
+                    continue
+                seen.add(id)
+                p.add("party", id=id, kind="party" if label in PERSISTENT else "list_vehicle", polity_id=AUSTRIA)
+                p.add(
+                    "external_id",
+                    entity_id=id,
+                    scheme="at.wien.party",
+                    value=label if label in PERSISTENT else f"{label}@{gr(year)}",
+                )
+                p.name(id, FULL_NAMES.get(label, label), "de", "official")
+                if label in FULL_NAMES:
+                    p.name(id, label, "de", "abbreviation", False)
     return p
 
 
-METHOD = (
-    "Results by polling district (Sprengel) from the city election office's results files. Vienna is a state and a "
-    "municipality, and its Gemeinderat also sits as the Landtag. Postal and absentee-card ballots (Wahlkarten) are "
-    "counted apart from the polling districts. The office prints them as a district-level row for each of the 23 "
-    "municipal districts, which is stored as its own unit, so the units add up to the city's result. Registered "
-    "voters are listed only for the polling districts."
-)
+# ---------------------------------------------------------------- one election
 
 
-def election(edition: Edition) -> Package:
-    year = edition.day.year
-    t = table(edition)
-    p = Package(
-        f"{SOURCE}/{edition.key}",
-        SOURCE,
-        f"The {edition.day} Viennese Gemeinderat and Landtag election by polling district from the city's election "
-        "office",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
-    )
-    p.external |= {AUSTRIA, COUNTRY}
-    for url in edition.files:
-        p.uses(raw.cached(SOURCE, url))
-    id = key("election", edition.key)
+def _ran(rows: list[Row], labels: list[str], modern: bool) -> list[str]:
+    """The lists with votes in these rows; the older sheets print a zero for a list that did not run."""
+    found = []
+    for label in labels:
+        totals = [row.votes.get(label) for row in rows]
+        if any(total is not None for total in totals) if modern else any(totals):
+            found.append(label)
+    return found
+
+
+def unit_id(year: int, code: str) -> str:
+    """One unit per place and day, shared by the Gemeinderat and the district council counted there."""
+    return key("unit", gr(year), code)
+
+
+def _unit(p: Package, year: int, row: Row) -> None:
+    day = ELECTIONS[year][0]
+    shaped = year in SHAPE_YEARS and row.shape is not None and row.shape in sprengel(year)
+    id = unit_id(year, row.code)
     p.add(
-        "election", id=id, polity_id=AUSTRIA, kind="general", date_from=edition.day, date_to=edition.day, status="held"
+        "reporting_unit",
+        id=id,
+        polity_id=AUSTRIA,
+        scheme_code=SPRENGEL_SCHEME,
+        code=f"{day}:{row.code}",
+        area_relation="equals" if shaped else "within",
+        area_id=precinct(year, row.shape) if shaped and row.shape is not None else district(row.bz),
+        kind=row.kind,
     )
-    p.name(id, f"{year} Viennese Landtag election", "en", "official")
-    p.name(id, f"Gemeinderatswahl {year}", "de", "native", False)
-    path = f"at/{edition.day}-wien-landtag"
-    p.add("slug", path=path, entity_id=id, is_current=True)
-    contest = key("contest", edition.key)
+    p.name(id, f"{row.label}, {districts()[row.bz]}", "de", "official")
+
+
+def _contest(
+    p: Package,
+    year: int,
+    council: bool,
+    scope: int | None,
+    election_id: str,
+    rows: list[Row],
+    found: Results,
+) -> str:
+    """One contest: the Gemeinderat (scope None) or the council of one district."""
+    prefix = gr(year) if council else bv(year)
+    contest = key("contest", prefix) if council else key("contest", prefix, scope)
+    result_set = key("result_set", prefix) if council else key("result_set", prefix, scope)
+    printed = seats(year, council, scope)
+    declared = found.declared.get(scope)
     p.add(
         "contest",
         id=contest,
-        election_id=id,
+        election_id=election_id,
         kind="list_allocation",
-        body_id=BODY,
-        district_area_id=LAND,
+        magnitude=printed[0] if printed else None,
+        body_id=BODY if scope is None else council_body(scope),
+        district_area_id=LAND if scope is None else district(scope),
+        round_number=1,
         default_result_kind="counted",
     )
-    p.name(contest, f"{year} Viennese Landtag", "en", "official")
-    p.add("slug", path=f"{path}/{changeset.slug('Landtag')}", entity_id=contest, is_current=True)
-    result_set = key("result_set", edition.key)
     p.add(
         "result_set",
         id=result_set,
-        election_id=id,
+        election_id=election_id,
         contest_id=contest,
         stage="official",
         kind="counted",
@@ -329,76 +677,155 @@ def election(edition: Edition) -> Package:
         completeness=1.0,
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
-    options = []
-    for position, label in enumerate(t.labels, start=1):
-        option = key("option", edition.key, label)
-        options.append(option)
+    options = {}
+    for position, label in enumerate(_ran(rows, found.labels, year == 2025), 1):
+        option = options[label] = key("option", prefix, label) if council else key("option", prefix, scope, label)
         p.add(
             "contest_option",
             id=option,
             contest_id=contest,
             kind="list",
-            party_id=party(edition, label),
+            party_id=party(year, label),
             ballot_position=position,
             ballot_label=label,
         )
-    valid = t.cast - t.invalid
-    for measure, value in ((2, t.registered), (3, t.cast), (4, valid), (5, t.invalid)):
-        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-    for option, votes in zip(options, t.votes, strict=True):
-        p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=votes)
-    for leaf in t.leaves:
-        code = f"{leaf.district:02d}-{leaf.polling}"
-        unit = key("unit", edition.key, code)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=AUSTRIA,
-            scheme_code="at-9.bezirk",
-            code=f"{edition.day}:{code}",
-            area_relation="within",
-            area_id=key("area", "at-9.bezirk", leaf.district),
-            kind="postal_district" if leaf.kind == "postal" else "standard",
-        )
-        where = DISTRICTS[leaf.district - 1]
-        if leaf.kind == "postal":
-            label = {"wk": "Wahlkarten", "bw": "Briefwahl"}.get(leaf.polling, "Wahlkarten")
-            p.name(unit, f"{label}, {where}", "de", "official")
-        else:
-            p.name(unit, f"Sprengel {int(leaf.polling)}, {where}", "de", "official")
-        for measure, field in MEASURES:
-            value = getattr(leaf, field)
+    for row in rows:
+        id = unit_id(year, row.code)
+        for measure, value in ((2, row.registered), (3, row.cast), (5, row.invalid), (4, row.cast - row.invalid)):
             if value is None:
                 continue
             p.add(
                 "result_value",
                 result_set_id=result_set,
-                unit_id=unit,
+                unit_id=id,
                 option_id=None,
                 channel=0,
                 measure=measure,
                 count_round=0,
-                flags=0,
+                flags=DERIVED if measure == 4 else 0,
                 value=value,
             )
-        for option, votes in zip(options, leaf.votes, strict=True):
+        for label, option in options.items():
+            value = row.votes.get(label)
+            if value is None:
+                continue
             p.add(
                 "result_value",
                 result_set_id=result_set,
-                unit_id=unit,
+                unit_id=id,
                 option_id=option,
                 channel=0,
                 measure=1,
                 count_round=0,
                 flags=0,
-                value=votes,
+                value=value,
             )
-    over = [leaf for leaf in t.leaves if leaf.registered is not None and leaf.cast > leaf.registered]
-    if over:
+    if declared is not None:
+        for measure, value in (
+            (2, declared.registered),
+            (3, declared.cast),
+            (5, declared.invalid),
+            (4, declared.cast - declared.invalid),
+        ):
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for label, option in options.items():
+            value = declared.votes.get(label)
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=value)
+        if printed is not None:
+            valid = declared.cast - declared.invalid
+            for share, count in printed[1]:
+                if not count:
+                    continue
+                match = [
+                    label
+                    for label in options
+                    if (votes := declared.votes.get(label)) is not None and abs(100 * votes / valid - share) < 0.011
+                ]
+                if len(match) != 1:
+                    raise ValueError(f"{prefix} {scope}: {share}% matches {match}")
+                p.add("outcome", result_set_id=result_set, option_id=options[match[0]], kind="won", seats=count)
+    if any(row.registered is not None and row.cast > row.registered for row in rows):
+        p.add(
+            "note",
+            id=key("note", result_set, "voting-cards"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md="In some polling districts more ballots were cast than voters were on the roll, because voters "
+            "with a voting card may vote in any polling district of their district. The figures are stored as printed.",
+            lang="en",
+        )
+    return result_set
+
+
+def _over(p: Package, rows: list[Row]) -> None:
+    count = sum(1 for row in rows if row.registered is not None and row.cast > row.registered)
+    if count:
         p.accept(
             "accounting.turnout",
-            f"{len(over)} polling {'district' if len(over) == 1 else 'districts'} counted more ballots than the file "
-            "lists registered voters, from voters with an absentee card who vote outside their own district; "
-            "stored as printed",
+            f"{count} polling-district rows print more ballots than registered voters, because voters with a voting "
+            "card (Wahlkarte) may vote in any polling district of their district; stored as printed",
         )
+
+
+def landtag(year: int) -> Package:
+    day = ELECTIONS[year][0]
+    found = results(year, True)
+    p = Package(
+        f"{SOURCE}/{gr(year)}",
+        SOURCE,
+        f"The {day} Viennese Gemeinderat and Landtag election by polling district from the city's election office",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRIA}
+    for url in [*files(year, True), *pages(year, True)]:
+        p.uses(raw.cached(SOURCE, url))
+    id = key("election", gr(year))
+    p.add("election", id=id, polity_id=AUSTRIA, kind="general", date_from=day, date_to=day, status="held")
+    p.name(id, f"{year} Viennese Landtag election", "en", "official")
+    p.name(id, f"Gemeinderatswahl {year}", "de", "native", False)
+    path = f"at/{day}-wien-landtag"
+    p.add("slug", path=path, entity_id=id, is_current=True)
+    for row in found.rows:
+        _unit(p, year, row)
+    _contest(p, year, True, None, id, found.rows, found)
+    contest = key("contest", gr(year))
+    p.name(contest, f"{year} Viennese Landtag", "en", "official")
+    p.add("slug", path=f"{path}/{changeset.slug('Landtag')}", entity_id=contest, is_current=True)
+    _over(p, found.rows)
+    return p
+
+
+def councils(year: int) -> Package:
+    day = ELECTIONS[year][0]
+    found = results(year, False)
+    names = districts()
+    p = Package(
+        f"{SOURCE}/{bv(year)}",
+        SOURCE,
+        f"The {day} elections of Vienna's 23 district councils (Bezirksvertretungen) by polling district from the "
+        "city's election office",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{gr(year)}"],
+    )
+    p.external |= {AUSTRIA}
+    for url in [*files(year, False), *pages(year, False)]:
+        p.uses(raw.cached(SOURCE, url))
+    id = key("election", bv(year))
+    p.add("election", id=id, polity_id=AUSTRIA, kind="local", date_from=day, date_to=day, status="held")
+    p.name(id, f"{year} Vienna district council elections", "en", "official")
+    p.name(id, f"Bezirksvertretungswahlen {year}", "de", "native", False)
+    path = f"at/{day}-wien-bezirksvertretung"
+    p.add("slug", path=path, entity_id=id, is_current=True)
+    shared = {row.code for row in results(year, True).rows}
+    for row in found.rows:
+        if row.code not in shared:
+            _unit(p, year, row)
+            shared.add(row.code)
+    for scope in sorted(names):
+        rows = [row for row in found.rows if row.bz == scope]
+        _contest(p, year, False, scope, id, rows, found)
+        contest = key("contest", bv(year), scope)
+        p.name(contest, f"Bezirksvertretung {names[scope]} {year}", "de", "official")
+        p.add("slug", path=f"{path}/{changeset.slug(names[scope])}", entity_id=contest, is_current=True)
+    _over(p, found.rows)
     return p
