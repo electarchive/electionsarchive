@@ -54,3 +54,4 @@ ignore = ["B023", "BLE001", "S112", "UP031"]
 
 [dependency-groups]
 dev = ["ruff>=0.17.0", "ty>=0.0.87"]
+scans = ["rapidocr-onnxruntime==1.2.3"]
