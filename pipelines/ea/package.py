@@ -1502,7 +1502,7 @@ def run(command: str, keys: list[str], reference: Path | None = None) -> None:
         print(f"{key}: checks passed, {checked}", flush=True)
         ready.append((path, accepted))
     if command == "load" and ready:
-        with store.connect() as conn:
+        with store.connect(autocommit=True) as conn:
             meter = Meter(conn)
             try:
                 load(conn, ready, meter)
@@ -1510,7 +1510,7 @@ def run(command: str, keys: list[str], reference: Path | None = None) -> None:
                 if meter.tripped:
                     raise MemoryError(
                         f"the database backend reached {meter.tripped:,} MB, over {SERVER_LIMIT:,} MB, "
-                        "so the load was canceled and rolled back"
+                        "so the load was canceled and its open chunk rolled back"
                     ) from None
                 raise
             finally:
