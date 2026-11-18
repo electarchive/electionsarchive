@@ -245,6 +245,10 @@ def figure(label: str) -> str | None:
         return "registered"
     if label.startswith("Գրանցված և քվեաթերթիկ ստացած") or label == "Քվեարկության մասնակիցների ընդհանուր թիվը":
         return "voters"
+    if label == "Ընտրողների ցուցակներում ընդգրկված ընտրողների ընդհանուր թիվը":
+        return "listed"
+    if label in ("Թեկնածուին դեմ քվեարկված քվեաթերթիկների թիվը", "Դեմ քվեարկված քվեաթերթիկների թիվը"):
+        return "against"
     if label == "Անվավեր քվեաթերթիկների թիվը":
         return "invalid"
     if label == "Վավեր քվեաթերթիկների թիվը":
@@ -291,6 +295,8 @@ def parse_page(text: str) -> Page:
         found = cells(row)
         if len(found) == 2 and (name := figure(found[0])) is not None and (value := number(found[1])) is not None:
             out.figures.setdefault(name, value)
+    if "registered" not in out.figures and "listed" in out.figures:
+        out.figures["registered"] = out.figures["listed"]
     decision = tab(text, "Tab6")
     marker = decision.find("ընտրվել")
     if marker > 0:
@@ -678,6 +684,16 @@ def election(day: date, group: list[Poll]) -> Package:
                 )
                 outcomes += 1
         listed = stations(poll.number)
+        against = key("option", poll.number, "against")
+        if "against" in page.figures:
+            p.add(
+                "contest_option",
+                id=against,
+                contest_id=contest,
+                kind="none_of_the_above",
+                ballot_position=len(options) + 1,
+                ballot_label="Against the candidate",
+            )
         pages: list[tuple[str, Page]]
         if len(listed) > 1:
             repeated = {n for _, n in listed if sum(1 for _, other in listed if other == n) > 1}
@@ -703,10 +719,13 @@ def election(day: date, group: list[Poll]) -> Package:
             )
             for name, measure in MEASURES.items():
                 values.add(result_set, unit, None, measure, unit_page.figures.get(name))
-            counted, valid = sum(votes or 0 for _, votes in unit_page.candidates), unit_page.figures.get("valid")
+            if "against" in page.figures:
+                values.add(result_set, unit, against, VOTES, unit_page.figures.get("against"))
+            counted = sum(votes or 0 for _, votes in unit_page.candidates) + unit_page.figures.get("against", 0)
+            valid = unit_page.figures.get("valid")
             if valid is not None and counted != valid:
                 short.append(
-                    f"{poll.community} ({poll.region}), station {station} ({counted} to candidates, {valid} valid)"
+                    f"{poll.community} ({poll.region}), station {station} ({counted} to candidates and against, {valid} valid)"
                 )
             registered, voters = unit_page.figures.get("registered"), unit_page.figures.get("voters")
             if registered is not None and voters is not None and voters > registered:
@@ -722,6 +741,8 @@ def election(day: date, group: list[Poll]) -> Package:
         for name, measure in MEASURES.items():
             if name in page.figures:
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=page.figures[name])
+        if "against" in page.figures:
+            p.add("declared", result_set_id=result_set, option_id=against, measure=VOTES, value=page.figures["against"])
         for (name, votes), option in zip(page.candidates, options, strict=True):
             if votes is not None:
                 p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
@@ -734,7 +755,7 @@ def election(day: date, group: list[Poll]) -> Package:
     if short:
         p.accept(
             "accounting.votes_valid",
-            "The Commission's own protocol prints candidate votes that differ from its valid ballot count at "
+            "The Commission's own protocol prints candidate votes that differ from its valid ballot count (against votes included) at "
             + "; ".join(short),
         )
     print(f"{package_key(day)}: {len(group)} contests, {outcomes} outcomes, {unmatched} unmatched", flush=True)
