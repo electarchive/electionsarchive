@@ -65,6 +65,7 @@ SEATS_BY_AGE = "LIGEDB1"
 LOCAL_RESULTS = "KVRES"
 LOCAL_PARTIES = ("VALGK3", "VALGK3X")
 REGION_PARTIES = ("AKVA3", "AKVA3X")
+PERSONAL = {y: f"KV{y % 100:02d}PERS" for y in (1997, 2001, 2005, 2009, 2013, 2017, 2021, 2025)}
 
 
 def tables() -> list[str]:
@@ -72,7 +73,16 @@ def tables() -> list[str]:
     for group in (FOLKETING, EUROPEAN, REFERENDUM):
         for names, total in group.values():
             found += [*names, *([total] if total else [])]
-    return [*found, SEATS, SEATS_BY_AGE, *DETAIL_LOCAL, LOCAL_RESULTS, *LOCAL_PARTIES, *REGION_PARTIES]
+    return [
+        *found,
+        SEATS,
+        SEATS_BY_AGE,
+        *DETAIL_LOCAL,
+        LOCAL_RESULTS,
+        *LOCAL_PARTIES,
+        *REGION_PARTIES,
+        *PERSONAL.values(),
+    ]
 
 
 def info_url(table: str) -> str:
@@ -281,9 +291,11 @@ class Contest:
         self.units: list[Unit] = []
         self.seats: dict[str, int] = {}
         self.declared: dict[tuple[str | None, int], int] = {}
+        self.candidate_votes: dict[str, int] = {}  # a candidate option to its personal votes in the council
         self.tables: list[str] = []
         self.notes: list[str] = []
         self.body_names: tuple[str, str] = ("", "")
+        self.place = ""  # the council's area name
         self.districts: list[Unit] = []  # the polling districts from the election database, when it holds them
         self.extract: int | None = None  # the election database's id of the election the districts come from
         self.district_notes: list[str] = []
@@ -472,6 +484,7 @@ def council(election: Election, kind: str, code: str, name: str, year: int) -> C
         SYSTEM_LIST,
     )
     contest.body = key("body", kind, code)
+    contest.place = name
     contest.body_names = (f"{name} {english.title()}", f"{name} {danish}")
     election.contests.append(contest)
     return contest
@@ -744,6 +757,122 @@ def folketing_elections() -> list[Election]:
     return found
 
 
+CANDIDATE = re.compile(r"^(.+) \(([^()]+)\) \(([^()]+)\)$")
+
+
+# The ballot letters of the national lists before 2009, when the party tables do not give them, to the list's code.
+OLD_LETTERS = {
+    "A": "socialdemokratiet",
+    "B": "radikale venstre",
+    "C": "konservative folkeparti",
+    "D": "centrum-demokraterne",
+    "F": "socialistisk folkeparti",
+    "O": "dansk folkeparti",
+    "Q": "kristeligt folkeparti",
+    "S": "slesvigsk parti",
+    "V": "venstre",
+    "Z": "fremskridtspartiet",
+    "Ø": "enhedslisten",
+}
+
+
+def resolve_lists(contest: Contest, tokens: list[str], year: int) -> dict[str, str]:
+    """The list each ballot token of a council's candidates stands for.
+
+    A national list is known by its letter. The source sometimes writes a list's letter with a number (V1), so a
+    numbered token joins the letter's list when together they hold exactly that list's seats; any other token is a
+    list without a reserved letter, which the source counts among the others."""
+    mapping = dict(letters(contest))
+    if year < 2009:
+        mapping |= {k: v for k, v in OLD_LETTERS.items() if v in contest.options}
+    unreserved = [c for c, o in contest.options.items() if o.kind == "others"]
+    other = next((c for c in unreserved if c in contest.seats), None) or next(iter(unreserved), None)
+    other = other or others_option(contest, "others")
+    sizes: dict[str, int] = defaultdict(int)
+    for token in tokens:
+        sizes[token] += 1
+    found = {token: mapping.get(token, other) for token in sizes}
+    for letter, code in mapping.items():
+        group = [t for t in sizes if t != letter and t.rstrip("0123456789") == letter]
+        if group and sum(sizes[t] for t in [letter, *group] if t in sizes) == contest.seats.get(code, 0):
+            for token in group:
+                found[token] = code
+    return found
+
+
+# The candidate tables' spellings of municipalities the area tables name differently.
+SPELLINGS = {
+    "københavns": "københavn",
+    "neksø": "nexø",
+    "nykøbing f.": "nykøbing-falster",
+    "thyborøn-harboør": "thyborøn-harboøre",
+}
+
+
+def council_key(text: str) -> str:
+    """A municipality's name without its suffix, for matching the names two tables spell differently."""
+    name = re.sub(r"\s*\([^()]*\)$", "", clean(text).casefold())
+    name = re.sub(r"\s+(kommune|amt)$", "", name)
+    name = SPELLINGS.get(name, name)
+    return name.replace("aa", "å").replace("å", "aa")
+
+
+def attach_candidates(election: Election, year: int) -> None:
+    """Personal votes of the elected municipal candidates, per municipality, as candidates under their lists."""
+    table = PERSONAL[year]
+    codes: dict[str, str] = {}
+    for c in election.contests:
+        name = c.place
+        if codes.setdefault(council_key(name), c.code.removeprefix("kommune-")) != c.code.removeprefix("kommune-"):
+            raise ValueError(f"{election.slug}: two councils named {name}")
+    texts = {str(x["id"]): str(x["text"]) for x in next(v for v in variables(table) if v["id"] == "KANDIDAT")["values"]}
+    by_council = {c.code: c for c in election.contests}
+    found = 0
+    missing: set[str] = set()
+    held: dict[str, list[tuple[str, str, str, int]]] = defaultdict(list)
+    for row in sheet(table):
+        if row["STEMMETYPE"] != "PERS" or row["Tid"] != str(year):
+            continue
+        match = CANDIDATE.match(clean(texts[row["KANDIDAT"]]))
+        if match is None:
+            raise ValueError(f"{table}: candidate {texts[row['KANDIDAT']]!r}")
+        name, letter, council_name = (clean(part) for part in match.groups())
+        code = codes.get(council_key(council_name))
+        contest = by_council.get(f"kommune-{code}") if code else None
+        if contest is None:
+            missing.add(council_name)
+            continue
+        held[contest.code].append((f"candidate-{row['KANDIDAT']}", name, letter, int(row["value"])))
+        found += 1
+    if missing:
+        raise ValueError(f"{table}: no council for {sorted(missing)}")
+    for code, rows in held.items():
+        contest = by_council[code]
+        lists = resolve_lists(contest, [letter for _, _, letter, _ in rows], year)
+        for option, name, letter, votes in rows:
+            contest.options[option] = Option(option, name, "candidate", parent=lists[letter])
+            contest.candidate_votes[option] = votes
+    for contest in election.contests:
+        counted: dict[str, int] = defaultdict(int)
+        for option in contest.candidate_votes:
+            counted[contest.options[option].parent or ""] += 1
+        if counted != {k: v for k, v in contest.seats.items() if v}:
+            contest.notes.append(
+                "The party letters the source prints with the elected candidates do not add up to the council's "
+                "seats per list; the candidates are stored under the lists their letters name."
+            )
+            print(f"{table} {contest.code}: letters differ from the seats", flush=True)
+    for contest in election.contests:
+        if contest.candidate_votes:
+            contest.tables.append(table)
+            contest.notes.append(
+                "The candidates are the elected members and deputies only: the source publishes the personal votes "
+                "of the elected candidates, per council, and not those of candidates who were not elected. The "
+                "candidate votes are given for the whole council."
+            )
+    print(f"{election.slug}: {found} candidates", flush=True)
+
+
 @functools.cache
 def elections() -> list[Election]:
     found: list[Election] = list(folketing_elections())
@@ -787,6 +916,8 @@ def elections() -> list[Election]:
             kommune_results(municipal, year, kommuner)
         else:
             aggregate_councils(municipal, year, "kommune", "VALGK3X")
+        if year in PERSONAL:
+            attach_candidates(municipal, year)
         found.append(municipal)
         if year >= 2005:
             regional = Election(
@@ -939,13 +1070,21 @@ def build(day: date) -> Package:
     for election in found:
         write_election(p, election)
     gapped = [f"{e.slug} {c.code}" for e in found for c in e.contests if c.districts and c.district_notes]
+    reasons: list[str] = []
     if gapped:
-        p.accept(
-            "accounting.declared",
+        reasons.append(
             "The election database's polling districts differ from Statistics Denmark's per-council count by a few "
             f"votes (at most one in a thousand) in {', '.join(gapped)}; both are the authority's own figures, and "
-            "the per-council figures are kept as the declared totals.",
+            "the per-council figures are kept as the declared totals."
         )
+    if any(c.candidate_votes and (c.districts or c.units[0].scheme != "dk.kommune") for e in found for c in e.contests):
+        reasons.append(
+            "Statistics Denmark publishes the personal votes of the elected candidates per council only, not per "
+            "polling district, so the candidates' votes are declared for the council and have no polling-district "
+            "counts to add up to."
+        )
+    if reasons:
+        p.accept("accounting.declared", " ".join(reasons))
     return p
 
 
@@ -1057,6 +1196,13 @@ def write_contest(p: Package, election: Election, election_id: str, c: Contest) 
             put(p, result_set, unit_id, None, measure, value)
         for (option, measure), value in unit.values.items():
             put(p, result_set, unit_id, ids[option], measure, value)
+        if unit.scheme == "dk.kommune":
+            for option, value in c.candidate_votes.items():
+                put(p, result_set, unit_id, ids[option], CANDIDATE_VOTES, value)
+    if not any(u.scheme == "dk.kommune" for u in c.units):
+        # the polling districts do not carry the candidates' votes, which the source gives for the whole council
+        for option, value in c.candidate_votes.items():
+            p.add("declared", result_set_id=result_set, option_id=ids[option], measure=CANDIDATE_VOTES, value=value)
     for (option, measure), value in c.declared.items():
         p.add(
             "declared",
@@ -1132,6 +1278,8 @@ def write_districts(
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
     for (option, measure), value in held.values.items():
         p.add("declared", result_set_id=result_set, option_id=ids[option], measure=measure, value=value)
+    for option, value in c.candidate_votes.items():
+        p.add("declared", result_set_id=result_set, option_id=ids[option], measure=CANDIDATE_VOTES, value=value)
     for option, count in c.seats.items():
         p.add("outcome", result_set_id=result_set, option_id=ids[option], kind="won", seats=count)
 
