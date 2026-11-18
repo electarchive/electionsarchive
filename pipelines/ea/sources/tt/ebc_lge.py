@@ -552,6 +552,13 @@ def election() -> Package:
     )
     p.external.add(TRINIDAD)
     p.uses(raw.cached(SOURCE, REPORT))
+    p.accept(
+        "accounting.turnout",
+        "Five polling stations that the report marks as holding the ballots of special electors (Election Rule 93) "
+        "show more ballots cast than names on their revised list: Erin 4530, Otaheite/Rousillac 4417, Couva "
+        "West/Roystonia 3122, Mayaro South/Guayaguayare 2506, and Valencia East/Toco 2105. The special electors are "
+        "on a separate list, so the station's printed electorate does not count them.",
+    )
     id = key("election", DAY)
     p.add("election", id=id, polity_id=TRINIDAD, kind="local", date_from=DAY, date_to=DAY, status="held")
     p.name(id, "2023 Trinidad and Tobago local government elections", "en", "official")
