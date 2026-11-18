@@ -423,8 +423,8 @@ def _fold(name: str) -> str:
 
 def _communities_data(day: date, data: dict[str, object]) -> list[Community]:
     """The communities' registered voters, ballots, and candidates in the results site's data file."""
-    slovenia = data["slovenija"]
-    if not isinstance(slovenia, dict) or not data["nastavitve"].get("is_final"):  # type: ignore[union-attr]
+    slovenia, settings = data["slovenija"], data["nastavitve"]
+    if not isinstance(slovenia, dict) or not isinstance(settings, dict) or not settings.get("is_final"):
         raise LookupError(f"{day}: the data file is not final")
     block = slovenia["prip_manjs"]
     found: list[Community] = []
