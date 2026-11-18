@@ -78,9 +78,10 @@ def fetch() -> None:
     jobs += [(table, year) for table in EP_TABLES for year in EP_YEARS]
     with ThreadPoolExecutor(WORKERS) as pool:
         list(pool.map(_get, jobs))
-    from ea.sources.se import scb_referendums
+    from ea.sources.se import scb_andra_kammaren, scb_referendums
 
     scb_referendums.fetch()
+    scb_andra_kammaren.fetch()
 
 
 # Membership of municipalities in the constituencies and county councils of Skåne and Västra Götaland. Statistics
@@ -966,7 +967,7 @@ def ep_election(year: int) -> Package:
 
 
 def packages() -> list[str]:
-    from ea.sources.se import scb_referendums
+    from ea.sources.se import scb_andra_kammaren, scb_referendums
 
     return [
         f"{SOURCE}/geo",
@@ -974,11 +975,12 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{DATES[year]}" for year in YEARS),
         *(f"{SOURCE}/{EP_DATES[year]}" for year in EP_YEARS),
         *scb_referendums.packages(),
+        *scb_andra_kammaren.packages(),
     ]
 
 
 def parse() -> None:
-    from ea.sources.se import scb_referendums
+    from ea.sources.se import scb_andra_kammaren, scb_referendums
 
     geo().write()
     registry().write()
@@ -987,6 +989,7 @@ def parse() -> None:
     for year in EP_YEARS:
         ep_election(year).write()
     scb_referendums.parse()
+    scb_andra_kammaren.parse()
 
 
 NATIONAL = {"R": "VR00", "L": "00L", "K": "00"}
