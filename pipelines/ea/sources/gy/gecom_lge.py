@@ -107,7 +107,13 @@ class Form(NamedTuple):
     labels: dict[int, str]
 
 
+COLUMNED = re.compile(r"^(.*?\S)\s{2,}([A-Za-z][A-Za-z./]{1,9})\s{2,}(\S.*)$")
+
+
 def clean(line: str) -> str:
+    columned = COLUMNED.match(line)
+    if columned and not re.search(r"\d", columned.group(2)) and not UNOPPOSED.search(line[: columned.start(3)]):
+        line = f"{columned.group(1)} ({columned.group(2)}) {columned.group(3)}"  # name, party, and votes in columns
     line = line.replace("…", " ").replace("\u2011", "-")
     line = re.sub(r"\.{2,}", " ", line)
     line = re.sub(r"[ \t]+", " ", line)
@@ -168,7 +174,7 @@ def party_key(label: str) -> str:
 
 
 def tokens(name: str) -> list[str]:
-    return sorted(re.findall(r"[A-Z]{2,}", re.sub(r"\([^)]*\)", " ", name.upper())))
+    return sorted(re.findall(r"[A-Z]{2,}", re.sub(r"\bMC\s+", "MC", re.sub(r"\([^)]*\)", " ", name.upper()))))
 
 
 LEADING_PARTY = re.compile(
@@ -184,18 +190,31 @@ def same_person(a: str, b: str) -> bool:
         return False
     if set(x) <= set(y) or set(y) <= set(x):
         return True
+    if sorted("".join(x)) == sorted("".join(y)):
+        return True  # the same letters, where a space was lost or added between two names
     return difflib.SequenceMatcher(None, " ".join(x), " ".join(y)).ratio() >= 0.85
 
 
 def split_candidate(text: str) -> tuple[str, str | None]:
     """A candidate's name and party label from a line that gives one or both."""
     text = text.strip(" :-–")
+    leading = re.match(r"\(?(APNU|PPP/C|AFC)\)?(?:\s*[-–]\s*|\s+)(\S.*)$", text)
+    if leading:
+        return leading.group(2).strip(), leading.group(1)  # the party is printed before the name
+    trailing = re.match(r"(.*\S)\s*[-–]\s*(APNU|PPP/C|AFC)$", text)
+    if trailing:
+        return trailing.group(1).strip(), trailing.group(2)
     found = re.search(r"\(([^)]*)\)\s*$", text)
     if found and not re.fullmatch(r"\d+", found.group(1)):
         label = found.group(1).strip()
         return text[: found.start()].strip(" :-–"), "INDEPENDENT" if re.fullmatch(
             r"independent|individual", label, re.IGNORECASE
         ) else label
+    tied = re.fullmatch(
+        r"(.+?)\s*[-–]\s*([^-–]*(?:party|group|council|alliance|association)[^-–]*)", text, re.IGNORECASE
+    )
+    if tied and not PARTY_WORDS.search(tied.group(1)):
+        return tied.group(1).strip(), tied.group(2).strip()
     for dash in (" – ", " - ", "–"):
         if dash in text:
             left, right = (part.strip() for part in text.split(dash, 1))
@@ -226,6 +245,8 @@ def parse_form(text: str) -> Form:
         index = 0
         while index < len(body):
             name, number = tail(body[index])
+            if number is None and UNOPPOSED.search(name):
+                name, number = UNOPPOSED.sub("", name).strip(" :-–"), 0  # a single list that took its seats unopposed
             if number is None and index + 1 < len(body) and re.fullmatch(r"\d[\d,]*", body[index + 1]):
                 number = int(body[index + 1].replace(",", ""))
                 index += 1
@@ -233,11 +254,14 @@ def parse_form(text: str) -> Form:
             if re.match(r"total", name, re.IGNORECASE):
                 valid = number
             elif name and not re.search(r"candidates\s*:?$", name, re.IGNORECASE):
-                pairs.append((name, number))
+                if number is None and pairs and pairs[-1][1] is not None and not pairs[-1][0].endswith(")"):
+                    pairs[-1] = (f"{pairs[-1][0]} {name}", pairs[-1][1])  # a label wrapped onto a second line
+                else:
+                    pairs.append((name, number))
     lists = [(name, number) for name, number in pairs if number is not None]
     rejected = None
     if rejected_at is not None:
-        for line in lines[rejected_at : rejected_at + 2]:
+        for line in (*lines[rejected_at : rejected_at + 2], lines[rejected_at - 1]):
             number = tail(line)[1]
             if number is not None:
                 rejected = number
@@ -245,14 +269,18 @@ def parse_form(text: str) -> Form:
     seats: dict[str, int] = {}
     if seats_at is not None:
         end = after if after is not None else len(lines)
+        seat_rows: list[tuple[str, int]] = []
         for line in lines[seats_at + 1 : end]:
-            name, number = tail(line)
+            name, number = tail(re.sub(r"\s+seats?$", "", line, flags=re.IGNORECASE))
             if number is None:
                 last = name.split()[-1].lower() if name.split() else ""
                 if last in WORDS:
                     name, number = " ".join(name.split()[:-1]), WORDS[last]
             if number is not None and name:
-                seats[party_key(name)] = number
+                seat_rows.append((name, number))
+            elif name and seat_rows and not re.search(r"names?\s+of|nil\b", name, re.IGNORECASE):
+                seat_rows[-1] = (f"{seat_rows[-1][0]} {name}", seat_rows[-1][1])  # a label wrapped onto a second line
+        seats = {party_key(name): number for name, number in seat_rows}
     if seats_at is not None and len(seats) < len(lists):
         # Some declarations name the councillors under each list instead of printing a seat count.
         found = {party_key(name) for name, _ in lists}
@@ -284,6 +312,8 @@ def parse_form(text: str) -> Form:
     previous = 0
     mode = "votes"
     raw_blocks: dict[int, list[str]] = {}
+    unnamed: list[int] = []
+    standalone: list[str] = []
     labels: dict[int, str] = {}
     for i in range(first_header, len(lines)):
         line = lines[i]
@@ -306,12 +336,25 @@ def parse_form(text: str) -> Form:
                     labels[number] = rest
             else:
                 rest = found.group(2).strip(" :-–")
-                if not rest:
-                    rest = next((lines[j] for j in range(i + 1, len(lines)) if not HEADER.match(lines[j])), "")
-                elected[number] = rest
+                if rest:
+                    elected[number] = rest
+                else:
+                    unnamed.append(number)
+            continue
+        if mode == "elected":
+            # A name on a line of its own sits above or below its header, so the names pair with the headers in order.
+            if re.search(r"[A-Za-z]{2}", line) and not re.match(
+                r"names?\s+of|(the )?constituency elections", line, re.IGNORECASE
+            ):
+                if standalone and standalone[-1].count("(") > standalone[-1].count(")"):
+                    standalone[-1] += " " + line  # a name wrapped onto a second line
+                else:
+                    standalone.append(line)
             continue
         if mode == "votes" and current is not None:
             raw_blocks[current].append(line)
+    if len(standalone) >= len(unnamed):  # any further line is the Returning Officer's signature
+        elected.update(zip(unnamed, standalone, strict=False))
     for number, entries in raw_blocks.items():
         candidates: list[Candidate] = []
         index = 0
@@ -329,7 +372,14 @@ def parse_form(text: str) -> Form:
                 r"(no\.? of|names? of|the following)", name, re.IGNORECASE
             ):
                 continue
+            if votes is None and not opposed and candidates and candidates[-1].votes is not None:
+                last = candidates[-1]  # a party or group name wrapped onto a second line
+                who, label = split_candidate(f"{last.name} {name}" if last.party is None else name)
+                candidates[-1] = Candidate(who, label or last.party, last.votes)
+                continue
             who, label = split_candidate(name)
+            if re.fullmatch(r"nil|none|-|APNU|PPP/C|AFC", who, re.IGNORECASE):
+                continue  # the party fielded no candidate here
             candidates.append(Candidate(who, label, None if opposed else votes))
         blocks[number] = candidates
     return Form(lists, rejected, seats, blocks, elected, valid, labels)
@@ -348,6 +398,11 @@ def hare(votes: dict[str, int], seats: int) -> dict[str, int]:
     return won
 
 
+def uncontested(form: Form) -> bool:
+    """Whether one list stood and took every list seat without a poll."""
+    return len(form.lists) == 1 and form.lists[0][1] == 0
+
+
 def problems(form: Form) -> tuple[list[str], list[int]]:
     """What stops the list contest from loading, and which constituencies cannot be loaded."""
     bad: list[str] = []
@@ -356,7 +411,7 @@ def problems(form: Form) -> tuple[list[str], list[int]]:
         bad.append("no list votes")
     elif len(set(keys)) != len(keys):
         bad.append("two lists share a key")
-    elif form.rejected is None:
+    elif form.rejected is None and not uncontested(form):
         bad.append("no rejected ballots")
     elif not form.seats or not set(form.seats) <= set(keys):
         bad.append(f"seats {sorted(form.seats)} do not match lists {keys}")
@@ -364,7 +419,10 @@ def problems(form: Form) -> tuple[list[str], list[int]]:
         votes = {party_key(name): v for name, v in form.lists}
         total = sum(form.seats.values())
         got = hare(votes, total)
-        if {k: form.seats.get(k, 0) for k in votes} != got:
+        if uncontested(form):
+            if form.seats != {keys[0]: total}:
+                bad.append(f"declared seats {form.seats} for the one unopposed list {keys[0]}")
+        elif {k: form.seats.get(k, 0) for k in votes} != got:
             bad.append(f"declared seats {form.seats} differ from the Hare allocation {got}")
         if form.valid is not None and form.valid != sum(votes.values()):
             bad.append(f"valid votes {form.valid} differ from the list sum {sum(votes.values())}")
@@ -381,7 +439,7 @@ def problems(form: Form) -> tuple[list[str], list[int]]:
         else:
             top = max(c.votes or 0 for c in candidates)
             leaders = [c for c in candidates if c.votes == top]
-            if len(leaders) != 1 or not same_person(leaders[0].name, elected):
+            if not any(same_person(c.name, elected) for c in leaders) or (len(leaders) > 1 and elected is None):
                 out.append(number)
     if sorted(form.constituencies) != list(range(1, len(form.constituencies) + 1)):
         out = sorted(form.constituencies)
@@ -617,13 +675,39 @@ def parsed(day: str) -> list[Area]:
             continue  # a scan with no text layer, or a file whose area is not known
         stem = AREAS_2023[name[:-4]]
         form = parse_form(text)
+        if uncontested(form):
+            form = form._replace(rejected=None)  # no poll was held
         bad, skipped = problems(form)
+        caveats: list[str] = []
+        for reason in [r for r in bad if r.startswith("declared seats") and "Hare allocation" in r]:
+            bad.remove(reason)  # the seats are stored as declared, with the allocation the votes would give
+            got = reason.split("Hare allocation ", 1)[1]
+            caveats.append(
+                "The seats are stored as the declaration gives them; a largest remainder allocation of the declared "
+                f"votes would give {got.strip('{}').replace(chr(39), '').replace(': ', ' ')}."
+            )
         ok = [n for n in sorted(form.constituencies) if n not in skipped]
         if bad and not ok:
             continue
         winners = {n: w for n in ok if (w := winner(form.constituencies[n], None)) is not None}
         ok = [n for n in ok if n in winners]
-        out.append(Area(day, slug_of(stem), display(stem), url, form, not bad, ok, skipped, bad, winners, {}, []))
+        out.append(
+            Area(
+                day,
+                slug_of(stem),
+                display(stem),
+                url,
+                form,
+                not bad,
+                ok,
+                skipped,
+                bad,
+                winners,
+                {},
+                caveats,
+                uncontested(form),
+            )
+        )
     return out
 
 
