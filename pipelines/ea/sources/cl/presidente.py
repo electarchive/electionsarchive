@@ -24,6 +24,7 @@ CHILE = servel.CHILE
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fCHL"))
 LISTING = "https://www.servel.cl/resultados-electorales-1925-1973/"
 BROWSER = "browser://20261117-073136-9adcc0/"
+MEMORIA = "https://www.memoriachilena.gob.cl/archivos2/pdfs/MC0043135.pdf"
 INBOX = DATA / "inbox" / SOURCE
 VALUES = Path(__file__).with_name("presidente.tsv")
 SCHEME = "cl.provincia_historica"
@@ -51,6 +52,7 @@ class Election(NamedTuple):
     printed: str  # the date in the returns' heading
     caveat: str
     advanced: tuple[str, ...] = ()  # with no majority, the two candidates the Congreso Pleno chose between
+    misprints: tuple[str, ...] = ()  # provinces whose printed figures do not add up, and columns that differ nationally
 
 
 def _c(key: str, name: str) -> Column:
@@ -140,6 +142,39 @@ ELECTIONS: dict[int, Election] = {
             "Magallanes were not called to vote. The national roll is the number of registrations the Registry "
             "counted on election day, before the cancellations it lists."
         ),
+    ),
+    1946: Election(
+        date(1946, 9, 4),
+        "special",
+        MEMORIA,
+        "1937",
+        (
+            _c("gonzalez", "Gabriel González Videla"),
+            _c("cruzcoke", "Eduardo Cruz Coke"),
+            _c("alessandri", "Fernando Alessandri Rodríguez"),
+            _c("ibanez", "Bernardo Ibáñez"),
+            Column("scattered", "others", "Dispersos"),
+            Column("blank", "blank", "En blanco"),
+            Column("invalid", "invalid", "Viciados (nulos)"),
+            TOTAL,
+        ),
+        "gonzalez",
+        631257,
+        "4 de septiembre de 1946",
+        (
+            "Province totals from the Tribunal Calificador's general final count, as the Dirección del Registro "
+            "Electoral printed it, in the copy the Biblioteca Nacional de Chile holds. The count prints each "
+            "department's figures too, which this result set does not hold. Blank and null votes are separate "
+            "columns. The returns give about 75.9 percent of the roll as having voted. In Aconcagua the printed "
+            "figures add up to 12,620, ten more than its printed total of 12,610: the department figures sum to "
+            "4,673 votes for González Videla, not the 4,683 the province column prints, and the national figure for "
+            "him is the sum of the printed province figures. The printed national total for Ibáñez, 12,114, is ten "
+            "fewer than his province figures add up to. Each is stored as printed. No candidate won an absolute "
+            "majority, so the Congreso Pleno chose between Gabriel González Videla and Eduardo Cruz Coke, and "
+            "elected González Videla on 24 October 1946; its vote is not part of these returns."
+        ),
+        ("gonzalez", "cruzcoke"),
+        ("Aconcagua", "ibanez"),
     ),
     1952: Election(
         date(1952, 9, 4),
@@ -308,8 +343,8 @@ METHOD = (
     "Province totals from the Dirección del Registro Electoral's printed returns of the election, as the Servicio "
     "Electoral (Servel) publishes them in its historical archive. The PDF is a scan without a text layer, so the "
     "numbers were keyed by hand from the page images; every province's figures add up to its printed total, the "
-    "provinces add up to the printed national totals, and each number keeps its page and box. The returns also print "
-    "each department (and, from 1938, each commune), which this result set does not hold."
+    "provinces add up to the printed national totals (a caveat says where they do not), and each number keeps its "
+    "page and box. The returns also print each department (and, from 1938, each commune), which this result set does not hold."
 )
 
 
@@ -389,7 +424,7 @@ def parse() -> None:
         parts = [c.key for c in election.columns if c.kind != "cast"]
         for name in names:
             row = dict(provinces.filter(pl.col("province") == name).select("column", "value").iter_rows())
-            if sum(row.get(k, 0) for k in parts) != row["total"]:
+            if name not in election.misprints and sum(row.get(k, 0) for k in parts) != row["total"]:
                 raise ValueError(f"{year} {name}: the parts do not add up to the printed total")
             for k in parts:
                 if f"{k}_m" in row and row[f"{k}_m"] + row[f"{k}_f"] != row[k]:
@@ -399,7 +434,7 @@ def parse() -> None:
         for column, value in summed.iter_rows():
             if sexed(column):
                 continue
-            if national.get(column) != value:
+            if national.get(column) != value and column not in election.misprints:
                 raise ValueError(
                     f"{year} {column}: provinces add up to {value}, not the printed {national.get(column)}"
                 )
@@ -535,6 +570,13 @@ def build(year: int) -> Package:
             "by province."
         )
     p.add("note", id=key("note", result_set, "caveat"), entity_id=result_set, kind="caveat", body_md=caveat, lang="en")
+
+    if election.misprints:
+        p.accept(
+            "accounting.declared",
+            "The returns' printed national figure for a candidate differs from the sum of their printed province "
+            "figures; both are stored as printed, as the result set's caveat says.",
+        )
 
     options: dict[str, str] = {}
     measures: dict[str, int] = {}
