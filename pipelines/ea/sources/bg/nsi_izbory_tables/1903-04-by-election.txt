@@ -1,0 +1,103 @@
+# page 557
+# Supplementary elections of 20 April 1903 (date not printed on the page; taken from task)
+D 1 | Ломъ | Lom
+S I 2276 841
+S II 2292 584
+S III 2021 435
+S IV 2543 572
+S V 1993 561
+S VI 1720 408
+T 12845 3401
+C E | Ст. Георгиевъ | I:274 II:542 III:358 IV:406 V:391 VI:349 | 2320
+C N | Ал. Малиновъ | I:512 II:12 III:64 IV:158 V:143 VI:54 | 943
+C N | Н. Харлаковъ [*] | I:29 II:30 III:13 IV:5 V:25 VI:2 | 104
+D 2 | Плѣвенъ (II-а избират.) | Pléven (II-ème électerale)
+S I 1689 346
+S II 2334 584
+S III 2553 364
+S IV 1691 338
+T 8267 1632
+C E | Ст. Ив. Кисовъ | I:232 II:134 III:178 IV:287 | 831
+C N | Семо Г. Мачовъ | I:39 II:376 III:34 IV:43 | 492
+C N | Лачо П. Лачовъ | I:75 II:1 III:150 IV:- | 226
+C N | Коста Ватовъ | I:- II:73 III:2 IV:- | 75
+D 3 | Русе (селска) | Roussé (rural)
+S I 2254 294
+S II 1879 259
+S III 1871 420
+S IV 1951 282
+S V 2058 312
+S VI 2167 389
+S VII 1927 448
+T 14107 2404
+C E | Д. Ц. Лучниковъ | I:294 II:153 III:245 IV:213 V:194 VI:234 VII:117 | 1450
+C N | М. Вълкановъ | I:- II:80 III:33 IV:25 V:87 VI:65 VII:305 | 595
+C N | Рачо Д. Даскаловъ | I:- II:26 III:142 IV:44 V:31 VI:89 VII:26 | 358
+D 4 | Орхание | Orchanié
+# Faint print: section I registered read 3008 (blurred; agrees with total)
+S I 3008? 1635
+S II 2470 1414
+S III 2000 989
+T 7478 4038
+C E | Д-ръ Никола Петковъ | I:1035 II:754 III:443 | 2232
+# Markov figures faint, partly under a stamp
+C N | Д. Марковъ | I:625 II:664 III:545 | 1834
+
+# page 558
+# Supplementary elections of 20 April 1903 (date not printed on the page; taken from task)
+# Orhanie (4) continues from p557: a second elected candidate and further non-elected candidates
+D 4 | cont
+C E | Кръстю Бахчевановъ | I:946 II:761 III:448 | 2155
+C N | Кр. М. Диловски | I:634 II:641 III:541 | 1816
+# NAME uncertain: Бръзчовъ (letters after Бр blurred)
+C N | В. Бръзчовъ | I:23 II:- III:- | 23
+C N | Г. Ив. Христовски | I:3 II:- III:- | 3
+D 5 | София (II-а селска) | Sophia (II-ème rural)
+S I 2450 273
+S II 2897 396
+S III 2514 673
+S IV 2530 870
+S V 2194 483
+S VI 1180 182
+T 13765 2877
+C E | Иванъ Пѣевъ | I:200 II:268 III:354 IV:452 V:276 VI:26 | 1576
+C N | Д-ръ Г. Стрѣзовъ | I:74 II:127 III:316 IV:418 V:208 VI:154 | 1297
+D 6 | Ст.-Загора (I-а избират.) | St.-Zagora (I-ère électorale)
+S I 2073 376
+S II 2457 787
+S III 2095 621
+# III registered as Table III (p556) prints it (Table IV also reads 2095 on re-reading)
+S IV 2329 700
+S V 2095 645
+T 11049 3129
+# registered and voters totals as Table III (p556) prints them; Table IV's total row prints 51307 / 11049, i.e. the district population and registered voters shifted one column
+C E | Георги В. Шиваровъ | I:355 II:784 III:598 IV:691 V:604 | 3032
+# NAME uncertain: Дервенджиевъ (4th letter blurred)
+C E | Христо Дервенджиевъ [*] | I:355 II:784 III:599 IV:691 V:600 | 3029
+C E | Хр. С. Шиваровъ | I:354 II:783 III:599 IV:689 V:601 | 3026
+C N | Маринъ Стояновъ [*] | I:17 II:1 III:22 IV:9 V:44 | 93
+C N | Диню Рашевъ [*] | I:17 II:1 III:22 IV:9 V:42 | 91
+C N | Станчо Момчевъ [*] | I:17 II:1 III:22 IV:9 V:42 | 91
+C N | Милю Ив. Милевъ | I:- II:- III:1 IV:- V:- | 1
+
+# page 559
+# Supplementary elections of 20 April 1903 (date not printed on the page; taken from task)
+D 7 | Горна-Орѣховица | Gorna-Oréhovitza
+S I 2691 957
+S II 2009 744
+S III 2632 584
+S IV 1701 585
+S V 2066 720
+S VI 2080 739
+S VII 2104 677
+T 15278 5006
+# MISMATCH registered: sections sum to 15283, printed total 15278 (all cells clearly printed; Table III (p556) prints the same section figures, confirmed by its percentages, and a total of 15273)
+C E | Д-ръ Ив. Момчиловъ | I:546 II:338 III:441 IV:352 V:311 VI:393 VII:383 | 2764
+C E | Ат. Буровъ | I:540 II:248 III:438 IV:357 V:306 VI:383 VII:148 | 2420
+# NAME uncertain: Бакарджиевъ (blurred)
+C N | П. Ив. Бакарджиевъ | I:398 II:272 III:76 IV:200 V:347 VI:326 VII:224 | 1843
+C N | Т. х. Константиновъ | I:415 II:235 III:82 IV:205 V:325 VI:329 VII:231 | 1822
+# Total blurred: reads 406 or 466; 466 matches the section sum
+C N | Ап. Карапешовъ | I:5 II:241 III:10 IV:31 V:102 VI:19 VII:58 | 466?
+C N | Никола Гешевъ | I:- II:151 III:90 IV:23 V:46 VI:16 VII:23 | 349
+

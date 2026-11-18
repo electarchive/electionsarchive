@@ -1,0 +1,1756 @@
+# page 449
+D 1 | Айтосъ | Aitos
+S I 2341 1267
+S II 1158 736
+S III 2308 1430
+T 5807 3433
+C E | Петъръ Н. Шоповъ | I:783 II:335 III:1102 | 2220
+C N | Желчо Д. Желѣзовъ | I:478 II:355 III:333 | 1166
+C N | Д-ръ А. Възвъзовъ | I:1 II:46 III:- | 47
+# name uncertain: "Д-ръ А. Възвъзовъ" (surname blurred)
+D 2 | Анхиолъ | Anhiol
+S I 1725 969
+S II 1466 736
+S III 1880 891
+T 5071 2596
+C E | Антонъ Франга (ОТ.) | I:708 II:36 III:237 | 981
+C N | Вълканъ Георгиевъ | I:43 II:115 III:419 | 577
+C N | Зиси Н. х. Василиу | I:67 II:472 III:2 | 541
+C N | Д-ръ Паскалъ Табурновъ [*] | I:151 II:113 III:233 | 497
+D 3 | Бургасъ | Bourgas
+S I 2067 1106
+S II 1903 1141
+S III 1921 542
+S IV 1618 772
+S V 2094 1128
+T 9603 4689
+C E | Йоанъ А. Воденичаровъ | I:640 II:526 III:118 IV:296 V:972 | 2552
+C E | Д-ръ Павелъ Пошковъ | I:643 II:525 III:115 IV:225 V:974 | 2482
+C E | Иванъ Поповъ | I:590 II:521 III:116 IV:206 V:979 | 2412
+# names uncertain: first name "Йоанъ" (printed blurred, reads like "Йоан"/"Йови"); surname "Пошковъ" (could be "Пешковъ")
+C N | Страти Димитровъ | I:444 II:606 III:424 IV:560 V:153 | 2187
+C N | Д-ръ Цоню Тотевъ | I:483 II:611 III:424 IV:517 V:148 | 2183
+C N | Лазаръ Гавалюговъ | I:450 II:607 III:424 IV:504 V:152 | 2137
+D 4 | Карнобатъ | Karnobat
+S I 2450 1298
+S II 1995 873
+S III 1271 738?
+S IV 1150 684
+T 6866 3593?
+# voters III and total blurred: read as 758/3598 or 738/3593; only 738/3593 is consistent
+C E | Иванъ З. Нейчевъ | I:454 II:338 III:1 IV:217 | 1010
+C N | Михаилъ Цанковъ | I:352 II:160 III:84 IV:261? | 857
+# Цанковъ IV blurred, reads like 201 or 261; 261 matches the printed total 857
+F К. — означава касиранъ отъ Народното Събрание. ОТ. — означава отказалъ се отъ избора отъ тая околия, понеже е избранъ отъ друга околия, отъ гдѣто е приелъ. * — означава кандидати не положили кандидатурата си, съгласно чл. 61 отъ Избирателния законъ, но избрани или получили повече отъ 30 гласа.
+F Забѣлѣжка. Въ графа 11-а на прѣдидущата таблица III при отбѣлѣзването броя на гласоветѣ получени отъ всѣкой единъ депутатъ е спазенъ сѫщия редъ на депутатитѣ, споредъ както сѫ наредени тѣ въ настоящата таблица IV (графа 5-а).
+
+# page 450
+D 4 | cont
+C E | Добри Карапановъ | I:256 II:415 III:- IV:198 | 869
+C N | х. Мина Поповъ | I:365 II:154 III:74 IV:261 | 854
+C N | Атанасъ Тодоровъ [*] | I:355 II:59 III:379 IV:60 | 853
+C N | Станчо Г. Златаровъ | I:290 II:314 III:90 IV:100 | 794
+C N | Михалъ Кантарджиевъ [*] | I:243 II:56 III:317 IV:51 | 667
+C N | Иови А. Воденчаровъ [*] | I:126 II:187 III:86 IV:97 | 496
+# name as read: "Иови А. Воденчаровъ" (on p449 printed "Йови А. Воденичаровъ"); spelling uncertain
+C N | Върбанъ Коевъ [*] | I:57 II:15 III:281 IV:11 | 364
+C N | Никола Рухчевъ | I:52 II:2 III:5 IV:56 | 115
+C N | Д-ръ П. Динчевъ [*] | I:30 II:23 III:3 IV:48 | 104
+# name uncertain: "Динчевъ" (could be "Дивчевъ")
+D 5 | Котелъ | Kotel
+S I 3297 742
+S II 2937 1108
+T 6234 1850
+# Kotel register/voter figures faint; sums agree
+C E | Д-ръ Петъръ Т. Гудевъ | I:40 II:629 | 669
+C N | Христо Ив. Балабановъ | I:250 II:382 | 632
+C N | Петръ П. Абрашевъ | I:446? II:86? | 532
+# Абрашевъ section figures obscured by a library watermark; read 445/446 and 86/80; 446+86 matches printed total 532
+
+# page 451
+D 6 | Къзълъ-агачъ | Kazil-agatch
+S I 2462 1630
+S II 2096 859
+S III 2469 1054
+S IV 1439 853
+S V 1926 833
+S VI 1797 1093
+T 12189 6322
+C E | Ной Марковъ | I:301 II:529 III:601 IV:483 V:496 VI:460 | 2870
+C E | Ташо Стояновъ | I:259 II:519 III:545 IV:483 V:414 VI:498 | 2718
+C E | Димитъръ Н. Икономидисъ | I:310 II:508 III:505 IV:483 V:408 VI:449 | 2663
+# name uncertain: initial in "Димитъръ Н. Икономидисъ" could be "П."
+C N | Димитръ Аргириадисъ [*] | I:1372 II:105 III:301 IV:62 V:215 VI:127 | 2182
+C N | Атанасъ Славовъ [*] | I:1282 II:116 III:282 IV:62 V:190 VI:139 | 2071
+C N | Хр. Ив. Гендовичъ | I:1329 II:110 III:287 IV:62 V:190 VI:89 | 2067
+C N | Костадинъ Илиевъ | I:4 II:241 III:227 IV:307 V:232 VI:464 | 1475
+C N | Коста Янчевъ | I:28 II:219 III:204 IV:307 V:150 VI:463 | 1371
+C N | Желѣзко Петковъ | I:- II:222 III:151 IV:307 V:204 VI:463 | 1347
+C N | Димо Д. Чолаковъ [*] | I:- II:2 III:54 IV:- V:- VI:- | 56
+
+# page 452
+D 6 | cont
+C N | Георги Кирковъ [*] | I:- II:- III:2 IV:1 V:1 VI:41 | 45
+C N | Георги Поповъ [*] | I:- II:- III:2 IV:1 V:1 VI:41 | 45
+C N | Михаилъ Кантарджиевъ [*] | I:- II:- III:- IV:1 V:1 VI:41 | 43
+# name uncertain: surname may read "Кантараджиевъ"/"Кантаражиевъ"
+D 7 | Сливенъ | Sliven
+S I 3334 1579
+S II 3380 1824
+S III 1339 634
+S IV 1480 824
+S V 1528 781
+T 11061 5642
+C E | Георги Кирковъ | I:599 II:721 III:131 IV:295 V:359 | 2105
+C E | Георги Василевъ | I:558 II:693 III:131 IV:290 V:359 | 2031
+C N | Петръ Папанчевъ | I:462 II:681 III:222 IV:334 V:247 | 1946
+C N | Михаилъ Начовъ | I:422 II:657 III:222 IV:292 V:247 | 1840
+C N | Ной Марковъ | I:570 II:453 III:281 IV:240 V:175 | 1719
+C N | Димитръ Петковъ | I:554 II:444 III:281 IV:196 V:175 | 1650
+
+# page 453
+D 8 | Ямболъ | Yambol
+S I 2908 1489
+S II 2345 1134
+S III 2070 1193
+S IV 2270 888
+S V 2483 931
+T 12076 5635
+C E | Янко Сакѫзовъ | I:599 II:585 III:385 IV:241 V:598 | 2408
+C E | Димитръ Благоевъ | I:589 II:585 III:379 IV:237 V:598 | 2388
+C E | Владимиръ Димитровъ | I:579 II:579 III:378 IV:230 V:598 | 2364
+C N | Никола Мановъ [*] | I:666 II:299 III:385 IV:402 V:132 | 1884
+C N | Никола Русевъ | I:639 II:294 III:388 IV:402 V:56 | 1779
+C N | Хр. П. Чакмаковъ | I:637 II:291 III:288 IV:400 V:56 | 1772
+# MISMATCH Хр. П. Чакмаковъ: sections sum to 1672, printed total 1772 (all cells clearly printed, re-read at 5x)
+C N | Митю Миляковъ | I:218 II:245 III:407 IV:256 V:201 | 1327
+C N | Димитръ х. Геновъ | I:236 II:259 III:363 IV:244 V:201 | 1303
+C N | Тодоръ Димчевъ | I:219 II:248 III:372 IV:248 V:201 | 1288
+C N | Вълю Продановъ [*] | I:31 II:8 III:53 IV:1 V:76 | 169
+C N | Димитръ Никовъ [*] | I:30 II:9 III:53 IV:1 V:76 | 169
+
+# page 454
+D 9 | Балчикъ | Baltchik
+S I 2842 1244
+S II 2375 1246
+S III 1462 606
+T 6679 3096
+C E | Петъръ Калниковъ | I:274 II:786 III:279 | 1339
+C E | Георги Пасаровъ | I:395 II:682 III:206 | 1283
+# names uncertain: "Калниковъ" (could be "Калчиковъ"); "Пасаровъ" (bold initial П/Н ambiguous, could be "Насаровъ")
+C N | Никола Г. Холевичъ | I:577 II:335 III:98 | 1010
+C N | Стефанъ Задгорски | I:584 II:320 III:105 | 1009
+C N | Юрданъ Йовевъ | I:385 II:71 III:197 | 653
+C N | Тодоръ Гавраиловъ | I:250 II:146 III:255 | 651
+C N | Георги Кирковъ [*] | I:11 II:81 III:37 | 129
+C N | Димитръ Благоевъ [*] | I:11 II:66 III:33 | 110
+D 10 | Варна (градска) | Varna (urbain)
+S I 1315 710
+S II 2258 1205
+S III 2043 1124
+T 5616 3039
+C E | Венедиктъ Поповъ | I:377 II:590 III:693 | 1660
+C E | Кръстю Мирски | I:339 II:569 III:696 | 1604
+C N | Тони Петровъ | I:290 II:448 III:334 | 1072
+C N | Петко Бакърджиевъ | I:284 II:444 III:335 | 1063
+C N | Зафиръ Зафировъ | I:78 II:159 III:63 | 300
+C N | Коста Ранковъ | I:45 II:143 III:63 | 251
+C N | Георги Кирковъ [*] | I:3 II:20? III:27 | 50?
+# Кирковъ (Varna urban) II and total partly under a library watermark: II reads 20 or 29, total 50; 3+20+27=50
+
+# page 455
+D 10 | cont
+C N | Янко Сакѫзовъ [*] | I:3 II:19 III:24 | 46
+D 10а | Варна (селска) | Varna (rural)
+S I 2079 994
+S II 2335 1027
+S III 2248 1005
+S IV 1424 692
+T 8086 3718
+C E | Георги Константиновъ (Палата) | I:826 II:214 III:582 IV:24 | 1646
+C E | Кара Христо Василевъ | I:826 II:212 III:532 IV:20 | 1590
+C N | Тодоръ Ноевъ [*] | I:137 II:341 III:373 IV:457 | 1308
+C N | Димо Шиковъ [*] | I:26 II:379 III:336 IV:4 | 745
+C N | Иванъ Ст. Явашчевъ | I:65 II:300 III:76 IV:105 | 546
+C N | Янаки Савовъ | I:26 II:73 III:8 IV:305 | 412
+C N | Райко П. Узуновъ [*] | I:1 II:267 III:60 IV:36 | 364
+C N | Д-ръ В. Карамихалевъ [*] | I:48 II:31 III:- IV:255 | 334
+C N | Илия С. Кавалджиевъ | I:20 II:125 III:16 IV:168 | 329
+C N | Георги Кирковъ [*] | I:3 II:64 III:11 IV:- | 78
+
+# page 456
+D 10а | cont
+C N | Янко Сакѫзовъ [*] | I:3? II:53 III:11 IV:- | 67
+D 11 | Добричъ | Dobritch
+S I 1962 985
+S II 1342 739
+S III 1151 636
+S IV 2563 1113
+S V 1764 748
+S VI 1528 823
+S VII 2251 900
+T 12561 5944
+C E | Моню Абаджиевъ | I:624 II:306 III:200 IV:326 V:357 VI:89 VII:349 | 2251
+C E | Александъръ Арсениевъ | I:602 II:309 III:201 IV:326 V:363 VI:87 VII:362 | 2250
+C E | Тосумъ-бей Ферадовъ | I:585 II:268 III:193 IV:322 V:357 VI:78 VII:328 | 2131
+C N | Демиръ Атанасовъ | I:266 II:265 III:355 IV:182 V:172 VI:590 VII:288 | 2118
+C N | Хасанъ Анти Бѣевъ | I:140? II:203 III:350 IV:609 V:224 VI:245 VII:279 | 2050
+C N | Генчо х. Витановъ | I:219 II:228 III:347 IV:167 V:172 VI:580 VII:249 | 1962
+C N | х. Костадинъ х. Славковъ | I:149 II:203 III:114 IV:660? V:224 VI:154 VII:292 | 1796
+C N | Джендо Н. Джендовъ | I:152 II:218 III:89 IV:613 V:224 VI:152 VII:298? | 1746?
+
+# page 457
+D 11 | cont
+C N | Хюсню Еф. Мустафовъ | I:204 II:214 III:36? IV:153 V:166 VI:496 VII:239 | 1508
+D 12 | Куртбунаръ | Kourtbounar
+S I 1896 978
+S II 1870 833
+S III 2265 1174
+S IV 1607 759
+T 7638 3744
+C E | Петъръ Драгулевъ | I:249 II:523 III:802 IV:561 | 2135
+C E | Халилъ-бей Мустафа-Беевъ | I:245 II:496 III:802 IV:561 | 2104
+C N | Георги Д. Маджаровъ | I:479 II:191 III:172 IV:189 | 1031
+C N | х. Яхѫ Юмеровъ | I:407 II:174 III:172 IV:189 | 942
+C N | Илчу Кумановъ | I:145 II:115 III:135 IV:1 | 396
+C N | Димо А. Поповъ | I:259 II:37 III:67 IV:8 | 371
+C N | Ахмедъ Еф. Сюлеймановъ [*] | I:36 II:60? III:135 IV:- | 231
+C N | Курбанъ Ахмедъ | I:136 II:40 III:67 IV:8 | 251
+D 13 | Провадия | Provadia
+# The bottom of this page (Provadia block) is out of focus; many digits are uncertain.
+S I 2130 1110
+S II 1463 843
+# II registered and voters as Table III (p428) prints them
+S III 1734 1034
+S IV 1171 687
+S V 1963 1317
+# V registered as Table III (p428) prints it
+S VI 1516 903
+# VI registered and voters as Table III (p428) prints them
+S VII 2252 1106
+T 12229 7000
+# voters total as Table III (p428) prints it
+C E | Исмаилъ Арнаудовъ | I:395 II:301 III:252 IV:317 V:435 VI:468 VII:570 | 2738
+# Исмаилъ Арнаудовъ: all cells and total as Table III (p428) prints them (Table IV cells blurred)
+C N | Гаврилъ Цонковъ | I:427? II:330 III:558? IV:272? V:506 VI:292? VII:? | 2804?
+# Гаврилъ Цонковъ: VII cell hidden by a scanner watermark and total partly hidden; VII would be 419 if the total is 2804, not recorded
+
+# page 458
+D 13 | cont
+C E | Недѣлчо Дечевъ | I:583 II:410 III:443 IV:256 V:104 VI:486 VII:336 | 2618
+C E | Лазаръ Дуковъ | I:421 II:338 III:395 IV:276 V:349 VI:294 VII:334 | 2407
+C N | Иванчо Стоиловъ | I:285 II:391 III:424 IV:254 V:102 VI:398 VII:362 | 2216
+C N | Риза-Бей Юмеръ-Беевъ | I:339 II:315 III:282 IV:263 V:221 VI:193 VII:287 | 1900
+C N | Владимиръ Димитровъ | I:91 II:89 III:283 IV:76 V:582 VI:146 VII:184 | 1451
+C N | Георги Кирковъ [*] | I:62 II:64 III:230 IV:81 V:545 VI:106 VII:181 | 1269
+C N | Янко Сакѫзовъ [*] | I:57 II:74 III:195 IV:69 V:515 VI:104 VII:162 | 1176
+C N | Янко С. Чучарковъ [*] | I:75 II:170 III:130 IV:27 V:82 VI:93 VII:19 | 596
+
+# page 459
+D 13 | cont
+C N | Якимъ Видовъ | I:390 II:2 III:- IV:- V:169 VI:- VII:- | 561
+C N | Тодоръ Миневъ | I:1 II:4 III:- IV:- V:131 VI:37 VII:239 | 412
+C N | Стефанъ Борановъ [*] | I:- II:18 III:28 IV:3 V:136 VI:26 VII:196 | 407
+C N | Ахмедъ Ахмедовъ [*] | I:76 II:- III:- IV:- V:99 VI:- VII:- | 175
+C N | Ламбо В. Плукчиевъ [*] | I:- II:- III:32 IV:- V:- VI:- VII:1 | 33
+D 14 | Бѣлоградчикъ | Belogradtchik
+S I 1623 753
+# I voters as Table III (p428) prints it
+S II 3930 1539
+S III 1892 988
+# III voters as Table III (p428) prints it
+T 7445 3280
+C E | Никола Санчевъ | I:129 II:938 III:244 | 1311
+C E | Тодоръ Г. Влайковъ | I:118 II:939 III:247 | 1304
+C N | Александъръ П. Вълчевъ [*] | I:237 II:415 III:513 | 1165
+C N | Живко П. Ивановъ [*] | I:199? II:342 III:? | 1062?
+# Живко П. Ивановъ: III cell hidden by a scanner watermark and total partly hidden (reads 1062 or 1092)
+
+# page 460
+D 14 | cont
+C N | Жико Еленковъ [*] | I:258 II:105 III:96 | 459
+C N | Стефанъ Андреевъ [*] | I:256 II:103 III:63 | 422
+C N | Ив. Ст. Кирковъ [*] | I:175 II:55 III:143 | 373
+C N | Анто Поповъ [*] | I:129 II:102 III:114 | 345
+C N | Коста Стефановъ | I:2 II:52 III:19 | 73
+C N | Григоръ Димитровъ [*] | I:3 II:28 III:2 | 33
+D 15 | Видинъ | Vidin
+S I 1964 1044
+S II 2144 1120
+S III 2172 902
+S IV 2202 1203
+S V 2742 1604
+S VI 2066 1403
+T 13290 7276
+C E | Найчо Цановъ | I:501 II:620 III:724 IV:942 V:1377 VI:1001 | 5165
+C E | Илия Георговъ | I:488 II:619 III:724 IV:926 V:1376 VI:987 | 5120
+C E | Антонъ Страшимировъ | I:484? II:619? III:721? IV:925? V:1377 VI:990? | 5116
+C N | Стефанъ Витски [*] | I:471 II:424 III:109 IV:249 V:136 VI:339 | 1728
+C N | Манолъ Златановъ | I:464 II:416 III:108 IV:257 V:122 VI:323 | 1690
+C N | Димитръ Драмовъ | I:474 II:414 III:112 IV:226 V:121? VI:320? | 1667
+
+# page 461
+D 15 | cont
+C N | Томо Лозановъ | I:63 II:32 III:39 IV:23 V:70 VI:69 | 296
+C N | Каменъ Велковъ | I:56 II:30 III:43 IV:18 V:70 VI:64 | 281
+C N | Митю Миленковъ | I:55 II:31 III:35 IV:23 V:70 VI:64 | 278
+C N | Георги Добриновичъ [*] | I:17 II:41 III:15 IV:18 V:27 VI:19 | 137
+C N | Петко Йоновъ [*] | I:15 II:30 III:14 IV:- V:33 VI:18 | 110
+C N | Никола Ангеловъ [*] | I:18 II:30 III:14 IV:- V:11 VI:9 | 82
+C N | Георги Кирковъ [*] | I:15 II:14 III:10 IV:1 V:? VI:? | ?
+# Георги Кирковъ: V, VI cells and the total are hidden by a scanner watermark at the page foot
+
+# page 462
+D 15 | cont
+C N | Димитръ Благоевъ [*] | I:11 II:14 III:16 IV:1 V:7 VI:- | 49
+C N | Крѫстю Пастуховъ [*] | I:11 II:14 III:16 IV:- V:2 VI:- | 43
+D 16 | Кула | Koula
+S I 2319 1064
+S II 2104 997
+S III 2128 925
+S IV 2665 1410
+T 9216 4396
+C E | Добри Филовъ | I:83 II:519 III:666 IV:919 | 2187
+C E | Д-ръ Димитъръ Милковъ | I:72 II:515 III:667 IV:916 | 2170
+C N | Никола Пановъ | I:399 II:343 III:34 IV:306 | 1082
+C N | Иванъ Оковский | I:378 II:174 III:116 IV:137 | 805
+C N | Андрей Вълковъ [*] | I:317 II:119 III:21 IV:285 | 742
+C N | Петръ Станчовъ | I:277 II:13 III:83 IV:72 | 445
+C N | Ново К. Ковачовъ | I:81 II:77 III:13 IV:114 | 285
+C N | Цеко П. Димитровъ | I:74 II:22 III:59 IV:49 | 204
+C N | Лало Дичовъ | I:135 II:23? III:37? IV:- | 195
+
+# page 463
+D 16 | cont
+C N | Алекси М. Филиповъ | I:109 II:69 III:- IV:- | 178
+C N | Тома Ц. Ванчовъ | I:109 II:65 III:- IV:- | 174
+C N | Ванко Лазаровъ | I:46 II:16 III:52 IV:15 | 129
+C N | Петко Цановъ | I:10 II:16 III:92 IV:- | 118
+C N | Христо Шоповъ | I:22 II:- III:- IV:5 | 27
+D 17 | Ломъ | Lom
+S I 2215 1191
+S II 2167 1109
+S III 1984 800
+S IV 2443 917
+S V 1918 961
+S VI 1671 655
+T 12398 5633
+C E | Стефанъ Арсениевъ | I:747 II:681 III:492 IV:631 V:735 VI:520 | 3806
+C E | Петко Каравеловъ [†] | I:743 II:681 III:496 IV:630 V:734 VI:519 | 3803
+C E | Никола Поповъ | I:751 II:681 III:492 IV:628 V:731 VI:509 | 3792
+C N | Стефанъ Георгиевъ | I:247 II:25 III:186 IV:131 V:132 VI:78 | 799
+C N | Христо Ивановъ Кулинъ | I:154 II:25 III:184 IV:221 V:130 VI:60 | 774
+C N | Пънто Н. Пънтовъ | I:171 II:246 III:97 IV:156 V:33 VI:14 | 717
+
+# page 464
+D 17 | cont
+C N | Атанасъ Босевъ [*] | I:228 II:246 III:117 IV:3 V:44 VI:52 | 690
+C N | Евстати Лозановъ [*] | I:225 II:25 III:201 IV:53 V:60 VI:69 | 633
+C N | Нацолъ Поповъ [*] | I:138 II:246 III:112 IV:3 V:31 VI:15 | 545
+C N | Никола Хр. Габровски [*] | I:47 II:157 III:5 IV:2 V:28 VI:40 | 279
+C N | Георги Кирковъ [*] | I:45 II:157 III:5 IV:2 V:28 VI:40 | 277
+C N | Димитръ Благоевъ [*] | I:43 II:157 III:5 IV:2 V:28 VI:40 | 275
+# V cell of Андрей Поповъ sits under the scan watermark and the total is partly cut at the page edge; read as 1 and 131 (sums agree)
+C N | Андрей Поповъ [*] | I:2 II:- III:1 IV:127 V:1? VI:- | 131?
+
+# page 465
+# scan of this page is blurred; several cells read only at low confidence (marked ?)
+D 17 | cont
+C N | Илия Младеновъ | I:- II:- III:- IV:12 V:101 VI:3 | 116
+C N | Георги Първановъ [*] | I:- II:- III:- IV:61 V:- VI:- | 61
+C N | Илия Щърбановъ [*] | I:- II:- III:- IV:46 V:1 VI:- | 47
+D 18 | Берковица | Berkovitza
+S I 2962 1497
+# I voters as Table III (p430) prints it
+S II 1958 845
+S III 1669 1017
+S IV 2692 1351
+# IV voters as Table III (p430) prints it
+T 9281 4710
+C E | Тодоръ Михайловъ | I:642 II:220 III:524 IV:1011 | 2397
+C E | Павелъ Марковъ | I:611 II:192 III:517 IV:1014 | 2334
+# Павелъ Марковъ: II and total as Table III (p430) prints them
+C N | Михаилъ Клисурски | I:781 II:388 III:161 IV:230 | 1560
+C N | Коста Каменовъ | I:443 II:34 III:144 IV:164 | 785
+C N | Иванъ Пешовъ [*] | I:75 II:201 III:281 IV:148 | 705
+C N | Витанъ Герасимовъ [*] | I:246? II:420? III:- IV:14 | 680?
+# Георги Кировъ: cells blurred and IV covered by the scan watermark; IV unreadable, total uncertain; sum not checkable
+C N | Георги Кировъ [*] | I:36? II:149? III:152? IV:? | 470?
+
+# page 466
+D 18 | cont
+C N | Стефанъ Ив Кисовъ | I:74 II:65 III:100 IV:7 | 246
+# surname of Рангелъ Ив. read at low confidence (Пашкарски?)
+C N | Рангелъ Ив. Пашкарски | I:39 II:20 III:105 IV:5 | 169
+C N | Петръ Младеновъ Котларъ [*] | I:41 II:26 III:2 IV:- | 69
+C N | Владимиръ Байчовъ | I:6 II:1 III:1 IV:3 | 11
+D 19 | Бѣла-Слатина | Bêla-Slatina
+S I 2111 1079
+S II 2421 1170
+S III 1540 820
+S IV 2249 1193
+S V 2296 1250
+T 10617 5512
+C E | Д-ръ Стоянъ Даневъ (СТ.) | I:513 II:913 III:625 IV:747 V:837 | 3635
+C E | Марко Георгиевъ | I:497 II:807 III:626 IV:733 V:631 | 3294
+C N | Михаилъ Тиковъ | I:557 II:247 III:195 IV:442 V:393 | 1834
+C N | Нешо Станевъ | I:543 II:231 III:196 IV:385 V:397 | 1752
+C N | Петко Геновъ | I:2 II:109 III:- IV:7 V:200 | 318
+C N | Кръстю Пастуховъ [*] | I:14 II:19 III:- IV:22 V:18 | 73!
+# Кръстю Пастуховъ: total cut off at the page foot; sum of the sections
+
+# page 467
+D 19 | cont
+# name read at low confidence (Гото Вановский?)
+C N | Гото Вановский [*] | I:6 II:3 III:- IV:38 V:- | 47
+C N | Георги Кирковъ [*] | I:17 II:5 III:- IV:5 V:18 | 45
+C N | Вълко Груевъ | I:- II:- III:- IV:- V:- | -
+C N | Пенко Д. Геновъ | I:- II:- III:- IV:- V:- | -
+D 20 | Враца | Vratza
+S I 2931 1560
+S II 2435 1079
+S III 2152 1098
+S IV 2569 1042
+# IV voters as Table III (p430) prints it
+S V 2548 1240
+# V voters as Table III (p430) prints it
+S VI 1942 1064
+S VII 1618 834
+# VII voters as Table III (p430) prints it
+T 16195 7917
+C E | Стефанаки Хр. Савовъ | I:1121 II:880 III:1007 IV:845 V:1038 VI:783 VII:429 | 6103
+C E | Михаилъ К. Сарафовъ (ОТ.) | I:1116 II:879 III:1007 IV:845 V:1038 VI:780 VII:429 | 6094
+C E | Драганъ Цанковъ | I:1111 II:879 III:1007 IV:849 V:1038 VI:777 VII:427 | 6088
+C N | Никола Ивановъ | I:338 II:130 III:87 IV:111 V:139 VI:232 VII:204 | 1241
+# first name read at low confidence (Вандо or Ванчо)
+C N | х. Вандо Бобошевски [*] | I:331 II:130 III:87 IV:111 V:139 VI:231 VII:206 | 1235
+# Кирко Стоиновъ: V, VII and total blurred (total under scan watermark); 138/125/1039 is the reading that adds up (133/130/1039 would too)
+C N | Кирко Стоиновъ | I:311 II:115 III:90 IV:36 V:138? VI:224 VII:125? | 1039?
+
+# page 468
+D 20 | cont
+C N | Илия Тодоровъ [*] | I:105 II:67 III:3 IV:18 V:56 VI:54 VII:4 | 307
+# Пастуховъ total blurred (303/305); 305 agrees with the sections
+C N | Кръстю Пастуховъ [*] | I:103 II:64 III:5 IV:18 V:57 VI:54 VII:4 | 305?
+C N | Янко Сакѫзовъ [*] | I:102 II:63 III:3 IV:18 V:56 VI:49 VII:4 | 295
+C N | Никола Ненчовъ [*] | I:8 II:- III:- IV:- V:- VI:16 VII:268 | 292
+C N | Никола Становъ [*] | I:8 II:- III:- IV:29 V:- VI:- VII:190 | 227
+C N | Коно Симеоновъ [*] | I:- II:- III:- IV:- V:- VI:- VII:188 | 188
+
+# page 469
+D 20 | cont
+C N | Аврамъ Стойчевъ [*] | I:8 II:5 III:3 IV:112 V:6 VI:2 VII:7 | 143
+C N | Д-ръ Хр. Иордановъ | I:21 II:17 III:4 IV:64 V:7 VI:2 VII:7 | 122
+C N | Никола Чолаковъ | I:8 II:4 III:3 IV:64 V:7 VI:8 VII:7 | 101
+D 21 | Орѣхово | Oréhovo
+S I 2712 1014
+S II 2413 1026
+S III 2038 985
+S IV 2507 1179
+S V 1733 931
+S VI 2356 1222
+T 13759 6357
+C E | Дамянъ Ц. Вълчевъ | I:602 II:716 III:607 IV:867 V:592 VI:896 | 4280
+# first name read at low confidence (Иоаники?)
+C E | Иоаники Ив. Гърковъ | I:593 II:716 III:613 IV:867 V:592 VI:896 | 4277
+# first name read at low confidence (Марийчо / Мариичо)
+C E | Марийчо М. Игнатовъ | I:594 II:716 III:606 IV:867 V:592 VI:899 | 4274
+C N | Д-ръ Симеонъ Тошковъ | I:343 II:190 III:143 IV:170 V:113 VI:131 | 1090
+C N | Д-ръ Тодоръ Гатевъ [*] | I:333 II:190 III:144 IV:174 V:113 VI:131 | 1085
+C N | Лука Братановъ | I:331 II:190 III:134 IV:169 V:113 VI:131 | 1068
+# surname read at low confidence (Цѣковъ?)
+# MISMATCH Никола Цѣковъ: sections as read sum to 816, printed total read 817; I, III, V, VI blurred and VI/total partly under the scan watermark
+C N | Никола Цѣковъ [*] | I:46? II:10 III:222? IV:135 V:216? VI:187? | 817?
+
+# page 470
+# page 
+D 21 | cont
+C N | Въльо Пацовъ [*] | I:19 II:2 III:232 IV:127 V:218 VI:159 | 757
+C N | Никола Ивановъ [*] | I:19 II:2 III:220 IV:127 V:218 VI:155 | 741
+C N | Кръстю Пастуховъ [*] | I:30? II:110? III:12 IV:7 V:6 VI:8 | 173
+C N | Янко Сакѫзовъ [*] | I:30 II:110 III:10 IV:7 V:6 VI:8 | 171
+C N | Никола Хр. Габровски [*] | I:28 II:110 III:8 IV:7 V:6 VI:8 | 167
+C N | Петко Каравеловъ [*] | I:38 II:8? III:- IV:6? V:1 VI:28 | 81
+C N | Стоянъ Геновъ [*] | I:26? II:8 III:- IV:3? V:1 VI:28 | 66?
+# Геновъ cells IV and total very blurred (IV could be 5 with total 68); 26+8+3+1+28=66 as read
+
+# page 471
+D 22 | Фердинандъ | Ferdinand
+S I 2512 1044
+# I voters as Table III (p431) prints it
+S II 1655 805
+S III 2096 850
+S IV 2345 794
+T 8608 3493
+C E | Василъ Статковъ | I:223 II:445 III:587 IV:348 | 1603
+C E | Василъ Поповъ | I:163 II:358 III:575 IV:378 | 1474
+C N | Иванъ Цековъ (куция) | I:587 II:290 III:16 IV:267 | 1160
+C N | Иванъ Цановъ | I:124 II:293 III:248 IV:266 | 931
+C N | Симеонъ Димитровъ | I:287 II:94 III:231 IV:113 | 725
+C N | Цоло И. Мисловъ | I:275 II:26 III:17 IV:67 | 385
+C N | Марко Илиевъ | I:164 II:- III:- IV:68 | 232
+C N | Кръстю Пастуховъ [*] | I:77 II:44 III:13 IV:22 | 156
+C N | Никола Габровски [*] | I:42 II:44 III:13 IV:22 | 121
+C N | Атанасъ П. Мечкарски | I:95? II:- III:- IV:4 | 99?
+C N | Георги Ивановъ | I:51? II:- III:- IV:32? | 83?
+# Мечкарски: I and total blurred at page edge (3 vs 9 ambiguous; 35/39 also possible). Ивановъ: I, IV and total blurred and partly under a stamp
+
+# page 472
+D 23 | Дупница | Doupnitza
+S I 2861 1519
+S II 2392 1175
+S III 2339 1111
+S IV 2049 1015
+S V 2356 1032
+T 11997 5852
+C E | Д-ръ Александръ П. Радевъ | I:604 II:434 III:289 IV:663 V:299 | 2289
+C E | Василъ Наковъ | I:565 II:434 III:289 IV:701 V:298 | 2287
+C E | Никола Бадински | I:600 II:434 III:289 IV:648 V:299 | 2270
+C N | Димитръ Ризовъ | I:580 II:452 III:483 IV:232 V:368 | 2115
+C N | Симеонъ Гиздовъ | I:460 II:460 III:482 IV:184 V:422 | 2008
+C N | Никола Попчевъ | I:474 II:453 III:483? IV:253? V:319 | 1982
+C N | Андонъ Мациевъ | I:372 II:281 III:337 IV:111 V:231 | 1332
+C N | Андонъ Бошковъ | I:303 II:281 III:337 IV:112 V:235 | 1268
+C N | Христо Лѣсовъ | I:255 II:289 III:337 IV:66 V:217 | 1164
+C N | Христо Т. Скочевски [*] | I:77 II:7 III:- IV:46 V:74 | 204
+C N | Георги Кирковъ [*] | I:59? II:- III:- IV:4? V:60? | 123?
+# Радевъ: surname blurred here; read as on p473 where it is clear. Попчевъ III/IV smeared at page edge, read consistent with total. Кирковъ cells under a stamp and blurred
+
+# page 473
+D 23 | cont
+C N | Борисъ Сотировъ [*] | I:55 II:- III:- IV:5 V:58 | 118
+C N | Янко Сакѫзовъ [*] | I:49 II:- III:- IV:4 V:55 | 108
+C N | Георги Милчевъ [*] | I:4 II:- III:- IV:11 V:80 | 95
+C N | Андонъ Величковъ [*] | I:9 II:- III:- IV:1 V:69 | 79
+C N | Тоне Алексиевъ | I:55 II:- III:2 IV:- V:- | 57
+D 24 | Кюстендилъ (I-а избир.) | Kustendil (I-ère électorale)
+S I 3174 1374
+S II 2240 1015
+S III 2198 981
+S IV 2037 753
+S V 1817 928
+T 11466 5051
+C E | Д-ръ Александръ П. Радевъ (ОТ.) | I:427 II:926 III:172 IV:171 V:267 | 1963
+C E | Стоичко Ицковъ | I:397 II:925 III:172 IV:172 V:270 | 1936
+C E | Андонъ Саноковлийски | I:416 II:923 III:144 IV:171 V:280 | 1934
+C N | Ив. Ев. Гешевъ | I:327 II:73 III:478 IV:310 V:592 | 1780
+C N | Панчо Страдалски | I:296 II:72 III:477 IV:311 V:601 | 1757
+C N | Георги Ангеловъ | I:313 II:72 III:476 IV:311 V:579! | 1751
+# Ангеловъ V: only "57" visible, last digit hidden by a stamp; inferred from total
+
+# page 474
+# page 
+D 24 | cont
+C N | Андонъ п. Димитровъ | I:500 II:9 III:270 IV:258 V:44 | 1081
+C N | Георги п. Ивановъ | I:447 II:9 III:271 IV:260 V:48 | 1035
+C N | Андонъ Иванчовъ | I:425 II:7 III:270? IV:278? V:47 | 1027
+C N | Георги Кирковъ [*] | I:115 II:- III:47 IV:11 V:1 | 174
+C N | Никола Габровски [*] | I:111 II:- III:47 IV:11 V:1 | 170
+C N | Янко Сакѫзовъ [*] | I:108 II:- III:47 IV:11 V:1 | 167
+C N | Хр. П. Славейковъ | I:79 II:3? III:37 IV:2? V:2? | 122?
+# MISMATCH Славейковъ: cells as read sum to 123, total reads 122; II, IV, V and total are blurred single digits at the page edge (one of II/IV/V may be 1 less)
+C N | Никола Поповъ [*] | I:73? II:- III:3? IV:- V:14 | 90
+# Иванчовъ III/IV and Поповъ I/III blurred (Поповъ partly under a stamp); readings consistent with totals
+
+# page 475
+D 24 | cont
+C N | Давитко Дѣяновъ [*] | I:46 II:- III:3 IV:- V:17 | 66
+C N | Хр. Фичевъ [*] | I:38 II:- III:3 IV:- V:13 | 54
+D 24а | Кюстендилъ (II-а изб.) | Kustendil (II-ème élect.)
+S I 2407 933
+S II 2137 917
+S III 2211 785
+S IV 2140 1112
+T 8895 3747
+C E | Василъ Стаменовъ | I:326 II:838 III:199 IV:167 | 1530
+# Василъ Стаменовъ: II as Table III (p432) prints it
+C E | Андонъ Грусевъ | I:373 II:833 III:161 IV:30 | 1397
+C N | Раденко Николовъ | I:152 II:84 III:457 IV:503 | 1196
+C N | Георги Джоневъ Поповъ | I:113 II:79 III:449 IV:549 | 1190
+C N | Коста Стаменовъ | I:308 II:- III:61? IV:327 | 696
+C N | Хр. Милтеновъ | I:182 II:- III:81 IV:262 | 525
+C N | Стаменъ Д. Пашовъ | I:322 II:- III:62 IV:54 | 438
+C N | Стойчо Велиновъ [*] | I:9 II:- III:23 IV:255 | 287
+C N | Хр. П. Славейковъ [*] | I:38? II:- III:67? IV:8? | 113?
+# Славейковъ: IV and total largely under a stamp and blurred; IV is a single faint digit, reading consistent with total
+
+# page 476
+D 25 | Радомиръ | Radomir
+S I 2514 1173
+S II 1685 861
+S III 2256 1405
+S IV 2532 1064
+S V 2894 1226
+T 11881 5729
+C E | Петръ Пановъ | I:182 II:318 III:595 IV:380 V:544 | 2019
+C E | Иванъ Соколовъ | I:220 II:317 III:545 IV:379 V:545 | 2006
+C E | Боте Минчовъ | I:187 II:309 III:459 IV:326 V:556 | 1837
+C N | Георги Дипевъ | I:438 II:396 III:242 IV:320 V:321 | 1717
+C N | Д-ръ Владимиръ Черновъ | I:368 II:139? III:425 IV:348 V:236 | 1516
+C N | Доца Поповъ | I:401 II:394 III:114? IV:221 V:305 | 1435
+C N | Д-ръ Д. Моловъ | I:393 II:357 III:121 IV:252 V:301 | 1424
+C N | Ненко Храновъ | I:311 II:128 III:366 IV:146 V:289 | 1240
+C N | Симеонъ Икономовъ | I:319 II:40 III:303 IV:271 V:188 | 1121
+C N | Стефанъ Касабовъ | I:225 II:97 III:207? IV:273 V:201? | 1033?
+# MISMATCH Касабовъ: cells as read sum to 1003, total reads 1033 (or 1032/1039); middle digits of III and V are blurred (one is probably 3: 237 or 231)
+C N | Нако А. Дѣлянски | I:249 II:39? III:419? IV:193? V:55? | 955!
+# Last candidate's total is cut off at the page foot and not printed on p477 (written as the sum of the sections); his name and II-V are faint and partly under a stamp; name reading uncertain. Names Дипевъ and Ненко Храновъ also blurred
+
+# page 477
+D 25 | cont
+C N | Савва Колевъ | I:193 II:53 III:314 IV:82 V:135 | 777
+C N | Иванъ Г. Неврокопски [*] | I:- II:- III:32 IV:- V:- | 32
+D 26 | Карлово | Karlovo
+S I 2996 1620
+S II 2700 1409
+S III 2741 1608
+S IV 1416 893
+S V 2981 1440
+T 12834 6970
+C E | Иванъ Кирковъ Петровъ | I:663 II:790 III:786 IV:456 V:715 | 3410
+C E | Димитръ С. Тончевъ | I:667 II:814 III:780 IV:419 V:712 | 3392
+C E | Никола Лазаровъ | I:659 II:798 III:760 IV:421 V:718 | 3356
+C N | Никола Ив. Козаревъ | I:938 II:495 III:699 IV:458 V:650 | 3240
+C N | Драганъ Табаковъ | I:934 II:512 III:690 IV:428 V:646 | 3210
+C N | Д-ръ Мичо Багаровъ | I:929 II:482 III:688 IV:453 V:650 | 3202
+C N | Найденъ Ранчовъ [*] | I:2 II:120 III:131 IV:20 V:72 | 345
+C N | Дѣлю К. Георгиевъ [*] | I:2 II:120 III:126 IV:16 V:73 | 337
+C N | Стефанъ Мачковъ | I:17 II:74 III:- IV:4? V:71? | 166?
+# NOTE Мачковъ IV, V and total partly hidden by a library watermark at page bottom; readings consistent with each other
+
+# page 478
+D 26 | cont
+C N | Ст. Лазаровъ [*] | I:- II:- III:87 IV:- V:- | 87
+C N | Михаилъ Такевъ [*] | I:- II:- III:37 IV:- V:- | 37
+D 27 | Панагюрище | Panagurichte
+S I 3572 1563
+S II 2760 1515
+S III 1957 938
+T 8289 4016
+C E | Ив. Ст. Бобековъ | I:884 II:443 III:93 | 1420
+C E | Нако Г. Пачовъ | I:172 II:736 III:471 | 1379
+C N | Вълко Нейчовъ [*] | I:123? II:347? III:809? | 1279?
+C N | Георги Ст. Дѣдовъ | I:886 II:328 III:51 | 1265
+C N | Ст. Ив. Консуловъ | I:295 II:367 III:395 | 1057
+C N | Александръ Евстатиевъ | I:24 II:602 III:11 | 637
+C N | Георги Стефановъ [*] | I:53 II:25 III:3 | 81
+D 28 | Пещера | Pechtéra
+S I 2458 1356
+S II 1634 1017
+S III 2767 1638
+S IV 1377 1008
+T 8236 5019
+C E | Михаилъ Такевъ | I:1015 II:525 III:457 IV:464 | 2461
+C E | Нѣйо Бъчваровъ | I:259 II:463 III:1160 IV:524 | 2406
+C N | Ангелъ Д. Горановъ | I:290 II:381 III:1180 IV:525 | 2376
+C N | Никола Д. Кѫпевъ | I:916 II:598 III:387 IV:416 | 2317
+C N | Яковъ Д. Матакиевъ | I:97 II:34? III:54 IV:12? | 197
+# NOTE Нейчовъ figures blurred at curled page edge; readings agree with total. Матакиевъ II and IV partly hidden by watermark; readings agree with total. Names Кѫпевъ and Яковъ Д. Матакиевъ blurred, best reading.
+
+# page 479
+# NOTE right edge of this page is badly blurred (page curl); many cells in okoliya 29a are uncertain readings, marked ?
+D 28 | cont
+C N | Хр. Ив. Поповъ [*] | I:66 II:- III:34 IV:65 | 165
+D 29 | Пловдивъ (градска) | Plovdiv (urbain)
+S I 943 575
+S II 2227 1079
+S III 2253 695
+S IV 1763 830
+T 7186 3179
+C E | Димитръ Петковъ (ОТ.) | I:353 II:774 III:363 IV:416 | 1906
+C E | Темю Начевъ | I:339 II:763 III:357 IV:410 | 1869
+C N | Д-ръ Д. Милковъ | I:228 II:281 III:319 IV:404 | 1232
+C N | Ив. Кв. Гешовъ [*] | I:211 II:278 III:314 IV:400 | 1203
+C N | Димитръ Благоевъ [*] | I:9 II:27 III:15 IV:14 | 65
+C N | Аргиръ Димитровъ [*] | I:9 II:23 III:13 IV:11 | 56
+D 29а | Пловдивъ (селска) (I-а избират.) | Plovdiv (rural) (I-ère électorale)
+S I 2099 755
+S II 2484 1217
+S III 1824 635
+S IV 1989 1023
+S V 2664 1275
+S VI 2238 1139
+T 13298 6044
+C E | Несторъ К. Абаджиевъ | I:487 II:442 III:261 IV:599 V:646 VI:216 | 2651
+C E | Драганъ В. Манчовъ | I:474 II:435 III:263 IV:596 V:642 VI:202 | 2612
+# Драганъ В. Манчовъ: III as Table III (p434) prints it
+C E | Милко С. Вълковъ | I:481 II:410 III:260 IV:587 V:646 VI:222 | 2606
+# Милко С. Вълковъ: II, III, V, VI and total as Table III (p434) prints them
+C N | Стефанъ Обрейковъ | I:257 II:625 III:310 IV:313 V:432 VI:196? | 2133?
+C N | Д-ръ П. Кръстевъ [*] | I:275? II:633? III:322? IV:137 V:454 VI:181? | 2002?
+C N | Илия Видевъ [*] | I:231? II:589? III:518 IV:112? V:397? VI:? | 1843?
+
+# Видевъ: VI cell hidden by watermark (unreadable at 600 dpi); cells I-V as read (1847) exceed total read 1843?; all blurred, not resolved
+# NOTE okoliya 29а label partly blurred ("I-а из-бират."); name Милко С. Вълковъ uncertain (surname blurred)
+
+# page 480
+D 29а | cont
+C N | Петъръ Шилевъ | I:6 II:182 III:65 IV:317 V:236 VI:739 | 1545
+C N | Деню Маневъ | I:32 II:180 III:55 IV:306? V:196 VI:702 | 1471
+C N | Никола Митовъ [*] | I:6? II:147? III:51 IV:307 V:179 VI:730 | 1420
+C N | Г. Ив. Джевизовъ | I:- II:- III:- IV:- V:- VI:- | -
+C N | Гаврилъ М. Старирадовъ | I:- II:- III:- IV:- V:- VI:- | -
+C N | Димитръ Ил. Стамболовъ | I:- II:- III:- IV:- V:- VI:- | -
+# NOTE Митовъ I (one faint digit) and II (reads 14x) barely visible at page edge; values chosen to agree with clear total 1420
+D 29б | Пловдивъ (селска) (II-а избир.) | Plovdiv (urbain) (II-ème électorale)
+S I 1872 674
+S II 2091 1061
+S III 2204 1018
+T 6167 2753
+C E | Димитръ К. Поповъ | I:390 II:356 III:327 | 1073
+C N | Константинъ Серафимовъ | I:208 II:551 III:214 | 973
+C N | Стефанъ С. Бобчевъ | I:20? II:99? III:350? | 469
+# NOTE Бобчевъ section cells largely hidden by library watermark; readings partial, chosen to agree with total 469. Latin okoliya name printed "urbain" (sic).
+
+# page 481
+D 29б | cont
+C N | Георги Р. Каравлановъ [*] | I:41 II:64 III:30 | 135
+C N | Риза Паша Ибрахимовъ [*] | I:15 II:- III:88 | 103
+D 30 | Станимака | Stanimaka
+S I 2109 1442
+S II 2071 1027
+S III 2190 1038
+S IV 2134 1049
+S V 2150 1003
+S VI 2077 1122
+S VII 2042 771
+T 14773 7452
+C E | Константинъ х. Калчовъ | I:446 II:573 III:320 IV:159 V:413 VI:593 VII:414 | 2918
+C E | Д-ръ Никола Генадиевъ | I:579 II:71 III:288 IV:428 V:536 VI:374 VII:552 | 2828
+C E | Петъръ Абрашевъ | I:331 II:350 III:507 IV:354 V:369 VI:533 VII:269 | 2713
+C N | Иванъ М. Лиловъ [*] | I:333 II:349 III:397 IV:360 V:379 VI:517 VII:104 | 2439
+C N | Рачо Петровъ [*] | I:419 II:571 III:71 IV:199 V:217 VI:423 VII:445 | 2345
+C N | Ангелъ Златановъ | I:576 II:94 III:239 IV:369 V:312 VI:189 VII:245 | 2024
+C N | Д-ръ Ф. Никогау [*] | I:296? II:349? III:375 IV:251 V:232 VI:404 VII:- | 1907
+C N | Атанасъ Епитропу | I:433 II:549 III:382 IV:5 V:59 VI:252 VII:208? | 1888
+# NOTE Никогау I/II blurred (glyphs also fit 236/549, which would sum to 2047); 296/349 is the reading that agrees with clear total 1907. Епитропу VII blurred (2?0/2?8), 208 agrees with total.
+
+# page 482
+D 30 | cont
+C N | Хр. Ив. Поповъ | I:68 II:10 III:281 IV:236 V:262? VI:- VII:- | 857
+C N | Михаилъ Такевъ [*] | I:463 II:65 III:- IV:36? V:32 VI:- VII:1 | 597
+C N | Хр. Калѣевъ [*] | I:51 II:10 III:2 IV:172 V:21 VI:2 VII:4 | 262
+C N | Янаки К. Дойчиновъ [*] | I:- II:- III:- IV:218 V:- VI:- VII:- | 218
+C N | Георги Кирковъ [*] | I:62 II:28 III:43 IV:54 V:6 VI:7 VII:2 | 202
+C N | Димитръ Благоевъ [*] | I:59 II:28 III:42 IV:34 V:6 VI:7 VII:2 | 178
+# NOTE Поповъ V blurred (262/263), Такевъ IV blurred (35/36); readings chosen agree with totals
+
+# page 483
+D 30 | cont
+C N | Аргиръ Димитровъ [*] | I:57 II:28 III:42 IV:23 V:6 VI:7 VII:- | 163
+C N | Кузма Толевъ | I:- II:- III:- IV:- V:- VI:- VII:- | -
+D 31 | Т.-Пазарджикъ (I-а избирателна) | T.-Pazardjik (I-ère électorale)
+S I 2553 1016
+S II 1885 1259
+S III 1746 697
+S IV 3197 1350
+S V 1475 656
+T 10856 4978
+C E | Иванъ Василевъ | I:532 II:1059 III:389 IV:891 V:554 | 3425
+C E | Георги Немевъ | I:538 II:1065 III:391 IV:848 V:554 | 3396
+C E | Д-ръ Г. Гаговъ | I:536 II:1062 III:389 IV:836 V:554 | 3377
+C N | Тодоръ Распоповъ [*] | I:461 II:174 III:307 IV:499 V:101 | 1542
+C N | Иванъ С. Войводовъ [*] | I:32 II:48 III:272 IV:323 V:88 | 763
+C N | Тома Сираковъ [*] | I:26 II:49 III:275 IV:313 V:88 | 751
+C N | Димитръ Петковъ | I:434 II:128 III:32 IV:140 V:13 | 747
+C N | Атанасъ Ибишевъ | I:435 II:127 III:32 IV:138? V:13 | 745
+# NOTE Ибишевъ IV partly hidden by library watermark (visible "13?"); 138 agrees with total. Name Немевъ slightly blurred.
+
+# page 484
+D 31 | cont
+C N | Димитръ Благоевъ [*] | I:9 II:23 III:- IV:- V:1 | 33
+C N | Янко Сакѫзовъ [*] | I:9 II:23 III:- IV:- V:1 | 33
+C N | Георги Кирковъ [*] | I:9? II:23? III:- IV:- V:1 | 33
+C N | Петръ Т. Мусевичъ | I:- II:- III:- IV:- V:- | -
+D 31а | Т.-Пазарджикъ (II-а избирателна) | T.-Pazardjik (II-ème électorale)
+S I 2290 1136
+S II 1491 525
+T 3781 1661
+C E | Тодоръ Бурмовъ | I:868 II:472 | 1340
+C N | Яковъ Д. Матакиевъ | I:266 II:50 | 316
+D 32 | Ловечъ | Lovetch
+S I 3557 1860
+S II 2259 1119
+S III 1731 945
+S IV 2683 1131
+S V 1844 1121
+S VI 1676 931
+T 13750 7107
+C E | Янко Ст. Забуновъ | I:165 II:12 III:168 IV:1002 V:799 VI:691 | 2837
+C E | Атанасъ Кр. Коновъ | I:165 II:7 III:168 IV:998 V:792 VI:690 | 2820
+C E | Михо Каравасилевъ | I:166? II:3? III:167 IV:997 V:792 VI:689? | 2814
+# Каравасилевъ: I, II and VI are blurred; read as 166 / 3 / 689 (the reading that sums to the printed 2814; II could also look like 5)
+C N | Д-ръ В. Радославовъ | I:1063 II:307 III:465 IV:66 V:69 VI:97 | 2067
+C N | Петко Войниковъ | I:556 II:799 III:309 IV:65 V:203 VI:134 | 2066
+C N | Ив. П. Димитровъ | I:1058 II:306 III:465? IV:70? V:70 VI:96? | 2065!
+# Димитровъ: III-IV are under the archive watermark; the total line is cut off below the page edge (not on p485 either), so it is written as the sum of the sections. III: first digit hidden by the watermark; read 465 (not 165) because the non-elected are listed by descending total and Димитровъ sits between 2066 (Войниковъ) and 2056 (Ганевъ); 465 also matches Радославовъ/Веселиновъ III
+# Бурмовъ: 4th letter of the surname is blurred (м or я)
+
+# page 485
+D 32 | cont
+C N | Неичо Ганевъ | I:552 II:798 III:310 IV:61 V:201 VI:134 | 2056
+C N | Хр. Никифоровъ | I:561 II:792 III:309 IV:61 V:198 VI:134 | 2055
+C N | Ионко Веселиновъ | I:1044 II:306 III:465 IV:66 V:69 VI:94 | 2044
+C N | Иванъ Петровъ [*] | I:51 II:8 III:- IV:1 V:31 VI:13 | 104
+C N | Ив. С. Докторовъ [*] | I:39 II:8 III:- IV:1 V:31 VI:13 | 92
+C N | Стоянъ Петровъ | I:38 II:8 III:- IV:1 V:31 VI:14 | 92
+C N | Георги Кирковъ [*] | I:38 II:1 III:2 IV:1 V:26? VI:-! | 68?
+# Кирковъ: VI cell and total are under the archive watermark; VI inferred as - from the total (same figures as Лунговъ/Колювъ on p486)
+# Неичо, Ионко: no breve visible at scan resolution (may be Нейчо, Йонко)
+
+# page 486
+D 32 | cont
+C N | Боню Лунговъ [*] | I:38 II:1 III:2 IV:1 V:26 VI:- | 68
+C N | Иванчо Колювъ [*] | I:38 II:1 III:2 IV:1 V:26 VI:- | 68
+D 33 | Луковитъ | Loukovit
+S I 2195 1343
+S II 1938 959
+S III 2049 1246
+S IV 2465 1505
+T 8647 5053
+C E | Димитръ Христовъ | I:569 II:449 III:431 IV:967 | 2416
+C E | Георги Трифоновъ | I:577 II:410 III:276 IV:1019 | 2282
+C N | Нино Герговъ | I:767? II:508 III:277 IV:31 | 1583
+C N | Иванъ Балтаджиевъ | I:627 II:495 III:281 IV:86 | 1489
+C N | Хр. К. Бонджиевъ | I:38 II:27 III:701 IV:497 | 1263
+C N | Витанъ Калчевъ | I:91 II:4 III:271 IV:381 | 747
+C N | Пою Табаковъ [*] | I:13 II:20 III:256 IV:13 | 302
+C N | Георги Ивановъ | I:- II:1 III:- IV:2 | 3
+# Герговъ I: last digit faint at the page curl; 767 is the only reading consistent with the total
+
+# page 487
+D 34 | Никополъ | Nikopol
+S I 1863 1035?
+S II 2011 907
+S III 1924 1040
+S IV 2073 1145
+S V 1993 989
+T 9864 5116
+C E | Д-ръ Александръ Н. Радевъ (ОТ.) | I:925 II:594 III:549 IV:121 V:518 | 2707
+C E | Атанасъ Блажевъ | I:908 II:594 III:552 IV:86 V:503 | 2643
+C N | Янко Ст. Забуновъ [*] | I:36 II:24 III:455 IV:785 V:193 | 1493
+C N | Иванъ Балканджиевъ | I:38 II:24 III:456 IV:713 V:193 | 1424
+C N | Панайотъ Г. Чорбаджиевъ [*] | I:33 II:252 III:41 IV:193 V:232 | 751
+C N | Иванъ Т. Мацевъ | I:33 II:258 III:21 IV:182 V:199 | 693
+C N | Андрей М. Баничковъ [*] | I:32 II:31 III:1 IV:131 V:51 | 246
+C N | Николай А. Мариновъ [*] | I:33 II:37 III:1 IV:68 V:89 | 228
+C N | Иванчо Върбановъ | I:- II:- III:- IV:- V:- | -
+D 35 | Плѣвенъ (I-а избират.) | Plevén (I-ère électorale)
+S I 2537 1098
+S II 1974 1005
+S III 2279 1233
+S IV 2035 1131
+T 8825 4467
+C E | Александръ Людскановъ (ОТ.) | I:701 II:721 III:483 IV:631 | 2536
+C N | Евстати С. Славовски [*] | I:295 II:183 III:132 IV:406 | 1016
+# Никополъ S I voters: third digit blurred (3 or 8); 1035 is the reading that matches the printed total 5116
+# Плѣвенъ block is faintly printed; all its figures agree with the printed totals
+
+# page 488
+D 35 | cont
+C E | Горанъ Бѣлевъ | I:689 II:714 III:425 IV:617 | 2445
+C N | Величко Поповъ [*] | I:8 II:- III:672 IV:- | 680
+C N | Тодоръ С. Табаковъ [*] | I:298 II:183 III:4 IV:186 | 671
+C N | Димитръ Драшевъ [*] | I:- II:1 III:540 IV:22 | 563
+C N | Димитръ Стояновъ | I:44 II:22 III:39 IV:303 | 408
+C N | Георги Кирковъ [*] | I:56 II:67 III:33 IV:1 | 157
+C N | Димитръ Благоевъ [*] | I:52 II:67 III:33 IV:1 | 153
+C N | Димитръ Я. Пенковъ [*] | I:36 II:19 III:13 IV:76 | 144
+C N | Маринъ Д. Узуновъ [*] | I:- II:1 III:90 IV:22 | 113
+D 35а | Плѣвенъ (II-а избират.) | Plevén (II-ème électorale)
+S I 1641 815
+S II 2328? 1082
+S III 2452? 1097
+S IV 1637? 732
+T 8058? 3726
+C E | Нино Христовъ | I:494? II:537 III:518 IV:483 | 2032?
+C N | Иванъ Мойковъ | I:236 II:146 III:360? IV:48? | 790
+# 35а block is very faintly printed/blurred at the page foot; the ? readings are the ones consistent with the printed totals
+# Мойковъ III and IV are partly under the archive watermark
+
+# page 489
+D 35а | cont
+C E | Христо Г. Върбеновъ [†] | I:484 II:537 III:514 IV:483 | 2018
+C N | Ангелъ Митовъ | I:236 II:147 III:366 IV:- | 749
+C N | Петко Гачевъ [*] | I:12 II:- III:154 IV:190 | 356
+C N | Янко С. Забуновъ [*] | I:12 II:- III:151 IV:190 | 353
+C N | Христо Тотевъ [*] | I:49 II:211 III:42 IV:- | 302
+C N | Никола П. Бинбашиски [*] | I:49 II:215 III:5 IV:- | 269
+C N | Димитръ Джоновъ | I:21 II:140 III:63 IV:9 | 233
+C N | Илия Димитровъ [*] | I:21 II:158 III:19 IV:8 | 206
+C N | Янко Сакѫзовъ [*] | I:13 II:31 III:- IV:- | 44
+C N | Никола Хр. Габровски [*] | I:13 II:31 III:- IV:- | 44
+# the dagger (†) before Върбеновъ is printed; no footnote explaining it on this page
+
+# page 490
+D 35а | cont
+C N | Христо Ив. Бурджовъ | I:- II:- III:- IV:- | -
+D 36 | Тетевенъ | Téteven
+S I 3806 1375
+S II 1823 960
+S III 2638 1456
+T 8267 3791
+C E | Димитръ М. Яблански | I:658 II:836 III:1336 | 2830
+C E | Ив. Ев. Гешовъ | I:596 II:802 III:1273 | 2671
+C N | Михаилъ Георгиевъ [*] | I:597 II:62 III:110 | 769
+C N | Александръ Людскановъ [*] | I:636? II:8 III:56 | 700
+C N | Ионко Веселиновъ [*] | I:74 II:98 III:1 | 173
+C N | Цончо Станевъ [*] | I:8 II:20 III:121 | 149
+C N | Искъръ Урмановъ [*] | I:40 II:72 III:1 | 113
+C N | Маринъ Николовъ [*] | I:65 II:13 III:3 | 81
+C N | Георги Кирковъ [*] | I:35 II:9 III:9 | 53
+D 37 | Троянъ | Troyan
+S I 2377 1253
+S II 2608 1214
+S III 2267 909
+S IV 2726 1428
+T 9978 4804
+C E | Цѣтко В. Таслаковъ | I:352 II:271 III:371 IV:596 | 1590
+C E | Никола Ганиджиски | I:343 II:194 III:330 IV:595 | 1462
+C N | Никола Г. Шивачевъ [*] | I:396 II:465 III:426 IV:125 | 1412
+C N | П. Д. Беджаковъ | I:439? II:83 III:98! IV:759? | 1379?
+# Людскановъ I: middle digit blurred (3 or 5); 636 is the reading that matches the printed total 700
+# Беджаковъ: III is hidden under the archive watermark (inferred from the total); I, IV and the total are faint/partly under it
+# Ганиджиски: surname faintly printed, letters uncertain; Цѣтко may be Цвѣтко with a faint в
+
+# page 491
+D 37 | cont
+C N | Д-ръ Никола К. Думановъ | I:458 II:92 III:104 IV:669 | 1323
+C N | Дамянъ Пеновъ [*] | I:402 II:392 III:382 IV:35 | 1211
+C N | Илчо Д. Андрѣевъ [*] | I:51 II:406 III:57 IV:2 | 516
+C N | Кънчо Радевъ [*] | I:43? II:402 III:53 IV:2 | 500
+C N | Петко Д. Врачовски | I:- II:66 III:1 IV:32 | 99
+C N | Ионко Н. Мутафовъ | I:1 II:56 III:1 IV:34 | 92
+D 38 | Бѣла | Bèla
+S I 1937 1175
+S II 2505 981
+S III 2486 1388
+S IV 2280 1088
+T 9208 4632
+C E | Димитръ С. Зографски | I:452 II:777 III:629 IV:544 | 2402
+C E | Недко Лефтеровъ | I:245 II:783 III:655 IV:534 | 2217
+C N | Ангелъ Д. Крушковъ [*] | I:584 II:183? III:245 IV:306 | 1318
+C N | Игнатъ Геновъ [*] | I:441 II:22 III:305 IV:287 | 1055
+C N | Боню Г. Кабакчиевъ [*] | I:259 II:15 III:470 IV:264 | 1008
+
+# page 492
+D 38 | cont
+C N | Марко Ивановъ [*] | I:359 II:182 III:263 IV:202 | 1006
+C N | Янко Цановъ [*] | I:- II:- III:- IV:38 | 38
+D 39 | Разградъ (I-а избират.) | Razgrad (I-ère électorale)
+S I 1953 1005
+S II 2296 1190
+S III 1547 876
+S IV 2302 795
+S V 1916 944
+T 10014 4810
+C E | Стефанъ Митовъ | I:583 II:306 III:649 IV:531 V:306 | 2375
+C E | х. Неджибъ бей | I:473 II:203 III:649 IV:451 V:257 | 2033
+C N | Тодоръ Ив. Тодоровъ [*] | I:311 II:552 III:135 IV:160 V:527 | 1665
+# MISMATCH Тодоръ Ив. Тодоровъ: sections sum to 1685, printed total 1665 (all cells re-read at 8-10x)
+C N | Сюлейманъ Еф. Мемишовъ | I:297 II:494 III:135 IV:60 V:455 | 1441
+C N | Юрданъ Г. Рашевъ | I:201 II:455 III:80 IV:159 V:75 | 970
+C N | х. Ибрямъ Халиловъ | I:95 II:327 III:80 IV:50 V:8 | 560
+C N | Георги Кирковъ [*] | I:22 II:25 III:- IV:16 V:130 | 193
+C N | Янко Сакѫзовъ [*] | I:22 II:20 III:- IV:17 V:121 | 180
+
+# page 493
+D 39 | cont
+C N | Димитръ Тотевъ [*] | I:- II:- III:9 IV:80 V:2 | 91
+C N | Стоянъ Стойновъ [*] | I:- II:- III:3 IV:43 V:3 | 49
+D 39а | Разградъ (II-а избират.) | Razgrad (II-ème élector.)
+S I 2218 960
+S II 2385 1420
+S III 2372 888
+S IV 1602 963
+T 8577 4231
+C E | Етемъ Ефенди Хасановъ | I:477 II:846 III:274 IV:587 | 2184
+C E | Георги Кърджиевъ | I:483 II:847 III:198 IV:587 | 2115
+C N | Георги Мартиневъ [*] | I:168 II:127 III:544 IV:337 | 1176
+C N | Риза Ефенди Ахмедовъ [*] | I:124 II:119 III:548 IV:337 | 1128
+C N | Петръ Добревъ | I:133 II:466 III:295 IV:39 | 933
+C N | Изетъ Мехмедовъ | I:119 II:430 III:167 IV:39 | 755
+C N | Никола Начовъ | I:231 II:5 III:3 IV:- | 239
+C N | Хасанъ х. Ахмедовъ | I:175 II:- III:3 IV:- | 178
+D 40 | Русе (градска) | Roussé (urbain)
+S I 2555 911
+S II 2953 1060
+S III 2769 1145
+T 8277 3116
+C E | Александръ Каназирски | I:288 II:347 III:378 | 1013
+C N | Стефанъ Мошановъ [*] | I:304 II:377 III:302? | 983?
+# Мошановъ III and total partly covered by the scan watermark; read as 302 / 983 (consistent with I+II)
+
+# page 494
+D 40 | cont
+C E | Филипъ Симидовъ | I:307 II:371 III:318 | 996
+# Филипъ Симидовъ: total as Table III (p437) prints it (Table IV's last digit is blurred)
+C N | Константинъ Папайотовъ | I:281 II:296 III:398 | 975
+C N | Д-ръ Петъръ Стайковъ | I:278 II:287 III:387 | 952
+C N | Иванъ Самарджиевъ | I:185 II:245 III:325 | 755
+C N | Христо Ивановъ | I:107 II:151 III:67 | 305
+# MISMATCH Христо Ивановъ: sections sum to 325, printed total 305; II (151, could be 131) and III (67, could be 47) are blurred
+C N | Георги Кирковъ [*] | I:34 II:31 III:56 | 121
+C N | Янко Сакѫзовъ [*] | I:33 II:26 III:51 | 110
+D 40а | Русе (селска) | Roussé (rural)
+S I 2293 1113
+S II 1891 729
+S III 1774 1064
+S IV 1929 887
+S V 1946 951
+S VI 2098 1070
+S VII 1865 788
+T 13796 6602
+C E | Беню Къретевъ [¹] | I:266 II:50 III:825 IV:630 V:62 VI:380 VII:261 | 2474
+C E | Скендеръ Бей Махмудовъ | I:573 II:14 III:415 IV:560 V:45 VI:262 VII:190 | 2059
+C E | Гецо Ив. Кутинчевъ | I:375 II:15 III:813 IV:247 V:43 VI:275 VII:261 | 2029
+# Кутинчевъ: III, VI and total as Table III (p438) prints them (Table IV block heavily blurred)
+C N | Маринъ Вълкановъ [*] | I:35 II:303 III:3 IV:4 V:349 VI:581 VII:439 | 1714
+C N | Найденъ Кормановъ [*] | I:35 II:298 III:1 IV:12 V:380 VI:520 VII:421 | 1667
+C N | Паню Ивановъ | I:40 II:293 III:10 IV:13 V:342 VI:? VII:194? | ?
+# Паню Ивановъ: VI, VII and the total are covered by the scan watermark; VI and total unreadable
+F ¹) Подалъ оставка и приета отъ Народното Събрание.
+
+# page 495
+D 40а | cont
+C N | Г. Губидѣлниковъ [*] | I:483 II:262 III:26 IV:115 V:453 VI:93 VII:66 | 1498
+C N | Маринъ Г. Радославовъ [*] | I:476 II:147 III:5 IV:112 V:509 VI:48 VII:37 | 1334
+C N | Османъ Нури Хавузъ Алиевъ [*] | I:479 II:149 III:5 IV:109 V:443 VI:83 VII:65 | 1333
+C N | Димитръ П. Ненковъ | I:322 II:247 III:10 IV:81 V:80 VI:195 VII:50 | 985
+C N | Симеонъ Неновъ [*] | I:5 II:181 III:7 IV:410 V:49 VI:123 VII:8 | 783
+C N | Ранко х. Панковъ | I:- II:61 III:308 IV:- V:- VI:- VII:116! | 485?
+# Ранко х. Панковъ: VII and the total are covered by the scan watermark; total looks like 485 or 369 (369 if VII is a dash). The non-elected are listed by descending total, between Неновъ 783 and Мутишевъ 471, so the total is 485 and VII (inferred from it) 116
+
+# page 496
+D 40а | cont
+C N | Исмаилъ х. Мутишевъ [*] | I:210 II:80 III:1 IV:13 V:42 VI:122 VII:3 | 471
+C N | Илия Братоевъ [*] | I:10 II:21 III:233 IV:119 V:17 VI:1 VII:43 | 444
+C N | Велико Вълевъ [*] | I:10 II:33 III:211 IV:119 V:17 VI:- VII:40 | 430
+C N | Тома Томовъ [*] | I:10 II:4 III:228 IV:119 V:18 VI:- VII:37 | 416
+C N | Бончо Радановъ | I:3 II:- III:- IV:- V:1 VI:1 VII:17 | 22
+D 41 | Силистра (I-а избират.) | Silistra (I-ère électorale)
+S I 2571 1051
+S II 2424 1294
+S III 2041 1004
+S IV 1499 949
+T 8535 4298
+C E | Христо Тоневъ | I:602 II:252 III:773 IV:359 | 1986
+C E | Петъръ Чаушовъ | I:638 II:267 III:386 IV:246 | 1537
+C N | Вълчо Георгиевъ | I:7 II:481 III:250 IV:395 | 1133
+C N | Гроздю Радевъ | I:7 II:451? III:22 IV:478 | 958
+# Гроздю Радевъ II partly under the scan watermark (reads 45x/450); 451 is the reading that matches the total
+
+# page 497
+D 41 | cont
+C N | Стоянъ Т. Бойковъ | I:111 II:461 III:225 IV:108 | 905
+C N | Георги Димковъ | I:144 II:467 III:228 IV:36 | 875
+C N | Марко П. Марковъ | I:274 II:88 III:74 IV:174 | 610
+C N | Василъ Димовъ | I:267 II:87 III:54 IV:104 | 512
+C N | Георги Кирковъ [*] | I:24 II:17 III:- IV:- | 41
+C N | Янко Сакѫзовъ [*] | I:22 II:18 III:- IV:- | 40
+D 41а | Силистра (II-а избир.) | Silistra (II-ème élector.)
+S I 2008 1123
+S II 1489 715
+S III 1995 1100
+S IV 2117 1245
+T 7609 4183
+C E | Османъ Бей Сали Беевъ | I:464 II:626 III:739 IV:588 | 2417
+C E | Петъръ Д. Златаровъ | I:298 II:615 III:739 IV:588 | 2240
+C N | Иванъ Константиновъ [*] | I:618 II:33 III:- IV:383 | 1034
+C N | х. Хасанъ х. Халиловъ | I:618 II:33 III:- IV:383 | 1034
+C N | Сава Бакаловъ | I:41 II:56 III:358 IV:273? | 728
+# Иванъ Константиновъ and х. Хасанъ х. Халиловъ print identical figures (as printed)
+# Сава Бакаловъ IV and total sit under the scan watermark; IV reads 273/275, 273 matches the total
+
+# page 498
+D 41a | cont
+C N | х. Яхж Юмеровъ | I:41 II:56 III:358 IV:273 | 728
+C N | Димитръ М. Кара-Николовъ [*] | I:166 II:11 III:- IV:- | 177
+D 42 | Тутраканъ | Toutrakan
+S I 2202 1271
+S II 1924 1085
+S III 1945 847
+S IV 1574 925
+S V 1781 981
+T 9426 5109
+C E | Д-ръ К. Т. Икономовъ | I:723 II:744 III:251 IV:601 V:474 | 2793
+C E | Иванъ С. Еневъ | I:713 II:744 III:251 IV:601 V:469 | 2778
+C E | Османъ С. Кечели | I:705 II:744 III:251 IV:601 V:466 | 2767
+C N | Иванъ М. Абрашовъ | I:510 II:268 III:463 IV:320 V:502 | 2063
+C N | Д-ръ П. Стайковъ [*] | I:498 II:268 III:463 IV:320 V:499 | 2048
+C N | Махмудъ х. Юмеровъ | I:489 II:268 III:463 IV:320 V:497 | 2037
+C N | Димитръ Бѣлчевъ | I:58 II:78 III:133 IV:4 V:13 | 286
+C N | Мемишъ Ю. Боровлу | I:57 II:78 III:133 IV:4 V:11 | 283
+C N | Мутишъ Мустафовъ | I:56 II:78 III:133 IV:4 V:11? | 282?
+# NOTE names "х. Яхж Юмеровъ", "Мемишъ Ю. Боровлу", "Мутишъ Мустафовъ" are faint; spelling uncertain. Mutishev V and total partly under library watermark.
+
+# page 499
+D 43 | Орхание | Orhanié
+S I 3035 2143
+S II 1968 1552
+S III 2408 1700
+T 7411 5395
+C E | Димитъръ Марковъ (К.) | I:994 II:877 III:860 | 2731
+C E | Кръстьо Диловски (К.) | I:986 II:876 III:849 | 2711
+C N | Тодоръ Балабановъ | I:1149 II:680 III:850 | 2679
+C N | Нако Диковъ | I:1159 II:678 III:822 | 2659
+D 44 | Пирдопъ | Pirdop
+S I 3359 1382
+S II 1623 630
+S III 2616 1049
+T 7598 3061
+C E | Генчо Филиповъ | I:582 II:454 III:498 | 1534
+C N | Недѣлко Ф. Свиняровъ [*] | I:432 II:174 III:544 | 1150
+C N | Петко Каравеловъ [*] | I:366 II:2 III:2 | 370
+D 45 | Самоковъ | Samokov
+S I 3503 1156
+S II 2502 1277
+S III 1506 757
+S IV 1397 533
+S V 2360 1139
+S VI 2453 939
+T 13721 5801
+C E | Христо Мановъ | I:358 II:559 III:273 IV:312 V:515 VI:361 | 2378
+C E | Иванъ Карастояновъ | I:332 II:556 III:273 IV:329 V:512 VI:321 | 2323
+C E | Стоилко П. Пиралковъ | I:151 II:662 III:381 IV:101 V:27 VI:421 | 1743
+C N | Иорданъ Кошовъ | I:129 II:470 III:8 IV:263 V:591 VI:264 | 1725
+C N | Никола Антикаровъ [*] | I:66 II:644 III:295? IV:154 V:70 VI:442 | 1671
+C N | Христо Занковъ | I:253 II:69 III:107 IV:69 V:512 VI:47 | 1057
+C N | Зарко Ангеловъ [*] | I:56 II:640 III:7 IV:96 V:89? VI:157! | 1045
+# NOTE Ангеловъ VI is under the library watermark; inferred from total (V+VI=246). Name "Стоилко П. Пиралковъ" faint.
+
+# page 500
+D 45 | cont
+C N | Д-ръ Д. Вачевъ [*] | I:143 II:69 III:98 IV:103 V:516 VI:59 | 988
+C N | Д-ръ Г. Калинковъ [*] | I:357 II:138 III:267 IV:64 V:15 VI:99 | 940
+C N | Иорданъ Цомевъ | I:76 II:- III:96 IV:87 V:539 VI:87 | 885
+C N | Христо Н. Петруновъ | I:185 II:4 III:355 IV:16 V:2 VI:28 | 590
+C N | Борисъ х. Сотировъ [*] | I:398 II:6 III:- IV:- V:3 VI:92 | 499
+C N | Георги Кирковъ [*] | I:288 II:6 III:- IV:- V:2 VI:37 | 333
+C N | Н. Хр. Велчевъ | I:203 II:- III:93 IV:- V:1? VI:32 | 329
+# NOTE Велчевъ IV and V lie under the library watermark.
+
+# page 501
+D 45 | cont
+C N | Янко Сакжзовъ [*] | I:208 II:6 III:- IV:- V:2 VI:37 | 318
+# MISMATCH Янко Сакжзовъ: sections sum to 253, printed total 318 (I could be 268 -> 313; neither reading reconciles; kept as printed)
+D 46 | София (градска) | Sophia (urbain)
+S I 1521 608
+S II 3663 884
+S III 1542 600
+S IV 1536 658
+S V 1788 682
+S VI 1450 454
+S VII 1072 435
+T 12572 4321
+C E | Д-ръ Стоянъ Даневъ | I:247 II:383 III:255 IV:259 V:262 VI:173 VII:233 | 1812
+C E | Михаилъ К. Сарафовъ (ОТ) | I:244 II:378 III:254 IV:260 V:262 VI:168 VII:231 | 1797
+C E | Стефанъ Пипевъ | I:233 II:367 III:243 IV:241 V:229 VI:150 VII:225 | 1688
+C N | Хр. Филиповъ [*] | I:227 II:283 III:177 IV:192 V:266 VI:216 VII:163 | 1524
+C N | Иванъ Вазовъ | I:227 II:280 III:177 IV:181 V:263 VI:204 VII:161 | 1493
+C N | Д-ръ Д. К. Вачовъ [*] | I:211 II:258 III:166 IV:171 V:231 VI:188 VII:126 | 1351
+C N | Димитръ Петковъ [*] | I:106 II:182 III:131 IV:186 V:134 VI:64 VII:- | 803
+C N | Ст. Хр. Гецовъ [*] | I:100 II:174 III:126 IV:179 V:132 VI:56 VII:33 | 800!
+# NOTE Гецовъ total: last digit under library watermark, inferred from sections. Name "Стефанъ Пипевъ" could be "Пиневъ".
+
+# page 502
+D 46 | cont
+C N | Мартинъ Тодоровъ | I:96 II:170 III:126 IV:176 V:129 VI:55 VII:- | 752
+C N | Георги Кирковъ [*] | I:47 II:65 III:49 IV:44 V:48 VI:31 VII:26 | 310
+C N | Янко Сакжзовъ [*] | I:42 II:58 III:43 IV:39 V:39 VI:25 VII:19 | 265
+C N | Гавраилъ Георгиевъ [*] | I:35 II:50 III:39 IV:33 V:32 VI:20 VII:27 | 236
+D 46a | София (селска) (I-а избирателна) | Sophia (rural) (I-ère électorale)
+S I 2673 1160
+S II 2278 815
+S III 2451 1076
+S IV 2111 752
+S V 2009 765
+S VI 2451 982
+T 13973 5550
+C E | Георги Згуревъ | I:538 II:349 III:495 IV:407 V:535 VI:660 | 2984
+C E | Стефанъ Бобчевъ | I:530 II:346 III:495 IV:409 V:535 VI:666 | 2981
+C N | Младенъ Златковъ | I:422 II:140 III:295 IV:94 V:89 VI:286 | 1326
+C N | Кръстанъ Г. Доцевъ [*] | I:402 II:139 III:295 IV:98 V:89? VI:293? | 1316
+# NOTE Доцевъ V and VI are partly under the library watermark.
+
+# page 503
+D 46a | cont
+C E | Найденъ Беневъ | I:535? II:346 III:495 IV:407 V:535 VI:661 | 2979
+C N | Иванъ Г. Поповъ | I:396 II:140 III:295 IV:92 V:88 VI:287 | 1298
+C N | Д-ръ С. Мирковъ [*] | I:225 II:326 III:288 IV:249 V:140 VI:30 | 1258
+C N | Драганъ Цанковъ [*] | I:224 II:325 III:288 IV:248 V:140 VI:31 | 1256
+C N | Антонъ Заприановъ [*] | I:216 II:326 III:288 IV:244 V:140 VI:31 | 1245
+D 46b | София (селска) (II-а избирателна) | Sophia (rural) (II-ème électorale)
+S I 2346 898
+S II 2696 807
+S III 2484 1306
+# III voters as Table III (p441) prints it
+S IV 2508 1499
+S V 2134 987
+S VI 1300 397
+T 13468 5894
+C E | Теодоръ Теодоровъ (ОТ.) | I:496 II:574 III:674 IV:717 V:464 VI:79 | 3004
+C E | Михаилъ Маджаровъ | I:495 II:566 III:636 IV:717 V:460 VI:110 | 2984
+C E | Игнатъ Веселиновъ | I:473 II:480 III:631 IV:717 V:497 VI:118 | 2916
+# Маджаровъ and Веселиновъ: blurred cells confirmed as Table III (p441) prints them
+C N | Ненъ Титоровъ [*] | I:71 II:126 III:600 IV:692 V:39 VI:249 | 1777
+C N | Лазаръ Ангеловъ [*] | I:47 II:- III:500 IV:636 V:233 VI:220 | 1636
+C N | Василъ Вълчановъ | I:82? II:- III:532? IV:551? V:244 VI:220? | 1635?
+# MISMATCH Василъ Вълчановъ: best readings sum to 1629, printed total read as 1635 (III 532/533, IV 551/531, VI and total partly under library watermark; total could be 1655). Cells very blurred; verify against another copy.
+# NOTE Page 503 scan is blurred in the lower half; 46b elected figures read with ? are consistent with their totals. Voters III read 1306 (glyph 1306/1506; 1306 matches T). Name "Ненъ Титоровъ" uncertain.
+
+# page 504
+D 46b | cont
+C N | Д-ръ Никола Вълчевъ | I:200 II:166 III:159 IV:159 V:- VI:1 | 685
+C N | Драганъ Цанковъ [*] | I:162 II:- III:29 IV:57 V:270 VI:60 | 578
+C N | Кр. К. Бахчевановъ [*] | I:162 II:30 III:19 IV:7 V:266 VI:59 | 543
+C N | Никола Митаковъ [*] | I:86 II:46 III:16 IV:7 V:303 VI:59 | 517
+C N | Гавраилъ Гроздановъ | I:190 II:- III:65 IV:126 V:- VI:1 | 382
+C N | Пешо Панчовъ [*] | I:206 II:21 III:51 IV:74 V:- VI:1 | 353
+C N | Илия Вълчевъ | I:23 II:11 III:- IV:- V:183? VI:8! | 225?
+# NOTE Илия Вълчевъ IV-VI lie under the library watermark; VI inferred from total read as 225 (could be 223, then VI=6). The page may continue on p505 (no further okoliya starts here).
+
+# page 505
+D 46 | cont
+C N | Павелъ Христовъ | I:- II:50 III:- IV:- V:- VI:- | 50
+C N | Стоянъ Цѣновъ | I:- II:13 III:- IV:- V:- VI:- | 13
+D 47 | Трънъ | Trin
+S I 2751 1509
+S II 2263 1218
+S III 2792 1764
+S IV 2061 1118
+S V 1117 865
+T 10984 6474
+C E | П. Вѫжаровъ | I:531 II:247 III:596 IV:663 V:521 | 2558
+C E | Коте Кафеджиски | I:482 II:210 III:590 IV:664 V:533 | 2479
+C N | Сотиръ Календаровъ | I:717 II:253 III:609 IV:121 V:- | 1700
+C N | Геора Шойлевъ | I:300 II:698 III:457 IV:165 V:66 | 1686
+C N | Захари П. Байкушевъ | I:694 II:255 III:609 IV:118 V:1 | 1677
+C N | Д-ръ Г. Стрѣзовъ | I:260 II:642 III:432 IV:150 V:73 | 1557
+C N | Хр. Г. Поповъ | I:18 II:32 III:112? IV:177 V:273 | 612
+C N | Цвѣтко М. Тошковъ | I:18 II:30 III:131 IV:176? V:250? | 605?
+# NOTE Тошковъ IV, V and total sit under a library watermark; 174/250/603 is an equally consistent reading.
+
+# page 506
+D 47 | cont
+C N | Георги Кирковъ [*] | I:2 II:30 III:7 IV:- V:2 | 41
+C N | Янко Сакѫзовъ [*] | I:- II:32 III:6 IV:- V:1 | 39
+D 48 | Царибродъ | Tzaribrod
+S I 2353 1516
+S II 1851 973
+S III 2758 1614
+S IV 2731 1606
+T 9693 5709
+C E | Емануилъ Начевъ | I:481 II:545 III:855 IV:372 | 2253
+C E | Теодоръ Теодоровъ | I:488 II:545 III:849 IV:369 | 2251
+C N | Соколъ Д. Невлянски [*] | I:654 II:200 III:145 IV:936 | 1935
+C N | Веселинъ Станимировъ [*] | I:607 II:189 III:119 IV:952 | 1867
+C N | Димитръ А. Чуковезърски | I:380 II:230 III:652 IV:296 | 1558
+C N | Михаилъ Каралѣевъ | I:405 II:218 III:592 IV:286 | 1501
+D 49 | Борисовградъ | Borisovgrad
+S I 2309 1537
+S II 2566 1797
+S III 2358 1452
+T 7233 4786
+C E | Марко Бошковъ | I:706 II:831 III:963 | 2500
+C E | Вълчо Илиевъ Кобуровъ | I:689 II:826 III:972 | 2487
+C N | Димитръ Н. Калайджиевъ | I:346 II:610 III:331 | 1287
+C N | Атанасъ Тилевъ | I:312 II:569 III:211 | 1092
+C N | Тодоръ Н. Бойчевъ | I:275 II:114 III:128 | 517
+C N | Дяко Поповъ [*] | I:304 II:94? III:78 | 476
+
+# page 507
+D 49 | cont
+C N | Василъ Милевъ [*] | I:158 II:156 III:130 | 444
+C N | Георги Атанасовъ [*] | I:160 II:150 III:68 | 378
+C N | Димитръ Благоевъ [*] | I:45 II:103 III:2 | 150
+C N | Янко Сакѫзовъ [*] | I:43 II:103 III:2 | 148
+C N | Петко Късѫровъ [*] | I:13 II:34 III:- | 47
+D 50 | Казанлъкъ | Kazanlik
+S I 2886 1516
+S II 2676 1186
+S III 2107 1117
+S IV 2106 1068
+S V 2023 980
+S VI 2216 1452
+T 14014 7319
+C E | Слави Славовъ | I:727 II:335 III:421 IV:360 V:318 VI:664 | 2825
+C E | Антонъ Геневъ | I:722 II:335 III:421 IV:359 V:318 VI:664 | 2819
+C E | Ив. Ев. Гешовъ (ОТ.) | I:722 II:335 III:421 IV:360 V:318 VI:662 | 2818
+C N | Хр. Г. Пипаловъ [*] | I:424 II:397 III:671 IV:343 V:538 VI:470 | 2843
+C N | Д-ръ Ст. Даневъ [*] | I:420 II:397 III:671 IV:340 V:538 VI:471 | 2837
+C N | Стефанъ Мечевъ [*] | I:365 II:393 III:633 IV:328 V:331 VI:432 | 2482
+C N | К. Т. Бозвелиевъ [*] | I:362 II:336 III:14 IV:124 V:246 VI:93 | 1175
+
+# page 508
+D 50 | cont
+C N | Георги Кирковъ [*] | I:357 II:335 III:15 IV:124 V:246 VI:93 | 1170
+C N | Ефтимъ Дабевъ [*] | I:349 II:335 III:14 IV:127 V:246 VI:93 | 1164
+C N | Ив. Г. Чакъровъ [*] | I:7 II:116 III:8 IV:312 V:83 VI:234 | 760
+C N | Иванъ Галовъ [*] | I:7 II:116 III:9 IV:313 V:83 VI:225 | 753
+C N | Д. Драгневъ [*] | I:7 II:116 III:9 IV:315 V:83 VI:221 | 751
+C N | Илия Ц. Видинлиевъ [*] | I:50 II:5 III:37 IV:11 V:6 VI:93 | 202?
+C N | Маню Райновъ | I:- II:- III:- IV:- V:- VI:1 | 1
+# NOTE Видинлиевъ total is blurred and could read 204; 202 is the only reading agreeing with the section cells.
+
+# page 509
+D 51 | Нова-Загора | Nova-Zagora
+S I 2401 1562
+S II 2327 1027
+S III 1794 843
+S IV 1271 621
+S V 2210 932
+T 10003 4985
+C E | Миланъ Стояновъ | I:458 II:387 III:312 IV:121 V:402 | 1680
+C E | Антонъ Франга | I:457 II:386 III:312 IV:121 V:402 | 1678
+C N | Никола Недковъ | I:630 II:321 III:139 IV:70 V:276 | 1436
+C N | Василъ Константиновъ | I:586 II:342 III:139 IV:70 V:276 | 1413
+C N | Ив. Т. Кутевъ [*] | I:251 II:220 III:100 IV:346 V:170 | 1087
+C N | Ефтимъ Дабевъ [*] | I:237 II:220 III:100 IV:346 V:167 | 1070
+C N | Руси Поповъ [*] | I:199 II:83 III:120 IV:46 V:31 | 479
+C N | Марко Димитровъ [*] | I:175 II:62 III:103 IV:46 V:32 | 418
+C N | Злати М. Кабаджовъ [*] | I:61 II:17 III:171 IV:38 V:54 | 341
+C N | Радни Колевъ [*] | I:43 II:17 III:188 IV:38 V:54 | 340
+
+# page 510
+D 52 | Ст.-Загора (I-а избират.) | St.-Zagora (I-ère électorale)
+S I 2382 1449
+S II 2242 1312
+S III 2276 1315
+S IV 2295 1394
+S V 2065 1318
+T 11260 6788
+C E | Милю Ив. Милевъ (К.) | I:1057 II:708 III:594 IV:448 V:298 | 3105
+# Милю Ив. Милевъ: total as Table III (p442) prints it (Table IV clearly misprints it as 2105)
+C E | Василъ Ив. Димчевъ (К.) | I:1049 II:677 III:595 IV:448 V:313 | 3082
+C E | Василъ Христовъ [К.] | I:1040 II:672 III:575 IV:411 V:288 | 2986
+C N | Д-ръ Андрей Ходжовъ | I:297 II:631 III:643 IV:794 V:549 | 2914
+C N | Хр. Дерменджиевъ | I:286 II:614 III:642 IV:794 V:555 | 2891
+C N | Г. Шиваровъ | I:288 II:589 III:642 IV:794 V:571 | 2884
+C N | Димитръ Драгневъ [*] | I:93 II:2 III:82 IV:190 V:504 | 871
+C N | Диню Рашевъ [*] | I:90 II:- III:65 IV:152 V:431 | 738
+C N | Янко Забуновъ [*] | I:89 II:- III:65 IV:152 V:431 | 737
+C N | Георги Кирковъ [*] | I:14 II:16 III:19 IV:3 V:5 | 57
+C N | Янко Сакѫзовъ [*] | I:14 II:15? III:19 IV:2 V:5 | 55!
+# NOTE Сакѫзовъ total is below the bottom edge of the scan (page 511 starts with a new candidate); sections sum to 55.
+
+# page 511
+D 52 | cont
+C N | Ефтимъ Дабевъ [*] | I:14 II:16 III:16 IV:3 V:5 | 54
+D 52а | Ст.-Загора (II-а избир.) | St.-Zagora (II-ème électorale)
+S I 2052 1324
+S II 2313 1019
+T 4365 2343
+C E | Димитръ Драгневъ | I:1033 II:503 | 1536
+C N | Петъръ Коларовъ | I:185 II:399 | 584
+C N | Вълчанъ Чакъровъ [*] | I:104 II:117 | 221
+D 53 | Харманлий | Harmanly
+S I 1149 770
+S II 1756 1066
+S III 2736 1627
+S IV 2331 1387
+S V 2110 925
+S VI 1880 1037
+T 11962 6812
+C E | Дико Диковъ | I:596 II:520 III:930 IV:499 V:592 VI:471 | 3608
+C E | Ив. П. Тинковски | I:596 II:500 III:929 IV:499 V:592 VI:468 | 3584
+C E | Петко Тодоровъ | I:596 II:499 III:946 IV:467 V:592 VI:469 | 3569
+C N | Гѫлъбъ Георгиевъ | I:174 II:439 III:557 IV:788 V:311 VI:363 | 2632
+C N | Тинко Димчевъ | I:174 II:466 III:548 IV:769 V:307 VI:363 | 2627
+C N | Вълчанъ Г. Чакъровъ | I:174 II:430 III:558 IV:726 V:272 VI:375 | 2535
+C N | Георги Кирковъ [*] | I:- II:112 III:72 IV:114 V:19 VI:6 | 323
+C N | Д. Дамяновъ [*] | I:- II:117 III:59 IV:114 V:19 VI:3? | 312?
+# NOTE Дамяновъ VI and total sit under a library watermark; VI could read 2 with total 311.
+
+# page 512
+D 53 | cont
+C N | Н. Хр. Габровски [*] | I:- II:105 III:70 IV:115 V:19 VI:1 | 310
+C N | Димитръ Драшевъ [*] | I:- II:2 III:67 IV:3 V:2 VI:200 | 274
+C N | Иванъ Драгиевъ [*] | I:- II:- III:66 IV:3 V:2 VI:196 | 267
+C N | Илия Ч. Калѫчевъ [*] | I:- II:- III:65 IV:3 V:1 VI:190 | 259
+C N | Василъ Милевъ | I:- II:7 III:16 IV:43 V:46 VI:- | 112
+D 54 | Хасково | Haskovo
+S I 2299 1333
+S II 2478 1336
+S III 2518 1387
+S IV 2450 1517
+S V 2643 1465
+S VI 1869 1218
+T 14257 8256
+C E | Койно Господиновъ | I:427 II:457 III:499 IV:494 V:441 VI:812 | 3130
+C E | Димитръ х. Тоневъ | I:438 II:461 III:496 IV:462 V:441 VI:812 | 3110
+C N | Димитръ Даминовъ | I:440 II:267 III:561 IV:593 V:415 VI:126 | 2402
+C N | Ефтимъ Дабевъ [*] | I:450 II:258 III:561 IV:575? V:415? VI:126? | 2365?
+# MISMATCH Ефтимъ Дабевъ: IV, VI and total are under a library watermark at the page foot; sections sum to 2385 vs total read as 2365 (either IV is 555 or total is 2385)
+
+# page 513
+D 54 | cont
+C E | Апостолъ Уруновъ | I:431 II:461 III:499 IV:458 V:441 VI:811 | 3101
+C N | Георги Стефановъ [*] | I:429 II:262 III:559 IV:542 V:415 VI:126 | 2333
+C N | Василъ Милевъ | I:349 II:375? III:213 IV:396 V:385 VI:262 | 1980
+C N | х. Василъ х. Тодоровъ [*] | I:344 II:362 III:211 IV:387 V:385 VI:262 | 1951
+C N | Димитръ Ивановъ [*] | I:325 II:356 III:208 IV:405 V:385 VI:262 | 1941
+C N | Д-ръ Георги Кожухаровъ [*] | I:139 II:256 III:112 IV:79 V:224 VI:16 | 826
+C N | Василъ Гьобеклиевъ [*] | I:121 II:250 III:112 IV:95 V:224 VI:16 | 818
+C N | Дѣлчо Дѣковъ [*] | I:120 II:243 III:112 IV:80 V:224 VI:16? | 795?
+
+# page 514
+D 54 | cont
+C N | Нешо Брайковъ | I:- II:- III:- IV:- V:- VI:- | -
+# Нешо Брайковъ: the sixth row is printed "IV" (misprint for VI); all cells are dashes
+D 55 | Чирпанъ | Tchirpan
+S I 2342 1178
+S II 2429 1143
+S III 2180 885
+S IV 2242 888
+S V 1938 1104
+S VI 2110 1280
+T 13241 6478
+C E | Тодоръ Н. Орловъ | I:310 II:417 III:235 IV:391 V:255 VI:210 | 1818
+C E | Петъръ Тенчевъ | I:310 II:416 III:217 IV:391 V:254 VI:210 | 1798
+C E | Христо Камбуровъ | I:310 II:409 III:217 IV:391 V:252 VI:210 | 1789
+C N | Иванъ Андоновъ | I:380 II:375 III:179 IV:121 V:231 VI:303 | 1589
+C N | Димитръ Георгиевъ [*] | I:379 II:369 III:170 IV:124 V:231 VI:300 | 1573
+C N | Д-ръ П. Динчевъ [*] | I:381 II:370 III:165 IV:121 V:231 VI:303 | 1571
+C N | Минко Шиваровъ [*] | I:216 II:148 III:136 IV:109 V:453 VI:398 | 1460
+C N | Петко Желѣзковъ [*] | I:215 II:- III:129 IV:54 V:452 VI:397 | 1247
+C N | Гено Е. х. Геновъ [*] | I:251 II:- III:124 IV:54? V:458 VI:304? | 1191
+# Name readings uncertain at scan resolution: "Андоновъ" (3rd letter could be л), "Желѣзковъ"
+
+# page 515
+D 55 | cont
+C N | Кирилъ Славовъ [*] | I:209 II:129 III:265 IV:221 V:138 VI:214 | 1176
+C N | Т. Байковъ [*] | I:197 II:127 III:123 IV:221 V:137 VI:214 | 1019
+C N | Въчо Ивановъ [*] | I:179 II:123 III:150 IV:221 V:107 VI:217 | 997
+C N | Иванъ Петровъ [*] | I:18 II:71 III:204 IV:73 V:27 VI:114 | 507
+C N | Геню Енчовъ [*] | I:- II:180 III:44 IV:- V:- VI:87 | 311
+C N | Геню Бойчевъ [*] | I:36 II:32 III:46 IV:72 V:18 VI:36 | 240
+C N | Слави Найдевъ [*] | I:8 II:- III:68 IV:- V:- VI:87 | 163
+# Слави Найдевъ: name as it appears in print (letter before ъ reads as в); p516 prints "Слави Найденовъ"
+
+# page 516
+D 55 | cont
+C N | Д-ръ К. Серафимовъ [*] | I:36 II:32 III:23 IV:18 V:18 VI:31 | 158
+C N | Петко Ж. Радевски [*] | I:- II:140 III:- IV:- V:- VI:- | 140
+C N | Георги Кирковъ [*] | I:21 II:15 III:16 IV:27 V:1 VI:31 | 111
+C N | Димитръ Благоевъ [*] | I:20 II:16 III:16 IV:27 V:- VI:31 | 110
+C N | Ефтимъ Дабевъ [*] | I:20 II:15 III:16 IV:27 V:- VI:31 | 109
+C N | Слави Найденовъ [*] | I:- II:27 III:- IV:1 V:37 VI:- | 65
+C N | Филипъ Стайковъ [*] | I:- II:- III:51 IV:- V:- VI:- | 51!
+# Филипъ Стайковъ: total line is below the rule at the scan's bottom edge and is cut off; inferred from sections
+
+# page 517
+D 55 | cont
+C N | П. Минчевъ [*] | I:36? II:12 III:- IV:- V:- VI:- | 48
+D 56 | Габрово | Gabrovo
+S I 2736 1505
+S II 1921 742
+S III 1691 902
+S IV 2001 880
+T 8349 4029
+C E | Ив. Пецовъ | I:697 II:234 III:283 IV:259 | 1473
+C E | Никола Т. Рашѣевъ | I:655 II:214 III:194 IV:224 | 1287
+C N | Хр. Конкилевъ | I:527 II:253 III:119 IV:207 | 1106
+C N | Хр. Топузановъ | I:492 II:260 III:118 IV:220 | 1090
+C N | Боню Лунговъ [*] | I:129 II:86 III:170 IV:105 | 490
+C N | Димитръ Благоевъ [*] | I:145 II:86 III:117 IV:102 | 450
+C N | Ст. Хр. Манафовъ | I:208 II:117 III:94 IV:4 | 423
+C N | Генчо Ив. Бърдаревъ [*] | I:5 II:23 III:38 IV:311 | 377
+C N | Д. Ц. Лучниковъ | I:8 II:42 III:293 IV:13 | 356
+C N | Калчо С. Дрѣнковъ | I:9 II:42 III:267 IV:13? | 331?
+# Калчо С. Дрѣнковъ: IV and total are under a library watermark at the page foot; IV partly visible, 13 is the reading that matches the total
+# Name readings uncertain at scan resolution: "Боню Лунговъ", "Дрѣнковъ"
+
+# page 518
+D 56 | cont
+C N | Ст. х. Петровъ [*] | I:8 II:36 III:38 IV:221 | 303
+C N | Лазаръ Панковъ [*] | I:121 II:82 III:17 IV:3 | 223
+C N | Хр. Н. Екимовъ [*] | I:1 II:8 III:7 IV:77 | 93
+D 57 | Горна-Орѣховица | Gorna-Oréhovitza
+S I 2626 1487
+S II 1962 1239
+S III 2596 1269
+S IV 1628 1036
+S V 2034 1288
+S VI 2051 1153
+S VII 2142 1130
+T 15039 8602
+C E | Ангелъ Каранешевъ (К.) | I:149 II:531 III:830 IV:172 V:536 VI:746 VII:362 | 3326
+# Ангелъ Каранешевъ: VI is printed "VI — ¹)746" (footnote ¹)
+C E | Атанасъ Буровъ (К.) | I:513 II:356 III:869 IV:165 V:385 VI:638 VII:367 | 3293
+C E | Димитъръ Петковъ | I:654 II:429 III:226 IV:279 V:315 VI:328 VII:688 | 2919
+C N | Д-ръ Ив. Момчиловъ | I:676 II:487 III:229 IV:279 V:322 VI:203 VII:690 | 2886
+C N | Иванъ Московъ | I:161 II:213 III:845 IV:95 V:405 VI:618 VII:362 | 2699
+C N | Гатю Поповъ [*] | I:616 II:431 III:216 IV:279 V:319 VI:130 VII:694 | 2685
+C N | Тодоръ х. Константиновъ | I:647 II:497 III:189 IV:555 V:528 VI:187 VII:75 | 2678
+F ¹) Тукъ влизатъ 630 гласа подадени за лицето Ангелъ Каранешевъ и 116 — за Ангелъ К. Нешевъ, които сѫ смѣтнати за едно и сѫщо лице; (въ опредѣлението на Окр. Сѫдъ е показано, че кандидата Ангелъ Каранешевъ е избранъ съ 3195 гласа.
+
+# page 519
+# NOTE: Stoyan P. Burmov's VI cell carries printed footnote mark ¹) before 410 (see F line).
+D 57 | cont
+C N | Петко Т. Бакърджиевъ | I:652 II:356 III:189 IV:528 V:461 VI:183 VII:70 | 2439
+C N | Стоянъ П. Бурмовъ | I:273 II:292 III:162 IV:445 V:496 VI:410 VII:76 | 2154
+C N | Георги Кирковъ [*] | I:26 II:48 III:17 IV:106 V:21 VI:2 VII:2 | 222
+C N | Никола Хр. Габровски [*] | I:24 II:23 III:13 IV:107 V:38 VI:1 VII:4 | 210
+C N | Янко Сакъзовъ [*] | I:26 II:39 III:13 IV:107 V:20 VI:- VII:1 | 206
+D 58 | Дрѣново | Drénovo
+S I 2630 1472
+S II 1908 758
+S III 2574 1376
+T 7112 3606
+C E | Никола Мушановъ | I:981 II:312 III:30 | 1323
+C E | Стефанъ Лафчиевъ | I:365 II:172 III:595 | 1132
+C N | Стефанъ Поповъ | I:160 II:252 III:689 | 1101
+# NOTE: surname of next candidate is blurred; read as Бурмовъ (letter width matches м), could be Бурковъ
+C N | Стоянъ Бурмовъ | I:164 II:263 III:650 | 1077
+F ¹) Тукъ влизатъ и подаденитѣ за лицето Ст. Бурмовъ — 5 гласа, за Стоянъ Бурмовъ — 201? гласа и за Ст. П. Бурмовъ — 2 гласа, което по всѣка вѣроятность е [едно и сѫщо лице ...; second line partly cut off at page bottom] ... VI секция сѫ прѣдставени по отдѣлно.
+
+# page 520
+D 58 | cont
+C N | Георги Стойчевъ | I:289 II:170 III:613 | 1072
+C N | Станчо х. Димитровъ [*] | I:738 II:308 III:20 | 1066
+C N | Боню Лунговъ [*] | I:156 II:6 III:10 | 172
+C N | Хараламби Джамбазовъ [*] | I:24 II:12 III:47 | 83
+C N | Тотю Миневъ Етето [*] | I:6 II:10 III:52 | 68
+C N | Никола Габровски [*] | I:49 II:6 III:10 | 65
+D 59 | Елена | Élena
+S I 2481 1161
+S II 2377 968
+S III 2261 868
+S IV 2114 782
+T 9233 3779
+C E | Йорданъ п. Теодоровъ | I:1141 II:229 III:563 IV:759 | 2692
+C E | Христо Ю. Бакаловъ | I:1140 II:218 III:562 IV:759 | 2679
+C N | Михаилъ Патевъ [*] | I:20 II:745 III:306 IV:22 | 1093
+# NOTE: next surname blurred; third letter could be е (Радеславовъ)
+C N | Минко Радославовъ [*] | I:24 II:746 III:300 IV:22 | 1092
+D 60 | Свищовъ | Svichtov
+S I 3153? 1381
+S II 2214 1007
+S III 1780 1041
+S IV 1889 889
+S V 1937 984
+S VI 1741 1145
+T 12714 6447
+C E | Никола Константиновъ | I:839 II:512 III:508 IV:575 V:406? VI:558 | 3398
+C E | Маринъ Павловъ | I:807 II:507 III:505 IV:575 V:402 VI:558 | 3354
+C N | Лазаръ Панковъ | I:510 II:378 III:311 IV:285 V:398 VI:584 | 2466
+C N | Ангелъ Ангеловъ | I:473 II:376 III:308 IV:285 V:375 VI:584? | 2401
+
+# page 521
+D 60 | cont
+C E | Велизаръ Якововъ | I:840 II:511 III:505 IV:575 V:355 VI:558 | 3344
+C N | Георги Булевъ | I:387 II:350 III:308 IV:285 V:382 VI:584 | 2296
+C N | Ангелъ Бръчковъ | I:136 II:138 III:229 IV:24 V:197 VI:2 | 726
+C N | Стойчо Ивановъ [*] | I:34 II:112 III:230 IV:22 V:237 VI:2 | 637
+C N | Иванъ Чонковъ [*] | I:33 II:112 III:226 IV:24 V:179 VI:2 | 576
+C N | Георги Кирковъ [*] | I:23 II:7 III:- IV:5 V:9 VI:1 | 45
+C N | Никола Хр. Габровски [*] | I:23 II:6 III:- IV:5 V:9 VI:1 | 44
+# NOTE: last candidate's name blurred (surname read as Дабевъ); its total is partly under the scan watermark
+C N | Ефтимъ Дабевъ [*] | I:23? II:5 III:- IV:5 V:9 VI:1 | 43?
+
+# page 522
+D 61 | Севлиево (I-а избират.) | Sevlievo (I-ère électorale)
+S I 2366 1388
+S II 2169 1071
+S III 2529 1138
+S IV 1352 837
+S V 2406 980
+T 10822 5414
+C E | Петъръ Пешевъ | I:1127 II:329 III:459 IV:670 V:40 | 2625
+C E | Христо Боневъ | I:1023 II:329 III:463 IV:668 V:25 | 2508
+C E | Стефанъ П. Недевъ | I:1044 II:323 III:449 IV:665 V:16 | 2497
+C N | Нено Гергиновъ | I:156 II:504 III:627 IV:162 V:895 | 2344
+C N | Радой Бакаловъ | I:131 II:158 III:616 IV:162 V:343 | 1410
+C N | Хр. Ломановъ | I:146 II:385 III:131 IV:82 V:339 | 1083
+C N | Димо Платикановъ | I:12 II:403 III:23 IV:- V:428 | 866
+C N | Ст. Хр. Геновъ | I:203 II:32 III:485 IV:82 V:32 | 834
+C N | Милко Славчевъ [*] | I:- II:112 III:8 IV:- V:429 | 549
+C N | Андрей Коновъ | I:119 II:210 III:48 IV:4 V:86 | 467
+# NOTE: last candidate's cells partly under scan watermark; total partly cut at page bottom (only top of digits visible)
+C N | Янко Сакъзовъ [*] | I:58 II:213? III:50 IV:4 V:76 | 401?
+
+# page 523
+D 61 | cont
+C N | Никола Вакевъ [*] | I:53 II:213 III:48 IV:4 V:64 | 382
+C N | Д-ръ Н. Московъ | I:65 II:1 III:1 IV:1 V:62 | 130
+C N | Сава Никифоровъ | I:3 II:- III:- IV:- V:81 | 84
+D 61a | Севлиево (II-а избират.) | Sevlievo (II-ème élector.)
+S I 1917 1304
+S II 2391 1109
+T 4308 2413
+C E | Андрей Коновъ | I:258 II:660 | 918
+C N | Ив. П. Вачковъ [*] | I:514 II:265 | 779
+# NOTE: initial "п." of next name partly covered by an ink dot
+C N | Пеню п. Кръстевъ [*] | I:382 II:154 | 536
+# NOTE: next surname blurred; read as Цивиевъ, uncertain
+C N | Ив. П. Цивиевъ | I:122 II:29 | 151
+D 62 | Търново (I-а избирателна) | Tirnovo (I-ère électorale)
+S I 3457 1759
+S II 1900 629
+S III 2307 1026
+S IV 2179 1444
+S V 2187 1122
+S VI 1900 1001
+T 13930 6981
+C E | Александръ К. Людскановъ | I:469 II:297 III:641 IV:765 V:666 VI:528 | 3366
+C E | Михаилъ К. Сарафовъ | I:464 II:297 III:639 IV:762 V:666 VI:527 | 3355
+# NOTE: next surname faint; read as Пѣевски
+C E | Иванъ Пѣевски | I:373 II:295 III:631 IV:830 V:665 VI:424 | 3218
+C N | Ив. Халачевъ | I:1289 II:191 III:236 IV:491 V:316 VI:387 | 2910
+C N | Лефтеръ Георгиевъ | I:1194 II:169 III:234 IV:511 V:314 VI:297 | 2719
+# NOTE: last total partly under scan watermark
+C N | Георги х. Дончовъ | I:1193 II:81 III:239 IV:511 V:312 VI:297 | 2633?
+
+# page 524
+D 62 | cont
+C N | Добри х. Радковъ | I:41 II:265 III:22 IV:52 V:135 VI:82 | 597
+C N | Джорджо Момчевъ [*] | I:51 II:142 III:18 IV:28 V:136 VI:79 | 454
+C N | Георги Кирковъ [*] | I:57 II:3 III:137 IV:127 V:4 VI:114 | 442
+C N | Иванъ К. Свилчовъ | I:36 II:139 III:16 IV:13 V:138 VI:82 | 424
+C N | Никола Габровски [*] | I:52 II:3 III:135 IV:128 V:4 VI:92 | 414
+C N | Сава Събевъ [*] | I:44 II:3? III:134 IV:109 V:4 VI:94 | 388
+# Сава Събевъ: II is a blurred single digit (5 or 3); 3 matches the total and the II figure of Кирковъ/Габровски
+D 62a | Търново (II-а избират.) | Tirnovo (II-ème élector.)
+S I 2584 1281
+S II 2323? 1160
+S III 1930? 1000
+T 6837 3441
+C E | Янко Сакъзовъ (ОТ.) | I:549 II:583 III:106 | 1238
+C E | Никола Хр. Габровски | I:493? II:485 III:106 | 1084
+C N | Атанасъ х. Славчовъ | I:626 II:309 III:88 | 1023
+# NOTE: Halachov's section cells are under the scan watermark; readings chosen to agree with the legible total
+C N | Иванъ Халачовъ | I:262? II:276? III:260? | 798
+
+# page 525
+D 62a | cont
+C N | Иванъ Недѣлчовъ [*] | I:121 II:69 III:547 | 737
+C N | Атанасъ Георгиевъ [*] | I:- II:79 III:539 | 618
+C N | Цанко Бакаловъ [*] | I:261 II:130 III:- | 391
+C N | Маринъ Гайдовъ | I:42 II:96 III:207 | 345
+C N | Теодоръ Теодоровъ | I:16 II:117 III:205 | 338
+C N | Цачо А. Неновъ [*] | I:148 II:35 III:16 | 199
+C N | Тодоръ Т. Христовъ | I:- II:19 III:170 | 189
+C N | Ив. Р. Хинковъ [*] | I:33 II:101 III:8 | 142
+C N | Стойко Деневъ [*] | I:- II:- III:95 | 95
+C N | Пенчо Николовъ | I:- II:8 III:- | 8
+D 63 | Ески-Джумая | Eski-Djoumaia
+S I 2550? 1406?
+S II 2525 1419
+S III 2248 1245
+S IV 1850 865
+T 9173? 4935?
+C E | Константинъ Досевъ | I:472 II:429 III:304 IV:258 | 1463
+C N | Добри К. Добревъ [*] | I:195 II:315 III:294 IV:361 | 1165
+# NOTE okoliya 62a = "62а. Търново (II-а избират.) - Tirnovo (II-ème collège)" from p524; this page continues its non-elected candidates.
+# NOTE 63 S/T figures are very blurred at the page bottom; I-registered last digit (0 vs 3), I-voters last digit (6 vs 8) and the T last digits chosen so S sums to T; alternate reading 2553/1408 with T 9176?/4937? not excluded.
+
+# page 526
+D 63 | cont
+C E | Мустафа х. Хюсеиновъ [*] | I:467 II:425 III:304 IV:258 | 1454
+C N | Сали Велиновъ [*] | I:175 II:313 III:394 IV:261 | 1143
+C N | Цвѣтанъ Крачуновъ | I:245 II:262 III:282 IV:125 | 914
+C N | Сеидъ Хюсеинъ Бѣевъ | I:242 II:251 III:270 IV:125 | 888
+C N | Бахни Марковъ | I:222 II:144 III:250 IV:187 | 803
+C N | Исмаилъ Пехливановъ | I:198 II:144 III:238 IV:187 | 767
+C N | Марко Георгиевъ | I:289 II:275 III:23 IV:32 | 619
+C N | Ахмедъ Мухтаровъ | I:284 II:272 III:23 IV:32 | 611
+D 64 | Османъ пазаръ | Osman-pazar
+S I 1668 845
+S II 1669 974
+S III 1925 1074
+S IV 1985 1085
+T 7247 3978
+C E | Мехмедъ Герей Месудовъ [*] | I:507 II:700 III:708 IV:389 | 2304
+C E | Пантелей Т. Ковачевъ | I:488 II:685 III:688 IV:379 | 2240
+C N | Мустафа Хюсейнаджикъ [*] | I:229 II:264 III:305 IV:226 | 1024
+C N | Герчо Ранчевъ | I:219 II:249? III:322? IV:215? | 1005
+# NOTE bottom of page blurred; names "Ковачевъ", "Хюсейнаджикъ", "Бахни" and "Ранчевъ" are best readings of faint type.
+# NOTE Герчо Ранчевъ II-IV partly covered by a digital watermark logo (not printed); readings agree with total 1005.
+
+# page 527
+D 64 | cont
+C N | Мехмедъ Али Османовъ | I:108 II:24 III:64 IV:479 | 675
+C N | Василъ Стойчевъ | I:108 II:24 III:51 IV:480 | 663
+D 65 | Попово | Popovo
+S I 2181 1146
+S II 1999 1030
+S III 2190 1100
+S IV 2410 1327
+T 8780 4603
+C E | Нончо Георгиевъ | I:444 II:105 III:856 IV:435 | 1840
+C E | Деньо Колевъ | I:348 II:61 III:684 IV:524 | 1617
+C N | Христо Г. Хаджиевъ [*] | I:437 II:566 III:114 IV:365 | 1482
+C N | Хр. Тодоровъ [*] | I:291 II:532 III:89 IV:292 | 1204
+C N | Колчо Колевъ [*] | I:369 II:278 III:44 IV:432 | 1123
+C N | Славчо Бабаджановъ [*] | I:310 II:264 III:12 IV:446 | 1032
+C N | Радой Т. Козаровъ [*] | I:56 II:99 III:66 IV:94 | 315
+C N | Илчо Поповъ [*] | I:17 II:- III:269 IV:- | 286
+C N | Юрданъ Стоиновъ [*] | I:9 II:144 III:6 IV:61 | 220
+C N | Никола Габровски [*] | I:- II:- III:41 IV:- | 41
+# NOTE "Стоиновъ" faint (could be Стоиловъ); Габровски IV dash partly under a digital watermark logo but visible.
+
+# page 528
+D 66 | Прѣславъ | Preslav
+S I 2520 1064
+S II 1661 836
+S III 1812 1166
+S IV 2116 772
+T 8109 3838
+C E | Ангелъ Станчевъ | I:390 II:736 III:475 IV:632 | 2233
+C E | Д-ръ К. Милановъ | I:390 II:540 III:471 IV:425 | 1826
+C N | Д-ръ Стоянъ Даневъ [*] | I:673 II:210 III:374 IV:110 | 1367
+C N | Пеню Боневъ | I:673 II:92 III:459 IV:136 | 1360
+C N | Маринъ Ст. Чжвгъновъ | I:- II:78 III:143 IV:235 | 456
+C N | Янко Сакъзовъ [*] | I:- II:8 III:223 IV:2 | 233
+C N | Никола Габровски [*] | I:- II:- III:191 IV:2 | 193
+D 67 | Шуменъ (I-а избирателна) | Choumen (1-ère électorale)
+S I 2304 931
+S II 2516 878
+S III 2388 1182
+S IV 2140 925
+S V 2099 966
+S VI 1935 1005
+T 13382 5887
+C E | Христо Тодоровъ | I:342 II:327 III:433 IV:323 V:757 VI:441 | 2623
+C E | Никола Узуновъ | I:274 II:274 III:435 IV:288 V:786 VI:441 | 2498
+C E | Мустафа Доспадски | I:284 II:295 III:359 IV:317 V:757 VI:441 | 2453
+C N | Атанасъ П. Краевъ | I:476 II:418 III:351 IV:238 V:158 VI:527 | 2168
+C N | х. Неджибъ Бей Чилингировъ | I:397 II:367 III:212 IV:318 V:171 VI:527 | 1992
+C N | Янко В. Симеоновъ | I:420 II:345 III:208 IV:316 V:172 VI:527 | 1988
+C N | Жело Бакаловъ | I:144 II:179 III:274 IV:84? V:21? VI:6? | 708?
+# NOTE "Чжвгъновъ" and "Жело Бакаловъ" are faint; best readings. Last block's IV-VI and total partly covered by a digital watermark logo and the page edge; readings agree with the sum 708.
+
+# page 529
+D 67 | cont
+C N | Юрданъ Чакжровъ | I:55 II:42 III:233 IV:201 V:18 VI:31 | 580
+C N | х. Шемшединъ Латифовъ | I:93 II:167 III:188 IV:83 V:5 VI:6 | 542
+C N | Исмаилъ х. Керимовъ | I:27 II:7 III:113 IV:322 V:18 VI:31 | 518
+C N | Жеко Райковъ | I:30 II:9 III:124 IV:201 V:18 VI:31 | 413
+C N | Атанасъ Ивановъ | I:88 II:46 III:265 IV:- V:- VI:- | 399?
+C N | Рюстемъ Ходжа Алиевъ [*] | I:15 II:117 III:- IV:83 V:20 VI:5 | 240
+C N | Георги Кирковъ [*] | I:40 II:17 III:135? IV:- V:- VI:- | 192
+# NOTE Атанасъ Ивановъ total blurred (could look like 339); 399 is the only reading agreeing with the sections. Кирковъ VI/total under a digital watermark logo, still legible.
+
+# page 530
+D 67 | cont
+C N | Янко Сакъзовъ [*] | I:34 II:11 III:99 IV:- V:- VI:- | 144
+C N | Павелъ Байновъ [*] | I:34 II:10 III:92 IV:- V:- VI:- | 136
+# NOTE Павелъ Байновъ: the sixth section row is printed "IV" (misprint for VI); recorded as VI.
+D 67a | Шуменъ (II-а избират.) | Choumen (II-ème électorale)
+S I 2426 1411
+S II 1910 1163
+S III 2650 1280
+T 6986 3854
+C E | Калю Малевъ | I:563 II:798 III:698 | 2059
+C E | Юмеръ Юсуфовъ | I:506 II:691 III:632 | 1829
+C N | Сабри Бей Салимовъ | I:750 II:268 III:504 | 1522
+C N | Беро Русановъ | I:696 II:112 III:501 | 1309
+C N | Тони Радевъ | I:246 II:72 III:142 | 460
+C N | Юрданъ В. Кулаксъзовъ | I:42 II:195 III:81 | 318
+C N | Геру Тоневъ [*] | I:- II:110 III:- | 110
+C N | Янко Сакъзовъ [*] | I:4 II:37 III:- | 41
+C N | Георги Кирковъ [*] | I:- II:39 III:- | 39
+C N | Никола П. Бакаловъ | I:14 II:- III:- | 14
+# NOTE okoliya number printed "67 а." (written 67a). Names "Геру Тоневъ", "Кулаксъзовъ" and "Никола П. Бакаловъ" are faint; best readings. Last block II/III dashes partly under a digital watermark logo.
+

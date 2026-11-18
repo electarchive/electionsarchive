@@ -1,0 +1,60 @@
+# DATE 1906-03-12
+# page 177
+# NOTE scan is blurred with bleed-through; all sums below checked. Name readings uncertain: "Радевъ" (Vratsa, could read "Радовъ"), "х. Ванчо" (4th letter blurred), "Ионко" (no breve visible), "Войниковъ".
+D 1 | Враца | Vratza
+S I 2865 953
+S II 2542 786
+S III 2455 641
+S IV 2256 556
+S V 3307 938
+S VI 1550 526
+S VII 2415 580
+T 17390 9480
+# MISMATCH Враца voters: sections sum to 4980, printed total reads 9480 (blurred; first two digits appear transposed in print). Per-section candidate votes confirm the section figures (III and IV exactly exhausted).
+C E | Ангелъ х. Антоновъ | I:692 II:585 III:431 IV:342 V:616 VI:427 VII:448 | 3541
+C N | Д-ръ Александъръ Радевъ | I:139 II:127 III:62 IV:161 V:209 VI:61 VII:23 | 782
+C N | х. Ванчо Бобошевски | I:97 II:64 III:148 IV:53 V:81 VI:37 VII:108 | 588
+C N | Кр. Пастуховъ [*] | I:22 II:6 III:- IV:- V:26 VI:- VII:- | 54
+D 2 | Ловечъ | Lovetch
+S I 3688 1691
+S II 2586 1365
+S III 2200 1028
+S IV 2886 717
+S V 2480 998
+S VI 1713 679
+T 15553 6478
+C E | Симеонъ Ц. Хитровъ | I:803 II:884 III:442 IV:504 V:490 VI:466 | 3589
+C N | Ионко Т. Веселиновъ | I:853 II:452 III:570 IV:210 V:505 VI:210 | 2800
+C N | Петко Н. Войниковъ [*] | I:24 II:20 III:16 IV:3 V:2 VI:- | 65
+D 3 | Хасково | Haskovo
+S I 2793 1134
+S II 2565 1093
+S III 2884 1074
+S IV 2178 954
+S V 3115 1283
+S VI 2025 1085
+T 15560 6623
+C E | Константинъ Д. Тонджоровъ | I:522 II:723 III:546 IV:579 V:662 VI:699 | 3731
+C N | Д-ръ Н. Радевъ [*] | I:296 II:200 III:191 IV:136 V:278 VI:172 | 1273
+
+# DATE 1906-03-12
+# page 178
+# NOTE Павелъ Брайковъ prints only sections I-V although Хасково has VI sections; transcribed as printed.
+D 3 | cont
+C N | Павелъ Брайковъ | I:- II:- III:- IV:- V:- | -
+C N | Ат Р. Урумовъ [*] | I:157 II:73 III:87 IV:102 V:170 VI:181 | 770
+C N | Янко Сакѫзовъ [*] | I:140 II:83 III:243 IV:112 V:173 VI:33 | 784
+C N | Василъ Миневъ [*] | I:19 II:8 III:7 IV:25 V:- VI:- | 59
+D 4 | Горна-Орѣховица | Gorna-Oréhovitza
+S I 2909 859
+S II 2165 776
+S III 2905 602
+S IV 1837 543
+S V 2302 706
+S VI 2211 473
+S VII 2364 570
+T 16693 4529
+C E | х. Николи х. Боневъ | I:857 II:769 III:72 IV:512 V:459 VI:288 VII:426 | 3383
+C N | Рачо Н. Домусчиевъ | I:2 II:4 III:531 IV:29 V:246 VI:151 VII:141 | 1104
+C N | Сава Г. Солтана | I:- II:- III:- IV:- V:- VI:34 VII:- | 34
+# NOTE section III: candidate votes 72+531=603 exceed printed voters 602 by 1 (all totals check; printed as is)
