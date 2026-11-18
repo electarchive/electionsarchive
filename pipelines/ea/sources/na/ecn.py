@@ -4,7 +4,9 @@ The Commission publishes results as Government Gazette notices and printed table
 results come from regional council elections (2010, 2015, 2020, and the 2025 by-elections) and from the 2014 National
 Assembly table; local authority results come from the 2020 gazette; the 2014 and 2024 presidential and National Assembly
 results are gazetted nationally, and the 2024 election report adds each constituency's registered voters, rejected
-votes, and votes cast. Every file has a text layer, read here with ``pdftotext -layout``. The 1998 and 2004
+votes, and votes cast. Regional council by-elections from 2018 on come from media releases, Government Gazette
+notices of results, and the Commission's post-election and annual reports. Every file but two scanned media releases
+has a text layer, read here with ``pdftotext -layout``. The 1998 and 2004
 regional council and local authority tables are spreadsheets, read here with ``xlrd``.
 """
 
@@ -56,6 +58,21 @@ URLS = {
     "lacandidates2025": f"{UPLOADS}/2025/11/8791-Gov-N311-Candidates-LA.pdf",
     "byopuwo2021": f"{UPLOADS}/2021/07/Opuwo-Rural-Final-Results-Media-Release-03-July-2021.pdf",
     "byswakopmund2022": f"{UPLOADS}/2022/08/OFFICIAL-RESULTS-FOR-THE-REGIONAL-COUNCIL-ELECTION-FOR-THE-SWAKOPMUND-CONSTITUENCY.pdf",
+    "annual2018": f"{UPLOADS}/2021/06/ECN_Annual-Report_20172018.pdf",
+    "byondangwa2019": f"{UPLOADS}/2021/07/Ondangwa_Assessment-Report_2019.pdf",
+    "byoshakati2019": f"{UPLOADS}/2021/06/Oshakati-East-Assessment-Report_2019.pdf",
+    "bygobabis2020": f"{UPLOADS}/2021/07/ECN_Gobabis_Assessment-Report_2020.pdf",
+    "byotjiwarongo2020": f"{UPLOADS}/2021/07/Otjiwarong-Assessment-2020.pdf",
+    "gazette7650": "https://www.lac.org.na/laws/2021/7650.pdf",
+    "byncamagoro2021": f"{UPLOADS}/2022/07/Ncamagoro_Post-Election-Report-2022_Final.pdf",
+    "bygaroeb2023": f"{UPLOADS}/2023/08/Preliminary-Report-Moses-Garoeb-20.06.2023_LR.pdf",
+    "byokaku2023": f"{UPLOADS}/2023/10/Preliminary-Report-Okaku-by-election-Report_24.10.23.pdf",
+    "gazette8117": "https://www.lac.org.na/laws/2023/8117.pdf",
+    "annual2024": f"{UPLOADS}/2026/02/10032025-ECN-Annual-Report-23-24_print-read.pdf",
+    "gazette8576": "https://www.lac.org.na/laws/2025/8576.pdf",
+    "annual2025": f"{UPLOADS}/2026/05/ECN-2024-25-Annual-Report.pdf",
+    "gazette8764": "https://www.lac.org.na/laws/2025/8764.pdf",
+    "byoutapi2025": f"{UPLOADS}/2026/05/270326-Outapi-Constituency-By-election-Report_Final.pdf",
 }
 DAYS = {
     "1992-11-30": date(1992, 11, 30),
@@ -66,11 +83,23 @@ DAYS = {
     "2010-11-27": date(2010, 11, 27),
     "2014-11-28": date(2014, 11, 28),
     "2015-11-27": date(2015, 11, 27),
+    "2018-03-28": date(2018, 3, 28),
+    "2019-06-15": date(2019, 6, 15),
+    "2019-08-24": date(2019, 8, 24),
+    "2020-01-15": date(2020, 1, 15),
+    "2020-03-09": date(2020, 3, 9),
     "2020-11-25": date(2020, 11, 25),
     "2021-07-02": date(2021, 7, 2),
+    "2021-08-25": date(2021, 8, 25),
+    "2021-12-17": date(2021, 12, 17),
     "2022-08-12": date(2022, 8, 12),
+    "2023-01-06": date(2023, 1, 6),
+    "2023-03-17": date(2023, 3, 17),
+    "2023-05-15": date(2023, 5, 15),
     "2024-11-27": date(2024, 11, 27),
+    "2025-01-17": date(2025, 1, 17),
     "2025-06-17": date(2025, 6, 17),
+    "2025-09-29": date(2025, 9, 29),
     "2025-11-26": date(2025, 11, 26),
 }
 
@@ -1626,6 +1655,417 @@ def _locate(p: Package, name: str, contest: Contest) -> None:
         )
 
 
+# Regional council by-elections read from files with a text layer: the Government Gazette notices of results, the
+# Commission's performance assessment and post-election reports, and its annual reports. Each entry names the files
+# its figures come from, the first of them printing the candidates' votes; every figure, and every candidate's surname,
+# is checked against those files' text when the package is built. The candidates' votes sum to the votes counted in
+# every one of them.
+@dataclass(frozen=True)
+class ByElection:
+    files: tuple[str, ...]
+    english: str
+    contests: tuple[Contest, ...]
+    note: str = ""
+
+
+TEXT_BY_ELECTIONS = {
+    "2018-03-28": ByElection(
+        ("annual2018",),
+        "2018 Ncuncuni constituency by-election",
+        (
+            Contest(
+                "Kavango West",
+                "Ncuncuni",
+                registered=5045,
+                counted=1452,
+                declared="Sindjanga Ritha",
+                candidates=[
+                    Candidate("Mangundu Paulus Kakoma", "APP", 355),
+                    Candidate("Sindjanga Ritha", "SWAPO", 1097, True),
+                ],
+            ),
+        ),
+        "The Commission's annual report for 2017/18 gives these figures in its account of the by-election: the "
+        "final voters' register and the votes for each of the two candidates, which add up to the 1,452 votes it "
+        "says were cast. Votes were cast on electronic voting machines, and no rejected ballots are reported.",
+    ),
+    "2019-06-15": ByElection(
+        ("byondangwa2019",),
+        "2019 Ondangwa Urban constituency by-election",
+        (
+            Contest(
+                "Oshana",
+                "Ondangwa Urban",
+                counted=3792,
+                declared="Negonga Leonard S",
+                candidates=[
+                    Candidate("Asser Vincent", "APP", 97),
+                    Candidate("Immanuel Angeline", None, 1402),
+                    Candidate("Mandume Andreas", "COD", 31),
+                    Candidate("Martin Johannes", "DTA", 326),
+                    Candidate("Negonga Leonard S", "SWAPO", 1936, True),
+                ],
+            ),
+        ),
+        "The report rounds the register to sixteen thousand voters, so no registered voters are stored. Votes were "
+        "cast on electronic voting machines.",
+    ),
+    "2019-08-24": ByElection(
+        ("byoshakati2019",),
+        "2019 Oshakati East constituency by-election",
+        (
+            Contest(
+                "Oshana",
+                "Oshakati East",
+                counted=3413,
+                declared="Shikongo Abner S",
+                candidates=[
+                    Candidate("Iiyambo Elias", "COD", 17),
+                    Candidate("Kamati Theofelus", "DTA", 185),
+                    Candidate("Kambayi Rebbeka", "SWANU", 10),
+                    Candidate("Kuutondoka Fiina", None, 234),
+                    Candidate("Shaduva Festus D", "NEFF", 32),
+                    Candidate("Shikongo Abner S", "SWAPO", 2935, True),
+                ],
+            ),
+        ),
+        "The report gives the register only as about 18,385 voters, so no registered voters are stored. Votes were "
+        "cast on electronic voting machines.",
+    ),
+    "2020-01-15": ByElection(
+        ("bygobabis2020",),
+        "2020 regional council by-elections",
+        (
+            Contest(
+                "Omaheke",
+                "Gobabis",
+                registered=13457,
+                counted=2339,
+                declared="Tebele Augustinus",
+                candidates=[
+                    Candidate("Binga Sylvestor Daniel", "LPM", 571),
+                    Candidate("Kauesa Iuonga Elvis", None, 82),
+                    Candidate("Modise Ellenterius Braynie", "DTA", 277),
+                    Candidate("Tebele Augustinus", "SWAPO", 1409, True),
+                ],
+            ),
+            Contest(
+                "Kharas",
+                "Keetmanshoop Urban",
+                registered=11534,
+                counted=3556,
+                declared="Minnaar Maxie Meliza",
+                candidates=[
+                    Candidate("/Goagoseb Abraham", "DTA", 292),
+                    Candidate("Minnaar Maxie Meliza", "LPM", 1958, True),
+                    Candidate("Shilimela Festus", "SWAPO", 1306),
+                ],
+            ),
+            Contest(
+                "Khomas",
+                "Khomasdal",
+                registered=25550,
+                counted=2104,
+                declared="Angolo Samuel",
+                candidates=[
+                    Candidate("Angolo Samuel", "SWAPO", 1227, True),
+                    Candidate("Baumgartner Mara Bonita", "LPM", 349),
+                    Candidate("Diergaardt Raymond Reginald", "DTA", 326),
+                    Candidate("Kauahuma Bartholomeus Tjiunomuinjo", "SWANU", 202),
+                ],
+            ),
+            Contest(
+                "Omusati",
+                "Oshikuku",
+                declared="Matheus Gabriel",
+                tacit=True,
+                candidates=[Candidate("Matheus Gabriel", "SWAPO", None, True)],
+            ),
+            Contest(
+                "Erongo",
+                "Walvis Bay Urban",
+                registered=23169,
+                counted=3593,
+                declared="Knowledge Ndunge Ipinge",
+                candidates=[
+                    Candidate("Hoaeb Richard", "DTA", 208),
+                    Candidate("Jason Kenneth Iilonga", None, 436),
+                    Candidate("Knowledge Ndunge Ipinge", None, 1636, True),
+                    Candidate("Sirie Topulathana", "SWAPO", 1313),
+                ],
+            ),
+        ),
+        "Only one candidate was nominated in Oshikuku, and the returning officer declared him elected on 6 December "
+        "2019 without a poll. Votes were cast on electronic voting machines.",
+    ),
+    "2020-03-09": ByElection(
+        ("byotjiwarongo2020",),
+        "2020 Otjiwarongo and Opuwo Rural constituency by-elections",
+        (
+            Contest(
+                "Otjozondjupa",
+                "Otjiwarongo",
+                counted=4682,
+                cast=4707,
+                rejected=25,
+                declared="Mbakera Marlayn Sharlay",
+                candidates=[
+                    Candidate("Guiteb Sebeteus", "LPM", 752),
+                    Candidate("Erastus Mbumba", None, 1020),
+                    Candidate("Mbakera Marlayn Sharlay", "SWAPO", 2910, True),
+                ],
+            ),
+            Contest(
+                "Kunene",
+                "Opuwo Rural",
+                counted=3141,
+                cast=3161,
+                rejected=20,
+                declared="Kakuva Uarikua Cornelius Venajo",
+                candidates=[
+                    Candidate("Kuvare Kapukatua", "NUDO", 640),
+                    Candidate("Kakuva Uarikua Cornelius Venajo", "DTA", 2066, True),
+                    Candidate("Katupa Steyn Keesire Uauirako Mupyone", "SWAPO", 435),
+                ],
+            ),
+        ),
+        "The report prints each constituency's turnout as a percentage but not its register, so no registered "
+        "voters are stored.",
+    ),
+    "2021-08-25": ByElection(
+        ("gazette7650",),
+        "2021 Katima Mulilo Urban constituency by-election",
+        (
+            Contest(
+                "Zambezi",
+                "Katima Mulilo Urban",
+                counted=3002,
+                declared="Simasiku Kennedy S.",
+                candidates=[
+                    Candidate("Kubwima Poniso Miller", None, 156),
+                    Candidate("Malipa Lynnette M.", "IPC", 296),
+                    Candidate("Matengu Mweti Marklee", "DTA", 294),
+                    Candidate("Nkando Gibson Kabuna", None, 417),
+                    Candidate("Simasiku Chripher M.", "NDP", 282),
+                    Candidate("Simasiku Kennedy S.", "SWAPO", 1557, True),
+                ],
+            ),
+        ),
+    ),
+    "2021-12-17": ByElection(
+        ("byncamagoro2021",),
+        "2021 Ncamagoro constituency by-election",
+        (
+            Contest(
+                "Kavango West",
+                "Ncamagoro",
+                registered=3818,
+                counted=1268,
+                rejected=15,
+                declared="Rengi Thomas Kavau",
+                candidates=[
+                    Candidate("Chimbango Domingo Frans", "DTA", 105),
+                    Candidate("Nyundu Moses", None, 153),
+                    Candidate("Rengi Thomas Kavau", "SWAPO", 912, True),
+                    Candidate("Shindimba Ladislaus Poroto", None, 79),
+                    Candidate("Tjiwana Andreas Kambinda", "IPC", 19),
+                ],
+            ),
+        ),
+    ),
+    "2023-01-06": ByElection(
+        ("bygaroeb2023",),
+        "2023 Moses //Garoeb constituency by-election",
+        (
+            Contest(
+                "Khomas",
+                "Moses //Garoeb",
+                registered=42135,
+                counted=4822,
+                cast=4845,
+                rejected=23,
+                declared="Ndengu Stefanus",
+                candidates=[
+                    Candidate("Hashoongo Kleopas Ndalifilwa", None, 72),
+                    Candidate("Hengobe Moses", None, 243),
+                    Candidate("Mwandingi Moses", "IPC", 1270),
+                    Candidate("Nakale Paulus Shinime", "NEFF", 267),
+                    Candidate("Ndengu Stefanus", "SWAPO", 2970, True),
+                ],
+            ),
+        ),
+    ),
+    "2023-03-17": ByElection(
+        ("byokaku2023",),
+        "2023 Okaku constituency by-election",
+        (
+            Contest(
+                "Oshana",
+                "Okaku",
+                registered=10920,
+                counted=4463,
+                cast=4485,
+                rejected=22,
+                declared="Fillipus David Taukondjele",
+                candidates=[
+                    Candidate("Fillipus David Taukondjele", "SWAPO", 3195, True),
+                    Candidate("Haufiku Jason Nghinomenwa", "DTA", 122),
+                    Candidate("Jacob Sakaria", "IPC", 852),
+                    Candidate("Nambambi Tomas Natangwe", "NEFF", 294),
+                ],
+            ),
+        ),
+    ),
+    "2023-05-15": ByElection(
+        ("gazette8117", "annual2024"),
+        "2023 Keetmanshoop Rural constituency by-election",
+        (
+            Contest(
+                "Kharas",
+                "Keetmanshoop Rural",
+                registered=6675,
+                counted=2912,
+                declared="Labuschagne Willem Petrus",
+                candidates=[
+                    Candidate("Eiman Johannes Frederick Jacobus", "DTA", 275),
+                    Candidate("Kharuxab Elias", "SWAPO", 872),
+                    Candidate("Labuschagne Willem Petrus", "LPM", 1270, True),
+                    Candidate("Van Staden Magdalena", "IPC", 32),
+                    Candidate("Witbooi Gerrit Albertus", None, 463),
+                ],
+            ),
+        ),
+        "The votes are those of Government Notice 177 in Government Gazette 8117 of 23 June 2023; the final "
+        "voters' register is the one the Commission's annual report for 2023/24 gives.",
+    ),
+    "2025-01-17": ByElection(
+        ("gazette8576", "annual2025"),
+        "2025 Guinas constituency by-election",
+        (
+            Contest(
+                "Oshikoto",
+                "Guinas",
+                registered=4337,
+                counted=2019,
+                declared="Khumub Moses",
+                candidates=[
+                    Candidate("Khumub Moses", "SWAPO", 1407, True),
+                    Candidate("Khumub Fransikus", "LPM", 612),
+                ],
+            ),
+        ),
+        "The votes are those of Government Notice 25 in Government Gazette 8576 of 13 February 2025; the final "
+        "voters' register is the one the Commission's annual report for 2024/25 gives.",
+    ),
+    "2025-09-29": ByElection(
+        ("gazette8764", "byoutapi2025"),
+        "2025 Outapi constituency by-election",
+        (
+            Contest(
+                "Omusati",
+                "Outapi",
+                registered=25814,
+                counted=10344,
+                declared="Asino Selma Nelago Nakambale",
+                candidates=[
+                    Candidate("Asino Selma Nelago Nakambale", "SWAPO", 9675, True),
+                    Candidate("Shikewambi Fillemon", "IPC", 669),
+                ],
+            ),
+        ),
+        "The votes are those of Government Notice 273 in Government Gazette 8764 of 16 October 2025, which spells "
+        "the losing candidate Shikewambi; the Commission's post-election report spells him Shikwambi. The final "
+        "voters' register is the one the report gives.",
+    ),
+}
+
+# The Okaku report also prints the votes in each of its eighteen polling teams, fixed (F) and mobile (M): each
+# candidate's votes in ballot order, then the ballot papers counted and rejected.
+OKAKU_TEAMS = {
+    "F101": (176, 4, 83, 16, 279, 2),
+    "F102": (243, 2, 70, 17, 332, 2),
+    "F103": (166, 4, 58, 6, 234, 0),
+    "F104": (195, 12, 82, 3, 292, 0),
+    "F105": (273, 2, 79, 1, 355, 1),
+    "F106": (160, 3, 9, 1, 173, 0),
+    "F107": (186, 14, 45, 2, 247, 0),
+    "F108": (147, 8, 10, 0, 165, 0),
+    "F109": (160, 0, 56, 136, 352, 4),
+    "F110": (52, 17, 27, 2, 98, 2),
+    "F111": (79, 1, 108, 2, 190, 1),
+    "F112": (80, 0, 24, 11, 115, 0),
+    "F113": (125, 2, 8, 1, 136, 0),
+    "F114": (100, 1, 37, 82, 220, 1),
+    "F115": (290, 5, 18, 1, 314, 0),
+    "M301": (291, 34, 11, 1, 337, 5),
+    "M302": (233, 11, 98, 10, 352, 4),
+    "M303": (239, 2, 29, 2, 272, 0),
+}
+
+
+def _printed(files: tuple[str, ...]) -> str:
+    return "\n".join(page for name in files for page in text(name))
+
+
+def _check_printed(day: str, entry: ByElection) -> None:
+    """Every figure and every surname of a by-election is printed in its files, and the votes add up."""
+    printed = _printed(entry.files)
+    folded = _fold(printed)
+    for contest in entry.contests:
+        figures = [contest.registered, contest.counted, contest.cast, contest.rejected]
+        figures += [c.votes for c in contest.candidates]
+        for figure in figures:
+            if figure is None:
+                continue
+            spaced = f"{figure:,}".replace(",", "[ , ]?")
+            if not re.search(rf"(?<![\d,]){spaced}(?![\d])", printed):
+                raise ValueError(f"{day}: {contest.name} figure {figure} is not printed in {entry.files}")
+        for candidate in contest.candidates:
+            surname = _fold(candidate.name.split()[0].lstrip("/"))
+            if surname not in folded:
+                raise ValueError(f"{day}: {candidate.name} is not printed in {entry.files}")
+        if not contest.tacit and contest.counted != sum(c.votes or 0 for c in contest.candidates):
+            raise ValueError(f"{day}: {contest.name} votes do not add up to {contest.counted}")
+        if contest.cast is not None and contest.cast != (contest.counted or 0) + (contest.rejected or 0):
+            raise ValueError(f"{day}: {contest.name} ballots cast do not add up")
+    if day == "2023-03-17":
+        contest = entry.contests[0]
+        columns = list(zip(*OKAKU_TEAMS.values(), strict=True))
+        expected = [*(c.votes for c in contest.candidates), contest.counted, contest.rejected]
+        if [sum(column) for column in columns] != expected:
+            raise ValueError("2023-03-17: the Okaku teams do not add up to the constituency")
+        for team, row in OKAKU_TEAMS.items():
+            if sum(row[:4]) != row[4] or not re.search(rf"{team}\s+" + r"\s+".join(map(str, row)), printed):
+                raise ValueError(f"2023-03-17: team {team} is not printed as {row}")
+
+
+def _okaku_teams(p: Package, tag: str) -> None:
+    """The Okaku polling teams as units below the constituency, with their votes and ballot papers."""
+    code = "oshana-okaku"
+    ctag = f"{tag}:{code}"
+    parent = key("unit", tag, code)
+    result_set = key("result_set", ctag)
+    for team, row in OKAKU_TEAMS.items():
+        unit = key("unit", tag, code, team)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=NAMIBIA,
+            scheme_code="na.polling_station",
+            code=f"{tag}:{code}:{team}",
+            parent_id=parent,
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        p.name(unit, f"Polling team {team}, Okaku constituency, Oshana region", "en", "official")
+        for position, votes in enumerate(row[:4], 1):
+            _put(p, result_set, unit, key("option", ctag, position), VOTES, votes)
+        _put(p, result_set, unit, None, VALID, row[4])
+        _put(p, result_set, unit, None, INVALID, row[5])
+        _put(p, result_set, unit, None, CAST, row[4] + row[5])
+
+
 @cache
 def local(name: str = "la2020") -> tuple[Area, ...]:
     return tuple(read_local(name))
@@ -1699,6 +2139,7 @@ def registry() -> Package:
     for code, noun, kind, rank in (
         ("na.constituency", "constituency", "electoral_district", 1),
         ("na.local_authority", "local authority area", "electoral_district", 1),
+        ("na.polling_station", "polling station", "precinct", 2),
         ("na.national", "country", "electoral_district", 0),
     ):
         p.add("scheme", code=code, polity_id=NAMIBIA, kind=kind, rank=rank, noun=noun)
@@ -2141,6 +2582,30 @@ def build(day: str) -> Package:
             flags=DIGITIZED,
         )
         _locate(p, name, contest)
+    elif day in TEXT_BY_ELECTIONS:
+        entry = TEXT_BY_ELECTIONS[day]
+        _check_printed(day, entry)
+        for name in entry.files:
+            p.uses(raw.cached(SOURCE, URLS[name]))
+        tag = f"by{day}"
+        plural = len(entry.contests) > 1
+        _constituencies(
+            p,
+            day,
+            tag,
+            "by_election",
+            entry.english,
+            f"na/{day}-by-election{'s' if plural else ''}",
+            first,
+            first,
+            entry.contests,
+            len(entry.contests),
+            valid_printed=True,
+        )
+        if entry.note:
+            _caveat(p, key("election", tag), "sources", entry.note)
+        if day == "2023-03-17":
+            _okaku_teams(p, tag)
     elif day == "2024-11-27":
         _national_2024(p, day, first)
     elif day == "2025-06-17":
