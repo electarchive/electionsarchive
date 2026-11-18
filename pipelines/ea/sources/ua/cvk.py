@@ -283,6 +283,7 @@ def fetch() -> None:
         if r.layout != "modern":
             fetch_old(r)
             print(f"{SOURCE}: {r.day} fetched", flush=True)
+    fetch_closed()
 
 
 def links(url: str) -> list[str]:
@@ -978,8 +979,11 @@ def unit_for(p: Package, e_day: date, precinct: str, district: int, units: dict[
 TVO_SCHEME = "ua.tvo"
 
 
+CLOSED_TVO = "ua.tvo_rada"  # the districts of the 2006 and 2007 elections, apart from the presidential ones
+
+
 def tvo(plan: str, district: int) -> str:
-    return area(TVO_SCHEME, f"{plan}:{district}")
+    return area(CLOSED_TVO if plan in ("2006", "2007") else TVO_SCHEME, f"{plan}:{district}")
 
 
 def old_unit(p: Package, day: date, plan: str, precinct: str, district: int, units: dict[str, str], kind: str) -> str:
@@ -992,9 +996,9 @@ def old_unit(p: Package, day: date, plan: str, precinct: str, district: int, uni
             "reporting_unit",
             id=id,
             polity_id=UKRAINE,
-            scheme_code="ua.dilnytsia" if kind == "stations" else TVO_SCHEME,
+            scheme_code="ua.dilnytsia" if kind in ("stations", "closed") else TVO_SCHEME,
             code=code,
-            area_relation="unlocated" if abroad else "within" if kind == "stations" else "equals",
+            area_relation="unlocated" if abroad else "within" if kind in ("stations", "closed") else "equals",
             area_id=None if abroad else tvo(plan, district),
             kind="abroad_mission" if abroad else "standard",
         )
@@ -1602,6 +1606,335 @@ def geo_tvo() -> Package:
     return p
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# The 2006 and 2007 elections: one nationwide closed list for 450 seats, published per polling station
+
+
+@dataclass(frozen=True)
+class Closed:
+    site: str
+    day: date
+    plan: str  # the territorial districts it votes in
+
+
+CLOSED = [
+    Closed("vnd2006", date(2006, 3, 26), "2006"),
+    Closed("vnd2007", date(2007, 9, 30), "2007"),
+]
+CLOSED_SEATS = 450
+CLOSED_SYSTEM = key("electoral_system", "rada-closed-list")
+ANNULLED = " Вибори недійсні"  # the site marks a station whose vote was declared invalid
+CLOSED_AGAINST = "Не підтримали жодної партії (блоку)"
+CLOSED_METHOD = (
+    "Counted by the Central Election Commission from the polling station protocols and published per polling "
+    "station on its results site. Registered voters are the voters on the roll (item 5 of the protocol), ballots "
+    "cast are the voters who took part (item 16), and the votes against all lists are the votes of voters who "
+    "supported no list (item 19). The site prints no valid or invalid ballots per station, so neither is stored. "
+    "Polling stations abroad vote in one abroad district, whose stations are numbered from 1."
+)
+LAYOUTS["closed"] = (3, {2: 1, 3: 2})
+
+
+def closed_page(c: Closed, name: str) -> str:
+    return f"{BASE}/{c.site}/{name}.html?PT001F01=600"
+
+
+def closed_index(c: Closed) -> str:
+    return closed_page(c, "W6P335517f")
+
+
+def closed_pages(c: Closed) -> dict[int, str]:
+    """The polling station page of each territorial district, abroad included, as the index links them."""
+    found: dict[int, str] = {}
+    for link in linked(closed_index(c), "w6p336"):
+        n = re.search(r"pf7331=(\d+)", link)
+        if n:
+            found[int(n.group(1))] = link
+    return found
+
+
+def fetch_closed() -> None:
+    for c in CLOSED:
+        _all([closed_page(c, name) for name in ("w6p300517f", "W6P312517f", "w6p611517f", "w6p030517f", "W6P335517f")])
+        _all(list(closed_pages(c).values()))
+        print(f"{SOURCE}: {c.day} fetched", flush=True)
+    _all([next(x for x in PRESIDENT if x.site == "vp2010").index])
+
+
+@functools.cache
+def closed_sheet(url: str, district: int) -> Sheet:
+    artifact = cached(url)
+    if artifact is None:
+        raise LookupError(f"{url} is not cached")
+    grid = next((t for t in tables(artifact) if t and t[0] and t[0][0] == "Дільн."), None)
+    if grid is None:
+        raise ValueError(f"{url} holds no polling station table")
+    header = [*grid[0]]
+    if not header[3].startswith("3)"):
+        raise ValueError(f"{url} has an unexpected third column: {header[3]}")
+    header[3] = CLOSED_AGAINST
+    return Sheet(
+        district=district,
+        region="",
+        kind="closed",
+        header=header,
+        rows=[
+            [row[0].split()[0], row[1], *([""] * (len(row) - 2))] if row[0] != row[0].split()[0] else row
+            for row in grid[1:]
+            if re.fullmatch(rf"\d+({ANNULLED})?", row[0]) and len(row) == len(header)
+        ],
+    )
+
+
+def cached_rows(url: str) -> list[list[str]]:
+    artifact = cached(url)
+    grid = next((t for t in tables(artifact) if t and t[0] and t[0][0] == "Дільн."), []) if artifact else []
+    return grid[1:]
+
+
+def closed_sheets(c: Closed) -> list[Sheet]:
+    sheets = [closed_sheet(url, n) for n, url in sorted(closed_pages(c).items())]
+    if sorted(s.district for s in sheets) != [*range(1, ABROAD + 1)]:
+        raise ValueError(f"{c.site} lacks polling station pages for some territorial districts")
+    return sheets
+
+
+def closed_index_rows(c: Closed) -> tuple[dict[int, str], dict[int, int]]:
+    """The region and the count of polling stations of each domestic territorial district, from the index."""
+    regions_of: dict[int, str] = {}
+    stations: dict[int, int] = {}
+    artifact = cached(closed_index(c))
+    region = ""
+    if artifact is None:
+        return regions_of, stations
+    for t in tables(artifact):
+        for row in t:
+            if len(row) == 1 and re.search(r"\s-\s*\d+$", row[0]):
+                region = re.sub(r"\s*-\s*\d+$", "", row[0])
+            elif len(row) >= 4 and row[0].isdigit():
+                regions_of[int(row[0])] = region
+                stations[int(row[0])] = int(row[2])
+            elif len(row) >= 4 and row[0] == "ЗВО":
+                stations[ABROAD] = int(row[2])
+    return regions_of, stations
+
+
+def closed_regions(c: Closed) -> dict[int, str]:
+    """The region of each domestic district, spelled as the archive's regions are."""
+    names = canonical_regions()
+
+    def canon(name: str) -> str | None:
+        if squash(name) in names:
+            return names[squash(name)]
+        hits = [full for short, full in names.items() if short.startswith(squash(name))]
+        return hits[0] if len(hits) == 1 else None
+
+    found = {n: canon(name) for n, name in closed_index_rows(c)[0].items()}
+    missing = sorted(n for n, name in found.items() if name is None)
+    if missing:
+        raise ValueError(f"{c.site} districts {missing} name regions the archive lacks")
+    return {n: name for n, name in found.items() if name is not None}
+
+
+def geo_closed() -> Package:
+    p = Package(
+        f"{SOURCE}/geo-tvo-2006",
+        SOURCE,
+        "The territorial districts of Ukraine's 2006 and 2007 parliamentary elections as the Central Election "
+        "Commission numbers them",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external.add(UKRAINE)
+    p.add(
+        "scheme",
+        code=CLOSED_TVO,
+        polity_id=UKRAINE,
+        kind="electoral_district",
+        rank=2,
+        noun="territorial electoral district",
+        code_system=None,
+    )
+    for c in CLOSED:
+        for n, name in sorted(closed_regions(c).items()):
+            id = tvo(c.plan, n)
+            p.add("area", id=id, scheme_code=CLOSED_TVO)
+            p.add("area_code", area_id=id, code=f"{c.plan}:{n}")
+            p.add("area_parent", area_id=id, parent_id=area("ua.region", region_key(name)))
+            p.name(id, f"Територіальний виборчий округ № {n} ({c.plan})", "uk", "official")
+            p.name(id, f"Territorial electoral district {n} ({c.plan})", "en", "official", False)
+    return p
+
+
+def closed_party(c: Closed, name: str) -> str:
+    return key("party", "rada-closed", norm(name))
+
+
+def closed_votes(c: Closed, name: str = "w6p300517f") -> dict[str, int]:
+    """The votes of each list as a results page prints them: nationwide, or abroad (W6P312517f)."""
+    artifact = cached(closed_page(c, name))
+    found: dict[str, int] = {}
+    if artifact is not None:
+        for t in tables(artifact):
+            if t and t[0][:1] == ["№"] and len(t[0]) > 4:
+                for row in t[1:]:
+                    votes = number(row[-1])
+                    if votes is not None:
+                        found[norm(row[1])] = votes
+    return found
+
+
+def closed_seats(c: Closed) -> dict[str, int]:
+    artifact = cached(closed_page(c, "w6p611517f"))
+    found: dict[str, int] = {}
+    if artifact is not None:
+        for t in tables(artifact):
+            if t and t[0][:1] == ["Партія (виборчий блок партій)"]:
+                for row in t[1:]:
+                    won = number(row[1]) if len(row) > 1 else None
+                    if won is not None:
+                        found[norm(row[0])] = won
+    return found
+
+
+def registry_closed() -> Package:
+    p = Package(
+        f"{SOURCE}/registry-2006",
+        SOURCE,
+        "The parties and blocs of Ukraine's 2006 and 2007 parliamentary elections and their electoral system from "
+        "the Central Election Commission",
+        depends=[f"{SOURCE}/registry"],
+    )
+    p.external.add(UKRAINE)
+    p.add(
+        "electoral_system",
+        id=CLOSED_SYSTEM,
+        polity_id=UKRAINE,
+        valid_from=date(2006, 1, 1),
+        valid_to=date(2012, 1, 1),
+        rules={
+            "formula": "hare",
+            "threshold": {"level": "list", "scope": "national", "percent": 3},
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", CLOSED_SYSTEM),
+        entity_id=CLOSED_SYSTEM,
+        kind="methodology",
+        body_md="450 seats are allocated by largest remainder with the Hare quota among the national closed lists "
+        "that reach 3% of the valid votes.",
+        lang="en",
+    )
+    names: dict[str, str] = {}
+    for c in CLOSED:
+        for s in closed_sheets(c):
+            for _, name in s.options:
+                if name != CLOSED_AGAINST:
+                    names[norm(name)] = name
+    for code, text in sorted(names.items()):
+        id = key("party", "rada-closed", code)
+        p.add("party", id=id, kind="party", polity_id=UKRAINE)
+        p.add("external_id", entity_id=id, scheme="ua.cvk.party.2006", value=code)
+        p.name(id, text, "uk", "official")
+    return p
+
+
+def closed(c: Closed) -> Package:
+    p = Package(
+        f"{SOURCE}/rada-{c.day}",
+        SOURCE,
+        f"The {c.day} Ukrainian parliamentary election by polling station from the Central Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/registry-2006", f"{SOURCE}/geo-tvo-2006"],
+    )
+    p.external.add(UKRAINE)
+    election = key("election", "rada", c.day)
+    p.add("election", id=election, polity_id=UKRAINE, kind="general", date_from=c.day, date_to=c.day, status="held")
+    path = f"ua/{c.day}-general"
+    p.name(election, f"{c.day.year} Ukrainian parliamentary election", "en", "official")
+    p.name(election, f"Вибори народних депутатів України {c.day.year}", "uk", "native", False)
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    contest = key("contest", "rada", c.day, "list")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="list_allocation",
+        body_id=RADA,
+        magnitude=CLOSED_SEATS,
+        round_number=1,
+        electoral_system_id=CLOSED_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{c.day.year} Verkhovna Rada national list", "en", "official")
+    p.name(contest, "Загальнодержавний багатомандатний виборчий округ", "uk", "native", False)
+    p.add("slug", path=f"{path}/national-list", entity_id=contest, is_current=True)
+    result_set = key("result_set", "rada", c.day, "list")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=CLOSED_METHOD, lang="en"
+    )
+    sheets = closed_sheets(c)
+    urls = [closed_page(c, name) for name in ("w6p300517f", "W6P312517f", "w6p611517f", "w6p030517f", "W6P335517f")]
+    for url in [*urls, *(closed_pages(c)[s.district] for s in sheets)]:
+        artifact = cached(url)
+        if artifact is not None:
+            p.artifact(artifact, SOURCE_ID)
+    declared = closed_votes(c)
+    won = closed_seats(c)
+    options: dict[str, str] = {}
+    for name in sorted({name for s in sheets for _, name in s.options}, key=norm):
+        option = options[name] = key("option", "rada", c.day, "list", norm(name))
+        if name == CLOSED_AGAINST:
+            p.add("contest_option", id=option, contest_id=contest, kind="none_of_the_above", ballot_label=name)
+            continue
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=closed_party(c, name),
+            ballot_label=name,
+        )
+        if norm(name) in won:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won[norm(name)])
+        if norm(name) in declared:
+            p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=declared[norm(name)])
+    missing = (set(declared) | set(won)) - {norm(name) for name in options}
+    if missing:
+        raise ValueError(f"{c.site} prints lists the station pages lack: {sorted(missing)}")
+    units: dict[str, str] = {}
+    over: list[tuple[int | None, ...]] = []
+    for s in sheets:
+        over += values(p, result_set, units, c.day, s, options, c.plan)
+    note_overcount(p, over)
+    cancelled = sum(1 for url in closed_pages(c).values() for row in cached_rows(url) if row[0].endswith(ANNULLED))
+    if cancelled:
+        p.add(
+            "note",
+            id=key("note", result_set, "annulled"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=f"The site marks {cancelled} polling stations 'Вибори недійсні' (election invalid) and prints "
+            "zero votes for every list there. Those stations store only the registered voters; the voters who took "
+            "part, where the site prints a figure for them, are not stored.",
+            lang="en",
+        )
+    return p
+
+
 def counted() -> list[Parliament]:
     """The parliamentary elections the commission published polling station results for."""
     return [e for e in PARLIAMENT if held(e)]
@@ -1612,6 +1945,9 @@ def packages() -> list[str]:
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         f"{SOURCE}/geo-tvo",
+        f"{SOURCE}/geo-tvo-2006",
+        f"{SOURCE}/registry-2006",
+        *(f"{SOURCE}/rada-{c.day}" for c in CLOSED),
         *(f"{SOURCE}/rada-{e.day}" for e in counted()),
         *(f"{SOURCE}/president-{r.day}" for r in PRESIDENT),
     ]
@@ -1621,6 +1957,10 @@ def parse() -> None:
     geo().write()
     registry().write()
     geo_tvo().write()
+    geo_closed().write()
+    registry_closed().write()
+    for c in CLOSED:
+        closed(c).write()
     for e in counted():
         parliament(e).write()
     for r in PRESIDENT:
