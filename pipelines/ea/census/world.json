@@ -850,10 +850,10 @@
       "kind": "compendium"
     },
     "ymd": {
-      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
-      "title": "Democratic Yemen: Dates of Elections, 28 to 30 October 1986",
-      "url": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF",
-      "kind": "compendium"
+      "publisher": "Republic of Yemen, National Information Center (المركز الوطني للمعلومات)",
+      "title": "المعارضة والثورة والوحدة (Opposition, Revolution, and Unity)",
+      "url": "https://www.yemen-nic.info/yemen/history/detail.php?ID=1256",
+      "kind": "official_body"
     },
     "rho": {
       "publisher": "Wikibooks",
@@ -3342,9 +3342,9 @@
       "iso": "YMD",
       "name_en": "South Yemen",
       "status": "former",
-      "reason": "Supreme People's Council elections from 1978 to 1986.",
+      "reason": "Independent from the British withdrawal of 30 November 1967 (as the People's Republic of Southern Yemen, renamed the People's Democratic Republic of Yemen under the Constitution of 30 November 1970) until it merged with the Yemen Arab Republic into the Republic of Yemen on 22 May 1990; its Supreme People's Council, designated in 1971, was popularly elected on 16-18 December 1978 and 28-30 October 1986 (Inter-Parliamentary Union, Chronicle of Parliamentary Elections), and governorate People's Councils were elected from 1976.",
       "source": "ymd",
-      "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF"
+      "locator": "https://www.yemen-nic.info/yemen/history/detail.php?ID=1256 (National Information Center of the Republic of Yemen: withdrawal of the British on 30 November 1967; the Republic of Yemen proclaimed on 22 May 1990)"
     },
     {
       "iso": "RHO",

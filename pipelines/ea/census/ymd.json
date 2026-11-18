@@ -1,0 +1,296 @@
+{
+  "polity": "YMD",
+  "name": "People's Democratic Republic of Yemen",
+  "sources": {
+    "nic-history": {
+      "title": "المعارضة والثورة والوحدة (Opposition, Revolution, and Unity)",
+      "publisher": "Republic of Yemen, National Information Center (المركز الوطني للمعلومات)",
+      "url": "https://www.yemen-nic.info/yemen/history/detail.php?ID=1256",
+      "kind": "official_body",
+      "note": "The successor state's official summary of its political history: the British withdrew from the south on 30 November 1967, and Yemeni unity and the Republic of Yemen were proclaimed on 22 May 1990."
+    },
+    "un-yemen": {
+      "title": "Yemen (Member States)",
+      "publisher": "United Nations",
+      "url": "https://www.un.org/en/about-us/member-states/yemen",
+      "kind": "official_body",
+      "note": "Democratic Yemen was admitted to the United Nations on 14 December 1967; on 22 May 1990 it merged with Yemen and the two have since been one Member."
+    },
+    "ipu-arc": {
+      "title": "PARLINE database: Yemen (Majlis Annowab), historical archive of parliamentary election results",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/2353_arc.htm",
+      "kind": "compendium",
+      "note": "Lists the People's Democratic Republic of Yemen's 1978 and 1986 elections, each a scan of the Chronicle of Parliamentary Elections."
+    },
+    "ipu1978": {
+      "title": "Democratic Yemen: Dates of Elections, 16 to 18 December 1978 (Chronicle of Parliamentary Elections XIII, 1978-1979)",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1978_E.PDF",
+      "kind": "compendium",
+      "note": "First popular election of the Supreme People's Council: 111 members for 5 years in 80 constituencies, block vote by plurality, candidates nominated by the mass organizations; 654,685 registered, 597,550 voters, 763 blank or void, 596,787 valid; replaced the 101-member provisional Council designated by the National Front's General Command in 1971; the new Council elected an 11-member Presidium and its Chairman (head of state) on 27 December 1978."
+    },
+    "ipu1986": {
+      "title": "Democratic Yemen: Dates of Elections, 28 to 30 October 1986 (Chronicle of Parliamentary Elections XXI, 1986-1987)",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF",
+      "kind": "compendium",
+      "note": "Second general election of the Supreme People's Council, postponed from 1983: 111 seats in 97 election circles, 181 candidates, run by a Supreme Committee under a Council resolution of 5 April 1986 with sub-committees in all six governorates, votes sorted by the administrative councils of 381 voting centres; 817,253 registered, 725,568 voters; 71 Yemeni Socialist Party members and 40 independents elected. By-elections fill vacant seats between general elections."
+    },
+    "ysp1986": {
+      "title": "Critical and Analytical Document on the Revolutionary Experience in Democratic Yemen (1978-1986)",
+      "publisher": "Yemeni Socialist Party",
+      "url": "https://archive.org/details/critical-and-analytical-document-on-the-revolutionary-experience-in-democratic",
+      "kind": "official_body",
+      "note": "English edition of the ruling party's 1986 review; it records that the Local People's Councils in the governorates had held four electoral sessions."
+    },
+    "moi1975": {
+      "title": "A Summary of the Experience of the Revolution in the Democratic Yemen, from the Armed Struggle until the Quinquennial Plan",
+      "publisher": "People's Democratic Republic of Yemen, Ministry of Information",
+      "url": "https://archive.org/details/a-summary-of-the-experience-of-the-revolution-in-the-democratic-yemen-from-the-a",
+      "kind": "official_body",
+      "note": "Ministry of Information booklet (1975): after the 22 June 1969 movement the National Front's General Command replaced the President of the Republic with a Presidential Council; the People's Supreme Assembly was formed, and Local People's Councils were planned in the governorates."
+    },
+    "halliday1983": {
+      "title": "The People's Democratic Republic of Yemen: The 'Cuban Path' in Arabia (in Revolutionary Socialist Development in the Third World, 1983)",
+      "publisher": "Fred Halliday",
+      "url": "https://archive.org/details/20240827_202409",
+      "kind": "academic",
+      "note": "The Supreme People's Council was set up in 1971 with a nominated membership and filled by direct election for 111 seats in 1978; People's Councils were elected in each of the six governorates in 1976 and 1977; the Constitution of October 1978 superseded that of 30 November 1970."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Jumhūriyyat al-Yaman ad-Dīmuqrāṭiyya ash-Shaʿbiyya",
+      "name_en": "People's Democratic Republic of Yemen (People's Republic of Southern Yemen until 30 November 1970)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1967-11-30",
+      "valid_to": "1990-05-22",
+      "source": "nic-history"
+    },
+    {
+      "key": "governorate",
+      "name": "al-Muḥāfaẓāt",
+      "name_en": "Governorates",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1967-11-30",
+      "valid_to": "1990-05-22",
+      "source": "halliday1983"
+    }
+  ],
+  "classes": [
+    {
+      "key": "majlis_shaab_aala",
+      "tier": "national",
+      "name": "Intikhābāt Majlis ash-Shaʿb al-Aʿlā",
+      "name_en": "Supreme People's Council",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1978-12-16",
+      "valid_to": "1990-05-22",
+      "first_held": "1978-12-16",
+      "measure": {
+        "unit": "constituency"
+      },
+      "finest_note": "National totals of electors, voters, and seats by group (IPU); no result by constituency or candidate is online.",
+      "source": "ipu1978",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1978_E.PDF (Characteristics of Parliament: 111 members elected for 5 years; Electoral System: 80 constituencies)",
+      "note": "The unicameral legislature. Its 111 members were elected for five years in multi-member constituencies (80 in 1978, 97 election circles in 1986), each elector casting as many votes as there were seats and the candidates with the most votes winning; candidates were nominated by the mass organizations, the Yemeni Socialist Party being the sole political organization. Only two general elections were held, in December 1978 and October 1986 (the 1983 election was postponed); by-elections filled seats that fell vacant, but none is dated in a source reached here. No publication of results by the PDRY's own organs was found online; the only series reached is the IPU's Chronicle of Parliamentary Elections, with national totals.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "YMD",
+          "valid_from": "1978-12-16",
+          "valid_to": "1990-05-22"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "partisan": false,
+          "administered_by": "Supreme Committee (al-Lajna al-ʿUlyā) named by resolution of the Supreme People's Council, with sub-committees in each governorate",
+          "valid_from": "1978-12-16",
+          "valid_to": "1990-05-22",
+          "source": "ipu1986",
+          "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1986_E.PDF (pages 51-52: 111 members elected for 5 years; elections postponed from 1983; organized by a Supreme Committee under a Council resolution of 5 April 1986)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Inter-Parliamentary Union, PARLINE historical archive (Chronicle of Parliamentary Elections)",
+          "url": "http://archive.ipu.org/parline-e/reports/2353_arc.htm",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1978-12-16",
+          "last_date": "1986-10-28",
+          "source": "ipu-arc",
+          "role": "publishes",
+          "evidence": "Scanned Chronicle reports for 1978 and 1986 with national electors, voters, valid votes (1978), and seats by group, sex, and profession; the https host reset the connection and the http host answered"
+        }
+      ],
+      "est_votes": 725568,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1978-12-16",
+          "election_kind": "general",
+          "contests": 80,
+          "seats": 111,
+          "source": "ipu1978",
+          "quote": "Dates of Elections: 16 to 18 December 1978",
+          "note": "Polling from 16 to 18 December 1978 in 80 constituencies; about 175 candidates; 654,685 registered electors, 597,550 voters (91.27%), 596,787 valid votes; the IPU's table gives all 111 seats to the Yemen Socialist Party. The Council first sat on 27 December 1978."
+        },
+        {
+          "date": "1986-10-28",
+          "election_kind": "general",
+          "contests": 97,
+          "seats": 111,
+          "source": "ipu1986",
+          "quote": "Dates of Elections: 28 to 30 October 1986",
+          "note": "Polling from 28 to 30 October 1986 in 97 election circles and 381 voting centres; 181 candidates; 817,253 registered electors, 725,568 voters (88.78%); 71 Yemeni Socialist Party members and 40 independents. The Council first sat on 6 November 1986."
+        }
+      ]
+    },
+    {
+      "key": "majlis_muaqqat",
+      "tier": "national",
+      "name": "Majlis ash-Shaʿb al-Aʿlā al-Muʾaqqat",
+      "name_en": "Provisional Supreme People's Council (designated)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_to": "1978-12-16",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu1978",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1978_E.PDF (General Political Considerations: the 101-member provisional Supreme People's Council designated by the Supreme Command of the National Liberation Front in 1971)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular vote: the 101-member provisional Supreme People's Council of 1971 was designated by the General Command of the National Front, and national legislators were appointed until the election of December 1978 (IPU 1978). From independence until 1971 the National Front's General Command held legislative power.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "appointed_assembly"
+          ],
+          "iso_pattern": "YMD",
+          "valid_to": "1978-12-16"
+        }
+      ]
+    },
+    {
+      "key": "rais",
+      "tier": "national",
+      "name": "Raʾīs al-Jumhūriyya, al-Majlis ar-Riʾāsī, Raʾīs Hayʾat Riʾāsat Majlis ash-Shaʿb al-Aʿlā",
+      "name_en": "Head of state (President, Presidential Council, and Chairman of the Presidium of the Supreme People's Council)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1967-11-30",
+      "valid_to": "1990-05-22",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu1978",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/DEMOCRATIC_YEMEN_1978_E.PDF (the newly elected Council appointed an 11-member Presidium to replace the five-man Presidential Council and elected its Chairman, and thus Head of State, on 27 December 1978)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Never chosen by a public vote: the Presidential Council that replaced the President of the Republic after the 22 June 1969 movement was constituted by the National Front's General Command (Ministry of Information, 1975), and from 27 December 1978 the head of state was the Chairman of the Presidium, elected by the Supreme People's Council at its first sitting (IPU 1978 and 1986).",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state",
+            "head_of_government"
+          ],
+          "iso_pattern": "YMD"
+        }
+      ]
+    },
+    {
+      "key": "majalis_shaabiyya_mahalliyya",
+      "tier": "governorate",
+      "name": "Intikhābāt al-Majālis ash-Shaʿbiyya al-Maḥalliyya",
+      "name_en": "Local People's Councils of the governorates",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1976-01-01",
+      "valid_to": "1990-05-22",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "halliday1983",
+      "locator": "https://archive.org/details/20240827_202409 (page 58: People's Councils were elected in each of the six Governorates in 1976 and 1977)",
+      "note": "People's Councils with limited financial and administrative powers, elected by direct vote in each of the six governorates, first in 1976 and 1977; the Yemeni Socialist Party's 1986 review counts four electoral sessions by then. District councils were planned in 1975 but no election of them is recorded.",
+      "disposition": "blocked",
+      "disposition_reason": "No official date, seat count, or result of any Local People's Council election was found: the councils' sessions are known only from Halliday (1976 and 1977) and the Yemeni Socialist Party's 1986 count of four electoral sessions, and the PDRY's official gazette and press are not online for those years.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "YMD*"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "through": "1977-12-31",
+          "election_kind": "local",
+          "source": "halliday1983",
+          "quote": "People’s Councils with limited financial and administrative powers were elected in each of the six Governorates in 1976 and 1977.",
+          "note": "First elections of the governorate People's Councils, staggered over 1976 and 1977; Halliday observed the 1977 election in the First Governorate (Aden)."
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "through": "1986-12-31",
+          "election_kind": "local",
+          "source": "ysp1986",
+          "quote": "In the course of their development four electoral sessions have been held",
+          "note": "The Yemeni Socialist Party's 1986 review counts four electoral sessions of the Local People's Councils since their formation; the sessions after 1977 are not yet dated."
+        }
+      ]
+    },
+    {
+      "key": "istifta",
+      "tier": "national",
+      "name": "al-Istiftāʾ",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1967-11-30",
+      "valid_to": "1990-05-22",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "halliday1983",
+      "disposition": "out_of_scope",
+      "disposition_reason": "None held: no national referendum is recorded in the IPU's reports, the Ministry of Information's 1975 summary, the Yemeni Socialist Party's 1986 review, or Halliday (1983); the referendum on the unity constitution was held by the Republic of Yemen after 22 May 1990.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "YMD*"
+        }
+      ]
+    }
+  ]
+}
