@@ -1197,6 +1197,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
             ]
             for relation, column in (
                 ("candidacy", "option_id"),
+                ("candidacy", "preference_option_id"),
                 ("outcome", "option_id"),
                 ("contest_option", "parent_option_id"),
             ):

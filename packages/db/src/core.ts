@@ -772,6 +772,7 @@ export const candidacy = pgTable("candidacy", {
 	ballotLines: smallint("ballot_lines").default(1).notNull(),
 	changesetId: uuid("changeset_id").notNull(),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	preferenceOptionId: uuid("preference_option_id"),
 }, (table) => [
 	foreignKey({
 		columns: [table.changesetId],
@@ -798,12 +799,19 @@ export const candidacy = pgTable("candidacy", {
 		foreignColumns: [person.id],
 		name: "candidacy_person_id_fkey"
 	}),
+	foreignKey({
+		columns: [table.preferenceOptionId],
+		foreignColumns: [contestOption.id],
+		name: "candidacy_preference_option_id_fkey"
+	}),
 	index("candidacy_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 	index("candidacy_head_option_idx2").using("btree", table.optionId.asc().nullsLast()).where(sql`(role = 'head'::candidacy_role)`),
 	index("candidacy_independent_idx").using("btree", table.optionId.asc().nullsLast()).where(sql`is_independent`),
 	index("candidacy_option_idx").using("btree", table.optionId.asc().nullsLast()),
 	index("candidacy_person_idx").using("btree", table.personId.asc().nullsLast()),
-check("candidacy_ballot_lines_check", sql`((ballot_lines >= 1) AND (ballot_lines <= 3))`),]);
+	unique("candidacy_preference_option_key").on(table.preferenceOptionId),
+check("candidacy_ballot_lines_check", sql`((ballot_lines >= 1) AND (ballot_lines <= 3))`),
+check("candidacy_preference_option_check", sql`(preference_option_id IS DISTINCT FROM option_id)`),]);
 
 export const candidacyNomination = pgTable("candidacy_nomination", {
 	candidacyId: uuid("candidacy_id").notNull(),
