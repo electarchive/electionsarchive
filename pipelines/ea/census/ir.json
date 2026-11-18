@@ -768,10 +768,11 @@
      "ir.ostan"
     ]
    },
-   "finest_note": "Yes and no votes per province",
+   "finest_note": "Yes and no votes per province for March 1979; national totals for the other four votes",
    "source": "constitution",
    "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 59: on two-thirds of the Majlis; art. 177: constitutional revision)",
    "first_held": "1953-08-03",
+   "earliest_record": "1953-08-03",
    "note": "Five national votes: the 1953 referendum on dissolving the 17th Majlis (Tehran on 3 August, the provinces on 10 August); the 1963 referendum on the Shah's six-point reform program; the March 1979 referendum on the Islamic Republic (30-31 March); the December 1979 referendum on the Constitution (2-3 December); and the 1989 revision of the Constitution, held with the presidential election. Under the Referendum Law of 1989 a referendum needs two-thirds of the Majlis (art. 59) or, for a revision, the Leader's order (art. 177).",
    "match": [
     {
@@ -789,25 +790,30 @@
      "date": "1953-08-03",
      "deferred": [
       "1953-08-10"
-     ]
+     ],
+     "contests": 1
     },
     {
-     "date": "1963-01-26"
+     "date": "1963-01-26",
+     "contests": 1
     },
     {
      "date": "1979-03-30",
      "deferred": [
       "1979-03-31"
-     ]
+     ],
+     "contests": 1
     },
     {
      "date": "1979-12-02",
      "deferred": [
       "1979-12-03"
-     ]
+     ],
+     "contests": 1
     },
     {
-     "date": "1989-07-28"
+     "date": "1989-07-28",
+     "contests": 1
     }
    ],
    "cadence": [
