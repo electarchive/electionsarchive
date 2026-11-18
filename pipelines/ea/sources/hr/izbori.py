@@ -1208,7 +1208,11 @@ def option_party(o: Option) -> str | None:
 
 @functools.cache
 def _declared_parties() -> tuple[dict[str, Counter[str]], dict[str, tuple[list[str], Counter[str]]]]:
-    """The parties and coalitions on the commission's printed totals, with their spellings and list labels."""
+    """The parties and coalitions on the commission's printed totals, with their spellings and list labels.
+
+    Every election's packages reference these parties, so a missing totals file stops the build rather than leaving
+    the registry without the parties that file alone names.
+    """
     spellings: dict[str, Counter[str]] = {}
     blocs: dict[str, tuple[list[str], Counter[str]]] = {}
     for d in days():
@@ -1217,7 +1221,7 @@ def _declared_parties() -> tuple[dict[str, Counter[str]], dict[str, tuple[list[s
         for contest in contests(d):
             found = declared(d, contest)
             if found is None:
-                continue
+                raise LookupError(f"{declared_url(d, contest)} is not in the raw cache; run ea fetch {SOURCE}")
             for o in found.options:
                 named = [n for n in o.parties if party_kind(n)]
                 for n in named:
