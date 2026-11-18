@@ -8,10 +8,14 @@ electoral districts the votes are counted in (`ep_<n>.js`, 57 of them with the o
 - **2024** has the three kinds of files, and a static file for each polling station with its name and kind, so every
   polling station, postal-vote counting station, and prison station is a reporting unit. The stations add up to the
   Ministry's national file.
-- **2019** has the stations' counts but not their names or kinds. The saved files lack the stations of three districts
-  (7, 63, and 64) and 34 of district 62. Those ballots are stored as one aggregate unit for each district, computed as
-  the district's file less its stations, so the units add up to the Ministry's district figures. The 2019 national
-  figures are the previous-election block of the 2024 national static file, which the Ministry prints.
+- **2019** has the stations' counts but not their names or kinds. The service has no station files for three districts
+  (7, 63, and 64) or for 34 of the 1,309 stations of district 62. For the three districts the finest unit published is
+  the municipal unit (`den_<n>.js`), so each municipal unit is an aggregate unit under its district. What the district's
+  file holds beyond its units (one counting station of district 7 and one of district 64, which the municipal units
+  omit) and beyond its stations (the 34 of district 62, which the files do not tie to a municipal unit) is stored as one
+  aggregate unit for the district, computed as the difference, so the units add up to the Ministry's district figures.
+  The 2019 national figures are the previous-election block of the 2024 national static file, which the Ministry
+  prints. The 2019 party names are those of the 2019 site's static file.
 
 The 2009 and 2014 elections are built by `ypes_national` and `ypes_results` at the unit those years publish, and the
 1999 and 2004 ones by `ypes_results` as national results; earlier elections are not on the Ministry's site.
@@ -54,6 +58,9 @@ LIVE_NATIONAL = f"{SITE}current/stat/e/epik_1.js"
 OLD_STATIONS = f"{OLD}2019/stat/e/ep_{{EP}}.js"
 OLD_EXTRA = (f"{OLD}2019/dyn/e/40/tm_405100.js", f"{OLD}2019/dyn/e/60/tm_600944.js")
 STATICS_2014 = f"{OLD}may2014/stat/e/statics.js"
+STATICS_2019 = f"{OLD}2019/stat/e/statics.js"
+UNITS_2019 = "browser://20261118-192640-d46ed1/gr-2019-euro-municipal-units-bundle.txt"
+UNIT = "gr.ep_municipal_unit"
 
 
 @dataclass(frozen=True)
@@ -63,14 +70,22 @@ class Election:
     stations: tuple[str, ...]
     prefix: str  # the folder of the site's files inside the bundles
     names: tuple[str, ...] = ()  # files that name parties, newest last
+    units: str | None = None  # the file of municipal-unit counts, for districts that have no station files
 
 
 ELECTIONS = [
-    Election("ep-2019", date(2019, 5, 26), (OLD_STATIONS, *OLD_EXTRA), "2019", (STATICS_2014, LIVE_NATIONAL)),
+    Election(
+        "ep-2019",
+        date(2019, 5, 26),
+        (OLD_STATIONS, *OLD_EXTRA),
+        "2019",
+        (STATICS_2014, STATICS_2019, LIVE_NATIONAL),
+        UNITS_2019,
+    ),
     Election("ep-2024", date(2024, 6, 9), (LIVE_STATIONS, LIVE_NATIONAL), "current", (LIVE_NATIONAL,)),
 ]
 BY_KEY = {e.key: e for e in ELECTIONS}
-FILES = {STATICS_2014, LIVE_STATIONS, LIVE_NATIONAL, OLD_STATIONS, *OLD_EXTRA}
+FILES = {STATICS_2014, STATICS_2019, UNITS_2019, LIVE_STATIONS, LIVE_NATIONAL, OLD_STATIONS, *OLD_EXTRA}
 
 
 def key(kind: str, *parts: object) -> str:
@@ -208,8 +223,17 @@ class Station:
 
 
 @dataclass
+class Unit:
+    id: int
+    district: int
+    name: str
+    figures: Figures
+
+
+@dataclass
 class Data:
     stations: list[Station]
+    units: list[Unit]
     districts: dict[int, Figures]
     district_names: dict[int, str]
     national: Figures
@@ -279,7 +303,33 @@ def load(e: Election) -> Data:
     if set(stat) - set(dyn):
         raise ValueError(f"{len(set(stat) - set(dyn))} stations have a static file and no count")
     total, declared = national(e)
-    return Data(stations, districts, names, total, declared, updated)
+    return Data(
+        stations, municipal_units(e, {s.district for s in stations}), districts, names, total, declared, updated
+    )
+
+
+def municipal_units(e: Election, stationed: set[int]) -> list[Unit]:
+    """The municipal units of the districts that have no station files, from the municipal units' own files."""
+    if e.units is None:
+        return []
+    stat: dict[int, dict[str, object]] = {}
+    dyn: dict[int, dict[str, object]] = {}
+    for path, text in segments(e.units).items():
+        found = re.search(rf"/{e.prefix}/(dyn|stat)/e/den_(\d+)\.js$", path)
+        if found is None:
+            continue
+        body = value(text)
+        if body is not None:
+            (stat if found.group(1) == "stat" else dyn)[int(found.group(2))] = mapping(body)
+    if set(stat) != set(dyn):
+        raise ValueError(f"{len(set(stat) ^ set(dyn))} municipal units have only one of their two files")
+    units = []
+    for n in sorted(stat):
+        row = stat[n]
+        district = whole(row["EP_ID"])
+        if district not in stationed:
+            units.append(Unit(n, district, str(row["Descr"]), figures(dyn[n], dyn[n]["party"])))
+    return units
 
 
 _DATA: dict[str, Data] = {}
@@ -298,6 +348,8 @@ def leaves(e: Election) -> tuple[list[Station], dict[int, Figures]]:
     held: dict[int, list[Figures]] = defaultdict(list)
     for station in d.stations:
         held[station.district].append(station.figures)
+    for unit in d.units:
+        held[unit.district].append(unit.figures)
     rest = {n: whole_.minus(held[n]) for n, whole_ in sorted(d.districts.items())}
     return d.stations, {n: f for n, f in rest.items() if not f.empty}
 
@@ -305,7 +357,7 @@ def leaves(e: Election) -> tuple[list[Station], dict[int, Figures]]:
 def _verify(e: Election, d: Data) -> None:
     """Everything counted must add up to the Ministry's national figures."""
     stations, rest = leaves(e)
-    parts = [s.figures for s in stations] + list(rest.values())
+    parts = [s.figures for s in stations] + [u.figures for u in d.units] + list(rest.values())
     for n, f in rest.items():
         if min(f.registered, f.valid, f.invalid, f.blank, *f.votes.values()) < 0:
             raise ValueError(f"{e.key}: district {n}'s stations hold more than the district")
@@ -355,6 +407,7 @@ def party_names() -> dict[int, dict[str, date]]:
     found: dict[int, dict[str, date]] = defaultdict(dict)
     sources = [
         (statics_names(segments(STATICS_2014)["/may2014/stat/e/statics.js"]), date(2014, 5, 25)),
+        (statics_names(raw.cached(SOURCE, STATICS_2019).path.read_text(encoding="utf-8")), date(2019, 5, 26)),
         (model_names(segments(LIVE_NATIONAL)["/current/e/home/dist/model.el.js"]), date(2024, 6, 9)),
     ]
     for names, day in sources:
@@ -367,9 +420,13 @@ def party(pid: int) -> str:
     return key("party", pid)
 
 
-def label(pid: int) -> str | None:
+def label(pid: int, e: Election) -> str | None:
+    """The party's name on the election's own site, or else its newest spelling."""
     spellings = party_names().get(pid)
-    return max(spellings, key=lambda text: spellings[text]) if spellings else None
+    if not spellings:
+        return None
+    own = {text: day for text, day in spellings.items() if day == e.day}
+    return max(own or spellings, key=lambda text: (own or spellings)[text])
 
 
 # ---------------------------------------------------------------- packages
@@ -390,7 +447,8 @@ def geo() -> Package:
     )
     p.external |= {GREECE, TERRITORY}
     p.add("scheme", code=DISTRICT, polity_id=GREECE, kind="electoral_district", rank=1, noun="counting district")
-    p.add("scheme", code=STATION, polity_id=GREECE, kind="precinct", rank=2, noun="polling station")
+    p.add("scheme", code=UNIT, polity_id=GREECE, kind="administrative", rank=2, noun="municipal unit")
+    p.add("scheme", code=STATION, polity_id=GREECE, kind="precinct", rank=3, noun="polling station")
     return p
 
 
@@ -442,15 +500,14 @@ METHOD = (
     "as stations of their own."
 )
 RESIDUAL = (
-    "The saved files of this election lack the polling stations of some districts, and the Ministry's district files "
-    "give those districts' figures. The ballots of every station that is missing are stored as one aggregate unit for "
-    "its district, computed as the district's figures less its stations, so that the units add up to the districts. "
-    "The Ministry's 2019 national totals are the previous-election block printed in its 2024 national file: valid "
-    "ballots, votes for each party, and seats. The other national figures of 2019 are not declared."
-)
-LABELS = (
-    "The 2019 files name parties by number only. Each party is labeled with the name that the Ministry's 2014 and 2024 "
-    "sites give the same number, and a party that neither names is labeled by its number."
+    "The Ministry's service has no station files for some districts of this election, and its district files give "
+    "those districts' figures. For a district with no station files, the counts of its municipal units are stored as "
+    "aggregate units. Whatever a district's file holds beyond its units and stations, such as one counting station that "
+    "the municipal units omit or 34 stations of one Athens district that the files do not tie to a municipal unit, is "
+    "stored as one aggregate unit for the district, computed as the district's figures less its units and stations, so "
+    "that the units add up to the districts. The Ministry's 2019 national totals are the previous-election block "
+    "printed in its 2024 national file: valid ballots, votes for each party, and seats. The other national figures of "
+    "2019 are not declared."
 )
 
 
@@ -511,16 +568,14 @@ def election(e: Election) -> Package:
         completeness=1.0,
     )
     p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=METHOD, lang="en")
-    if rest:
+    if rest or d.units:
         p.add("note", id=key("note", rs, "residual"), entity_id=rs, kind="caveat", body_md=RESIDUAL, lang="en")
-    if e.key == "ep-2019":
-        p.add("note", id=key("note", rs, "labels"), entity_id=rs, kind="caveat", body_md=LABELS, lang="en")
 
     pids = sorted(d.national.votes, key=lambda pid: -d.national.votes[pid])
     options: dict[int, str] = {}
     for pid in pids:
         options[pid] = key("option", e.key, pid)
-        name = label(pid)
+        name = label(pid, e)
         p.add(
             "contest_option",
             id=options[pid],
@@ -550,7 +605,7 @@ def election(e: Election) -> Package:
 
     parents = {
         n: unit(DISTRICT, str(n), "aggregate", n, None, d.district_names.get(n))
-        for n in sorted({s.district for s in stations} | set(rest))
+        for n in sorted({s.district for s in stations} | {u.district for u in d.units} | set(rest))
     }
     rows: dict[str, list[object]] = {c: [] for c in ("unit_id", "option_id", "measure", "flags", "value")}
 
@@ -574,6 +629,8 @@ def election(e: Election) -> Package:
             s.name,
         )
         emit(uid, s.figures)
+    for u in d.units:
+        emit(unit(UNIT, str(u.id), "aggregate", u.district, parents[u.district], u.name), u.figures)
     for n, f in rest.items():
         emit(unit(STATION, f"residual:{n}", "aggregate", n, parents[n], None), f, DERIVED)
     frame = pl.DataFrame(
