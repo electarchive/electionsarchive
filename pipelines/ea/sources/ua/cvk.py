@@ -979,8 +979,11 @@ def unit_for(p: Package, e_day: date, precinct: str, district: int, units: dict[
 TVO_SCHEME = "ua.tvo"
 
 
+CLOSED_TVO = "ua.tvo.rada"  # the districts of the 2006 and 2007 elections, apart from the presidential ones
+
+
 def tvo(plan: str, district: int) -> str:
-    return area(TVO_SCHEME, f"{plan}:{district}")
+    return area(CLOSED_TVO if plan in ("2006", "2007") else TVO_SCHEME, f"{plan}:{district}")
 
 
 def old_unit(p: Package, day: date, plan: str, precinct: str, district: int, units: dict[str, str], kind: str) -> str:
@@ -1739,13 +1742,22 @@ def geo_closed() -> Package:
         SOURCE,
         "The territorial districts of Ukraine's 2006 and 2007 parliamentary elections as the Central Election "
         "Commission numbers them",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/geo-tvo"],
+        depends=[f"{SOURCE}/geo"],
     )
     p.external.add(UKRAINE)
+    p.add(
+        "scheme",
+        code=CLOSED_TVO,
+        polity_id=UKRAINE,
+        kind="electoral_district",
+        rank=2,
+        noun="territorial electoral district",
+        code_system=None,
+    )
     for c in CLOSED:
         for n, name in sorted(closed_regions(c).items()):
             id = tvo(c.plan, n)
-            p.add("area", id=id, scheme_code=TVO_SCHEME)
+            p.add("area", id=id, scheme_code=CLOSED_TVO)
             p.add("area_code", area_id=id, code=f"{c.plan}:{n}")
             p.add("area_parent", area_id=id, parent_id=area("ua.region", region_key(name)))
             p.name(id, f"Територіальний виборчий округ № {n} ({c.plan})", "uk", "official")
