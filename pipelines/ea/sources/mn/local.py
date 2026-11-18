@@ -59,6 +59,7 @@ class Block:
     rows: list[polls.Row]
     declared: list[int] | None
     label: str | None = None
+    declared_extra: dict[int, int] | None = None
 
 
 @dataclass
@@ -139,4 +140,85 @@ def blocks(name: str, locate: dict[str, places.Place], sheet: str | int = 0) -> 
             current.rows.append(polls.Row(cells[0][1], place, cells[0][1], values))
         elif current is not None and cells[0][1] == "Нийт":
             current.declared = [sheets.number(row[i]) or 0 for i in columns]
+    return out
+
+
+SECTION_TITLE = re.compile(
+    r"^(?P<head>.+?) ИТХ-ын сонгуульд (?P<what>.+?) нэр дэвшигчдэд өгсөн хүчинтэй саналын тоо"
+    r"\s*\(Мандатын тоо\s+(?P<seats>\d+)\)$"
+)
+SECTION_LABEL = re.compile(
+    r"^(?:(?P<aimag>.+?) аймаг |Улаанбаатар хот )?(?P<place>.+?) (?P<part>\d+)-р (?:баг|хороо) (?P<number>\d+)-р хэсэг$"
+)
+PART_TITLE = re.compile(r"^(?P<n>\d+)-р (?P<kind>баг|хороо)(?:аас|ноос)$")
+SOUM_TITLE = re.compile(r"^(?P<soum>.+?) сумаас$")
+SOUM_PART_TITLE = re.compile(r"^(?P<soum>.+?) сумын(?: \(.*?\))? (?P<n>\d+)-р багаас$")
+
+
+def section_blocks(name: str, sheet: str | int = 0) -> list[Block]:
+    """Blocks of a workbook that titles each council constituency and lists its polling sections.
+
+    Each block has a title naming the council and the constituency, a header row ("Дүгаар", "Хэсгийн дүгаар", the
+    candidates, then the invalid ballots, the ballots with no mark, and the valid ballots read), one row per section,
+    and a Нийт row. A soum or district council's constituencies are its baghs or khoroos and keep their own numbers.
+    An aimag council's constituencies are soums or a soum's baghs, and are numbered in file order."""
+    rows = sheets.sheet_rows(name, sheet)
+    out: list[Block] = []
+    current: Block | None = None
+    columns: list[int] = []
+    extras: dict[int, int] = {}
+    counts: dict[str, int] = {}
+    seen: set[tuple[str, int]] = set()
+    for index, row in enumerate(rows):
+        cells = [c for c in row if c]
+        if not cells:
+            continue
+        where = f"{name}: row {index}"
+        if len(cells) == 1 and (found := SECTION_TITLE.match(cells[0])):
+            owner = council(found["head"])
+            what = found["what"].strip()
+            if part := PART_TITLE.match(what):
+                number, label = int(part["n"]), f"{part['n']}-р {part['kind']}"
+            elif (named := SOUM_TITLE.match(what)) or (named := SOUM_PART_TITLE.match(what)):
+                counts[owner.key] = number = counts.get(owner.key, 0) + 1
+                label = f"{named['soum']} сум" + (f", {named['n']}-р баг" if "n" in named.groupdict() else "")
+            else:
+                raise ValueError(f"{where}: unreadable constituency {what!r}")
+            if (owner.key, number) in seen:
+                raise ValueError(f"{where}: {owner.key} constituency {number} appears twice")
+            seen.add((owner.key, number))
+            current = Block(owner, number, int(found["seats"]), [], [], None, label)
+            out.append(current)
+        elif current is not None and row[0] == "Дүгаар":
+            tail = [i for i, c in enumerate(row) if c.startswith(("Хүчингүй", "Санал огт", "Нийт уншигдсан"))]
+            if len(tail) != 3:
+                raise ValueError(f"{where}: unreadable header {row!r}")
+            columns = [i for i, c in enumerate(row) if 2 <= i < tail[0] and c]
+            extras = {polls.INVALID: tail[0], polls.BLANK: tail[1]}
+            current.candidates = [polls.candidate(row[i]) for i in columns]
+        elif current is not None and sheets.is_index(row[0]):
+            label = SECTION_LABEL.match(row[1])
+            if label is None:
+                raise ValueError(f"{where}: {row[1]!r} is not a section")
+            place = places.place_of(label["aimag"], label["place"])
+            if place is None:
+                raise ValueError(f"{where}: unreadable place in {row[1]!r}")
+            current.rows.append(
+                polls.Row(
+                    label["number"],
+                    place,
+                    row[1],
+                    [sheets.number(row[i]) for i in columns],
+                    {m: v for m, i in extras.items() if (v := sheets.number(row[i])) is not None},
+                )
+            )
+        elif current is not None and row[0] == "Нийт":
+            current.declared = [sheets.number(row[i]) or 0 for i in columns]
+            current.declared_extra = {m: sheets.number(row[i]) or 0 for m, i in extras.items()}
+    for block in out:
+        sums = [sum(r.votes[k] or 0 for r in block.rows) for k in range(len(block.candidates))]
+        if sums != block.declared:
+            raise ValueError(
+                f"{name}: {block.council.key} {block.number}: sections sum to {sums}, file prints {block.declared}"
+            )
     return out

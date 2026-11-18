@@ -1,6 +1,7 @@
 """Mongolia's General Election Commission: presidential and parliamentary elections by polling section."""
 
 import functools
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from uuid import uuid5
@@ -160,6 +161,7 @@ class LocalElection:
     kind: str = "local"
     aliases: dict[str, str] | None = None
     summary: str | None = None
+    path: str | None = None
 
 
 NATIVE_LOCAL = "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын {year} оны ээлжит сонгууль"
@@ -250,6 +252,83 @@ def early_local_2016() -> LocalElection:
     )
 
 
+SECTION_WORKBOOK_2016 = "d3c34eb3"
+REVOTE_WORKBOOK_2016 = "34be9b88"
+SECTION_2016 = "2016-06-29-local-soum"
+REVOTE_2016 = "2016-revote-local-soum"
+SECOND_REVOTE_2016 = "2016-revote-2-local-soum"
+SECOND_REVOTE_SHEET = "Завхан Алдархаан"
+# Parties of the 2016 soum and district council ballots that neither registry package holds, with the kind of
+# party. The workbook prints only the abbreviation, and the package stores it as the party's name.
+SECTION_PARTIES_2016 = {"АНМАХНТНЭ": "bloc", "МҮАН": "party"}
+
+
+def section_party(abbreviation: str | None) -> str | None:
+    if abbreviation in SECTION_PARTIES_2016:
+        return key("party", abbreviation)
+    return early_party(abbreviation)
+
+
+@functools.cache
+def section_elections_2016() -> list[LocalElection]:
+    """The 2016 soum and district council elections and the re-votes that followed, by polling section."""
+    blocks = local.section_blocks(SECTION_WORKBOOK_2016)
+    first, second = ([], [])
+    for sheet, name in enumerate(sheets.sheet_names(REVOTE_WORKBOOK_2016)):
+        (second if name == SECOND_REVOTE_SHEET else first).extend(local.section_blocks(REVOTE_WORKBOOK_2016, sheet))
+    return [
+        LocalElection(
+            SECTION_2016,
+            date(2016, 6, 29),
+            date(2016, 6, 29),
+            "day",
+            None,
+            "2016 Mongolian local council elections (soum and district councils)",
+            NATIVE_LOCAL.format(year=2016) + " (сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурал)",
+            blocks,
+            [sheets.url(SECTION_WORKBOOK_2016)],
+            aliases={},
+            summary="The 2016 soum and district council elections, and the council seats of the soums that voted for a "
+            "province council, by polling section and council constituency from the General Election Commission",
+            path=f"mn/{SECTION_2016}",
+        ),
+        _revote(
+            REVOTE_2016,
+            "2016 Mongolian soum council repeat votes",
+            "(дахин санал хураалт)",
+            "The Commission's workbook is titled \u201c2016 дахин\u201d (2016 repeat vote) and prints no day.",
+            first,
+        ),
+        _revote(
+            SECOND_REVOTE_2016,
+            "2016 Mongolian soum council second repeat vote",
+            "(давтан дахин санал хураалт)",
+            "The Commission's workbook gives this vote on its own sheet, \u201c"
+            + SECOND_REVOTE_SHEET
+            + "\u201d, for a constituency whose first repeat vote is on the workbook's first sheet; it prints no day.",
+            second,
+        ),
+    ]
+
+
+def _revote(key_: str, english: str, tail: str, text: str, blocks: list[local.Block]) -> LocalElection:
+    return LocalElection(
+        key_,
+        date(2016, 1, 1),
+        date(2016, 12, 31),
+        "year",
+        text,
+        english,
+        NATIVE_LOCAL.format(year=2016) + " " + tail,
+        blocks,
+        [sheets.url(REVOTE_WORKBOOK_2016)],
+        "by_election",
+        aliases={},
+        summary=f"{english} by polling section from the General Election Commission",
+        path=f"mn/{key_}",
+    )
+
+
 def council_name(council: local.Council) -> tuple[str, str | None]:
     """The Mongolian and, where it is known, the English name of a council."""
     if council.kind == "capital":
@@ -285,6 +364,10 @@ def council_area(council: local.Council) -> str:
     return area("mn.soum", place.code)
 
 
+def section_packages() -> list[str]:
+    return [f"{SOURCE}/{election_.key}" for election_ in section_elections_2016()]
+
+
 def packages() -> list[str]:
     return [
         f"{SOURCE}/geo",
@@ -293,6 +376,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{day}" for day in parliament_keys()),
         *(f"{SOURCE}/{election.key}" for election in local_elections()),
         *early_packages(),
+        *section_packages(),
     ]
 
 
@@ -333,6 +417,8 @@ def parse() -> None:
     early_legislature(early.DAY_2016).write()
     legislature_2016_soums().write()
     councils(early_local_2016()).write()
+    for election_ in section_elections_2016():
+        section_councils(election_).write()
 
 
 def emit() -> None:
@@ -889,6 +975,104 @@ def councils(spec: LocalElection) -> Package:
     return p
 
 
+SECTION_ACCOUNTING = (
+    "The workbook's valid ballots read, the last column of each row, are not stored: in a constituency that elects "
+    "several members each voter marks several candidates, so the column does not equal the candidates' votes."
+)
+
+
+def section_councils(spec: LocalElection) -> Package:
+    """A council election read from a workbook of constituency blocks, with the invalid and unmarked ballots of each
+    section kept as unit-level figures. It mints its own council constituencies and uses the soums, council bodies,
+    and most parties that the registry and early packages hold."""
+    day = spec.key
+    p = Package(f"{SOURCE}/{day}", SOURCE, spec.summary or spec.english)
+    blocks = spec.blocks
+    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, *SCHEMES}
+    p.external |= {council_body(block.council) for block in blocks}
+    p.external |= {council_area(block.council) for block in blocks}
+    p.external |= {area("mn.soum", row.place.code) for block in blocks for row in block.rows if row.place}
+    used: set[str] = {c.party for block in blocks for c in block.candidates if c.party}
+    p.external |= inherited(set[str | None](used))
+    p.external |= {id for a in used & EARLY_PARTIES.keys() if (id := early_party(a))}
+    for url in spec.files:
+        p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
+    election_id = key("election", day)
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=MONGOLIA,
+        kind=spec.kind,
+        date_from=spec.date_from,
+        date_to=spec.date_to,
+        date_precision=spec.precision,
+        original_text=spec.original_text,
+        status="held",
+    )
+    p.name(election_id, spec.english, "en", "official")
+    p.name(election_id, spec.native, "mn", "native", False)
+    path = spec.path or f"mn/{day}-local"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    for abbreviation in sorted(used & SECTION_PARTIES_2016.keys()):
+        id = section_party(abbreviation)
+        assert id is not None
+        p.add("party", id=id, kind=SECTION_PARTIES_2016[abbreviation], polity_id=MONGOLIA)
+        p.add("external_id", entity_id=id, scheme="mn.gec.party", value=abbreviation)
+        p.name(id, abbreviation, "mn", "official")
+    units: dict[str, str] = {}
+    for block in blocks:
+        for row in block.rows:
+            if row.code in units:
+                continue
+            unit = units[row.code] = key("unit", day, row.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=MONGOLIA,
+                scheme_code="mn.hesg",
+                code=f"{day}:{row.code}",
+                area_relation="within" if row_area(row) else "unlocated",
+                area_id=row_area(row),
+                kind="standard",
+            )
+            p.name(unit, row.label, "mn", "official")
+    for block in blocks:
+        tag = f"{block.council.key}:{block.number}"
+        native, _ = council_name(block.council)
+        constituency = area("mn.council_constituency", f"{day}:{tag}")
+        p.add("area", id=constituency, scheme_code="mn.council_constituency")
+        p.add("area_code", area_id=constituency, code=f"{day}:{tag}")
+        p.add("area_parent", area_id=constituency, parent_id=council_area(block.council))
+        p.name(constituency, f"{native}, {block.label}", "mn", "native")
+        contest = key("contest", day, tag)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=council_body(block.council),
+            district_area_id=constituency,
+            magnitude=block.seats,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{native}, {block.label}", "mn", "native")
+        p.add("slug", path=f"{path}/{council_slug(block.council)}-{block.number}", entity_id=contest, is_current=True)
+        result_set = _early_result_set(p, election_id, contest, tag, day, BLOCK_METHOD + " " + SECTION_ACCOUNTING)
+        options = _early_candidates(
+            p, day, tag, contest, result_set, block.candidates, block.declared, None, True, section_party
+        )
+        for measure, value in (block.declared_extra or {}).items():
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for row in block.rows:
+            for option, value in zip(options, row.votes, strict=True):
+                if value is not None:
+                    _value(p, result_set, units[row.code], option, 1, value)
+            for measure, value in row.extra.items():
+                _value(p, result_set, units[row.code], None, measure, value)
+    return p
+
+
 def legislature_2020() -> Package:
     day = parliament.DAY_2020
     p = Package(
@@ -1231,13 +1415,14 @@ def _early_candidates(
     declared: list[int] | None,
     aliases: dict[str, str] | None,
     known_parties: bool,
+    resolve: Callable[[str | None], str | None] | None = None,
 ) -> list[str]:
     options: list[str] = []
     for index, entry in enumerate(candidates):
         option = key("option", day, tag, index)
         options.append(option)
         person = key("person", day, tag, index)
-        affiliation = early_party(entry.party, aliases)
+        affiliation = resolve(entry.party) if resolve else early_party(entry.party, aliases)
         p.add("person", id=person)
         p.name(person, entry.label, "mn", "official")
         p.add(
