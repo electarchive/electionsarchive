@@ -22,6 +22,10 @@ REPORT = "https://necliberia.org/results/results2005/PDFs/NationalProgressiveres
 RUNOFF_REPORT = "https://necliberia.org/results/results2005/PDFs/RunoffProgressiveResultsReport.pdf"
 HOUSE_PAGES = BROWSER + "lr-2005-house-results-pages.html"
 SENATE_PAGES = BROWSER + "lr-2005-senate-results-pages.html"
+BY_BROWSER = "browser://20261117-222523-00a527/"
+BY_HOUSE_PAGES = BY_BROWSER + "lr-2005-portal-house-by-elections-2006-2010.html"
+BY_SENATE_PAGES = BY_BROWSER + "lr-2005-portal-senate-by-elections-2007-2009.html"
+DECLARATION_INDEX = "https://web.archive.org/web/20240417131011id_/https://results.necliberia.org/results2005/Declaration/DeclarationIndex.html"
 FIRST_DAY = date(2005, 10, 11)
 RUNOFF_DAY = date(2005, 11, 8)
 SENATE_DAY = date(2014, 12, 20)
@@ -126,7 +130,7 @@ def _text(url: str) -> str:
 @functools.cache
 def bundle(url: str) -> dict[str, str]:
     html = raw.cached(SOURCE, url).path.read_bytes().decode("utf-8", errors="replace")
-    parts = re.split(r"<!-- SOURCE: (.*?) -->", html)
+    parts = re.split(r"<!-- SOURCE(?: URL)?: (.*?) -->", html)
     return {parts[i]: parts[i + 1] for i in range(1, len(parts), 2)}
 
 
@@ -530,6 +534,7 @@ def packages() -> list[str]:
         f"{SOURCE}/2005-10-11",
         f"{SOURCE}/2005-11-08",
         f"{SOURCE}/2014-12-20",
+        *(f"{SOURCE}/{by.day}" for by in BY_ELECTIONS),
     ]
 
 
@@ -539,6 +544,8 @@ def parse() -> None:
     general_election().write()
     runoff_election().write()
     senate_election().write()
+    for by in BY_ELECTIONS:
+        by_election(by).write()
 
 
 def emit() -> None:
@@ -748,7 +755,7 @@ class Builder:
     def option(self, contest: str, tag: str, position: int, label: str, vice: str | None = None) -> str:
         abbr = party_of(label)
         id = key("option", tag, label)
-        party = party_id(abbr)
+        party = by_party_id(abbr)
         p = self.p
         p.add(
             "contest_option",
@@ -1169,5 +1176,194 @@ def senate_election() -> Package:
             "The Commission's declared county totals differ from the sum of its polling-place pages in "
             + "; ".join(gaps)
             + ". The pages leave some polling-place columns blank, and both sets of figures are stored as published.",
+        )
+    return p
+
+
+@dataclass(frozen=True)
+class ByElection:
+    """A House by-election the portal reports at district total only: its polling day, the portal page, and the
+    electoral district."""
+
+    day: date
+    county: str
+    district: int
+    page: str  # file name of the portal's first-round page
+    name: str
+
+
+# The polling days are those the Commission's declaration index prints for each by-election.
+BY_ELECTIONS = [
+    ByElection(date(2006, 5, 13), "36", 1, "Results_36012006.php", "River Cess County, Electoral District 1"),
+    ByElection(date(2007, 2, 6), "33", 6, "Results_3306200706.php", "Nimba County, Electoral District 6"),
+]
+# Parties that stood in a by-election but not in the 2005 general election, so the registry does not hold them.
+BY_PARTIES = {"LAP": "Liberia Action Party"}
+BY_SYSTEM = key("electoral_system", "house", "by-election")
+
+
+def by_party_id(abbr: str) -> str | None:
+    return key("party", abbr, "by-election") if abbr in BY_PARTIES else party_id(abbr)
+
+
+def _ballot_name(cells_: list[str]) -> str:
+    if len(cells_) >= 2:
+        name = f"{cells_[0].rstrip(',')}, {cells_[1]}"
+    else:
+        name = cells_[0]
+        if "," not in name:
+            words = name.split()
+            at = next((i for i, word in enumerate(words) if not re.fullmatch(r"[A-Z'\-.]+", word)), len(words))
+            if 0 < at < len(words):
+                name = " ".join(words[:at]) + ", " + " ".join(words[at:])
+    return re.sub(r"^([^,]+), (SR|JR|II|III)\.? (?=\S)", r"\1, \2., ", name)
+
+
+def by_election_page(html: str) -> Declared:
+    """A by-election page of the 2005 portal. The cells of a candidate vary from page to page (surname and given
+    name in one cell or two, the party's abbreviation alone or after its name), so each candidate is every cell up
+    to its vote count."""
+    items = [item for item in cells(html, lines=False) if item]
+    start = next(i for i, item in enumerate(items) if item == "Votes") + 1
+    stop = next(i for i, item in enumerate(items) if item == "Total Valid Votes")
+    declared = Declared()
+    buffer: list[str] = []
+    for item in items[start:stop]:
+        if re.fullmatch(r"\(?[\d.]+%\)?", item):
+            continue
+        if not re.fullmatch(r"[\d,]+", item) or not buffer:
+            buffer.append(item)
+            continue
+        text = " ".join(buffer)
+        found = re.search(r"\(\s*(\w+)\s*\)?\s*\)?\s*$", text)
+        abbr = found.group(1).upper() if found else INDEPENDENT
+        abbr = INDEPENDENT if abbr == "IND" else abbr
+        opened = next((i for i, cell in enumerate(buffer) if "(" in cell), len(buffer))
+        party_at = opened if opened < len(buffer) and buffer[opened].split("(")[0].strip() else opened - 1
+        if found is None:
+            party_at = len(buffer) - 1
+        declared.options[f"{_ballot_name(buffer[:party_at])} ({abbr})"] = number(item)
+        buffer = []
+    if buffer:
+        raise ValueError(f"unread cells {buffer}")
+    _page_totals(items, declared)
+    return declared
+
+
+def by_election(by: ByElection) -> Package:
+    p = Package(
+        f"{SOURCE}/{by.day}",
+        SOURCE,
+        f"The {by.day:%-d %B %Y} Liberian House of Representatives by-election, {by.name}, at district total",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {LIBERIA, TERRITORY}
+    for url in (DECLARATION_INDEX, BY_HOUSE_PAGES):
+        p.artifact(raw.cached(SOURCE, url), NEC_SOURCE)
+    page = by_election_page(bundle(BY_HOUSE_PAGES)[f"{PORTAL}results2005/House/{by.page}"])
+    if page.total is None or page.valid is None:
+        raise ValueError(f"{by.page}: no totals")
+    b = Builder(p)
+    election = key("election", str(by.day))
+    path = f"lr/{by.day}-house-by-election"
+    district = f"{by.county}{by.district:02d}"
+    p.add(
+        "election",
+        id=election,
+        polity_id=LIBERIA,
+        kind="by_election",
+        date_from=by.day,
+        date_to=by.day,
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    p.name(election, f"{by.day.year} Liberian House of Representatives by-election, {by.name}", "en", "official")
+    p.add(
+        "electoral_system",
+        id=BY_SYSTEM,
+        polity_id=LIBERIA,
+        valid_from=by.day,
+        valid_to=None,
+        rules={"formula": "two_round", "majority": 0.5, "advance": 2},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", BY_SYSTEM),
+        entity_id=BY_SYSTEM,
+        kind="methodology",
+        body_md=(
+            "A House seat vacated between general elections is filled at a by-election. A candidate who wins an "
+            "absolute majority of valid votes is elected; otherwise the two leading candidates go to a runoff. The "
+            "date bounds the by-elections this archive holds, not the period the law applied."
+        ),
+        lang="en",
+    )
+    contest = key("contest", str(by.day), "house", district)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="body_seats",
+        body_id=HOUSE_BODY,
+        district_area_id=area("lr.house_district", district),
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=BY_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, by.name, "en", "official")
+    p.add("slug", path=f"{path}/house", entity_id=contest, is_current=True)
+    tag = f"{by.day}:house:{district}"
+    result_set = b.result_set(
+        election,
+        contest,
+        tag,
+        "Counted by the National Elections Commission and published by the Commission as one total for the "
+        "district; the portal's page names no polling-place results.",
+        "The Commission's page does not say which candidates advance; the two with the most votes are recorded as "
+        "advancing because no candidate won a majority.",
+    )
+    unit = key("unit", f"{by.day}:{district}")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=LIBERIA,
+        scheme_code="lr.house_district",
+        code=f"{by.day}:{district}",
+        area_relation="equals",
+        area_id=area("lr.house_district", district),
+        kind="aggregate",
+    )
+    p.name(unit, by.name, "en", "official")
+    printed = list(page.options)
+    options = {}
+    for position, label in enumerate(printed, 1):
+        id = b.option(contest, tag, position, label)
+        options[label] = id
+    # parties the registry lacks are minted here, under a key of their own
+    for abbr, name in BY_PARTIES.items():
+        if any(party_of(label) == abbr for label in printed):
+            id = by_party_id(abbr)
+            assert id is not None
+            p.add("party", id=id, kind="party", polity_id=LIBERIA)
+            p.add("external_id", entity_id=id, scheme="lr.nec.party", value=abbr)
+            p.name(id, name, "en", "official")
+            p.name(id, abbr, "en", "abbreviation", False)
+    b.values(result_set, unit, Tally(list(page.options.items()), page.valid, page.invalid, page.total), options, None)
+    b.declare(result_set, options, page)
+    if sum(page.options.values()) != page.valid:
+        p.accept(
+            "accounting.votes_valid",
+            f"The Commission's page prints {page.valid:,} valid votes, but its candidates' votes sum to "
+            f"{sum(page.options.values()):,}; both are stored as printed.",
+        )
+    standing = sorted(printed, key=lambda label: -page.options[label])
+    for label in printed:
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=options[label],
+            kind="advanced" if label in standing[:2] else "eliminated",
         )
     return p
