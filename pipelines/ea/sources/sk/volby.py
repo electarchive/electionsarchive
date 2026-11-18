@@ -3,8 +3,9 @@
 The office publishes every national, European, regional, and municipal election and every referendum it has counted
 since 1994 as open-data tables on volby.statistics.sk. The finest unit differs by year: the polling district (okrsok)
 from 2010 for referendums, 2016 for the National Council, 2017 for regional elections, 2019 for the presidency and the
-European Parliament, and 2022 for municipal elections; the municipality (obec) before that; and the district (okres)
-for the 1998 National Council election. One package covers each election day, both rounds included.
+European Parliament, and 2022 for municipal elections; the municipality (obec) before that; the district (okres)
+for the 1998 National Council election; and the regional electoral district (volebný obvod) for the regional elections
+of 2001 to 2013, whose chairs the office prints by region in the first round. One package covers each election day, both rounds included.
 """
 
 import csv
@@ -241,6 +242,8 @@ FACT_SCHEMA = pl.Schema(
     }
 )
 UNIT_SCHEMA = pl.Schema({name: pl.String() for name in ("unit", "scheme", "obec", "okres", "kraj")})
+UNIT_EXTRA = pl.Schema({"area": pl.String(), "relation": pl.String()})
+"""A unit may name its area and its relation to it, where the area is not a municipality, a district, or a region."""
 
 
 def units_of(
@@ -857,6 +860,14 @@ def geo() -> Package:
             f"{known.kraje[kraj]}, {text.lower() if text.startswith('Volebný') else text}",
             area(KRAJ, kraj),
         )
+    for path in sorted(old_geo_paths()):
+        p.artifact(raw.cached(SOURCE, url(path)), VOLBY_SOURCE)
+    for code, (text, kraj, since, until) in sorted(old_districts().items()):
+        id = area(VUC_OBVOD, code)
+        p.add("area", id=id, scheme_code=VUC_OBVOD)
+        p.add("area_code", area_id=id, code=code, valid_from=since, valid_to=until)
+        p.add("area_parent", area_id=id, parent_id=area(KRAJ, kraj), valid_from=since, valid_to=until)
+        p.name(id, f"{known.kraje[kraj]}, {text}", "sk", "official")
     return p
 
 
@@ -1061,11 +1072,14 @@ METHOD = (
 def build(d: Day) -> Package:
     p = Package(f"{SOURCE}/{d.key}", SOURCE, d.summary, depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"])
     p.external |= {SLOVAKIA, COUNTRY}
+    stored: set[str] = set()
     for path in dict.fromkeys(d.paths):
-        if path in TERRITORY or path in DISTRICT_TABLES:
-            p.uses(raw.cached(SOURCE, url(path)))
-        else:
-            p.artifact(raw.cached(SOURCE, url(path)), VOLBY_SOURCE)
+        cached = raw.cached(SOURCE, url(path))
+        if path in TERRITORY or path in DISTRICT_TABLES or path in old_geo_paths():
+            p.uses(cached)
+        elif cached.storage_key not in stored:  # two tables with the same bytes are one artifact
+            stored.add(cached.storage_key)
+            p.artifact(cached, VOLBY_SOURCE)
     elections: dict[str, str] = {}
     slugs: dict[str, str] = {}
     for e in d.elections:
@@ -1084,7 +1098,15 @@ def build(d: Day) -> Package:
         p.name(id, e.english, "en", "official")
         p.name(id, e.slovak, "sk", "native", False)
         p.add("slug", path=e.slug, entity_id=id, is_current=True)
-    units = pl.concat([u.select(list(UNIT_SCHEMA)).cast(UNIT_SCHEMA) for u in d.units]).unique("unit", keep="first")
+    both = pl.Schema({**UNIT_SCHEMA, **UNIT_EXTRA})
+    units = pl.concat(
+        [
+            u.with_columns(**{n: pl.lit(None, pl.String) for n in UNIT_EXTRA if n not in u.columns})
+            .select(list(both))
+            .cast(both)
+            for u in d.units
+        ]
+    ).unique("unit", keep="first")
     unit_ids = {code: key("unit", code) for code in units["unit"]}
     p.frame(
         "reporting_unit",
@@ -1093,12 +1115,17 @@ def build(d: Day) -> Package:
             polity_id=pl.lit(SLOVAKIA),
             scheme_code="scheme",
             code="unit",
-            area_relation=pl.when(pl.col("obec") == ABROAD).then(pl.lit("unlocated")).otherwise(pl.lit("within")),
+            area_relation=pl.when(pl.col("obec") == ABROAD)
+            .then(pl.lit("unlocated"))
+            .otherwise(pl.col("relation").fill_null("within")),
             area_id=pl.when(pl.col("obec") == ABROAD)
             .then(pl.lit(None, pl.String))
             .otherwise(
-                pl.struct("obec", "okres", "kraj").map_elements(
-                    lambda r: unit_area(r["obec"], r["okres"], r["kraj"]), pl.String
+                pl.coalesce(
+                    pl.col("area"),
+                    pl.struct("obec", "okres", "kraj").map_elements(
+                        lambda r: unit_area(r["obec"], r["okres"], r["kraj"]), pl.String
+                    ),
                 )
             ),
             kind=pl.when(pl.col("obec") == ABROAD).then(pl.lit("postal_district")).otherwise(pl.lit("standard")),
@@ -1330,6 +1357,8 @@ def _register() -> None:
         reader(functools.partial(ref_precinct, year), f"ref-{year}")
     for year in (2017, 2022, 2026):
         reader(functools.partial(osk_modern, year), f"osk-{year}")
+    for year in OSK_OLD:
+        reader(functools.partial(osk_old, year), f"osk-{year}")
     for year in (2022, 2026):
         reader(functools.partial(oso_modern, year), f"oso-{year}")
     for year in (2014, 2018):
@@ -2905,6 +2934,486 @@ def oso_mayors(year: int) -> Day:
             "than the valid mayoral ballots it prints for the municipality; both are stored as printed"
         )
     add_local(d, day, Local(candidates, votes_, units, meta))
+    return d
+
+
+# Regional elections of 2001 to 2013. The office prints these by electoral district (volebný obvod): the council's
+# votes for each candidate in each district (not for 2001), the chair's votes for each region, and, in the second
+# round of 2005, 2009, and 2013, the chair's votes in each district. The first round was on the first day and the
+# second round, where no candidate won a majority, two weeks later.
+
+OSK_OLD = (2001, 2005, 2009, 2013)
+
+
+def onum(text: object) -> int | None:
+    """A count, which the 2005 tables sometimes print as "-" in quotation marks."""
+    return number(str(text).strip('"') if text is not None else None)
+
+
+OLD_TABLES: dict[int, dict[str, tuple[int, int]]] = {
+    2001: {"obvod": (1, 1), "chair1": (1, 7), "obvod2": (2, 8), "chair2": (2, 9)},
+    2005: {
+        "obvod": (1, 2),
+        "chair1": (1, 6),
+        "elected": (1, 7),
+        "others": (1, 8),
+        "obvod2": (2, 1),
+        "chair2": (2, 3),
+    },
+    2009: {
+        "obvod": (1, 2),
+        "chair1": (1, 5),
+        "elected": (1, 8),
+        "others": (1, 9),
+        "obvod2": (2, 10),
+        "chair2": (2, 7),
+    },
+    2013: {
+        "obvod": (1, 2),
+        "chair1": (1, 5),
+        "all": (1, 8),
+        "others": (1, 9),
+        "obvod2": (2, 10),
+        "chair2": (2, 7),
+    },
+}
+
+
+def old_path(year: int, name: str) -> str:
+    round_number, n = OLD_TABLES[year][name]
+    return f"osk/{year}/{round_number}.kolo/OSK_{year}_{round_number}kolo_tab{n:02d}.csv"
+
+
+def old_paths(year: int) -> list[str]:
+    return [old_path(year, name) for name in OLD_TABLES[year]]
+
+
+def kraj_of(text: object) -> str | None:
+    """A region's code from the name in a table: 'Bratislavský', 'Bratislavský kraj', 'Spolu Bratislavský kraj'. The
+    first three letters tell the regions apart, which also reads the 2005 table's 'žilinksy'."""
+    first = {fold(name)[:3]: code for code, name in places().kraje.items()}
+    words = fold(text).removeprefix("spolu").split()
+    return first.get(words[0][:3]) if words else None
+
+
+@dataclass
+class OldRow:
+    kraj: str | None
+    name: str
+    kind: str
+    values: dict[str, int | None]
+    cells: list[str | None]
+
+
+def old_rows(frame: pl.DataFrame, obvod_kraj: dict[str, str] | None = None) -> list[OldRow]:
+    """The rows of a district table, each a district, a region's total, or the republic's total. A region's total is
+    printed in the district column as the region's name or 'Spolu', or in the first column as 'Spolu <region>'; 2005's
+    first-round table has no region column, so a district's region comes from `obvod_kraj`."""
+    names = {
+        "registered": col(frame, "opravnenych"),
+        "voters": col(frame, "vydane"),
+        "cast": col(frame, "odovzdan", "obal", exclude=["podiel"]),
+    }
+    if has(frame, "platnych", "predsedu"):
+        names["valid_chair"] = col(frame, "platnych", "predsedu")
+    else:
+        names["valid_chair"] = col(frame, "platnych", "listkov", exclude=["zastupitel"])
+    if has(frame, "platnych", "zastupitel"):
+        names["valid_vuc"] = col(frame, "platnych", "zastupitel")
+        names["seats"] = col(frame, "poslancov", "mal")
+        names["elected"] = col(frame, "zvolenych", "poslancov")
+    out: list[OldRow] = []
+    for row in frame.iter_rows(named=True):
+        cells = list(row.values())
+        values = {key_: onum(row[c]) for key_, c in names.items()}
+        first = clean(cells[0])
+        if obvod_kraj is not None:
+            label = fold(first)
+            if label.startswith(("spolu", "sr")):
+                out.append(OldRow(None, first, "sr", values, cells))
+            elif label.endswith("kraj") and kraj_of(first):
+                out.append(OldRow(kraj_of(first), first, "kraj", values, cells))
+            else:
+                out.append(OldRow(obvod_kraj[fold(first)], first, "obvod", values, cells))
+            continue
+        second = clean(cells[1])
+        label, name = fold(first), fold(second)
+        if label == "sr" or "za sr" in label:
+            out.append(OldRow(None, first, "sr", values, cells))
+        elif label.startswith("spolu") or not name or name.startswith("spolu") or name == "sr spolu" or name == label:
+            out.append(OldRow(kraj_of(first), first, "kraj", values, cells))
+        else:
+            kraj = kraj_of(first)
+            if kraj is None:
+                raise ValueError(f"no region in {first!r}")
+            out.append(OldRow(kraj, second, "obvod", values, cells))
+    return out
+
+
+@functools.cache
+def old_table(year: int, name: str) -> list[OldRow]:
+    mapping = None
+    if year == 2005 and name == "obvod":
+        mapping = {}
+        for c in old_candidates(year, "elected", council=True):
+            kraj = kraj_of(c["kraj"])
+            assert kraj is not None and c["obvod"]
+            mapping[fold(c["obvod"])] = kraj
+    return old_rows(table(old_path(year, name)), mapping)
+
+
+@functools.cache
+def old_candidates(year: int, name: str, *, council: bool) -> list[dict[str, str]]:
+    """Rows of a candidate table: region, district (council tables), name, party label, votes, and the other cells."""
+    frame = table(old_path(year, name))
+    person, label, votes_ = col(frame, "meno"), col(frame, "skratka"), col(frame, "platnych hlasov", exclude=["podiel"])
+    used = {frame.columns[0], person, label, votes_}
+    if council:
+        used.add(frame.columns[1])
+    out = []
+    for row in frame.iter_rows(named=True):
+        if not clean(row[person]):
+            continue  # a blank line the office leaves between a region's rows
+        out.append(
+            {
+                "kraj": clean(row[frame.columns[0]]),
+                "obvod": clean(row[frame.columns[1]]) if council else "",
+                "name": clean(row[person]),
+                "party": clean(row[label]),
+                "votes": clean(row[votes_]),
+                "notes": " ".join(clean(row[c]) for c in frame.columns if c not in used and row[c]),
+            }
+        )
+    return out
+
+
+def obvod_key(name: object) -> str:
+    """A district's name as the candidate tables print it, some with 'obvod' in front."""
+    return fold(name).removeprefix("obvod ")
+
+
+def obvod_code(year: int, kraj: str, name: str) -> str:
+    return f"{plan_of(year)}:{kraj}:{changeset.slug(name)}"
+
+
+def plan_of(year: int) -> int:
+    """The first election held under the district plan of `year`: a plan that a later election printed unchanged is
+    one plan."""
+
+    def names(y: int) -> set[tuple[str | None, str]]:
+        return {(r.kraj, changeset.slug(r.name)) for r in old_table(y, "obvod") if r.kind == "obvod"}
+
+    for earlier in OSK_OLD:
+        if earlier < year and names(earlier) == names(year):
+            return earlier
+    return year
+
+
+def old_geo_paths() -> set[str]:
+    """The tables the geo package cites for the districts of 2001 to 2013: each plan's first district table, and the
+    2005 candidate table that tells which region each of its districts is in."""
+    return {old_path(plan, "obvod") for plan in {plan_of(y) for y in OSK_OLD}} | {old_path(2005, "elected")}
+
+
+@functools.cache
+def old_districts() -> dict[str, tuple[str, str, date, date]]:
+    """Regional electoral districts of 2001 to 2013: code → (name, region, first day, last day). Each plan is valid
+    from its first election to the day before the first election of the next plan (2017's for the last)."""
+    plans = sorted({plan_of(year) for year in OSK_OLD})
+    out: dict[str, tuple[str, str, date, date]] = {}
+    for index, plan in enumerate(plans):
+        following = OSK_DAYS[plans[index + 1]][0] if index + 1 < len(plans) else OSK_DAYS[2017][0]
+        for r in old_table(plan, "obvod"):
+            if r.kind == "obvod":
+                assert r.kraj is not None
+                out[obvod_code(plan, r.kraj, r.name)] = (
+                    r.name,
+                    r.kraj,
+                    OSK_DAYS[plan][0],
+                    date.fromordinal(following.toordinal() - 1),
+                )
+    return out
+
+
+def old_council_contest(year: int, kraj: str, name: str, seats: int | None) -> Contest:
+    text = places().kraje[kraj]
+    code = obvod_code(year, kraj, name)
+    return Contest(
+        f"vuc:{code}",
+        "osk:1",
+        "body_seats",
+        f"Zastupiteľstvo, {text}, {name}",
+        f"{changeset.slug(text)}-council-{changeset.slug(name)}",
+        system("vuc-council"),
+        district=area(VUC_OBVOD, code),
+        magnitude=seats,
+        body=regional_council(kraj),
+    )
+
+
+CHAIR_NOTES = (("zvolen", "elected"), ("postupuj", "advanced"), ("nevoliteln", "disqualified"))
+
+
+def chair_outcome(notes: str) -> str:
+    folded = fold(notes)
+    for word, outcome in CHAIR_NOTES:
+        if word in folded:
+            return outcome
+    return "eliminated"
+
+
+OLD_RELABELED = {2009: {("6", "banska stiavnica"): "Brezno"}}
+"""A district whose candidates the office's list of those not elected prints under its neighbor's name: year →
+(region, name printed) → the district's own name."""
+
+
+def relabel_second_block(rows: list[dict[str, str]], region: str, printed: str, belongs: str) -> list[dict[str, str]]:
+    """Rows printed under one district's name that are in two blocks, each in order of votes: the second block, where
+    the votes rise again, belongs to `belongs`."""
+    out = []
+    previous: int | None = None
+    second = False
+    for c in rows:
+        if kraj_of(c["kraj"]) == region and obvod_key(c["obvod"]) == printed:
+            now = onum(c["votes"]) or 0
+            second = second or (previous is not None and now > previous)
+            previous = now
+            if second:
+                c = {**c, "obvod": belongs}
+        out.append(c)
+    return out
+
+
+def old_facts(rows: list[tuple[str, str | None, int, int | None]]) -> pl.DataFrame:
+    return pl.DataFrame(
+        [r for r in rows if r[3] is not None],
+        schema={"unit": pl.String, "option": pl.String, "measure": pl.Int16, "value": pl.Int64},
+        orient="row",
+    )
+
+
+def old_accounting(unit: str, row: OldRow, valid: str) -> list[tuple[str, str | None, int, int | None]]:
+    return [
+        (unit, None, REGISTERED, row.values["registered"]),
+        (unit, None, VOTERS, row.values["voters"]),
+        (unit, None, CAST, row.values["cast"]),
+        (unit, None, VALID, row.values[valid]),
+    ]
+
+
+def osk_old(year: int) -> Day:
+    first, second = OSK_DAYS[year]
+    assert second is not None
+    d = Day(
+        str(first),
+        f"The {year} regional elections: chairs by region and, in the second round, by electoral district"
+        + (", councils by electoral district" if year != 2001 else ", and each council district's roll and turnout"),
+        [],
+    )
+    d.method = (
+        " The office prints these elections by electoral district and region, not by municipality or polling "
+        "district. Each voter cast one ballot for the region's chair and one for the council of the district, with as "
+        "many votes as the district elects; valid ballots are counted per ballot."
+    )
+    d.elections += [osk_election(year, 1), osk_election(year, 2)]
+    d.paths += old_paths(year)
+    table_units: dict[str, dict[str, str | None]] = {}
+
+    def unit(day: date, scheme: str, code: str, area_id: str) -> str:
+        name = f"{day}:{'vuc' if scheme == VUC_OBVOD else 'kraj'}:{code}"
+        table_units[name] = {
+            "unit": name,
+            "scheme": scheme,
+            "obec": None,
+            "okres": None,
+            "kraj": None,
+            "area": area_id,
+            "relation": "equals",
+        }
+        return name
+
+    def kraj_unit(day: date, kraj: str) -> str:
+        return unit(day, KRAJ, kraj, area(KRAJ, kraj))
+
+    def obvod_unit(day: date, kraj: str, name: str) -> str:
+        code = obvod_code(year, kraj, name)
+        return unit(day, VUC_OBVOD, code, area(VUC_OBVOD, code))
+
+    table1 = old_table(year, "obvod")
+    obvody = [r for r in table1 if r.kind == "obvod"]
+    totals = {r.kraj: r for r in table1 if r.kind == "kraj"}
+    national = next(r for r in table1 if r.kind == "sr") if any(r.kind == "sr" for r in table1) else None
+    for kraj in sorted(totals, key=str):
+        mine = [r for r in obvody if r.kraj == kraj]
+        for key_ in ("registered", "voters", "cast", "valid_chair", "valid_vuc"):
+            if key_ in totals[kraj].values and sum(r.values[key_] or 0 for r in mine) != totals[kraj].values[key_]:
+                raise ValueError(
+                    f"{year} {kraj} {key_}: districts add up to {sum(r.values[key_] or 0 for r in mine)}, the "
+                    f"office's total is {totals[kraj].values[key_]}"
+                )
+    if national is not None:
+        for key_ in ("registered", "voters", "cast", "valid_chair", "seats"):
+            got = sum(r.values[key_] or 0 for r in obvody)
+            if got != national.values[key_]:
+                raise ValueError(
+                    f"{year} {key_}: districts add up to {got}, the national total is {national.values[key_]}"
+                )
+
+    # Chairs: the first round's votes by region, then the second round's.
+    for round_number in (1, 2):
+        day = first if round_number == 1 else second
+        rows = old_candidates(year, f"chair{round_number}", council=False)
+        if year == 2005 and round_number == 1:
+            # 2005 flags a candidate who advances and a candidate who could not be elected in two columns.
+            frame = table(old_path(year, "chair1"))
+            flags = [(row[frame.columns[-2]], row[frame.columns[-1]]) for row in frame.iter_rows(named=True)]
+            for c_, (advance, barred) in zip(rows, flags, strict=True):
+                c_["notes"] = "postupuje" if advance == "1" else "nevoliteľný" if barred == "1" else ""
+        if year == 2005 and round_number == 2:
+            frame = table(old_path(year, "chair2"))
+            for c_, row in zip(rows, frame.iter_rows(named=True), strict=True):
+                c_["notes"] = "zvolený" if row[frame.columns[-1]] == "1" else ""
+        by_obvod = round_number == 2 and year != 2001
+        detail = old_table(year, "obvod2") if round_number == 2 else table1
+        kraje = sorted({kraj_of(c_["kraj"]) or "" for c_ in rows})
+        for kraj in kraje:
+            mine = sorted((c_ for c_ in rows if kraj_of(c_["kraj"]) == kraj), key=lambda c_: -(onum(c_["votes"]) or 0))
+            c = chair_contest(kraj, year, round_number)
+            for n, cand in enumerate(mine, start=1):
+                label, independent = local_party(cand["party"])
+                outcome = chair_outcome(cand["notes"])
+                if round_number == 2:
+                    outcome = "elected" if outcome == "elected" else "lost"
+                c.options.append(
+                    Option(
+                        str(n),
+                        cand["name"],
+                        "candidate",
+                        party=label,
+                        person=cand["name"],
+                        independent=independent,
+                        outcome=outcome,
+                    )
+                )
+            region = next(r for r in detail if r.kind == "kraj" and r.kraj == kraj)
+            if not by_obvod:
+                u = kraj_unit(day, kraj)
+                c.facts.append(
+                    old_facts(
+                        [(u, str(n), VOTES, onum(cand["votes"])) for n, cand in enumerate(mine, start=1)]
+                        + old_accounting(u, region, "valid_chair")
+                    )
+                )
+            else:
+                header = table(old_path(year, "obvod2")).columns
+                start = (
+                    header.index(col(table(old_path(year, "obvod2")), "platnych", "listkov", exclude=["zastupitel"]))
+                    + 1
+                )
+                mine_rows = [r for r in detail if r.kind == "obvod" and r.kraj == kraj]
+                active = [
+                    j for j in range(start, len(header), 2) if any(onum(r.cells[j]) is not None for r in mine_rows)
+                ]
+                column_of: dict[int, str] = {}
+                for n, cand in enumerate(mine, start=1):
+                    # 2009 prints some regions' columns twice; the first is read.
+                    match = [j for j in active if sum(onum(r.cells[j]) or 0 for r in mine_rows) == onum(cand["votes"])]
+                    if not match:
+                        raise ValueError(f"{year} {kraj}: no column adds up to the votes of {cand['name']}")
+                    column_of[match[0]] = str(n)
+                parts: list[tuple[str, str | None, int, int | None]] = []
+                for r in mine_rows:
+                    u = obvod_unit(day, kraj, r.name)
+                    parts += old_accounting(u, r, "valid_chair")
+                    parts += [(u, option, VOTES, onum(r.cells[j])) for j, option in column_of.items()]
+                c.facts.append(old_facts(parts))
+                for n, cand in enumerate(mine, start=1):
+                    c.declared[(str(n), VOTES)] = onum(cand["votes"]) or 0
+                for key_, measure in (
+                    ("registered", REGISTERED),
+                    ("voters", VOTERS),
+                    ("cast", CAST),
+                    ("valid_chair", VALID),
+                ):
+                    if region.values[key_] is not None:
+                        c.declared[(None, measure)] = region.values[key_] or 0
+            d.contests.append(c)
+
+    # Councils: the district's candidates and votes.
+    if year != 2001:
+        if year == 2013:
+            # The office lists every candidate and, separately, those who were not elected.
+            everyone = old_candidates(year, "all", council=True)
+            left = Counter(
+                (kraj_of(c_["kraj"]), fold(c_["name"]), onum(c_["votes"]))
+                for c_ in old_candidates(year, "others", council=True)
+            )
+            names, others = [], []
+            for c_ in everyone:
+                k = (kraj_of(c_["kraj"]), fold(c_["name"]), onum(c_["votes"]))
+                if left[k] > 0:
+                    left[k] -= 1
+                    others.append(c_)
+                else:
+                    names.append(c_)
+            d.method += (
+                " The office's list of candidates who were not elected prints the first district of the Banská Bystrica "
+                "region under the eleventh, so each candidate is matched to the list of all candidates by region, name, "
+                "and votes."
+            )
+        else:
+            names = old_candidates(year, "elected", council=True)
+            others = old_candidates(year, "others", council=True)
+            for (region, printed), belongs in OLD_RELABELED.get(year, {}).items():
+                others = relabel_second_block(others, region, printed, belongs)
+        for r in obvody:
+            assert r.kraj is not None
+            wanted = (r.kraj, obvod_key(r.name))
+            mine = [(c_, True) for c_ in names if (kraj_of(c_["kraj"]), obvod_key(c_["obvod"])) == wanted]
+            mine += [(c_, False) for c_ in others if (kraj_of(c_["kraj"]), obvod_key(c_["obvod"])) == wanted]
+            mine.sort(key=lambda t_: (-(onum(t_[0]["votes"]) or 0), t_[0]["name"]))
+            c = old_council_contest(year, r.kraj, r.name, r.values["seats"])
+            u = obvod_unit(first, r.kraj, r.name)
+            for n, (cand, elected) in enumerate(mine, start=1):
+                label, independent = local_party(cand["party"])
+                c.options.append(
+                    Option(
+                        str(n),
+                        cand["name"],
+                        "candidate",
+                        party=label,
+                        person=cand["name"],
+                        independent=independent,
+                        outcome="elected" if elected else "lost",
+                    )
+                )
+            winners = sum(1 for _, e in mine if e)
+            if winners != r.values["seats"]:
+                raise ValueError(f"{year} {r.name}: {winners} elected, {r.values['seats']} seats")
+            lowest = min((onum(cand["votes"]) or 0 for cand, e in mine if e), default=0)
+            highest = max((onum(cand["votes"]) or 0 for cand, e in mine if not e), default=0)
+            if highest > lowest:
+                raise ValueError(f"{year} {r.name}: a candidate not elected has more votes than one elected")
+            c.facts.append(
+                old_facts(
+                    [(u, str(n), VOTES, onum(cand["votes"])) for n, (cand, _) in enumerate(mine, start=1)]
+                    + old_accounting(u, r, "valid_vuc")
+                )
+            )
+            d.contests.append(c)
+    else:
+        d.accepts["accounting.votes_valid"] = (
+            "the office prints no candidate's votes for the 2001 councils, only each district's roll, turnout, and "
+            "valid ballots, so the districts that elect one councillor have no votes to compare with the ballots"
+        )
+        for r in obvody:
+            assert r.kraj is not None
+            c = old_council_contest(year, r.kraj, r.name, r.values["seats"])
+            c.facts.append(old_facts(old_accounting(obvod_unit(first, r.kraj, r.name), r, "valid_vuc")))
+            d.contests.append(c)
+    d.units.append(
+        pl.DataFrame(list(table_units.values()), schema={**UNIT_SCHEMA, "area": pl.String(), "relation": pl.String()})
+    )
     return d
 
 
