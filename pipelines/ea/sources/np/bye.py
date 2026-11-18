@@ -42,7 +42,7 @@ METHOD = (
     "(Maoist Centre) are linked to those parties, and the other candidates carry no party here."
 )
 
-CONTESTS = [
+CONTESTS: list[dict[str, Any]] = [
     {
         "tag": "hor:3-2",
         "level": "House of Representatives",
@@ -156,7 +156,7 @@ def election() -> Package:
             area_id=area(str(cfg["scheme"]), str(cfg["code"])),
             kind="standard",
         )
-        for measure, value in dict(cfg["totals"]).items():  # type: ignore[arg-type]
+        for measure, value in cfg["totals"].items():
             p.add(
                 "result_value",
                 result_set_id=rs,
@@ -215,7 +215,7 @@ def election() -> Package:
                 p.add("outcome", result_set_id=rs, option_id=option, kind="elected")
         if winners != 1:
             raise ValueError(f"{tag} has {winners} elected candidates")
-        if total != dict(cfg["totals"])[4]:  # type: ignore[arg-type]
+        if total != cfg["totals"][4]:
             raise ValueError(f"{tag} candidate votes {total} differ from the printed valid votes")
     return p
 
