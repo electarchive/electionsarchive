@@ -17,6 +17,7 @@ import xlrd
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.pa import cuadro3
 from ea.sources.pa import winners as win
 from ea.store import DATA
 
@@ -28,6 +29,7 @@ INBOX = DATA / "inbox" / "pa.te"
 
 # Measures
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
+DERIVED = 1  # result_value.flags: a figure the archive computed from the source's, not one the source prints
 
 
 DOWNLOAD = SITE + "/wp-content/plugins/download-attachments/includes/download.php?id="
@@ -506,6 +508,7 @@ class Election:
     files: list[str]
     tickets: list[Ticket] = field(default_factory=list)
     president: list[Unit] = field(default_factory=list)
+    corregimientos: list[Unit] = field(default_factory=list)  # the presidential votes by corregimiento, derived
     deputy: list[Unit] = field(default_factory=list)
     mayor: list[Unit] = field(default_factory=list)
     rep: list[Unit] = field(default_factory=list)
@@ -862,7 +865,7 @@ class Places:
 def places() -> Places:
     out = Places()
     for e in elections().values():
-        for office in ("president", "deputy", "mayor", "rep", "council"):
+        for office in ("president", "corregimientos", "deputy", "mayor", "rep", "council"):
             for unit in getattr(e, office):
                 if unit.scheme in ("exterior", "adelantado"):
                     out.extras[unit.scheme] = pretty(unit.path[0])
@@ -913,6 +916,19 @@ METHOD = (
     "Tribunal's results tables of the general election. Registered voters are the electoral roll, ballots cast are "
     "the votes issued, valid votes are the votes for parties and free-nomination lines, and blank and null votes "
     "are printed separately. The tables give no results per polling station."
+)
+
+
+METHOD_CORREGIMIENTO = (
+    "The Tribunal's Cuadro 3 prints the votes of every party in each corregimiento, and its Cuadro 2 names the parties "
+    "of each alliance on the presidential tickets. A ticket's votes here are the sums of the party columns Cuadro 2 "
+    "names under it, so they are derived, not printed. They add up to the printed votes of each ticket in every "
+    "electoral circuit and in the country. Registered voters, ballots cast, valid votes, and null votes are as Cuadro 3 "
+    "prints them."
+)
+SHARED_CORREGIMIENTO = (
+    "The corregimiento of Ailigandí is divided by populated place between circuits 10.1 and 10.2, and Cuadro 3 prints a "
+    "row for each part. The row here adds the two."
 )
 
 
@@ -1070,9 +1086,9 @@ EXPLAINED = {
 def compare(e: Election) -> list[str]:
     """Check each office's units against the national Total row the Tribunal prints, and say what was compared."""
     lines: list[str] = []
-    for office in ("president", "deputy", "mayor", "rep", "council"):
+    for office in ("president", "corregimientos", "deputy", "mayor", "rep", "council"):
         units = getattr(e, office)
-        printed = e.printed.get(office)
+        printed = e.printed.get("president_columns" if office == "corregimientos" else office)
         if not units or printed is None:
             continue
         found: dict[str, tuple[int, int]] = {}
@@ -1364,6 +1380,7 @@ def election(e: Election) -> Package:
         return uid
 
     def contest(office: str, parts: Sequence[object], label: str, area_id: str, **fields: object) -> tuple[str, str]:
+        default = fields.pop("default", True)
         cid = key("contest", e.day, office, *parts)
         en, es = OFFICES[office]
         p.add(
@@ -1387,14 +1404,14 @@ def election(e: Election) -> Package:
         rid = key("result_set", e.day, office, *parts)
         p.add(
             "result_set", id=rid, election_id=id, contest_id=cid, stage="official", kind="counted",
-            source_id=SOURCE_ID, status="active", is_default=True, completeness=1.0,
+            source_id=SOURCE_ID, status="active", is_default=bool(default), completeness=1.0,
         )  # fmt: skip
         p.add("note", id=key("note", rid), entity_id=rid, kind="methodology", body_md=METHOD, lang="en")
         return cid, rid
 
     over: dict[str, list[str]] = {}
 
-    def values(rid: str, uid: str, row: Row, options: dict[str, str]) -> None:
+    def values(rid: str, uid: str, row: Row, options: dict[str, str], flags: int = 0) -> None:
         if row.reg is not None and row.cast is not None and row.cast > row.reg:
             over.setdefault(rid, []).append(f"{row.cast:,} ballots cast and {row.reg:,} registered")
         for measure, value in (
@@ -1409,7 +1426,7 @@ def election(e: Election) -> Package:
                       count_round=0, flags=0, value=value)  # fmt: skip
         for label, value in row.votes.items():
             p.add("result_value", result_set_id=rid, unit_id=uid, option_id=options[label], channel=0, measure=VOTES,
-                  count_round=0, flags=0, value=value)  # fmt: skip
+                  count_round=0, flags=flags, value=value)  # fmt: skip
 
     def option(cid: str, label: str, position: int, tag: str) -> str:
         oid = key("option", cid, norm(label))
@@ -1486,8 +1503,8 @@ def election(e: Election) -> Package:
                 p.add("outcome", result_set_id=rid, option_id=oid, kind="lost")
 
     # The presidency: one contest, with a unit for every electoral circuit.
-    cid, rid = contest("president", [], "", COUNTRY, kind="office", office_id=PRESIDENCY, magnitude=1,
-                       electoral_system_id=SYSTEM_PLURALITY)  # fmt: skip
+    cid, rid = contest("president", [], "", COUNTRY, default=not e.corregimientos, kind="office",
+                       office_id=PRESIDENCY, magnitude=1, electoral_system_id=SYSTEM_PLURALITY)  # fmt: skip
     options: dict[str, str] = {}
     for position, t in enumerate(e.tickets, 1):
         oid = options[t.label] = key("option", cid, norm(t.label))
@@ -1526,6 +1543,27 @@ def election(e: Election) -> Package:
             p.add("declared", result_set_id=rid, option_id=None, measure=measure, value=value)
     for label, value in votes.votes.items():
         p.add("declared", result_set_id=rid, option_id=options[label], measure=VOTES, value=value)
+    if e.corregimientos:
+        # The finer table supersedes the count by circuit as the contest's default.
+        fine = key("result_set", e.day, "president", "corregimiento")
+        p.add("result_set", id=fine, election_id=id, contest_id=cid, stage="official", kind="counted",
+              source_id=SOURCE_ID, status="active", is_default=True, supersedes_id=rid, completeness=1.0)  # fmt: skip
+        p.add("note", id=key("note", fine), entity_id=fine, kind="methodology", body_md=METHOD_CORREGIMIENTO, lang="en")
+        p.add("note", id=key("note", fine, "shared"), entity_id=fine, kind="caveat", lang="en",
+              body_md=SHARED_CORREGIMIENTO)  # fmt: skip
+        for u in e.corregimientos:
+            row = Row(u.row.label, 0, [], reg=u.row.reg, cast=u.row.cast, valid=u.row.valid, null=u.row.null)
+            row.votes = {t.label: sum(u.row.votes[c] for c in t.parties) for t in e.tickets}
+            values(fine, unit(u), row, options, DERIVED)
+        for measure, value in (
+            (REGISTERED, total.reg),
+            (CAST, total.cast),
+            (VALID, total.valid),
+            (INVALID, total.null),
+        ):
+            p.add("declared", result_set_id=fine, option_id=None, measure=measure, value=value)
+        for label, value in votes.votes.items():
+            p.add("declared", result_set_id=fine, option_id=options[label], measure=VOTES, value=value)
     if e.president_winner:
         head = e.president_winner[0]
         won = ticket_of(e, head)
@@ -1628,12 +1666,111 @@ def pdf_party_table(
     e.printed[office] = rows[0]
 
 
+def row_of(line: cuadro3.Line) -> Row:
+    return Row(line.label, line.indent, [], reg=line.reg, cast=line.cast, valid=line.valid, null=line.null,
+               votes=dict(line.votes))  # fmt: skip
+
+
+# Corregimientos Cuadro 3 spells differently from the tables of the same election by corregimiento (Cuadro 12), keyed by
+# district and name as Cuadro 3 prints them. The spelling of Cuadro 12 names the area. Horconcitos and Las Lajas are the
+# seats of the corregimientos Cuadro 12 names San Lorenzo and San Félix.
+CUADRO_12_NAMES = {
+    ("colon", "nueva providencia"): "Nva Providencia",
+    ("donoso", "san jose del general"): "San Josè del Gral",
+    ("baru", "puerto armuelles (cab)"): "Pto Armuelles (Cab)",
+    ("gualaca", "hornitos"): "Hornito",
+    ("san lorenzo", "horconcitos (cab)"): "San Lorenzo (Cab)",
+    ("tole", "quebrada de piedra"): "Qda de Piedra",
+    ("san felix", "la lajas (cab)"): "San Félix (Cab)",
+    ("sambu", "jingurudu"): "Jingurudó",
+    ("las minas", "quebrada del rosario"): "Qda del Rosario",
+    ("las tablas", "vallerriquito"): "Valleriquito",
+    ("los santos", "la cruces"): "Las Cruces",
+    ("macaracas", "bajo de guera"): "Bajos de Güera",
+    ("chepo", "santa cruz de chinina"): "Sta Cruz de Chinina",
+    ("san miguelito", "amelia denis de icaza"): "Amelia D. de Icaza",
+    ("san miguelito", "jose domingo espinar"): "José D. Espinar",
+    ("santiago", "la raya de santa maria"): "La Raya de Sta María",
+    ("santa fe", "gatu o gatuncillo"): "Gatú o Gatuncito",
+}  # fmt: skip
+
+
+def president_1994(e: Election, one: str, two: str) -> None:
+    """The 1994 presidency from Cuadro 3, which prints every party's votes down to the corregimiento, and Cuadro 2,
+    which prints the votes of each ticket by circuit. A ticket's votes by corregimiento are the sums of the party
+    columns Cuadro 2 names under it, and the circuits' sums of those columns must match Cuadro 2."""
+    table = cuadro3.parse(pdf_lines(one))
+    e.tickets = TICKETS[1994]
+    cells = sheet_rows(pdf_grid(two), {"valid": 1}, {t.label: t.column for t in e.tickets})
+    by_circuit = {place_key(u.path[-1]): u for u in circuits(cells)}
+    columns = {name for t in e.tickets for name in t.parties}
+    if columns != set(cuadro3.PARTIES) or sum(len(t.parties) for t in e.tickets) != len(columns):
+        e.issues.append("the tickets of Cuadro 2 do not use every party column of Cuadro 3 once")
+    leaves: dict[tuple[str, str, str], Unit] = {}
+    shared: Row | None = None
+    left = 0
+    for province in table.provinces:
+        for circuit in province.circuits:
+            row = row_of(circuit.line)
+            unit = Unit("circuito", (province.line.label, circuit.code), row)
+            printed = by_circuit[place_key(circuit.code)].row
+            if printed.valid != row.valid:
+                e.issues.append(
+                    f"president circuit {circuit.code}: valid {row.valid:,} in Cuadro 3, {printed.valid:,} in Cuadro 2"
+                )
+            if any(sum(row.votes[c] for c in t.parties) != printed.votes[t.label] for t in e.tickets):
+                e.issues.append(
+                    f"president circuit {circuit.code}: Cuadro 3's party columns do not add up to Cuadro 2's tickets"
+                )
+            e.president.append(unit)
+            parties = dict(row.votes)
+            row.votes = dict(printed.votes)
+            members = [row_of(m) for m in circuit.members]
+            # A district of several circuits prints its total once, among the rows of the first, and the later circuits
+            # list its corregimientos without it.
+            total = next((m for m in members if m.valid and m.valid > circuit.line.valid), None)
+            if total:
+                members.remove(total)
+                shared, left = total, total.valid or 0
+                pairs = nest(row_with(circuit.line, parties), members, e.issues)
+            elif shared and left > 0:
+                left -= circuit.line.valid
+                pairs = [(shared, m) for m in members]
+            else:
+                pairs = nest(row_with(circuit.line, parties), members, e.issues)
+            for top, leaf in pairs:
+                leaf.label = CUADRO_12_NAMES.get((place_key(top.label), place_key(leaf.label)), leaf.label)
+                found = Unit("corregimiento", (province.line.label, top.label, leaf.label), leaf)
+                k = (place_key(province.line.label), place_key(top.label), place_key(leaf.label))
+                if k in leaves:  # a corregimiento that two circuits share, printed once for each
+                    merge(leaves[k].row, leaf)
+                else:
+                    leaves[k] = found
+    e.corregimientos = list(leaves.values())
+    e.printed["president"] = row_with(table.total, {})
+    e.printed["president_votes"] = cells[0]
+    e.printed["president_columns"] = row_of(table.total)
+
+
+def row_with(line: cuadro3.Line, votes: dict[str, int]) -> Row:
+    row = row_of(line)
+    row.votes = dict(votes)
+    return row
+
+
+def merge(into: Row, other: Row) -> None:
+    for name in ("reg", "cast", "valid", "null"):
+        setattr(into, name, (getattr(into, name) or 0) + (getattr(other, name) or 0))
+    for party, count in other.votes.items():
+        into.votes[party] = into.votes.get(party, 0) + count
+
+
 def load_1994() -> Election:
     e = Election(1994, date(1994, 5, 8), [])
-    names = ["01_-_Presidente-1", "02_-_Presidente_x_circuito", "04_-_Legislador_x_circuito", "09_-_Alcalde_x_distrito",
-             "12_-_Representante_x_corregimiento", "14_-_Concejal_x_distrito"]  # fmt: skip
+    names = ["03_-_Presidente_x_corregimiento", "02_-_Presidente_x_circuito", "04_-_Legislador_x_circuito",
+             "09_-_Alcalde_x_distrito", "12_-_Representante_x_corregimiento", "14_-_Concejal_x_distrito"]  # fmt: skip
     e.files = [f"1994/Cuadro_{n}.pdf" for n in names]
-    president_table(1994, pdf_grid(e.files[0]), C94, pdf_grid(e.files[1]), e)
+    president_1994(e, e.files[0], e.files[1])
     pdf_party_table(e.files[2], P94, e, "c", "deputy", start="CUADRO No.4")
     pdf_party_table(e.files[3], [*P94, "PNP", *LP], e, 2, "mayor")
     pdf_party_table(e.files[4], [*P94, "PNP", *LP], e, 3, "rep", reg=4)
