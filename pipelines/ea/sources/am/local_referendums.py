@@ -7,6 +7,7 @@ one spreadsheet per region gives the figures of every polling station.
 
 import functools
 import html
+import json
 import re
 import zipfile
 from dataclasses import dataclass
@@ -15,6 +16,8 @@ from uuid import uuid5
 
 import httpx
 import polars as pl
+import shapely
+import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
@@ -33,6 +36,12 @@ REGIONS = {
     "09": ("Սյունիք", "Syunik", "lfSyunik"),
     "11": ("Տավուշ", "Tavush", "lfTavush"),
 }
+GEOBOUNDARIES = "am.local_referendums.geoboundaries"
+OUTLINES = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ARM/ADM1/"
+    "geoBoundaries-ARM-ADM1_simplified.geojson"
+)
+GEO_SOURCE = str(uuid5(package.NAMESPACE, "am.local_referendums\x1fsource\x1fgeoboundaries"))
 METHOD = (
     "Counted by the precinct commissions and published by the Central Electoral Commission in its regional results "
     "spreadsheet, with the protocol it prints on each poll's page for the whole community. Registered voters are the "
@@ -128,6 +137,7 @@ def listing() -> list[Poll]:
 
 
 def fetch() -> None:
+    raw.fetch(GEOBOUNDARIES, OUTLINES, suffix=".geojson")
     for poll in listing():
         keep(poll_url(poll.id), poll.id)
     for region in REGIONS:
@@ -304,6 +314,7 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, marz, "hy", "official")
         p.name(id, english, "en", "english", False)
+    outlines(p)
     for poll in listing():
         id = area("am.community", f"{poll.region}:{poll.community}")
         p.add("area", id=id, scheme_code="am.community")
@@ -312,6 +323,54 @@ def geo() -> Package:
         p.name(id, poll.community, "hy", "official")
         p.name(id, ENGLISH[short(poll.community)], "en", "english", False)
     return p
+
+
+def outlines(p: Package) -> None:
+    """Attach the geoBoundaries outlines of the three regions. The communities have no open outlines."""
+    p.add(
+        "source",
+        id=GEO_SOURCE,
+        kind="academic",
+        publisher="geoBoundaries (William & Mary geoLab), from Wikimedia Commons",
+        title="geoBoundaries gbOpen Armenia ADM1, 2005",
+        url="https://www.geoboundaries.org/",
+        license="CC BY 2.5",
+        license_url="https://creativecommons.org/licenses/by/2.5/",
+        attribution="geoBoundaries (William & Mary geoLab), Wikimedia Commons",
+    )
+    p.artifact(raw.cached(GEOBOUNDARIES, OUTLINES), GEO_SOURCE)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "am.marz", 2005),
+        scheme_code="am.marz",
+        vintage="2005",
+        valid_from=DAY,
+        valid_to=None,
+        as_of=date(2005, 1, 1),
+    )
+    wanted = {english: marz for marz, english, _ in REGIONS.values()}
+    found: dict[str, shapely.geometry.base.BaseGeometry] = {}
+    for feature in json.loads(raw.cached(GEOBOUNDARIES, OUTLINES).path.read_text("utf-8"))["features"]:
+        name = feature["properties"]["shapeName"]
+        if name in wanted:
+            found[wanted[name]] = shapely.geometry.shape(feature["geometry"])
+    if set(found) != set(wanted.values()):
+        raise ValueError(f"the geoBoundaries file lacks regions: {sorted(set(wanted.values()) - set(found))}")
+    for marz, shape in sorted(found.items()):
+        if shape.geom_type == "Polygon":
+            shape = shapely.geometry.MultiPolygon([shape])
+        p.add(
+            "area_geometry",
+            area_id=area("am.marz", marz),
+            valid_from=DAY,
+            valid_to=None,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=GEO_SOURCE,
+        )
 
 
 def registry() -> Package:
