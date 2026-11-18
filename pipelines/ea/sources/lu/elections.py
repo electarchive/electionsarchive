@@ -662,8 +662,30 @@ def national_referendum(name: str, question: int) -> dict[str, int]:
 # Geography.
 
 
+# The elections site spells some communes in ways the cadastre's files for the same period do not. Each spelling maps
+# to the cadastre's commune in force at that election, so a commune has one area and its shapes apply. The 2011
+# council election was held before the 2012 mergers, so its Kaerjeng lists stand for the two former communes, while
+# the single list for the Ernz valley stands for the commune the merger formed, which the election chose a council for.
+SPELLINGS = {
+    "bettborn": "Préizerdaul",
+    "colmas-berg": "Colmar-Berg",
+    "redange-sur-attert": "Redange",
+    "habscht-hobscheid": "Hobscheid",
+    "habscht-septfontaines": "Septfontaines",
+    "kaerjeng-bascharage": "Bascharage",
+    "kaerjeng-clemency": "Clemency",
+    "lac-haute-sure": "Lac de la Haute-Sûre",
+    "aerenzdallgemeng": "Vallée de l'Ernz",
+}
+
+
+def commune_name(text: str) -> str:
+    """The cadastre's spelling of a commune the elections site names."""
+    return SPELLINGS.get(slug(text), text)
+
+
 def area(scheme: str, text: str) -> str:
-    return key("area", scheme, slug(text))
+    return key("area", scheme, slug(commune_name(text) if scheme == "lu.commune" else text))
 
 
 def places_of(name: str) -> dict[str, str | None]:
@@ -711,6 +733,7 @@ def geo() -> Package:
     communes: dict[str, tuple[str, str]] = {}
     for name in NAMES_ALL:
         for commune, canton in places_of(name).items():
+            commune = commune_name(commune)
             _, held = communes.get(slug(commune), (commune, ""))
             communes.setdefault(slug(commune), (commune, canton or held))
             if canton:
@@ -936,7 +959,7 @@ def registry() -> Package:
 
 
 def council(commune: str) -> str:
-    return key("body", "council", slug(commune))
+    return key("body", "council", slug(commune_name(commune)))
 
 
 # Elections.

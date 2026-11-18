@@ -30,8 +30,7 @@ QUESTION = (
 )
 # The report's national table (table 2.1): registered voters, ballots in the box, blank or invalid, valid, yes, no.
 NATIONAL = {"registered": 220717, "cast": 199609, "blank_or_invalid": 5894, "valid": 193715, "yes": 109494, "no": 84221}
-# The site spells one commune differently from the cadastre's file for the period, whose spelling the geo package keeps.
-SPELLING = {"Redange-sur-Attert": "Redange"}
+# The site spells one commune differently from the cadastre's file for the period; `elections.SPELLINGS` maps it.
 SOURCE_ID = elections.key("source", SOURCE)
 REPORT_ID = elections.key("source", f"{SOURCE}:report")
 METHOD = (
@@ -194,7 +193,7 @@ def build() -> Package:
         p.name(options[answer], answer.title(), "en", "english")
     values = elections.Facts()
     for row in communes:
-        text = SPELLING.get(row.commune, row.commune)
+        text = elections.commune_name(row.commune)
         unit = key("unit", f"{day}:{slug(text)}")
         p.add(
             "reporting_unit",
