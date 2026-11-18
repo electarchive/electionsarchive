@@ -15,6 +15,7 @@ from uuid import uuid5
 
 import httpx
 import polars as pl
+import pymupdf
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -126,6 +127,7 @@ def surname_like(name: str) -> bool:
     head = name.partition(",")[0]
     if "," not in name or not head:
         return False
+    head = re.sub(r"^(?:[a-z]+ )+(?=[A-Z])", "", head)
     head = re.sub(r"^(?i:mc|mac|de|di|van|la|le|von|del|da) ?(?=[A-Z])", "", head)
     return all(not ch.islower() for ch in head)
 
@@ -193,7 +195,24 @@ def _ha(day: date, workbook: str, folder: str) -> HaElection:
     )
 
 
+def _ha_2014() -> HaElection:
+    names = {"bass": "Bass", "braddon": "Braddon", "clark": "Denison", "franklin": "Franklin", "lyons": "Lyons"}
+    results = f"{HA}/StateElection2014/Results"
+    return HaElection(
+        date(2014, 3, 15),
+        {
+            code: (f"{results}/{name}/2014 {name} first preferences by polling place.pdf".replace(" ", "%20"), None)
+            for code, name in names.items()
+        },
+        {
+            code: f"{results}/{name}/2014 {name} scrutiny event sheet.pdf".replace(" ", "%20")
+            for code, name in names.items()
+        },
+    )
+
+
 HA_ELECTIONS = [
+    _ha_2014(),
     _ha_2018(),
     _ha(
         date(2021, 5, 1),
@@ -243,6 +262,8 @@ GROUP = re.compile(r"group [a-z]", re.IGNORECASE)
 
 
 def place_kind(name: str) -> str:
+    if re.fullmatch(r"pre-?poll votes", name, re.IGNORECASE):
+        return "aggregate"
     if re.search(r"postal|telephone", name, re.IGNORECASE):
         return "postal_district"
     if re.search(r"mobile", name, re.IGNORECASE):
@@ -254,11 +275,83 @@ def place_kind(name: str) -> str:
 
 @functools.cache
 def sheet(url: str, name: str | None) -> Sheet:
+    if url.endswith(".pdf"):
+        return grid(url, name, pdf_grid(url))
     frames = pl.read_excel(
         raw.cached(SOURCE, url).path, sheet_name=name, has_header=False, infer_schema_length=0, engine="calamine"
     )
     frame = frames if name is not None else next(iter(frames.values())) if isinstance(frames, dict) else frames
-    rows = [[clean(cell or "") for cell in row] for row in frame.rows()]
+    return grid(url, name, [[clean(cell or "") for cell in row] for row in frame.rows()])
+
+
+def is_figure(label: str) -> bool:
+    return bool(re.fullmatch(r"\d[\d ]*", label))
+
+
+BALLOT = re.compile(
+    r"((?:(?i:van|von|der|den|de|di|la|le|del|da|du) )*(?:(?i:mc|mac) ?)?[A-Z][A-Z'\-]+(?: [A-Z][A-Z'\-]+)*) (\S.*)"
+)
+
+
+def ballot_name(label: str) -> str:
+    """The 2014 PDFs print `SURNAME Given`; the workbooks print `SURNAME, Given`."""
+    label = re.sub(r"^\([A-Z]\) ", "", label)
+    found = BALLOT.fullmatch(label)
+    return f"{found.group(1)}, {found.group(2)}" if found and "," not in label else label
+
+
+def pdf_grid(url: str) -> list[list[str]]:
+    """The commission's 2014 PDFs print the places across, a few to a page, with the names set sideways. Lay
+    them out as one grid like the later workbooks: a `Candidates` header row, then one row per candidate."""
+    pages: list[list[list[str]]] = []
+    for page in pymupdf.open(raw.cached(SOURCE, url).path):
+        names: list[tuple[float, str]] = []
+        lines: list[tuple[float, float, float, str]] = []  # x0, x1, y0, text
+        for block in page.get_text("dict")["blocks"]:
+            for line in block.get("lines", []):
+                label = clean("".join(span["text"] for span in line["spans"]))
+                x0, y0, x1 = line["bbox"][0], line["bbox"][1], line["bbox"][2]
+                if not label:
+                    continue
+                if line["dir"][0] == 0:
+                    names.append(((x0 + x1) / 2, label))
+                else:
+                    lines.append((x0, x1, y0, label))
+        names.sort()
+        groups: list[list[tuple[float, str]]] = []
+        for center, label in names:  # a name that wraps has its lines one text height apart
+            if groups and center - groups[-1][-1][0] < 15:
+                groups[-1].append((center, label))
+            else:
+                groups.append([(center, label)])
+        if not groups:
+            raise ValueError(f"{url}: a page has no column names")
+        centers = [group[0][0] for group in groups]
+        header = ["Candidates", *(clean(" ".join(label for _, label in group)) for group in groups)]
+        body = [
+            (y0, [label] + [""] * len(centers))
+            for x0, x1, y0, label in sorted(lines, key=lambda line: line[2])
+            if 90 <= y0 <= 780 and not is_figure(label)
+        ]
+        body = [(y0, [ballot_name(row[0]), *row[1:]]) for y0, row in body]
+        for x0, x1, y0, label in lines:
+            if 90 <= y0 <= 780 and is_figure(label):
+                row = min(body, key=lambda item: abs(item[0] - y0))
+                if abs(row[0] - y0) > 3:
+                    raise ValueError(f"{url}: figure {label} has no row label")
+                index = min(range(len(centers)), key=lambda i: abs(centers[i] + 21 - x1))
+                row[1][index + 1] = label
+        pages.append([header, *(row for _, row in body)])
+    merged = pages[0]
+    for other in pages[1:]:
+        if [row[0] for row in other] != [row[0] for row in merged]:
+            raise ValueError(f"{url}: the pages do not list the same rows")
+        for row, extra in zip(merged, other, strict=True):
+            row += extra[1:]
+    return merged
+
+
+def grid(url: str, name: str | None, rows: list[list[str]]) -> Sheet:
     head = next(i for i, row in enumerate(rows) if row[0] == "Candidates")
     header = rows[head]
     width = max(i for i, cell in enumerate(header) if cell) + 1
@@ -284,6 +377,9 @@ def sheet(url: str, name: str | None) -> Sheet:
         values = [number(row[p.column]) for p in places]
         lowered = label.lower()
         if lowered.startswith("total formal"):
+            if pending and url.endswith(".pdf"):  # the PDFs print the ungrouped candidates without a group row
+                candidates += [Candidate(ballot, None, v) for ballot, v in pending]
+                pending = []
             formal = values
         elif lowered.startswith("informal"):
             informal = values
@@ -318,7 +414,31 @@ ELECTED = re.compile(
 )
 
 
-def ha_page(url: str) -> Page:
+EVENT = re.compile(r"([A-Za-z'’\-]+)(?:, ([A-Z])\.)? elected (\d+)")
+
+
+def ha_event_sheet(url: str, ballots: list[str]) -> Page:
+    """The scrutiny event sheet's remarks name each member as `SURNAME elected n` (or `SURNAME, I. elected n`), and
+    the first count's line ends with the total of formal votes."""
+    body = clean(" ".join(page.get_text() for page in pymupdf.open(raw.cached(SOURCE, url).path)))
+    elected: dict[str, int] = {}
+    for surname, initial, order in EVENT.findall(body):
+        found = [
+            b
+            for b in ballots
+            if b.partition(",")[0].casefold() == surname.casefold()
+            and (not initial or b.partition(",")[2].strip().startswith(initial))
+        ]
+        if len(found) != 1:
+            raise ValueError(f"{url}: {surname} {initial} elected matches {found}")
+        elected[found[0]] = int(order)
+    formal = re.search(r"(\d{5,6}) [^\d]{0,60}? elected 1\b", body)
+    return Page(elected, int(formal.group(1)) if formal else None, None, None)
+
+
+def ha_page(url: str, ballots: list[str] | None = None) -> Page:
+    if url.endswith(".pdf"):
+        return ha_event_sheet(url, ballots or [])
     html = text(url)
     body = plain(html)
     elected: dict[str, int] = {}
@@ -382,12 +502,13 @@ def result_set(p: Package, election: str, contest: str, method: str) -> str:
 
 
 HA_METHOD = (
-    "First preferences per polling place from the Tasmanian Electoral Commission's spreadsheet of first preferences "
-    "by polling place. Pre-poll voting centers are stored as places; out-of-division, postal (including telephone), "
-    "mobile, and provisional votes are reported once per division and stored as one unit each. Informal ballot "
-    "papers are stored on the same units. The enrolment is the commission's figure on its distribution of "
-    "preferences page. Declared outcomes are the candidates the commission's distribution of preferences marks as "
-    "elected; the later counts are not stored."
+    "First preferences per polling place from the Tasmanian Electoral Commission's spreadsheet (for 2014, PDF) of "
+    "first preferences by polling place. Pre-poll voting centers are stored as places; out-of-division, postal "
+    "(including telephone), mobile, and provisional votes are reported once per division and stored as one unit "
+    "each. Informal ballot papers are stored on the same units. Where the commission's distribution of preferences "
+    "page gives the enrolment, it is stored on its own unit. Declared outcomes are the candidates the commission's "
+    "distribution of preferences (for 2014, its scrutiny event sheet) marks as elected; the later counts are not "
+    "stored."
 )
 
 
@@ -420,7 +541,7 @@ def ha_election(election: HaElection) -> Package:
     values = Values()
     for code, (url, name) in election.workbooks.items():
         data = sheet(url, name)
-        page = ha_page(election.pages[code])
+        page = ha_page(election.pages[code], [c.ballot for c in data.candidates])
         division = area("au.tas_division", code)
         label = DIVISIONS[code]
         seats = len(page.elected)
@@ -823,7 +944,7 @@ def lg_fetch() -> None:
 
 def fetch_files(urls: list[str]) -> None:
     for url in dict.fromkeys(urls):
-        raw.fetch(SOURCE, url, suffix=".xlsx" if url.endswith(".xlsx") else ".html")
+        raw.fetch(SOURCE, url, suffix=".xlsx" if url.endswith(".xlsx") else ".pdf" if url.endswith(".pdf") else ".html")
 
 
 def fetch() -> None:
