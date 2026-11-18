@@ -10,12 +10,13 @@ from ea.changeset import Changeset
 from ea.store import Connection, connect
 
 SOURCE = "ca.quebec_match"
-VERSION = "2"
+VERSION = "3"
 SHORT = {"st": "saint", "ste": "sainte"}
-# Members whose next candidacy has another printed name or a riding that is not a namesake, joined by hand. Each
-# tuple lists ca.quebec candidacy keys of one person, backed by the member's page on assnat.qc.ca. The same name does
-# not make people the same: Éric Girard (Lac-Saint-Jean) and Eric Girard (Groulx) are two members, and two Gilles
-# Baril ran in Rouyn-Noranda-Témiscamingue in 1985.
+# Members whose candidacies, won or lost, carry another printed name or a riding that is not a namesake, or lie two
+# general elections apart, joined by hand. Each tuple lists ca.quebec candidacy keys of one person, and the member's
+# notice on assnat.qc.ca names each of those candidacies, defeats included. The same name does not make people the
+# same: Éric Girard (Lac-Saint-Jean) and Eric Girard (Groulx) are two members, and two Gilles Baril ran in
+# Rouyn-Noranda-Témiscamingue in 1985.
 SAME = (
     (  # Cloutier: François Cloutier, Ahuntsic 1970; François Cloutier, L'Acadie 1973
         "1970-04-29:3:1970-04-29:3:0",
@@ -25,9 +26,11 @@ SAME = (
         "1970-04-29:14:1970-04-29:14:0",
         "1973-10-29:38:1973-10-29:38:0",
     ),
-    (  # Harvey: André Harvey, Chauveau 1970; André Harvey, Charlesbourg 1973
+    (  # Harvey: André Harvey, Chauveau 1970; Charlesbourg 1973; Charlesbourg 1976; Jonquière 1981
         "1970-04-29:19:1970-04-29:19:0",
         "1973-10-29:18:1973-10-29:18:0",
+        "1976-11-15:18:1976-11-15:18:1",
+        "1981-04-13:880:1981-04-13:880:1",
     ),
     (  # Bossé: Alfre Bossé, Dorion 1970; Alfred Bossé, Dorion 1973
         "1970-04-29:25:1970-04-29:25:0",
@@ -65,9 +68,11 @@ SAME = (
         "1970-04-29:106:1970-04-29:106:0",
         "1973-10-29:152:1973-10-29:152:0",
     ),
-    (  # Cournoyer: Jean Cournoyer, Chambly 1971; Jean Cournoyer, Robert-Baldwin 1973
-        "1971-02-08:240:1971-02-08:240:0",
+    (  # Cournoyer: Jean Cournoyer, Saint-Jacques 1970; Chambly 1971 by-election; Robert-Baldwin 1973; Richelieu 1976
+        "1970-04-29:87:1970-04-29:87:2",
+        "1971-02-08:15:1971-02-08:15:0",
         "1973-10-29:160:1973-10-29:160:0",
+        "1976-11-15:50:1976-11-15:50:1",
     ),
     (  # Fortier: J.-Arthur-Guy Fortier, Gaspé-Sud 1970; Guy Fortier, Gaspé 1973
         "1970-04-29:32:1970-04-29:32:0",
@@ -150,6 +155,146 @@ SAME = (
     (  # Blanchette Vézina: Maïté Blanchette Vézina, Rimouski 2022; Maïté Blanchette Vézina, La Peltrie 2026
         "2022-10-03:838:2499",
         "2026-10-05:729:3566",
+    ),
+    (  # Grenier: Fernand Grenier, Frontenac 1970; Fernand Grenier, Lotbinière 1973
+        "1970-04-29:30:1970-04-29:30:1",
+        "1973-10-29:28:1973-10-29:28:3",
+    ),
+    (  # Gauthier: Gilles Gauthier, Trois-Rivières 1970; Gilles Gauthier, Champlain 1976
+        "1970-04-29:102:1970-04-29:102:1",
+        "1976-11-15:32:1976-11-15:32:2",
+    ),
+    (  # Parizeau: Jacques Parizeau, Ahuntsic 1970; Jacques Parizeau, Crémazie 1973
+        "1970-04-29:3:1970-04-29:3:1",
+        "1973-10-29:146:1973-10-29:146:1",
+    ),
+    (  # Malépart: Jean-Claude Malepart, Sainte-Marie 1970; Jean-Claude Malépart, Sainte-Marie 1973
+        "1970-04-29:94:1970-04-29:94:1",
+        "1973-10-29:140:1973-10-29:140:0",
+    ),
+    (  # Proulx: Jérôme Proulx, Saint-Jean 1970; Jérôme Proulx, Saint-Jean 1973
+        "1970-04-29:88:1970-04-29:88:1",
+        "1973-10-29:93:1973-10-29:93:1",
+    ),
+    (  # Bergeron: Marc Bergeron, Mégantic 1970; Marc Bergeron, Frontenac 1973
+        "1970-04-29:62:1970-04-29:62:1",
+        "1973-10-29:24:1973-10-29:24:2",
+    ),
+    (  # Hamel: Paul-Yvon Hamel, Rouville 1970; Paul-Yvon Hamel, Iberville 1973
+        "1970-04-29:82:1970-04-29:82:1",
+        "1973-10-29:53:1973-10-29:53:1",
+    ),
+    (  # Marois: Pierre Marois, Chambly 1970; Pierre Marois, Laporte 1973
+        "1970-04-29:15:1970-04-29:15:1",
+        "1973-10-29:67:1973-10-29:67:1",
+    ),
+    (  # Lévesque: René Lévesque, Laurier 1970; René Lévesque, Dorion 1973
+        "1970-04-29:49:1970-04-29:49:1",
+        "1973-10-29:144:1973-10-29:144:1",
+    ),
+    (  # Michaud: Yves Michaud, Gouin 1970; Yves Michaud, Bourassa 1973
+        "1970-04-29:34:1970-04-29:34:1",
+        "1973-10-29:139:1973-10-29:139:1",
+    ),
+    (  # Tremblay: Charles Tremblay, Sainte-Marie 1973; Charles Tremblay, Saint-Hyacinthe 1976
+        "1973-10-29:140:1973-10-29:140:1",
+        "1976-11-15:51:1976-11-15:51:1",
+    ),
+    (  # Gautrin: Henri-François Gautrin, Mercier 1976; Henri-François Gautrin, Dorion 1981
+        "1976-11-15:142:1976-11-15:142:4",
+        "1981-04-13:655:1981-04-13:655:1",
+    ),
+    (  # Veilleux: Jacques Veilleux, Saint-Jean 1976; Jacques Veilleux, Saint-Jean 1981
+        "1976-11-15:93:1976-11-15:93:1",
+        "1981-04-13:525:1981-04-13:525:1",
+    ),
+    (  # Beaudoin: Louise Beaudoin, Jean-Talon 1976; Louise Beaudoin, Louis-Hébert 1985
+        "1976-11-15:103:1976-11-15:103:1",
+        "1985-12-02:190:1985-12-02:190:1",
+    ),
+    (  # Leduc: Michel Leduc, Laval 1976; Michel Leduc, Fabre 1985
+        "1976-11-15:123:1976-11-15:123:1",
+        "1985-12-02:580:1985-12-02:580:1",
+    ),
+    (  # Bourassa: Robert Bourassa, Mercier 1976; Robert Bourassa, Bertrand 1985
+        "1976-11-15:142:1976-11-15:142:1",
+        "1985-12-02:555:1985-12-02:555:1",
+    ),
+    (  # Dean: Robert Dean, Prévost 1985; Robert Dean, Groulx 1989
+        "1985-12-02:570:1985-12-02:570:1",
+        "1989-09-25:560:1989-09-25:560:1",
+    ),
+    (  # Beaumier: Yves Beaumier, Nicolet 1985; Yves Beaumier, Champlain 1989
+        "1985-12-02:370:1985-12-02:370:1",
+        "1989-09-25:680:1989-09-25:680:1",
+    ),
+    (  # Beaudoin: Denise Beaudoin, Argenteuil 1998; Denise Beaudoin, Mirabel 2007
+        "1998-11-30:595:1998-11-30:595:1",
+        "2007-03-26:492:2007-03-26:492:1",
+    ),
+    (  # Grégoire: Marie Grégoire, L'Assomption 1998; Marie Grégoire, Berthier 2003
+        "1998-11-30:445:1998-11-30:445:2",
+        "2003-04-14:354:2003-04-14:354:1",
+    ),
+    (  # Shaw: William F. Shaw, Jacques-Cartier 1998; William F. Shaw, D'Arcy-McGee 2003
+        "1998-11-30:485:1998-11-30:485:2",
+        "2003-04-14:406:2003-04-14:406:3",
+    ),
+    (  # Méthé: Lucille Méthé, Iberville 2003; Lucille Méthé, Saint-Jean 2008
+        "2003-04-14:142:2003-04-14:142:2",
+        "2008-12-08:188:2008-12-08:188:2",
+    ),
+    (  # Proulx: Sébastien Proulx, Laviolette 2003; Sébastien Proulx, Trois-Rivières 2008
+        "2003-04-14:584:2003-04-14:584:2",
+        "2008-12-08:334:2008-12-08:334:2",
+    ),
+    (  # Gaudreau: François Gaudreau, Vimont 2007; François Gaudreau, Sainte-Rose 2012
+        "2007-03-26:448:2007-03-26:448:1",
+        "2012-09-04:447:2012-09-04:447:1",
+    ),
+    (  # De Martin: Albert De Martin, Huntingdon 2008; Albert De Martin, Huntingdon 2014
+        "2008-12-08:148:2008-12-08:148:2",
+        "2014-04-07:149:319",
+    ),
+    (  # Lévesque: Christian Levesque, Lévis 2008; Christian Lévesque, Bellechasse 2012
+        "2008-12-08:664:2008-12-08:664:1",
+        "2012-09-04:303:2012-09-04:303:1",
+    ),
+    (  # Gosselin: Jean-François Gosselin, Jean-Lesage 2008; Jean-François Gosselin, La Peltrie 2012
+        "2008-12-08:624:2008-12-08:624:2",
+        "2012-09-04:603:2012-09-04:603:1",
+    ),
+    (  # Roy Verville: Monique Roy Verville, La Prairie 2008; Monique Roy Verville, Jean-Talon 2014
+        "2008-12-08:182:2008-12-08:182:2",
+        "2014-04-07:643:546",
+    ),
+    (  # Deschamps: Robert Deschamps, Saint-Maurice 2008; Robert Deschamps, Trois-Rivières 2012
+        "2008-12-08:342:2008-12-08:342:2",
+        "2012-09-04:333:2012-09-04:333:5",
+    ),
+    (  # Skeete: Christopher Skeete, Vimont 2012; Christopher Skeete, Fabre 2014
+        "2012-09-04:449:2012-09-04:449:2",
+        "2014-04-07:443:687",
+    ),
+    (  # Aussant: Jean-Martin Aussant, Nicolet-Bécancour 2012; Jean-Martin Aussant, Pointe-aux-Trembles 2018
+        "2012-09-04:329:2012-09-04:329:1",
+        "2018-10-01:380:1492",
+    ),
+    (  # Asselin: Mario Asselin, Taschereau 2012; Mario Asselin, Louis-Hébert 2014
+        "2012-09-04:633:2012-09-04:633:2",
+        "2014-04-07:653:353",
+    ),
+    (  # Zanetti: Sol Zanetti, Louis-Hébert 2012; Sol Zanetti, Jean-Lesage 2014
+        "2012-09-04:653:2012-09-04:653:4",
+        "2014-04-07:623:424",
+    ),
+    (  # Breton: Daniel Breton, Sainte-Marie-Saint-Jacques 2014; Daniel Breton, Saint-Hyacinthe 2018
+        "2014-04-07:389:83",
+        "2018-10-01:260:1542",
+    ),
+    (  # Trudel: Denise Trudel, Charlesbourg 2014; Denise Trudel, Roberval 2018
+        "2014-04-07:619:600",
+        "2018-10-01:930:1491",
     ),
     (  # Simard: Jean-François Simard, Montmorency 1998; Jean-François Simard, Montmorency 2003; Jean-François Simard, Montmorency 2018; Jean-François Simard, Montmorency 2022; Jean-François Simard, Montmorency 2026
         "1998-11-30:747:1998-11-30:747:0",
