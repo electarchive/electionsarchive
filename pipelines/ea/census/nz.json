@@ -733,9 +733,9 @@
      "note": "By-elections from the first Parliament to the first MMP Parliament; listed in the Electoral Commission's history and returned in the Appendix to the Journals, not yet counted here."
     },
     {
-     "date": "1998-04-11",
+     "date": "1998-05-02",
      "election_kind": "by_election",
-     "note": "Taranaki-King Country."
+     "note": "Taranaki-King Country; the Electoral Commission's results file prints the poll as held on 2 May 1998."
     },
     {
      "date": "2004-07-10",
@@ -786,6 +786,11 @@
      "date": "2017-02-25",
      "election_kind": "by_election",
      "note": "Mount Albert."
+    },
+    {
+     "date": "2018-06-09",
+     "election_kind": "by_election",
+     "note": "Northcote."
     },
     {
      "date": "2022-06-18",
