@@ -15,6 +15,7 @@ import shapely.geometry
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.at import landtag as lander
 
 SOURCE = "at.wien"
 SITE = "https://www.wien.gv.at"
@@ -24,6 +25,7 @@ WFS = (
     "https://data.wien.gv.at/daten/geo?service=WFS&version=1.1.0&request=GetFeature&srsName=EPSG:4326&outputFormat=json"
 )
 AUSTRIA = str(uuid5(package.NAMESPACE, "polity\x1fAT"))
+LAND_POLITY = lander.polity("AT-9")
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fAUT"))
 TOLERANCE = 0.00003
 DERIVED = 1
@@ -482,6 +484,7 @@ def geo() -> Package:
         SOURCE,
         "Vienna, its 23 municipal districts, and the polling districts of the 2005 to 2025 elections, with shapes from "
         "the City of Vienna's open data",
+        depends=[f"{lander.SOURCE}/geo"],
     )
     p.external |= {AUSTRIA, COUNTRY}
     p.add(
@@ -509,6 +512,7 @@ def geo() -> Package:
     p.add("area_parent", area_id=LAND, parent_id=COUNTRY)
     p.name(LAND, "Wien", "de", "official")
     p.name(LAND, "Vienna", "en", "official", False)
+    p.add("polity_territory", polity_id=LAND_POLITY, area_id=LAND)
     _outline(p, LAND, shapely.coverage_union_all([shape for _, shape in found.values()]), None, None)
     taken = raw.cached(SOURCE, wfs(BEZIRKE)).retrieved_at
     for scheme in (LAND_SCHEME, BEZIRK_SCHEME):
@@ -585,12 +589,12 @@ def registry() -> Package:
         for council in (True, False):
             for url in [*files(year, council), *pages(year, council)]:
                 p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
-    p.add("body", id=BODY, polity_id=AUSTRIA, kind="unicameral")
+    p.add("body", id=BODY, polity_id=LAND_POLITY, kind="unicameral")
     p.name(BODY, "Viennese Landtag", "en", "official")
     p.name(BODY, "Wiener Landtag und Gemeinderat", "de", "native", False)
     for number, name in sorted(districts().items()):
         body = council_body(number)
-        p.add("body", id=body, polity_id=AUSTRIA, kind="council")
+        p.add("body", id=body, polity_id=LAND_POLITY, kind="council")
         p.name(body, f"Bezirksvertretung {name}", "de", "official")
         p.name(body, f"District Council of {name}", "en", "official", False)
     seen: set[str] = set()
@@ -634,7 +638,7 @@ def _unit(p: Package, year: int, row: Row) -> None:
     p.add(
         "reporting_unit",
         id=id,
-        polity_id=AUSTRIA,
+        polity_id=LAND_POLITY,
         scheme_code=SPRENGEL_SCHEME,
         code=f"{day}:{row.code}",
         area_relation="equals" if shaped else "within",
@@ -787,7 +791,7 @@ def landtag(year: int) -> Package:
     for url in [*files(year, True), *pages(year, True)]:
         p.uses(raw.cached(SOURCE, url))
     id = key("election", gr(year))
-    p.add("election", id=id, polity_id=AUSTRIA, kind="general", date_from=day, date_to=day, status="held")
+    p.add("election", id=id, polity_id=LAND_POLITY, kind="general", date_from=day, date_to=day, status="held")
     p.name(id, f"{year} Viennese Landtag election", "en", "official")
     p.name(id, f"Gemeinderatswahl {year}", "de", "native", False)
     path = f"at/{day}-wien-landtag"
@@ -817,7 +821,7 @@ def councils(year: int) -> Package:
     for url in [*files(year, False), *pages(year, False)]:
         p.uses(raw.cached(SOURCE, url))
     id = key("election", bv(year))
-    p.add("election", id=id, polity_id=AUSTRIA, kind="local", date_from=day, date_to=day, status="held")
+    p.add("election", id=id, polity_id=LAND_POLITY, kind="local", date_from=day, date_to=day, status="held")
     p.name(id, f"{year} Vienna district council elections", "en", "official")
     p.name(id, f"Bezirksvertretungswahlen {year}", "de", "native", False)
     path = f"at/{day}-wien-bezirksvertretung"
