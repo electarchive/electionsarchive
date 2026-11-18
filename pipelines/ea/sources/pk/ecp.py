@@ -200,6 +200,71 @@ RETURNED = {
 }
 FILES_2008 = [PAGE_2008, VOLUME, PARTY_VOTES, TURNOUT_NA, TURNOUT_PA, POSITION_NA, POSITION_PA, *RETURNED.values()]
 ECP_2008 = key("source", "ecp", "2008")
+ECP_BYE_2008 = key("source", "ecp", "2008-by")
+BYE_DAY = date(2008, 6, 26)
+SITE = "https://ecp.gov.pk/"
+POSTAL = SITE + "exercise-of-right-of-vote-through-postal-ballot-papers-for-fresh-electionsbye-elections"
+BYE_FILES = [
+    SITE + "election-commission-issues-schedule-for-the-conduct-of-bye-elections-2008",
+    SITE + "election-commission-issues-revised-schedule-for-the-conduct-of-bye-elections-2008",
+    SITE + "bye-elections-programme-of-provincial-assembly",
+    SITE + "election-schedule-of-national-assembly",
+    POSTAL,
+    SITE
+    + "candidates-returned-to-the-provincial-assemblies-of-punjab-pp-59-pp-124-pp-219-pp-229-pp-243-pp-258-pp-277-as-a-result-of-bye-elections",
+]
+# The constituencies the Commission's release of 17 May 2008 lists for the fresh elections and by-elections it says
+# were held on 26 June 2008. The volume prints no result for NA-123, NA-42, PF-59, PF-81 or PF-92.
+POLLED_BYE = [
+    "NA-11",
+    "NA-52",
+    "NA-55",
+    "NA-119",
+    "NA-123",
+    "NA-131",
+    "NA-147",
+    "NA-207",
+    "PP-10",
+    "PP-48",
+    "PP-59",
+    "PP-70",
+    "PP-99",
+    "PP-107",
+    "PP-118",
+    "PP-124",
+    "PP-141",
+    "PP-154",
+    "PP-171",
+    "PP-219",
+    "PP-229",
+    "PP-243",
+    "PP-258",
+    "PP-277",
+    "PP-295",
+    "PS-30",
+    "PS-44",
+    "PS-62",
+    "PF-20",
+    "PF-45",
+    "PF-59",
+    "PF-75",
+    "PF-81",
+    "PF-91",
+    "PF-92",
+    "PB-9",
+    "PB-32",
+    "PB-44",
+]
+# The candidates the Commission's notification of 1 July 2008 returned to the Punjab Assembly, with their fathers.
+RETURNED_BYE = {
+    "PP-59": ("Qasim Zia", "Mian Zia-ud-Din"),
+    "PP-124": ("Rana Shamim Ahmed Khan", "Rana Muhammad Charagh"),
+    "PP-219": ("Karam Dad Wahla", "Abdul Rehman Wahla"),
+    "PP-229": ("Sardar Wajid Ali", "Sardar Allah Ditta"),
+    "PP-243": ("Sardar Zulfiqar Ali Khan Khosa", "Sardar Dost Muhammad Khan Khosa"),
+    "PP-258": ("Mukhdoom Zada Syed Haroon Ahmed Sultan Bukhari", "Mukhdoom Syed Abdullah Shah Bukhari"),
+    "PP-277": ("Mian Fida Hussain", "Mian Nazar Muhammad"),
+}
 
 
 class Assembly(NamedTuple):
@@ -359,10 +424,11 @@ LABELS = {
     "Rejected Votes": "rejected",
     "Total Votes": "total",
     "Regd. Voters": "registered",
+    "Regd. Vots": "registered",
     # PB-18 prints its rejected votes with a stray backslash in place of the label.
     "\\": "rejected",
 }
-TOTAL_2008 = re.compile(r"^(Valid Votes|Rejected Votes|Total Votes|Regd\. Voters|\\)\s+(\d+)$")
+TOTAL_2008 = re.compile(r"^(Valid Votes|Rejected Votes|Total Votes|Regd\. Voters|Regd\. Vots|\\)\s+(\d+)$")
 
 
 def pages(url: str) -> list[list[Word]]:
@@ -388,14 +454,26 @@ def joined(words: list[Word]) -> str:
     return " ".join(w.text for w in words)
 
 
-def general_seats() -> list[Seat2008]:
-    """Every general-seat constituency of the volume's detailed results, before its by-election pages."""
+def general_seats(bye: bool = False) -> list[Seat2008]:
+    """Every constituency of the volume's detailed results before its by-election pages, or, with `bye`, of the
+    by-election pages after them."""
     seats: list[Seat2008] = []
     seen: dict[str, Seat2008] = {}
     current: Seat2008 | None = None
+    started = not bye
     for number, words in enumerate(pages(VOLUME), 1):
         if "BYE ELECTIONS" in joined(words):
-            break
+            if not bye:
+                break
+            started = True
+            continue
+        if not started:
+            continue
+        # The by-election pages print a code with a trailing comma, and run a code into the name beside it.
+        words = [w._replace(text=w.text.rstrip(",")) if re.match(r"^[A-Z]{2}-\d+,$", w.text) else w for w in words]
+        if any(w.text == "PF-91" for w in words) and any(w.text == "Charsadda-IV" for w in words):
+            # PF-91's header is printed over the stale one of PF-20 Charsadda-IV.
+            words = [w for w in words if w.text not in ("PF-20", "Charsadda-IV")]
         header = next((w for w in words if w.text == "Contesting"), None)
         if header is None:
             current = None
@@ -409,6 +487,8 @@ def general_seats() -> list[Seat2008]:
             if w.text in ("Contesting", "Candidates", "Party", "Affilliation", "Votes", "Polled", "No.")
         )
         body = [w for w in words if top - 2 < w.y0 < 740]
+        if bye and (left := [w.x0 for w in body if w.text == "Independent"]):
+            party_x = min(party_x, min(left))  # some by-election pages print the party column left of its heading
         codes = sorted((w for w in body if CODE.match(w.text)), key=lambda w: w.y)
         if codes and codes[0].text in seen:
             # Each page repeats a constituency from earlier as a running header, sometimes over the real header.
@@ -434,7 +514,7 @@ def general_seats() -> list[Seat2008]:
             text = joined(line.words)
             if total := TOTAL_2008.match(text):
                 current.totals[LABELS[total.group(1)]] = int(total.group(2))
-            elif text.startswith("% of Votes"):
+            elif text.lower().startswith("% of votes"):
                 continue
             elif current.totals:
                 raise ValueError(f"{current.code}: a line after the totals: {text}")
@@ -671,18 +751,21 @@ def elected_2008(seats: list[Seat2008]) -> dict[str, Candidate2008]:
 
 
 def packages() -> list[str]:
-    return ["pk.ecp/registry", "pk.ecp/2002-10-10", "pk.ecp/2008-02-18"]
+    return ["pk.ecp/registry", "pk.ecp/2002-10-10", "pk.ecp/2008-02-18", "pk.ecp/2008-06-26"]
 
 
 def fetch() -> None:
     for url in (CONSTITUENCIES, PARTIES, *FILES_2008):
         raw.fetch(SOURCE, url, suffix=".html" if url == PAGE_2008 else ".pdf")
+    for url in BYE_FILES:
+        raw.fetch(SOURCE, url, suffix=".html")
 
 
 def parse() -> None:
     registry().write()
     build().write()
     build_2008().write()
+    build_bye_2008().write()
 
 
 def emit() -> None:
@@ -883,107 +966,20 @@ def build_2008() -> Package:
         lang="en",
     )
     for seat in seats:
-        assembly = ASSEMBLIES[seat.prefix]
-        contest = key("contest", "2008", seat.code)
-        label = f"{seat.code} {seat.name}"
-        p.add(
-            "contest",
-            id=contest,
-            election_id=election,
-            kind="body_seats",
-            body_id=assembly.body,
-            magnitude=1,
-            round_number=1,
-            electoral_system_id=SYSTEM,
-            default_result_kind="tacit" if seat.tacit else "counted",
+        notes = caveats(seat, seat.code in elected, notified)
+        add_seat(
+            p,
+            seat,
+            election,
+            "2008",
+            "2008-02-18",
+            "pk/2008-02-18-general",
+            "election",
+            ECP_2008,
+            METHOD_2008,
+            elected,
+            notes,
         )
-        title = (
-            "2008 Pakistani National Assembly election"
-            if seat.prefix == "NA"
-            else f"2008 {assembly.label} Provincial Assembly election"
-        )
-        p.name(contest, f"{title}, {label}", "en", "official")
-        p.add("slug", path=f"pk/2008-02-18-general/{seat.code.lower()}", entity_id=contest, is_current=True)
-        result_set = key("result_set", "2008", seat.code)
-        p.add(
-            "result_set",
-            id=result_set,
-            election_id=election,
-            contest_id=contest,
-            stage="official",
-            kind="tacit" if seat.tacit else "counted",
-            source_id=ECP_2008,
-            status="active",
-            is_default=True,
-            completeness=None if seat.tacit else 1.0,
-        )
-        p.add(
-            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD_2008, lang="en"
-        )
-        for index, caveat in enumerate(caveats(seat, seat.code in elected, notified)):
-            p.add(
-                "note",
-                id=key("note", result_set, "caveat", index),
-                entity_id=result_set,
-                kind="caveat",
-                body_md=caveat,
-                lang="en",
-            )
-        unit = key("unit", "2008", seat.code)
-        if not seat.tacit:
-            p.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=PAKISTAN,
-                scheme_code=assembly.scheme,
-                code=f"2008-02-18:{seat.code}",
-                area_relation="unlocated",
-                kind="standard",
-            )
-            p.name(unit, label, "en", "official")
-            accounting = (
-                (REGISTERED, seat.totals["registered"]),
-                (CAST, seat.totals["total"]),
-                (INVALID, seat.totals["rejected"]),
-                (VALID, seat.totals["valid"]),
-            )
-            for measure, value in accounting:
-                if measure == REGISTERED and value == 0:
-                    continue  # printed as 0 where the figure is missing
-                put(p, result_set, unit, None, measure, value)
-                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-        for position, c in enumerate(seat.candidates, 1):
-            option = key("option", "2008", seat.code, position)
-            independent = c.party == "Independent"
-            person = key("person", "2008", seat.code, position)
-            p.add("person", id=person)
-            p.name(person, c.name, "en", "official")
-            p.add(
-                "contest_option",
-                id=option,
-                contest_id=contest,
-                kind="candidate",
-                ballot_position=position,
-                ballot_label=c.name,
-            )
-            p.add(
-                "candidacy",
-                id=key("candidacy", "2008", seat.code, position),
-                person_id=person,
-                option_id=option,
-                role="head",
-                ballot_name=c.name,
-                member_of_party_id=None if independent else party_id(c.party),
-                is_independent=independent,
-            )
-            if seat.code in elected:
-                kind = "elected" if elected[seat.code] is c else "withdrew" if c.retired else "lost"
-                p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
-            elif c.retired:
-                p.add("outcome", result_set_id=result_set, option_id=option, kind="withdrew")
-            if c.votes is not None:
-                put(p, result_set, unit, option, VOTES, c.votes)
-                p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=c.votes)
     for code, reason in ACCEPTED_2008.items():
         p.accept(code, reason)
     return p
@@ -998,7 +994,122 @@ ACCEPTED_2008 = {
 }
 
 
-def caveats(seat: Seat2008, has_winner: bool, notified: dict[str, Notified | None]) -> list[str]:
+def add_seat(
+    p: Package,
+    seat: Seat2008,
+    election: str,
+    tag: str,
+    tag_day: str,
+    slug: str,
+    noun: str,
+    source: str,
+    method: str,
+    elected: dict[str, Candidate2008],
+    notes: list[str],
+    year: int = 2008,
+) -> None:
+    assembly = ASSEMBLIES[seat.prefix]
+    contest = key("contest", tag, seat.code)
+    label = f"{seat.code} {seat.name}"
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="body_seats",
+        body_id=assembly.body,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=SYSTEM,
+        default_result_kind="tacit" if seat.tacit else "counted",
+    )
+    title = (
+        f"{year} Pakistani National Assembly {noun}"
+        if seat.prefix == "NA"
+        else f"{year} {assembly.label} Provincial Assembly {noun}"
+    )
+    p.name(contest, f"{title}, {label}", "en", "official")
+    p.add("slug", path=f"{slug}/{seat.code.lower()}", entity_id=contest, is_current=True)
+    result_set = key("result_set", tag, seat.code)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="tacit" if seat.tacit else "counted",
+        source_id=source,
+        status="active",
+        is_default=True,
+        completeness=None if seat.tacit else 1.0,
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+    for index, caveat in enumerate(notes):
+        p.add(
+            "note",
+            id=key("note", result_set, "caveat", index),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=caveat,
+            lang="en",
+        )
+    unit = key("unit", tag, seat.code)
+    if not seat.tacit:
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=PAKISTAN,
+            scheme_code=assembly.scheme,
+            code=f"{tag_day}:{seat.code}",
+            area_relation="unlocated",
+            kind="standard",
+        )
+        p.name(unit, label, "en", "official")
+        accounting = (
+            (REGISTERED, seat.totals["registered"]),
+            (CAST, seat.totals["total"]),
+            (INVALID, seat.totals["rejected"]),
+            (VALID, seat.totals["valid"]),
+        )
+        for measure, value in accounting:
+            if measure == REGISTERED and value == 0:
+                continue  # printed as 0 where the figure is missing
+            put(p, result_set, unit, None, measure, value)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    for position, c in enumerate(seat.candidates, 1):
+        option = key("option", tag, seat.code, position)
+        independent = c.party == "Independent"
+        person = key("person", tag, seat.code, position)
+        p.add("person", id=person)
+        p.name(person, c.name, "en", "official")
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            ballot_position=position,
+            ballot_label=c.name,
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", tag, seat.code, position),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=c.name,
+            member_of_party_id=None if independent else party_id(c.party),
+            is_independent=independent,
+        )
+        if seat.code in elected:
+            kind = "elected" if elected[seat.code] is c else "withdrew" if c.retired else "lost"
+            p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+        elif c.retired:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="withdrew")
+        if c.votes is not None:
+            put(p, result_set, unit, option, VOTES, c.votes)
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=c.votes)
+
+
+def caveats(seat: Seat2008, has_winner: bool, notified: dict[str, Notified | None], bye: bool = False) -> list[str]:
     found: list[str] = []
     if not seat.tacit:
         votes = sum(c.votes or 0 for c in seat.candidates)
@@ -1020,7 +1131,12 @@ def caveats(seat: Seat2008, has_winner: bool, notified: dict[str, Notified | Non
             )
     else:
         found.append("The only candidate was returned unopposed, so no poll was held.")
-    if not has_winner:
+    if not has_winner and not seat.tacit and bye:
+        found.append(
+            "The Commission's notification of the candidate returned from this poll is not among the files used "
+            "here, so no winner is stored for this constituency."
+        )
+    elif not has_winner:
         if seat.prefix == "PS":
             found.append(
                 "The Commission's notification of the candidates returned to the Provincial Assembly of Sindh is "
@@ -1048,3 +1164,103 @@ def put(p: Package, result_set: str, unit: str, option: str | None, measure: int
         flags=0,
         value=value,
     )
+
+
+def bye_seats() -> list[Seat2008]:
+    """The seats of the 26 June 2008 polls: those the by-election pages print, and the later polls the general pages
+    print, among the constituencies the Commission's release lists."""
+    found = {seat.code: seat for seat in general_seats(True) if seat.code in POLLED_BYE}
+    for seat in general_seats():
+        if seat.code in NOT_POLLED and seat.code in POLLED_BYE and seat.code not in found:
+            found[seat.code] = seat
+    order = list(ASSEMBLIES)
+    return sorted(found.values(), key=lambda s: (order.index(s.prefix), s.number))
+
+
+def build_bye_2008() -> Package:
+    p = Package(
+        "pk.ecp/2008-06-26",
+        SOURCE,
+        "The Pakistani by-elections of 26 June 2008 to the National Assembly and the provincial assemblies, by "
+        "constituency, from the Election Commission's second report volume on the 2008 general elections",
+        depends=["pk.ecp/registry"],
+    )
+    p.external.add(PAKISTAN)
+    for url in (VOLUME, *BYE_FILES):
+        p.uses(raw.cached(SOURCE, url))
+    p.add(
+        "source",
+        id=ECP_BYE_2008,
+        kind="official_body",
+        publisher="Election Commission of Pakistan",
+        title="Bye-elections of 2008: schedules, press releases, and notifications",
+        url=SITE + "election-commission-issues-schedule-for-the-conduct-of-bye-elections-2008",
+        license="Official publication; reuse terms are not stated",
+        attribution="Election Commission of Pakistan",
+    )
+    for url in BYE_FILES:
+        p.artifact(raw.cached(SOURCE, url), ECP_BYE_2008)
+    seats = bye_seats()
+    by_code = {s.code: s for s in seats}
+    elected: dict[str, Candidate2008] = {s.code: s.candidates[0] for s in seats if s.tacit}
+    for code, (name, father) in RETURNED_BYE.items():
+        elected[code] = winner(by_code[code], Notified(name, father))
+    election = key("election", "2008-06-26")
+    p.add(
+        "election",
+        id=election,
+        polity_id=PAKISTAN,
+        kind="by_election",
+        date_from=BYE_DAY,
+        date_to=BYE_DAY,
+        status="held",
+    )
+    p.add("slug", path="pk/2008-06-26-by-election", entity_id=election, is_current=True)
+    p.name(election, "2008 Pakistani by-elections", "en", "official")
+    p.add(
+        "note",
+        id=key("note", election, "context"),
+        entity_id=election,
+        kind="context",
+        body_md="The Commission scheduled these by-elections, and the fresh elections that replaced the polls "
+        "terminated on a candidate's death in the general election of 18 February 2008, for 18 June 2008, then "
+        "revised the schedule. Its press release of 17 May 2008 gives 26 June 2008 as the day of the polls. The "
+        "volume prints a result for the constituencies stored here; for the others in the release, and for NA-37, "
+        "NA-42, NA-210, and PP-250, it prints none or a poll on another day.",
+        lang="en",
+    )
+    for seat in seats:
+        notes = caveats(seat, seat.code in elected, {}, bye=True)
+        add_seat(
+            p,
+            seat,
+            election,
+            "2008-06-26",
+            "2008-06-26",
+            "pk/2008-06-26-by-election",
+            "by-election",
+            ECP_2008,
+            METHOD_BYE,
+            elected,
+            notes,
+        )
+    for code, reason in ACCEPTED_BYE.items():
+        p.accept(code, reason)
+    return p
+
+
+METHOD_BYE = (
+    "Counted and published by constituency by the Election Commission of Pakistan in the second volume of its report "
+    "on the 2008 general elections. Valid votes are the votes polled by the candidates, total votes are valid and "
+    "rejected votes together, and registered voters are the voters on the electoral roll of the constituency. The "
+    "volume does not publish the count of each polling station. The polling day is the one given in the "
+    "Commission's press release of 17 May 2008."
+)
+ACCEPTED_BYE = {
+    "accounting.votes_valid": "In PP-59, PP-124, PP-154, PP-258, and PF-91 the candidates' votes printed in the "
+    "Commission's volume do not sum to the valid votes it prints for them; both are stored as printed, with a "
+    "caveat on each.",
+    "accounting.ballots_sum": "In PP-107, PP-124, and PP-258 the printed valid and rejected votes do not sum to the "
+    "printed total votes (PP-124 prints a total equal to its valid votes); all three are stored as printed, with a "
+    "caveat on each.",
+}
