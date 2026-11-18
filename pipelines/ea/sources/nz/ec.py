@@ -201,6 +201,9 @@ def fetch() -> None:
     from ea.sources.nz import ecby
 
     ecby.fetch()
+    from ea.sources.nz import ecref
+
+    ecref.fetch()
 
 
 def split_saved() -> None:
@@ -818,9 +821,9 @@ def has_referendums() -> bool:
 def packages() -> list[str]:
     held = [f"nz.ec/{REFERENDUM_DAY}"] if has(REFERENDUM_URL) else []
     more = [*([LISTS_KEY] if has_lists() else []), *([REFERENDUMS_KEY] if has_referendums() else [])]
-    from ea.sources.nz import ecby
+    from ea.sources.nz import ecby, ecref
 
-    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *more, *ecby.packages()]
+    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *more, *ecby.packages(), *ecref.packages()]
 
 
 def parse() -> None:
@@ -837,6 +840,9 @@ def parse() -> None:
     from ea.sources.nz import ecby
 
     ecby.parse()
+    from ea.sources.nz import ecref
+
+    ecref.parse()
 
 
 def emit() -> None:
