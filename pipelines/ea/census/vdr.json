@@ -1,0 +1,570 @@
+{
+  "polity": "VDR",
+  "name": "Democratic Republic of Vietnam",
+  "sources": {
+    "cp-1945": {
+      "title": "I- Từ Ủy ban Dân tộc giải phóng đến Chính phủ lâm thời nước Việt Nam Dân chủ Cộng hòa (Lịch sử Chính phủ, giai đoạn 1945-1954)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/i-tu-uy-ban-dan-toc-giai-phong-den-chinh-phu-lam-thoi-nuoc-viet-nam-dan-chu-cong-hoa-10001588",
+      "kind": "official_body",
+      "note": "The Government's own history of its first months: the Provisional Government's proclamation in Ba Đình Square on 2 September 1945, the decree of 8 September 1945 calling the general election, Decree 51-SL of 17 October 1945 on its rules, Decree 63-SL of 22 November 1945 on the People's Councils and Administrative Committees, and Decree 76-SL of 18 December 1945 moving the poll to 6 January 1946."
+    },
+    "cp-1946": {
+      "title": "III- Tổng tuyển cử - Thành lập Chính phủ liên hiệp kháng chiến (Lịch sử Chính phủ, giai đoạn 1945-1954)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/iii-tong-tuyen-cu-thanh-lap-chinh-phu-lien-hiep-khang-chien-10001589",
+      "kind": "official_body"
+    },
+    "cp-1946-hp": {
+      "title": "IV- Thông qua Hiến pháp đầu tiên của nước Việt Nam Dân chủ Cộng hòa và thành lập Chính phủ mới (Lịch sử Chính phủ, giai đoạn 1945-1954)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/iv-thong-qua-hien-phap-dau-tien-cua-nuoc-viet-nam-dan-chu-cong-hoa-va-thanh-lap-chinh-phu-moi-10001590",
+      "kind": "official_body"
+    },
+    "cp-1955": {
+      "title": "1 - Hoàn thành cải cách ruộng đất và khôi phục kinh tế quốc dân (1955-1957) (Lịch sử Chính phủ, giai đoạn 1955-1975)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1955-1975-xay-dung-cnxh-va-dau-tranh-thong-nhat-dat-nuoc/1-hoan-thanh-cai-cach-ruong-dat-va-khoi-phuc-kinh-te-quoc-dan-1955-1957-10001592",
+      "kind": "official_body"
+    },
+    "cp-1958": {
+      "title": "2 - Hoàn thành cải tạo xã hội chủ nghĩa, bước đầu phát triển kinh tế và văn hóa, đưa miền Bắc vào thời kỳ quá độ (Lịch sử Chính phủ, giai đoạn 1955-1975)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1955-1975-xay-dung-cnxh-va-dau-tranh-thong-nhat-dat-nuoc/2-hoan-thanh-cai-tao-xa-hoi-chu-nghia-buoc-dau-phat-trien-kinh-te-va-van-hoa-dua-mien-bac-vao-th-10001575",
+      "kind": "official_body",
+      "note": "Covers the 11th session of the First Assembly (18 to 31 December 1959: the 1959 Constitution and the National Assembly Election Law), the first sessions of the Second (7 to 15 July 1960) and Third (27 June to 3 July 1964) Assemblies with the officers each elected, and the 5th session of the Second Assembly (23 to 27 October 1962: the Law on the Organization of People's Councils and Administrative Committees, and the renaming of the Thái-Mèo autonomous zone as Tây Bắc)."
+    },
+    "cp-1969": {
+      "title": "4 - Khôi phục kinh tế và đánh thắng chiến tranh phá hoại lần thứ hai của Mỹ (Lịch sử Chính phủ, giai đoạn 1955-1975)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1955-1975-xay-dung-cnxh-va-dau-tranh-thong-nhat-dat-nuoc/4-khoi-phuc-kinh-te-va-danh-thang-chien-tranh-pha-hoai-lan-thu-hai-cua-my-10001593",
+      "kind": "official_body"
+    },
+    "cp-1975": {
+      "title": "5 - Khôi phục và phát triển kinh tế, dồn sức chi viện cho miền Nam (Lịch sử Chính phủ, giai đoạn 1955-1975)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1955-1975-xay-dung-cnxh-va-dau-tranh-thong-nhat-dat-nuoc/5-khoi-phuc-va-phat-trien-kinh-te-don-suc-chi-vien-cho-mien-nam-2871",
+      "kind": "official_body"
+    },
+    "cp-1976": {
+      "title": "I- Chính phủ nhiệm kỳ Quốc hội khóa VI (1976-1981) (Lịch sử Chính phủ, giai đoạn 1976-1985)",
+      "publisher": "Cổng Thông tin điện tử Chính phủ (Government of Vietnam portal)",
+      "url": "https://chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892",
+      "kind": "official_body",
+      "note": "The general election of 25 April 1976 and the first session of the Sixth Assembly (24 June to 3 July 1976), which named the reunified state the Socialist Republic of Vietnam."
+    },
+    "na-terms": {
+      "title": "Vài nét về Quốc hội nước CHXHCN Việt Nam (the National Assembly's terms I to XII, with the date and deputies of each election)",
+      "publisher": "Báo Điện tử Chính phủ (Government of Vietnam)",
+      "url": "https://baochinhphu.vn/vai-net-ve-quoc-hoi-nuoc-chxhcn-viet-nam-10271664.htm",
+      "kind": "official_body"
+    },
+    "ipu-arc": {
+      "title": "PARLINE database: Viet Nam, historical archive of parliamentary election results",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline-e/reports/2349_arc.htm",
+      "kind": "compendium",
+      "note": "Lists the 1975 election under the Democratic Republic of Viet Nam and the elections from 1976 under the reunified state: \"Viet Nam was reunified in 1976. The following election results refer to the parliaments in the Democratic Republic of Viet Nam and the Republic of Viet Nam.\""
+    },
+    "ipu-1975": {
+      "title": "Chronicle of Parliamentary Elections IX (1 July 1974 to 30 June 1975), Democratic Republic of Viet-Nam: elections of 6 April 1975",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM_1975_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu-1976": {
+      "title": "Chronicle of Parliamentary Elections, Socialist Republic of Viet Nam: elections of 25 April 1976",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM_1976.PDF",
+      "kind": "compendium"
+    },
+    "hp-1946": {
+      "title": "Hiến pháp năm 1946 (Constitution of the Democratic Republic of Vietnam, 9 November 1946)",
+      "publisher": "LuatVietnam (text of the Constitution as adopted by the National Assembly)",
+      "url": "https://luatvietnam.vn/tu-phap/hien-phap-nam-1946-29476-d1.html",
+      "kind": "compendium"
+    },
+    "sl-63": {
+      "title": "Sắc lệnh số 63-SL ngày 22 tháng 11 năm 1945 về tổ chức các Hội đồng nhân dân và Uỷ ban hành chính",
+      "publisher": "LuatVietnam (text of the decree of the President of the Provisional Government)",
+      "url": "https://luatvietnam.vn/linh-vuc-khac/sac-lenh-63-sl-chu-tich-nuoc-67-d1.html",
+      "kind": "compendium"
+    },
+    "luat-1959": {
+      "title": "Luật bầu cử đại biểu Quốc hội nước Việt Nam dân chủ cộng hoà, số 3-SL (31 December 1959)",
+      "publisher": "LuatVietnam (text of the law as adopted by the National Assembly)",
+      "url": "https://luatvietnam.vn/linh-vuc-khac/luat-3-sl-quoc-hoi-988-d1.html",
+      "kind": "compendium"
+    },
+    "luat-1962": {
+      "title": "Luật tổ chức Hội đồng nhân dân và Uỷ ban hành chính các cấp, số 51-LCT (27 October 1962)",
+      "publisher": "LuatVietnam (text of the law as adopted by the National Assembly)",
+      "url": "https://luatvietnam.vn/linh-vuc-khac/luat-51-lct-quoc-hoi-1011-d1.html",
+      "kind": "compendium"
+    },
+    "nq-56-1961": {
+      "title": "Nghị quyết số 56-NQ/TVQH ngày 29 tháng 7 năm 1961 quy định thời gian bầu cử Hội đồng nhân dân khoá II các cấp châu, xã và thị trấn thuộc khu tự trị Thái - Mèo",
+      "publisher": "LuatVietnam (text of the resolution of the Standing Committee of the National Assembly)",
+      "url": "https://luatvietnam.vn/linh-vuc-khac/nghi-quyet-56-nq-tvqh-uy-ban-thuong-vu-quoc-hoi-1000-d1.html",
+      "kind": "compendium"
+    },
+    "qlnn-2021": {
+      "title": "Quyền lực nhà nước của hội đồng nhân dân quận qua các bản Hiến pháp từ năm 1946 đến nay",
+      "publisher": "Tạp chí Quản lý nhà nước, Học viện Hành chính Quốc gia (State Management Review, National Academy of Public Administration)",
+      "url": "https://www.quanlynhanuoc.vn/2021/07/14/quyen-luc-nha-nuoc-cua-hoi-dong-nhan-dan-quan-qua-cac-ban-hien-phap-tu-nam-1946-den-nay/",
+      "kind": "academic"
+    },
+    "dbnd-nghean": {
+      "title": "80 năm Ngày bầu cử đầu tiên của HĐND tỉnh Nghệ An (24/2/1946 – 24/2/2026)",
+      "publisher": "Báo Đại biểu Nhân dân, cơ quan của Quốc hội (People's Deputies, the National Assembly's newspaper)",
+      "url": "https://daibieunhandan.vn/80-nam-ngay-bau-cu-dau-tien-cua-hdnd-tinh-nghe-an-24-2-1946-24-2-2026-ghi-dau-hanh-trinh-hinh-thanh-va-phat-trien-cua-mot-thiet-che-quyen-luc-nha-nuoc-o-dia-phuong-10403306.html",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Việt Nam Dân chủ Cộng hòa",
+      "name_en": "Democratic Republic of Vietnam",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1945-09-02",
+      "valid_to": "1976-07-02",
+      "source": "cp-1945"
+    },
+    {
+      "key": "bo",
+      "name": "Bộ (Kỳ): Bắc Bộ, Trung Bộ, Nam Bộ",
+      "name_en": "Regions (Bắc Bộ, Trung Bộ, Nam Bộ), with administrative committees only",
+      "parent": "national",
+      "elects": false,
+      "valid_from": "1945-11-22",
+      "source": "sl-63"
+    },
+    {
+      "key": "khu_tu_tri",
+      "name": "Khu tự trị: Thái - Mèo (Tây Bắc), Việt Bắc",
+      "name_en": "Autonomous zones (Thái-Mèo, renamed Tây Bắc in 1962, and Việt Bắc)",
+      "parent": "national",
+      "valid_to": "1975-12-27",
+      "source": "cp-1975"
+    },
+    {
+      "key": "tinh",
+      "name": "Tỉnh, thành phố trực thuộc trung ương",
+      "name_en": "Provinces and centrally governed cities",
+      "parent": "national",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "source": "sl-63"
+    },
+    {
+      "key": "huyen",
+      "name": "Huyện, châu, thị xã, thành phố thuộc tỉnh, khu phố",
+      "name_en": "Districts, provincial towns and cities, and urban wards",
+      "parent": "tinh",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "source": "luat-1962"
+    },
+    {
+      "key": "xa",
+      "name": "Xã, thị trấn",
+      "name_en": "Communes and townships",
+      "parent": "huyen",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "source": "sl-63"
+    }
+  ],
+  "classes": [
+    {
+      "key": "quoc_hoi",
+      "tier": "national",
+      "name": "Bầu cử đại biểu Quốc hội nước Việt Nam Dân chủ Cộng hòa",
+      "name_en": "National Assembly, directly elected",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1945-09-08",
+      "valid_to": "1976-04-25",
+      "first_held": "1946-01-06",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "electoral unit (đơn vị bầu cử): a province, centrally governed city, undivided zone, or industrial area electing one deputy per 50,000 inhabitants, divided when it had ten or more seats (1959 law, arts. 11 and 13); 85 units in 1975",
+      "source": "luat-1959",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/luat-3-sl-quoc-hoi-988-d1.html (Điều 1: phổ thông, bình đẳng, trực tiếp và bỏ phiếu kín; Điều 11: cứ năm vạn dân được cử một đại biểu; Điều 13: đơn vị bầu cử là tỉnh, thành phố trực thuộc trung ương, khu; Điều 50: quá nửa số phiếu hợp lệ; Điều 51-52: bầu thêm, bầu lại trong mười lăm ngày)",
+      "note": "Five general elections. The first, on 6 January 1946 under Decree 51-SL of 17 October 1945, was held across the whole country and elected 333 deputies; the Assembly then added 70 unelected seats for two nationalist parties (class quoc_hoi_ghe_bo_sung). The 1946 Constitution set a three-year term (art. 24), but war kept the First Assembly in office until 1960. From 1960 the elections, under the 1959 Constitution and the Election Law of 31 December 1959, were held in the north only, and the First Assembly's southern deputies kept their seats (91 in 1960, 87 in 1964). The Third Assembly, elected in 1964, sat until 1971. Each unit elected several deputies by block vote: a candidate needed more than half the valid ballots, unfilled seats went to a further ballot within fifteen days among the unsuccessful candidates, and a unit where no more than half the registered voters voted voted again (arts. 50-52). The Election Council's national report listed the voters, valid and invalid ballots, and each winner's votes (art. 54); it was printed, not published online. Candidates came from the Fatherland Front's lists. The Vietnam census (VN) also lists these five elections as the first terms of the present Assembly.",
+      "disposition": "blocked",
+      "disposition_reason": "The Election Council's reports with each winner's votes by electoral unit were printed in the official gazette and the press; no official digital copy was found. The National Assembly's site and digital library (quochoi.vn, thuvienso.quochoi.vn) refused scripted requests on 2026-11-18. The IPU gives national totals for 1975 only.",
+      "match": [
+        {
+          "election_kinds": ["general", "by_election"],
+          "body_kinds": ["unicameral"],
+          "iso_pattern": "VDR"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "valid_from": "1960-01-01",
+          "valid_to": "1976-04-25",
+          "administered_by": "Hội đồng bầu cử (Election Council), with an election board (Ban bầu cử) in each electoral unit",
+          "source": "ipu-1975",
+          "runoff": "majority",
+          "runoff_rule": "A candidate needs more than half the valid ballots; unfilled seats go to a further ballot within fifteen days, decided by plurality, and a unit where no more than half the registered voters voted votes again (1959 law, arts. 50-53)",
+          "vacancy_rule": "By-election called by the Standing Committee of the National Assembly (1959 law, art. 55)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "IPU PARLINE archive, Chronicle of Parliamentary Elections",
+          "url": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM_1975_E.PDF",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "first_date": "1975-04-06",
+          "last_date": "1975-04-06",
+          "role": "publishes",
+          "evidence": "National totals of the 6 April 1975 election: 10,855,644 registered voters, 10,667,171 voting (98.26%), 105,807 blank or void ballots, 10,561,364 valid votes, and 424 Fatherland Front deputies in 85 constituencies; no figures by constituency.",
+          "source": "ipu-1975"
+        },
+        {
+          "platform": "Quốc hội Việt Nam (quochoi.vn)",
+          "url": "https://quochoi.vn/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "role": "administers",
+          "evidence": "On 2026-11-18 quochoi.vn returned a JavaScript cookie challenge and its digital library (thuvienso.quochoi.vn) a 403 to a scripted request; not bypassed."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-06",
+          "election_kind": "general",
+          "seats": 333,
+          "source": "cp-1946",
+          "quote": "Ngày 6-1-1946, cuộc Tổng tuyển cử đầu tiên diễn ra trên đất nước Việt Nam. ... Hơn 90% tổng số cử tri đã đi bỏ phiếu. Nhân dân cả nước đã bầu 333 đại biểu vào Quốc hội đầu tiên của nước Việt Nam Dân chủ Cộng hoà.",
+          "note": "Called by the decree of 8 September 1945 and Decree 51-SL of 17 October 1945 for 23 December 1945, and moved to 6 January 1946 by Decree 76-SL of 18 December 1945."
+        },
+        {
+          "date": "1960-05-08",
+          "election_kind": "general",
+          "seats": 362,
+          "source": "na-terms",
+          "quote": "Bầu ngày 8/5/1960, gồm 453 đại biểu (362 đại biểu được bầu, 91 đại biểu Khóa I của Miền Nam được lưu nhiệm)."
+        },
+        {
+          "date": "1964-04-26",
+          "election_kind": "general",
+          "seats": 366,
+          "source": "na-terms",
+          "quote": "Bầu ngày 26/4/1964, gồm 453 đại biểu: 366 đại biểu được bầu, 87 đại biểu Khóa I của Miền Nam được lưu nhiệm."
+        },
+        {
+          "date": "1971-04-11",
+          "election_kind": "general",
+          "seats": 420,
+          "source": "na-terms",
+          "quote": "Bầu ngày 11 tháng 4 năm 1971, gồm 420 đại biểu."
+        },
+        {
+          "date": "1975-04-06",
+          "election_kind": "general",
+          "contests": 85,
+          "seats": 424,
+          "source": "ipu-1975",
+          "quote": "Date of Elections: April 6, 1975 ... composed of 424 members elected for 4 years ... Deputies are chosen within the country's 85 electoral constituencies"
+        }
+      ],
+      "est_votes": 45000000,
+      "effort": 4
+    },
+    {
+      "key": "quoc_hoi_ghe_bo_sung",
+      "tier": "national",
+      "name": "70 ghế bổ sung Quốc hội khóa I (Việt Nam Quốc dân đảng, Việt Nam Cách mệnh đồng minh hội)",
+      "name_en": "The 70 seats added to the First National Assembly without election",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1946-03-02",
+      "valid_to": "1946-03-03",
+      "first_held": "1946-03-02",
+      "measure": {},
+      "source": "cp-1946",
+      "locator": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/iii-tong-tuyen-cu-thanh-lap-chinh-phu-lien-hiep-khang-chien-10001589 (Ngày 2-3-1946 ... Quốc hội đã thông qua danh sách 70 đại biểu của Việt Nam Quốc dân đảng và Việt Nam Cách mệnh đồng minh hội bổ sung vào Quốc hội)",
+      "note": "50 seats for the Việt Nam Quốc dân đảng and 20 for the Việt Nam Cách mạng Đồng minh hội, giving the First Assembly 403 members (na-terms).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Filled by the Assembly's approval of a list on 2 March 1946, not by voters.",
+      "match": []
+    },
+    {
+      "key": "chu_tich_nuoc",
+      "tier": "national",
+      "name": "Bầu Chủ tịch nước Việt Nam Dân chủ Cộng hòa",
+      "name_en": "President, elected by the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1946-03-02",
+      "valid_to": "1976-07-02",
+      "first_held": "1946-03-02",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hp-1946",
+      "locator": "https://luatvietnam.vn/tu-phap/hien-phap-nam-1946-29476-d1.html (Điều thứ 45: Chủ tịch nước Việt Nam dân chủ cộng hoà chọn trong Nghị viện nhân dân và phải được hai phần ba tổng số nghị viện bỏ phiếu thuận)",
+      "note": "The Assembly elected Hồ Chí Minh chairman of the Government on 2 March 1946 (cp-1946) and President at the first sessions of the Second (July 1960) and Third (June to July 1964) Assemblies (cp-1958); after his death it elected Tôn Đức Thắng on 23 September 1969, and re-elected him in June 1971 and June 1975 (cp-1969, cp-1975).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the National Assembly; there was no popular vote.",
+      "match": []
+    },
+    {
+      "key": "chinh_phu_quoc_hoi",
+      "tier": "national",
+      "name": "Bầu Thủ tướng, Ủy ban Thường vụ Quốc hội và các chức vụ do Quốc hội bầu",
+      "name_en": "Prime Minister, Standing Committee, and other officers elected by the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1946-03-02",
+      "valid_to": "1976-07-02",
+      "first_held": "1946-03-02",
+      "measure": {},
+      "source": "cp-1958",
+      "locator": "https://chinhphu.vn/giai-doan-1955-1975-xay-dung-cnxh-va-dau-tranh-thong-nhat-dat-nuoc/2-hoan-thanh-cai-tao-xa-hoi-chu-nghia-buoc-dau-phat-trien-kinh-te-va-van-hoa-dua-mien-bac-vao-th-10001575 (Từ ngày 7 đến ngày 15-7-1960, Kỳ họp thứ nhất Quốc hội khoá II đã bầu: ... Chủ tịch Ủy ban Thường vụ Quốc hội: Ông Trường-Chinh. Thủ tướng Chính phủ: Ông Phạm Văn Đồng)",
+      "note": "Each Assembly's first session elected the Vice President, the chair and members of its Standing Committee (from 1946 the Standing Bureau), and the Prime Minister.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the National Assembly, not by voters.",
+      "match": []
+    },
+    {
+      "key": "phuc_quyet",
+      "tier": "national",
+      "name": "Phúc quyết toàn dân",
+      "name_en": "National referendum (popular ratification)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1946-11-09",
+      "valid_to": "1976-07-02",
+      "measure": {},
+      "source": "hp-1946",
+      "locator": "https://luatvietnam.vn/tu-phap/hien-phap-nam-1946-29476-d1.html (Điều thứ 21: Nhân dân có quyền phúc quyết về Hiến pháp và những việc quan hệ đến vận mệnh quốc gia; Điều thứ 32: nếu hai phần ba tổng số nghị viên đồng ý; Điều thứ 70: những điều thay đổi khi đã được Nghị viện ưng chuẩn thì phải đưa ra toàn dân phúc quyết)",
+      "note": "The 1946 Constitution required a referendum for constitutional amendments and allowed one on matters of national destiny by a two-thirds vote of the Assembly, under a law that was never passed. The 1959 Constitution was adopted by the Assembly itself on 31 December 1959 (cp-1958).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No referendum was held under the Democratic Republic.",
+      "match": []
+    },
+    {
+      "key": "uy_ban_hanh_chinh_bo",
+      "tier": "bo",
+      "name": "Bầu Ủy ban hành chính Bộ (Kỳ) và Ủy ban hành chính huyện",
+      "name_en": "Regional and district administrative committees, elected by council members",
+      "category": "indirect",
+      "goal": "subnational",
+      "valid_from": "1945-11-22",
+      "measure": {},
+      "source": "sl-63",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/sac-lenh-63-sl-chu-tich-nuoc-67-d1.html (Ở hai cấp xã và tỉnh có Hội đồng nhân dân và Uỷ ban hành chính ở các cấp huyện và kỳ chỉ có Uỷ ban hành chính; Điều thứ 23: Uỷ ban hành chính cấp huyện do hội viên các Hội đồng nhân dân xã trong huyện bầu ra; Điều thứ 53: Uỷ ban hành chính kỳ do hội viên các Hội đồng nhân dân tỉnh trong kỳ bầu ra)",
+      "note": "Under Decree 63-SL the regions (Bắc, Trung, and Nam Bộ) and districts had no council; their administrative committees were elected by the members of the provincial and commune councils within them. In the war years the regions gave way to resistance zones (November 1946, cp-1946-hp), and the regional level was abolished under the 1959 Constitution (qlnn-2021).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by council members, not by voters.",
+      "match": []
+    },
+    {
+      "key": "hdnd_khu_tu_tri",
+      "tier": "khu_tu_tri",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân khu tự trị",
+      "name_en": "Autonomous zone People's Councils",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_to": "1975-12-27",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "luat-1962",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/luat-51-lct-quoc-hoi-1011-d1.html (Điều 1: Nước chia thành tỉnh, thành phố trực thuộc trung ương, khu tự trị ... Các đơn vị hành chính kể trên đều có Hội đồng nhân dân và Uỷ ban hành chính; Điều 4: Nhiệm kỳ của mỗi khoá Hội đồng nhân dân ... khu tự trị là ba năm)",
+      "note": "Two autonomous zones: Thái-Mèo in the northwest, formed under Decree 230-SL of 29 April 1955 and renamed Tây Bắc on 27 October 1962 (cp-1958), and Việt Bắc, formed on 1 July 1956 from Cao Bằng, Lạng Sơn, Bắc Cạn, Tuyên Quang, and Thái Nguyên (cp-1955). The 2nd session of the Fifth Assembly (22 to 27 December 1975) abolished the zone level (cp-1975).",
+      "disposition": "blocked",
+      "disposition_reason": "Results were announced by the zones' election committees and printed locally; no official digital copy was found.",
+      "match": [],
+      "dates": [
+        {
+          "date": "1955-01-01",
+          "precision": "year",
+          "through": "1975-12-27",
+          "note": "Zone council elections not yet counted here."
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "key": "hdnd_tinh",
+      "tier": "tinh",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân tỉnh, thành phố",
+      "name_en": "Provincial and city People's Councils",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "first_held": "1946-01-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "sl-63",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/sac-lenh-63-sl-chu-tich-nuoc-67-d1.html (Hội đồng nhân dân do dân bầu ra theo lối phổ thông và trực tiếp đầu phiếu; Điều thứ 33: Đơn vị tuyển cử là huyện; Điều thứ 37: Thời hạn làm việc của các Hội đồng nhân dân tỉnh là 2 năm)",
+      "note": "Provincial councils were first elected in early 1946 under Decree 63-SL, by district constituencies, for two years (Nghệ An voted on 24 February 1946 and elected 39 deputies, dbnd-nghean); Decree 77-SL of 21 December 1945 extended the councils to the cities. The 1962 law gave provincial, city, and zone councils three-year terms (art. 4), with elections under the Ordinance on People's Council Elections of 23 January 1961 (nq-56-1961).",
+      "disposition": "blocked",
+      "disposition_reason": "Each province's election committee announced its winners locally; no official digital copy of the results of any provincial council election of the period was found.",
+      "match": [
+        {
+          "election_kinds": ["general", "local", "by_election"],
+          "body_kinds": ["council", "unicameral"],
+          "polity_kinds": ["region"]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "through": "1976-07-02",
+          "note": "Provincial and city council elections not yet counted here."
+        }
+      ],
+      "est_votes": 40000000,
+      "effort": 5
+    },
+    {
+      "key": "uy_ban_hanh_chinh",
+      "tier": "tinh",
+      "name": "Hội đồng nhân dân bầu Ủy ban hành chính và Tòa án nhân dân",
+      "name_en": "Administrative committees and local people's courts, elected by the People's Councils",
+      "category": "indirect",
+      "goal": "subnational",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "measure": {},
+      "source": "luat-1962",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/luat-51-lct-quoc-hoi-1011-d1.html (Điều 3: Uỷ ban hành chính do Hội đồng nhân dân bầu ra; Hội đồng nhân dân các cấp bầu ra Uỷ ban hành chính và Toà án nhân dân cấp mình)",
+      "note": "Every council elected its administrative committee (Decree 63-SL, arts. 13 and 43), and from the 1959 Constitution also the president and judges of the people's court at its level.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Chosen by the councils, not by voters.",
+      "match": []
+    },
+    {
+      "key": "hdnd_huyen",
+      "tier": "huyen",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân huyện, châu, thị xã, khu phố",
+      "name_en": "District, town, and urban ward People's Councils",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1960-01-01",
+      "valid_to": "1976-07-02",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "qlnn-2021",
+      "locator": "https://www.quanlynhanuoc.vn/2021/07/14/quyen-luc-nha-nuoc-cua-hoi-dong-nhan-dan-quan-qua-cac-ban-hien-phap-tu-nam-1946-den-nay/ (Điều 78 và Điều 79 Hiến pháp năm 1959 quy định ... Tại các đơn vị hành chính đều thành lập HĐND và UBHC; các thành phố có thể chia thành khu phố có HĐND và UBHC)",
+      "note": "Districts had no council under Decree 63-SL. The 1959 Constitution gave every administrative unit a council, and the 1962 law set a two-year term for all councils below the province (art. 4). In the Thái-Mèo zone the districts were called châu; their second councils were elected in October 1961 (nq-56-1961).",
+      "disposition": "blocked",
+      "disposition_reason": "Results were announced locally by each district's election committee; no official digital copy was found.",
+      "match": [],
+      "dates": [
+        {
+          "date": "1960-01-01",
+          "precision": "year",
+          "through": "1976-07-02",
+          "note": "District, town, and ward council elections not yet counted here."
+        }
+      ],
+      "est_votes": 80000000,
+      "effort": 5
+    },
+    {
+      "key": "hdnd_xa",
+      "tier": "xa",
+      "name": "Bầu cử đại biểu Hội đồng nhân dân xã, thị trấn",
+      "name_en": "Commune and township People's Councils",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1945-11-22",
+      "valid_to": "1976-07-02",
+      "first_held": "1946-01-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "sl-63",
+      "locator": "https://luatvietnam.vn/linh-vuc-khac/sac-lenh-63-sl-chu-tich-nuoc-67-d1.html (Điều thứ 3: Tất cả những công dân Việt Nam, 18 tuổi trở lên ... đều có quyền bầu cử Hội đồng nhân dân hàng xã; Điều thứ 6: Thời hạn làm việc của các Hội đồng nhân dân hàng xã là 2 năm. Nhưng khoá đầu thời hạn làm việc ... chỉ có một năm thôi)",
+      "note": "Commune councils were elected by all residents aged 18 and over for two years (one for the first term), on dates set by the Minister of the Interior (art. 5), with the provincial committee ruling on their validity (art. 11). The 1962 law kept the two-year term (art. 4).",
+      "disposition": "blocked",
+      "disposition_reason": "Results were posted in each commune and reported up to the province; no source gathers them.",
+      "match": [
+        {
+          "election_kinds": ["general", "local", "by_election"],
+          "body_kinds": ["council"],
+          "polity_kinds": ["municipality"]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "through": "1976-07-02",
+          "note": "Commune council elections not yet counted here."
+        }
+      ],
+      "est_votes": 120000000,
+      "effort": 5
+    },
+    {
+      "key": "tong_tuyen_cu_1976",
+      "tier": "national",
+      "name": "Tổng tuyển cử bầu Quốc hội chung của nước Việt Nam thống nhất (25-4-1976)",
+      "name_en": "General election of the National Assembly of reunified Vietnam, 25 April 1976",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1976-04-25",
+      "valid_to": "1976-07-02",
+      "first_held": "1976-04-25",
+      "measure": {},
+      "source": "cp-1976",
+      "locator": "https://chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892 (Ngày 25-4-1976, Tổng tuyển cử, bầu Quốc hội chung của nước Việt Nam thống nhất đã được tiến hành trong cả nước ... Tên nước: Cộng hòa xã hội chủ nghĩa Việt Nam ... Khoá Quốc hội được bầu trong cuộc Tổng tuyển cử ngày 25-4-1976 là Quốc hội khoá VI)",
+      "note": "Decided by the Political Consultative Conference of 15 to 21 November 1975 and held on 25 April 1976 in both the Democratic Republic and the south, then governed by the Provisional Revolutionary Government: 492 deputies in 79 constituencies, 249 for the north and 243 for the south, from 23,387,940 registered voters (ipu-1976). The new Assembly met on 24 June 1976 and on 2 July 1976 named the reunified state the Socialist Republic of Vietnam.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The election of the reunified state's first National Assembly, the Sixth; the IPU files it under the Socialist Republic of Viet Nam, and it is counted in the Vietnam census (VN).",
+      "access": [
+        {
+          "platform": "IPU PARLINE archive, Chronicle of Parliamentary Elections",
+          "url": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM_1976.PDF",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "first_date": "1976-04-25",
+          "last_date": "1976-04-25",
+          "role": "publishes",
+          "evidence": "National totals of the 25 April 1976 election: 23,387,940 registered voters, 23,099,655 voting (98.76%), 204,054 blank or void ballots, and 22,895,611 valid votes.",
+          "source": "ipu-1976"
+        }
+      ],
+      "match": []
+    },
+    {
+      "key": "mat_tran_dang",
+      "tier": "national",
+      "name": "Hiệp thương giới thiệu người ứng cử của Mặt trận và bầu cử nội bộ đảng phái",
+      "name_en": "Fatherland Front candidate selection and party internal votes",
+      "category": "nominating",
+      "goal": "national",
+      "valid_from": "1945-09-02",
+      "valid_to": "1976-07-02",
+      "measure": {},
+      "source": "ipu-1975",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM_1975_E.PDF (Candidates for Parliament were nominated chiefly by the Viet-Nam Fatherland Front, the political organization which unites the country's three political parties (Viet-Nam Workers' Party (Lao-Dong), Socialist Party and Democratic Party) and State organizations)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Nominations by the Fatherland Front and votes within the Workers', Socialist, and Democratic parties are not public elections.",
+      "match": []
+    }
+  ]
+}
