@@ -11,7 +11,8 @@ not here.
 """
 
 import re
-from dataclasses import dataclass, field
+from collections import Counter
+from dataclasses import dataclass, field, replace
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
@@ -30,6 +31,7 @@ from ea.sources.si.dvk import (
     bare,
     clean,
     key,
+    plain,
     title,
 )
 
@@ -128,6 +130,7 @@ YEARS = [
             "turnout": "html/udel_vo.html",
             "units": "html/rez_ve.html",
             "national": "html/rez_si.html",
+            "elected": "html/rez_imena.html",
         },
         SYSTEM_2000,
     ),
@@ -139,6 +142,7 @@ YEARS = [
             "turnout": "udelezba/udelezba_okraji.html",
             "units": "rezultati/izidi_enote.html",
             "national": "rezultati/rezultati_slo.html",
+            "elected": "rezultati/izvoljeni_kandid_po_volilnih_enotah.html",
         },
         SYSTEM_2000,
     ),
@@ -197,10 +201,14 @@ def text(path: Path) -> str:
         return body.decode("cp1250")
 
 
-def tables(year: Year, page: str) -> list[list[list[str]]]:
+def tables_at(url: str) -> list[list[list[str]]]:
     parser = _Tables()
-    parser.feed(text(raw.cached(SOURCE, year.url(page)).path))
+    parser.feed(text(raw.cached(SOURCE, url).path))
     return parser.tables
+
+
+def tables(year: Year, page: str) -> list[list[list[str]]]:
+    return tables_at(year.url(page))
 
 
 def number(cell: str) -> int:
@@ -242,6 +250,16 @@ class Totals:
         return None if self.cast is None or self.invalid is None else self.cast - self.invalid
 
 
+@dataclass(frozen=True)
+class Elected:
+    """One deputy the commission names as elected, with the electoral unit, list, and district it prints."""
+
+    unit: int
+    list_name: str
+    candidate: str
+    district: str
+
+
 @dataclass
 class Parsed:
     year: Year
@@ -252,6 +270,10 @@ class Parsed:
     national: Totals
     labels: dict[tuple[int, str], str] = field(default_factory=dict)
     """A per-unit full name for lists whose name differs by unit, such as the independent candidates of 1996."""
+    seats: dict[int, dict[str, int]] = field(default_factory=dict)
+    """Each electoral unit's declared seats by list key, where the site prints them (2004 and 2008)."""
+    elected: list[Elected] = field(default_factory=list)
+    """The deputies the site names, by unit and list (2004 and 2008)."""
 
 
 def fetch() -> None:
@@ -276,21 +298,25 @@ def _national_names(year: Year) -> dict[str, int]:
 
 def _unit_table(year: Year) -> tuple[list[str], dict[int, Totals], Totals]:
     """The table of each electoral unit's ballots and list votes, with Slovenia's column where printed."""
-    for table in tables(year, "units"):
+    return unit_votes(tables(year, "units"), year.year, year.url("units"))
+
+
+def unit_votes(found: list[list[list[str]]], year: int, where: str) -> tuple[list[str], dict[int, Totals], Totals]:
+    for table in found:
         head = table[0] if table else []
         if len(head) < 9 or not any("Kranj" in cell for cell in head):
             continue
         if not any(re.search(r"glas", row[0], re.IGNORECASE) for row in table[1:3]):
             continue
-        offset = 1 if year.year == 1996 else 2
-        first = offset if year.year == 1996 else 1
+        offset = 1 if year == 1996 else 2
+        first = offset if year == 1996 else 1
         units = {unit: Totals() for unit in ELECTORAL_UNITS}
         national = Totals()
         order: list[str] = []
         for row in table[1:]:
             label = row[0]
             cells = row[offset : offset + 8]
-            whole = None if year.year == 1996 else row[first]
+            whole = None if year == 1996 else row[first]
             if re.search(r"preštetih|oddanih", label, re.IGNORECASE):
                 for unit, cell in zip(ELECTORAL_UNITS, cells, strict=True):
                     units[unit].cast = number(cell)
@@ -308,7 +334,68 @@ def _unit_table(year: Year) -> tuple[list[str], dict[int, Totals], Totals]:
                 if whole is not None:
                     national.votes[label] = number(whole)
         return order, units, national
-    raise LookupError(f"{year.url('units')} has no table of electoral units")
+    raise LookupError(f"{where} has no table of electoral units")
+
+
+def seat_table(found: list[list[list[str]]], where: str) -> dict[str, dict[int, int]]:
+    """Each list's seats in each electoral unit, by the list's short label, from the page's table of mandates by
+    electoral unit. The table's own total column and the 11 seats of every unit are checked."""
+    for table in found:
+        head = table[0] if table else []
+        if len(head) != 10 or head[:2] != ["Lista", "Skupaj"]:
+            continue
+        seats: dict[str, dict[int, int]] = {}
+        for row in table[1:]:
+            if len(row) != 10:
+                raise ValueError(f"{where}: unreadable seat row {row}")
+            by_unit = {
+                unit: 0 if cell == "-" else number(cell) for unit, cell in zip(ELECTORAL_UNITS, row[2:], strict=True)
+            }
+            if sum(by_unit.values()) != number(row[1]):
+                raise ValueError(f"{where}: {row[0]} has {sum(by_unit.values())} seats in its units, not {row[1]}")
+            seats[row[0]] = {unit: n for unit, n in by_unit.items() if n}
+        for unit in ELECTORAL_UNITS:
+            if sum(lists.get(unit, 0) for lists in seats.values()) != 11:
+                raise ValueError(f"{where}: unit {unit} does not hold 11 seats")
+        return seats
+    raise LookupError(f"{where} has no table of seats by electoral unit")
+
+
+def elected_2004(url: str) -> list[Elected]:
+    """The elected deputies of 2004: one table per list, headed by the list's name, with a row for each unit."""
+    page = text(raw.cached(SOURCE, url).path)
+    heads = re.findall(r'<p class="tekst">([^<]+)</p>\s*<table', page)
+    boards = [t for t in tables_at(url) if t and t[0][:2] == ["Kandidat", "Volilni okraj"]]
+    if len(heads) != len(boards):
+        raise LookupError(f"{url}: {len(heads)} list headings but {len(boards)} tables")
+    found: list[Elected] = []
+    for head, board in zip(heads, boards, strict=True):
+        unit = 0
+        for row in board[1:]:
+            if len(row) == 1:
+                heading = re.match(r"VE\s+(\d)", row[0])
+                if heading is None:
+                    raise ValueError(f"{url}: unreadable unit heading {row[0]!r}")
+                unit = int(heading.group(1))
+            else:
+                found.append(Elected(unit, clean(head), row[0], row[1]))
+    return found
+
+
+def elected_2008(url: str) -> list[Elected]:
+    """The elected deputies of 2008: one table per electoral unit, with a row naming each list."""
+    boards = [t for t in tables_at(url) if t and t[0][:2] == ["Kandidat", "Volilni okraj"]]
+    if len(boards) != 8:
+        raise LookupError(f"{url}: found {len(boards)} unit tables")
+    found: list[Elected] = []
+    for unit, board in zip(ELECTORAL_UNITS, boards, strict=True):
+        name = ""
+        for row in board[1:]:
+            if len(row) == 1:
+                name = row[0]
+            else:
+                found.append(Elected(unit, name, row[0], row[1]))
+    return found
 
 
 def _turnout(year: Year) -> dict[tuple[int, int], tuple[int, int, str]]:
@@ -445,6 +532,7 @@ def load(year: Year) -> Parsed:
     order, units, national = _unit_table(year)
     printed = _national_names(year)
     labels: dict[tuple[int, str], str] = {}
+    short: dict[str, str] = {}
     if year.year == 1996:
         okraji, full, labels = _okraji_1996(year)
         lists = {label: full[label] for label in order}
@@ -480,7 +568,37 @@ def load(year: Year) -> Parsed:
         turnout = _turnout(year)
         for okraj in okraji:
             okraj.registered, okraj.voters, _ = turnout[(okraj.unit, okraj.seat)]
-    return Parsed(year, lists, okraji, units, national, labels)
+    parsed = Parsed(year, lists, okraji, units, national, labels)
+    if "elected" in year.pages:
+        _seats(parsed, short)
+    return parsed
+
+
+def _seats(parsed: Parsed, short: dict[str, str]) -> None:
+    """Read the seats of each list in each unit and the deputies the commission names, and check them against each
+    other."""
+    year = parsed.year
+    where = year.url("units")
+    parsed.seats = {unit: {} for unit in ELECTORAL_UNITS}
+    for label, by_unit in seat_table(tables(year, "units"), where).items():
+        if label not in short:
+            raise LookupError(f"{where}: seats for {label}, which has no votes")
+        for unit, n in by_unit.items():
+            parsed.seats[unit][short[label]] = n
+    named = (elected_2004 if year.year == 2004 else elected_2008)(year.url("elected"))
+    by_plain: dict[str, str] = {plain(name): name for name in parsed.lists}
+    for deputy in named:
+        key_ = plain(deputy.list_name)
+        found = [name for name in by_plain.values() if plain(name) == key_] or [
+            name for name in by_plain.values() if plain(name) in key_ or key_ in plain(name)
+        ]
+        if len(found) != 1:
+            raise LookupError(f"{year.year}: elected deputy list {deputy.list_name!r} matches {found}")
+        parsed.elected.append(replace(deputy, list_name=found[0]))
+    count: Counter[tuple[int, str]] = Counter((d.unit, d.list_name) for d in parsed.elected)
+    seats = {(unit, name): n for unit, lists in parsed.seats.items() for name, n in lists.items()}
+    if dict(count) != seats:
+        raise ValueError(f"{year.year}: named deputies {dict(count)} disagree with the seats {seats}")
 
 
 def _match_names(year: Year, short: dict[str, int], printed: dict[str, int]) -> dict[str, str]:
@@ -612,6 +730,12 @@ def method(parsed: Parsed) -> str:
             "Registered voters and voters come from the turnout page. Ballots cast and invalid ballots are printed "
             "for the units only, and are stored with each unit's declared figures. "
         )
+    if parsed.seats:
+        text += (
+            "Each list's seats in the electoral unit are the commission's declared outcome, from its table of mandates "
+            "by electoral unit: the seats the list won in the unit from the unit allocation and the national remainder "
+            "allocation. The deputies the commission names as elected are stored as outcomes of their candidacies. "
+        )
     text += (
         "The two seats of the Italian and Hungarian national communities are elected separately and are not here. "
         "The district areas are the commission's 88 districts as numbered today; their boundaries have changed "
@@ -628,6 +752,32 @@ def _artifacts(p: Package, year: Year) -> None:
 def person_name(name: str) -> str:
     plain = bare(name)
     return title(plain) if plain.isupper() else plain
+
+
+def _outcomes(
+    p: Package,
+    parsed: Parsed,
+    unit: int,
+    result_set: str,
+    options: dict[str, str],
+    candidacies: dict[tuple[str, str], str],
+) -> None:
+    """Declare the seats each list won in the unit and the deputies the commission names as elected."""
+    for label, seats in sorted(parsed.seats.get(unit, {}).items()):
+        p.add("outcome", result_set_id=result_set, option_id=options[label], kind="won", seats=seats)
+    for deputy in parsed.elected:
+        if deputy.unit != unit:
+            continue
+        candidacy = candidacies.get((deputy.list_name, plain(bare(deputy.candidate))))
+        if candidacy is None:
+            raise LookupError(f"{parsed.year.year} unit {unit}: elected {deputy.candidate} is no candidate of the list")
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=options[deputy.list_name],
+            candidacy_id=candidacy,
+            kind="elected",
+        )
 
 
 def election(parsed: Parsed) -> Package:
@@ -713,6 +863,7 @@ def election(parsed: Parsed) -> Package:
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=text, lang="en")
         printed = parsed.units[unit]
         options: dict[str, str] = {}
+        members_of: dict[tuple[str, str], str] = {}
         for label in parsed.lists:
             if label not in printed.votes and not any(label in okraj.votes for okraj in here):
                 continue
@@ -740,6 +891,7 @@ def election(parsed: Parsed) -> Package:
                     people.add(person)
                     p.add("person", id=person)
                     p.name(person, person_name(candidate), "sl", "official")
+                members_of[(label, plain(bare(candidate)))] = key("candidacy", year.day, unit, label, candidate)
                 p.add(
                     "candidacy",
                     id=key("candidacy", year.day, unit, label, candidate),
@@ -748,6 +900,7 @@ def election(parsed: Parsed) -> Package:
                     role="list_member",
                     ballot_name=candidate,
                 )
+        _outcomes(p, parsed, unit, result_set, options, members_of)
         short = [
             f"{okraj.name} prints candidates with {sum(okraj.votes.values()):,} votes but {okraj.valid:,} valid votes"
             for okraj in here

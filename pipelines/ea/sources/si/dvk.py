@@ -365,8 +365,12 @@ MANDATE_LISTS = {
     2022: {"241141": 4, "241152": 15, "241149": 12, "241154": 17, "241143": 6},
     2026: {"107753": 1, "107752": 2, "107757": 5, "107760": 6, "107749": 10, "107754": 11, "107755": 15},
 }
+# The archived results page of an election whose files print no seats: its table of each list's mandates by
+# electoral unit.
+ARCHIVE_SEATS = {2011: f"{ARCHIVE}/dz2011/rezultati/izidi_enote.html"}
 # Seats the commission declared each list at the national level, by ballot position.
 NATIONAL_SEATS = {
+    2011: {7: 28, 11: 26, 10: 10, 4: 8, 3: 6, 13: 6, 9: 4},
     2014: {13: 36, 10: 21, 1: 10, 9: 6, 4: 6, 6: 5, 16: 4},
     2018: {15: 25, 9: 13, 20: 10, 18: 10, 8: 9, 12: 7, 23: 5, 2: 5, 17: 4},
     2022: {4: 41, 15: 27, 12: 8, 17: 7, 6: 5},
@@ -389,15 +393,38 @@ UNIT_SEATS_2014 = {
 def fetch() -> None:
     for vote in VOTES:
         raw.fetch(SOURCE, vote.url, suffix="xlsx" if vote.layout == "izvoz" else vote.path.rsplit(".", 1)[1])
-    for url in (*REPORTS.values(), *MANDATES.values()):
+    for url in (*REPORTS.values(), *MANDATES.values(), *ARCHIVE_SEATS.values()):
         raw.fetch(SOURCE, url, suffix=url.rsplit(".", 1)[1])
 
 
-def unit_seats(year: int) -> dict[int, dict[int, int]] | None:
-    """Seats of each list in each electoral unit, by ballot position, checked against the national totals."""
+def _page_seats(year: int, totals: dict[int, int | None]) -> dict[int, dict[int, int]]:
+    """The seats an archived results page prints for each list in each unit, by ballot position. The page names
+    lists by short labels, so each is paired with the ballot line whose national votes it shares."""
+    from ea.sources.si import dvk_okraji  # imported here because dvk_okraji builds on this module
+
+    url = ARCHIVE_SEATS[year]
+    found = dvk_okraji.tables_at(url)
+    _, _, printed = dvk_okraji.unit_votes(found, year, url)
+    seats: dict[int, dict[int, int]] = {unit: {} for unit in ELECTORAL_UNITS}
+    for label, by_unit in dvk_okraji.seat_table(found, url).items():
+        lines = [position for position, votes in totals.items() if votes == printed.votes[label]]
+        if len(lines) != 1:
+            raise ValueError(f"{year}: {label} shares its national votes with ballot lines {lines}")
+        for unit, n in by_unit.items():
+            seats[unit][lines[0]] = n
+    return seats
+
+
+def unit_seats(year: int, totals: dict[int, int | None] | None = None) -> dict[int, dict[int, int]] | None:
+    """Seats of each list in each electoral unit, by ballot position, checked against the national totals. Where the
+    seats come from an archived page, `totals` are the ballot lines' declared national votes by ballot position."""
     if year not in NATIONAL_SEATS:
         return None
-    if year in MANDATES:
+    if year in ARCHIVE_SEATS:
+        if totals is None:
+            raise ValueError(f"{year}: the ballot lines' national votes are needed to read the seats")
+        seats = _page_seats(year, totals)
+    elif year in MANDATES:
         found: dict[int, Counter[int]] = {}
         text = raw.cached(SOURCE, MANDATES[year]).path.read_text(encoding="utf-8-sig")
         for line in text.splitlines()[1:]:
@@ -934,7 +961,9 @@ def reconcile(vote: Vote, sheet: Sheet) -> dict[str, object]:
     }
 
 
-RAW_FILES = sorted({vote.url for vote in VOTES} | set(REPORTS.values()) | set(MANDATES.values()))
+RAW_FILES = sorted(
+    {vote.url for vote in VOTES} | set(REPORTS.values()) | set(MANDATES.values()) | set(ARCHIVE_SEATS.values())
+)
 PREFERENCE: set[str] = set()
 
 
@@ -1222,7 +1251,7 @@ def _package(vote: Vote, summary: str, depends: list[str] | None = None) -> Pack
     p.external.add(SLOVENIA)
     p.uses(raw.cached(SOURCE, vote.url))
     if vote.kind == "dz":
-        for found in (REPORTS.get(vote.day.year), MANDATES.get(vote.day.year)):
+        for found in (REPORTS.get(vote.day.year), MANDATES.get(vote.day.year), ARCHIVE_SEATS.get(vote.day.year)):
             if found is not None:
                 p.uses(raw.cached(SOURCE, found))
     return p
@@ -1260,7 +1289,12 @@ def assembly(vote: Vote, sheet: Sheet) -> Package:
         by_unit.setdefault(electoral_unit, []).append(row)
     result_sets: dict[int, str] = {}
     options: dict[tuple[int, int], str] = {}
-    seats = unit_seats(vote.day.year)
+    seats = unit_seats(
+        vote.day.year,
+        None
+        if sheet.total is None
+        else {position: sheet.total.options[index] for index, (_, position) in enumerate(lines)},
+    )
     for unit in ELECTORAL_UNITS:
         name = title(next(row.ve_name for row in by_unit[unit] if row.ve_name))
         contest = key("contest", vote.day, unit)
