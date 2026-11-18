@@ -17,11 +17,15 @@ PAGE = "https://www.cne.gob.ec/resultados-electorales/"
 BASE = "https://www.cne.gob.ec/wp-content/uploads"
 LOCAL_2019 = f"{BASE}/2022/05/Resultados-a-nivel-parroquial-1.sav"
 RUNOFF_2021 = f"{BASE}/2022/05/Resultados-2021Segunda-vuelta.sav"
+FIRST_2021 = f"{BASE}/2022/05/Resultados-2021Primera-vuelta.sav"
 BOOK_2019 = f"{BASE}/2022/05/RESULTADOS-ELECTORALES-2019.pdf"
 ARCHIVED = {BOOK_2019: "https://web.archive.org/web/20240714015955id_/" + BOOK_2019}
-FILES = {LOCAL_2019: ".sav", RUNOFF_2021: ".sav", BOOK_2019: ".pdf"}
+FILES = {LOCAL_2019: ".sav", FIRST_2021: ".sav", RUNOFF_2021: ".sav", BOOK_2019: ".pdf"}
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
-DAYS = {"2019-03-24": date(2019, 3, 24), "2021-04-11": date(2021, 4, 11)}
+DAYS = {"2019-03-24": date(2019, 3, 24), "2021-02-07": date(2021, 2, 7), "2021-04-11": date(2021, 4, 11)}
+# The first-round file lists its presidential rows first: 1,299 parishes, 16 tickets, men's and women's stations. The
+# rows after the first 142,964 (part of the national assembly contest) do not read, so only the presidential rows are used.
+FIRST_PRESIDENT_ROWS = 41600
 
 METHOD = (
     "Counted per parish and published by the National Electoral Council in its parish-level results files. Each "
@@ -60,8 +64,10 @@ def fetch() -> None:
 
 
 @functools.cache
-def sav(url: str) -> tuple[pl.DataFrame, dict[str, dict[float, str]]]:
-    frame, meta = pyreadstat.read_sav(str(artifact(url).path), apply_value_formats=False, output_format="polars")
+def sav(url: str, rows: int = 0) -> tuple[pl.DataFrame, dict[str, dict[float, str]]]:
+    frame, meta = pyreadstat.read_sav(
+        str(artifact(url).path), apply_value_formats=False, output_format="polars", row_limit=rows
+    )
     if not isinstance(frame, pl.DataFrame):
         raise TypeError(f"{url} did not read as a polars frame")
     return frame, {name: dict(labels) for name, labels in meta.variable_value_labels.items()}
@@ -108,13 +114,15 @@ def area(scheme: str, value: str) -> str:
     return key("area", scheme, value)
 
 
-def places() -> tuple[dict[str, str], dict[str, tuple[str, str]], dict[str, tuple[str, str]]]:
-    """Provinces, cantons, and parishes by code, from both files' value labels; the 2019 spelling wins."""
+def places(
+    urls: tuple[str, ...] = (LOCAL_2019, RUNOFF_2021),
+) -> tuple[dict[str, str], dict[str, tuple[str, str]], dict[str, tuple[str, str]]]:
+    """Provinces, cantons, and parishes by code, from the files' value labels; the first file's spelling wins."""
     provinces: dict[str, str] = {}
     cantons: dict[str, tuple[str, str]] = {}
     parishes: dict[str, tuple[str, str]] = {}
-    for url in (LOCAL_2019, RUNOFF_2021):
-        frame, labels = sav(url)
+    for url in urls:
+        frame, labels = sav(url, FIRST_PRESIDENT_ROWS if url == FIRST_2021 else 0)
         for row in frame.select("PROVINCIA_CODIGO", "CANTON_CODIGO", "PARROQUIA_CODIGO").unique().iter_rows():
             province, canton, parish = (code(v) for v in row)
             provinces.setdefault(province, clean(labels["PROVINCIA_NOMBRE"][float(province)]))
@@ -516,24 +524,31 @@ def _local(p: Package, day: str) -> None:
     )
 
 
-RUNOFF = (
-    ("1021", "Guillermo Lasso Mendoza", "Alfredo Borja Cabezas", "CREO-PSC"),
-    ("1030", "Andrés Arauz Galarza", "Carlos Rabascall Villacís", "UNES"),
-)
+# organization code -> (head of ticket, running mate, party); the file carries no labels for these codes
+RUNOFF = {
+    "1021": ("Guillermo Lasso Mendoza", "Alfredo Borja Cabezas", "CREO-PSC"),
+    "1030": ("Andrés Arauz Galarza", "Carlos Rabascall Villacís", "UNES"),
+}
+# first-round tickets named only where the file's vote totals match the published results
+FIRST_NAMED = {**RUNOFF, "2": ("Yaku Pérez Guartambel", "", ""), "42": ("Xavier Hervas Morillo", "", "")}
 
 
-def _runoff(p: Package, day: str) -> None:
-    frame, _ = sav(RUNOFF_2021)
-    p.uses(artifact(RUNOFF_2021))
-    _, _, parishes = places()
+def _president(p: Package, day: str, first: bool) -> None:
+    url = FIRST_2021 if first else RUNOFF_2021
+    frame, _ = sav(url, FIRST_PRESIDENT_ROWS if first else 0)
+    if first:
+        frame = frame.filter(pl.col("DIGNIDAD_NOMBRE") == 1.0)
+    p.uses(artifact(url))
+    _, _, parishes = places((url,)) if first else places()
+    round_text = "first" if first else "second"
     election = _election(
         p,
-        "runoff",
+        "first" if first else "runoff",
         DAYS[day],
-        "runoff",
-        "2021 Ecuadorian presidential election, second round",
-        "Elecciones presidenciales del Ecuador 2021, segunda vuelta",
-        f"ec/{day}-presidential-runoff",
+        "general" if first else "runoff",
+        f"2021 Ecuadorian presidential election, {round_text} round",
+        f"Elecciones presidenciales del Ecuador 2021, {'primera' if first else 'segunda'} vuelta",
+        f"ec/{day}-presidential" + ("" if first else "-runoff"),
     )
     contest = key("contest", day, "president")
     p.add(
@@ -543,47 +558,71 @@ def _runoff(p: Package, day: str) -> None:
         kind="office",
         office_id=PRESIDENCY,
         magnitude=1,
-        round_number=2,
+        round_number=1 if first else 2,
+        previous_round_id=None if first else key("contest", "2021-02-07", "president"),
         default_result_kind="counted",
         electoral_system_id=SYSTEM_PRESIDENT,
     )
-    p.name(contest, "2021 Ecuadorian presidential election, second round", "en", "official")
-    p.name(contest, "Elecciones presidenciales del Ecuador 2021, segunda vuelta", "es", "native", False)
-    p.add("slug", path=f"ec/{day}-presidential-runoff/president", entity_id=contest, is_current=True)
+    p.name(contest, f"2021 Ecuadorian presidential election, {round_text} round", "en", "official")
+    p.name(
+        contest,
+        f"Elecciones presidenciales del Ecuador 2021, {'primera' if first else 'segunda'} vuelta",
+        "es",
+        "native",
+        False,
+    )
+    p.add(
+        "slug",
+        path=f"ec/{day}-presidential" + ("" if first else "-runoff") + "/president",
+        entity_id=contest,
+        is_current=True,
+    )
     result_set = _result_set(p, election, contest, "president")
+    codes = sorted({code(v) for v in frame["OP_CODIGO"].to_list()}, key=lambda c: (c not in RUNOFF, int(c)))
+    if not first:
+        codes = list(RUNOFF)
     options: dict[str, str] = {}
-    for position, (org, name, mate, party) in enumerate(RUNOFF, 1):
-        option = options[org] = key("option", "president", org)
-        person = key("person", "president-2021", org)
-        p.add("person", id=person)
-        p.name(person, name, "es", "official")
-        mate_person = key("person", "president-2021-running-mate", org)
-        p.add("person", id=mate_person)
-        p.name(mate_person, mate, "es", "official")
+    for position, org in enumerate(codes, 1):
+        option = options[org] = key("option", "president", org) if not first else key("option", day, "president", org)
+        who = (FIRST_NAMED if first else RUNOFF).get(org)
+        label = f"Organization {org}"
+        if who:
+            name, mate, party = who
+            label = f"{name} and {mate} ({party})" if mate else name
         p.add(
             "contest_option",
             id=option,
             contest_id=contest,
             kind="ticket",
             ballot_position=position,
-            ballot_label=f"{name} and {mate} ({party})",
+            ballot_label=label,
         )
+        if not who:
+            continue
+        tag = "president-2021-first" if first else "president-2021"
+        person = key("person", tag, org)
+        p.add("person", id=person)
+        p.name(person, name, "es", "official")
         p.add(
             "candidacy",
-            id=key("candidacy", "president", org),
+            id=key("candidacy", "president" if not first else f"{day}-president", org),
             person_id=person,
             option_id=option,
             role="head",
             ballot_name=name,
         )
-        p.add(
-            "candidacy",
-            id=key("candidacy", "president-running-mate", org),
-            person_id=mate_person,
-            option_id=option,
-            role="running_mate",
-            ballot_name=mate,
-        )
+        if mate:
+            mate_person = key("person", f"{tag}-running-mate", org)
+            p.add("person", id=mate_person)
+            p.name(mate_person, mate, "es", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", "president-running-mate" if not first else f"{day}-president-running-mate", org),
+                person_id=mate_person,
+                option_id=option,
+                role="running_mate",
+                ballot_name=mate,
+            )
     table = _table(frame, [], "OP_CODIGO")
     seen: set[str] = set()
     for parish_rows in table.partition_by("PARROQUIA_CODIGO", as_dict=False):
@@ -595,11 +634,18 @@ def _runoff(p: Package, day: str) -> None:
         _put(p, result_set, unit, None, VALID, int(parish_rows["VOTOS"].sum()))
         for org, votes in zip(parish_rows["OP_CODIGO"].to_list(), parish_rows["VOTOS"].to_list(), strict=True):
             _put(p, result_set, unit, options[code(org)], VOTES, int(votes))
-    p.accept(
-        "accounting.ballots_sum",
-        "the file's own parish figures disagree: valid votes plus blank and null votes differ from the ballots cast "
-        "in 528 of 1,299 parishes, by 83 ballots at most and 1,100 ballots in all; stored as published",
-    )
+    if first:
+        p.accept(
+            "accounting.ballots_sum",
+            "the file's own parish figures disagree: valid votes plus blank and null votes differ from the ballots "
+            "cast in 740 of 1,299 parishes, by 78 ballots at most and 2,505 ballots in all; stored as published",
+        )
+    else:
+        p.accept(
+            "accounting.ballots_sum",
+            "the file's own parish figures disagree: valid votes plus blank and null votes differ from the ballots "
+            "cast in 528 of 1,299 parishes, by 83 ballots at most and 1,100 ballots in all; stored as published",
+        )
 
 
 def build(day: str) -> Package:
@@ -607,11 +653,11 @@ def build(day: str) -> Package:
         f"ec.cne/{day}",
         SOURCE,
         f"The Ecuadorian elections of {DAYS[day]} by parish, from the National Electoral Council's results files",
-        depends=["ec.cne/geo", "ec.cne/registry"],
+        depends=["ec.cne/geo", "ec.cne/registry", *(["ec.cne/2021-02-07"] if day == "2021-04-11" else [])],
     )
     p.external.add(ECUADOR)
     if day == "2019-03-24":
         _local(p, day)
     else:
-        _runoff(p, day)
+        _president(p, day, day == "2021-02-07")
     return p
