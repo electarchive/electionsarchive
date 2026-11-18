@@ -7,6 +7,7 @@ and `tw.cec/registry`, which call `extend_geo`, `extend_districts`, and `registr
 import functools
 import json
 import re
+from collections.abc import Callable
 from datetime import date
 from typing import NamedTuple, cast
 from urllib.parse import quote
@@ -296,7 +297,13 @@ def sheet(by: By, kind: str) -> list[list[object]]:
 
 
 def workbook_data(by: By) -> Data:
-    rows = sheet(by, "stations")
+    return workbook_rows(by.name, lambda kind: sheet(by, kind))
+
+
+def workbook_rows(title: str, get: Callable[[str], list[list[object]]]) -> Data:
+    """Read a by-election published as workbooks, given a reader for the station table, the candidate totals, and the
+    summary."""
+    rows = get("stations")
     header, columns, first, start = cells(rows)
     options = options_of(rows, header, columns, first)
     out: list[Row] = []
@@ -305,7 +312,7 @@ def workbook_data(by: By) -> Data:
         label, village, code = text(row[0]), text(row[1]), station_number(row[2])
         if village and code:
             if not township:
-                raise ValueError(f"{by.name}: a station row comes before any township")
+                raise ValueError(f"{title}: a station row comes before any township")
             out.append(
                 Row(
                     township,
@@ -317,24 +324,24 @@ def workbook_data(by: By) -> Data:
             )
         elif label and not village and number(row[first]) is not None:
             township = label
-    totals = sheet(by, "totals")
+    totals = get("totals")
     t_header, t_columns, t_first, t_total = cells(totals)
     t_options = options_of(totals, t_header, t_columns, t_first)
     if [(no, cjk(name)) for no, name, _ in t_options] != [(no, cjk(name)) for no, name, _ in options]:
-        raise ValueError(f"{by.name}: the totals table lists other candidates than the station table")
+        raise ValueError(f"{title}: the totals table lists other candidates than the station table")
     row = totals[t_total]
     declared = [number(row[t_first + index]) for index in range(len(options))]
     top = max(value or 0 for value in declared)
     leaders = [index for index, value in enumerate(declared) if value == top]
     if len(leaders) != 1:
-        raise ValueError(f"{by.name}: the leading candidates tie")
+        raise ValueError(f"{title}: the leading candidates tie")
     cands = [
         Cand(no, name, party, "", "", index == leaders[0], declared[index] or 0)
         for index, (no, name, party) in enumerate(options)
     ]
     total = {field: number(row[t_columns[field]]) or 0 for field in ("valid", "invalid", "cast", "registered")}
-    summary = sheet(by, "summary")
-    figures = next(r for r in summary if number(r[1]) and number(r[9]))
+    summary = get("summary")
+    figures = next(r for r in summary if number(r[9]))
     seats = number(figures[5])
     return Data(
         cands,
