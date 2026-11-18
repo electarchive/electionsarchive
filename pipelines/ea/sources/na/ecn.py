@@ -22,6 +22,7 @@ import xlrd
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.na import early
 
 SOURCE = "na.ecn"
 SITE = "https://www.ecn.na"
@@ -47,15 +48,21 @@ URLS = {
     "rc2004": f"{UPLOADS}/2021/06/Regional-Councils-Election-2004.xls",
     "la2004": f"{UPLOADS}/2021/06/local-Authourity-Election-2004.xls",
     "gazette2025": "https://www.lac.org.na/laws/2025/8818.pdf",
+    "rc1992": "https://www.lac.org.na/laws/1992/545.pdf",
+    "la1992": "https://www.lac.org.na/laws/1992/547.pdf",
+    "gazette2010": "https://www.lac.org.na/laws/2010/4627.pdf",
+    "nom1992": "https://www.lac.org.na/laws/1992/521.pdf",
     "rccandidates2025": f"{UPLOADS}/2025/11/8790-Gov-N310.-RC-Candidates.pdf",
     "lacandidates2025": f"{UPLOADS}/2025/11/8791-Gov-N311-Candidates-LA.pdf",
     "byopuwo2021": f"{UPLOADS}/2021/07/Opuwo-Rural-Final-Results-Media-Release-03-July-2021.pdf",
     "byswakopmund2022": f"{UPLOADS}/2022/08/OFFICIAL-RESULTS-FOR-THE-REGIONAL-COUNCIL-ELECTION-FOR-THE-SWAKOPMUND-CONSTITUENCY.pdf",
 }
 DAYS = {
+    "1992-11-30": date(1992, 11, 30),
     "1998-02-16": date(1998, 2, 16),
     "1998-11-30": date(1998, 11, 30),
     "2004-11-15": date(2004, 11, 15),
+    "2010-11-26": date(2010, 11, 26),
     "2010-11-27": date(2010, 11, 27),
     "2014-11-28": date(2014, 11, 28),
     "2015-11-27": date(2015, 11, 27),
@@ -100,6 +107,7 @@ PARTIES = {
     "MAG": "Monitor Action Group",
     "NDP": "National Democratic Party of Namibia",
     "NEFC": "National Empowerment Fighting Corruption",
+    "NPF": "National Patriotic Front of Namibia",
     "NEFF": "Namibia Economic Freedom Fighters",
     "NPP": "Namibia Progressive Party",
     "NUDO": "National Unity Democratic Organisation",
@@ -189,6 +197,10 @@ ALIASES = {
     "united namibian's party": "UNP",
     "app of namibia": "APP",
     "swapo-party": "SWAPO",
+    "united democratic party of namibia": "UDF",
+    "npf": "NPF",
+    "npf of namibia": "NPF",
+    "national patriotic front of namibia": "NPF",
     "dcn": "DCN",
     "democratic coalition of namibia": "DCN",
     "fcn": "FCN",
@@ -251,6 +263,12 @@ def text(name: str) -> list[str]:
         pages = text("gazette2025")
         start = next(i for i, page in enumerate(pages) if "FOR REGIONAL COUNCILS: ELECTORAL ACT" in page)
         return pages[start:] if name == "rc2025" else pages[:start]
+    if name == "la2010":
+        pages = text("gazette2010")
+        start = next(
+            i for i, page in enumerate(pages) if "NOTIFICATION OF RESULT OF GENERAL ELECTION FOR LOCAL" in page
+        )
+        return pages[start:]
     path = raw.cached(SOURCE, URLS[name]).path
     done = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True)
     return done.stdout.split("\f")
@@ -632,6 +650,7 @@ class Area:
     registered: int | None = None
     valid: int | None = None
     rejected: int | None = None
+    tacit: bool = False
 
 
 def read_local(name: str = "la2020") -> list[Area]:
@@ -1078,6 +1097,7 @@ ASSOCIATION_NAMES = {
     "CIVIC_ASSOCIATION_OF_HENTIES_BAY": "Civic Association of Henties Bay",
     "KATIMA_ALLIANCE_DEVELOPMENT_ASSOCIATION": "Katima Alliance Development Association",
     "OTJIWARONGO_RESIDENTS_ASSOCIATION": "Otjiwarongo Residents Association",
+    "RUNDU_CONCERNED_CITIZEN_ASSOCIATION": "Rundu Concerned Citizen Association",
     "ADA_GUI_SENIOR_CITIZENS_AND_DESTITUTE_CHILDRENS_ASSOCIATION": (
         "Ada /Gui Senior Citizens and Destitute Children's Association"
     ),
@@ -1094,6 +1114,9 @@ ASSOCIATIONS = {
     r"swakopmund res": "SWAKOPMUND_RESIDENTS_ASSOCIATION",
     r"civic assoc": "CIVIC_ASSOCIATION_OF_HENTIES_BAY",
     r"katima alliance": "KATIMA_ALLIANCE_DEVELOPMENT_ASSOCIATION",
+    r"swako\w+ res": "SWAKOPMUND_RESIDENTS_ASSOCIATION",
+    r"rundu concerned": "RUNDU_CONCERNED_CITIZEN_ASSOCIATION",
+    r"association of otjiwarongo": "OTJIWARONGO_RESIDENTS_ASSOCIATION",
     r"ot(?:ij|i)warongo res": "OTJIWARONGO_RESIDENTS_ASSOCIATION",
     r"ada ?/ ?gui": "ADA_GUI_SENIOR_CITIZENS_AND_DESTITUTE_CHILDRENS_ASSOCIATION",
 }
@@ -1311,6 +1334,141 @@ def read_la2004() -> list[Area]:
 # --- packages ---------------------------------------------------------------------------------------------------------
 
 
+# --- 1992 regional councils and local authorities, 2010 local authorities (Government Gazette) -------------------------
+
+
+def early_party(label: str) -> str | None:
+    """The key of the party a label of the 1992 and 2010 notices names, whose OCR text splits and misspells some."""
+    label = clean(label).replace("’", "'")
+    label = re.sub(r"(?i)sw\s?a[p?]o", "SWAPO", label)
+    label = re.sub(r"(?i)\b[do]\s?t\s?a\b", "DTA", label)
+    label = re.sub(r"(?i)workers'? revolutionary p\w+", "Workers Revolutionary Party", label)
+    label = re.sub(r"(?i)\bpeoples\b", "people's", label)
+    label = label.replace("Paity", "Party").replace(".", "")
+    return old_party(label)
+
+
+def noisy(name: str) -> bool:
+    return bool(re.search(r"[^A-Za-zÀ-ÿ'\- ,.]|[A-Za-z][A-Z]", name))
+
+
+# Candidates whose names neither the results notice nor the notice of nominations gives in clean OCR text, read from
+# the scan of the results notice.
+MANUAL_NAMES: dict[tuple[str, str], str] = {
+    ("Okaku", "SWAPO"): "Ya Kasita, Henock Sheya",
+    ("Mashari", "SWAPO"): "Shikongo, Paulus Kaeuru",
+    ("Kongola", "DTA"): "Walubita, Mukelabayi Conrad",
+    ("Walvis Bay", "SWAPO"): "Emvula, Wilfried Inotira",
+    ("Grootfontein", "SWAPO"): "Sheyapo, Fidelis Antonius",
+    ("Otavi", "SWAPO"): "Shangetha, Bartholomeus",
+    ("Otjiwarongo", "SWAPO"): "Ua-Ndjarakana, Mbeuta",
+    ("Soweto", "SWAPO"): "Pandeni, John Alphons",
+    ("Rehoboth West Urban", "DTA"): "Cloete, Herman Heinie",
+    ("Opuwo", "DTA"): "Mumbuu, Edward Uapundua",
+    ("Oshikango", "SWAPO"): "Hishikushitja, Michael",
+    ("Windhoek East", "DTA"): "Howes, Kenneth James",
+    ("Anamulenge", "SWAPO"): "Andowa, Generosa",
+    ("Okatjali", "SWAPO"): "Kapia, Paulus Iilonga",
+    ("Engela", "SWAPO"): "Nghiwewelekwa, Heita",
+    ("Ondobe", "SWAPO"): "Mwaringange, Billy William",
+    ("Ohangwena", "SWAPO"): "Kandjambanga, Hamutire Josephine",
+    ("Kapako", "SWAPO"): "Kongowa, Gabriel Kalimbwe",
+    ("Omatako", "DTA"): "Tjihuro, Arnold Ngaurije",
+    ("Katutura Central", "SWAPO"): "!!Gowases, Tsukhoe",
+    ("Keetmanshoop Urban", "SWAPO"): "!Ha-Eiros, Ida Jimmy",
+    ("Swakopmund", "DTA"): "Göthje, Hans-Dieter Kurt",
+    ("Windhoek West", "DTA"): "Mudge, Henry Ferdinand",
+    ("Windhoek Rural", "DTA"): "Tsuob, Albert",
+    ("Omaruru", "DTA"): "Scheepers, Ian André",
+}
+
+
+def read_rc1992() -> list[Contest]:
+    nominated = early.read_nominations_1992(text("nom1992"))
+    contests: list[Contest] = []
+    for seat in early.read_rc1992(text("rc1992")):
+        close = difflib.get_close_matches(seat.name, list(nominated), 1, 0.7)
+        pool: dict[str | None, list[str]] = {}
+        for name, label in nominated.get(close[0], []) if close else []:
+            code = early_party("WRP" if label.lower() == "workers" else label) if label else "?"
+            pool.setdefault(code, []).append(name)
+        printed = seat.names if len(seat.names) == len(seat.parties) else [""] * len(seat.parties)
+        used: dict[str | None, int] = {}
+        candidates: list[Candidate] = []
+        for name, label, votes in zip(printed, seat.parties, seat.votes, strict=True):
+            code = early_party(label)
+            name = re.sub(r"^([^\s,.]+)\. ", r"\1, ", clean(name))
+            taken = used[code] = used.get(code, -1) + 1
+            if code and (seat.name, code) in MANUAL_NAMES:
+                name = MANUAL_NAMES[seat.name, code]
+            elif not name or noisy(name):
+                options = pool.get(code, [])
+                if len(options) > taken:
+                    name = options[taken]
+                elif pool.get("?"):
+                    name = pool["?"].pop(0)  # a nomination whose party the OCR text lost
+                else:
+                    print("MISSING", seat.name, label, repr(name), seat.names, pool)
+                    name = "?"
+            candidates.append(Candidate(name, code, votes, label=label))
+        top = max(candidates, key=lambda c: c.votes or 0)
+        if sum(1 for c in candidates if c.votes == top.votes) != 1:
+            raise ValueError(f"1992 regional: {seat.name} has no single leader")
+        top.elected = True
+        contests.append(
+            Contest(
+                region_name(seat.region),
+                seat.name,
+                counted=seat.total,
+                rejected=seat.rejected,
+                candidates=candidates,
+                declared=top.name,
+            )
+        )
+    return contests
+
+
+def _entries(rows: list[early.Row]) -> list[Entry]:
+    return [Entry(row.label, row.votes, row.seats, list(row.names)) for row in rows]
+
+
+def read_la1992() -> list[Area]:
+    areas = [
+        Area("", place.name, place.total, place.quota, _entries(place.rows), rejected=place.rejected)
+        for place in early.read_la1992(text("la1992"))
+    ]
+    areas += [Area("", name, 0, "", [Entry(label, 0, seats)], tacit=True) for name, label, seats in early.TACIT_1992]
+    return sorted(areas, key=lambda area: area.name)
+
+
+def read_la2010() -> list[Area]:
+    areas: list[Area] = []
+    for place in early.read_2010(text("la2010")):
+        region = difflib.get_close_matches(place.region.replace("OTOZ", "OTJOZ"), early.REGIONS, 1, 0)[0]
+        entries = _entries(place.rows)
+        for entry in entries:
+            for name in list(entry.names):
+                elsewhere = any(name in other.names for other in entries if other is not entry)
+                if elsewhere and len(entry.names) > entry.seats:
+                    entry.names.remove(name)
+            if len(entry.names) != entry.seats:
+                raise ValueError(
+                    f"2010 local: {place.name} {entry.label} has {len(entry.names)} names, {entry.seats} seats"
+                )
+        areas.append(
+            Area(
+                region.title(),
+                place.name,
+                place.total,
+                place.quota,
+                entries,
+                rejected=place.rejected,
+                tacit=place.total == 0,
+            )
+        )
+    return areas
+
+
 def slug(value: str) -> str:
     plain = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", plain.casefold()).strip("-")
@@ -1337,6 +1495,8 @@ def emit() -> None:
 
 @cache
 def regional(name: str) -> tuple[Contest, ...]:
+    if name == "rc1992":
+        return tuple(read_rc1992())
     if name == "rc2010":
         return tuple(read_2010())
     if name == "rc1998":
@@ -1472,6 +1632,11 @@ def local(name: str = "la2020") -> tuple[Area, ...]:
 
 
 @cache
+def early_local(name: str) -> tuple[Area, ...]:
+    return tuple(read_la1992() if name == "la1992" else read_la2010())
+
+
+@cache
 def old_local(name: str) -> tuple[Area, ...]:
     return tuple(read_la1998() if name == "la1998" else read_la2004())
 
@@ -1488,8 +1653,12 @@ def assembly_2014() -> tuple[list[Row], Row, int]:
 
 def everything() -> None:
     """Read every file once, so the registry sees every party any package uses."""
-    for name in ("rc2010", "rc2015", "rc2020", "rcby2025", "rc2025", "rc1998", "rc2004"):
+    for name in ("rc2010", "rc2015", "rc2020", "rcby2025", "rc2025", "rc1998", "rc2004", "rc1992"):
         regional(name)
+    for name in ("la1992", "la2010"):
+        for area in early_local(name):
+            for entry in area.lists:
+                early_party(entry.label)
     local()
     local("la2025")
     for name in ("la1998", "la2004"):
@@ -1808,7 +1977,45 @@ def build(day: str) -> Package:
     )
     p.external.add(NAMIBIA)
     everything()
-    if day == "2010-11-27":
+    if day == "1992-11-30":
+        for name in ("rc1992", "nom1992", "la1992"):
+            p.uses(raw.cached(SOURCE, URLS[name]))
+        _constituencies(
+            p,
+            day,
+            "rc1992",
+            "local",
+            "1992 Namibian regional council elections",
+            f"na/{day}-regional-councils",
+            first,
+            date(1992, 12, 3),
+            regional("rc1992"),
+            len(regional("rc1992")),
+        )
+        _local_early(
+            p,
+            day,
+            "la1992",
+            first,
+            date(1992, 12, 3),
+            "1992 Namibian local authority council elections",
+            early_local("la1992"),
+            "cast",
+        )
+        _notes_1992(p)
+    elif day == "2010-11-26":
+        p.uses(raw.cached(SOURCE, URLS["gazette2010"]))
+        _local_early(
+            p,
+            day,
+            "la2010",
+            first,
+            date(2010, 11, 27),
+            "2010 Namibian local authority council elections",
+            early_local("la2010"),
+            "valid",
+        )
+    elif day == "2010-11-27":
         p.uses(raw.cached(SOURCE, URLS["rc2010"]))
         _constituencies(
             p,
@@ -2156,6 +2363,202 @@ def _local_old(p: Package, tag: str, day: str, first: date, last: date, english:
             + ". Both are stored as printed.",
             lang="en",
         )
+
+
+def _largest_remainder(votes: list[int], seats: int) -> list[int]:
+    quota = sum(votes) / seats
+    won = [int(v // quota) for v in votes]
+    order = sorted(range(len(votes)), key=lambda i: -(votes[i] / quota - won[i]))
+    for i in order[: seats - sum(won)]:
+        won[i] += 1
+    return won
+
+
+def _local_early(
+    p: Package, day: str, tag: str, first: date, last: date, english: str, areas: tuple[Area, ...], basis: str
+) -> None:
+    """Local authority councils of a Government Gazette notice, where an area's printed total counts ``basis`` ballots."""
+    path = f"na/{day}-local-authorities"
+    election = _election(p, tag, "local", first, last, english, path)
+    measure = VALID if basis == "valid" else CAST
+    unequal: list[str] = []
+    allocated: list[str] = []
+    for area in areas:
+        code = f"{slug(area.region)}-{slug(area.name)}".strip("-")
+        where = f"{area.name} ({area.region} region)" if area.region else area.name
+        ctag = f"{tag}:{code}"
+        contest = _contest(
+            p,
+            ctag,
+            election,
+            "list_allocation",
+            f"{english}, {where}",
+            f"{path}/{slug(area.region)}/{slug(area.name)}" if area.region else f"{path}/{slug(area.name)}",
+            tacit=area.tacit,
+            body_id=LOCAL,
+            magnitude=sum(entry.seats for entry in area.lists),
+            electoral_system_id=SYSTEM_LOCAL,
+        )
+        unit = _unit(
+            p,
+            tag,
+            "na.local_authority",
+            code,
+            f"{area.name} local authority area" + (f", {area.region} region" if area.region else ""),
+        )
+        result_set = _result_set(p, ctag, election, contest, tacit=area.tacit, empty=area.tacit)
+        if area.quota:
+            p.add(
+                "note",
+                id=key("note", result_set, "quota"),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=f"The Commission prints a quota of {area.quota} votes for the area.",
+                lang="en",
+            )
+        if not area.tacit:
+            _put(p, result_set, unit, None, measure, area.cast)
+            _put(p, result_set, unit, None, INVALID, area.rejected)
+        for position, entry in enumerate(area.lists, 1):
+            party = early_party(entry.label)
+            option = key("option", ctag, position)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party_id(party) if party else None,
+                ballot_position=position,
+                ballot_label=party_label(party),
+            )
+            if not area.tacit:
+                _put(p, result_set, unit, option, VOTES, entry.votes)
+            if entry.label.startswith("United Democratic Party"):
+                _caveat(
+                    p,
+                    result_set,
+                    "party",
+                    f"The notice names a party {entry.label} here, which is read as the United Democratic Front of Namibia.",
+                )
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=None,
+                kind="won" if entry.seats else "lost",
+                seats=entry.seats,
+            )
+            for place, name in enumerate(entry.names, 1):
+                person = key("person", ctag, position, place)
+                candidacy = key("candidacy", ctag, position, place)
+                p.add("person", id=person)
+                p.name(person, name, "en", "official")
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=place,
+                    ballot_name=name,
+                    member_of_party_id=party_id(party) if party else None,
+                    is_independent=False,
+                )
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    candidacy_id=candidacy,
+                    kind="elected",
+                    seats=None,
+                )
+        if area.tacit:
+            _caveat(
+                p,
+                result_set,
+                "tacit",
+                "One party submitted a list, so no poll was held and the notice prints no votes. The party is "
+                "declared to hold every seat.",
+            )
+            continue
+        votes = [entry.votes for entry in area.lists]
+        seats = [entry.seats for entry in area.lists]
+        printed = area.cast or 0
+        summed = sum(votes) + (area.rejected or 0 if basis == "cast" else 0)
+        if summed != printed:
+            unequal.append(f"{area.name} (printed {printed:,}, lists {summed:,})")
+            _caveat(
+                p,
+                result_set,
+                "total",
+                f"The notice prints {printed:,} as the total number of votes counted. The lists' votes "
+                + ("and the rejected ballot papers " if basis == "cast" else "")
+                + f"add up to {summed:,}. Every figure is stored as printed.",
+            )
+        if all(votes) and _largest_remainder(votes, sum(seats)) != seats:
+            allocated.append(area.name)
+            _caveat(
+                p,
+                result_set,
+                "seats",
+                "The seats the notice declares differ from a largest remainder allocation of the printed votes, "
+                "which gives "
+                + ", ".join(str(n) for n in _largest_remainder(votes, sum(seats)))
+                + ". The declared seats are stored as printed.",
+            )
+    if unequal:
+        p.accept(
+            "accounting.votes_valid",
+            "The printed total of votes counted differs from the sum of the lists' votes"
+            + (" and rejected ballot papers" if basis == "cast" else "")
+            + " for "
+            + "; ".join(unequal)
+            + ". Each is stored as printed.",
+        )
+
+
+def _notes_1992(p: Package) -> None:
+    regional_election = key("election", "rc1992")
+    _caveat(
+        p,
+        regional_election,
+        "notice",
+        "The Government Gazette notice prints each result as one table of constituencies, with the total number of "
+        "votes counted and, in brackets, the rejected ballot papers. It marks the member declared elected by "
+        "underlining the name, which the notice's scanned text layer does not keep. The member of each constituency "
+        "is stored as the candidate with the most votes. The text layer misreads many names, so the names are read "
+        "against the page images and the notice of nominations (Government Notice 155 of 1992). The notice lists no "
+        "result for the Keetmanshoop Rural and Olukonda constituencies, where the polls were held again in February "
+        "1993.",
+    )
+    for contest in regional("rc1992"):
+        votes = sum(c.votes or 0 for c in contest.candidates)
+        printed = contest.counted or 0
+        if printed == votes + (contest.rejected or 0):
+            continue
+        code = f"{slug(contest.region)}-{slug(contest.name)}"
+        _caveat(
+            p,
+            key("result_set", f"rc1992:{code}"),
+            "total",
+            f"The notice prints {printed:,} as the total number of votes counted, with {contest.rejected:,} rejected "
+            f"ballot papers in brackets. The candidates' votes add up to {votes:,}"
+            + (
+                ", the printed total, so the total leaves out the rejected ballot papers."
+                if votes == printed
+                else f", and with the rejected ballot papers to {votes + (contest.rejected or 0):,}."
+            )
+            + " Every figure is stored as printed.",
+        )
+    _caveat(
+        p,
+        key("election", "la1992"),
+        "notice",
+        "The notice prints, for each local authority area with a poll, the total number of votes counted with the "
+        "rejected ballot papers in brackets, the quota, each party's votes and seats, and the names of the members "
+        "declared elected. The names are not stored. Three areas where one party stood are declared elected without "
+        "a poll. The election for the Aroab council was held in February 1993.",
+    )
 
 
 def _local(p: Package, day: str, first: date, last: date, year: int, areas: tuple[Area, ...]) -> None:
