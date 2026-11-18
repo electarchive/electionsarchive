@@ -206,6 +206,66 @@ def pdf_mayors(lines: list[str]) -> list[Place]:
     return places
 
 
+# 2014 tables ------------------------------------------------------------------------------------------------------
+
+PROCLAIMED = re.compile(
+    rf"^(?P<label>\s*\S.*?)\s{{2,}}(?P<name>\S.*?)\s{{2,}}(?P<party>\S.*?)\s{{2,}}(?P<votes>{NUMBER})$"
+)
+TIE = re.compile(
+    rf"^(?P<label>\s*\S.*?)\s*\(EMPATE\)\s{{2,}}(?P<names>\S.*?)\s{{2,}}(?P<party>\S.*?)\s{{2,}}(?P<votes>{NUMBER})-(?P=votes)$"
+)
+WRAPPED = re.compile(rf"^(?P<label>\s*\S.*?)\s{{2,}}(?P<party>\S.*?)\s{{2,}}(?P<votes>{NUMBER})$")
+
+
+def party(text: str) -> str:
+    """An alliance printed as `CD / MOLIRENA`, written as the other tables write one: `CD, MOLIRENA`."""
+    return ", ".join(clean(part) for part in text.split("/"))
+
+
+def pdf_representatives(lines: list[str]) -> list[Place]:
+    """The 2014 Cuadro 13: the representative proclaimed in each corregimiento, under its province or comarca, printed
+    in capitals, and its district. A comarca of one corregimiento prints its winner on its own line, and the
+    corregimientos of a comarca with no districts carry an empty district. A tie prints both candidates and no
+    winner; its place has no winners and a note that says so."""
+    places: list[Place] = []
+    province = district = ""
+    body = False
+    for line in lines:
+        text = line.rstrip()
+        if "OBTENIDOS" in text:
+            body = True
+            continue
+        if not body or not text.strip():
+            continue
+        if text.strip().startswith(("FUENTE", "FECHA", "TRIBUNAL ELECTORAL")):
+            body = False
+            continue
+        if places and places[-1].winners and not places[-1].winners[0].name and not re.search(r"\d", text):
+            places[-1].winners[0].name = clean(text)  # a name the table wraps onto the next line
+        elif match := TIE.match(text):
+            names = " and ".join(clean(n) for n in match["names"].split("/"))
+            note = (
+                f"The Tribunal's table of representatives proclaimed prints a tie here between {names}, with "
+                f"{number(match['votes']):,} votes each, and gives their parties as \u201c{clean(match['party'])}\u201d. "
+                "It names no single winner, so no winner is recorded."
+            )
+            places.append(Place((province, district, clean(match["label"])), [], note=note))
+        elif match := PROCLAIMED.match(text) or WRAPPED.match(text):
+            label = clean(match["label"])
+            winner = Winner(clean(match.groupdict().get("name") or ""), party(match["party"]), number(match["votes"]))
+            if label.isupper():
+                places.append(Place((label, "", label), [winner]))
+            else:
+                places.append(Place((province, district, label), [winner]))
+        elif re.search(r"\d", text):
+            continue  # a page number
+        elif clean(text).isupper():
+            province, district = clean(text), ""
+        else:
+            district = clean(text)
+    return places
+
+
 # 2014 proclamation lists ----------------------------------------------------------------------------------------
 
 

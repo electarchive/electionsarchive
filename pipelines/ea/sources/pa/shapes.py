@@ -9,7 +9,7 @@ shape is the union of its corregimientos in the same layer, so neighbors share t
 
 An election takes a district's corregimientos from a layer only when the layer holds exactly the corregimientos that
 the election's tables print in that district, and it takes the nearest such layer in time. It takes a district's
-outline the same way, or, in 2014, whose tables give no corregimientos, from the nearest layer whose districts in the
+outline the same way, or, in an election whose tables give no corregimientos, from the nearest layer whose districts in the
 province are the election's. A province takes the nearest layer whose districts in it are the election's. Neither
 takes a layer across the day a comarca took land from it. So a shape is never drawn for an election in which the area
 held other corregimientos, districts, or land than the layer shows. A corregimiento whose shape spans several elections
