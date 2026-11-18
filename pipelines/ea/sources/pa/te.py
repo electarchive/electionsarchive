@@ -46,7 +46,11 @@ def url(name: str) -> str:
 
 
 def fetch() -> None:
-    """Load the files that were saved from the Tribunal's site (data/inbox/pa.te/) into the raw cache."""
+    """Load the files that were saved from the Tribunal's site (data/inbox/pa.te/) into the raw cache, and fetch the
+    boundary layers."""
+    from ea.sources.pa import shapes
+
+    shapes.fetch()
     index = json.loads((INBOX / "index.json").read_text())
     for key, entry in index.items():
         content = (INBOX / entry["file"]).read_bytes()
@@ -951,7 +955,8 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Panama's provinces and comarcas, electoral circuits, districts, and corregimientos, as named in the "
-        "Tribunal Electoral's results tables",
+        "Tribunal Electoral's results tables, with the shapes of the provinces, districts, and corregimientos from "
+        "the census office's and the Instituto Geográfico Nacional Tommy Guardia's boundary layers",
     )
     p.external |= {PANAMA, COUNTRY}
     for code, rank, kind, noun in SCHEMES:
@@ -976,6 +981,9 @@ def geo() -> Package:
         put("pa.distrito", code, best(labels), parents)
     for (district, code), labels in sorted(found.corregimientos.items()):
         put("pa.corregimiento", f"{district}:{code}", best(labels), [(area("pa.distrito", district), None, None)])
+    from ea.sources.pa import shapes
+
+    shapes.add(p)
     return p
 
 
