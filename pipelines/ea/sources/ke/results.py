@@ -211,13 +211,13 @@ def registry() -> Package:
 class Builder:
     """Stages the units, contests, and values of one election's package."""
 
-    def __init__(self, p: Package, day: date, source: str) -> None:
+    def __init__(self, p: Package, day: date, source: str, path: str | None = None) -> None:
         self.p = p
         self.day = day
         self.source = source
         self.units: dict[tuple[str, str], str] = {}
         self.slugs: set[str] = set()
-        self.path = f"ke/{day}-general" if day == GENERAL else f"ke/{day}-presidential"
+        self.path = path or (f"ke/{day}-general" if day == GENERAL else f"ke/{day}-presidential")
 
     def unit(self, level: str, code: str) -> str:
         """The reporting unit for an area on this day, staged on first use."""
@@ -271,6 +271,7 @@ class Builder:
         system: str = FPTP,
         method: str | None = None,
         status: str = "active",
+        completeness: float = 1.0,
     ) -> tuple[str, str]:
         p = self.p
         contest = key("contest", self.day, tag)
@@ -300,7 +301,7 @@ class Builder:
             source_id=self.source,
             status=status,
             is_default=True,
-            completeness=1.0,
+            completeness=completeness,
         )
         if method:
             p.add(
