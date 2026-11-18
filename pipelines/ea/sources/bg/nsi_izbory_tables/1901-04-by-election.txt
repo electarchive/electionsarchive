@@ -1,0 +1,14 @@
+# The volume's notes (p170): the election in Попово took place on 8 April 1901, those in the other 19 districts on 7 October 1901
+
+# page 335
+D 10 | Попово | Popovo
+S I 3299 1105
+S II 3045 850
+S III 3020 920
+T 9364 2875
+C E | Славчо Бабаджановъ | I:284 II:242 III:552 | 1078
+C N | Димитръ Драшевъ [*] | I:699 II:134 III:140 | 973
+C N | Христо Г. Хаджиевъ [*] | I:38 II:352 III:17 | 407
+C N | Тодоръ Тодоровъ [*] | I:83 II:132 III:173 | 388
+C N | Никола Ст. Фидовски [*] | I:- II:- III:36 | 36
+

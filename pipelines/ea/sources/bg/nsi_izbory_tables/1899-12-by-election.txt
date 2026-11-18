@@ -1,0 +1,17 @@
+# page 153
+# Table I (pp. 148-149) dates the districts: Луковитъ and Орхание voted on 5/XII-1899, Кула and Стара-Загора on 6/II-1900
+D 2 | Луковитъ | Loukovit
+S I 2825 852
+S II 2963 672
+S III 2803 585
+T 8591 2109
+C E | Иванъ Убевъ | I:259 II:668 III:497 | 1424
+# first name read as "Нино" here (p143 Луковитъ has the same man, read there as "Пино"); uncertain
+C N | Нино Горговъ [*] | I:381 II:3 III:7 | 391
+C N | Ив. Балтаджиевъ [*] | I:212 II:1 III:79 | 292
+D 3 | Орхание | Orhanié
+S I 3945 921
+S II 3415 1110
+T 7360 2031
+C E | Кръстю М. Диловски | I:919 II:1109 | 2028
+# Table III (p152) prints I as 919

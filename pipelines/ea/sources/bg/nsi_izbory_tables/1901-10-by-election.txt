@@ -1,0 +1,279 @@
+# The volume's notes (p170): the election in Попово took place on 8 April 1901, those in the other 19 districts on 7 October 1901
+
+# page 329
+D 1 | Бургазъ | Bourgas
+S I 2285 988
+S II 2241 689
+S III 2253 469
+S IV 2577 421
+T 9356 2567
+C E | Д-ръ Н. Генадиевъ | I:307 II:650 III:35 IV:226 | 1218
+C N | Иони А. Воденичаровъ | I:598 II:18 III:362 IV:161 | 1139
+C N | Атанасъ Славовъ [*] | I:84 II:18 III:69 IV:34 | 205
+D 2 | Варна | Varna
+S I 1718 706
+S II 3017 1284
+S III 1452 522
+S IV 2328 335
+S V 2078 292
+S VI 2335 392
+T 12928 3531
+C E | Кръстьо Мирски | I:365 II:775 III:230 IV:145 V:79 VI:125 | 1719
+C N | Илия Стаматовъ | I:319 II:459 III:287 IV:184 V:181 VI:224 | 1654
+C N | Д-ръ В. Карамихалевъ | I:20 II:44 III:5 IV:6 V:32 VI:41 | 148
+D 3 | Видинъ | Vidin
+S I 1886 808
+S II 2119 720
+S III 2172 475
+S IV 2202 686
+S V 2742 1080
+S VI 2066 681
+T 13187 4450
+C E | Тома Ц. Ванчовъ | I:366 II:403 III:461 IV:658 V:1029 VI:537 | 3454
+C N | Димитръ Т. Драмовъ | I:332 II:238 III:5 IV:18 V:34 VI:42 | 669
+C N | Коста Стефановъ | I:97 II:59 III:8 IV:10 V:6 VI:102 | 282
+C N | Димитръ Благоевъ [*] | I:11 II:18 III:1 IV:- V:9 VI:- | 39
+D 4 | Орѣхово | Orehovo
+S I 3198 787
+S II 3415 743
+S III 3181 837
+S IV 1927 537
+S V 2039 496
+T 13760 3400
+C E | Давидъ Ц. Вълчовъ | I:561 II:565 III:691 IV:410 V:422 | 2649
+C N | Андрей Цвѣтковъ [*] | I:227 II:179 III:145 IV:126? V:81 | 758?
+# IV and total of Андрей Цвѣтковъ are under the printed library stamp/watermark; only "1?6" and "7??" visible; 126 chosen because the other two Orehovo non-elected on p330 have IV:126; values are best guesses.
+
+# page 330
+D 4 | cont
+C E | Ионикий Ив. Гърковъ | I:543 II:561 III:691 IV:410 V:435 | 2640
+C E | Тодоръ Хр. Даскаловъ [*] | I:545 II:563 III:694 IV:410 V:416 | 2628
+C N | Христо Сп. Рахиловъ [*] | I:236 II:178 III:145 IV:126 V:62 | 747
+C N | Тошо Белишовъ [*] | I:230 II:174 III:142 IV:126 V:65 | 737
+# Table III (p325) prints 545 for this elected candidate's section I; Table IV prints 543, which agrees with the 2640 total.
+D 5 | Конушъ | Konouch
+S I 4370 1333
+S II 1611 629
+S III 2365 914
+S IV 3409 1043
+T 11755 3919
+C E | Костадинъ х. Калчевъ | I:460 II:449 III:551 IV:168 | 1628
+C E | Атанасъ Епитропу | I:467 II:461 III:255 IV:2 | 1185
+C N | Ангелъ Златановъ | I:460 II:29 III:31 IV:633 | 1153
+C N | Ив. М. Лиловъ | I:174 II:114 III:265 IV:468 | 1021
+C N | Тома Карайовевъ | I:371 II:63 III:112 IV:285 | 831
+C N | Др. В. Манчевъ | I:146 II:- III:336 IV:169 | 651
+C N | К. Толевъ | I:173 II:96 III:139 IV:- | 408
+C N | Д-ръ В. Радославовъ [*] | I:128 II:6 III:34 IV:236 | 404
+C N | Д. Благоевъ [*] | I:68 II:13 III:8 IV:5 | 94
+
+# page 331
+D 5 | cont
+C N | Янко Сакѫзовъ [*] | I:64 II:13 III:8 IV:5 | 80
+# MISMATCH Янко Сакѫзовъ: sections sum to 90, printed total 80
+C N | Георги Тормановъ [*] | I:13 II:- III:42 IV:21 | 76
+D 6 | Пещера | Pechtera
+S I 2756 1130
+S II 2713 1091
+S III 2767 1441
+T 8236 3662
+C E | Михаилъ Такевъ | I:794 II:732 III:598 | 2124
+C N | Ангелъ Горановъ [*] | I:331 II:353 III:843 | 1527
+D 7a | Пловдивъ (градска) | Plovdiv (urbain)
+S I 2021 658
+S II 2178 934
+S III 1950 681
+S IV 1818 737
+T 7967 3010
+C E | Д-ръ Тодоръ Гатевъ | I:318 II:665 III:295 IV:470 | 1748
+C E | Д-ръ Димитръ Мидковъ | I:298 II:655 III:284 IV:485 | 1722
+C N | Георги Ив. Джевизовъ [*] | I:322 II:173 III:345 IV:212 | 1052
+C N | Михаилъ Ив. Маджаровъ | I:315 II:179 III:338 IV:206 | 1038
+C N | Хр. Ив Поповъ [*] | I:36 II:36 III:10 IV:54 | 136
+C N | Д. Благоевъ [*] | I:6 II:40 III:21 IV:13 | 80
+C N | Аргиръ Демировъ [*] | I:6 II:42 III:- IV:- | 48
+C N | Теню Пачевъ | I:1 II:17 III:11 IV:7 | 36
+C N | Д-ръ Д. Бойкиновъ [*] | I:- II:21 III:6 IV:8 | 35
+
+# page 332
+D 7a | cont
+C N | Аргиръ Димитровъ [*] | I:- II:- III:21 IV:11 | 32
+D 7б | Пловдивъ (селска) | Plovdiv (rural)
+S I 1719 617
+S II 2484 1099
+S III 2863 987
+S IV 3316 919
+S V 2105 699
+T 12487 4321
+C E | Несторъ К. Абаджиевъ | I:459 II:419 III:629 IV:382 V:536 | 2425
+C E | Мильо С. Балтовъ | I:450 II:417 III:627 IV:375 V:487 | 2356
+C E | Найденъ Беневъ | I:459 II:385 III:637 IV:382 V:491 | 2354
+C N | Д-ръ Т. Кръстевъ | I:163 II:648 III:356 IV:465 V:205 | 1837
+C N | Никола Митевъ | I:154 II:609 III:361 IV:535 V:168 | 1827
+C N | Янко Божиловъ [*] | I:154 II:568 III:345 IV:55 V:149 | 1271
+C N | К. Мариновъ (генералъ) [*] | I:3 II:36 III:- IV:428 V:12 | 479
+C N | Д. Драгневъ [*] | I:- II:37 III:3 IV:52 V:- | 92
+C N | Генко Шойлековъ [*] | I:- II:6 III:3 IV:74 V:4 | 87
+C N | Хр. Славковъ [*] | I:- II:26 III:- IV:- V:47 | 73?
+# Total of Хр. Славковъ partly under the printed library stamp; reads 73 (= 26+47).
+
+# page 333
+D 7б | cont
+C N | Т. Гаговъ [*] | I:- II:64 III:- IV:- V:- | 64
+C N | Г. Атанасовъ [*] | I:3 II:39 III:- IV:1 V:2 | 45
+D 8 | Сърнена-Гора (закрита) | Sirnena-Gora (suprimé)
+S I 3284 958
+S II 2955 900
+S III 2171 662
+T 8410 2520
+C E | Димитръ К. Поповъ | I:648 II:718 III:364 | 1730
+C E | Стефанъ С. Бобчевъ | I:647 II:718 III:364 | 1729
+C N | Тоню Петровъ [*] | I:306 II:181 III:298 | 785
+C N | Василъ Милевъ | I:157 II:181 III:296 | 634
+C N | Григоръ Начевичъ [*] | I:147 II:1 III:- | 148
+D 9 | Плѣвенъ | Pleven
+S I 2414 847
+S II 2616 707
+S III 2433 311
+S IV 3703 578
+S V 2765 680
+S VI 2614 459
+T 16545 3582
+C E | Горанъ Бѣльовъ | I:498 II:317 III:193 IV:52 V:322 VI:20 | 1402
+C E | Д-ръ Алекси П. Друмевъ | I:506 II:319 III:193 IV:60 V:146 VI:20 | 1244
+C N | Хр. Г. Върбеновъ [*] | I:119 II:194? III:4 IV:317 V:276 VI:77 | 987
+C N | Иванъ Наповъ [*] | I:115 II:193 III:4 IV:328 V:127 VI:103 | 870
+C N | Ангелъ Митовъ [*] | I:110? II:142 III:59 IV:22 V:22 VI:243 | 598
+# Names blurred: "Д-ръ Алекси П. Друмевъ" (could be Дружевъ), "Иванъ Наповъ".
+# Хр. Г. Върбеновъ II read 191 or 194; 194 makes the sum match the printed 987.
+
+# page 334
+D 9 | cont
+C N | П. Х. Шоповъ [*] | I:114 II:145 III:56 IV:21 V:26 VI:163 | 525
+C N | Д. Драгиевъ [*] | I:4 II:- III:19 IV:76 V:189 VI:64 | 352
+C N | Димитръ Джоновъ [*] | I:38 II:1 III:50 IV:86 V:9 VI:168 | 322
+# MISMATCH Димитръ Джоновъ: sections sum to 352, printed total 322 (IV clearly 86; 56 would make 322)
+C N | Вѣшко Дуновъ [*] | I:1 II:- III:20 IV:73 V:120 VI:1 | 215
+C N | Хр. Ив. Бурджевъ [*] | I:36 II:14 III:28 IV:91 V:9 VI:18 | 196
+C N | Къно А. Игнатовъ [*] | I:34 II:18 III:8 IV:7 V:66 VI:18 | 151
+C N | Никола Р. Кръстановъ [*] | I:35 II:18 III:8 IV:7 V:28? VI:17? | 113
+# V and VI of Никола Р. Кръстановъ partly under the printed library stamp; 28+17 agrees with total 113.
+
+# page 335
+D 9 | cont
+C N | Никола Хр. Габровски [*] | I:42 II:26 III:- IV:1 V:11 VI:- | 80
+C N | Димитръ Благоевъ [*] | I:41 II:26 III:- IV:1 V:8 VI:- | 76
+D 11 | Русе | Roussé
+S I 2974 758
+S II 2963 762
+S III 3292 960
+S IV 2999 656
+S V 2477 736
+S VI 2366? 536
+T 17071 4408
+C E | Александръ Каназирски | I:361 II:400 III:285 IV:175 V:104 VI:288 | 1613
+C N | Беню х. Кръстевъ | I:152 II:1 III:63 IV:277 V:479 VI:205 | 1177
+C N | Никола Мушановъ | I:129 II:205 III:271 IV:167 V:133 VI:38 | 943
+# Ruse block is faintly printed; all figures read at zoom and agree with totals. VI registered could read 2566; 2366 agrees with T and with Table I.
+
+# page 336
+D 11 | cont
+C N | Константинъ Панайотовъ | I:105 II:139 III:304 IV:37 V:18 VI:5 | 608
+C N | Янко Сакѫзовъ [*] | I:10 II:17 III:31 IV:- V:2 VI:- | 60
+D 12 | Каваклии (закрита) | Kavakly (suprimé)
+S I 2462 1056
+S II 1774 562
+S III 2604 556
+S IV 2002 551
+T 8842 2725
+C E | Ной Марковъ | I:7 II:395 III:356 IV:417 | 1175
+C N | Христо Ив. Гендовичъ [*] | I:472 II:156 III:176 IV:114 | 918
+C N | Д-ръ Марко К. Марковъ [*] | I:575 II:11 III:3 IV:- | 589
+C N | Панайотъ П. Стойновъ [*] | I:2 II:- III:16 IV:19 | 37
+D 13 | Сливенъ | Sliven
+S I 2995 1313
+S II 3491 1360
+S III 2151 472
+S IV 2196 542
+T 10833 3687?
+# Voters total blurred, looks like 3587; 3687 agrees with the section sum and with Table III.
+C E | Петръ Папанчевъ | I:500? II:657 III:314 IV:301 | 1772
+# Петръ Папанчевъ I blurred, looks like 590; 500 agrees with the total 1772 and with Table III (p327).
+C N | Янко Сакѫзовъ [*] | I:438 II:480 III:81 IV:100 | 1099
+C N | Христо Доградмаджиевъ [*] | I:376 II:223 III:77 IV:141 | 817
+D 14 | Ихтиманъ (закрита) | Ihtiman (suprimé)
+S I 2750 972
+S II 2521 760
+T 5271 1732
+C E | Д-ръ Г. Гаговъ | I:496 II:571 | 1067
+C N | Георги Згуревъ [*] | I:325 II:201 | 526
+C N | Х. Т. Кобиляровъ [*] | I:125 II:- | 125
+
+# page 337
+D 15 | Пирдопъ | Pirdop
+S I 3358 1209
+S II 3480 762
+T 6838 1971
+C E | Михаилъ Такевъ (ОТ.) | I:526 II:453 | 979
+C N | Д-ръ В. Радославовъ [*] | I:297 II:286 | 583
+C N | Генчо Филиповъ [*] | I:382 II:21 | 403
+D 16 | София | Sophia
+S I 2599 677
+S II 3730 1051
+S III 4593 1230
+S IV 3289 555
+S V 3252 566
+S VI 2411 601
+S VII 3066 723
+T 22940 5403
+C E | Христо Славейковъ | I:392 II:481 III:595 IV:186 V:125 VI:176 VII:271 | 2226
+C E | Д-ръ Димитръ Моловъ | I:386 II:441 III:589 IV:176 V:128 VI:177 VII:276 | 2173
+C N | Тодоръ Тодоровъ | I:188 II:318 III:420 IV:304 V:272 VI:237 VII:362 | 2101
+C N | Д. М. Яблански [*] | I:185 II:318 III:407 IV:304 V:272 VI:237 VII:358 | 2081
+C N | Д-ръ В. Радославовъ | I:65 II:189 III:152 IV:62 V:164 VI:188 VII:81 | 901
+C N | Иванъ Г. Поповъ | I:61 II:175 III:145 IV:62 V:164 VI:187 VII:80 | 874
+C N | Янко Сакѫзовъ [*] | I:25 II:63 III:61 IV:1 V:- VI:- VII:- | 150?
+# Total of Янко Сакѫзовъ partly under the printed library stamp; read as 150 (sum of sections).
+
+# page 338
+D 16 | cont
+C N | Димитръ Благоевъ [*] | I:21 II:63 III:59 IV:1 V:- VI:- VII:- | 144
+C N | Пантелей Баджовъ [*] | I:7 II:39 III:12 IV:13 V:5 VI:1 VII:13 | 90
+D 17 | Царибродъ | Tzaribrod
+S I 3119 1572
+S II 3606 1262
+T 6725 2834
+C E | Тодоръ Тодоровъ | I:366 II:575 | 941
+C N | Соколъ Д. Невлянски | I:647 II:241 | 888
+C N | Д-ръ Дико Иовевъ | I:216 II:310 | 526
+C N | Михаилъ Каралеевъ | I:189 II:74 | 263
+C N | Дончо Иговъ [*] | I:160 II:62 | 222
+D 18 | Сейменъ (закрита) | Seymen (suprimé)
+S I 2407 1010
+S II 2222 719
+S III 2245 754
+T 6874 2483
+C E | Христо Камбуровъ | I:329 II:290 III:412 | 1031
+C N | Вълчанъ Г. Чакъровъ | I:487 II:164 III:182 | 833
+C N | Димитръ Яблански | I:192 II:238 III:37 | 467
+C N | Димитръ Драгиевъ [*] | I:3 II:28 III:123? | 154
+D 19 | Г.-Орѣховица | G.-Orehovitza
+S I 3439? 1080
+S II 2776? 945
+S III 2801 768
+S IV 2786? 915
+T 11802 3708
+C E | Д-ръ Петръ С. Стайковъ | I:593 II:328 III:242 IV:394 | 1557
+C N | Тодоръ Тодоровъ | I:245 II:183 III:444 IV:213 | 1085
+# G.-Orehovitza registered figures faintly printed; readings agree with T. Тодоровъ III/IV partly under printed library stamp.
+
+# page 339
+D 20 | Кесарово (закрита) | Kesarovo (suprimé)
+S I 3381 1238
+S II 2080 1053
+T 5461 2291
+C E | Атанасъ А. Буровъ (К.) | I:607 II:345 | 952
+C N | Иванъ Халачевъ | I:493 II:455 | 948
+C N | Стоянъ Бурмовъ | I:138 II:179 | 317
+C N | Василъ Стойчевъ [*] | I:- II:80 | 80
+

@@ -1,0 +1,273 @@
+# page 141
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column.
+D 1 | Анхиолъ | Anhiol
+S I 2268 854
+S II 2745 632
+T 5013 1486
+C E | Д-ръ П. Табурновъ | I:854 II:632 | 1486
+D 2 | Видинъ | Vidin
+S I 3065 1593
+S II 3485 1560
+S III 2574 -
+S IV 3591 2280
+T 12715 5433
+# section III voters printed "—¹)" (footnote 1: no election held in section III)
+C E | Младенъ Ивановъ | I:1127 II:1555 III:- IV:92 | 2774
+# Table IV prints II as 1155; Table III (p137) prints 1555, which matches the printed total 2774
+# name: е and о are hard to tell apart in this small type; read as "Георгиевъ" (same typeface renders the е of "Ге-" alike)
+C E | Гуца Георгиевъ | I:1120 II:1555 III:- IV:92 | 2767
+C E | Ванко Митковъ | I:1119 II:1555 III:- IV:92 | 2766
+C N | Найчо Цановъ | I:481 II:2 III:- IV:2189 | 2672
+C N | Тома Ц. Вайчовъ | I:477 II:2 III:- IV:2189 | 2668
+C N | Манолъ Х. Златановъ | I:475 II:2 III:- IV:2189 | 2666
+D 3 | Бѣла-Слатина | Bela-Slatina
+S I 3506 1180
+S II 3476 958
+S III 3497 930
+T 10479 3068
+C E | Лука Вратановъ | I:992 II:957 III:929 | 2878
+C E | Константинъ Липовански | I:970 II:922 III:923 | 2815
+C N | Тодоръ Г. Влайковъ [*] | I:185 II:1 III:- | 186
+C N | Иванъ Димитровъ [*] | I:185 II:1 III:- | 186
+C N | Никола В. Становъ | I:22 II:35 III:6 | 63
+D 4 | Дупница | Doupnitza
+S I 3381 825
+S II 2958 247
+S III 2913 801
+S IV 2248 731
+T 11500 2604
+C E | Иванчо Д. Зографъ | I:559 II:237 III:798 IV:726 | 2320
+C E | Димитъръ Антовъ | I:555 II:237 III:791 IV:726 | 2309
+C N | Д-ръ Ал. Радевъ | I:116 II:- III:3 IV:- | 119
+C N | Ив. Козаровъ | I:116 II:- III:2 IV:- | 118
+C N | Ив. Ев. Поповъ [*] | I:145 II:10 III:1 IV:7 | 163
+F ¹) Изборътъ въ III секция не станалъ.
+
+# page 142
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column.
+D 4 | cont
+C N | Димитръ П. Радевъ | I:143 II:10 III:1 IV:7 | 161
+D 5 | Кюстендилъ | Kustendil
+S I 3262 1149
+S II 3365 745
+S III 2806 968
+S IV 3383 543
+T 12816 3405
+C E | Михаилъ Давидовъ | I:1145 II:745 III:968 IV:543 | 3401
+C E | Стефанъ Касабовъ | I:1135 II:745 III:968 IV:543 | 3391
+C E | Богданъ Станковичъ | I:1134 II:745 III:968 IV:543 | 3390
+C N | Христо П. Славейковъ | I:10 II:- III:- IV:- | 10
+C N | Димитръ Ризовъ | I:2 II:- III:- IV:- | 2
+C N | Иванъ Златковъ | I:1 II:- III:- IV:- | 1
+# the next two candidates print no section figures, only a dash in the total column
+C N | Костадинъ Г. Юговъ | | -
+C N | Д-ръ Алекс. П. Радевъ | | -
+D 6 | Ловечъ | Lovetch
+S I 3410 1741
+S II 3036 1550
+S III 2902 1177
+S IV 2909 1167
+T 12257 5635
+C E | Маринчо Караконовъ | I:1491 II:845 III:493 IV:860 | 3689
+C E | Василъ Ст. Джабарски | I:1490 II:845 III:493 IV:860 | 3688
+# surname read as "Гължбаровъ"; small type, letters 2-4 uncertain
+C E | Паскалъ Гължбаровъ | I:1491 II:845 III:493 IV:860 | 3689
+C N | Стефанъ Георгиевъ | I:243 II:712 III:684 IV:307 | 1946
+C N | А. Г. Башевъ | I:242 II:711 III:684 IV:307 | 1944
+C N | Хр. П. Никифоровъ | I:242 II:711 III:684 IV:307 | 1944
+D 7 | Тетевенъ | Teteven
+S I 3044 585
+S II 2666 1119
+S III 3073 1073
+T 8783 2777
+C E | Иванъ Бобевски | I:501 II:814 III:1051 | 2366
+# surname read as "Ваневъ"; faint print, uncertain
+C E | Никола Ваневъ | I:501 II:811 III:1051 | 2363
+C N | Хр. А. Филиповъ | I:84 II:305 III:22 | 411
+# Иовански III cell is covered by the scanner's watermark logo; 22 inferred from total 410 and the parallel Филиповъ row
+C N | Димитръ Иовански [*] | I:83 II:305 III:22? | 410
+
+# page 143
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column.
+D 8 | Ломъ | Lom
+S I 3197 1704
+S II 2201 1043
+S III 2735 1202
+S IV 3345 1198
+T 11478 5147
+C E | Илия Георговъ | I:950 II:672 III:861 IV:270 | 2753
+C N | Панто П. Пантовъ | I:751 II:365 III:341 IV:930 | 2387
+D 9 | Пловдивъ | Plovdiv
+S I 3637 796
+S II 3167 1015
+S III 3670 648
+S IV 1594 475
+T 12068 2934
+C E | Стефанъ х. Калчовъ | I:550 II:951 III:583 IV:387 | 2471
+# first name read as "Гьока"; small type, uncertain
+C N | Хаджи Гьока Павловъ | I:230 II:55 III:61 IV:88 | 434
+C N | Д. Благоевъ [*] | I:16 II:12 III:3 IV:- | 31
+D 10 | Луковитъ | Loukovit
+S I 2825 1174
+S II 2963 968
+S III 2803 817
+T 8591 2959
+C E | Пою М. Табаковъ | I:495 II:647 III:453 | 1595
+C N | Найденъ Беневъ [*] | I:370 II:321 III:143 | 834
+# name read as "Пино Горговъ"; small type, uncertain
+C N | Пино Горговъ | I:310 II:- III:223 | 533
+D 11 | Силистра | Silistra
+S I 3560 1070
+S II 2568 1425
+S III 2333 1285
+T 8461 3780
+C E | Стоянъ Т. Бойковъ | I:241 II:1074 III:941 | 2256
+C N | Петръ Карагеоргиевъ | I:616 II:340 III:347 | 1303
+C N | Антонъ Т. Кумановъ | I:116 II:7 III:- | 123
+C N | Марко П. Марковъ | I:96 II:- III:- | 96
+C N | Василъ Г. Патроновъ | I:3 II:- III:- | 3
+D 12 | Ямболъ | Yambol
+S I 3912 1678
+S II 2602 970
+S III 3783 921
+# voters total looks like "8569" in the scan but bold 3 and 8 are indistinguishable here (the 3s of 3912/3783 look the same); 1678+970+921=3569
+T 10297 3569
+C E | Иванъ Г. Поповъ | I:737 II:489 III:583 | 1809
+# Кулевъ I cell is very faint; 735 fits the printed total 1807
+C E | Атанасъ Г. Кулевъ | I:735? II:489 III:583 | 1807
+C N | Янко Сакъзовъ | I:944 II:481 III:353 | 1778
+# last candidate: name faint (read as "Димитръ Благоевъ"), and the total is half covered by the scanner's watermark logo; visible "17?3", 919+481+353=1753
+C N | Димитръ Благоевъ? | I:919 II:481 III:353 | 1753?
+
+# page 144
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column.
+D 12 | cont
+C N | Христо Чакмаковъ | I:20 II:- III:- | 20
+C N | Х. Ст. Дочовъ | I:4 II:- III:- | 4
+D 13 | Искрецъ | Iskretz
+S I 4326 1394
+S II 2343 747
+S III 1610 656
+T 8279 2797
+C E | Кръстанъ Доцевъ Георгиевъ | I:899 II:680 III:258 | 1837
+C E | Илия Д. Вълчевъ | I:899 II:677 III:258 | 1834
+C N | Игнатъ Веселиновъ [*] | I:495 II:66 III:398 | 959
+C N | Стоянъ Ценовъ [*] | I:495 II:68 III:398 | 961
+D 14 | Самоковъ | Samocov
+S I 5164 922
+S II 2016 301
+S III 2063 509
+T 9243 1732
+C E | Христо Г. Занковъ | I:902 II:294 III:510 | 1706
+D 15 | София | Sophia
+S I 5547 842
+S II 4242 913
+S III 3817 802
+S IV 2774 329
+S V 2263 586
+S VI 3257 626
+T 21900 4098
+# surname read as "Калжповъ" (8x zoom); unusual, uncertain
+C E | Михалъ Калжповъ | I:842 II:907 III:801 IV:329 V:583 VI:626 | 4088
+C E | Василъ Гьошевъ | I:841 II:905 III:801 IV:329 V:583 VI:626 | 4085
+D 16 | Царибродъ | Tzaribrod
+S I 3005 1246
+S II 3440 1011
+T 6445 2257
+# surname read as "Пронадалиевъ"; small type, uncertain
+C E | Димитръ П. Пронадалиевъ | I:931 II:843 | 1774
+# surname faint, read as "Повлански"; uncertain
+C N | Соколъ Д. Повлански [*] | I:320 II:167 | 487
+D 17 | Казанлѫкъ | Kazanlik
+S I 3416 991
+S II 3641 994
+S III 3436 835
+S IV 3333 707
+T 13826 3527
+C E | Гавр. Константиновъ | I:421 II:373 III:472 IV:590 | 1856
+# surname very faint, read as "Бодруловъ"; uncertain
+C N | Константинъ Бодруловъ? | I:567 II:620 III:363 IV:119 | 1669
+D 18 | Нова-Загора | Nova-Zagora
+S I 3332 1455
+S II 3135 937
+S III 2171 501
+T 8638 2893
+C E | Д-ръ Иорданъ Н. Нейковъ | I:681 II:463 III:460 | 1604
+C N | Антонъ Франга | I:758 II:475 III:41 | 1274
+
+# page 145
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column. Faint bleed-through from the reverse (heading of the 5/XII-99 and 6/II-900 by-elections) ignored.
+D 19 | Сейменъ | Seymen
+S I 2578 818
+S II 2664 538
+T 5242 1356
+C E | Вълчанъ Г. Чакъровъ | I:821 II:529 | 1350
+C N | Василъ Ив. Димчевъ | I:4 II:9 | 13
+D 20 | Чирпанъ | Tchirpan
+S I 3526 756
+S II 3823 806
+S III 3376 597
+T 10725 2159
+# Поповъ I cell: last digit reads 3 or 6 at 8x; 756 matches the printed total 2157
+C E | Христо Ив. Поповъ | I:756 II:806 III:595 | 2157
+D 21 | Пещера | Pechtera
+S I 2619 1163
+S II 2749 1045
+S III 2693 1533
+T 8061 3741
+# section I and the total as Table III (p140) prints them: 2619 and 8061
+C E | Ст. Чешмеджиевъ | I:664 II:786 III:1117 | 2567
+C E | Деню Маневъ | I:660 II:789 III:1117 | 2566
+C N | Михаилъ Такевъ | I:509 II:252 III:427 | 1188
+C N | Никола Каневъ | I:505 II:257 III:427 | 1189
+D 22 | Т.-Пазарджикъ | T.-Pazardjik
+S I 3390 854
+S II 3340 998
+S III 3055 509
+S IV 2890 545
+T 12675 2906
+# surname read as "Ибишевъ"; uncertain
+C E | Атанасъ Ив. Ибишевъ | I:776 II:514 III:133 IV:267 | 1690
+C N | Д-ръ Георги Гаговъ [*] | I:39 II:349 III:51 IV:111 | 550
+C N | Георги Т. Абаджиевъ | I:37 II:126 III:326 IV:169 | 658
+D 23 | Г.-Орѣховица | G.-Orèhovitza
+# the second section row is printed "I" (misprint for II)
+S I 2859 931
+S II 2898 667
+S III 2584 876
+S IV 2316 906
+T 10657 3380
+C E | Стефанъ Жълтовъ | I:326 II:421 III:475 IV:472 | 1694
+C N | Ив. Халачовъ | I:600 II:241 III:402 IV:430 | 1673
+D 24 | Хасково | Hascovo
+S I 3519 1320
+S II 3389 1260
+S III 2696 970
+S IV 3490 1121
+T 13094 4671
+# surname read as "Станоновъ"; small type, uncertain
+C E | Д-ръ Т. Станоновъ | I:663 II:701 III:615 IV:425 | 2404
+# MISMATCH Кирилъ Н. Добревъ: faint cells read I:543 II:660 III:546 IV:318 (sum 2067) vs printed total read as 2076 (last digit 0/6 unclear); II=669 would reconcile with 2076
+C E | Кирилъ Н. Добревъ | I:543 II:660 III:546 IV:318 | 2076
+# Table III (p140) prints the same figures: 543, 660, 546, 318 and a total of 2076
+C N | Константинъ Величковъ | I:384 II:225 III:278 IV:552 | 1439
+C N | Георги Ив. Манчевъ | I:352 II:208 III:278 IV:552 | 1390
+# Кирковъ: faint cells; I reads 255/256 and IV 121/124, and the total is half covered by the scanner's watermark logo. His running mate Димитръ Дамяновъ [*] on p146 has I:255 II:231 III:18 IV:124 = 628, which these cells match; best reading below
+C N | Георги Кирковъ [*] | I:255? II:231 III:18 IV:124? | 628?
+
+# page 146
+# Layout: elected (col 5-6) and non-elected (col 7-8) candidates are listed independently side by side; no party column.
+D 24 | cont
+C N | Димитръ Дамяновъ [*] | I:255 II:231 III:18 IV:124 | 628
+C N | Василъ Айрановъ | I:119 II:123 III:69 IV:107 | 418
+C N | Михаилъ Таковъ [*] | I:16 II:23 III:62 IV:21 | 122
+C N | Василъ Милевъ [*] | I:16 II:21 III:62 IV:21 | 120
+# no section figures printed, only a dash in the total column
+C N | Тодоръ Ив. Спраковъ | | -
+D 25 | Нови-Пазаръ | Novi-Pazar
+S I 3791 939
+S II 2916 1034
+T 6707 1973
+C E | Д-ръ Кирякъ Н. Провадалиевъ | I:778 II:1004 | 1782
+C N | Христо Тодоровъ | I:163 II:30 | 193
+

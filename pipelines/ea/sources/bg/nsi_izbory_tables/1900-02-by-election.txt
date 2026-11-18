@@ -1,0 +1,28 @@
+# page 153
+# Table I (pp. 148-149) dates the districts: Луковитъ and Орхание voted on 5/XII-1899, Кула and Стара-Загора on 6/II-1900
+D 1 | Кула | Koula
+S I 3966 1589
+S II 2039 990
+S III 2822 1512
+T 8827 4091
+C E | Нено К. Ковачевъ | I:1224 II:818 III:1497 | 3539
+C E | Лало Дичовъ | I:1224 II:818 III:1497 | 3539
+C N | Алекси М. Филиповъ | I:364 II:132 III:13 | 509
+C N | Марко Вельовъ | I:364 II:172 III:13 | 549
+D 4 | Стара-Загора | Stara-Zagora
+S I 3292 943
+S II 2916 839
+S III 3084 640
+S IV 2959 642
+T 12251 3064
+C E | Пеню Нановъ | I:883 II:730 III:588 IV:603 | 2804
+C E | Желѣзко Тоновъ | I:883 II:730 III:588 IV:603 | 2804
+# Table III (p152) prints the total as 2804
+C E | Димитръ Начовъ | I:883 II:729 III:588 IV:603 | 2803
+C N | Д-ръ Андрей Ходжовъ [*] | I:95 II:85 III:11 IV:- | 191
+C N | Георги В. Шиваровъ [*] | I:95 II:85 III:11 IV:- | 191
+C N | Димитръ Матеевъ [*] | I:95 II:84 III:11 IV:- | 190
+C N | Д. Драгиевъ [*] | I:7 II:25 III:41 IV:41 | 114
+C N | К. Тоневъ [*] | I:7 II:24 III:41 IV:41 | 113
+# Костовъ II cell is covered by the scanner's watermark logo; 24 fits the total 113
+C N | Ст. Костовъ [*] | I:7 II:24? III:41 IV:41 | 113
