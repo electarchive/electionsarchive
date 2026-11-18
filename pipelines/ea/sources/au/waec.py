@@ -24,6 +24,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.au import waec_shapes
 
 SOURCE = "au.waec"
 HOST = "https://www.elections.wa.gov.au"
@@ -1852,7 +1853,27 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=f"{plan}:{slug}")
         p.add("area_parent", area_id=id, parent_id=WA)
         p.name(id, name, "en", "official")
+    shapes(p, found)
     return p
+
+
+def shapes(p: Package, found: dict[tuple[str, str], str]) -> None:
+    """The districts' and regions' shapes, from `waec_shapes`, valid from each plan's first general election to the
+    next plan's."""
+    firsts = sorted({plan: min(day for day, v in PLANS.items() if v == plan) for plan in PLANS.values()}.items())
+    spans = {
+        plan: (date.fromisoformat(day), date.fromisoformat(firsts[i + 1][1]) if i + 1 < len(firsts) else None)
+        for i, (plan, day) in enumerate(firsts)
+    }
+    districts: dict[str, dict[str, str]] = {}
+    for plan, slug in found:
+        districts.setdefault(plan, {})[slug] = area("au-wa.district", f"{plan}:{slug}")
+    regions: dict[str, dict[str, str]] = {}
+    for g in GENERALS:
+        for d in checked(g.day):
+            if d.region is not None:
+                regions.setdefault(PLANS[g.day], {})[changeset.slug(d.name)] = waec_shapes.region_slug(d.region)
+    waec_shapes.add(p, key, districts, regions, spans)
 
 
 def registry() -> Package:
@@ -3061,6 +3082,7 @@ def packages() -> list[str]:
 def fetch() -> None:
     for link in files():
         raw.fetch(SOURCE, link, suffix=".pdf")
+    waec_shapes.fetch()
 
 
 def parse() -> None:
