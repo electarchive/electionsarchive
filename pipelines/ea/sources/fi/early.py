@@ -60,6 +60,12 @@ LIST_METHOD = (
     "candidate is placed on the list whose votes equal the votes of the candidates it is placed on, since the "
     "pages name a candidate's party only by an abbreviation, and the European Parliament pages name it not at all."
 )
+# The parliamentary elections whose voting districts `fi.statfin_aanestysalue` adds: its result sets supersede these
+SUPERSEDED = {date(2003, 3, 16), date(2007, 3, 18)}
+SUPERSEDED_NOTE = (
+    " Statistics Finland's tables give the same votes by voting district, and the result set built from them "
+    "supersedes this one as the contest's default; this set remains the one with each candidate's votes."
+)
 NO_WINNER = "The service marks no candidate as elected or advancing on these pages, so no outcome is stored."
 RESULT_ONLY = (
     "The service marks no individual candidate as elected on these pages, so only each list's seats are stored."
@@ -355,6 +361,7 @@ class Build:
         self.used.add(slug)
         p.add("slug", path=slug, entity_id=contest, is_current=True)
         result_set = vaalit.key("result_set", page.day, kind, ck)
+        superseded = kind == "E" and page.day in SUPERSEDED
         p.add(
             "result_set",
             id=result_set,
@@ -363,8 +370,8 @@ class Build:
             stage="official",
             kind="counted",
             source_id=vaalit.VOLBY,
-            status="active",
-            is_default=True,
+            status="superseded" if superseded else "active",
+            is_default=not superseded,
             completeness=1.0,
         )
         p.add(
@@ -374,7 +381,8 @@ class Build:
             kind="methodology",
             body_md=METHOD
             + (LIST_METHOD if candidates and not president else "")
-            + (" " + NO_WINNER if president else " " + RESULT_ONLY),
+            + (" " + NO_WINNER if president else " " + RESULT_ONLY)
+            + (SUPERSEDED_NOTE if superseded else ""),
             lang="en",
         )
         # The contest's own counts
