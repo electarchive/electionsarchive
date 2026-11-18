@@ -655,9 +655,64 @@ def _result_set(p: Package, election: str, contest: str, method: str) -> str:
     return result_set
 
 
+PAGE_DECLARATION = {
+    "Absent": "ABSENT",
+    "Provisional": "PROVISIONAL",
+    "Declaration pre-poll": "PRE_POLL",
+    "Postal": "POSTAL",
+}
+
+
+class ByVoteType(NamedTuple):
+    candidates: dict[str, int]  # "SURNAME, Given" in upper case -> total first preferences
+    formal: int
+    informal: int
+    declaration: dict[str, tuple[int, int]]  # DECLARATION kind -> (formal, informal)
+    enrolment: int | None
+
+
+def by_vote_type(event: Event) -> ByVoteType | None:
+    """The first preferences by vote type table on a by-election's division page, which the downloads lack."""
+    url = by_election_page(event)
+    if url is None:
+        return None
+    html = page(url)
+    rows = cells(html)
+    begin = next((i for i, row in enumerate(rows) if row[:3] == ["Candidate", "Party", "Ordinary"]), None)
+    if begin is None:
+        return None
+    header = rows[begin][2:-2]
+    if "Total" not in rows[begin] or any(kind not in PAGE_DECLARATION for kind in header[1:]):
+        return None
+    candidates: dict[str, int] = {}
+    lines: dict[str, list[int]] = {}
+    for row in rows[begin + 2 :]:
+        if len(row) < 2 * len(header) + 4:
+            break
+        numbers = [_int(row[2 + 2 * i]) for i in range(len(header) + 1)]
+        if row[0] in ("Formal", "Informal"):
+            lines[row[0]] = numbers
+            if row[0] == "Informal":
+                break
+        else:
+            candidates[row[0].upper()] = numbers[-1]
+    if set(lines) != {"Formal", "Informal"}:
+        return None
+    declaration = {
+        PAGE_DECLARATION[kind]: (lines["Formal"][i + 1], lines["Informal"][i + 1]) for i, kind in enumerate(header[1:])
+    }
+    match = re.search(r'lblEnrolment">([\d,]+)<', html)
+    return ByVoteType(
+        candidates, lines["Formal"][-1], lines["Informal"][-1], declaration, _int(match.group(1)) if match else None
+    )
+
+
 def _enrolment(event: Event) -> dict[str, tuple[str, int]]:
     if event.kind == "by_election":
-        return {}
+        table = by_vote_type(event)
+        if table is None or table.enrolment is None or event.state is None:
+            return {}
+        return {_by_election_division(event): (event.state, table.enrolment)}
     return {
         row["DivisionID"]: (field(row, "StateAb"), _int(row["Enrolment"]))
         for row in csv_rows(download(event, "GeneralEnrolmentByDivisionDownload"))
@@ -685,6 +740,7 @@ def house(p: Package, event: Event, election: str, path: str, units: Units, valu
     declared: dict[str, list[dict[str, str]]] = defaultdict(list)
     elected: dict[str, str] = {}
     final: dict[str, dict[str, int]] = defaultdict(dict)
+    table = by_vote_type(event) if event.kind == "by_election" else None
     if event.kind == "general":
         for row in csv_rows(download(event, "HouseFirstPrefsByCandidateByVoteTypeDownload")):
             declared[row["DivisionID"]].append(row)
@@ -737,6 +793,8 @@ def house(p: Package, event: Event, election: str, path: str, units: Units, valu
             HOUSE_METHOD.format(
                 informal=" and, for declaration votes, from the first preferences by vote type file"
                 if event.kind == "general"
+                else " and, for declaration votes, from the division page's first preferences by vote type table"
+                if table is not None
                 else "; the by-election files give no informal count for declaration votes"
             ),
         )
@@ -818,6 +876,23 @@ def house(p: Package, event: Event, election: str, path: str, units: Units, valu
                     measure=1,
                     value=_int(row["TotalVotes"]),
                 )
+        if table is not None:
+            labels = {f"{c['Surname']}, {c['GivenNm']}".upper(): id for id, c in candidates.items() if id in options}
+            if set(table.candidates) != set(labels):
+                raise ValueError(f"{event.id} {name}: division page candidates differ from the candidates file")
+            for label, total in table.candidates.items():
+                p.add("declared", result_set_id=result_set, option_id=options[labels[label]], measure=1, value=total)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=table.formal)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=table.informal)
+            for kind, (formal, invalid) in table.declaration.items():
+                code = f"{event.day}:{division}:{kind}"
+                if formal == 0 and invalid == 0 and code not in units.ids:
+                    continue
+                unit = units.declaration(division, kind)
+                valid[unit] += 0
+                if valid[unit] != formal:
+                    raise ValueError(f"{event.id} {name}: {kind} formal votes {valid[unit]:,} against {formal:,}")
+                bad[unit] = invalid
         if declared.get(division):
             formal = sum(_int(r["TotalVotes"]) for r in declared[division] if r["CandidateID"] != "999")
             p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=formal)
@@ -1117,6 +1192,8 @@ def packages() -> list[str]:
 
 def _cited(event: Event) -> list[str]:
     found = list(urls(event))
+    if event.kind == "by_election" and (division_page := by_election_page(event)):
+        found.append(division_page)
     if event.kind == "general":
         found = [u for u in found if "GeneralPollingPlaces" not in u] + senate_division_urls(event)
     if event.kind == "referendum":
