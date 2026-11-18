@@ -867,6 +867,11 @@ def geo() -> Package:
         )
     for path in sorted(old_geo_paths()):
         p.artifact(raw.cached(SOURCE, url(path)), VOLBY_SOURCE)
+    # The districts of 2001 to 2013 are rows of their own beside the districts of 2017 on: each plan's codes carry the
+    # plan's year, so no earlier district's id, code, or parent ever changes when a plan is added.
+    reused = set(old_districts()) & set(vuc_obvody())
+    if reused:
+        raise ValueError(f"district codes of 2001 to 2013 reuse codes of 2017 on: {sorted(reused)[:5]}")
     for code, (text, kraj, since, until) in sorted(old_districts().items()):
         id = area(VUC_OBVOD, code)
         p.add("area", id=id, scheme_code=VUC_OBVOD)
