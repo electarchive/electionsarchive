@@ -3,12 +3,14 @@ import html
 import io
 import re
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from html.parser import HTMLParser
+from time import sleep
 from typing import NamedTuple
 from uuid import uuid5
 
 import fastexcel
+import httpx
 import polars as pl
 
 from ea import changeset, package, raw
@@ -43,6 +45,7 @@ class StateYear(NamedTuple):
 
 
 STATE: dict[int, StateYear] = {
+    2011: StateYear(2011, date(2011, 3, 26), "SGE2011", "la_index.htm"),
     2015: StateYear(
         2015,
         date(2015, 3, 28),
@@ -81,7 +84,7 @@ def state_url(year: int) -> str:
 
 # Parties ---------------------------------------------------------------------------------------------------------
 
-STATE_ALIASES = {"LAB": "ALP", "NP": "NAT", "PHON": "ON"}
+STATE_ALIASES = {"LAB": "ALP", "NP": "NAT", "PHON": "ON", "LP": "LIB", "GNS": "GRN", "CL": "CLP"}
 NO_PARTY = {"", "IND", "Independent"}
 
 
@@ -97,6 +100,13 @@ ASSEMBLY_METHOD = (
     "First preference votes per voting venue, as the NSW Electoral Commission publishes them in its final votes "
     "spreadsheet for each election. Ordinary votes are reported per election-day voting centre and per early voting "
     "centre; absent, postal, iVote, provisional, enrolment, and declared-institution votes are reported once per "
+    "district and are stored as one unit each. The count of preferences after the first is not stored here, and no "
+    "elected member is recorded."
+)
+ASSEMBLY_METHOD_2011 = (
+    "First preference votes per polling place in one district, as the NSW Electoral Commission's results pages for "
+    "the 2011 election print them after the final count. Votes counted outside a polling place (postal and iVote, "
+    "declared institution, absent, provisional and silent, enrolment, and pre-poll votes) are reported once per "
     "district and are stored as one unit each. The count of preferences after the first is not stored here, and no "
     "elected member is recorded."
 )
@@ -161,7 +171,10 @@ BYE_METHOD = (
 
 def fetch() -> None:
     for year in STATE:
-        raw.fetch(SOURCE, state_url(year), suffix=".xlsx")
+        if year == 2011:
+            fetch_2011()
+        else:
+            raw.fetch(SOURCE, state_url(year), suffix=".xlsx")
     for config in COUNCIL.values():
         if config.workbook is not None:
             raw.fetch(SOURCE, config.workbook, suffix=".xlsx")
@@ -184,6 +197,8 @@ class Row(NamedTuple):
 
 
 def state_rows(year: int) -> list[Row]:
+    if year == 2011:
+        return [r for d in districts_2011() for r in d.rows]
     path = raw.cached(SOURCE, state_url(year)).path
     frame = fastexcel.read_excel(str(path)).load_sheet("Data", header_row=0).to_polars()
     out: list[Row] = []
@@ -200,6 +215,145 @@ def state_rows(year: int) -> list[Row]:
             )
         )
     return out
+
+
+# 2011: the commission's results pages ----------------------------------------------------------------------------
+
+SGE2011 = f"{PAST}/SGE2011"
+DECLARATION_ROWS = (
+    "Postal/iVote Votes",
+    "Declared Institution Votes",
+    "Absent Votes",
+    "Provisional/Silent Votes",
+    "Enrolment New Votes",
+    "Pre-poll Votes",
+)
+
+
+class District2011(NamedTuple):
+    name: str
+    enrolled: int
+    rows: list[Row]
+    totals: dict[str, int]
+    formal: int
+    informal: int
+
+
+def district_pages_2011() -> list[tuple[str, str, str]]:
+    """(slug, summary url, venue url) for each district on the results-by-district index."""
+    text = raw.cached(SOURCE, state_url(2011)).path.read_bytes().decode("cp1252", "replace")
+    slugs = sorted(set(re.findall(r'href="la/la_district_summary-([^"]+)\.htm"', text)))
+    return [
+        (slug, f"{SGE2011}/la/la_district_summary-{slug}.htm", f"{SGE2011}/la/la_post_election_night-{slug}.htm")
+        for slug in slugs
+    ]
+
+
+# The host's CDN appends a script carrying a per-request id to every page, so two fetches of one page never hash
+# alike. It is cut before the page is stored, which keeps each stored page's hash stable across fetches.
+CDN_SCRIPT = re.compile(rb"<script>\(function\(\)\{function c\(\)\{.*?__CF\$cv\$params.*?</script>", re.DOTALL)
+
+
+def fetch_page_2011(client: httpx.Client, url: str) -> None:
+    if url in raw.keys(SOURCE):
+        return
+    for attempt in range(4):
+        try:
+            response = client.get(url)
+            response.raise_for_status()
+            break
+        except httpx.HTTPError:
+            if attempt == 3:
+                raise
+            sleep(2**attempt)
+    content = CDN_SCRIPT.sub(b"", response.content)
+    if b"__CF$cv$params" in content:
+        raise ValueError(f"{url}: the CDN script was not removed")
+    raw.store(
+        SOURCE,
+        url,
+        content,
+        suffix=".html",
+        retrieved_at=datetime.now(UTC),
+        media_type=response.headers.get("content-type", "text/html"),
+    )
+
+
+def fetch_2011() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=120) as client:
+        fetch_page_2011(client, state_url(2011))
+        urls = [u for _, a, b in district_pages_2011() for u in (a, b)]
+        with ThreadPoolExecutor(8) as pool:
+            list(pool.map(lambda u: fetch_page_2011(client, u), urls))
+
+
+def state_pages(year: int) -> list[str]:
+    if year != 2011:
+        return [state_url(year)]
+    return [state_url(2011), *(u for _, a, b in district_pages_2011() for u in (a, b))]
+
+
+def _votes(text: str) -> int:
+    return int(text.replace(",", ""))
+
+
+def district_2011(slug: str, summary: str, venues: str) -> District2011:
+    page = re.sub(r"\s+", " ", raw.cached(SOURCE, summary).path.read_bytes().decode("cp1252", "replace"))
+    heading = re.search(r"<h1><span>State Electoral District of ([^<]+)</span>", page)
+    enrolled = re.search(r"Electors Enrolled:\s*([\d,]+)", page)
+    if heading is None or enrolled is None:
+        raise ValueError(f"{summary}: no district heading or electors enrolled")
+    name = html.unescape(heading.group(1)).strip()
+    v = table_rows(venues)
+    head = next(i for i, r in enumerate(v) if r and r[0] == "Polling Places")
+    labels: list[str] = []
+    parties: list[str] = []
+    for cell in v[head][1:-3]:
+        m = re.fullmatch(r"(.+?)\s*\+?\s*(?:\(\s*(\S+?)\s*\)\s*\+?)?", cell)
+        if m is None:
+            raise ValueError(f"{venues}: unreadable candidate header {cell!r}")
+        labels.append(m.group(1).strip())
+        parties.append(m.group(2) or "")
+    shared = {x for x in labels if labels.count(x) > 1}
+    labels = [f"{x} ({parties[i] or 'no party'})" if x in shared else x for i, x in enumerate(labels)]
+    if len(set(labels)) != len(labels):
+        raise ValueError(f"{venues}: repeated candidate in {labels}")
+    names = {
+        m.group(2): html.unescape(m.group(1))
+        for m in re.finditer(r'<a class="partyname" title="([^"]*)">([^<]+)</a>', page)
+    }
+    out: list[Row] = []
+    totals: dict[str, int] = {}
+    formal = informal = 0
+    for r in v[head + 1 :]:
+        if len(r) != len(labels) + 4:
+            continue
+        label = r[0]
+        if label.startswith("% of"):
+            continue
+        nums = [_votes(x) for x in r[1:]]
+        if label == "Grand Total":
+            totals = dict(zip(labels, nums[: len(labels)], strict=True))
+            formal, informal = nums[len(labels)], nums[len(labels) + 1]
+            continue
+        if label.startswith("Total "):
+            continue
+        subtype = "Declaration" if label in DECLARATION_ROWS else "Ordinary"
+        for cand, party, votes in zip(labels, parties, nums[: len(labels)], strict=True):
+            out.append(Row(name, subtype, label, cand, party, names.get(party, ""), votes))
+        out.append(Row(name, subtype, label, "Informal", "", "", nums[len(labels) + 1]))
+    return District2011(name, _votes(enrolled.group(1)), out, totals, formal, informal)
+
+
+_D2011: list[District2011] = []
+
+
+def districts_2011() -> list[District2011]:
+    if not _D2011:
+        _D2011.extend(district_2011(*page) for page in district_pages_2011())
+    return _D2011
 
 
 def person_name(ballot: str) -> str:
@@ -222,7 +376,7 @@ def unit_kind(subtype: str, venue: str) -> str:
     text = f"{subtype} {venue}".lower()
     if "postal" in text:
         return "postal_district"
-    if any(w in text for w in ("absent", "declared", "enrolment", "provisional", "ivote", "silent")):
+    if any(w in text for w in ("absent", "declared", "enrolment", "provisional", "ivote", "silent", "pre-poll")):
         return "aggregate"
     return "standard"
 
@@ -396,7 +550,8 @@ def geo(states: list[int], locals_: list[int]) -> Package:
     p.external |= {AUSTRALIA, COUNTRY}
     source_row(p)
     for year in states:
-        p.artifact(raw.cached(SOURCE, state_url(year)), NSWEC)
+        for url in state_pages(year):
+            p.artifact(raw.cached(SOURCE, url), NSWEC)
     for year in locals_:
         p.artifact(raw.cached(SOURCE, LOCAL[year].combined), NSWEC)
     for store in (BYE_PAST, BYE_RESULTS):
@@ -499,10 +654,15 @@ def state_election(year: int) -> Package:
         SOURCE,
         f"The {year} New South Wales state election, Legislative Assembly first preferences by voting venue, from the "
         "NSW Electoral Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            *([f"{SOURCE}/geo-2011", f"{SOURCE}/registry-2011"] * (year == 2011)),
+        ],
     )
     p.external |= {AUSTRALIA}
-    p.uses(raw.cached(SOURCE, state_url(year)))
+    for url in state_pages(year):
+        p.uses(raw.cached(SOURCE, url))
     election_id = key("election", day)
     path = f"au/nsw/{day}-general"
     p.add(
@@ -556,7 +716,7 @@ def state_election(year: int) -> Package:
             id=key("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md=ASSEMBLY_METHOD,
+            body_md=ASSEMBLY_METHOD_2011 if year == 2011 else ASSEMBLY_METHOD,
             lang="en",
         )
         parties_of: dict[str, str] = {}
@@ -620,7 +780,73 @@ def state_election(year: int) -> Package:
             values.add(result_set, unit, None, 4, valid[unit])
             values.add(result_set, unit, None, 5, bad[unit])
             values.add(result_set, unit, None, 3, valid[unit] + bad[unit])
+        if year == 2011:
+            d = next(x for x in districts_2011() if x.name == name)
+            for candidate, votes in d.totals.items():
+                p.add("declared", result_set_id=result_set, option_id=options[candidate], measure=1, value=votes)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=d.formal)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=d.informal)
+            roll = key("unit", day, name, "roll")
+            p.add(
+                "reporting_unit",
+                id=roll,
+                polity_id=AUSTRALIA,
+                scheme_code="au-nsw.venue",
+                code=f"{day}:{name}:ROLL",
+                area_relation="within",
+                area_id=district,
+                kind="aggregate",
+            )
+            p.name(roll, f"{name}: electoral roll", "en", "official")
+            values.add(result_set, roll, None, 2, d.enrolled)
     p.frame("result_value", values.frame())
+    return p
+
+
+def geo_2011() -> Package:
+    year = 2011
+    names = sorted({r.district for r in state_rows(year)})
+    p = Package(
+        f"{SOURCE}/geo-2011",
+        SOURCE,
+        f"The {len(names)} Legislative Assembly districts of the 2011 New South Wales state election, as the NSW "
+        "Electoral Commission names them",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external |= {AUSTRALIA, COUNTRY}
+    for url in state_pages(year):
+        p.artifact(raw.cached(SOURCE, url), NSWEC)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "au-nsw.district", year),
+        scheme_code="au-nsw.district",
+        vintage=str(year),
+        as_of=STATE[year].day,
+    )
+    for name in names:
+        id = area("au-nsw.district", f"{year}:{name}")
+        p.add("area", id=id, scheme_code="au-nsw.district")
+        p.add("area_code", area_id=id, code=f"{year}:{name}")
+        p.add("area_parent", area_id=id, parent_id=NSW)
+        p.name(id, name, "en", "official")
+    return p
+
+
+def registry_2011() -> Package:
+    known = state_parties([y for y in STATE if y != 2011])
+    new = {c: n for c, n in state_parties([2011]).items() if c not in known}
+    p = Package(
+        f"{SOURCE}/registry-2011",
+        SOURCE,
+        f"The {len(new)} parties on the 2011 New South Wales Legislative Assembly ballots that no later election "
+        "carries, as the NSW Electoral Commission names them",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {AUSTRALIA}
+    for code, name in sorted(new.items()):
+        id = key("party", "state", code)
+        p.add("party", id=id, kind="party", polity_id=AUSTRALIA)
+        p.name(id, name, "en", "official")
     return p
 
 
@@ -1591,6 +1817,8 @@ def packages() -> list[str]:
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
+        f"{SOURCE}/geo-2011",
+        f"{SOURCE}/registry-2011",
         *(f"{SOURCE}/{c.day}" for c in STATE.values()),
         *(f"{SOURCE}/{c.day}" for c in LOCAL.values()),
         f"{SOURCE}/lc-registry",
@@ -1600,10 +1828,12 @@ def packages() -> list[str]:
 
 
 def parse() -> None:
-    states, locals_ = sorted(STATE), sorted(LOCAL)
+    states, locals_ = [y for y in sorted(STATE) if y != 2011], sorted(LOCAL)
     geo(states, locals_).write()
     registry(states, locals_).write()
-    for year in states:
+    geo_2011().write()
+    registry_2011().write()
+    for year in sorted(STATE):
         state_election(year).write()
     for year in locals_:
         local_election(year).write()
