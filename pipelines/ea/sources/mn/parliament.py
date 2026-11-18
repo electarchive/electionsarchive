@@ -1,7 +1,7 @@
 """The 2024 State Great Khural election, by polling section: the 13 constituencies and the nationwide party list."""
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 
 from ea.sources.mn import places, polls, sheets
@@ -36,6 +36,7 @@ class Contest:
     rows: list[polls.Row]
     declared: list[int] | None
     files: list[str]
+    declared_extra: dict[int, int] = field(default_factory=dict)
 
 
 def seats_2024() -> dict[int, int]:

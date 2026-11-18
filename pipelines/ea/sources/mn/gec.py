@@ -301,6 +301,7 @@ def early_packages() -> list[str]:
         f"{SOURCE}/early",
         f"{SOURCE}/{early.DAY_2012}",
         f"{SOURCE}/{early.DAY_2012}-local",
+        f"{SOURCE}/{early.DAY_REVOTE_26}",
         f"{SOURCE}/{early.DAY_2016}",
         f"{SOURCE}/{early.DAY_2016}-soum",
         f"{SOURCE}/{early_local_2016().key}",
@@ -328,6 +329,7 @@ def parse() -> None:
     early_registry().write()
     early_legislature(early.DAY_2012).write()
     early_capital_list_2012().write()
+    revote_2013().write()
     early_legislature(early.DAY_2016).write()
     legislature_2016_soums().write()
     councils(early_local_2016()).write()
@@ -1107,6 +1109,23 @@ def by_elections_2021() -> Package:
 SCHEMES = {"mn.hesg", "mn.constituency", "mn.council_constituency"}
 
 
+BOOK_NOTE = (
+    "The workbook of polling-section results stops after constituency 4, so this constituency is read from the "
+    "Commission's printed book of results. For the provinces it prints the votes of each candidate by soum; for the "
+    "capital, Darkhan-Uul, and Orkhon, by polling section where it prints them, with the registered voters, the "
+    "ballots cast, the valid ballots, and the invalid ballots of each unit."
+)
+SECTION_39_NOTE = (
+    "The book prints no column for section 39, though its printed total includes it, so the figures stored for "
+    "section 39 are the printed total less the other 79 sections."
+)
+REVOTE_NOTE = (
+    "One seat, filled by the candidate with the most votes. The constituency's 2012 block vote did not give either "
+    "of the two leading candidates the share the law required for a seat, so the Commission held this repeat vote "
+    "between them. Votes are stored per candidate for each polling section as the Commission published them."
+)
+
+
 def _method(day: date) -> str:
     if day == early.DAY_2016:
         return (
@@ -1170,15 +1189,16 @@ def _early_unit(p: Package, day: str, row: polls.Row, units: dict[str, str]) -> 
         return
     unit = units[row.code] = key("unit", day, row.code)
     located = row_area(row)
+    soum = row.code.startswith("soum:")
     p.add(
         "reporting_unit",
         id=unit,
         polity_id=MONGOLIA,
-        scheme_code="mn.hesg",
+        scheme_code="mn.soum" if soum else "mn.hesg",
         code=f"{day}:{row.code}",
         area_relation="within" if located else "unlocated",
         area_id=located,
-        kind="standard",
+        kind="aggregate" if soum else "standard",
     )
     p.name(unit, row.label, "mn", "official")
 
@@ -1282,17 +1302,34 @@ def early_legislature(day: date) -> Package:
     2016 (76 constituencies)."""
     is_2016 = day == early.DAY_2016
     contests = early.parliament_2016() if is_2016 else early.constituencies_2012()
+    if not is_2016:
+        early.with_parties(contests)
+        contests = [*contests, *early.book_contests()]
     block = None if is_2016 else early.list_2012()
     year = day.year
     p = Package(
         f"{SOURCE}/{day}",
         SOURCE,
         f"The {year} Mongolian parliamentary election by polling section from the General Election Commission"
-        + ("" if is_2016 else " (the national party list and the first four constituencies)"),
+        + (
+            ""
+            if is_2016
+            else " (the national party list and 26 constituencies, by polling section for the first four and the "
+            "capital, and by soum for the provinces)"
+        ),
         depends=[f"{SOURCE}/early"],
     )
-    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, KHURAL, *SCHEMES}
+    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, KHURAL, *SCHEMES, "mn.soum"}
     p.uses(raw.cached(SOURCE, sheets.url(early.RESULTS_2016 if is_2016 else early.RESULTS_2012)))
+    if not is_2016:
+        for name in (early.SUMMARY_2012, early.book.BOOK):
+            p.artifact(raw.cached(SOURCE, sheets.url(name)), GEC_SOURCE)
+        p.accept(
+            "accounting.votes_valid",
+            "In the one-seat constituencies of the book (5, 6, 8, 11, and 12) the printed valid ballots include "
+            "ballots that mark no candidate, and the book prints no figure for those, so they exceed the candidates' "
+            "votes in each soum.",
+        )
     aliases = ALIASES_2016 if is_2016 else None
     used = {c.party for contest in contests for c in contest.candidates}
     used |= {early.LIST_PARTIES_2012[name] for name in (block.parties if block else [])}
@@ -1339,14 +1376,23 @@ def early_legislature(day: date) -> Package:
         )
         p.name(contest_id, f"{year} Mongolian parliamentary election, constituency {contest.number}", "en", "official")
         p.add("slug", path=f"{path}/constituency-{contest.number}", entity_id=contest_id, is_current=True)
-        result_set = _early_result_set(p, election_id, contest_id, tag, str(day), _method(day))
+        note = _method(day)
+        if not is_2016 and (contest.number or 0) >= 5:
+            note += " " + BOOK_NOTE
+            if contest.number == 26:
+                note += " " + SECTION_39_NOTE
+        result_set = _early_result_set(p, election_id, contest_id, tag, str(day), note)
         options = _early_candidates(
-            p, str(day), tag, contest_id, result_set, contest.candidates, contest.declared, aliases, is_2016
+            p, str(day), tag, contest_id, result_set, contest.candidates, contest.declared, aliases, True
         )
+        for measure, value in contest.declared_extra.items():
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
         for row in contest.rows:
             for option, value in zip(options, row.votes, strict=True):
                 if value is not None:
                     _value(p, result_set, units[row.code], option, 1, value)
+            for measure, value in row.extra.items():
+                _value(p, result_set, units[row.code], None, measure, value)
     return p
 
 
@@ -1397,6 +1443,62 @@ def early_capital_list_2012() -> Package:
         "Votes are stored per party or coalition and polling section, as the Commission counted them.",
     )
     _early_list(p, tag, "capital-list", contest_id, result_set, block, units)
+    return p
+
+
+def revote_2013() -> Package:
+    """The repeat vote of 2013 for one seat of constituency 26."""
+    day = early.DAY_REVOTE_26
+    contest = early.revote_26()
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "The 2013 repeat vote for one seat of constituency 26 (Songinokhairkhan) by polling section from the "
+        "General Election Commission",
+        depends=[f"{SOURCE}/early"],
+    )
+    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, KHURAL, *SCHEMES}
+    p.external |= inherited({c.party for c in contest.candidates})
+    p.artifact(raw.cached(SOURCE, sheets.url(early.REVOTE_26)), GEC_SOURCE)
+    p.accept(
+        "accounting.votes_valid",
+        "The workbook's count of valid ballots exceeds the two candidates' votes in each of the 80 sections, by the "
+        "unmarked ballots it prints and up to seven more that it does not explain; the figures are stored as printed.",
+    )
+    election_id = key("election", str(day))
+    p.add("election", id=election_id, polity_id=MONGOLIA, kind="by_election", date_from=day, date_to=day, status="held")
+    p.name(election_id, "2013 Mongolian parliamentary repeat vote, constituency 26", "en", "official")
+    p.name(election_id, "Улсын Их Хурлын 26 дугаар тойргийн 2013 оны давтан санал хураалт", "mn", "native", False)
+    path = f"mn/{day}-by-election"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    contest_id = key("contest", str(day), "26")
+    p.add(
+        "contest",
+        id=contest_id,
+        election_id=election_id,
+        kind="body_seats",
+        body_id=KHURAL,
+        district_area_id=area("mn.constituency", "2012-26"),
+        magnitude=1,
+        round_number=1,
+        default_result_kind="counted",
+    )
+    p.name(contest_id, "2013 Mongolian parliamentary repeat vote, constituency 26", "en", "official")
+    p.add("slug", path=f"{path}/constituency-26", entity_id=contest_id, is_current=True)
+    result_set = _early_result_set(p, election_id, contest_id, "26", str(day), REVOTE_NOTE)
+    options = _early_candidates(
+        p, str(day), "26", contest_id, result_set, contest.candidates, contest.declared, None, True
+    )
+    for measure, value in contest.declared_extra.items():
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    units: dict[str, str] = {}
+    for row in contest.rows:
+        _early_unit(p, str(day), row, units)
+        for option, value in zip(options, row.votes, strict=True):
+            if value is not None:
+                _value(p, result_set, units[row.code], option, 1, value)
+        for measure, value in row.extra.items():
+            _value(p, result_set, units[row.code], None, measure, value)
     return p
 
 

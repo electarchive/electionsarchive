@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 
-from ea.sources.mn import local, parliament, polls, sheets
+from ea.sources.mn import book, local, parliament, places, polls, sheets
 
 DAY_2012 = date(2012, 6, 28)
 DAY_2016 = date(2016, 6, 29)
@@ -250,3 +250,164 @@ def constituencies_2012() -> list[parliament.Contest]:
     complete = [c for c in out if c.declared is not None]
     _verify(complete)
     return complete
+
+
+# 2012 re-vote of constituency 26, the vote in the workbook of the Commission's results of that repeat vote.
+REVOTE_26 = "50c8b733"
+DAY_REVOTE_26 = date(2013, 4, 14)
+# The aimag code of each province constituency, to name its soums; the soums of Govisumber are told apart.
+AIMAG_OF_CONSTITUENCY = {
+    1: "073",
+    2: "071",
+    3: "069",
+    4: "067",
+    5: "065",
+    6: "063",
+    7: "061",
+    8: "059",
+    9: "057",
+    10: "055",
+    11: "053",
+    12: "051",
+    13: "049",
+    14: "047",
+    15: "046",
+    16: "043",
+    17: "041",
+    18: "039",
+    19: "037",
+    20: "035",
+}
+PARTY_KEYS: dict[str, str | None] = {}
+
+
+def _party_key(text: str) -> str:
+    return re.sub(r"[\s\-]+", "", text).casefold()
+
+
+for _name, _abbreviation in LIST_PARTIES_2012.items():
+    PARTY_KEYS[_party_key(_name)] = _abbreviation
+    PARTY_KEYS[_party_key(_abbreviation)] = _abbreviation
+PARTY_KEYS[_party_key("Бие даан нэрээ дэвшүүлэгч")] = None
+PARTY_KEYS[_party_key("Бие даан нэр дэвшигч")] = None
+
+
+def party_2012(text: str) -> str | None:
+    """The abbreviation of the party or coalition the book names for a candidate, or None for an independent."""
+    try:
+        return PARTY_KEYS[_party_key(text)]
+    except KeyError:
+        raise KeyError(f"2012 candidate party {text!r} is not known") from None
+
+
+def seats_2012() -> dict[int, int]:
+    """The seats of each constituency, from the workbook of constituencies, seats, and voters."""
+    out: dict[int, int] = {}
+    for row in sheets.sheet_rows(SUMMARY_2012, 0):
+        if row[0].isdigit() and len(row) > 3 and row[2].isdigit() and row[3].isdigit():
+            out[int(row[2])] = int(row[3])
+    return out
+
+
+def with_parties(contests: list[parliament.Contest]) -> None:
+    """Give the candidates of the workbook's constituencies the party the book prints beside the same name."""
+    for contest in contests:
+        assert contest.number is not None
+        named = {_party_key(c.label): c for c in book.read(contest.number).candidates}
+        for candidate in contest.candidates:
+            found = named.get(_party_key(candidate.label))
+            if found is None:
+                raise ValueError(f"constituency {contest.number}: {candidate.label} is not in the book")
+            candidate.party = party_2012(found.party)
+
+
+def book_contests() -> list[parliament.Contest]:
+    """The constituencies the workbook leaves out (5 to 26), at the finest level the book prints: the soums of a
+    province, and the polling sections where it prints them."""
+    seats = seats_2012()
+    out: list[parliament.Contest] = []
+    for number in range(5, 27):
+        detail = book.read(number)
+        rows: list[polls.Row] = []
+        for unit in detail.units:
+            extra = {2: unit.registered, 3: unit.voters, 4: unit.valid, 5: unit.invalid}
+            if unit.section is not None and number >= 19 and not (number == 20 and unit.label == "Жаргалант"):
+                rows.append(
+                    polls.Row(
+                        f"{number}-{unit.section}",
+                        None,
+                        f"{number}-р тойрог, {unit.section}-р хэсэг",
+                        list(unit.votes),
+                        extra,
+                        f"2012-{number}",
+                    )
+                )
+            else:
+                rows.append(
+                    polls.Row(
+                        f"soum:{number}:{places.norm(unit.label)}",
+                        None,
+                        unit.label,
+                        list(unit.votes),
+                        extra,
+                        f"2012-{number}",
+                    )
+                )
+        candidates = [polls.Candidate(c.label, party_2012(c.party)) for c in detail.candidates]
+        declared = {
+            2: detail.total.registered if detail.total else 0,
+            3: detail.total.voters if detail.total else 0,
+            4: detail.total.valid if detail.total else 0,
+            5: detail.total.invalid if detail.total else 0,
+        }
+        contest = parliament.Contest(
+            number, seats[number], candidates, rows, [c.total for c in detail.candidates], [sheets.url(book.BOOK)]
+        )
+        contest.declared_extra = declared
+        out.append(contest)
+    return out
+
+
+def revote_26() -> parliament.Contest:
+    """The repeat vote in constituency 26, which the Commission published by polling section."""
+    rows = sheets.sheet_rows(REVOTE_26, 0)
+    header = next(r for r in rows if r[0] == "Дүгаар")
+    candidates = [polls.candidate(c) for c in header[2:4]]
+    out: list[polls.Row] = []
+    declared: list[int] = []
+    declared_extra: dict[int, int] = {}
+    for row in rows:
+        if row[0] == "Нийт":
+            declared = [sheets.number(c) or 0 for c in row[2:4]]
+            declared_extra = {
+                5: sheets.number(row[4]) or 0,
+                6: sheets.number(row[5]) or 0,
+                4: sheets.number(row[6]) or 0,
+            }
+        elif sheets.is_index(row[0]):
+            found = re.search(r"(\d+)-р хороо (\d+)-р хэсэг$", row[1])
+            if found is None:
+                raise ValueError(f"{REVOTE_26}: unreadable section {row[:2]}")
+            out.append(
+                polls.Row(
+                    f"26-{found[2]}",
+                    None,
+                    f"26-р тойрог, {found[1]}-р хороо, {found[2]}-р хэсэг",
+                    [sheets.number(row[2]), sheets.number(row[3])],
+                    {
+                        5: sheets.number(row[4]) or 0,
+                        6: sheets.number(row[5]) or 0,
+                        4: sheets.number(row[6]) or 0,
+                    },
+                    "2012-26",
+                )
+            )
+    contest = parliament.Contest(26, 1, candidates, out, declared, [sheets.url(REVOTE_26)])
+    contest.declared_extra = declared_extra
+    for k, total in enumerate(declared):
+        if sum(r.votes[k] or 0 for r in out) != total:
+            raise ValueError(f"{REVOTE_26}: candidate {k} sections do not sum to the printed total")
+    for measure, total in declared_extra.items():
+        if sum(r.extra[measure] for r in out) != total:
+            raise ValueError(f"{REVOTE_26}: measure {measure} sections do not sum to the printed total")
+    return contest
