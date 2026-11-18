@@ -1,0 +1,287 @@
+{
+  "polity": "SCG",
+  "name": "Serbia and Montenegro",
+  "sources": {
+    "povelja": {
+      "title": "Текст Уставне повеље (Уставна повеља државне заједнице Србија и Црна Гора)",
+      "publisher": "Влада Републике Србије",
+      "url": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php",
+      "kind": "official_body",
+      "license": "CC BY-NC-ND 3.0 RS",
+      "note": "The Government of Serbia's publication of the Constitutional Charter of the State Union of Serbia and Montenegro, first posted on 5 February 2003 (arhiva.srbija.gov.rs/vesti/2003-02/05/333116.html). Its article numbers are those of the text as published there: art. 12 (the Assembly), art. 13 (the President), art. 19 (the Court), art. 23 (entry into force on proclamation in the Federal Assembly), and art. 25 (withdrawal after a referendum in a member state)."
+    },
+    "ipu-2003": {
+      "title": "PARLINE database: Serbia and Montenegro, Skupstina, elections of 25 February 2003",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/2355_03.htm",
+      "kind": "compendium",
+      "note": "The IPU's record of the only election of the Assembly of Serbia and Montenegro: 91 Serbian and 35 Montenegrin deputies chosen by the two republics' parliaments on 25 February 2003, the Assembly inaugurated on 3 March 2003, and its mandate, expired on 3 March 2005, extended by the agreement of 7 April 2005 until the republics held new elections."
+    },
+    "ipu-srbija": {
+      "title": "PARLINE database: Serbia, historical archive of parliamentary election results",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline-e/reports/2355_arc.htm",
+      "kind": "compendium",
+      "note": "Lists the 2003 indirect election as the only election of the Parliament of the State Union, between the Federal Republic of Yugoslavia's chambers (1992-2000) and Serbia's National Assembly (2007 onward)."
+    },
+    "rik-arhiva": {
+      "title": "Архива сајта до 1. марта 2020. године",
+      "publisher": "Републичка изборна комисија",
+      "url": "https://arhiva.rik.parlament.gov.rs/",
+      "kind": "official_body"
+    },
+    "cik-cg": {
+      "title": "Izbori (arhiva rezultata)",
+      "publisher": "Centralna izborna komisija Crne Gore",
+      "url": "https://cik.me/dik-izbori",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Државна заједница Србија и Црна Гора",
+      "name_en": "State Union of Serbia and Montenegro",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "elects": false,
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "source": "povelja"
+    },
+    {
+      "key": "drzava_clanica",
+      "name": "Државе чланице: Србија и Црна Гора",
+      "name_en": "Member states (Serbia, with Vojvodina and Kosovo and Metohija, and Montenegro)",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "source": "povelja",
+      "counts": [
+        {
+          "date": "2003-02-04",
+          "value": 2,
+          "source": "povelja",
+          "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Члан 2: Србија и Црна Гора заснована је на равноправности две државе чланице, државе Србије и државе Црне Горе)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "skupstina_scg",
+      "tier": "national",
+      "name": "Избор посланика Скупштине Србије и Црне Горе",
+      "name_en": "Assembly of Serbia and Montenegro (deputies delegated by the republics' assemblies)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "first_held": "2003-02-25",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "povelja",
+      "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Члан 12: Скупштина је једнодома и чини је 126 посланика, од којих је 91 из Србије и 35 из Црне Горе ... Током прве две године по усвајању Уставне повеље посланици се бирају посредно ... После овог почетног периода, посланици Скупштине Србије и Црне Горе бирају се на непосредним изборима)",
+      "note": "A unicameral Assembly of 126 deputies, 91 from Serbia and 35 from Montenegro, with a four-year mandate. For the first two years the deputies were chosen indirectly, in proportion to the parties in the National Assembly of Serbia and the Assembly of Montenegro, from among the members of those assemblies and the Federal Assembly; a member state's delegation was to be realigned after its own parliamentary election (Serbia's of 28 December 2003). The Charter then called for direct elections, but none was ever held: the agreement of 7 April 2005 extended the mandate, which had expired on 3 March 2005, until each republic elected its delegation, and the State Union ended on 3 June 2006 first.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The deputies were chosen by the assemblies of Serbia and Montenegro on 25 February 2003, not by voters; the direct election the Charter provided for after two years was never held.",
+      "access": [
+        {
+          "platform": "IPU PARLINE archive",
+          "url": "http://archive.ipu.org/parline-e/reports/arc/2355_03.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "first_date": "2003-02-25",
+          "last_date": "2003-02-25",
+          "role": "publishes",
+          "evidence": "Date, seats by member state, and composition by sex of the 2003 Assembly; no vote figures, since the deputies were chosen by the two republican assemblies.",
+          "source": "ipu-2003"
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SCG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2003-02-25",
+          "election_kind": "indirect",
+          "seats": 126,
+          "source": "ipu-2003",
+          "quote": "The parliaments of Serbia and Montenegro voted on 25 February 2003 to elect the members of the union's new 126-seat joint legislature. The 91 Serbian and 35 Montenegrin deputies",
+          "note": "Chosen by the National Assembly of Serbia (91) and the Assembly of Montenegro (35); the Assembly was inaugurated on 3 March 2003."
+        }
+      ]
+    },
+    {
+      "key": "predsednik_scg",
+      "tier": "national",
+      "name": "Избор председника Србије и Црне Горе у Скупштини",
+      "name_en": "President of Serbia and Montenegro, elected by the Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "povelja",
+      "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Члан 13: Председник и потпредседник Скупштине предлажу Скупштини кандидата за председника Србије и Црне Горе ... Мандат председника Србије и Црне Горе траје четири године)",
+      "note": "The President of Serbia and Montenegro also chaired the Council of Ministers. The Speaker and Deputy Speaker proposed a candidate to the Assembly; if two candidates failed, the Assembly was dissolved. The office could not go to the same member state twice in a row.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the Assembly of Serbia and Montenegro, itself chosen indirectly; there was no popular vote.",
+      "match": []
+    },
+    {
+      "key": "sud_scg",
+      "tier": "national",
+      "name": "Избор судија Суда Србије и Црне Горе",
+      "name_en": "Judges of the Court of Serbia and Montenegro",
+      "category": "judicial",
+      "goal": "national",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "povelja",
+      "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Члан 19: Судије Суда Србије и Црне Горе бира Скупштина државне заједнице на предлог Савета министара на период од шест година)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges were elected by the Assembly on the proposal of the Council of Ministers, not by voters.",
+      "match": []
+    },
+    {
+      "key": "republicke_skupstine",
+      "tier": "drzava_clanica",
+      "name": "Избори за Народну скупштину Републике Србије и Скупштину Републике Црне Горе",
+      "name_en": "Member-state parliaments (National Assembly of Serbia, Assembly of Montenegro)",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "ipu-srbija",
+      "note": "Under the Charter the member states kept their own constitutions, assemblies, presidents, election commissions, and local government; art. 23 required each to bring its constitution into line with the Charter. The National Assembly of Serbia was elected on 28 December 2003; Montenegro's Assembly, elected in October 2002, sat through the State Union, and its next election, on 10 September 2006, came after independence.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held and published by each member state's own election commission; they are counted in the censuses of Serbia (RS) and Montenegro (ME).",
+      "access": [
+        {
+          "platform": "Републичка изборна комисија, архива",
+          "url": "https://arhiva.rik.parlament.gov.rs/arhiva.php",
+          "format": "pdf, doc, xls",
+          "access": "open",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "first_date": "2003-12-28",
+          "last_date": "2003-12-28",
+          "role": "administers",
+          "evidence": "Reports and statistical publications of the Republic Electoral Commission of Serbia for every vote of the period.",
+          "source": "rik-arhiva"
+        }
+      ],
+      "match": []
+    },
+    {
+      "key": "republicki_predsednici",
+      "tier": "drzava_clanica",
+      "name": "Избори за председника Републике Србије и предсједника Републике Црне Горе",
+      "name_en": "Member-state presidents (Serbia, Montenegro)",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "ipu-srbija",
+      "note": "Under the Charter the member states kept their own constitutions, assemblies, presidents, election commissions, and local government; art. 23 required each to bring its constitution into line with the Charter. Montenegro voted on 9 February 2003 (void for low turnout) and 11 May 2003; Serbia on 16 November 2003 (void for low turnout) and on 13 and 27 June 2004.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held and published by each member state's own election commission; they are counted in the censuses of Serbia (RS) and Montenegro (ME).",
+      "match": []
+    },
+    {
+      "key": "referendum_clanice",
+      "tier": "drzava_clanica",
+      "name": "Референдум о државно-правном статусу Републике Црне Горе",
+      "name_en": "Member-state referendums (Montenegro's independence referendum)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "povelja",
+      "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Члан 25: По истеку периода од три године, државе чланице имају право да покрену поступак ... за иступање из Србије и Црне Горе. Одлука о иступању из Србије и Црне Горе доноси се након референдума. Закон о референдуму доноси држава чланица)",
+      "note": "The Charter had no union-wide referendum. A member state could leave after three years by referendum under its own law; Montenegro voted on 21 May 2006 and its Assembly declared independence on 3 June 2006, which ended the State Union, with Serbia as its successor (IPU PARLINE archive, Serbia).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Called under Montenegro's own referendum law and run by its Republic Referendum Commission; it is counted in Montenegro's census (ME).",
+      "access": [
+        {
+          "platform": "Centralna izborna komisija Crne Gore: Izbori",
+          "url": "https://cik.me/dik-izbori",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18T00:00:00Z",
+          "first_date": "2006-05-21",
+          "last_date": "2006-05-21",
+          "role": "publishes",
+          "evidence": "Final results of the 21 May 2006 referendum by municipality and polling station.",
+          "source": "cik-cg"
+        }
+      ],
+      "match": []
+    },
+    {
+      "key": "pokrajine",
+      "tier": "drzava_clanica",
+      "name": "Избори за Скупштину АП Војводине и Скупштину Косова",
+      "name_en": "Provincial assemblies within Serbia (Vojvodina; Kosovo under UN administration)",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "povelja",
+      "locator": "https://www.srbija.gov.rs/vest/2158/tekst-ustavne-povelje.php (Преамбула: државе Србије која укључује аутономне покрајине Војводину и Косово и Метохију, тренутно под међународном администрацијом у складу с Резолуцијом 1244)",
+      "note": "Vojvodina's Assembly was elected on 19 September 2004 by its Provincial Electoral Commission; the Assembly of Kosovo was elected on 23 October 2004 under UNMIK.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in the censuses of Serbia (RS, Vojvodina) and Kosovo (XK).",
+      "match": []
+    },
+    {
+      "key": "lokalni_izbori",
+      "tier": "drzava_clanica",
+      "name": "Локални избори у државама чланицама",
+      "name_en": "Local elections in the member states (municipal assemblies and directly elected mayors)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "ipu-srbija",
+      "note": "Serbia held municipal assembly and mayoral elections on 19 September and 3 October 2004; Montenegrin municipalities voted on their own dates, with mayors elected directly from 2003.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the member states' municipal election commissions; counted in the censuses of Serbia (RS), Montenegro (ME), and Kosovo (XK).",
+      "match": []
+    },
+    {
+      "key": "stranacki_izbori",
+      "tier": "national",
+      "name": "Страначки унутрашњи избори",
+      "name_en": "Party leadership and candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "valid_from": "2003-02-04",
+      "valid_to": "2006-06-03",
+      "measure": {},
+      "source": "povelja",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Internal party votes, not public elections.",
+      "match": []
+    }
+  ]
+}
