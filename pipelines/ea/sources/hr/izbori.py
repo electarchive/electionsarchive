@@ -1206,6 +1206,27 @@ def option_party(o: Option) -> str | None:
     return None
 
 
+@functools.cache
+def _declared_parties() -> tuple[dict[str, Counter[str]], dict[str, tuple[list[str], Counter[str]]]]:
+    """The parties and coalitions on the commission's printed totals, with their spellings and list labels."""
+    spellings: dict[str, Counter[str]] = {}
+    blocs: dict[str, tuple[list[str], Counter[str]]] = {}
+    for d in days():
+        if d.family == "referendum":
+            continue
+        for contest in contests(d):
+            found = declared(d, contest)
+            if found is None:
+                continue
+            for o in found.options:
+                named = [n for n in o.parties if party_kind(n)]
+                for n in named:
+                    spellings.setdefault(party(n), Counter())[n] += 1
+                if len(named) > 1:
+                    blocs.setdefault(bloc(named), (named, Counter()))[1][o.label] += 1
+    return spellings, blocs
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
@@ -1232,21 +1253,7 @@ def registry() -> Package:
             "electoral_system", id=id, polity_id=CROATIA, valid_from=since, valid_to=until, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
-    spellings: dict[str, Counter[str]] = {}
-    blocs: dict[str, tuple[list[str], Counter[str]]] = {}
-    for d in days():
-        if d.family == "referendum":
-            continue
-        for contest in contests(d):
-            found = declared(d, contest)
-            if found is None:
-                continue
-            for o in found.options:
-                named = [n for n in o.parties if party_kind(n)]
-                for n in named:
-                    spellings.setdefault(party(n), Counter())[n] += 1
-                if len(named) > 1:
-                    blocs.setdefault(bloc(named), (named, Counter()))[1][o.label] += 1
+    spellings, blocs = _declared_parties()
     for id, names in sorted(spellings.items()):
         name = names.most_common(1)[0][0]
         p.add("party", id=id, kind="party", polity_id=CROATIA)
@@ -1478,6 +1485,15 @@ def election(d: Day) -> Package:
         if eu is not None:
             contest_id = eu.contest
             elected(d, target)
+            # The package adds no parties, so every list's party must be one the registry package holds.
+            spellings, blocs = _declared_parties()
+            unknown = {
+                o.label
+                for o in target.options
+                if (o_party := option_party(o)) and o_party not in spellings | blocs.keys()
+            }
+            if unknown:
+                raise ValueError(f"{d.year}: lists whose party the registry lacks: {sorted(unknown)}")
         else:
             p.add(
                 "contest",
