@@ -25,7 +25,6 @@ SOURCE = "pa.te"
 SITE = "https://www.tribunal-electoral.gob.pa"
 BROWSER = "browser://20261116-222948-d9df9f/"
 BROWSER_DECLARED = "browser://20261118-025251-af3923/"
-BROWSER_1994 = "browser://20261118-043613-352b1d/"
 INBOX = DATA / "inbox" / "pa.te"
 
 # Measures
@@ -38,13 +37,11 @@ DOWNLOAD = SITE + "/wp-content/plugins/download-attachments/includes/download.ph
 
 def url(name: str) -> str:
     """The URL a file was cached under: a full URL, a site download id written `dl:<id>`, or a name saved in the
-    browser (`b:` and `d:` mark the two sessions that saved the declared tables and the 1994 tables)."""
+    browser."""
     if name.startswith("https://"):
         return name
     if name.startswith("dl:"):
         return DOWNLOAD + name[3:]
-    if name.startswith("d:"):
-        return BROWSER_1994 + name[2:]
     return BROWSER_DECLARED + name[2:] if name.startswith("b:") else BROWSER + name
 
 
@@ -1770,18 +1767,18 @@ def merge(into: Row, other: Row) -> None:
 
 def load_1994() -> Election:
     e = Election(1994, date(1994, 5, 8), [])
-    names = ["dl:6996", "dl:6995", "d:Cuadro_04_-_Legislador_x_circuito.pdf", "d:Cuadro_09_-_Alcalde_x_distrito.pdf",
-             "d:Cuadro_12_-_Representante_x_corregimiento.pdf", "d:Cuadro_14_-_Concejal_x_distrito.pdf"]  # fmt: skip
-    e.files = names
-    president_1994(e, names[0], names[1])
+    names = ["03_-_Presidente_x_corregimiento", "02_-_Presidente_x_circuito", "04_-_Legislador_x_circuito",
+             "09_-_Alcalde_x_distrito", "12_-_Representante_x_corregimiento", "14_-_Concejal_x_distrito"]  # fmt: skip
+    e.files = [f"1994/Cuadro_{n}.pdf" for n in names]
+    president_1994(e, e.files[0], e.files[1])
     pdf_party_table(e.files[2], P94, e, "c", "deputy", start="CUADRO No.4")
     pdf_party_table(e.files[3], [*P94, "PNP", *LP], e, 2, "mayor")
     pdf_party_table(e.files[4], [*P94, "PNP", *LP], e, 3, "rep", reg=4)
     pdf_party_table(e.files[5], [*P94, "Libre Postulación"], e, 2, "council")
     e.issues = [i for i in e.issues if i != "DARIEN: districts do not add up to the province"]
     e.notes["rep"] = "the table counts the Emberá comarca inside Darién province's printed total"
-    e.files += ["d:Cuadro_05_-_Legislador_electo.pdf", "d:Cuadro_10_-_Alcalde_electo.pdf",
-                "d:Cuadro_06_-_Legislador_x_tipo_de_proclamacion.pdf"]  # fmt: skip
+    e.files += ["b:Cuadro_05_-_Legislador_electo.pdf", "b:Cuadro_10_-_Alcalde_electo.pdf",
+                "b:Cuadro_06_-_Legislador_x_tipo_de_proclamacion.pdf"]  # fmt: skip
     e.declared["deputy"] = win.pdf_deputies(pdf_lines(e.files[-3]))
     e.declared["mayor"] = win.pdf_mayors(pdf_lines(e.files[-2]))
     e.seats = win.pdf_party_seats(pdf_lines(e.files[-1]))
