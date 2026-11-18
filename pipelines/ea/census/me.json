@@ -1260,9 +1260,6 @@
           "office_kinds": [
             "mayor"
           ],
-          "polity_kinds": [
-            "municipality"
-          ],
           "within": null,
           "valid_from": "2003-07-16",
           "valid_to": "2010-01-08"
