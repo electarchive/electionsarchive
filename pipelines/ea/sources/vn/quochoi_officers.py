@@ -215,7 +215,7 @@ def fetch() -> None:
 
 def text(url: str) -> str:
     body = raw.cached(SOURCE, url).path.read_text("utf-8", "replace")
-    body = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", body, flags=re.S)
+    body = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", body, flags=re.DOTALL)
     return " ".join(re.sub(r"<[^>]+>", " ", body).split())
 
 
