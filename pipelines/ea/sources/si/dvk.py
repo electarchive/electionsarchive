@@ -704,6 +704,34 @@ def izvoz_total(vote: Vote, book: fastexcel.ExcelReader, names: list[str]) -> Ro
     )
 
 
+SEATS_CELL = re.compile(r"\s*-\s*št\. mandatov\s*$")
+EP_SEATS = {2014: 8, 2024: 9}
+
+
+def printed_seats(vote: Vote) -> dict[str, int]:
+    """The seats the Podatki sheet of an izvoz workbook prints for each list, by list name."""
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, vote.url).path))
+    printed = grid(book, "Podatki")
+    top = header_row(printed, "Podatki")
+    heads = [clean(None if cell is None else str(cell)) for cell in printed[top]]
+    line = next(row for row in printed[top + 1 :] if not clean(str(row[0] or "")) and not clean(str(row[1] or "")))
+    return {
+        bare(SEATS_CELL.sub("", head)): value
+        for position, head in enumerate(heads)
+        if SEATS_CELL.search(head) and (value := count(line[position])) is not None
+    }
+
+
+def elected(vote: Vote) -> dict[str, int]:
+    """The Mandat column of an izvoz EP workbook's Kandidati sheet, by candidate name."""
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, vote.url).path))
+    sheet = grid(book, "Kandidati")
+    heads = [clean(None if cell is None else str(cell)) for cell in sheet[0]]
+    if heads[:3] != ["Stranka", "Kandidat", "Mandat"]:
+        raise LookupError(f"{vote.url} has unexpected candidate columns: {heads[:5]}")
+    return {bare(clean(str(row[1]))): count(row[2]) or 0 for row in sheet[1:] if row[1]}
+
+
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
@@ -1278,6 +1306,14 @@ def assembly(vote: Vote, sheet: Sheet) -> Package:
                     "outcome", result_set_id=result_sets[unit], option_id=by_position[position], kind="won", seats=count
                 )
     _facts(p, sheet, result_sets, units, options)
+    if seats is not None and vote.layout == "izvoz":
+        won: Counter[str] = Counter()
+        for unit_lists in seats.values():
+            for position, n in unit_lists.items():
+                won[bare(next(label for label, number in lines if number == position))] += n
+        printed = {name: n for name, n in printed_seats(vote).items() if n}
+        if dict(won) != printed:
+            raise ValueError(f"{vote.day}: seats {dict(won)} disagree with the printed seats {printed}")
     return p
 
 
@@ -1337,7 +1373,7 @@ def president(vote: Vote, sheet: Sheet) -> Package:
 
 
 def european(vote: Vote, sheet: Sheet) -> Package:
-    p = _package(vote, "The 2014 European Parliament election in Slovenia by polling station")
+    p = _package(vote, f"The {vote.day.year} European Parliament election in Slovenia by polling station")
     election_id = _election(p, vote, "general", f"si/{vote.day}-european-parliament")
     contest = key("contest", vote.day)
     p.add(
@@ -1345,7 +1381,7 @@ def european(vote: Vote, sheet: Sheet) -> Package:
         id=contest,
         election_id=election_id,
         kind="list_allocation",
-        magnitude=8,
+        magnitude=EP_SEATS[vote.day.year],
         round_number=1,
         electoral_system_id=SYSTEMS["ep"],
         default_result_kind="counted",
@@ -1354,6 +1390,7 @@ def european(vote: Vote, sheet: Sheet) -> Package:
     p.add("slug", path=f"si/{vote.day}-european-parliament/slovenia", entity_id=contest, is_current=True)
     result_set = _result_set(p, election_id, contest, vote, str(vote.day))
     options: dict[int, str] = {}
+    candidacies: dict[int, str] = {}
     current: str | None = None
     position = 0
     seen: set[str] = set()
@@ -1386,6 +1423,7 @@ def european(vote: Vote, sheet: Sheet) -> Package:
         person = key("person", f"ep:{vote.day}:{label}")
         option = options[index] = key("option", vote.day, current, position, label)
         PREFERENCE.add(option)
+        candidacies[index] = key("candidacy", vote.day, current, position, label)
         p.add("person", id=person)
         p.name(person, title(label), "sl", "official")
         p.add(
@@ -1399,7 +1437,7 @@ def european(vote: Vote, sheet: Sheet) -> Package:
         )
         p.add(
             "candidacy",
-            id=key("candidacy", vote.day, current, position, label),
+            id=candidacies[index],
             person_id=person,
             option_id=option,
             role="list_member",
@@ -1409,7 +1447,35 @@ def european(vote: Vote, sheet: Sheet) -> Package:
     units = _units(p, vote, sheet)
     _facts(p, sheet, result_set, units, {(0, index): option for index, option in options.items()})
     _declare(p, result_set, sheet, options)
+    if vote.layout == "izvoz":
+        _elect(p, vote, sheet, result_set, options, candidacies)
     return p
+
+
+def _elect(
+    p: Package, vote: Vote, sheet: Sheet, result_set: str, options: dict[int, str], candidacies: dict[int, str]
+) -> None:
+    """Store the candidates the Kandidati sheet's Mandat column marks as elected, and the seats each list won."""
+    marked = elected(vote)
+    owner: dict[int, str] = {}
+    current = ""
+    for index, name in enumerate(sheet.options):
+        if index in candidacies:
+            owner[index] = current
+        else:
+            current = options[index]
+    won: Counter[str] = Counter()
+    for index, candidacy in candidacies.items():
+        label = bare(clean(sheet.options[index]))
+        if label not in marked:
+            raise ValueError(f"{vote.day}: {label} is missing from the Kandidati sheet")
+        if marked[label]:
+            won[owner[index]] += 1
+            p.add("outcome", result_set_id=result_set, option_id=owner[index], candidacy_id=candidacy, kind="elected")
+    if sum(won.values()) != EP_SEATS[vote.day.year]:
+        raise ValueError(f"{vote.day}: {sum(won.values())} candidates are marked elected")
+    for option, seats in won.items():
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
 
 
 def referendum(held: list[tuple[Vote, Sheet]]) -> Package:
