@@ -236,13 +236,14 @@ BODIES = {
 
 
 def packages() -> list[str]:
-    from ea.sources.rs import rik_2022, rik_poslanici, rik_predsednik
+    from ea.sources.rs import rik_2022, rik_poslanici, rik_predsednik, rik_referendum
 
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         *rik_predsednik.packages(),
         *rik_poslanici.packages(),
+        *rik_referendum.packages(),
         *rik_2022.packages(),
         *(f"{SOURCE}/{e.slug}" for e in ELECTIONS),
     ]
@@ -263,6 +264,9 @@ def parse() -> None:
     from ea.sources.rs import rik_poslanici
 
     rik_poslanici.parse()
+    from ea.sources.rs import rik_referendum
+
+    rik_referendum.parse()
     from ea.sources.rs import rik_2022
 
     rik_2022.parse()
@@ -278,6 +282,9 @@ def fetch() -> None:
     from ea.sources.rs import rik_poslanici
 
     rik_poslanici.fetch()
+    from ea.sources.rs import rik_referendum
+
+    rik_referendum.fetch()
     from ea.sources.rs import rik_2022
 
     rik_2022.fetch()
