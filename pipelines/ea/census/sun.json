@@ -1,0 +1,770 @@
+{
+  "polity": "SUN",
+  "name": "Union of Soviet Socialist Republics",
+  "sources": {
+    "prlib-1922": {
+      "title": "Подписаны декларация и договор об образовании СССР",
+      "publisher": "Президентская библиотека имени Б. Н. Ельцина",
+      "url": "https://www.prlib.ru/history/619858",
+      "kind": "compendium",
+      "note": "Dates the Declaration and Treaty on the formation of the USSR, signed at the First Congress of Soviets of the USSR, to 30 December 1922, and names the Congress of Soviets and its Central Executive Committee as the supreme organs."
+    },
+    "prlib-ref1991": {
+      "title": "Состоялся всесоюзный референдум по вопросу «О сохранении обновлённого Союза»",
+      "publisher": "Президентская библиотека имени Б. Н. Ельцина",
+      "url": "https://www.prlib.ru/history/619099",
+      "kind": "compendium",
+      "note": "The referendum of 17 March 1991, called by the Congress of People's Deputies on 24 December 1990, held in 9 of the 15 republics; cites the Supreme Soviet's resolution on its results of 21 March 1991 (Ведомости, 1991, No. 13, art. 350)."
+    },
+    "cnst1924": {
+      "title": "Основной закон (Конституция) Союза Советских Социалистических Республик 1924 г.",
+      "publisher": "II съезд Советов СССР",
+      "url": "http://www.hist.msu.ru/ER/Etext/cnst1924.htm",
+      "kind": "official_body",
+      "note": "Text kept by the Faculty of History of Lomonosov Moscow State University. Text of the 1924 Constitution with the Declaration and Treaty of 30 December 1922. Arts. 8-14: the Congress of Soviets of the USSR, made up of delegates of city soviets (1 per 25,000 voters) and of provincial congresses of soviets (1 per 125,000 inhabitants), chosen at the provincial or republican congresses; it elects the Central Executive Committee."
+    },
+    "cnst1936": {
+      "title": "Конституция (Основной закон) Союза Советских Социалистических Республик 1936 г. (с последующими изменениями)",
+      "publisher": "Чрезвычайный VIII съезд Советов СССР",
+      "url": "http://www.hist.msu.ru/ER/Etext/cnst1936.htm",
+      "kind": "official_body",
+      "note": "Text kept by the Faculty of History of Lomonosov Moscow State University. Text of the 1936 Constitution as amended. Arts. 13 (union republics), 33-36 (Supreme Soviet of two chambers: Soviet of the Union, one deputy per 300,000 inhabitants; Soviet of Nationalities, 32 per union republic, 11 per autonomous republic, 5 per autonomous oblast, 1 per national okrug; four-year term), 48 (Presidium elected by the Supreme Soviet), 94-95 (local soviets elected for two years), 109 (people's judges elected by the district's citizens for five years), 134-142 (universal, equal, direct, secret suffrage in single-member districts)."
+    },
+    "cnst1977": {
+      "title": "Конституция (Основной закон) Союза Советских Социалистических Республик 1977 г.",
+      "publisher": "Верховный Совет СССР",
+      "url": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm",
+      "kind": "official_body",
+      "note": "Text kept by the Faculty of History of Lomonosov Moscow State University. Text of the 1977 Constitution as adopted on 7 October 1977. Arts. 5 (referendum), 71 (fifteen union republics), 90 (five-year term of the Supreme Soviets, two and a half years for local soviets), 95-102 (suffrage), 108-110 (Supreme Soviet of two equal chambers; Soviet of Nationalities 32 per union republic, 11 per autonomous republic, 5 per autonomous oblast, 1 per autonomous okrug), 152 (people's judges elected by the district's citizens for five years, people's assessors by open vote at meetings for two and a half years)."
+    },
+    "zv1937": {
+      "title": "Сообщение Центральной избирательной комиссии о результатах выборов в Верховный Совет СССР (Заря Востока, No. 286, 14 December 1937)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/468241",
+      "kind": "official_body",
+      "note": "Gives 137,185 polling stations and 1,143 districts (569 for the Soviet of the Union, 574 for the Soviet of Nationalities); the issue's masthead prints No. 285. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/468241/1/Zaria_Vostoka_1937_N286.pdf"
+    },
+    "zv1937b": {
+      "title": "Сообщение Центральной избирательной комиссии об общих итогах выборов в Верховный Совет СССР (Заря Востока, No. 287, 15 December 1937)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/468250",
+      "kind": "official_body",
+      "note": "Election of all 1,143 deputies registered; electors and turnout for the USSR and each of the 11 union republics. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/468250/1/Zaria_Vostoka_1937_N287.pdf"
+    },
+    "zv1946a": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР (Заря Востока, No. 33, 12 February 1946)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/470975",
+      "kind": "official_body",
+      "note": "1,339 districts (682 for the Soviet of the Union, 657 for the Soviet of Nationalities) and 149,798 polling stations; deputies elected in all 1,339. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/470975/1/Zaria_Vostoka_1946_N33.pdf"
+    },
+    "zv1950": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов 12 марта 1950 года и персональном списке депутатов (Заря Востока, No. 58, 15 March 1950)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/474902",
+      "kind": "official_body",
+      "note": "Final totals by chamber and union republic; deputies registered in all 1,316 districts, with the list of deputies by district. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/474902/1/Zaria_Vostoka_1950_N58.pdf"
+    },
+    "zv1954": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР (Заря Востока, No. 65, 17 March 1954)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/477783",
+      "kind": "official_body",
+      "note": "1,347 districts (708 for the Soviet of the Union, 639 for the Soviet of Nationalities). Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/477783/1/Zaria_Vostoka_1954_N65.pdf"
+    },
+    "zv1958": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 66, 19 March 1958)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/492003",
+      "kind": "official_body",
+      "note": "Deputies registered in all 1,378 districts: 738 to the Soviet of the Union and 640 to the Soviet of Nationalities, with the list of deputies. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/492003/1/Zaria_Vostoka_1958_N66.pdf"
+    },
+    "zv1962b": {
+      "title": "В Центральной избирательной комиссии (Заря Востока, No. 69, 22 March 1962)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/502156",
+      "kind": "official_body",
+      "note": "The Commission registered the election of deputies in all 1,443 districts and signed the protocol of final results of the 18 March 1962 election. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/502156/1/Zaria_Vostoka_1962_N69.pdf"
+    },
+    "zv1966": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР (Заря Востока, No. 136, 14 June 1966)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/505824",
+      "kind": "official_body",
+      "note": "1,517 districts: 767 for the Soviet of the Union and 750 for the Soviet of Nationalities. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/505824/1/Zaria_Vostoka_1966_N136.pdf"
+    },
+    "zv1966b": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 137, 15 June 1966)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/505825",
+      "kind": "official_body",
+      "note": "Final totals by chamber: 767 Soviet of the Union districts; 750 Soviet of Nationalities districts (480 from the 15 union republics, 40 from 8 autonomous oblasts, 10 from 10 national okrugs, the rest from the autonomous republics). Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/505825/1/Zaria_Vostoka_1966_N137.pdf"
+    },
+    "zv1990": {
+      "title": "Закон СССР об учреждении поста Президента СССР и внесении изменений и дополнений в Конституцию (Основной закон) СССР; Постановление Съезда народных депутатов СССР о Президенте СССР (Заря Востока, No. 63, 16 March 1990)",
+      "publisher": "Съезд народных депутатов СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/540636",
+      "kind": "official_body",
+      "note": "The law of March 1990: the President is elected by the citizens by universal, equal, direct, secret ballot for five years, but the first President by the Congress of People's Deputies; the Congress's resolution electing M. S. Gorbachev. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/540636/1/Zaria_Vostoka_1990_N63.pdf"
+    },
+    "zv1939": {
+      "title": "Незабываемый день (Заря Востока, No. 296, 25 December 1939)",
+      "publisher": "Заря Востока",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/468322",
+      "kind": "news_agency",
+      "note": "Leading article on the elections to the local soviets of working people's deputies under the 1936 Constitution, held on 24 December 1939. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/468322/1/Zaria_Vostoka_1939_N296.pdf"
+    },
+    "zv1970": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 140, 17 June 1970)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/514120",
+      "kind": "official_body",
+      "note": "Final totals: 767 Soviet of the Union districts and 750 Soviet of Nationalities districts (32 per union republic, 11 per autonomous republic, 5 per autonomous oblast, 1 per national okrug). Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/514120/1/Zaria_Vostoka_1970_N140.pdf"
+    },
+    "zv1974": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 142, 19 June 1974)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/519270",
+      "kind": "official_body",
+      "note": "Deputies registered in all 1,517 districts: 767 of the Soviet of the Union and 750 of the Soviet of Nationalities. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/519270/1/Zaria_Vostoka_1974_N142.pdf"
+    },
+    "zv1979": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 57, 7 March 1979)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/533838",
+      "kind": "official_body",
+      "note": "The first election under the 1977 Constitution and the Law on elections to the Supreme Soviet of the USSR: 750 Soviet of the Union districts and 750 Soviet of Nationalities districts (32 per union republic, 11 per autonomous republic, 5 per autonomous oblast, 1 per autonomous okrug), all 1,500 held. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/533838/1/Zaria_Vostoka_1979_N57.pdf"
+    },
+    "zv1984": {
+      "title": "Сообщение Центральной избирательной комиссии по выборам в Верховный Совет СССР об итогах выборов (Заря Востока, No. 59, 7 March 1984)",
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/535542",
+      "kind": "official_body",
+      "note": "Final totals: 184,029,412 electors, 184,006,373 voted; 750 deputies elected to the Soviet of the Union and 750 to the Soviet of Nationalities, every candidate with an absolute majority. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/535542/1/Zaria_Vostoka_1984_N59.pdf"
+    },
+    "zv1989": {
+      "title": "Сообщение Центральной избирательной комиссии о результатах выборов народных депутатов СССР (Заря Востока, No. 80, 5 April 1989)",
+      "publisher": "Центральная избирательная комиссия по выборам народных депутатов СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/538952",
+      "kind": "official_body",
+      "note": "Results of 26 March 1989: 192,575,165 electors in the districts, 172,840,130 voted; 750 territorial districts (1,431 candidates; 590 deputies elected; 46 to repeat voting under art. 60 and the rest to repeat elections under art. 61 of the Law on elections of people's deputies of the USSR) and 750 national-territorial districts (1,419 candidates; 636 elected; 30 to repeat voting); 732 of the 750 deputies of public organizations elected at their congresses and plenums; 1,958 of 2,250 deputies registered. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/538952/1/Zaria_Vostoka_1989_N80.pdf"
+    },
+    "zv1989b": {
+      "title": "Сообщение Центральной избирательной комиссии о результатах выборов народных депутатов СССР при повторном голосовании 2 и 9 апреля 1989 года (Заря Востока, No. 89, 15 April 1989)",
+      "publisher": "Центральная избирательная комиссия по выборам народных депутатов СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/538968",
+      "kind": "official_body",
+      "note": "Repeat voting of 2 and 9 April 1989 in 46 territorial and 30 national-territorial districts; 76 deputies elected; repeat elections set for 14 May 1989. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/538968/1/Zaria_Vostoka_1989_N89.pdf"
+    },
+    "zv1989c": {
+      "title": "Сообщение Центральной избирательной комиссии об итогах повторных выборов народных депутатов СССР, проведенных после 26 марта 1989 года (Заря Востока, No. 118, 21 May 1989)",
+      "publisher": "Центральная избирательная комиссия по выборам народных депутатов СССР",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/539491",
+      "kind": "official_body",
+      "note": "Repeat elections of 14 May 1989 in 198 districts (114 territorial, 84 national-territorial): 71 deputies registered, 126 districts to repeat voting under art. 60, one territorial district to a further repeat election; also the election in Aktyubinsk rural district No. 619 to replace a deceased deputy. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/539491/1/Zaria_Vostoka_1989_N118.pdf"
+    },
+    "zv1989d": {
+      "title": "Съезд народных депутатов СССР: демократия — наш исторический выбор (Заря Востока, No. 123, 27 May 1989)",
+      "publisher": "Заря Востока",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/539549",
+      "kind": "news_agency",
+      "note": "Report (TASS) of the third sitting of the Congress of People's Deputies on 26 May 1989, which took up the election of the Supreme Soviet of the USSR by secret ballot from lists of deputies agreed by the deputies' groups. Printed in Заря Востока, the daily of the Georgian SSR's party, Supreme Soviet, and government; scan kept by the National Parliamentary Library of Georgia (Iverieli digital library). PDF: https://dspace.nplg.gov.ge/bitstream/1234/539549/1/Zaria_Vostoka_1989_N123.pdf"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Союз Советских Социалистических Республик",
+      "name_en": "Union of Soviet Socialist Republics",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1922-12-30",
+      "valid_to": "1991-12-26",
+      "source": "prlib-1922"
+    },
+    {
+      "key": "union_republic",
+      "name": "Союзные республики",
+      "name_en": "Union republics",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "valid_from": "1922-12-30",
+      "valid_to": "1991-12-26",
+      "source": "cnst1977",
+      "counts": [
+        {
+          "date": "1937-12-12",
+          "value": 11,
+          "source": "zv1937b",
+          "locator": "https://dspace.nplg.gov.ge/handle/1234/468250 (electors and turnout listed for the RSFSR and the Ukrainian, Belorussian, Azerbaijan, Georgian, Armenian, Turkmen, Uzbek, Tajik, Kazakh, and Kirghiz SSRs)"
+        },
+        {
+          "date": "1966-06-12",
+          "value": 15,
+          "source": "zv1966b",
+          "locator": "https://dspace.nplg.gov.ge/handle/1234/505825 (480 Soviet of Nationalities districts from the 15 union republics)"
+        },
+        {
+          "date": "1977-10-07",
+          "value": 15,
+          "source": "cnst1977",
+          "locator": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm (Статья 71: the fifteen union republics)"
+        }
+      ]
+    },
+    {
+      "key": "local",
+      "name": "Местные Советы",
+      "name_en": "Local soviets (krai, oblast, okrug, raion, city, settlement, and village)",
+      "parent": "union_republic",
+      "polity_kind": "municipality",
+      "valid_to": "1991-12-26",
+      "source": "cnst1936"
+    }
+  ],
+  "classes": [
+    {
+      "key": "verkhovny_sovet",
+      "tier": "national",
+      "name": "Выборы в Верховный Совет СССР",
+      "name_en": "Supreme Soviet of the USSR (Soviet of the Union and Soviet of Nationalities)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1936-12-05",
+      "valid_to": "1989-03-26",
+      "first_held": "1937-12-12",
+      "earliest_record": "1937-12-12",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "sun.okrug"
+        ]
+      },
+      "finest_note": "The Central Electoral Commission printed totals for the Union and each union republic, by chamber, and the deputy elected in each district; district returns went only to the district electoral commissions.",
+      "source": "cnst1936",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1936.htm (Статьи 33-36: two chambers, one Soviet of the Union deputy per 300,000 inhabitants, Soviet of Nationalities seats per republic, oblast, and okrug, four-year term; статьи 134-142: direct, secret ballot in districts)",
+      "note": "Each elector voted in two single-member districts, one for each chamber; the candidates stood for the bloc of communists and non-party people, and a voter could vote against by crossing out the name, so the reports give votes for and against each chamber's candidates. The Central Electoral Commission for each election reported the electorate, turnout, and votes for and against by chamber and union republic. Under the 1977 Constitution the term became five years and each chamber had 750 deputies. The Supreme Soviet chosen in 1989 was elected by the Congress of People's Deputies (class verkhovny_sovet_1989).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "SUN",
+          "valid_to": "1989-03-26"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+          "valid_to": "1977-10-07",
+          "source": "cnst1936",
+          "locator": "http://www.hist.msu.ru/ER/Etext/cnst1936.htm (Статья 36: four-year term)"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+          "valid_from": "1977-10-07",
+          "source": "cnst1977",
+          "locator": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm (Статья 90: five-year term)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Parliamentary Library of Georgia, Iverieli (Заря Востока)",
+          "url": "https://dspace.nplg.gov.ge/handle/1234/465196",
+          "format": "pdf (scanned, with OCR text)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1937-12-12",
+          "last_date": "1984-03-04",
+          "finest": "sun.okrug",
+          "role": "publishes",
+          "source": "zv1937",
+          "evidence": "The Central Electoral Commission's reports on every Supreme Soviet election, by chamber and union republic, with the list of deputies elected in each district"
+        }
+      ],
+      "est_votes": 180000000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1937-12-12",
+          "election_kind": "general",
+          "contests": 1143,
+          "seats": 1143,
+          "source": "zv1937",
+          "quote": "Всего имеется по СССР 137.185 избирательных участков и 1.143 избирательных округа (по Совету Союза 569 и по Совету Национальностей 574)",
+          "note": "Soviet of the Union 569, Soviet of Nationalities 574. First election under the 1936 Constitution; 11 union republics. 90,319,346 of 93,639,478 electors voted in the first count (15 December 1937 report)."
+        },
+        {
+          "date": "1946-02-10",
+          "election_kind": "general",
+          "contests": 1339,
+          "seats": 1339,
+          "source": "zv1946a",
+          "quote": "было образовано 1.339 избирательных округов, из них по выборам в Совет Союза 682 округа и по выборам в Совет Национальностей 657 округов",
+          "note": "Soviet of the Union 682, Soviet of Nationalities 657. First election since 1937; 101,450,936 of 101,717,686 electors voted (final report of 14 February 1946)."
+        },
+        {
+          "date": "1950-03-12",
+          "election_kind": "general",
+          "contests": 1316,
+          "seats": 1316,
+          "source": "zv1950",
+          "quote": "зарегистрировала избрание депутатов в Верховный Совет СССР по всем 1.316 избирательным округам",
+          "note": "111,090,010 of 111,116,373 electors voted (final report of 15 March 1950)."
+        },
+        {
+          "date": "1954-03-14",
+          "election_kind": "general",
+          "contests": 1347,
+          "seats": 1347,
+          "source": "zv1954",
+          "quote": "образовано 1.347 избирательных округов, из них по выборам в Совет Союза 708 округов и по выборам в Совет Национальностей 639 округов",
+          "note": "Soviet of the Union 708, Soviet of Nationalities 639."
+        },
+        {
+          "date": "1958-03-16",
+          "election_kind": "general",
+          "contests": 1378,
+          "seats": 1378,
+          "source": "zv1958",
+          "quote": "по всем 1.378 избирательным округам. В Совет Союза избрано 738 депутатов, в Совет Национальностей — 640 депутатов",
+          "note": "Soviet of the Union 738, Soviet of Nationalities 640."
+        },
+        {
+          "date": "1962-03-18",
+          "election_kind": "general",
+          "contests": 1443,
+          "seats": 1443,
+          "source": "zv1962b",
+          "quote": "зарегистрировала избрание депутатов в Верховный Совет СССР во всех 1.443 избирательных округах",
+          "note": "Soviet of the Union 791. 791 Soviet of the Union districts (report of 21 March 1962)."
+        },
+        {
+          "date": "1966-06-12",
+          "election_kind": "general",
+          "contests": 1517,
+          "seats": 1517,
+          "source": "zv1966",
+          "quote": "образовано 1.517 избирательных округов, из них 767 избирательных округов по выборам в Совет Союза и 750 избирательных округов по выборам в Совет Национальностей",
+          "note": "Soviet of the Union 767, Soviet of Nationalities 750. Soviet of Nationalities seats: 480 from the 15 union republics, 40 from 8 autonomous oblasts, 10 from 10 national okrugs, and the rest from the autonomous republics (report of 15 June 1966)."
+        },
+        {
+          "date": "1970-06-14",
+          "election_kind": "general",
+          "contests": 1517,
+          "seats": 1517,
+          "source": "zv1970",
+          "quote": "Для проведения выборов в Совет Союза было образовано 767 избирательных округов ... в Совет Национальностей было образовано 750 избирательных округов",
+          "note": "Soviet of the Union 767, Soviet of Nationalities 750."
+        },
+        {
+          "date": "1974-06-16",
+          "election_kind": "general",
+          "contests": 1517,
+          "seats": 1517,
+          "source": "zv1974",
+          "quote": "по всем 1.517 избирательным округам, в том числе 767 депутатов Совета Союза и 750 депутатов Совета Национальностей",
+          "note": "Soviet of the Union 767, Soviet of Nationalities 750."
+        },
+        {
+          "date": "1979-03-04",
+          "election_kind": "general",
+          "contests": 1500,
+          "seats": 1500,
+          "source": "zv1979",
+          "quote": "Для проведения выборов в Совет Союза на территории СССР было образовано 750 избирательных округов, выборы состоялись во всех избирательных округах",
+          "note": "Soviet of the Union 750, Soviet of Nationalities 750. First election under the 1977 Constitution and the Law on elections to the Supreme Soviet of the USSR, which replaced the 1937 regulation."
+        },
+        {
+          "date": "1984-03-04",
+          "election_kind": "general",
+          "contests": 1500,
+          "seats": 1500,
+          "source": "zv1984",
+          "quote": "Для проведения выборов в Совет Союза на территории СССР было образовано 750 избирательных округов ... Всего в Совет Союза избрано 750 депутатов.",
+          "note": "Soviet of the Union 750, Soviet of Nationalities 750. The last direct election of the Supreme Soviet; 184,006,373 of 184,029,412 electors voted."
+        }
+      ]
+    },
+    {
+      "key": "sezd_sovetov",
+      "tier": "national",
+      "name": "Съезд Советов СССР и Центральный Исполнительный Комитет СССР",
+      "name_en": "Congress of Soviets of the USSR and its Central Executive Committee",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1922-12-30",
+      "valid_to": "1936-12-05",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cnst1924",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1924.htm (Глава третья, 9-10: delegates of city soviets and provincial congresses of soviets, elected at the provincial or republican congresses; 14: the Congress elects the Union Soviet of the Central Executive Committee)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "From 1922 to 1936 the supreme organ was the Congress of Soviets of the USSR, whose delegates were chosen by the city soviets and by the provincial or republican congresses of soviets, not by the voters; the Congress in turn elected the Central Executive Committee. No public vote chose an all-Union body before the Supreme Soviet election of 12 December 1937.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "SUN",
+          "valid_to": "1937-01-01"
+        }
+      ]
+    },
+    {
+      "key": "sezd_narodnykh_deputatov",
+      "tier": "national",
+      "name": "Выборы народных депутатов СССР по территориальным и национально-территориальным избирательным округам",
+      "name_en": "Congress of People's Deputies of the USSR: territorial and national-territorial districts",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1989-03-26",
+      "valid_to": "1991-12-26",
+      "first_held": "1989-03-26",
+      "earliest_record": "1989-03-26",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "sun.okrug"
+        ]
+      },
+      "finest_note": "Results by district in the Central Electoral Commission's reports.",
+      "source": "zv1989",
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/538952 (Выборы по территориальным округам; Выборы по национально-территориальным избирательным округам; Итоги выборов от общественных организаций)",
+      "note": "The Congress of People's Deputies had 2,250 deputies: 750 from territorial districts, 750 from national-territorial districts in the union and autonomous republics, autonomous oblasts, and autonomous okrugs, and 750 from public organizations (class obshchestvennye_organizatsii). In the districts one, two, or more candidates stood; where more than two stood and none was elected, the two leaders went to repeat voting (art. 60 of the Law on elections of people's deputies of the USSR), and where one or two stood and none was elected, or turnout was under half, a repeat election with new nominations followed (art. 61). Elections to replace deputies who left were also held in single districts.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "SUN",
+          "valid_from": "1989-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": false,
+          "partisan": false,
+          "runoff": "majority",
+          "runoff_rule": "Repeat voting between the two leading candidates where more than two stood and none was elected (art. 60); a repeat election with new nominations where one or two stood and none was elected, or under half the electors voted (art. 61)",
+          "administered_by": "Центральная избирательная комиссия по выборам народных депутатов СССР",
+          "source": "zv1989",
+          "locator": "https://dspace.nplg.gov.ge/handle/1234/538952 (Выборы по территориальным округам; Выборы по национально-территориальным избирательным округам; Итоги выборов от общественных организаций)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Parliamentary Library of Georgia, Iverieli (Заря Востока)",
+          "url": "https://dspace.nplg.gov.ge/handle/1234/465196",
+          "format": "pdf (scanned, with OCR text)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1989-03-26",
+          "last_date": "1989-05-14",
+          "role": "publishes",
+          "source": "zv1989",
+          "evidence": "The Central Electoral Commission's reports on the 26 March 1989 election, the repeat voting of 2 and 9 April, and the repeat elections of 14 May, with totals by kind of district and turnout by union republic; district results went to local papers"
+        }
+      ],
+      "est_votes": 170000000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1989-03-26",
+          "election_kind": "general",
+          "contests": 1500,
+          "seats": 1500,
+          "source": "zv1989",
+          "quote": "было образовано 750 территориальных избирательных округов ... было образовано 750 национально-территориальных избирательных округов",
+          "note": "Held in 749 territorial and 748 national-territorial districts; 1,226 deputies elected in the districts. 172,840,130 of 192,575,165 electors voted. The 750 deputies of public organizations are in obshchestvennye_organizatsii."
+        },
+        {
+          "date": "1989-04-02",
+          "election_kind": "runoff",
+          "source": "zv1989b",
+          "quote": "2 и 9 апреля 1989 года состоялось повторное голосование в 46 территориальных и 30 национально-территориальных избирательных округах",
+          "note": "First of the two days of repeat voting between the two leading candidates in districts with more than two candidates where no one was elected; over both days 76 districts (46 territorial, 30 national-territorial) voted and 76 deputies were elected. The report does not split the districts by day."
+        },
+        {
+          "date": "1989-04-09",
+          "election_kind": "runoff",
+          "source": "zv1989b",
+          "quote": "2 и 9 апреля 1989 года состоялось повторное голосование в 46 территориальных и 30 национально-территориальных избирательных округах",
+          "note": "Second of the two days of repeat voting; see 2 April 1989 for the 76 districts held over both days."
+        },
+        {
+          "date": "1989-05-14",
+          "election_kind": "special",
+          "contests": 198,
+          "seats": 198,
+          "source": "zv1989c",
+          "quote": "повторные выборы, проведенные 14 мая по 198 избирательным округам",
+          "note": "Repeat elections with new nominations in 114 territorial and 84 national-territorial districts; 71 deputies elected and 126 districts sent to repeat voting, whose date the report does not give."
+        }
+      ]
+    },
+    {
+      "key": "obshchestvennye_organizatsii",
+      "tier": "national",
+      "name": "Выборы народных депутатов СССР от общественных организаций",
+      "name_en": "Congress of People's Deputies: deputies of public organizations",
+      "category": "indirect",
+      "goal": "national",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "zv1989",
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/538952 (Выборы по территориальным округам; Выборы по национально-территориальным избирательным округам; Итоги выборов от общественных организаций)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "750 of the 2,250 people's deputies were elected by the congresses, conferences, or plenums of the all-Union bodies of public organizations (871 candidates for the 750 seats in March 1989; repeat elections in April and May 1989 in, among others, the Academy of Sciences, the Union of Artists, and the Soviet Peace Fund), not by the voters.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "SUN",
+          "valid_from": "1989-01-01"
+        }
+      ]
+    },
+    {
+      "key": "verkhovny_sovet_1989",
+      "tier": "national",
+      "name": "Избрание Верховного Совета СССР Съездом народных депутатов",
+      "name_en": "Supreme Soviet of the USSR elected by the Congress of People's Deputies, 1989-1991",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1989-05-26",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "zv1989d",
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/539549 (26 May 1989: the Congress proceeds to the election of the Supreme Soviet of the USSR, by secret ballot on agreed lists of deputies)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "From 1989 the two chambers of the Supreme Soviet were elected by the Congress of People's Deputies from among its members, first by secret ballot on 26 May 1989; no public vote chose them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "SUN",
+          "valid_from": "1989-05-26",
+          "precedence": 1
+        }
+      ]
+    },
+    {
+      "key": "prezident",
+      "tier": "national",
+      "name": "Выборы Президента СССР",
+      "name_en": "President of the USSR",
+      "category": "executive",
+      "goal": "national",
+      "valid_to": "1991-12-25",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "zv1990",
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/540636 (Закон СССР об учреждении поста Президента СССР: art. 127-1, popular election for five years; part III, the first President elected by the Congress of People's Deputies; the Congress's resolution electing M. S. Gorbachev)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 1990 law provided for a President elected by the citizens for five years, but made the first President an election by the Congress of People's Deputies; the Congress elected M. S. Gorbachev in March 1990, he resigned on 25 December 1991, and the office ended without any popular presidential election.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "SUN"
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Референдум СССР",
+      "name_en": "All-Union referendum",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1977-10-07",
+      "valid_to": "1991-12-26",
+      "first_held": "1991-03-17",
+      "earliest_record": "1991-03-17",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Totals for the Union and for each republic that voted, in the Central Commission of the Referendum's report and the Supreme Soviet's resolution of 21 March 1991.",
+      "source": "cnst1977",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm (Статья 5: the most important questions are put to a nationwide vote, a referendum)",
+      "note": "The 1977 Constitution allowed referendums, and the Law of 21 December 1990 on the nationwide vote (referendum of the USSR) set the procedure; the only referendum, on preserving the Union as a renewed federation, was held on 17 March 1991 in nine republics. Armenia, Georgia, Latvia, Lithuania, Moldavia, and Estonia did not hold it.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "SUN"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Президентская библиотека имени Б. Н. Ельцина",
+          "url": "https://www.prlib.ru/history/619099",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1991-03-17",
+          "last_date": "1991-03-17",
+          "role": "publishes",
+          "source": "prlib-ref1991",
+          "evidence": "National electorate, turnout, and yes vote, citing the Supreme Soviet's resolution on the results"
+        }
+      ],
+      "est_votes": 148500000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1991-03-17",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "prlib-ref1991",
+          "quote": "Из 185,6 млн. граждан СССР, включённых в списки для голосования, в референдуме приняли участие 148,5 млн. (79,5%); из них 113,5 млн. (76,43%) высказались за сохранение СССР.",
+          "note": "Held in 9 of the 15 union republics. Questions a republic put to its own voters on the same day belong to that republic's census."
+        }
+      ]
+    },
+    {
+      "key": "verkhovnye_sovety_respublik",
+      "tier": "union_republic",
+      "name": "Выборы в Верховные Советы союзных республик",
+      "name_en": "Supreme Soviets of the union republics",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1936-12-05",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cnst1936",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1936.htm (Статьи 57-59: the Supreme Soviet of a union republic, elected by its citizens, with representation set by the republic's constitution)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each union republic elected its own Supreme Soviet under its own constitution and electoral law, from 1938 to the competitive elections of 1990; these elections are counted in the census of each successor state (for example the classes soviet_rsfsr and congress_rsfsr of Russia, supreme_soviet_ssr of Ukraine, Georgia, Armenia, and Uzbekistan), not again here.",
+      "match": []
+    },
+    {
+      "key": "mestnye_sovety",
+      "tier": "local",
+      "name": "Выборы в местные Советы",
+      "name_en": "Local soviets",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1936-12-05",
+      "valid_to": "1991-12-26",
+      "first_held": "1939-12-24",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "zv1939",
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/468322 (leading article: the elections to the local soviets of working people's deputies, held the day before, 24 December 1939); the 1936 Constitution, arts. 94-96, set two-year terms",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Local soviets were elected under the union republics' constitutions and regulations, first on 24 December 1939, every two years and from 1977 every two and a half years; these elections are counted in each successor state's census (for example soviets_local of Russia and local_soviets_ssr of Ukraine), not again here.",
+      "match": []
+    },
+    {
+      "key": "narodnye_sudi",
+      "tier": "local",
+      "name": "Выборы народных судей",
+      "name_en": "People's judges of the district and city courts",
+      "category": "judicial",
+      "goal": "local",
+      "valid_from": "1936-12-05",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "cnst1977",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm (Статья 152: people's judges of district and city courts elected by the citizens for five years; people's assessors elected at meetings by open vote)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "People's judges of the district and city courts were elected by the citizens under the 1936 and 1977 Constitutions, but in elections the union republics organized and reported; they belong to the successor states' censuses. People's assessors were chosen by open vote at meetings of workers and residents, and the higher courts by the soviets.",
+      "match": []
+    },
+    {
+      "key": "otzyv",
+      "tier": "national",
+      "name": "Отзыв депутата Верховного Совета СССР",
+      "name_en": "Recall of a deputy of the Supreme Soviet of the USSR",
+      "category": "direct_democracy",
+      "goal": "national",
+      "valid_from": "1936-12-05",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cnst1936",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1936.htm (Статья 142: every deputy reports to the voters and may be recalled at any time by decision of a majority of the voters)",
+      "note": "The 1936 and 1977 Constitutions let a majority of a district's voters recall their deputy. The sources read here list no recall vote of a deputy of the Supreme Soviet of the USSR, so the class has no dates yet.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "iso_pattern": "SUN"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "kpss",
+      "tier": "national",
+      "name": "Выдвижение кандидатов",
+      "name_en": "Nomination of candidates and party bodies",
+      "category": "nominating",
+      "goal": "national",
+      "valid_from": "1936-12-05",
+      "valid_to": "1991-12-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cnst1977",
+      "locator": "http://www.hist.msu.ru/ER/Etext/cnst1977.htm (Статья 100: candidates nominated by the organizations of the CPSU, the trade unions, the Komsomol, cooperatives, other public organizations, labor collectives, and meetings of servicemen)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Candidates were nominated by party, trade-union, and Komsomol organizations, labor collectives, and meetings of servicemen; the CPSU chose its bodies at its own congresses. The state ran and published no primaries.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "SUN"
+        }
+      ]
+    }
+  ]
+}
