@@ -93,6 +93,7 @@ HEADERS = {
     "candidatos": "candidato",
     "opcion": "candidato",
     "votostricel": "votos",
+    "vototricel": "votos",
     "votoster": "votos",
     "votos": "votos",
     "votospreliminares": "votos",
