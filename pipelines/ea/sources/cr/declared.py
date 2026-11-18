@@ -3,6 +3,7 @@
 import html
 import re
 import subprocess
+import time
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -16,6 +17,8 @@ BASE = "https://www.tse.go.cr"
 INDEX_URL = f"{BASE}/declaratorias.html"
 PROVINCES = ("SAN JOSE", "ALAJUELA", "CARTAGO", "HEREDIA", "GUANACASTE", "PUNTARENAS", "LIMON")
 CHALLENGE = b"Radware Bot Manager"
+ATTEMPTS = 6
+"""How many times to ask for a declaratoria: the site answers some requests with a bot challenge and others with the file."""
 
 
 @dataclass(frozen=True)
@@ -84,11 +87,15 @@ def fetch() -> list[Resolution]:
     raw.fetch(SOURCE, INDEX_URL, suffix=".html")
     got = []
     for resolution in RESOLUTIONS:
-        try:
-            raw.fetch(SOURCE, url(resolution), suffix=Path(resolution.path).suffix, check=refuse)
-        except ConnectionError, OSError:
-            continue
-        got.append(resolution)
+        for attempt in range(ATTEMPTS):
+            try:
+                raw.fetch(SOURCE, url(resolution), suffix=Path(resolution.path).suffix, check=refuse)
+            except ConnectionError, OSError:
+                if attempt + 1 < ATTEMPTS:
+                    time.sleep(5)
+                continue
+            got.append(resolution)
+            break
     return got
 
 
