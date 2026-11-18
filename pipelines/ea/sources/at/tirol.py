@@ -33,6 +33,11 @@ class Edition:
         return f"{BASE}/landtagswahl_{self.year}/dokumente/{self.file}.csv"
 
     @property
+    def districts(self) -> str | None:
+        """The file that holds the results by polling district (Sprengel), where the office publishes one."""
+        return f"{BASE}/landtagswahl_{self.year}/dokumente/{self.file}_sprengel.csv" if self.year == 2022 else None
+
+    @property
     def page(self) -> str:
         return f"{BASE}/landtagswahl_{self.year}/index.html"
 
@@ -67,6 +72,8 @@ def fetch() -> None:
     for edition in EDITIONS:
         raw.fetch(SOURCE, edition.csv, suffix=".csv")
         raw.fetch(SOURCE, edition.page, suffix=".html")
+        if edition.districts:
+            raw.fetch(SOURCE, edition.districts, suffix=".csv")
 
 
 def parse() -> None:
@@ -139,6 +146,48 @@ def table(edition: Edition) -> tuple[date, list[Row]]:
             )
         )
     return day, rows
+
+
+@dataclass
+class Leaf:
+    """One polling district (Sprengel) of a municipality, or the municipality's postal ballots (-1)."""
+
+    code: str
+    number: str
+    cast: int
+    valid: int
+    invalid: int
+    votes: dict[int, int]
+
+
+@functools.cache
+def leaves(edition: Edition) -> dict[str, list[Leaf]]:
+    """Read the polling-district file: the rows below each municipality's own total row, keyed by municipality."""
+    assert edition.districts is not None
+    text = raw.cached(SOURCE, edition.districts).path.read_bytes().decode("cp1252")
+    reader = csv.reader(io.StringIO("\n".join(text.splitlines()[1:])), delimiter=";")
+    header = next(reader)
+    invalid = header.index("Ungültige Stimmen")
+    found: dict[str, list[Leaf]] = {}
+    for line in reader:
+        if not line or not line[0].strip() or not line[4].strip():
+            continue
+        votes = {
+            int(line[index]): number(line[index + 2])
+            for index in range(invalid + 1, len(line) - 3, 4)
+            if line[index].strip()
+        }
+        found.setdefault(line[2], []).append(
+            Leaf(
+                line[2],
+                line[4].strip(),
+                number(line[header.index("Abgegebene Stimmen")]),
+                number(line[header.index("Gültige Stimmen")]),
+                number(line[invalid]),
+                votes,
+            )
+        )
+    return found
 
 
 class Cells(HTMLParser):
@@ -305,6 +354,8 @@ def registry() -> Package:
     for edition in EDITIONS:
         p.artifact(raw.cached(SOURCE, edition.csv), SOURCE_ID)
         p.artifact(raw.cached(SOURCE, edition.page), SOURCE_ID)
+        if edition.districts:
+            p.artifact(raw.cached(SOURCE, edition.districts), SOURCE_ID)
     p.add("body", id=LANDTAG, polity_id=AUSTRIA, kind="unicameral")
     p.name(LANDTAG, "Tyrolean Landtag", "en", "official")
     p.name(LANDTAG, "Tiroler Landtag", "de", "native", False)
@@ -342,6 +393,8 @@ def election(edition: Edition) -> Package:
     p.external |= {AUSTRIA, COUNTRY}
     p.uses(raw.cached(SOURCE, edition.csv))
     p.uses(raw.cached(SOURCE, edition.page))
+    if edition.districts:
+        p.uses(raw.cached(SOURCE, edition.districts))
     id = key("election", edition.key)
     p.add("election", id=id, polity_id=AUSTRIA, kind="general", date_from=day, date_to=day, status="held")
     p.name(id, f"{year} Tyrolean Landtag election", "en", "official")
@@ -369,8 +422,8 @@ def election(edition: Edition) -> Package:
         stage="official",
         kind="counted",
         source_id=SOURCE_ID,
-        status="active",
-        is_default=True,
+        status="superseded" if edition.districts else "active",
+        is_default=not edition.districts,
         completeness=1.0,
     )
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
@@ -461,7 +514,96 @@ def election(edition: Edition) -> Package:
             f"{len(over)} {'municipality' if len(over) == 1 else 'municipalities'} counted more ballots than the "
             "file lists registered voters, as printed",
         )
+    if edition.districts:
+        districts(p, edition, id, contest, result_set, options, by_page, state)
     return p
+
+
+def districts(
+    p: Package,
+    edition: Edition,
+    election_id: str,
+    contest: str,
+    below: str,
+    options: dict[int, str],
+    by_page: dict[int, str],
+    state: Declared,
+) -> None:
+    """Add the result set by polling district, which supersedes the one by municipality and takes the default."""
+    day, rows = table(edition)
+    found = leaves(edition)
+    result_set = key("result_set", edition.key, "sprengel")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+        supersedes_id=below,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md="Results by polling district (Sprengel) from the Tyrolean state election office's file by polling "
+        "district, with the state totals and seats from its state-level page. Each municipality's postal ballots "
+        "are reported as one unit of their own. The file prints registered voters only for whole municipalities, "
+        "so they are left out here. It supersedes the set by municipality.",
+        lang="en",
+    )
+    for field, measure in (("registered", 2), ("cast", 3), ("valid", 4), ("invalid", 5)):
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=getattr(state, field))
+    for position, name in by_page.items():
+        p.add("declared", result_set_id=result_set, option_id=options[position], measure=1, value=state.votes[name])
+        if state.seats.get(name):
+            p.add("outcome", result_set_id=result_set, option_id=options[position], kind="won", seats=state.seats[name])
+    names = {row.code: row.name for row in rows}
+    for code, items in sorted(found.items()):
+        for leaf in items:
+            postal = leaf.number == "-1"
+            unit = key("unit", edition.key, code, leaf.number)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=AUSTRIA,
+                scheme_code="at-7.gemeinde",
+                code=f"{day}:{code}:{leaf.number}",
+                parent_id=key("unit", edition.key, code),
+                area_relation="within",
+                area_id=key("area", "at-7.gemeinde", code),
+                kind="postal_district" if postal else "standard",
+            )
+            p.name(unit, f"{names[code]}, " + ("Wahlkarten" if postal else f"Sprengel {leaf.number}"), "de", "official")
+            for measure, value in ((3, leaf.cast), (4, leaf.valid), (5, leaf.invalid)):
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
+            for position, votes in sorted(leaf.votes.items()):
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=options[position],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=votes,
+                )
 
 
 def match(labels: dict[int, str], total: dict[int, int], state: Declared) -> dict[int, str]:
