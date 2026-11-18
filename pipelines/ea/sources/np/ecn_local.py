@@ -879,7 +879,7 @@ def election(day: str) -> Package:
                 area_id=area,
                 kind="standard",
                 valid_from=when,
-                valid_to=when,
+                valid_to=None,
             )
         if ward is None and result_kind == "counted":
             p.add(
