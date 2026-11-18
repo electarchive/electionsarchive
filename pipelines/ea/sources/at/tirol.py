@@ -10,10 +10,12 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.at import landtag
 
 SOURCE = "at.tirol"
 BASE = "https://wahlen.tirol.gv.at"
 AUSTRIA = str(uuid5(package.NAMESPACE, "polity\x1fAT"))
+LAND_POLITY = landtag.polity("AT-7")
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fAUT"))
 
 
@@ -304,14 +306,16 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Tyrol's districts and municipalities as the state's election office codes them in its Landtag results",
+        depends=[f"{landtag.SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     for code, rank, noun in (
         ("at-7.land", 1, "state"),
         ("at-7.bezirk", 2, "political district"),
         ("at-7.gemeinde", 3, "municipality"),
     ):
         p.add("scheme", code=code, polity_id=AUSTRIA, kind="administrative", rank=rank, noun=noun, code_system=None)
+    p.add("polity_territory", polity_id=LAND_POLITY, area_id=LAND)
     p.add("area", id=LAND, scheme_code="at-7.land")
     p.add("area_code", area_id=LAND, code="7")
     p.add("area_parent", area_id=LAND, parent_id=COUNTRY)
@@ -341,7 +345,7 @@ def registry() -> Package:
         "The Tyrolean Landtag and the lists on its ballots, as the state's election office prints them",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.add(
         "source",
         id=SOURCE_ID,
@@ -356,7 +360,7 @@ def registry() -> Package:
         p.artifact(raw.cached(SOURCE, edition.page), SOURCE_ID)
         if edition.districts:
             p.artifact(raw.cached(SOURCE, edition.districts), SOURCE_ID)
-    p.add("body", id=LANDTAG, polity_id=AUSTRIA, kind="unicameral")
+    p.add("body", id=LANDTAG, polity_id=LAND_POLITY, kind="unicameral")
     p.name(LANDTAG, "Tyrolean Landtag", "en", "official")
     p.name(LANDTAG, "Tiroler Landtag", "de", "native", False)
     seen: set[str] = set()
@@ -390,13 +394,13 @@ def election(edition: Edition) -> Package:
         f"The {day} Tyrolean Landtag election by municipality from the state's election office",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.uses(raw.cached(SOURCE, edition.csv))
     p.uses(raw.cached(SOURCE, edition.page))
     if edition.districts:
         p.uses(raw.cached(SOURCE, edition.districts))
     id = key("election", edition.key)
-    p.add("election", id=id, polity_id=AUSTRIA, kind="general", date_from=day, date_to=day, status="held")
+    p.add("election", id=id, polity_id=LAND_POLITY, kind="general", date_from=day, date_to=day, status="held")
     p.name(id, f"{year} Tyrolean Landtag election", "en", "official")
     p.name(id, f"Landtagswahl {year}", "de", "native", False)
     path = f"at/{day}-tirol-landtag"
@@ -461,7 +465,7 @@ def election(edition: Edition) -> Package:
         p.add(
             "reporting_unit",
             id=unit,
-            polity_id=AUSTRIA,
+            polity_id=LAND_POLITY,
             scheme_code="at-7.gemeinde",
             code=f"{day}:{row.code}",
             area_relation="equals",
