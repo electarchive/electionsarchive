@@ -18,7 +18,7 @@ import httpx
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
-from ea.sources.tt import report2010, report2015, report2020
+from ea.sources.tt import report1946, report2010, report2015, report2020
 
 SOURCE = "tt.ebc"
 SITE = "https://ebctt.com"
@@ -115,7 +115,7 @@ PARTIES = {
 
 
 def fetch() -> None:
-    for url, suffix in FILES.items():
+    for url, suffix in {**FILES, **{url: ".pdf" for url in report1946.REPORTS.values()}}.items():
         for attempt in range(6):
             try:
                 raw.fetch(SOURCE, url, suffix=suffix)
@@ -201,6 +201,9 @@ class District:
     # Polling divisions whose electorate is printed once for several stations: the electorate, and the page and
     # box it was read from.
     divisions: dict[str, Division] = field(default_factory=dict)
+    # For a district read from the summary table of one of the 1946 to 1966 reports: each figure's page and box,
+    # keyed by the candidate's index or by the measure (registered, ballots, valid, rejected).
+    cells: dict[int | str, tuple[int, tuple[float, float, float, float]]] = field(default_factory=dict)
 
 
 class Event(NamedTuple):
@@ -1254,11 +1257,82 @@ def _district_report(
 
 
 MISSING = {(29, "Y.O.U.R."): "Judith De Verteuil"}
+# Parties that first appear among the candidates of the 1946 to 1966 reports, minted in their election's package,
+# with the abbreviation the report prints.
+EARLY_CODES = {"ANC": "A.N.C."}
+EARLY_PARTIES = set(EARLY_CODES)
+
+
+def _natural(label: str) -> str:
+    """A name the report prints surname first, with a comma, in natural order."""
+    surname, comma, given = label.partition(", ")
+    return f"{given} {surname}" if comma else label
+
+
+def early_report(year: int, history_set: Election) -> Election:
+    """The 1946, 1956, 1961, or 1966 election by constituency with every candidate's votes, from the summary table
+    of the commission's report (for 1966, the total rows of its surviving polling station tables), superseding the
+    winner-only district figures of the historical data."""
+    earlier = {norm(district.name): district for district in history_set.districts}
+    read = {norm(entry.district): entry for entry in report1946.entries(year)}
+    if set(read) - set(earlier):
+        raise ValueError(f"{year}: the report names districts the historical data lacks: {set(read) - set(earlier)}")
+    districts = []
+    for code, before in earlier.items():
+        entry = read.get(code)
+        if entry is None:
+            districts.append(before)
+            continue
+        candidates = [
+            Candidate(_natural(label), None if party == "Ind." else party, votes, party == "Ind.", label)
+            for label, votes, party in entry.candidates
+        ]
+        winner = _winner(candidates)
+        elected = before.candidates[0]
+        surnames = {norm(word) for word in re.split(r"[\s,.]+", candidates[winner].label or "") if len(word) > 2}
+        if elected.name is None or not surnames & {norm(word) for word in re.split(r"[\s,.]+", elected.name)}:
+            raise ValueError(
+                f"{year} {before.name}: the report's leader {candidates[winner].label} is not {elected.name}"
+            )
+        # The elected candidate keeps the name and party of the historical data, as the earlier set has them.
+        candidates[winner] = Candidate(
+            elected.name, elected.party, candidates[winner].votes, elected.independent, candidates[winner].label
+        )
+        votes = sum(candidate.votes or 0 for candidate in candidates)
+        districts.append(
+            District(
+                before.name,
+                entry.registered if entry.registered is not None else before.registered,
+                entry.valid if entry.valid is not None else votes,
+                entry.rejected,
+                entry.ballots,
+                candidates,
+                winner,
+                columns=[0 if index == winner else -1 for index in range(len(candidates))],
+                cells=entry.cells,
+            )
+        )
+    return Election(
+        year,
+        districts,
+        sources=[report1946.REPORTS[year]],
+        supersedes=history_set,
+        pages=report1946.sizes(year),
+    )
+
+
+def one_election(year: int) -> Election:
+    """One election; the 1946 to 1966 elections without reading the later reports' scans."""
+    if year in report1946.REPORTS:
+        return early_report(year, history()[year])
+    return elections()[year]
 
 
 @functools.cache
 def elections() -> dict[int, Election]:
     found = history()
+    for year in report1946.REPORTS:
+        found[year] = early_report(year, found[year])
     for year in REPORTS:
         found[year] = election_report(year, found[year])
     found[2015] = election_2015()
@@ -1367,6 +1441,81 @@ METHODS = {
 }
 
 
+EARLY_METHODS = {
+    1946: (
+        "From the commission's report on the 1 July 1946 Legislative Council election, Table 3, which gives each "
+        "constituency's electors, ballots cast, accepted and rejected ballots, and the ballots cast for each "
+        "candidate. Candidates are named as the table prints them, surname first, and their parties are not "
+        "printed. The report is a scan; its figures were read from the page by hand, and each one's box on the "
+        "page was found among the words optical character recognition reads there, or placed between its "
+        "neighbours where it reads none. Every constituency's ballots cast are its accepted plus rejected ballots. "
+        "In Caroni the candidates' ballots add up to 50 more than the accepted ballots the table prints, and in "
+        "Eastern Counties to 2 fewer; both are stored as printed."
+    ),
+    1956: (
+        "From the commission's report on the 24 September 1956 Legislative Council election, Table 4, which gives "
+        "each constituency's total votes cast, each candidate's votes, and the rejected votes. Candidates who lost "
+        "are named as the table prints them; their parties are not printed. The elected candidate keeps the name "
+        "and party of the commission's historical data. The electorate is the historical data's, which Table 4 "
+        "does not print. Valid votes are the candidates' votes added up. The report is a scan; its figures were "
+        "read from the page by hand, and each one's box on the page was found among the words optical character "
+        "recognition reads there. In Tunapuna the table prints 15,006 votes cast, while its candidates and rejected "
+        "votes add up to 15,066, the figure of the historical data; the printed figure is stored."
+    ),
+    1961: (
+        "From the commission's report on the 4 December 1961 general election, Table 4, which gives each "
+        "candidate's votes and party, and each district's rejected and total votes cast. Where the table prints no "
+        "rejected votes, none are stored. Steadman Roberts of Point Fortin, printed as P.B., is taken as a "
+        "candidate of the Butler Party, B.P. The elected candidate keeps the name and party of the commission's "
+        "historical data. The electorate is the historical data's, which Table 4 does not print. Valid votes are "
+        "the candidates' votes added up. The report is a scan; its figures were read from the page by hand, and "
+        "each one's box on the page was found among the words optical character recognition reads there, or "
+        "placed between its neighbours where it reads none."
+    ),
+    1966: (
+        "From the commission's report on the 7 November 1966 general election, Table 1, the statement of the poll "
+        "by polling station that each returning officer certified, whose total row gives each candidate's votes, "
+        "the rejected postal votes, the total votes (including rejected postal votes), and the electorate. The "
+        "election used voting machines, so only postal votes could be rejected. The file the commission publishes "
+        "breaks off after its 63rd page, so only the 25 districts whose tables close by then were read; 22 of them "
+        "are stored, those whose total row adds up and whose total votes and electorate equal the commission's "
+        "historical data. Candidates who lost are named as the column headings print them, surname first; their "
+        "parties are not printed. The elected candidate keeps the name and party of the historical data. The scan "
+        "is worn; its figures were read from the page by hand, and each one's box is its cell in the total row, "
+        "placed by the table's rules and the words optical character recognition reads there."
+    ),
+}
+for early_year, early_method in EARLY_METHODS.items():
+    METHODS[early_year] = early_method
+METHODS.update(
+    {
+        f"{year}-summary": (
+            "From the commission's historical district profile data, which gives each constituency's electors, "
+            "accepted votes, rejected ballots, and the elected candidate with their party, without any candidate's "
+            "votes. The candidates' votes of the commission's report on the election supersede this set."
+        )
+        for year in EARLY_METHODS
+    }
+)
+# Findings the reports' own printed figures cause.
+EARLY_ACCEPTS: dict[int, dict[str, str]] = {
+    1946: {
+        "accounting.votes_valid": (
+            "Table 3 of the commission's 1946 report prints accepted ballots in Caroni of 15,130 and in Eastern "
+            "Counties of 12,706, while the candidates' ballots it prints add up to 15,180 and 12,704; both are "
+            "stored as printed."
+        ),
+    },
+    1956: {
+        "accounting.ballots_sum": (
+            "Table 4 of the commission's 1956 report prints 15,006 total votes cast in Tunapuna, while the "
+            "candidates' votes and the rejected votes it prints add up to 15,066, the figure of the commission's "
+            "historical data; the printed total is stored."
+        ),
+    },
+}
+
+
 def _label(year: int) -> str:
     return f"{year} Trinidad and Tobago {'Legislative Council' if year in COUNCIL else 'parliamentary'} election"
 
@@ -1442,6 +1591,8 @@ def registry() -> Package:
                 if candidate.party:
                     codes[party_code(candidate.party, year)] = candidate.party
     for code, text in sorted(codes.items()):
+        if code in EARLY_PARTIES:
+            continue
         id = party(code)
         p.add("party", id=id, kind="party", polity_id=TRINIDAD)
         full = PARTIES.get(text)
@@ -1456,7 +1607,7 @@ def party(code: str) -> str:
 
 
 def general(year: int) -> Package:
-    election = elections()[year]
+    election = one_election(year)
     day = DAYS[year]
     p = Package(
         f"tt.ebc/{day}",
@@ -1467,8 +1618,22 @@ def general(year: int) -> Package:
         depends=["tt.ebc/geo", "tt.ebc/registry"],
     )
     p.external.add(TRINIDAD)
+    early = year in report1946.REPORTS
     for url in election.sources + (election.supersedes.sources if election.supersedes else []):
-        p.uses(raw.cached(SOURCE, url))
+        if early and url == report1946.REPORTS[year]:
+            # The registry does not carry the 1946 to 1966 reports, so their package carries their artifact.
+            p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+        else:
+            p.uses(raw.cached(SOURCE, url))
+    if early:
+        for code in sorted(EARLY_PARTIES):
+            if any(
+                candidate.party and party_code(candidate.party, year) == code
+                for district in election.districts
+                for candidate in district.candidates
+            ):
+                p.add("party", id=party(code), kind="party", polity_id=TRINIDAD)
+                p.name(party(code), PARTIES.get(EARLY_CODES[code], EARLY_CODES[code]), "en", "official")
     pages = _pages(p, election)
     earlier = {norm(d.name): d for d in election.supersedes.districts} if election.supersedes else {}
     body = COUNCIL_BODY if year in COUNCIL else BODY
@@ -1477,8 +1642,16 @@ def general(year: int) -> Package:
         p.accept(
             "accounting.votes_valid",
             "The commission's historical district data gives each constituency's valid votes and only the elected "
-            "candidate, without the votes of any candidate, so the options' votes cannot sum to the valid votes.",
+            "candidate, without the votes of any candidate, so the options' votes cannot sum to the valid votes."
+            + (
+                f" {EARLY_ACCEPTS[year]['accounting.votes_valid']}"
+                if "accounting.votes_valid" in EARLY_ACCEPTS.get(year, {})
+                else ""
+            ),
         )
+    for code, reason in EARLY_ACCEPTS.get(year, {}).items():
+        if code != "accounting.votes_valid":
+            p.accept(code, reason)
     if year in REPORTS and any(district.stations for district in election.districts):
         p.accept(
             "accounting.turnout",
@@ -1560,6 +1733,8 @@ def general(year: int) -> Package:
             supersedes_id=superseded,
         )
         method = general_method if district.stations or year not in REPORTS else METHODS["history"]
+        if early and not district.cells:
+            method = METHODS["history"]
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
         unit = key("unit", day, code)
         p.add(
@@ -1674,7 +1849,36 @@ def general(year: int) -> Package:
             )
         if stations and stations[0].page is not None:
             _locate(p, result_set, units, options, district, pages)
+        if district.cells:
+            _cells(p, result_set, unit, options, district, pages)
     return p
+
+
+MEASURES = {"registered": REGISTERED, "ballots": BALLOTS, "valid": VALID, "rejected": INVALID}
+
+
+def _cells(
+    p: Package, result_set: str, unit: str, options: list[str], district: District, pages: dict[int, str]
+) -> None:
+    """Where on the scanned page each figure of a district read from a summary table stands, in the pixels of the
+    page's image."""
+    for key, (page, box) in district.cells.items():
+        option, measure = (options[key], VOTES) if isinstance(key, int) else (None, MEASURES[key])
+        p.add(
+            "value_locator",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            page_id=pages[page],
+            source_id=SOURCE_ID,
+            x0=round(box[0], 1),
+            y0=round(box[1], 1),
+            x1=round(box[2], 1),
+            y1=round(box[3], 1),
+        )
 
 
 def _pages(p: Package, election: Election) -> dict[int, str]:
