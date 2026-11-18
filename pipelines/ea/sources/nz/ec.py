@@ -751,9 +751,10 @@ def party_id(name: str) -> str:
     return key("party", name.casefold())
 
 
-# The 2023 voting-place pages list parties that no summary prints, such as parties that stood only candidates. The
-# registry holds the parties that the summaries list, so the 2023 election makes the others itself, under ids of its own.
-LOCAL_YEARS = (1999, 2002, 2005, 2008, 2011, 2014, 2023)
+# The saved polling-place bundles of 1999 to 2014 list parties that no summary prints, such as parties that stood only
+# candidates. The registry holds the parties that the summaries list and those the 2017 to 2023 pages print, so the
+# bundled elections make the others themselves, under ids of their own.
+LOCAL_YEARS = (1999, 2002, 2005, 2008, 2011, 2014)
 
 
 def listed(year: int) -> set[str]:
@@ -969,6 +970,7 @@ REGISTRY_PARTIES = (
     "Democrats for Social Credit",
     "Destiny New Zealand",
     "Direct Democracy Party",
+    "Economic Euthenics",
     "Family Party",
     "Focus New Zealand",
     "Freedoms NZ",
@@ -991,31 +993,38 @@ REGISTRY_PARTIES = (
     "Mana Maori",
     "Maori Party",
     "Money Free Party",
+    "Money Free Party NZ",
     "Māori Party",
     "NAP",
     "NMP",
     "NZ Economic Euthenics Party",
     "NZ First",
     "NZ Independent Coalition",
+    "NZ Outdoors & Freedom Party",
     "NZ Outdoors Party",
     "NZ Public Party",
     "National Party",
     "New Conservative",
     "New Conservatives",
     "New Nation Party",
+    "New World Order McCann Party",
     "New Zealand Family Rights Protection Party",
     "New Zealand First Party",
     "New Zealand Loyal",
     "New Zealand Pacific Party",
     "New Zealand People's Party",
+    "New Zealand Sovereignty Party",
     "NewZeal",
+    "Northland Party",
     "ONE Party",
     "OneNZ Party",
     "Outdoor Rec. NZ",
     "Progressive Aotearoa New Zealand",
     "Progressive Coalition",
+    "Protect and Prosper New Zealand",
     "RAM - Residents Action Movement",
     "Republic of New Zealand Party",
+    "Rock the Vote NZ",
     "Social Credit",
     "Sustainable New Zealand Party",
     "TEA Party",
@@ -1031,6 +1040,7 @@ REGISTRY_PARTIES = (
     "Vision New Zealand",
     "Voice of the People",
     "Women’s Rights Party",
+    "Workers Now",
     "Workers Party",
 )
 
