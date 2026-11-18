@@ -1,0 +1,1586 @@
+{
+  "polity": "CY-NC",
+  "name": "Turkish Republic of Northern Cyprus",
+  "sources": {
+    "ysk-mevzuat": {
+      "title": "Mevzuat: Genel Bilgiler",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/mevzuat/",
+      "kind": "official_body",
+      "note": "States the three kinds of election (presidential, Assembly, and local bodies), the five-year presidential and Assembly terms, the four-year local term, and the two-round presidential rule."
+    },
+    "l5-1976": {
+      "title": "5/1976 sayılı Seçim ve Halkoylaması Yasası (değiştirilmiş şekliyle)",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc",
+      "kind": "official_body",
+      "note": "Adopted by the Constituent Assembly of the Turkish Federated State of Cyprus on 3 March 1976; consolidated text as amended to Law 55/2026. Arts. 5 (electoral regions), 10 (terms), 11 (polling days and the presidential runoff), 12 (renewal of Assembly elections), 13-14 (vacancies and by-elections), 52 (seats per district by population), 133A (5% national threshold), 134 (d'Hondt by district), 138-139 (declaration of results)."
+    },
+    "ysk-cb": {
+      "title": "Cumhurbaşkanlığı Seçimleri",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/cumhurbaskanligi/",
+      "kind": "official_body"
+    },
+    "ysk-mv": {
+      "title": "Milletvekilliği Seçimleri",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/milletvekilligi/",
+      "kind": "official_body"
+    },
+    "ysk-yerel": {
+      "title": "Yerel Seçimler",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/yerel-secimler/",
+      "kind": "official_body"
+    },
+    "ysk-ref": {
+      "title": "Halkoylaması (Referandum)",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/halkoylamasi-referandum/",
+      "kind": "official_body"
+    },
+    "mfa-history": {
+      "title": "Historical Perspective",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Dışişleri Bakanlığı",
+      "url": "https://mfa.gov.ct.tr/pages/historical-perspective",
+      "kind": "official_body"
+    },
+    "mv1976": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1976-06-20",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131224141119839.pdf",
+      "kind": "official_body"
+    },
+    "mv1981": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1981-06-28",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1981ss.pdf",
+      "kind": "official_body"
+    },
+    "mv1985": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1985-06-23",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1985ss.pdf",
+      "kind": "official_body"
+    },
+    "mv1990": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1990-05-06",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1990ss.pdf",
+      "kind": "official_body"
+    },
+    "mv1993": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1993-12-12",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1993ss.pdf",
+      "kind": "official_body"
+    },
+    "mv1998": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 1998-12-06",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1998ss.pdf",
+      "kind": "official_body"
+    },
+    "mv2003": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2003-12-14",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20140109115630980.pdf",
+      "kind": "official_body"
+    },
+    "mv2005": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2005-02-20",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/kmi-1.doc",
+      "kind": "official_body"
+    },
+    "mv2009": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2009-04-19",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2009-Milletvekilligi-Secim-Sonuclarinin-Ilani-1.doc",
+      "kind": "official_body"
+    },
+    "mv2013": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2013-07-28",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2013sonuc-2.zip",
+      "kind": "official_body"
+    },
+    "mv2018": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2018-01-07",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2018-Milletvekilligi-Secim-sonuclari-ilani.xlsx",
+      "kind": "official_body"
+    },
+    "mv2022": {
+      "title": "Milletvekilliği seçimi sonuçlarının ilanı, 2022-01-23",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/secim_sonuclari_ocak_2022_v2-2.zip",
+      "kind": "official_body"
+    },
+    "mv2026": {
+      "title": "2026 Milletvekilliği Erken Genel Seçimi Takvimi",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/2026-Milletvekilligi-Erken-Genel-Secimi-Takvimi-.pdf",
+      "kind": "official_body"
+    },
+    "mvara1991": {
+      "title": "Milletvekilliği ara seçimi sonuçlarının ilanı, 1991-10-13",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1991ss.pdf",
+      "kind": "official_body"
+    },
+    "mvara2006": {
+      "title": "Milletvekilliği ara seçimi sonuçlarının ilanı, 2006-06-25",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/sonuc.doc",
+      "kind": "official_body"
+    },
+    "mvara2010": {
+      "title": "Milletvekilliği ara seçimi sonuçlarının ilanı, 2010-06-27",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131227120241926.pdf",
+      "kind": "official_body"
+    },
+    "mvara2023": {
+      "title": "Milletvekilliği ara seçimi sonuçlarının ilanı, 2023-06-25",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2023-Milletvekiligi-Ara-Secim-Sonuclarinin-Ilani.docx",
+      "kind": "official_body"
+    },
+    "cb1976": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1976-06-20",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1976ss.pdf",
+      "kind": "official_body"
+    },
+    "cb1981": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1981-06-28",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1981ss.pdf",
+      "kind": "official_body"
+    },
+    "cb1985": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1985-06-09",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1985sc-1.doc",
+      "kind": "official_body"
+    },
+    "cb1990": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1990-04-22",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1990ss-1.pdf",
+      "kind": "official_body"
+    },
+    "cb1995": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1995-04-15",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1995ss-1.pdf",
+      "kind": "official_body"
+    },
+    "cb1995r2": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 1995-04-22",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/cb1995ss2.pdf",
+      "kind": "official_body"
+    },
+    "cb2000": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2000-04-15",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/2000i.doc",
+      "kind": "official_body"
+    },
+    "cb2005": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2005-04-17",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/02/ilan1-1.doc",
+      "kind": "official_body"
+    },
+    "cb2010": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2010-04-18",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/secilenilan.doc",
+      "kind": "official_body"
+    },
+    "cb2015": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2015-04-19",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/secim_sonuclari_1-2.doc",
+      "kind": "official_body"
+    },
+    "cb2015r2": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2015-04-26",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/secim_sonuclari_2-2.doc",
+      "kind": "official_body"
+    },
+    "cb2020": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2020-10-11",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2020_Secim_Sonuclari-6.zip",
+      "kind": "official_body"
+    },
+    "cb2020r2": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2020-10-18",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2020_secim_sonuclari_2-2.zip",
+      "kind": "official_body"
+    },
+    "cb2025": {
+      "title": "Cumhurbaşkanlığı seçim sonuçlarının ilanı, 2025-10-19",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/10/KKTC-Geneli-Cumhurbaskanligi-Secim-Sonucu-Ilani.pdf",
+      "kind": "official_body"
+    },
+    "ref1975": {
+      "title": "Halkoylaması sonuçları, 1975-06-08",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/HalkoylamasiSonuclari1976.pdf",
+      "kind": "official_body"
+    },
+    "ref1985": {
+      "title": "Halkoylaması sonuçları, 1985-05-05",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/HalkoylamasiSonuclari1985.pdf",
+      "kind": "official_body"
+    },
+    "ref2004": {
+      "title": "Halkoylaması sonuçları, 2004-04-24",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/kktc.xls",
+      "kind": "official_body"
+    },
+    "ref2014": {
+      "title": "Halkoylaması sonuçları, 2014-06-29",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/ilan-2.doc",
+      "kind": "official_body"
+    },
+    "ref2020": {
+      "title": "Halkoylaması sonuçları, 2020-10-11",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2020_Secim_Sonuclari-6.zip",
+      "kind": "official_body"
+    },
+    "yerel1976": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1976-05-23",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131230114639592.pdf",
+      "kind": "official_body"
+    },
+    "yerel1980": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1980-06-01",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131230115907909.pdf",
+      "kind": "official_body"
+    },
+    "yerel1986": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1986-06-01",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131230122301766.pdf",
+      "kind": "official_body"
+    },
+    "yerel1990": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1990-06-24",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131230132157261.pdf",
+      "kind": "official_body"
+    },
+    "yerel1994": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1994-06-19",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20140114133915472.pdf",
+      "kind": "official_body"
+    },
+    "yerel1998": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 1998-06-28",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20140102090146157.pdf",
+      "kind": "official_body"
+    },
+    "yerel2002": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 2002-06-30",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20140102091850485.pdf",
+      "kind": "official_body"
+    },
+    "yerel2010": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 2010-06-27",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2010yerel-7.zip",
+      "kind": "official_body"
+    },
+    "yerel2014": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 2014-06-29",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/sonuc-1-3.zip",
+      "kind": "official_body"
+    },
+    "yerel2018": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 2018-06-24",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/sonuc-8.zip",
+      "kind": "official_body"
+    },
+    "yerel2022": {
+      "title": "Yerel kuruluş organları genel seçimi sonuçları, 2022-12-25",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/SecimSonuclariResmiGazete-1.zip",
+      "kind": "official_body"
+    },
+    "yerel2026": {
+      "title": "6 Aralık 2026 Yerel Kuruluş Organları Genel Seçimi Takvimi",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2026/09/6-aralik-2026-yerel-kurulus-organlari-genel-secimi-ile-ilgili-takvim.pdf",
+      "kind": "official_body"
+    },
+    "yerelara2005": {
+      "title": "Yerel kuruluş organları ara seçim sonuçlarının ilanı, 2005-02-20",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/ilan5-1.doc",
+      "kind": "official_body"
+    },
+    "yerelara2013": {
+      "title": "Lefkoşa Türk Belediyesi Başkanlığı ve Meclis Üyeliği Ara Seçimi, 2013-04-07",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/tumsonuc-1.zip",
+      "kind": "official_body"
+    },
+    "yerelara2020": {
+      "title": "Duyuru No: 10, ihtiyar heyeti üyeliği ara seçimleri",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/Duyuru-No.10-Bos-olan-yerler-3.doc",
+      "kind": "official_body"
+    },
+    "yerelara2023": {
+      "title": "Muhtarlık ara seçim sonuçlarının ilanı, 2023-06-25",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2023-Muhtar-Ara-Secim-Sonuclarinin-Ilani.xlsx",
+      "kind": "official_body"
+    },
+    "yerelara2024": {
+      "title": "Aşağı Dikmen Mahallesi muhtarlık ara seçim sonuçları, 2024-06-30",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/ASAGI_DIKMEN_MAHALLESI_MUHTARLIK_SECIM_SONUCLARI-1.pdf",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Kuzey Kıbrıs Türk Cumhuriyeti",
+      "name_en": "Turkish Republic of Northern Cyprus (Turkish Federated State of Cyprus, 1975-1983)",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "source": "mfa-history"
+    },
+    {
+      "key": "ilce",
+      "name": "İlçeler (milletvekilliği seçim bölgeleri)",
+      "name_en": "Districts (Assembly constituencies)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "cy-nc.ilce",
+      "elects": false,
+      "source": "l5-1976",
+      "counts": [
+        {
+          "date": "1976-06-20",
+          "value": 3,
+          "source": "mv1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/20131224141119839.pdf (Lefkoşa, Mağusa, Girne)"
+        },
+        {
+          "date": "1998-12-06",
+          "value": 5,
+          "source": "mv1998",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/millet1998ss.pdf (Lefkoşa, Gazi Mağusa, Girne, Güzelyurt, İskele)"
+        },
+        {
+          "date": "2018-01-07",
+          "value": 6,
+          "source": "mv2018",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/2018-Milletvekilligi-Secim-sonuclari-ilani.xlsx (Lefkoşa, Gazimağusa, Girne, Güzelyurt, İskele, Lefke)"
+        }
+      ]
+    },
+    {
+      "key": "belediye",
+      "name": "Belediyeler",
+      "name_en": "Municipalities",
+      "parent": "ilce",
+      "polity_kind": "municipality",
+      "scheme": "cy-nc.belediye",
+      "source": "l5-1976",
+      "counts": [
+        {
+          "date": "2018-06-24",
+          "value": 28,
+          "source": "yerel2018",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/sonuc-8.zip (28 BELEDIYESI_BMU_SECIM_SONUCLARI files)"
+        },
+        {
+          "date": "2022-12-25",
+          "value": 18,
+          "source": "yerel2022",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/03/SecimSonuclariResmiGazete-1.zip (18 Belediye Başkanı rows across the six district sheets)"
+        }
+      ]
+    },
+    {
+      "key": "muhtarlik",
+      "name": "Köy ve mahalle muhtarlıkları",
+      "name_en": "Villages and urban quarters (muhtarlık)",
+      "parent": "ilce",
+      "polity_kind": "submunicipal",
+      "scheme": "cy-nc.muhtarlik",
+      "source": "l5-1976"
+    }
+  ],
+  "classes": [
+    {
+      "key": "meclis",
+      "tier": "national",
+      "name": "Cumhuriyet Meclisi (1976-1983: Kıbrıs Türk Federe Devleti Yasama Meclisi) genel seçimleri",
+      "name_en": "Assembly of the Republic (Legislative Assembly of the Turkish Federated State of Cyprus, 1976-1983)",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1976-06-20",
+      "earliest_record": "1976-06-20",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.ilce"
+        ],
+        "fine": [
+          "cy-nc.ilce",
+          "cy-nc.sandik"
+        ]
+      },
+      "finest_note": "Party and candidate votes by district from 1976; by ballot box from 2009.",
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 10(1), 52, 133A, 134)",
+      "note": "Members are elected for five years from open party lists in multi-member districts (the ilçeler), each district's seats set by population before every election (Law 5/1976 art. 52); seats go by d'Hondt to parties over 5% of the national valid vote (art. 133A), and voters may mark candidates across lists. The Federated Assembly had 40 seats (1976, 1981); the Assembly of the Republic has had 50 since 1985. Between the proclamation of 15 November 1983 and the 1985 election the Assembly elected in 1981, enlarged by appointed members, sat as the Constituent Assembly; no election chose it.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "CY-NC"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (art. 10(1): five-year term; art. 12: renewal by the Assembly or the President)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Milletvekilliği Seçimleri",
+          "url": "https://ysk.gov.ct.tr/milletvekilligi/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-06-20",
+          "last_date": "2023-06-25",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-mv",
+          "role": "administers",
+          "evidence": "Declarations of results for every election since 1976 (scanned Official Gazette notices to 2003), with ballot-box files from 2009"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-06-20",
+          "election_kind": "general",
+          "contests": 3,
+          "seats": 40,
+          "source": "mv1976",
+          "quote": "20 Haziran, 1976 tarihinde yapılan Milletvekilliği seçimi sonuçları",
+          "note": "First election of the Legislative Assembly of the Turkish Federated State of Cyprus, in three districts (Lefkoşa, Mağusa, Girne)."
+        },
+        {
+          "date": "1981-06-28",
+          "election_kind": "general",
+          "contests": 3,
+          "seats": 40,
+          "source": "mv1981",
+          "quote": "28 Haziran 1981 tarihinde yapılan milletvekilliği seçimi sonuçları",
+          "note": "Lefkoşa, Mağusa, and Girne districts. The Assembly elected in 1981 proclaimed the TRNC on 15 November 1983 and, enlarged by appointed members, sat as the Constituent Assembly until 1985."
+        },
+        {
+          "date": "1985-06-23",
+          "election_kind": "general",
+          "contests": 3,
+          "seats": 50,
+          "source": "mv1985",
+          "quote": "23 Haziran 1985 tarihinde yapılan milletvekilliği seçimi sonuçları",
+          "note": "First election of the Assembly of the Republic under the 1985 Constitution."
+        },
+        {
+          "date": "1990-05-06",
+          "election_kind": "general",
+          "contests": 3,
+          "seats": 50,
+          "source": "mv1990",
+          "quote": "6 Mayıs, 1990 tarihinde yapılan milletvekilliği seçimi sonuçları"
+        },
+        {
+          "date": "1993-12-12",
+          "election_kind": "general",
+          "contests": 3,
+          "seats": 50,
+          "source": "mv1993",
+          "quote": "12 Aralık 1993 tarihinde yapılan Milletvekilliği genel seçimlerinde",
+          "note": "Early election."
+        },
+        {
+          "date": "1998-12-06",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 50,
+          "source": "mv1998",
+          "quote": "6 Aralık 1998 tarihinde yapılan milletvekilliği seçim sonuçları",
+          "note": "First election with Güzelyurt and İskele as districts of their own."
+        },
+        {
+          "date": "2003-12-14",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 50,
+          "source": "mv2003",
+          "quote": "14 Aralık 2003 tarihinde yapılan Milletvekilliği seçim sonuçları"
+        },
+        {
+          "date": "2005-02-20",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 50,
+          "source": "mv2005",
+          "quote": "20 Şubat 2005 tarihinde yapılacak \"2005 Milletvekilliği Genel Seçimleri\" için kesinleşen aday listeleri",
+          "note": "Early election, held with local by-elections; the candidate lists name five districts."
+        },
+        {
+          "date": "2009-04-19",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 50,
+          "source": "mv2009",
+          "quote": "19 Nisan 2009 tarihinde yapılan Milletvekilliği Erken Genel Seçimleri seçim sonuçları",
+          "note": "Early election."
+        },
+        {
+          "date": "2013-07-28",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 50,
+          "source": "mv2013",
+          "quote": "PARTİ / İLÇE,LEFKOŞA,G. MAĞUSA,GİRNE,GÜZELYURT,İSKELE",
+          "note": "Early election (secim_sonuclari2.xls)."
+        },
+        {
+          "date": "2018-01-07",
+          "election_kind": "general",
+          "contests": 6,
+          "seats": 50,
+          "source": "mv2018",
+          "quote": "7 Ocak 2018 tarihinde yapılan Milletvekilliği Erken Genel Seçimi sonuçları",
+          "note": "Early election; first with Lefke as a district of its own."
+        },
+        {
+          "date": "2022-01-23",
+          "election_kind": "general",
+          "contests": 6,
+          "seats": 50,
+          "source": "mv2022",
+          "note": "Early election; results by district and ballot box for Gazimağusa, Girne, Güzelyurt, Lefke, Lefkoşa, and İskele."
+        },
+        {
+          "date": "2026-12-06",
+          "election_kind": "general",
+          "source": "mv2026",
+          "quote": "2026 Milletvekilliği Erken Genel Seçimi",
+          "note": "Early election called by the Assembly, held on the same day as the local general elections."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "meclis_ara",
+      "tier": "national",
+      "name": "Cumhuriyet Meclisi ara seçimleri",
+      "name_en": "Assembly of the Republic by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1991-10-13",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.ilce"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (art. 14: by-elections)",
+      "note": "Vacant seats are filled at by-elections in the district concerned, usually held with another election.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CY-NC"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Milletvekilliği Seçimleri",
+          "url": "https://ysk.gov.ct.tr/milletvekilligi/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1991-10-13",
+          "last_date": "2023-06-25",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-mv",
+          "role": "administers",
+          "evidence": "Declarations of the 1991, 2006, 2010, and 2023 by-election results"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1991-10-13",
+          "election_kind": "by_election",
+          "contests": 3,
+          "seats": 12,
+          "source": "mvara1991",
+          "quote": "13 Ekim, 1991 tarihinde yapılan milletvekilliği ara seçimi sonuçları",
+          "note": "By-election for twelve seats (six in Lefkoşa, three each in Gazi Mağusa and Girne), held with local by-elections."
+        },
+        {
+          "date": "2006-06-25",
+          "election_kind": "by_election",
+          "contests": 2,
+          "seats": 2,
+          "source": "mvara2006",
+          "quote": "25 Haziran 2006 tarihinde yapılan Milletvekilliği Ara Seçimi sonuçları",
+          "note": "One seat each in Lefkoşa and Girne, held with the local general elections."
+        },
+        {
+          "date": "2010-06-27",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "mvara2010",
+          "quote": "27 Haziran 2010 tarihinde yapılan Milletvekilliği Ara Seçimi sonuçları",
+          "note": "One seat in Gazimağusa, held with the local general elections."
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "mvara2023",
+          "quote": "25 Haziran 2023 tarihinde yapılan Milletvekilliği Ara Seçimleri sonuçları",
+          "note": "One seat in Lefkoşa, held with local by-elections."
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 2
+    },
+    {
+      "key": "cumhurbaskani",
+      "tier": "national",
+      "name": "Cumhurbaşkanlığı seçimi (1976-1983: Kıbrıs Türk Federe Devleti Başkanlığı)",
+      "name_en": "President (President of the Turkish Federated State of Cyprus, 1976-1983)",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1976-06-20",
+      "earliest_record": "1976-06-20",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cy-nc.ilce"
+        ],
+        "fine": [
+          "cy-nc.sandik"
+        ]
+      },
+      "finest_note": "Votes by district from 1976; by ballot box from 2005.",
+      "source": "ysk-mevzuat",
+      "note": "Elected for five years by absolute majority of valid votes; failing one, the top two meet in a second round seven days later (Law 5/1976 art. 11(2)). A vacancy is filled by an election within 45 days (art. 13(1)).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CY-NC"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Top two on the Sunday seven days after the first round",
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 10(1), 11(2), 13(1))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Cumhurbaşkanlığı Seçimleri",
+          "url": "https://ysk.gov.ct.tr/cumhurbaskanligi/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-06-20",
+          "last_date": "2025-10-19",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-cb",
+          "role": "administers",
+          "evidence": "Declarations of results for every presidential election since 1976, with ballot-box files from 2005"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-06-20",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1976",
+          "note": "President of the Turkish Federated State of Cyprus, elected with the Assembly."
+        },
+        {
+          "date": "1981-06-28",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1981",
+          "note": "President of the Turkish Federated State of Cyprus."
+        },
+        {
+          "date": "1985-06-09",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1985",
+          "quote": "9 Haziran 1985 tarihinde yapılan Cumhurbaşkanlığı seçimi sonucu",
+          "note": "First TRNC presidential election."
+        },
+        {
+          "date": "1990-04-22",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1990"
+        },
+        {
+          "date": "1995-04-15",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1995",
+          "note": "No candidate won a majority."
+        },
+        {
+          "date": "1995-04-22",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb1995r2",
+          "note": "Second round between the top two."
+        },
+        {
+          "date": "2000-04-15",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2000",
+          "quote": "Ulusal Birlik Partisi adayı Sayın Dr. Derviş Eroğlu'nun adaylıktan çekilmesi ve aday sayısının bire inmesi nedeniyle",
+          "note": "No candidate won a majority; the runoff called for 22 April 2000 was stopped when the second candidate withdrew, and the Council declared the leading candidate elected on 20 April 2000."
+        },
+        {
+          "date": "2005-04-17",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2005",
+          "quote": "17 Nisan 2005 tarihinde yapılan 2005 Cumhurbaşkanlığı Seçim sonuçları"
+        },
+        {
+          "date": "2010-04-18",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2010",
+          "quote": "18 Nisan 2010 tarihinde yapılan Kuzey Kıbrıs Türk Cumhuriyeti Cumhurbaşkanlığı Seçimi"
+        },
+        {
+          "date": "2015-04-19",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2015",
+          "quote": "19 Nisan 2015 tarihinde yapılan Cumhurbaşkanlığı Seçim Sonuçları",
+          "note": "No candidate won a majority."
+        },
+        {
+          "date": "2015-04-26",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2015r2",
+          "quote": "26 Nisan 2015 tarihinde yapılan İkinci Tur Cumhurbaşkanlığı Seçim Sonuçları"
+        },
+        {
+          "date": "2020-10-11",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2020",
+          "quote": "11 EKİM 2020 CUMHURBAŞKANLIĞI SEÇİMİ",
+          "note": "Set for 26 April 2020 and postponed to 11 October because of the pandemic; held with a referendum. No candidate won a majority."
+        },
+        {
+          "date": "2020-10-18",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2020r2",
+          "note": "Second round between the top two."
+        },
+        {
+          "date": "2025-10-19",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cb2025",
+          "note": "Won outright in the first round."
+        }
+      ],
+      "est_votes": 140000,
+      "effort": 2
+    },
+    {
+      "key": "halkoylamasi",
+      "tier": "national",
+      "name": "Halkoylaması",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1975-06-08",
+      "earliest_record": "1975-06-08",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "cy-nc.ilce"
+        ],
+        "fine": [
+          "cy-nc.sandik"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (art. 11(4): polling on the fourth Sunday after the call, or with a general election within three months)",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CY-NC"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Halkoylaması (Referandum)",
+          "url": "https://ysk.gov.ct.tr/halkoylamasi-referandum/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1975-06-08",
+          "last_date": "2020-10-11",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-ref",
+          "role": "administers",
+          "evidence": "Results of the 1975, 1985, 2004, 2014, and 2020 referendums, by district from 2004 and by ballot box from 2014"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1975-06-08",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref1975",
+          "note": "Constitution of the Turkish Federated State of Cyprus."
+        },
+        {
+          "date": "1985-05-05",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref1985",
+          "note": "Constitution of the Turkish Republic of Northern Cyprus."
+        },
+        {
+          "date": "2004-04-24",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref2004",
+          "note": "The United Nations settlement plan for Cyprus, voted on the same day as in the south; results by district."
+        },
+        {
+          "date": "2014-06-29",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref2014",
+          "note": "Constitutional amendments, held with the local general elections."
+        },
+        {
+          "date": "2020-10-11",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "ref2020",
+          "note": "Constitutional amendment, held with the presidential election; rejected by 53,994 to 53,711."
+        }
+      ],
+      "est_votes": 120000,
+      "effort": 1
+    },
+    {
+      "key": "belediye_baskani",
+      "tier": "belediye",
+      "name": "Belediye başkanlığı seçimleri",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "first_held": "1976-05-23",
+      "earliest_record": "1976-05-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.belediye"
+        ],
+        "fine": [
+          "cy-nc.sandik"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 5, 10(3), 11(3))",
+      "note": "Each municipality elects its mayor by plurality for four years, with its council and the muhtars and councils of elders, at the local general elections (yerel kuruluş organları genel seçimleri).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (art. 10(3): four-year term; art. 11(3): first Sunday of December from Law 55/2026)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Yerel Seçimler",
+          "url": "https://ysk.gov.ct.tr/yerel-secimler/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-05-23",
+          "last_date": "2024-06-30",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-yerel",
+          "role": "administers",
+          "evidence": "Declarations of every local general election since 1976, with spreadsheets from 2010 and ballot-box files from 2013"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-05-23",
+          "election_kind": "local",
+          "source": "yerel1976",
+          "quote": "23 Mayıs 1976 tarihinde yapılan yerel kuruluş organları seçimleri sonuçları"
+        },
+        {
+          "date": "1980-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1986-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1990-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-06-28",
+          "election_kind": "local",
+          "source": "yerel1998",
+          "quote": "28 Haziran 1998 tarihinde yapılan Yerel Kuruluş Organları Genel Seçimleri sonuçları"
+        },
+        {
+          "date": "2002-06-30",
+          "election_kind": "local"
+        },
+        {
+          "date": "2006-06-25",
+          "election_kind": "local",
+          "note": "Held with Assembly by-elections in Lefkoşa and Girne."
+        },
+        {
+          "date": "2010-06-27",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2010",
+          "note": "Held with an Assembly by-election in Gazimağusa."
+        },
+        {
+          "date": "2014-06-29",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2014",
+          "note": "Held with a constitutional referendum."
+        },
+        {
+          "date": "2018-06-24",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2018"
+        },
+        {
+          "date": "2022-12-25",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "yerel2022",
+          "note": "First election after the local government reform cut the municipalities from 28 to 18; set for June 2022 and postponed to December."
+        },
+        {
+          "date": "2026-12-06",
+          "election_kind": "local",
+          "source": "yerel2026",
+          "quote": "6 Aralık 2026 Yerel Kuruluş Organları Genel Seçimi",
+          "note": "First local general election on the first Sunday of December (Law 5/1976 art. 11(3) as amended by Law 55/2026); held with the early Assembly election."
+        },
+        {
+          "date": "2013-04-07",
+          "election_kind": "by_election",
+          "source": "yerelara2013",
+          "note": "Mayor of Lefkoşa.",
+          "contests": 1
+        }
+      ],
+      "est_votes": 130000,
+      "effort": 3
+    },
+    {
+      "key": "belediye_meclisi",
+      "tier": "belediye",
+      "name": "Belediye meclisi üyeliği seçimleri",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1976-05-23",
+      "earliest_record": "1976-05-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.belediye"
+        ],
+        "fine": [
+          "cy-nc.sandik"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 5, 10(3), 52(2))",
+      "note": "Councils are elected for four years from party lists and independents in each municipality, the size of each council set by population (Law 5/1976 art. 52).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 10(3), 11(3))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Yerel Seçimler",
+          "url": "https://ysk.gov.ct.tr/yerel-secimler/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-05-23",
+          "last_date": "2022-12-25",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-yerel",
+          "role": "administers",
+          "evidence": "Declarations of every local general election since 1976, with spreadsheets from 2010"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-05-23",
+          "election_kind": "local",
+          "source": "yerel1976",
+          "quote": "23 Mayıs 1976 tarihinde yapılan yerel kuruluş organları seçimleri sonuçları"
+        },
+        {
+          "date": "1980-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1986-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1990-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-06-28",
+          "election_kind": "local",
+          "source": "yerel1998",
+          "quote": "28 Haziran 1998 tarihinde yapılan Yerel Kuruluş Organları Genel Seçimleri sonuçları"
+        },
+        {
+          "date": "2002-06-30",
+          "election_kind": "local"
+        },
+        {
+          "date": "2006-06-25",
+          "election_kind": "local",
+          "note": "Held with Assembly by-elections in Lefkoşa and Girne."
+        },
+        {
+          "date": "2010-06-27",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2010",
+          "note": "Held with an Assembly by-election in Gazimağusa."
+        },
+        {
+          "date": "2014-06-29",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2014",
+          "note": "Held with a constitutional referendum."
+        },
+        {
+          "date": "2018-06-24",
+          "election_kind": "local",
+          "contests": 28,
+          "source": "yerel2018"
+        },
+        {
+          "date": "2022-12-25",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "yerel2022",
+          "note": "First election after the local government reform cut the municipalities from 28 to 18; set for June 2022 and postponed to December."
+        },
+        {
+          "date": "2026-12-06",
+          "election_kind": "local",
+          "source": "yerel2026",
+          "quote": "6 Aralık 2026 Yerel Kuruluş Organları Genel Seçimi",
+          "note": "First local general election on the first Sunday of December (Law 5/1976 art. 11(3) as amended by Law 55/2026); held with the early Assembly election."
+        },
+        {
+          "date": "1991-10-13",
+          "election_kind": "by_election",
+          "source": "mvara1991",
+          "note": "Council seats in Güzelyurt, among other local by-elections."
+        },
+        {
+          "date": "2013-04-07",
+          "election_kind": "by_election",
+          "source": "yerelara2013",
+          "note": "Council of Lefkoşa.",
+          "contests": 1
+        }
+      ],
+      "est_votes": 130000,
+      "effort": 3
+    },
+    {
+      "key": "muhtar",
+      "tier": "muhtarlik",
+      "name": "Muhtarlık seçimleri",
+      "name_en": "Village and quarter headmen (muhtar)",
+      "category": "executive",
+      "goal": "local",
+      "first_held": "1976-05-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.muhtarlik"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 5, 10(3), 13(2))",
+      "note": "Each village and urban quarter elects a muhtar, without party labels, for four years at the local general elections; vacancies go to by-elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "muhtar"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 10(3), 11(3))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Yerel Seçimler",
+          "url": "https://ysk.gov.ct.tr/yerel-secimler/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-05-23",
+          "last_date": "2024-06-30",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-yerel",
+          "role": "administers",
+          "evidence": "Declarations of every local general election since 1976 and of the muhtar by-elections of 2005, 2023, and 2024"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-05-23",
+          "election_kind": "local",
+          "source": "yerel1976",
+          "quote": "23 Mayıs 1976 tarihinde yapılan yerel kuruluş organları seçimleri sonuçları"
+        },
+        {
+          "date": "1980-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1986-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1990-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-06-28",
+          "election_kind": "local",
+          "source": "yerel1998",
+          "quote": "28 Haziran 1998 tarihinde yapılan Yerel Kuruluş Organları Genel Seçimleri sonuçları"
+        },
+        {
+          "date": "2002-06-30",
+          "election_kind": "local"
+        },
+        {
+          "date": "2006-06-25",
+          "election_kind": "local",
+          "note": "Held with Assembly by-elections in Lefkoşa and Girne."
+        },
+        {
+          "date": "2010-06-27",
+          "election_kind": "local",
+          "note": "Held with an Assembly by-election in Gazimağusa."
+        },
+        {
+          "date": "2014-06-29",
+          "election_kind": "local",
+          "note": "Held with a constitutional referendum."
+        },
+        {
+          "date": "2018-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "2022-12-25",
+          "election_kind": "local",
+          "contests": 179,
+          "source": "yerel2022",
+          "note": "First election after the local government reform cut the municipalities from 28 to 18; set for June 2022 and postponed to December."
+        },
+        {
+          "date": "2026-12-06",
+          "election_kind": "local",
+          "source": "yerel2026",
+          "quote": "6 Aralık 2026 Yerel Kuruluş Organları Genel Seçimi",
+          "note": "First local general election on the first Sunday of December (Law 5/1976 art. 11(3) as amended by Law 55/2026); held with the early Assembly election."
+        },
+        {
+          "date": "1991-10-13",
+          "election_kind": "by_election",
+          "source": "mvara1991",
+          "note": "Serhatköy, among other local by-elections."
+        },
+        {
+          "date": "2005-02-20",
+          "election_kind": "by_election",
+          "source": "yerelara2005",
+          "note": "Held with the early Assembly election."
+        },
+        {
+          "date": "2023-06-25",
+          "election_kind": "by_election",
+          "source": "yerelara2023",
+          "note": "Lefkoşa quarters, held with an Assembly by-election."
+        },
+        {
+          "date": "2024-06-30",
+          "election_kind": "by_election",
+          "source": "yerelara2024",
+          "note": "Aşağı Dikmen quarter.",
+          "contests": 1
+        }
+      ],
+      "est_votes": 130000,
+      "effort": 4
+    },
+    {
+      "key": "ihtiyar_heyeti",
+      "tier": "muhtarlik",
+      "name": "İhtiyar heyeti üyeliği seçimleri",
+      "name_en": "Village and quarter councils of elders (ihtiyar heyeti)",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1976-05-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cy-nc.muhtarlik"
+        ]
+      },
+      "source": "l5-1976",
+      "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 5, 10(3), 14(3))",
+      "note": "Each village and quarter elects the members of its council of elders, without party labels, for four years.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "source": "l5-1976",
+          "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2026/10/5-1976.doc (arts. 10(3), 11(3))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Yüksek Seçim Kurulu, Yerel Seçimler",
+          "url": "https://ysk.gov.ct.tr/yerel-secimler/",
+          "format": "pdf (scanned Official Gazette notices to 2003), doc, xls, xlsx, zip",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1976-05-23",
+          "last_date": "2022-12-25",
+          "finest": "cy-nc.sandik",
+          "source": "ysk-yerel",
+          "role": "administers",
+          "evidence": "Declarations of every local general election since 1976"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-05-23",
+          "election_kind": "local",
+          "source": "yerel1976",
+          "quote": "23 Mayıs 1976 tarihinde yapılan yerel kuruluş organları seçimleri sonuçları"
+        },
+        {
+          "date": "1980-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1986-06-01",
+          "election_kind": "local"
+        },
+        {
+          "date": "1990-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "local"
+        },
+        {
+          "date": "1998-06-28",
+          "election_kind": "local",
+          "source": "yerel1998",
+          "quote": "28 Haziran 1998 tarihinde yapılan Yerel Kuruluş Organları Genel Seçimleri sonuçları"
+        },
+        {
+          "date": "2002-06-30",
+          "election_kind": "local"
+        },
+        {
+          "date": "2006-06-25",
+          "election_kind": "local",
+          "note": "Held with Assembly by-elections in Lefkoşa and Girne."
+        },
+        {
+          "date": "2010-06-27",
+          "election_kind": "local",
+          "note": "Held with an Assembly by-election in Gazimağusa."
+        },
+        {
+          "date": "2014-06-29",
+          "election_kind": "local",
+          "note": "Held with a constitutional referendum."
+        },
+        {
+          "date": "2018-06-24",
+          "election_kind": "local"
+        },
+        {
+          "date": "2022-12-25",
+          "election_kind": "local",
+          "note": "First election after the local government reform cut the municipalities from 28 to 18; set for June 2022 and postponed to December."
+        },
+        {
+          "date": "2026-12-06",
+          "election_kind": "local",
+          "source": "yerel2026",
+          "quote": "6 Aralık 2026 Yerel Kuruluş Organları Genel Seçimi",
+          "note": "First local general election on the first Sunday of December (Law 5/1976 art. 11(3) as amended by Law 55/2026); held with the early Assembly election."
+        },
+        {
+          "date": "2005-02-20",
+          "election_kind": "by_election",
+          "source": "yerelara2005",
+          "note": "Held with the early Assembly election."
+        },
+        {
+          "date": "2020-10-11",
+          "election_kind": "by_election",
+          "source": "yerelara2020",
+          "note": "Six councils in Gazimağusa, Girne, and İskele, held with the presidential election.",
+          "contests": 6
+        }
+      ],
+      "est_votes": 130000,
+      "effort": 4
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "Yargıçlar",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ysk-mevzuat",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Supreme Election Council lists only three kinds of election (presidential, Assembly, and local bodies) besides referendums; no judicial office is elected.",
+      "match": []
+    },
+    {
+      "key": "nominating",
+      "tier": "national",
+      "name": "Siyasal partilerin aday belirlemesi",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ysk-mevzuat",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties set their candidates under their own rules and hand the lists to the Council (Law 5/1976 art. 55); the Council runs no primaries and publishes no party selections.",
+      "match": []
+    }
+  ]
+}
