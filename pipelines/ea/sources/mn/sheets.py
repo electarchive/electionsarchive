@@ -9,12 +9,17 @@ import xlrd
 from ea import raw
 
 SOURCE = "mn.gec"
-BASE = "browser://20261116-225258-c41682/"
+BASE = "https://e-election.mn/storage/uploads/process/"
+EARLIER_BASE = "browser://20261116-225258-c41682/"
 
 
 def url(name: str) -> str:
-    """The cache key of a workbook, named by the first eight characters of its file name."""
-    found = [key for key in raw.keys(SOURCE) if key.startswith(BASE) and key[len(BASE) :].startswith(name[:8])]
+    """The cache key of a workbook, named by the first eight characters of its file name. Workbooks first cached from a
+    browser session carry a browser key; those cached from the portal's own address carry that address."""
+    keys = raw.keys(SOURCE)
+    found = [key for key in keys if key.startswith(BASE) and key[len(BASE) :].startswith(name[:8])]
+    if not found:
+        found = [key for key in keys if key.startswith(EARLIER_BASE) and key[len(EARLIER_BASE) :].startswith(name[:8])]
     if len(found) != 1:
         raise LookupError(f"{name}: {found}")
     return found[0]
