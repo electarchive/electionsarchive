@@ -12,6 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset
+from ea.sources.br.identity import namesakes
 from ea.sources.br.tse import UFS, proper
 from ea.sources.br.tse_history import ELECTED, WITHDRAWN, party_key
 from ea.store import DATA, connect
@@ -556,6 +557,30 @@ def slug(text: str) -> str:
     return "-".join("".join(character if character.isalnum() else " " for character in folded).split())
 
 
+def person_keys() -> pl.DataFrame:
+    """The person key of each candidacy with a birth date in every year, as `emit` builds it before rekeying
+    namesakes."""
+    frames = []
+    for year in YEARS:
+        path = PARSED / str(year) / "candidates.parquet"
+        if not path.exists():
+            raise FileNotFoundError(f"{path} is missing; parse every year before emitting one")
+        frames.append(
+            pl.read_parquet(path, columns=["municipality", "candidate", "name", "birth"])
+            .filter(pl.col("birth").is_not_null())
+            .unique(["municipality", "candidate"])
+            .select(
+                year=pl.lit(year, pl.Int32),
+                place="municipality",
+                candidate=pl.col("candidate").cast(pl.String),
+                key=pl.struct("name", "birth").map_elements(
+                    lambda row: f"{slug(row['name'])}|{row['birth']}", return_dtype=pl.String
+                ),
+            )
+        )
+    return pl.concat(frames)
+
+
 def emit() -> Path:
     year = int(os.environ["BR_YEAR"])
     folder = PARSED / str(year)
@@ -850,6 +875,7 @@ def emit() -> Path:
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         contests: dict[str, UUID] = {}
+        moved = namesakes()
         shared = set(
             candidates.group_by("candidate")
             .agg(pl.col("municipality").n_unique())
@@ -962,6 +988,8 @@ def emit() -> Path:
                     if row["candidate"] in shared
                     else f"{year}:{row['candidate']}"
                 )
+                if row["birth"] is not None:
+                    person_key = moved.get((year, municipality, str(row["candidate"])), person_key)
                 if person_key not in persons:
                     reused = uuid5(NAMESPACE, f"external_id:{SOURCE}.person\x1f{person_key}") in cs.retired
                     persons[person_key] = cs.key(f"{SOURCE}.person", f"{person_key}|2" if reused else person_key)

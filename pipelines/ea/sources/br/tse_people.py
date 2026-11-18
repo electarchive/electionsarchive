@@ -9,6 +9,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.br import municipais, tse_history
+from ea.sources.br.identity import CANDIDACY, TITLES, identities, unambiguous
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_people"
@@ -72,69 +73,14 @@ def parse() -> None:
     titles = pl.concat(frames).unique()
     checked = titles.select("title").unique().filter(pl.col("title").map_elements(valid, return_dtype=pl.Boolean))
     print(f"titles {titles['title'].n_unique()}, passing their check digits {checked.height}")
-    titles.join(checked, on="title").write_parquet(PARSED / "titles.parquet")
-
-
-CANDIDACY = ["year", "place", "candidate"]
-
-
-def components(nodes: int, edges: pl.DataFrame) -> list[int]:
-    """Label each node with the smallest node it connects to through the `node` and `root` columns of `edges`."""
-    parent = list(range(nodes))
-
-    def find(node: int) -> int:
-        while parent[node] != node:
-            parent[node] = parent[parent[node]]
-            node = parent[node]
-        return node
-
-    for node, root in edges.iter_rows():
-        first, second = find(node), find(root)
-        if first != second:
-            parent[max(first, second)] = min(first, second)
-    return [find(node) for node in range(nodes)]
-
-
-def identities(titles: pl.DataFrame) -> pl.DataFrame:
-    """Join candidacies into one identity by exact keys only.
-
-    Two candidacies are one person when they carry the same voter title and the same tax number, the same voter
-    title and the same name and birth date, or the same tax number and the same birth date. A title the rosters give
-    at most one tax number then joins all its candidacies when each year's candidacies under it are already one
-    identity, so a title that two people share in one year stays apart.
-    """
-    nodes = titles.select(CANDIDACY).unique().sort(CANDIDACY).with_row_index("node")
-    rows = titles.join(nodes, on=CANDIDACY)
-
-    def edges(frame: pl.DataFrame, keys: list[str]) -> pl.DataFrame:
-        return (
-            frame.drop_nulls(keys)
-            .select("node", root=pl.col("node").min().over(keys))
-            .filter(pl.col("node") != pl.col("root"))
-        )
-
-    exact = pl.concat(
-        [edges(rows, ["title", "cpf"]), edges(rows, ["title", "name", "birth"]), edges(rows, ["cpf", "birth"])]
-    )
-    label = pl.Series("identity", components(nodes.height, exact), pl.UInt32)
-    rows = rows.with_columns(identity=label.gather(rows["node"]))
-    split = rows.group_by("title", "year").agg(pl.col("identity").n_unique()).filter(pl.col("identity") > 1)
-    single = (
-        rows.group_by("title")
-        .agg(pl.col("cpf").drop_nulls().n_unique())
-        .filter(pl.col("cpf") <= 1)
-        .join(split, on="title", how="anti")
-        .select("title")
-    )
-    title = edges(rows.join(single, on="title"), ["title"])
-    label = pl.Series("identity", components(nodes.height, pl.concat([exact, title])), pl.UInt32)
-    return nodes.with_columns(identity=label.gather(nodes["node"])).drop("node")
+    titles.join(checked, on="title").write_parquet(TITLES)
 
 
 def plan(titles: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
     """Group the persons of the held candidacies by identity, survivor first, and write what the merge skips."""
-    ambiguous = titles.group_by(CANDIDACY).agg(pl.col("title").n_unique()).filter(pl.col("title") > 1)
-    titles = titles.join(ambiguous.select(CANDIDACY), on=CANDIDACY, how="anti")
+    candidacies = titles.select(CANDIDACY).unique().height
+    titles = unambiguous(titles)
+    ambiguous = candidacies - titles.select(CANDIDACY).unique().height
     joined = held.join(titles.unique(CANDIDACY, keep="first", maintain_order=True), on=CANDIDACY).join(
         identities(titles), on=CANDIDACY
     )
@@ -155,7 +101,7 @@ def plan(titles: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
         f"titles {people.height}, identities merging {merging.height}, "
         f"titles split between identities {skipped.height}, "
         f"of which with several tax numbers {skipped.filter(pl.col('cpfs') > 1).height}, "
-        f"persons in several identities {split.height}, candidacies with two titles {ambiguous.height}"
+        f"persons in several identities {split.height}, candidacies with two titles {ambiguous}"
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     split.write_parquet(PARSED / "split.parquet")
@@ -179,7 +125,7 @@ def plan(titles: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
 
 
 def emit() -> Path:
-    titles = pl.read_parquet(PARSED / "titles.parquet")
+    titles = pl.read_parquet(TITLES)
     with connect() as conn:
         held = pl.DataFrame(
             conn.execute(
