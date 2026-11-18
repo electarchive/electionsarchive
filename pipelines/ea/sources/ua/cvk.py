@@ -979,7 +979,7 @@ def unit_for(p: Package, e_day: date, precinct: str, district: int, units: dict[
 TVO_SCHEME = "ua.tvo"
 
 
-CLOSED_TVO = "ua.tvo.rada"  # the districts of the 2006 and 2007 elections, apart from the presidential ones
+CLOSED_TVO = "ua.tvo_rada"  # the districts of the 2006 and 2007 elections, apart from the presidential ones
 
 
 def tvo(plan: str, district: int) -> str:
